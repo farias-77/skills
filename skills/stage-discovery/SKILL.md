@@ -35,11 +35,19 @@ On open:
 1. Derive the slug: `YYYY-MM-DD-<short-kebab-name>`.
 2. Create the workstream folder at the workspace's designs root (the
    consuming project's `CLAUDE.md` says where designs live) and the state
-   file: `designs-root/<slug>/.state.md` with `stage: discovery`.
-3. Start `00-discovery/notes.md` **on the first turn** — the interview
-   notes are written as the conversation happens, so a dead session loses
-   nothing and resume is just re-reading them. Notes are a working file:
-   they are deleted when the stage closes (see Lifecycle).
+   file: `designs-root/<slug>/.state.md` with `wave: (pending cut)` and
+   `stage: discovery`.
+3. Start `notes.md` at the workstream root **on the first turn** — the
+   interview notes are written as the conversation happens, so a dead
+   session loses nothing and resume is just re-reading them. When the wave
+   cut is approved, the notes move into wave 1's `00-discovery/`. Notes
+   are a working file: deleted when the stage closes (see Lifecycle).
+4. **Create the workstream's Project in Linear — via the Linear MCP, with
+   NO issues.** The Project is the founder's portfolio view of the
+   workstream (name = the workstream title, description = the one-line
+   frame); issues never live here — they are born in GitHub at planning.
+   If the Linear MCP is not configured in this workspace, say so once and
+   continue — a tracker mirror never blocks a stage.
 
 ## Breaking into waves
 
@@ -57,8 +65,29 @@ A large demand does not enter whole. Propose a cut into **waves**:
   as direction. Knowing the destination is what lets the design build
   wave 1 extensible in the right places instead of guessing.
 
-The founder approves the cut before the interview goes deep. This
-workstream builds wave 1; the wave map travels in the blueprint.
+The founder approves the cut before the interview goes deep. When it is
+approved, **all wave folders are born at once**, named
+`wNN-<what-it-delivers>` (order prefix + a 2-4 word kebab slug of what the
+wave ships):
+
+```
+designs-root/2026-08-15-workspace-invites/
+├── .state.md                      # wave: w01-invite-by-email · stage: discovery
+├── w01-invite-by-email/           # this wave — the full pipeline runs here
+│   ├── blueprint.html             # one blueprint PER WAVE (each wave runs all stages)
+│   └── 00-discovery/              # stage folders, numbered in pipeline order
+├── w02-resend-and-revoke/
+│   └── README.md                  # one page: what this wave builds, written NOW
+└── w03-bulk-csv-invites/
+    └── README.md
+```
+
+Each future wave starts with only a `README.md` — one page, written during
+the cut, describing what that wave delivers and its rough scope. **The
+README is the seed of that wave's discovery**: when a wave closes (stage
+7), the closure suggests opening the next one on the spot, and its
+discovery starts from the README plus what the previous wave shipped —
+next waves are a queue that moves, not a parking lot.
 
 ## The interview
 
@@ -172,13 +201,14 @@ Delete or rewrite any question that:
 ## Writing the documents
 
 Write only when the coverage map is all Clear and the playback got its
-explicit "that's it". Two files, from the templates — stage folders are
-numbered so they sort in pipeline order:
+explicit "that's it". Two files inside the current wave's folder, from the
+templates — stage folders are numbered so they sort in pipeline order:
 
-- `00-discovery/pr-faq.md` — [templates/pr-faq.md](templates/pr-faq.md).
+- `wNN-<wave>/00-discovery/pr-faq.md` —
+  [templates/pr-faq.md](templates/pr-faq.md).
   The product narrated: press release, external FAQ, internal FAQ, what we
   are NOT building, and what would have to be true.
-- `00-discovery/user-stories.md` —
+- `wNN-<wave>/00-discovery/user-stories.md` —
   [templates/user-stories.md](templates/user-stories.md). Stories with IDs
   (`S-001`, `S-002`, ...), acceptance criteria in EARS form (`WHEN
   <condition>, the system SHALL <behavior>`) with IDs
@@ -234,18 +264,22 @@ report without the enumeration is invalid and gets re-dispatched.
 
 ## The blueprint
 
-One artifact per workstream, one URL from discovery to closure. Copy
-[assets/blueprint.html](assets/blueprint.html), fill only the `BLUEPRINT`
-data object (never the shell), publish, and keep republishing the same
-file path at every later stage. Discovery fills four tabs: **Overview**
-(the frame, the wave map), **PR-FAQ**, **User Stories**, **Inferred &
-Open Points**.
+One artifact **per wave** (each wave runs the whole pipeline), one URL
+from its discovery to its closure. Copy
+[assets/blueprint.html](assets/blueprint.html) to
+`wNN-<wave>/blueprint.html`, fill only the `BLUEPRINT` data object (never
+the shell), publish, and keep republishing the same file path at every
+later stage — the stage tabs light up as the wave advances. Discovery
+fills the **Overview** (the frame, the wave map — which shows ALL waves,
+so any wave's blueprint locates itself in the whole) and the three
+**Discovery** sections: PR-FAQ, User Stories, What was inferred.
 
 ## Closing
 
 Present the blueprint URL and ask for review. Approval is explicit —
 silence, or a loose "looks good" without reading, does not close the
-stage. On approval: mark `.state.md` `stage: design`, commit the
+stage. On approval: mark `.state.md` `stage: design`, move the Linear
+Project to its design status (if the MCP is available), commit the
 workstream folder, and hand off to `stage-design`. On "approved with
 fixes": apply, re-run the review round, close. On rejection: the reasons
 re-open the interview.
@@ -254,11 +288,12 @@ re-open the interview.
 
 Working files die with the stage; the record survives it.
 
-- **Working (deleted at stage close):** `00-discovery/notes.md`,
+- **Working (deleted at stage close):** `notes.md`,
   `00-discovery/reviews.md`, the blind readers' outputs.
-- **Permanent:** the blueprint (the artifact that accumulates the whole
-  workstream, stage by stage), `00-discovery/pr-faq.md`,
-  `00-discovery/user-stories.md`, and `.state.md`.
+- **Permanent:** the wave's blueprint (the artifact that accumulates the
+  wave, stage by stage), `00-discovery/pr-faq.md`,
+  `00-discovery/user-stories.md`, the future waves' READMEs, and
+  `.state.md`.
 
 ## Resuming
 

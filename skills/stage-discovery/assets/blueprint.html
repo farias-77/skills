@@ -1,283 +1,1260 @@
 <title>Workstream blueprint</title>
 
 <!--
-  FIXED BLUEPRINT SHELL — one artifact per workstream, one URL from discovery to
-  closure. Discovery creates the file from this shell; every later stage
-  fills its own key in `const BLUEPRINT` and republishes the SAME file path.
+  FIXED BLUEPRINT SHELL — one per workstream wave, same URL from start to
+  finish: discovery creates the file from this shell; each stage fills its
+  own key in BLUEPRINT and republishes the SAME file path.
 
-  How to use: copy this file and replace ONLY the BLUEPRINT object between
-  the DATA / END DATA markers. Never edit the CSS or the render functions —
-  the identical shell across workstreams is what lets the reader find
-  everything without searching.
+  How to use: copy this file and replace ONLY the `const BLUEPRINT` object
+  (between the DATA / END OF DATA markers). Never edit the CSS or the
+  render code — the identical shell across workstreams is what lets the
+  reader find everything without searching.
 
-  Tabs appear when their data key exists: discovery fills `overview`,
-  `prfaq`, `stories`, `inferred`. Later stages register their tabs in
-  TAB_REGISTRY (each stage's skill documents its data contract).
-
-  Theme: opens by the reader's clock (17h-05h dark, otherwise light) and
-  the button toggles the `.dark` class. Do not use prefers-color-scheme —
-  the host stamps its theme after this script runs. Diagrams are HTML/CSS
-  passed as strings in the data; text fields accept inline HTML
-  (<b>, <code>, <br>).
+  Tab data contracts live with the stage that fills them (each stage skill
+  documents its key). Rules: the theme opens by the READER's clock (17h-05h
+  dark, light otherwise) and the button toggles the `.dark` class; never
+  prefers-color-scheme (the host stamps its theme after this script runs).
+  NEVER mermaid: diagrams are HTML/CSS built with this shell's primitives
+  (.diagram/.flow/.box/.block/.arrow/.down/.group/.branches), passed as
+  strings in the data. Text fields accept inline HTML (<b>, <code>).
 -->
 
 <style>
   :root {
-    --ground:#F7F7F4; --surface:#FFFFFF; --surface-2:#EFEFEA;
-    --line:#E3E3DC; --line-2:#CFCFC6;
-    --ink:#20211C; --ink-2:#5D5F55; --ink-3:#96988C;
-    --accent:#1F5F5B; --accent-ink:#174744; --band:#DDEEEC; --band-line:#B9D8D5;
-    --pending-bg:#FBF6EA; --pending-line:#E8D9B0;
+    --ground:#F7F6F4; --surface:#FFFFFF; --surface-2:#F1EFEC;
+    --line:#E8E5E1; --line-2:#D6D2CD;
+    --ink:#1A1917; --ink-2:#5C5852; --ink-3:#94908A;
+    --accent:#C14E0E; --band:#FFE3CE; --band-line:#F2C7A4;
+    --open-bg:#FFF9F4; --open-line:#F0D6BE;
     --ok:#2F6B4F; --ok-bg:#E4F0E9;
     --warn:#8A6410; --warn-bg:#F8E9C7;
     --bad:#B32B24; --bad-bg:#F7DEDB;
-    --code-bg:#EFEFEA;
-    --shadow: 0 1px 2px rgba(24,22,18,.04), 0 10px 30px -18px rgba(24,22,18,.16);
-    --serif: Georgia, "Iowan Old Style", ui-serif, "Times New Roman", serif;
-    --sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-    --mono: ui-monospace, "SF Mono", "Cascadia Code", Menlo, monospace;
+    --code-bg:#F4F2EF;
+    --shadow: 0 1px 2px rgba(24,20,18,.04), 0 10px 30px -18px rgba(24,20,18,.16);
+    --f-serif: Georgia, "Iowan Old Style", ui-serif, "Times New Roman", serif;
+    --f-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    --f-mono: ui-monospace, "Geist Mono", "SF Mono", Menlo, monospace;
   }
   :root.dark {
-    --ground:#151614; --surface:#1D1E1B; --surface-2:#252622;
-    --line:#30322C; --line-2:#42443D;
-    --ink:#F0F0EB; --ink-2:#A6A89C; --ink-3:#767870;
-    --accent:#8FC6C1; --accent-ink:#A8D6D2; --band:#1E3634; --band-line:#2F4F4C;
-    --pending-bg:#26221A; --pending-line:#4A3F26;
+    --ground:#141312; --surface:#1C1B1A; --surface-2:#242220;
+    --line:#2F2C29; --line-2:#403C38;
+    --ink:#F2F0ED; --ink-2:#A8A39D; --ink-3:#78736D;
+    --accent:#FFC49B; --band:#402517; --band-line:#5E3A24;
+    --open-bg:#231C16; --open-line:#3D2F22;
     --ok:#7FC0A0; --ok-bg:#16291F;
     --warn:#D9B23D; --warn-bg:#2E2410;
     --bad:#E08279; --bad-bg:#331F1C;
-    --code-bg:#141513;
+    --code-bg:#151413;
     --shadow: none;
   }
-  * { box-sizing: border-box; }
+
+  * { box-sizing:border-box; }
   body { margin:0; background:var(--ground); color:var(--ink);
-    font-family:var(--sans); line-height:1.6; font-size:15.5px; }
-  .masthead { background:var(--band); border-bottom:1px solid var(--band-line); }
-  .masthead-inner { max-width:920px; margin:0 auto; padding:26px 28px 18px;
-    display:flex; justify-content:space-between; align-items:flex-end; gap:16px; }
-  .kicker { font-family:var(--mono); font-size:11px; letter-spacing:.14em;
-    text-transform:uppercase; color:var(--accent-ink); }
-  h1.feature { font-family:var(--serif); font-size:30px; line-height:1.15;
-    margin:6px 0 2px; letter-spacing:-.01em; }
-  .slug { font-family:var(--mono); font-size:12px; color:var(--ink-2); }
-  .themebtn { appearance:none; border:1px solid var(--band-line);
-    background:var(--surface); color:var(--ink); border-radius:999px;
-    font-family:var(--mono); font-size:11px; padding:6px 12px; cursor:pointer; }
+         font-family:var(--f-sans); font-size:16px; line-height:1.7;
+         -webkit-font-smoothing:antialiased; }
+  .wrap { max-width:920px; margin:0 auto; padding:0 28px; }
+  main.wrap { padding-top:26px; padding-bottom:56px; }
+  code { font-family:var(--f-mono); font-size:.92em; background:var(--surface-2);
+         padding:1px 5px; border-radius:4px; }
+  pre { background:var(--code-bg); border:1px solid var(--line); border-radius:12px;
+        padding:14px 17px; margin:4px 0 0; overflow-x:auto; font-family:var(--f-mono);
+        font-size:13.5px; line-height:1.75; color:var(--ink-2); }
+  pre .c { color:var(--ink-3); font-style:italic; }
+
+  /* ---------- header and navigation ---------- */
+  .topbar { background:var(--surface); border-bottom:1px solid var(--line); }
+  .topbar .wrap { display:flex; align-items:center; gap:18px; flex-wrap:wrap; padding:17px 28px; }
+  .brand { font-family:var(--f-serif); font-size:19px; margin-right:auto; }
+  .brand .t { color:var(--ink-3); font-size:14.5px; }
+  .brand .t::before { content:"  ·  "; }
+  .topmeta { font-family:var(--f-mono); font-size:13px; color:var(--ink-3); }
+  .themeBtn { appearance:none; cursor:pointer; font-family:inherit; font-size:17px;
+             line-height:1; color:var(--ink-2); background:var(--surface-2);
+             border:1px solid var(--line); border-radius:999px;
+             width:38px; height:38px; display:grid; place-items:center; }
+  .themeBtn:hover { color:var(--ink); border-color:var(--line-2); }
+
   .tabs { background:var(--surface); border-bottom:1px solid var(--line);
-    position:sticky; top:0; z-index:5; }
-  .tabs-inner { display:flex; max-width:920px; margin:0 auto; padding:0 28px;
-    overflow-x:auto; }
-  .tab { appearance:none; background:none; border:none; cursor:pointer;
-    font-family:inherit; font-size:13.5px; color:var(--ink-2); padding:13px 14px 11px;
-    border-bottom:2.5px solid transparent; white-space:nowrap; }
+          position:sticky; top:0; z-index:20; overflow-x:auto; }
+  .tabsinner { display:flex; max-width:920px; margin:0 auto; padding:0 28px; }
+  .tab { appearance:none; background:none; border:none; cursor:pointer; font-family:inherit;
+         font-size:15.5px; color:var(--ink-2); padding:13px 17px 11px;
+         border-bottom:2px solid transparent; white-space:nowrap; }
   .tab:hover:not([disabled]) { color:var(--ink); }
-  .tab[aria-selected="true"] { color:var(--ink); border-bottom-color:var(--accent);
-    font-weight:600; }
-  .tab[disabled] { color:var(--ink-3); cursor:default; }
-  main { max-width:920px; margin:0 auto; padding:30px 28px 80px; }
-  section.card { background:var(--surface); border:1px solid var(--line);
-    border-radius:10px; box-shadow:var(--shadow); padding:22px 26px; margin:0 0 18px; }
-  h2 { font-family:var(--serif); font-size:20px; margin:0 0 10px; letter-spacing:-.01em; }
-  h3 { font-size:14.5px; margin:18px 0 6px; }
-  p { margin:8px 0; }
-  ul { margin:8px 0; padding-left:20px; }
-  li { margin:5px 0; }
-  code { font-family:var(--mono); font-size:.87em; background:var(--code-bg);
-    border-radius:4px; padding:.08em .34em; }
-  .label { font-family:var(--mono); font-size:10.5px; letter-spacing:.12em;
-    text-transform:uppercase; color:var(--ink-3); }
-  .qa { border-left:3px solid var(--line-2); padding:2px 0 2px 14px; margin:12px 0; }
-  .qa .q { font-weight:600; margin:0; }
-  .qa .a { margin:4px 0 0; color:var(--ink-2); }
-  .chip { display:inline-block; font-family:var(--mono); font-size:10.5px;
-    letter-spacing:.06em; border-radius:999px; padding:2px 9px; vertical-align:middle; }
-  .chip.ok { color:var(--ok); background:var(--ok-bg); }
-  .chip.warn { color:var(--warn); background:var(--warn-bg); }
-  .chip.bad { color:var(--bad); background:var(--bad-bg); }
-  .story { border:1px solid var(--line); border-radius:10px; padding:18px 22px;
-    margin:14px 0; background:var(--surface); }
-  .story-id { font-family:var(--mono); font-size:12px; color:var(--accent-ink);
-    font-weight:700; }
-  .story h3.story-name { font-family:var(--serif); font-size:17px; margin:2px 0 8px; }
-  .ac { display:flex; gap:10px; margin:7px 0; align-items:baseline; }
-  .ac .ac-id { font-family:var(--mono); font-size:11px; color:var(--ink-3);
-    white-space:nowrap; }
-  .tablewrap { overflow-x:auto; margin:8px 0; }
-  table { border-collapse:collapse; width:100%; font-size:13.5px; }
-  th { text-align:left; font-family:var(--mono); font-size:10.5px;
-    letter-spacing:.1em; text-transform:uppercase; color:var(--ink-3);
-    border-bottom:1.5px solid var(--line-2); padding:6px 12px 6px 0; font-weight:600; }
-  td { border-bottom:1px solid var(--line); padding:7px 12px 7px 0; vertical-align:top; }
-  .pending { background:var(--pending-bg); border:1px solid var(--pending-line);
-    border-radius:8px; padding:10px 14px; margin:10px 0; }
-  .muted { color:var(--ink-2); }
-  .wave { display:flex; gap:12px; align-items:baseline; margin:6px 0; }
-  .wave .n { font-family:var(--mono); font-size:11px; color:var(--accent-ink);
-    font-weight:700; white-space:nowrap; }
-  footer { max-width:920px; margin:0 auto; padding:0 28px 40px;
-    font-family:var(--mono); font-size:11px; color:var(--ink-3); }
+  .tab[aria-selected="true"] { color:var(--ink); border-bottom-color:var(--accent); font-weight:600; }
+  .tab[disabled] { color:var(--ink-3); opacity:.45; cursor:default; }
+
+  .subtabs { background:var(--ground); border-bottom:1px solid var(--line);
+             position:sticky; top:49px; z-index:19; overflow-x:auto; }
+  .subtabs[hidden] { display:none; }
+  .subtabsinner { display:flex; gap:8px; max-width:920px; margin:0 auto; padding:11px 28px; }
+  .subtab { appearance:none; border:1px solid transparent; background:none; cursor:pointer;
+            font-family:inherit; font-size:14.5px; color:var(--ink-3); white-space:nowrap;
+            padding:6px 14px; border-radius:999px; }
+  .subtab:hover { color:var(--ink); }
+  .subtab[aria-selected="true"] { background:var(--surface); color:var(--ink); font-weight:600;
+                                  border-color:var(--line); box-shadow:var(--shadow); }
+  .subtab .badge { font-family:var(--f-mono); font-size:12px; margin-left:6px; opacity:.75; }
+
+  main { padding:56px 0 160px; }
+  .panel[hidden] { display:none; }
+  .empty { color:var(--ink-3); font-size:15px; padding:48px 0; text-align:center; }
+
+  /* ---------- shared blocks ---------- */
+  .lede { font-size:18px; line-height:1.6; color:var(--ink-2); max-width:70ch; margin:0 0 8px; }
+  section.sec { margin-top:48px; }
+  section.sec:first-child { margin-top:0; }
+  .sec-t { display:flex; align-items:baseline; gap:12px; margin:0 0 6px; }
+  .sec-t h2 { font-family:var(--f-serif); font-size:26px; line-height:1.25;
+              font-weight:400; margin:0; letter-spacing:-.01em; }
+  .sec-t .n { font-family:var(--f-mono); font-size:13px; color:var(--ink-3); }
+  .sec-d { color:var(--ink-3); font-size:15px; line-height:1.6; max-width:80ch; margin:0 0 20px; }
+  .list { display:grid; gap:11px; }
+
+  .card { background:var(--surface); border:1px solid var(--line); border-radius:16px;
+          padding:20px 24px 18px; box-shadow:var(--shadow); }
+  .card h3 { font-family:var(--f-serif); font-size:20px; line-height:1.3; font-weight:400; margin:0 0 6px; }
+
+  .rule { background:var(--surface); border:1px solid var(--band-line);
+           border-left:4px solid var(--accent); border-radius:14px; padding:17px 21px;
+           margin:20px 0 0; box-shadow:var(--shadow); }
+  .rule > b { font-family:var(--f-serif); font-size:19px; font-weight:400; display:block; margin-bottom:3px; }
+  .rule p { margin:0; font-size:15.5px; color:var(--ink-2); line-height:1.65; max-width:80ch; }
+  .rule.calm { border-left-color:var(--ok); border-color:var(--line); }
+
+  .table { width:100%; border-collapse:collapse; background:var(--surface);
+            border:1px solid var(--line); border-radius:16px; overflow:hidden; box-shadow:var(--shadow); }
+  .table th { text-align:left; font-size:13.5px; color:var(--ink-3); font-weight:600;
+               padding:12px 18px; border-bottom:1px solid var(--line); }
+  .table td { padding:12px 18px; border-bottom:1px solid var(--line);
+               font-size:15px; color:var(--ink-2); line-height:1.6; vertical-align:top; }
+  .table tr:last-child td { border-bottom:none; }
+  .table td.n { color:var(--ink); font-weight:600; width:210px; }
+  .table td.num, .table th.num { text-align:right; font-family:var(--f-mono);
+               font-variant-numeric:tabular-nums; white-space:nowrap; }
+  .table td .obs { display:block; font-size:13.5px; color:var(--ink-3); line-height:1.5; }
+  .table tr.total td { background:var(--surface-2); color:var(--ink); font-weight:600; }
+  .table .fx { color:var(--accent); }
+  .scroll { overflow-x:auto; border-radius:16px; }
+
+  .scoreboard { display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
+            gap:12px; margin-bottom:24px; }
+  .pl { background:var(--surface); border:1px solid var(--line); border-radius:16px;
+        padding:16px 18px; box-shadow:var(--shadow); display:grid; gap:1px; }
+  .pl .v { font-family:var(--f-mono); font-size:24px; font-weight:600; letter-spacing:-.02em; }
+  .pl .l { font-size:13.5px; color:var(--ink-2); line-height:1.45; }
+  .pl.ok .v { color:var(--ok); } .pl.fix .v { color:var(--warn); }
+  .pl.fail .v { color:var(--bad); } .pl.na .v { color:var(--ink-3); }
+  .pl.now { background:var(--band); border-color:var(--band-line); }
+
+  .status { font-size:13.5px; font-weight:600; white-space:nowrap; }
+  .status::before { content:"● "; }
+  .status.ok { color:var(--ok); } .status.warn { color:var(--warn); }
+  .status.na { color:var(--ink-3); } .status.bad { color:var(--bad); }
+
+  .kv { display:grid; grid-template-columns:160px 1fr; gap:4px 16px; align-items:baseline; }
+  .kv > b { font-size:13.5px; color:var(--ink-3); font-weight:600; }
+  .kv > span { font-size:15.5px; color:var(--ink-2); line-height:1.6; max-width:74ch; }
+  @media (max-width:640px) { .kv { grid-template-columns:1fr; } }
+
+  /* ---------- HTML diagram primitives (use in data strings) ---------- */
+  .diagram { background:var(--surface); border:1px solid var(--line); border-radius:16px;
+          padding:28px 26px 22px; box-shadow:var(--shadow); overflow-x:auto; margin-bottom:22px; }
+  .flow { display:flex; align-items:center; min-width:620px; }
+  .diagram-col { min-width:560px; display:grid; justify-items:stretch; }
+  .level { display:flex; gap:10px; justify-content:center; flex-wrap:wrap; }
+  .box, .block { background:var(--surface-2); border:1px solid var(--line); border-radius:12px;
+           padding:11px 16px; display:grid; gap:1px; text-align:center; }
+  .box b, .block b { font-size:15.5px; font-weight:600; line-height:1.35; }
+  .box i, .block i { font-style:normal; font-size:13.5px; color:var(--ink-3); line-height:1.45; }
+  .box.highlight, .block.highlight { background:var(--band); border-color:var(--band-line); }
+  .block.mono { font-family:var(--f-mono); font-size:14px; padding:9px 15px; color:var(--ink-2); }
+  .block.external { background:none; border-style:dashed; }
+  .arrow { position:relative; flex:0 0 96px; height:1px; background:var(--line-2); }
+  .arrow span { position:absolute; left:50%; top:-22px; transform:translateX(-50%);
+               font-size:12.5px; color:var(--ink-3); white-space:nowrap; }
+  .arrow::after { content:""; position:absolute; right:0; top:-3.5px;
+                 border-left:7px solid var(--line-2);
+                 border-top:4px solid transparent; border-bottom:4px solid transparent; }
+  .down { position:relative; height:38px; }
+  .down::before { content:""; position:absolute; top:0; bottom:9px; left:50%; width:1px;
+                  background:var(--line-2); }
+  .down::after { content:""; position:absolute; bottom:1px; left:50%; transform:translateX(-50%);
+                 border-top:7px solid var(--line-2);
+                 border-left:4.5px solid transparent; border-right:4.5px solid transparent; }
+  .down span { position:absolute; top:50%; left:calc(50% + 14px); transform:translateY(-50%);
+               font-size:13px; color:var(--ink-3); white-space:nowrap; }
+  .group { position:relative; flex:1 1 auto; border:1px dashed var(--line-2);
+           border-radius:14px; padding:24px 22px 18px; }
+  .group > .label { position:absolute; top:-10px; left:20px; background:var(--surface);
+                     padding:0 9px; font-size:12.5px; color:var(--accent); font-weight:600; }
+  .group > .label.mono { font-family:var(--f-mono); color:var(--ink-3); }
+  .hub { display:flex; align-items:center; }
+  .branches { position:relative; display:grid; gap:9px; margin-left:24px; padding-left:24px;
+           border-left:1px solid var(--line-2); }
+  .branches::before { content:""; position:absolute; left:-24px; top:50%; width:24px; height:1px;
+                   background:var(--line-2); }
+  .branches > .box, .branches > .block { position:relative; }
+  .branches > .box::before, .branches > .block::before { content:""; position:absolute; left:-24px;
+                   top:50%; width:24px; height:1px; background:var(--line-2); }
+  .group > .obs { margin:16px 0 0; font-size:13.5px; color:var(--ink-3); line-height:1.55; }
+  .group > .obs::before { content:"⇢  "; }
+  .gateway { background:var(--band); border:1px solid var(--band-line); border-radius:12px;
+           padding:14px 18px; display:grid; gap:8px; justify-items:center; }
+  .gateway > b { font-family:var(--f-mono); font-size:15px; }
+  .gateway > i { font-style:normal; font-size:13.5px; color:var(--ink-2); text-align:center; }
+  .gateway .level .block { background:var(--surface); border-color:var(--band-line); }
+  .diagram-foot { text-align:center; font-size:13.5px; color:var(--ink-3); margin-top:9px; }
+
+  /* ---------- overview ---------- */
+  .steps { display:flex; flex-wrap:wrap; border:1px solid var(--line); border-radius:16px;
+           background:var(--surface); overflow:hidden; box-shadow:var(--shadow); }
+  .steps .st { flex:1 1 120px; padding:13px 16px; border-right:1px solid var(--line); display:grid; gap:2px; }
+  .steps .st:last-child { border-right:none; }
+  .steps .st .sn { font-family:var(--f-mono); font-size:12.5px; color:var(--ink-3); }
+  .steps .st .sw { font-size:15px; }
+  .steps .st.done .sw { color:var(--ink-3); text-decoration:line-through; }
+  .steps .st.now { background:var(--band); }
+  .steps .st.now .sw { font-weight:600; }
+  .statgrid { display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); gap:1px;
+              background:var(--line); border:1px solid var(--line); border-radius:16px;
+              overflow:hidden; box-shadow:var(--shadow); }
+  .statgrid .cell { background:var(--surface); padding:14px 16px; display:grid; gap:2px; }
+  .statgrid .v { font-family:var(--f-mono); font-size:24px; font-weight:600; letter-spacing:-.02em; }
+  .statgrid .l { font-size:13px; color:var(--ink-3); }
+  .wave { display:grid; grid-template-columns:86px 1fr; gap:14px; align-items:baseline;
+          padding:10px 12px; border-top:1px solid var(--line); }
+  .wave:first-of-type { border-top:none; }
+  .wave > b { font-family:var(--f-mono); font-size:13.5px; color:var(--accent); white-space:nowrap; }
+  .wave > div { display:grid; gap:1px; }
+  .wave .wn { font-size:15.5px; }
+  .wave .ws { font-size:13.5px; color:var(--ink-3); }
+  .wave.this { background:var(--band); border-radius:10px; border-top:none; }
+  .wave.this > b { font-weight:700; }
+
+  /* ---------- discovery: pr-faq ---------- */
+  .split { display:grid; grid-template-columns:250px 1fr; gap:28px; align-items:start; }
+  .toc { position:sticky; top:112px; display:grid; gap:14px; }
+  .toc .grp { display:grid; gap:2px; }
+  .toc .grpname { font-size:12.5px; color:var(--ink-3); font-weight:600;
+                  text-transform:uppercase; letter-spacing:.07em; margin-bottom:2px; }
+  .toc a { font-size:14px; color:var(--ink-2); text-decoration:none; padding:3px 10px;
+           border-left:2px solid var(--line); line-height:1.45; }
+  .toc a:hover { color:var(--ink); }
+  .toc a.on { color:var(--accent); border-left-color:var(--accent); font-weight:600; }
+  .answers { display:grid; gap:12px; }
+  .qa { background:var(--surface); border:1px solid var(--line); border-radius:16px;
+        padding:18px 22px 16px; box-shadow:var(--shadow); }
+  .qa .q { display:flex; gap:12px; align-items:baseline; margin-bottom:6px; }
+  .qa .qid { font-family:var(--f-mono); font-size:12.5px; color:var(--accent); }
+  .qa .qt { font-family:var(--f-serif); font-size:19px; line-height:1.35; }
+  .qa .a { font-size:15.5px; color:var(--ink-2); line-height:1.65; max-width:74ch; }
+  .release .kicker { font-family:var(--f-mono); font-size:12.5px; color:var(--ink-3); margin-bottom:8px; }
+  .release h3 { font-family:var(--f-serif); font-size:23px; font-weight:400; line-height:1.3; margin:0 0 4px; }
+  .release .sub { color:var(--ink-2); font-size:16px; margin:0 0 12px; }
+  .release h4 { font-size:13.5px; color:var(--ink-3); font-weight:600;
+                text-transform:uppercase; letter-spacing:.06em; margin:14px 0 3px; }
+  .release p { margin:0; font-size:15.5px; color:var(--ink-2); line-height:1.65; }
+  .release blockquote { margin:12px 0; padding:2px 0 2px 15px; border-left:3px solid var(--band-line);
+                        font-family:var(--f-serif); font-style:italic; color:var(--ink-2); }
+  .release cite { display:block; font-style:normal; font-family:var(--f-sans);
+                  font-size:13.5px; color:var(--ink-3); margin-top:3px; }
+  .open-item { border-left:4px solid var(--warn); }
+  .open-item .m { font-size:15px; color:var(--ink-2); line-height:1.6; }
+  .open-item .m b { color:var(--ink-3); font-weight:600; }
+
+  /* ---------- discovery: stories ---------- */
+  .scard header { display:grid; gap:4px; margin-bottom:10px; }
+  .scard .idline { display:flex; gap:12px; align-items:baseline; }
+  .scard .sid { font-family:var(--f-mono); font-size:14px; color:var(--accent); font-weight:600; }
+  .scard .sname { font-family:var(--f-serif); font-size:20px; line-height:1.3; }
+  .scard .attrs { display:flex; gap:16px; flex-wrap:wrap; font-size:13.5px; color:var(--ink-3); }
+  .scard .attrs b { color:var(--ink-2); font-weight:600; }
+  .scard .narr { font-size:15.5px; color:var(--ink-2); line-height:1.65; max-width:76ch; margin-bottom:10px; }
+  .scard .note { display:flex; gap:10px; align-items:baseline; font-size:14px;
+                 color:var(--ink-2); margin-bottom:8px; }
+  .scard .note .tag { font-size:12.5px; color:var(--warn); font-weight:600; white-space:nowrap; }
+  .scard .note .tag::before { content:"● "; }
+  .aclist { list-style:none; margin:0; padding:0; display:grid; gap:6px; }
+  details.ac { border:1px solid var(--line); border-radius:12px; background:var(--surface-2); }
+  details.ac > summary { display:grid; grid-template-columns:auto 1fr auto; gap:12px;
+                         align-items:baseline; padding:9px 14px; cursor:pointer; list-style:none; }
+  details.ac > summary::-webkit-details-marker { display:none; }
+  .acid { font-family:var(--f-mono); font-size:13px; color:var(--ink-3); }
+  .actitle { font-size:14.5px; color:var(--ink); }
+  .pill { font-size:12px; font-weight:600; white-space:nowrap; color:var(--ink-3); }
+  .pill::before { content:"● "; }
+  .pill.p-primary { color:var(--ok); } .pill.p-negative { color:var(--bad); }
+  .pill.p-validation, .pill.p-auth { color:var(--warn); }
+  .clausewrap { padding:2px 14px 12px 40px; }
+  .clauses { display:grid; gap:2px; font-size:13.5px; color:var(--ink-2); }
+  .clauses .kw { font-family:var(--f-mono); font-size:12px; font-weight:700; margin-right:8px; color:var(--accent); }
+  .bp { margin:12px 0 0; }
+  .bp h4 { font-size:13px; color:var(--ink-3); font-weight:600; text-transform:uppercase;
+           letter-spacing:.06em; margin:0 0 6px; }
+
+  /* ---------- discovery: inferred ---------- */
+  .inf { border-left:4px solid var(--warn); display:grid; gap:5px; }
+  .inf .num { font-family:var(--f-mono); font-size:12.5px; color:var(--ink-3); }
+  .inf .ttl { font-size:16.5px; font-weight:600; }
+
+  /* ---------- design: glossary ---------- */
+  .gcard { display:grid; grid-template-columns:200px 1fr; padding:0; overflow:hidden; }
+  .gcard .rail { border-right:1px solid var(--line); padding:16px 16px 16px 20px;
+                  display:grid; gap:8px; align-content:start; background:var(--surface-2); }
+  .gcard.hero .rail { background:var(--band); }
+  .gcard .term { font-family:var(--f-serif); font-size:20px; line-height:1.25; }
+  .gcard .term code { background:none; padding:0; font-size:16px; }
+  .gcard .et { font-size:12.5px; font-weight:600; color:var(--ink-3); }
+  .gcard .et::before { content:"● "; }
+  .gcard .et.ours { color:var(--accent); } .gcard .et.vendor { color:var(--warn); }
+  .gcard .body { padding:15px 20px 16px; display:grid; gap:10px; }
+  .gfield { display:grid; gap:1px; }
+  .gfield > b { font-size:12.5px; text-transform:uppercase; letter-spacing:.07em;
+                color:var(--ink-3); font-weight:600; }
+  .gfield > span { font-size:15px; color:var(--ink-2); line-height:1.6; max-width:78ch; }
+  .gfield.here > span { color:var(--ink); }
+  .gexample { border-left:3px solid var(--band-line); padding:2px 0 2px 13px; }
+  .gexample b { font-size:12.5px; text-transform:uppercase; letter-spacing:.07em;
+                color:var(--ink-3); font-weight:600; display:block; }
+  .gexample q { display:block; color:var(--ink-2); font-style:italic; font-size:14.5px; }
+  .gexample q::before, .gexample q::after { content:none; }
+  @media (max-width:680px) { .gcard { grid-template-columns:1fr; }
+    .gcard .rail { border-right:none; border-bottom:1px solid var(--line); } }
+
+  /* ---------- design: how it works ---------- */
+  .repos { display:flex; gap:1px; background:var(--line); border:1px solid var(--line);
+           border-radius:16px; overflow:hidden; flex-wrap:wrap; box-shadow:var(--shadow); }
+  .repos .r { background:var(--surface); padding:11px 16px; display:grid; gap:2px; flex:1 1 220px; }
+  .repos .r .rn { font-family:var(--f-mono); font-size:14px; font-weight:600; }
+  .repos .r .rp { font-size:13.5px; color:var(--ink-3); }
+  h3.flow-t { font-family:var(--f-serif); font-size:23px; font-weight:400;
+               letter-spacing:-.01em; margin:44px 0 3px; }
+  h3.flow-t .fn { font-family:var(--f-mono); font-size:15px; color:var(--ink-3); margin-right:10px; }
+  .flow-sub { color:var(--ink-3); font-size:15px; margin:0 0 12px; max-width:76ch; }
+  .chips { display:flex; gap:6px; flex-wrap:wrap; margin:0 0 18px; }
+  .chip { font-family:var(--f-mono); font-size:13px; border:1px solid var(--line);
+          background:var(--surface); color:var(--ink-2); padding:3px 11px; border-radius:999px; }
+  .chip.ext { background:var(--warn-bg); border-color:transparent; color:var(--warn); }
+  .prose p { margin:0 0 13px; color:var(--ink-2); font-size:16px; line-height:1.7; }
+  .prose strong { color:var(--ink); }
+
+  /* ---------- design: decisions ---------- */
+  .dcard.open { background:var(--open-bg); border-color:var(--open-line); }
+  .waiting { display:inline-block; font-size:13px; color:var(--accent); font-weight:600;
+             letter-spacing:.04em; margin:0 0 10px; }
+  .dcard .dq { font-family:var(--f-serif); font-size:20px; line-height:1.35; margin:0 0 8px; max-width:46ch; }
+  .dcard .dctx { color:var(--ink-2); font-size:15.5px; line-height:1.65; margin:0 0 18px; max-width:72ch; }
+  .ops { display:grid; gap:8px; }
+  .op { display:grid; grid-template-columns:26px 1fr; gap:14px; align-items:baseline;
+        padding:13px 17px; border-radius:12px; background:var(--surface-2);
+        border:1px solid transparent; }
+  .op .m { font-family:var(--f-mono); font-size:13.5px; color:var(--ink-3); }
+  .op .x { font-size:15.5px; line-height:1.6; color:var(--ink-2); }
+  .op.chosen { background:var(--band); border-color:var(--band-line); }
+  .op.chosen .m { color:var(--accent); font-weight:700; }
+  .op.chosen .x { color:var(--ink); }
+  .op.rec { background:var(--surface); border-color:var(--accent); }
+  .op.rec .m { color:var(--accent); font-weight:700; }
+  .op.rec .x { color:var(--ink); }
+  .op .seal { display:block; margin-top:4px; font-size:13.5px; color:var(--accent); }
+  .dwhy { margin:18px 0 0; padding-top:16px; border-top:1px solid var(--line);
+         font-size:15px; line-height:1.65; color:var(--ink-2); max-width:76ch; }
+  .dcard.open .dwhy { border-top-color:var(--open-line); }
+  .dwhy .lbl { color:var(--ink-3); font-size:13px; display:block; margin-bottom:2px; }
+  .dwhy .obs2 { display:block; margin-top:8px; color:var(--ink-3); font-size:14.5px; }
+  .sup { border-left:4px solid var(--warn); display:grid; gap:4px; }
+  .sup .st1 { font-family:var(--f-serif); font-size:19px; line-height:1.35; margin:0; }
+  .sup .st2 { color:var(--ink-2); font-size:15px; line-height:1.65; margin:0; max-width:76ch; }
+  .sup .st3 { color:var(--ink-3); font-size:14.5px; line-height:1.6; margin:0; max-width:76ch; }
+  .tail { margin-top:14px; font-size:15px; color:var(--ink-3); max-width:76ch; }
+
+  /* ---------- design: data ---------- */
+  .qrow { display:grid; gap:5px; }
+  .qrow .qtop { display:flex; align-items:baseline; justify-content:space-between; gap:16px; }
+  .qrow .qscreen { font-size:16px; font-weight:600; }
+  .qrow .qcost { font-family:var(--f-mono); font-size:13px; color:var(--accent); white-space:nowrap; }
+  .qrow .qhow { font-size:15px; color:var(--ink-2); line-height:1.6; max-width:76ch; }
+  .qrow .qwhy { font-size:14px; color:var(--ink-3); line-height:1.6; max-width:76ch; }
+  .scalex b { display:block; font-size:16px; margin-bottom:2px; }
+  .scalex span { font-size:15px; color:var(--ink-2); line-height:1.6; }
+
+  /* ---------- design: infra & cost ---------- */
+  .bill { display:grid; gap:3px; }
+  .bill .cv { font-family:var(--f-mono); font-size:23px; font-weight:600; letter-spacing:-.02em; }
+  .bill .cd { font-size:14px; color:var(--ink-2); line-height:1.5; }
+  .rec-top { display:flex; align-items:baseline; justify-content:space-between; gap:18px; }
+  .rec .type { display:block; font-family:var(--f-mono); font-size:12.5px; color:var(--accent); margin-bottom:2px; }
+  .rec .name { font-family:var(--f-mono); font-size:15.5px; font-weight:600; word-break:break-word; }
+  .rec .price { font-family:var(--f-mono); font-size:13.5px; color:var(--ink-2); white-space:nowrap; }
+  .rec .cfg { margin:3px 0 0; font-size:13.5px; color:var(--ink-3); line-height:1.6; max-width:80ch; }
+  .rec .what { margin:4px 0 0; font-size:15px; color:var(--ink-2); line-height:1.65; max-width:78ch; }
+  .rec .end { margin:2px 0 0; font-size:13.5px; color:var(--ink-3); line-height:1.55; }
+  .rec .end::before { content:"↳  "; }
+  .rec.reuse { background:var(--surface-2); box-shadow:none; }
+  .rec.none { background:none; border-style:dashed; box-shadow:none; }
+  .rec.none .name { font-family:var(--f-sans); color:var(--ink-2); }
+  h3.gr { font-size:14px; color:var(--ink-3); font-weight:600; margin:24px 0 10px; }
+
+  /* ---------- design: code ---------- */
+  .pcard .pairs { display:grid; gap:9px; margin-top:8px; padding-top:12px; border-top:1px solid var(--line); }
+  .groupc > .gwhat { margin:-2px 0 0; font-size:15px; color:var(--ink-2); line-height:1.65; max-width:78ch; }
+  .comp { display:grid; grid-template-columns:180px 1fr; gap:16px; align-items:baseline;
+          padding:9px 0; border-top:1px solid var(--line); }
+  .comp:first-of-type { border-top:none; }
+  .comp > b { font-family:var(--f-mono); font-size:14px; font-weight:600; }
+  .comp > span { font-size:14.5px; color:var(--ink-2); line-height:1.6; max-width:70ch; }
+  @media (max-width:640px) { .comp { grid-template-columns:1fr; gap:1px; } }
+  .ext .kv > b.changes { color:var(--accent); }
+  .ext .kv > b.stays { color:var(--ink-3); }
+  .ext .kv > span.stays { color:var(--ink-3); }
+
+  /* ---------- design: security ---------- */
+  .cl.risk { background:var(--warn-bg); border-color:var(--warn); }
+  .cl.na { background:none; border-style:dashed; box-shadow:none; }
+  .cl .cab { display:flex; align-items:baseline; justify-content:space-between; gap:16px; }
+  .cl .extra { margin:6px 0 0; padding-top:10px; border-top:1px solid var(--line);
+               font-size:14.5px; color:var(--ink-2); line-height:1.6; max-width:78ch; }
+  .cl .extra b { color:var(--ink-3); font-weight:600; font-size:13px; display:block; margin-bottom:1px; }
+  .cl .what2 { margin:0; font-size:15px; color:var(--ink-2); line-height:1.65; max-width:78ch; }
+
+  /* ---------- design: alarms ---------- */
+  .al .acab { display:flex; align-items:baseline; justify-content:space-between; gap:16px; flex-wrap:wrap; }
+  .al .anm { font-family:var(--f-mono); font-size:15px; font-weight:600; }
+  .al .aq { font-family:var(--f-mono); font-size:13px; color:var(--accent);
+            background:var(--band); padding:3px 10px; border-radius:8px; white-space:nowrap; }
+  .al .atit { font-family:var(--f-serif); font-size:18.5px; line-height:1.35; margin:2px 0 8px; }
+  .al .fields { display:grid; gap:8px; padding-top:11px; border-top:1px solid var(--line); }
+  .al .fields .kv > b.action { color:var(--ok); }
+  .al .fields .kv > b.false { color:var(--warn); }
+  .al .fields .kv > span.action { color:var(--ink); }
+
+  /* ---------- design: going to production ---------- */
+  .brief .phrase { font-family:var(--f-serif); font-size:20px; line-height:1.45; margin:0 0 14px; max-width:62ch; }
+  .brief .phrase b { color:var(--accent); font-weight:400; }
+  .step { display:grid; grid-template-columns:30px 1fr; gap:16px; }
+  .step .pnum { font-family:var(--f-mono); font-size:14px; color:var(--ink-3); padding-top:2px; }
+  .step .pbody { display:grid; gap:5px; }
+  .step .pt { font-size:16px; font-weight:600; line-height:1.45; }
+  .step .pwhere { font-size:13px; color:var(--ink-3); }
+  .step .pd { font-size:15px; color:var(--ink-2); line-height:1.6; max-width:74ch; }
+  .step .pchk { font-size:14.5px; color:var(--ink-2); line-height:1.6; max-width:74ch;
+                 border-top:1px dashed var(--line); padding-top:8px; }
+  .step .pchk b { color:var(--ok); font-weight:600; font-size:13px; display:block; }
+  .step.gate { background:var(--warn-bg); border-color:var(--warn); }
+  .step.gate .pnum { color:var(--warn); font-weight:700; }
+  .step.gate .mark { font-size:13px; color:var(--warn); font-weight:600; }
+  .step.gate .mark::before { content:"● "; }
+  .rollback .vcab { display:flex; align-items:baseline; justify-content:space-between; gap:16px; }
+  .rollback .vtime { font-family:var(--f-mono); font-size:13.5px; color:var(--ok); white-space:nowrap; }
+  .rollback .vwhen { font-size:15px; color:var(--ink-2); line-height:1.6; max-width:76ch; }
+  .trap { border-left:4px solid var(--warn); display:grid; gap:3px; }
+  .trap .at { font-size:16px; font-weight:600; }
+  .trap .ad { font-size:15px; color:var(--ink-2); line-height:1.6; max-width:76ch; }
+
+  /* ---------- design: review ---------- */
+  .lens.fix { border-color:var(--warn); }
+  .lens.fail { border-color:var(--bad); background:var(--bad-bg); }
+  .lens.missing { background:none; border-style:dashed; border-color:var(--bad); box-shadow:none; }
+  .lens .lcab { display:flex; align-items:baseline; justify-content:space-between; gap:14px; flex-wrap:wrap; }
+  .lens .lnm { font-family:var(--f-mono); font-size:15px; font-weight:600; }
+  .lens .judges { font-size:14.5px; color:var(--ink-2); line-height:1.6; margin:2px 0 0; max-width:76ch; }
+  .lens .verified { font-size:14px; color:var(--ink-2); line-height:1.65; margin-top:8px; }
+  .lens .verified b { color:var(--ink-3); font-weight:600; font-size:12.5px; display:block; }
+  .lens .verified .it::after { content:"  ·  "; color:var(--ink-3); }
+  .lens .verified .it:last-child::after { content:""; }
+  .lquote { border-left:3px solid var(--band-line); padding:2px 0 2px 13px; margin-top:8px; }
+  .lquote b { color:var(--ink-3); font-weight:600; font-size:12.5px; display:block; }
+  .lquote q { display:block; font-family:var(--f-mono); font-size:13px; color:var(--ink-2); line-height:1.6; }
+  .lquote q::before, .lquote q::after { content:none; }
+  .lmeta { display:flex; gap:22px; flex-wrap:wrap; font-family:var(--f-mono); font-size:12.5px;
+           color:var(--ink-3); padding-top:9px; border-top:1px solid var(--line); margin-top:9px; }
+  .lmeta span b { color:var(--ink-2); font-weight:600; }
+  .warning { background:var(--bad-bg); border:1px solid var(--bad); border-radius:14px;
+           padding:15px 19px; margin-top:14px; }
+  .warning b { font-family:var(--f-serif); font-size:18px; font-weight:400; display:block; margin-bottom:2px; }
+  .warning p { margin:0; font-size:15px; color:var(--ink-2); line-height:1.6; max-width:78ch; }
+
+  /* ---------- plan ---------- */
+  .pwaves { display:flex; min-width:880px; }
+  .pcol { flex:1; min-width:104px; padding:0 6px; position:relative; }
+  .pcol + .pcol::before { content:""; position:absolute; left:-1px; top:32px; bottom:6px;
+                          border-left:1px dashed var(--line-2); }
+  .pcol h4 { font-size:12.5px; font-weight:600; letter-spacing:.06em; text-transform:uppercase;
+             color:var(--ink-3); margin:0 0 12px; text-align:center; }
+  .pno { background:var(--surface-2); border:1px solid var(--line); border-radius:12px;
+         padding:9px 11px; margin-bottom:9px; font-size:13px; line-height:1.4; }
+  .pno b { font-family:var(--f-mono); font-size:13px; display:block; margin-bottom:2px; }
+  .pno .dep { display:block; margin-top:4px; font-family:var(--f-mono); font-size:11.5px; color:var(--ink-3); }
+  .pno.critical { border-left:4px solid var(--accent); }
+  .pno.front { background:var(--band); border-color:var(--band-line); }
+  .plegend { display:flex; gap:20px; flex-wrap:wrap; font-size:13.5px; color:var(--ink-3);
+              margin-top:12px; align-items:center; }
+  .plegend i { display:inline-block; width:12px; height:12px; border-radius:4px; margin-right:6px;
+                vertical-align:-1px; border:1px solid var(--line); background:var(--surface-2); }
+  .plegend i.critical { border-left:4px solid var(--accent); }
+  .plegend i.front { background:var(--band); border-color:var(--band-line); }
+  h3.ibatch { font-family:var(--f-serif); font-size:20px; font-weight:400; color:var(--ink-3); margin:36px 0 12px; }
+  h3.ibatch b { color:var(--ink); font-weight:400; }
+  .icard .icab { display:flex; gap:12px; align-items:baseline; flex-wrap:wrap; }
+  .icard .icab h3 { margin:0; }
+  .icard .inum { font-family:var(--f-mono); font-size:14px; font-weight:600; color:var(--accent); white-space:nowrap; }
+  .icard .irepo { font-family:var(--f-mono); font-size:12px; color:var(--ink-3);
+                   border:1px solid var(--line); border-radius:999px; padding:3px 10px;
+                   margin-left:auto; white-space:nowrap; }
+  .icard p { margin:7px 0 10px; font-size:15.5px; color:var(--ink-2); line-height:1.65; max-width:86ch; }
+  .icard .ichips { display:flex; gap:5px; flex-wrap:wrap; }
+  .ichip { font-family:var(--f-mono); font-size:12.5px; background:var(--surface-2);
+           border:1px solid var(--line); border-radius:8px; padding:3px 9px; color:var(--ink-2); }
+  .ichip.prod { color:var(--ok); border-color:var(--ok-bg); background:var(--ok-bg); }
+
+  /* ---------- execution ---------- */
+  .xtl { position:relative; margin-top:16px; padding-left:26px; display:grid; gap:22px; }
+  .xtl::before { content:""; position:absolute; left:7px; top:8px; bottom:8px; width:2px;
+                 background:var(--line-2); border-radius:2px; }
+  .xtl .xi { position:relative; }
+  .xtl .xi::before { content:""; position:absolute; left:-24px; top:7px; width:12px; height:12px;
+                     border-radius:999px; background:var(--surface); border:3px solid var(--line-2); }
+  .xtl .xi.milestone::before { border-color:var(--accent); background:var(--band); }
+  .xtl .xi.bad::before  { border-color:var(--bad); background:var(--bad-bg); }
+  .xtl .xi.good::before   { border-color:var(--ok); background:var(--ok-bg); }
+  .xtl .when { font-family:var(--f-mono); font-size:12.5px; color:var(--ink-3); }
+  .xtl .what { font-size:15.5px; }
+  .xtl .det { font-size:14.5px; color:var(--ink-2); margin-top:2px; max-width:75ch; }
+  pre .xok { color:var(--ok); } pre .xerr { color:var(--bad); }
+  .xgreen { color:var(--ok); font-weight:600; } .xred { color:var(--bad); font-weight:600; }
+  .xnote { font-size:13.5px; color:var(--ink-3); margin-top:10px; }
+
+  @media (max-width:860px) { .split { grid-template-columns:1fr; gap:20px; } .toc { position:static; } }
 </style>
 
+<header class="topbar"><div class="wrap">
+  <div class="brand" id="brand"></div>
+  <div class="topmeta" id="topmeta"></div>
+  <button class="themeBtn" type="button" aria-label="Toggle light and dark theme">☾</button>
+</div></header>
+
+<nav class="tabs"><div class="tabsinner" role="tablist" aria-label="Stages" id="tablist"></div></nav>
+<nav class="subtabs" hidden><div class="subtabsinner" role="tablist" aria-label="Sections" id="subtablist"></div></nav>
+
+<main class="wrap" id="panels"></main>
+
+
 <script>
-/* ============================= DATA ==================================== */
-/* Replace ONLY this object. Text fields accept inline HTML.               */
+/* ══════════════════════════════════════════════════════════════════════════
+   DATA — replace ONLY this object. Do not edit anything below the
+   END OF DATA marker. Each stage skill documents its tab's contract.
+   ══════════════════════════════════════════════════════════════════════════ */
 const BLUEPRINT = {
-  meta: {
-    feature: "Feature name",
-    slug: "YYYY-MM-DD-feature-slug",
-    stage: "discovery",            // discovery | design | planning | implementation | test | release | done
-    updated: "YYYY-MM-DD",
-  },
+  workstream: { slug: '<yyyy-mm-dd>-<slug>', title: 'Workstream name', wave: 1, stage: 'discovery' },
 
   overview: {
-    what: "One paragraph: what this is, from the user's side.",
-    who: "Who it is for, and who it is explicitly not for.",
-    problem: "The problem it solves — concrete, with what it costs today.",
+    summary: 'One paragraph saying what this wave builds and for whom, in product language.',
+    status: 'Discovery written — awaiting your review',
     waves: [
-      { n: "wave 1", name: "the smallest end-to-end path", state: "this workstream" },
-      { n: "wave 2", name: "named next step", state: "starts when wave 1 ships" },
+      { n: 'wave 1', name: 'the MVP — smallest useful end-to-end path', state: 'this wave' },
+      { n: 'wave 2', name: 'named next step', state: 'starts when wave 1 ships' }
     ],
+    stages: [
+      { name: 'Discovery', numbers: [ { l: 'stories', v: '0' }, { l: 'criteria', v: '0' } ] }
+    ]
   },
 
-  prfaq: {
-    headline: "The product announced in one line.",
-    announcement: "The announcement paragraph, as if it shipped today.",
-    problem: "The problem paragraph.",
-    solution: "The solution paragraph — names the alternative used today.",
-    how: "The mechanism in ~5 lines. Behavior only.",
-    faqExternal: [ { q: "Customer question?", a: "Real answer." } ],
-    faqInternal: [ { q: "Hard internal question?", a: "Real answer." } ],
-    notBuilding: [ { item: "capability", reason: "out: reason. Wave 2." } ],
-    wouldHaveToBeTrue: [ "assumption whose falsity kills the product" ],
-  },
-
-  stories: [
-    {
-      id: "S-001",
-      name: "short story name",
-      asA: "persona", iWant: "capability", soThat: "outcome",
-      acs: [ { id: "SLUG-S-001-AC-1", text: "WHEN <condition>, the system SHALL <behavior>." } ],
-      badPaths: [ { category: "Boundary input", caseText: "email empty", behavior: "what happens" } ],
-      out: [ "what this story deliberately does not cover" ],
+  discovery: {
+    prfaq: {
+      release: {
+        date: '<city>, <date>',
+        head: 'Headline: one sentence, verb first, readable by the person who will use it',
+        sub: 'Sub-headline: for X who suffers from Y, this delivers Z.',
+        blocks: [ ['Summary', '...'], ['Problem', '...'], ['Solution', '... (names the alternative the customer uses today)'] ],
+        quotes: [ ['Internal quote.', 'Name, role'], ['User quote.', 'Name, role'] ],
+        how: 'The end-to-end path in 3-4 sentences.',
+        availability: 'Where and when it becomes available.'
+      },
+      themes: [
+        { name: 'Product & use', questions: [ { id: 'E1', t: 'Question?', a: 'Answer.' } ] }
+      ],
+      notBuilding: [
+        { item: 'capability', reason: 'out: reason — or the wave it lands in' }
+      ],
+      mustBeTrue: [ 'assumption whose falsity kills the product' ],
+      open: [
+        { t: 'What was left undecided', gap: '...', evidence: '...', resolution: '...' }
+      ]
     },
-  ],
-
-  inferred: {
-    items: [ { guess: "What the author had to assume, marked as a guess.", status: "pending" } ], // pending | confirmed | corrected
-    open: [],   // MUST be empty to approve — anything here is the next interview round
+    stories: [
+      { id: 'S-001', name: 'Short capability name', persona: 'PERSONA',
+        narrative: 'As a <persona>, I want <capability>, so that <outcome>.',
+        notes: [ ['accepted limitation', 'A conscious restriction of this story.'] ],
+        acs: [
+          { id: 'AC-1', type: 'primary', t: 'concrete condition, never "happy path"',
+            clauses: [ ['WHEN', '<condition>'], ['THE SYSTEM SHALL', '<observable behavior, concrete values>'] ] }
+        ],
+        badPaths: [
+          { category: 'Boundary input', caseText: 'field empty / malformed', behavior: 'what the system does' },
+          { category: 'Repeat / concurrency', caseText: 'same action twice', behavior: 'what the system does' },
+          { category: 'Dependency failure', caseText: 'the service behind the step is down', behavior: 'what the system does' },
+          { category: 'Permission', caseText: 'the actor who must NOT do this', behavior: 'what the system does' }
+        ],
+        out: [ 'what this story deliberately does not cover' ] }
+    ],
+    inferred: [
+      { t: 'What was assumed, in one sentence', assumed: '...', why: '...', ifWrong: '...' }
+    ]
   },
-};
-/* =========================== END DATA ================================== */
 
-/* Shell below — do not edit. */
-const TAB_REGISTRY = [
-  { key: "overview", label: "Overview" },
-  { key: "prfaq",    label: "PR-FAQ" },
-  { key: "stories",  label: "User Stories" },
-  { key: "inferred", label: "Inferred & Open" },
-  /* Later stages register here: design tabs, plan, execution report, release. */
+  /* Filled by later stages — each stage skill documents its contract. */
+  design: null,
+  plan: null,
+  execution: null
+};
+/* ══════════════ END OF DATA — do not edit below this line ══════════════ */
+</script>
+
+<script>
+/* ══════════════════════════ SHELL — do not edit ══════════════════════════ */
+const esc = s => String(s).replace(/[&<>]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
+const jsonc = s => esc(s).replace(/\/\/(.*)$/gm, '<span class="c">//$1</span>');
+const nonEmpty = v => Array.isArray(v) ? v.length > 0 : !!v;
+const has = k => nonEmpty(BLUEPRINT[k]);
+const secT = (t, n) => `<div class="sec-t"><h2>${t}</h2>${n != null ? `<span class="n">${n}</span>` : ''}</div>`;
+
+const STAGES = [
+  { key:'overview', label:'Overview' },
+  { key:'discovery', label:'Discovery', sections: [
+    { key:'prfaq', label:'PR-FAQ' },
+    { key:'stories', label:'User Stories' },
+    { key:'inferred', label:'What was inferred' }
+  ]},
+  { key:'design', label:'Design', sections: [
+    { key:'glossary', label:'Glossary' },
+    { key:'flows', label:'How it works' },
+    { key:'decisions', label:'Decisions' },
+    { key:'data', label:'Data' },
+    { key:'infra', label:'Infra & cost' },
+    { key:'code', label:'Code' },
+    { key:'security', label:'Security' },
+    { key:'alarms', label:'Alarms' },
+    { key:'live', label:'Going to production' },
+    { key:'review', label:'Review' }
+  ]},
+  { key:'plan', label:'Plan' },
+  { key:'execution', label:'Execution Report' }
 ];
 
-const esc = s => String(s ?? "");
-function el(html) { const t = document.createElement("template"); t.innerHTML = html.trim(); return t.content; }
-function qaList(items) {
-  return (items || []).map(x => `<div class="qa"><p class="q">${esc(x.q)}</p><p class="a">${esc(x.a)}</p></div>`).join("");
+/* ---------- overview ---------- */
+function renderOverview() {
+  const p = BLUEPRINT.overview;
+  const order = ['discovery','design','plan','execution'];
+  const lbl = { discovery:'Discovery', design:'Design', plan:'Plan', execution:'Execution' };
+  const at = order.indexOf(BLUEPRINT.workstream.stage);
+  return `
+  <section class="sec">${secT('What we are building')}
+    <p class="lede">${p.summary}</p></section>
+  <section class="sec">${secT('Where this wave is')}
+    <div class="steps">${order.map((k,i) => `<div class="st ${i<at?'done':''} ${i===at?'now':''}">
+      <span class="sn">${i+1}</span><span class="sw">${lbl[k]}</span></div>`).join('')}</div>
+    <p style="margin:10px 0 0;color:var(--ink-2)">${p.status}</p></section>
+  ${p.waves?.length ? `<section class="sec">${secT('The wave map', `wave ${BLUEPRINT.workstream.wave} is this one`)}
+    <div class="card" style="display:grid;padding:14px 16px">${p.waves.map(w => `<div class="wave ${w.state==='this wave'?'this':''}">
+      <b>${w.n}</b><div><span class="wn">${w.name}</span><span class="ws">${w.state}</span></div></div>`).join('')}</div>
+  </section>` : ''}
+  ${(p.stages||[]).map(e => `<section class="sec">${secT(e.name, 'in numbers')}
+    <div class="statgrid">${e.numbers.map(n =>
+      `<div class="cell"><span class="v">${n.v}</span><span class="l">${n.l}</span></div>`).join('')}</div>
+  </section>`).join('')}`;
 }
 
+/* ---------- discovery ---------- */
+function releaseHTML(r) {
+  return `<div class="release">
+    <div class="kicker">Press release · ${r.date}</div>
+    <h3>${r.head}</h3><p class="sub">${r.sub}</p>
+    ${r.blocks.map(([h,b]) => `<h4>${h}</h4><p>${b}</p>`).join('')}
+    ${r.quotes[0] ? `<blockquote>${r.quotes[0][0]}<cite>— ${r.quotes[0][1]}</cite></blockquote>` : ''}
+    <h4>How it works</h4><p>${r.how}</p>
+    ${r.quotes[1] ? `<blockquote>${r.quotes[1][0]}<cite>— ${r.quotes[1][1]}</cite></blockquote>` : ''}
+    <h4>Availability</h4><p>${r.availability}</p></div>`;
+}
+
+function renderPrfaq() {
+  const d = BLUEPRINT.discovery.prfaq;
+  const all = d.themes.flatMap(t => t.questions);
+  const toc = d.themes.map(t => `<div class="grp"><div class="grpname">${t.name}</div>
+    ${t.questions.map(q => `<a href="#q-${q.id}" data-q="${q.id}">${q.t}</a>`).join('')}</div>`).join('');
+  return `
+  <section class="sec">${secT(`The ${all.length} questions`, 'grouped by theme')}
+    <div class="split"><nav class="toc">${toc}</nav>
+      <div class="answers">
+        <article class="qa" id="q-release">
+          <div class="q"><span class="qid">Opening</span><span class="qt">What is this, in one read?</span></div>
+          <div class="a">${releaseHTML(d.release)}</div></article>
+        ${all.map(q => `<article class="qa" id="q-${q.id}">
+          <div class="q"><span class="qid">${q.id}</span><span class="qt">${q.t}</span></div>
+          <div class="a">${q.a}</div></article>`).join('')}
+      </div></div></section>
+  ${d.notBuilding?.length ? `<section class="sec">${secT('What we are NOT building', d.notBuilding.length)}
+    <p class="sec-d">The fence, named — one line of reason each. Next waves live here too: this list is a queue, not a graveyard.</p>
+    <div class="scroll"><table class="table">${d.notBuilding.map(x =>
+      `<tr><td class="n">${x.item}</td><td>${x.reason}</td></tr>`).join('')}</table></div></section>` : ''}
+  ${d.mustBeTrue?.length ? `<section class="sec">${secT('What would have to be true', d.mustBeTrue.length)}
+    <p class="sec-d">The assumptions whose falsity kills the product. Bets, not advantages — each one checkable.</p>
+    <div class="list">${d.mustBeTrue.map(x => `<div class="card"><p style="margin:0;font-size:15.5px;color:var(--ink-2)">${x}</p></div>`).join('')}</div></section>` : ''}
+  ${d.open?.length ? `<section class="sec">${secT('Open', d.open.length)}
+    <div class="list">${d.open.map(o => `<div class="card open-item">
+      <h3>${o.t}</h3><div class="m">${o.gap}</div>
+      <div class="m"><b>Evidence:</b> ${o.evidence}</div>
+      <div class="m"><b>Resolution:</b> ${o.resolution}</div></div>`).join('')}</div></section>` : ''}`;
+}
+
+function renderStories() {
+  const S = BLUEPRINT.discovery.stories;
+  const total = S.reduce((n,s) => n + s.acs.length, 0);
+  return `
+  <section class="sec">${secT('Story map', S.length)}
+    <div class="scroll"><table class="table">
+      <tr><th>ID</th><th>Capability</th><th>Persona</th><th class="num">Criteria</th><th class="num">Bad paths</th></tr>
+      ${S.map(s => `<tr><td class="n" style="width:auto;color:var(--accent);font-family:var(--f-mono)">${s.id}</td>
+        <td>${s.name}</td><td>${s.persona}</td>
+        <td class="num">${s.acs.length}</td><td class="num">${(s.badPaths||[]).length}</td></tr>`).join('')}
+    </table></div></section>
+  <section class="sec">${secT('Stories and criteria', `${total} criteria · click to open the contract`)}
+    <div class="list">${S.map(s => `<article class="card scard">
+      <header><div class="idline"><span class="sid">${s.id}</span><span class="sname">${s.name}</span></div>
+        <div class="attrs"><span><b>${s.persona}</b></span></div></header>
+      <div class="narr">${s.narrative}</div>
+      ${(s.notes||[]).map(([tag,txt]) => `<div class="note"><span class="tag">${tag}</span><span>${txt}</span></div>`).join('')}
+      <ul class="aclist">${s.acs.map(a => `<li><details class="ac">
+        <summary><span class="acid">${a.id}</span><span class="actitle">${a.t}</span>
+          <span class="pill p-${a.type}">${a.type}</span></summary>
+        <div class="clausewrap"><div class="clauses">${a.clauses.map(([kw,tx]) =>
+          `<div><span class="kw">${kw}</span>${tx}</div>`).join('')}</div></div>
+      </details></li>`).join('')}</ul>
+      ${(s.badPaths||[]).length ? `<div class="bp"><h4>Bad paths — each with defined behavior</h4>
+        <div class="scroll"><table class="table">
+          <tr><th>Category</th><th>Case</th><th>Defined behavior</th></tr>
+          ${s.badPaths.map(b => `<tr><td class="n" style="width:170px">${b.category}</td>
+            <td>${b.caseText}</td><td>${b.behavior}</td></tr>`).join('')}
+        </table></div></div>` : ''}
+      ${(s.out||[]).length ? `<div class="bp"><h4>Out of this story</h4>
+        <div style="font-size:14.5px;color:var(--ink-2)">${s.out.map(o => `<div>· ${o}</div>`).join('')}</div></div>` : ''}
+      </article>`).join('')}</div></section>`;
+}
+
+function renderInferred() {
+  const I = BLUEPRINT.discovery.inferred;
+  return `<section class="sec">
+    ${secT('Assumptions I made', `${I.length} · confirm or correct in conversation`)}
+    <div class="list">${I.map((i,n) => `<div class="card inf">
+      <span class="num">${String(n+1).padStart(2,'0')}</span><div class="ttl">${i.t}</div>
+      <div class="kv"><b>I assumed</b><span>${i.assumed}</span></div>
+      <div class="kv"><b>because</b><span>${i.why}</span></div>
+      <div class="kv"><b>if wrong</b><span style="color:var(--bad)">${i.ifWrong}</span></div>
+    </div>`).join('')}</div></section>`;
+}
+
+/* ---------- design: glossary ---------- */
+const GCATS = {
+  vendor: { title:'From the vendor', desc:'Words that come from outside and cannot be changed. Much of the design constraint is born here.' },
+  ours: { title:'Our vocabulary', desc:'Words we invented in this workstream. If they are badly defined here, nobody else knows what they mean — these are the ones you can disagree with.' },
+  eng: { title:'Engineering words', desc:'Standard software vocabulary, used the same way across the industry.' }
+};
+function gcard(t, hero) {
+  const name = t.code ? `<code>${t.t}</code>` : t.t;
+  return `<article class="card gcard ${hero?'hero':''}">
+    <div class="rail"><span class="term">${name}</span><span class="et ${t.cat}">${t.cat === 'eng' ? 'engineering' : t.cat}</span></div>
+    <div class="body">
+      <div class="gfield"><b>what it means</b><span>${t.def}</span></div>
+      <div class="gfield here"><b>in our case</b><span>${t.here}</span></div>
+      <div class="gexample"><b>in a sentence</b><q>${t.ex}</q></div>
+    </div></article>`;
+}
+function renderGlossary() {
+  const g = BLUEPRINT.design.glossary;
+  const ess = g.terms.filter(t => t.ess);
+  const alpha = a => [...a].sort((x,y) => x.t.localeCompare(y.t,'en'));
+  return `
+  <p class="lede">Every word that appears in the other tabs without explanation is here. The tag
+  says where it comes from: what is <b>ours</b> is a decision and can be discussed; what comes
+  from the <b>vendor</b> is a constraint and is not negotiable.</p>
+  ${ess.length ? `<section class="sec">${secT('Without these, the rest does not close', ess.length)}
+    <div class="list">${ess.map(t => gcard(t, true)).join('')}</div></section>` : ''}
+  ${['vendor','ours','eng'].map(c => {
+    const inBlock = alpha(g.terms.filter(t => t.cat === c && !t.ess));
+    const onTop = g.terms.filter(t => t.cat === c && t.ess);
+    if (!inBlock.length && !onTop.length) return '';
+    return `<section class="sec">${secT(GCATS[c].title, inBlock.length + onTop.length)}
+      <p class="sec-d">${GCATS[c].desc}${onTop.length ? ` From this block, on top: <b>${onTop.map(t=>t.t).join('</b> · <b>')}</b>.` : ''}</p>
+      <div class="list">${inBlock.map(t => gcard(t, false)).join('')}</div></section>`;
+  }).join('')}`;
+}
+
+/* ---------- design: how it works ---------- */
+function renderFlows() {
+  const f = BLUEPRINT.design.flows;
+  return `
+  <p class="lede">${f.intro}</p>
+  <div class="repos" style="margin-top:22px">${f.repos.map(r =>
+    `<div class="r"><span class="rn">${r.n}</span><span class="rp">${r.p}</span></div>`).join('')}</div>
+  ${f.items.map((x,i) => `
+    <h3 class="flow-t"><span class="fn">${String(i+1).padStart(2,'0')}</span>${x.title}</h3>
+    <p class="flow-sub">${x.sub}</p>
+    <div class="chips">${x.chips.map(c => `<span class="chip ${c.ext?'ext':''}">${c.t}</span>`).join('')}</div>
+    <div class="prose">${x.prose.map(p => `<p>${p}</p>`).join('')}</div>
+    ${x.diagram ? `<div class="diagram" style="margin-top:20px">${x.diagram}</div>` : ''}`).join('')}`;
+}
+
+/* ---------- design: decisions ---------- */
+function dcard(d, open) {
+  const ops = d.ops.map(o => {
+    const marked = o.m === d.chosen;
+    const cls = marked ? (open ? 'rec' : 'chosen') : '';
+    const seal = (marked && open) ? '<span class="seal">what I decided</span>' : '';
+    return `<div class="op ${cls}"><span class="m">${o.m}</span><span class="x">${o.x}${seal}</span></div>`;
+  }).join('');
+  return `<article class="card dcard ${open?'open':''}">
+    ${open ? '<span class="waiting">Decided in your place</span>' : ''}
+    <h3 class="dq">${d.q}</h3><p class="dctx">${d.ctx}</p>
+    <div class="ops">${ops}</div>
+    <p class="dwhy"><span class="lbl">${open ? 'why I decided this way' : 'why'}</span>${d.why}
+      ${open && d.obs ? `<span class="obs2">${d.obs}</span>` : ''}</p></article>`;
+}
+function renderDecisions() {
+  const d = BLUEPRINT.design.decisions;
+  return `
+  <p class="lede">Every decision is a question someone had to answer. The ones that were yours
+  are on top, already decided — disagreeing here is cheap, nothing became code yet.</p>
+  <section class="sec">${secT('Decided in your place', d.decided.length)}
+    <p class="sec-d">These were your calls. I chose, marked, and wrote the argument — you
+    disagree with the argument, not the letter.</p>
+    <div class="list">${d.decided.map(x => dcard(x, true)).join('')}</div></section>
+  <section class="sec">${secT('Decisions taken', d.taken.length)}
+    <p class="sec-d">The same question, already answered: the chosen way highlighted, the reason below.</p>
+    <div class="list">${d.taken.map(x => dcard(x, false)).join('')}</div>
+    ${d.tail ? `<p class="tail">${d.tail}</p>` : ''}</section>
+  <section class="sec">${secT('What I assumed without you saying it', d.assumed.length)}
+    <p class="sec-d">Decided on my own, and it changes the design if wrong. Only flag the ones
+    that are broken.</p>
+    <div class="list">${d.assumed.map(s => `<div class="card sup">
+      <p class="st1">${s.a}</p><p class="st2">${s.b}</p><p class="st3">${s.c}</p></div>`).join('')}
+    </div></section>`;
+}
+
+/* ---------- design: data ---------- */
+function renderData() {
+  const d = BLUEPRINT.design.data;
+  return `
+  <p class="lede">${d.intro}</p>
+  <section class="sec">${secT('How things connect')}
+    <div class="diagram">${d.map}</div></section>
+  <section class="sec">${secT('What gets stored', d.entities.length)}
+    <div class="list">${d.entities.map(e => `<article class="card">
+      <h3>${e.name}</h3>
+      <p style="margin:0 0 14px;font-size:15.5px;color:var(--ink-2);line-height:1.65;max-width:76ch">${e.sub}</p>
+      <pre>${jsonc(e.json)}</pre>
+      <div style="display:grid;gap:9px;margin-top:14px">
+        <div class="kv"><b>how it is found</b><span>${e.found}</span></div>
+        <div class="kv"><b>how it grows</b><span>${e.grows}</span></div>
+      </div></article>`).join('')}</div></section>
+  <section class="sec">${secT('The queries the screen makes', d.queries.length)}
+    <div class="list">${d.queries.map(c => `<div class="card qrow">
+      <div class="qtop"><span class="qscreen">${c.screen}</span><span class="qcost">${c.cost}</span></div>
+      <div class="qhow">${c.how}</div><div class="qwhy">${c.why}</div></div>`).join('')}</div></section>
+  <section class="sec">${secT('Why this holds up as it grows')}
+    <div class="list">${d.scale.map(e => `<div class="card scalex"><b>${e.t}</b><span>${e.d}</span></div>`).join('')}
+    </div></section>`;
+}
+
+/* ---------- design: infra & cost ---------- */
+function recCard(r, cls, withPrice) {
+  return `<article class="card rec ${cls}">
+    <div class="rec-top"><div>
+      ${r.type && cls !== 'none' ? `<span class="type">${r.type}</span>` : ''}
+      <span class="name">${cls === 'none' ? r.type : r.name}</span></div>
+      ${withPrice && r.price ? `<span class="price">${r.price}</span>` : ''}</div>
+    ${r.cfg ? `<p class="cfg">${r.cfg}</p>` : ''}
+    <p class="what">${r.what}</p>
+    ${r.end ? `<p class="end">${r.end}</p>` : ''}</article>`;
+}
+function renderInfra() {
+  const a = BLUEPRINT.design.infra;
+  return `
+  <p class="lede">The bill first; then, resource by resource, what this wave creates.</p>
+  <section class="sec">${secT('The monthly bill')}
+    <div class="scoreboard" style="grid-template-columns:repeat(auto-fit,minmax(200px,1fr))">${a.totals.map((t,i) => `
+      <div class="pl bill ${i===0?'now':''}"><span class="l">${t.scale}</span>
+        <span class="cv">${t.v}</span><span class="cd">${t.sub}. ${t.d}</span></div>`).join('')}</div>
+    <div class="scroll"><table class="table">
+      <tr><th>Fixed cost — exists even with nobody using it</th><th class="num">US$/mo</th></tr>
+      ${a.fixed.map(f => `<tr><td class="n">${f.n}<span class="obs">${f.obs}</span></td>
+        <td class="num fx">${f.v}</td></tr>`).join('')}
+      <tr class="total"><td>Fixed total</td><td class="num">${a.fixedTotal}</td></tr></table></div>
+    <div class="scroll" style="margin-top:14px"><table class="table">
+      <tr><th>Cost that follows usage</th>${a.variableCols.map(c => `<th class="num">${c}</th>`).join('')}<th class="num">Total</th></tr>
+      ${a.variable.map(v => `<tr><td class="n">${v.scale}<span class="obs">${v.who}</span></td>
+        ${v.cols.map(x => `<td class="num">${x}</td>`).join('')}
+        <td class="num fx">${v.v}</td></tr>`).join('')}</table></div>
+    ${a.highlights.map(x => `<div class="rule"><b>${x.t}</b><p>${x.p}</p></div>`).join('')}</section>
+  <section class="sec">${secT('What gets created', `${a.created.length} resources`)}
+    <p class="sec-d">${a.stack}</p>
+    <div class="list">${a.created.map(r => recCard(r, '', true)).join('')}</div>
+    ${a.reused.length ? `<h3 class="gr">Reused, nothing created</h3>
+      <div class="list">${a.reused.map(r => recCard(r, 'reuse', false)).join('')}</div>` : ''}
+    ${a.notCreated.length ? `<h3 class="gr">Not created, on purpose — verifiable in the stack</h3>
+      <div class="list">${a.notCreated.map(r => recCard(r, 'none', false)).join('')}</div>` : ''}
+    <h3 class="gr">Deleted</h3>
+    <div class="list">${a.deleted.length ? a.deleted.map(r => recCard(r, 'none', false)).join('')
+      : recCard({ type:'None', what:'This wave removes no existing resource.' }, 'none', false)}</div></section>
+  <section class="sec">${secT('What the service is allowed to do')}
+    <div class="scroll"><table class="table">
+      ${a.iam.map(i => `<tr><td class="n">${i.o}</td><td>${i.d}</td></tr>`).join('')}</table></div></section>`;
+}
+
+/* ---------- design: code ---------- */
+function renderCode() {
+  const c = BLUEPRINT.design.code;
+  return `
+  <p class="lede">The rules that hold the design, how backend and frontend split, and where the
+  code grows without being rewritten.</p>
+  <section class="sec">${secT('The patterns and what each one guarantees', c.patterns.length)}
+    <p class="sec-d">A pattern without a consequence is personal preference. Each one comes with
+    what it guarantees and the concrete deviation that voids it — which is what review hunts.</p>
+    <div class="list">${c.patterns.map(p => `<article class="card pcard">
+      <h3>${p.n}${p.code ? ` <code>${p.code}</code>` : ''}</h3>
+      <p style="margin:0;font-size:15.5px;color:var(--ink-2);line-height:1.65;max-width:78ch">${p.what}</p>
+      <div class="pairs">
+        <div class="kv"><b>guarantees</b><span>${p.guarantees}</span></div>
+        <div class="kv"><b style="color:var(--bad)">what voids it</b><span>${p.voids}</span></div>
+      </div></article>`).join('')}</div></section>
+  <section class="sec">${secT('The backend: the path of one request')}
+    <div class="diagram">${c.map}</div>
+    <div class="scroll"><table class="table">
+      <tr><th>Layer</th><th>The rule it guarantees</th></tr>
+      ${c.layers.map(x => `<tr><td class="n">${x.nm}</td><td>${x.rule}</td></tr>`).join('')}</table></div></section>
+  <section class="sec">${secT('The frontend: how the screen splits',
+      c.front.groups.reduce((n,g)=>n+g.items.length,0) + ' components')}
+    <div class="list">${c.front.groups.map(g => `<div class="card groupc">
+      <h3>${g.g}</h3><p class="gwhat">${g.what}</p>
+      <div style="margin-top:8px">${g.items.map(i =>
+        `<div class="comp"><b>${i.n}</b><span>${i.d}</span></div>`).join('')}</div></div>`).join('')}</div>
+    <div class="rule"><b>${c.front.rule.t}</b><p>${c.front.rule.p}</p></div></section>
+  <section class="sec">${secT('Where the next piece goes', c.extensions.length)}
+    <p class="sec-d">Extensibility only means something when it is a named place — and the line
+    of what does NOT change is what gives the measure.</p>
+    <div class="list">${c.extensions.map(e => `<div class="card ext" style="display:grid;gap:8px">
+      <h3>${e.n}</h3>
+      <div class="kv"><b>when</b><span>${e.when}</span></div>
+      <div class="kv"><b class="changes">what changes</b><span>${e.changes}</span></div>
+      <div class="kv"><b class="stays">what does NOT change</b><span class="stays">${e.stays}</span></div>
+    </div>`).join('')}</div></section>`;
+}
+
+/* ---------- design: security ---------- */
+function renderSecurity() {
+  const s = BLUEPRINT.design.security;
+  const EST = { ok:'covered', risk:'risk accepted', na:'does not apply' };
+  const count = e => s.classes.filter(c => c.e === e).length;
+  return `
+  <p class="lede">The sweep covers ${s.classes.length} known failure classes. The list is fixed
+  and the same in every workstream — a class without a line is a hole, not silence.</p>
+  <div class="scoreboard" style="margin-top:22px">
+    <div class="pl ok"><span class="v">${count('ok')}</span><span class="l">covered, with concrete mitigation</span></div>
+    <div class="pl fix"><span class="v">${count('risk')}</span><span class="l">risks accepted, with reason and compensation</span></div>
+    <div class="pl na"><span class="v">${count('na')}</span><span class="l">do not apply, with the why</span></div></div>
+  <section class="sec">${secT('The sweep', `${s.classes.length} classes`)}
+    <div class="list">${s.classes.map(c => `<article class="card cl ${c.e==='ok'?'':c.e}">
+      <div class="cab"><h3>${c.c}</h3><span class="status ${c.e==='risk'?'warn':c.e==='na'?'na':'ok'}">${EST[c.e]}</span></div>
+      <p class="what2">${c.what}</p>
+      ${c.reason ? `<p class="extra"><b>why it was accepted</b>${c.reason}</p>` : ''}
+      ${c.compensates ? `<p class="extra" style="border-top:none;padding-top:0"><b>what compensates</b>${c.compensates}</p>` : ''}
+      ${c.worst ? `<p class="extra"><b>the worst case, written out</b>${c.worst}</p>` : ''}
+    </article>`).join('')}</div></section>`;
+}
+
+/* ---------- design: alarms ---------- */
+function renderAlarms() {
+  const a = BLUEPRINT.design.alarms;
+  return `
+  <p class="lede">${a.items.length} alarms. Each one says what fires it, what normal looks like,
+  when it can ring without a bug, and what to do when it rings.</p>
+  <div class="rule" style="margin-top:20px"><b>An alarm without a written action is not an alarm, it is a dashboard number</b>
+    <p>If an alarm has no action, it should not wake anyone — it becomes a chart on the ops
+    panel. And an alarm that fires in normal operation, with nobody able to explain why,
+    trains everyone to ignore the next one.</p></div>
+  <section class="sec">${secT('The alarms', a.items.length)}
+    <p class="sec-d">Most important first.</p>
+    <div class="list">${a.items.map(x => `<article class="card al">
+      <div class="acab"><span class="anm">${x.nm}</span><span class="aq">${x.when}</span></div>
+      <h3 class="atit">${x.tit}</h3>
+      <div class="fields">
+        <div class="kv"><b>what it catches</b><span>${x.catches}</span></div>
+        <div class="kv"><b>what normal looks like</b><span>${x.normal}</span></div>
+        <div class="kv"><b class="false">when it rings without a bug</b><span>${x.falseRing}</span></div>
+        <div class="kv"><b class="action">what to do</b><span class="action">${x.action}</span></div>
+      </div></article>`).join('')}</div>
+    <div class="rule calm"><b>${a.calibration.t}</b><p>${a.calibration.p}</p></div></section>`;
+}
+
+/* ---------- design: going to production ---------- */
+function renderLive() {
+  const p = BLUEPRINT.design.live;
+  return `
+  <p class="lede">${p.steps.length} steps, ${p.steps.filter(x=>x.gate).length} of them
+  blocked on you. Nothing is irreversible.</p>
+  <section class="sec">${secT('In thirty seconds')}
+    <div class="card brief"><p class="phrase">${p.brief.phrase}</p>
+      <div class="scoreboard" style="margin:0">${p.brief.cells.map(c => `
+        <div class="pl ${c.al?'fix':''}"><span class="l">${c.r}</span>
+          <span class="v" style="font-size:17px">${c.v}</span></div>`).join('')}</div></div></section>
+  <section class="sec">${secT('The script of the day', `${p.steps.length} steps`)}
+    <p class="sec-d">In order. Each step says where it runs and how to confirm it worked before
+    moving on. The highlighted ones stop and wait for you.</p>
+    <div class="list">${p.steps.map((x,i) => `<div class="card step ${x.gate?'gate':''}">
+      <span class="pnum">${String(i+1).padStart(2,'0')}</span>
+      <div class="pbody">${x.gate ? '<span class="mark">needs you</span>' : ''}
+        <span class="pt">${x.t}</span><span class="pwhere">${x.where}</span>
+        <span class="pd">${x.d}</span>
+        ${x.cmd ? `<pre>${esc(x.cmd)}</pre>` : ''}
+        <span class="pchk"><b>confirmed working when</b>${x.chk}</span>
+        ${x.obs ? `<span class="pd" style="color:var(--ink-3)">${x.obs}</span>` : ''}
+      </div></div>`).join('')}</div></section>
+  <section class="sec">${secT('How to go back')}
+    <p class="sec-d">${p.rehearsal}</p>
+    <div class="list">${p.rollbacks.map(v => `<div class="card rollback" style="display:grid;gap:6px">
+      <div class="vcab"><h3>${v.t}</h3><span class="vtime">${v.time}</span></div>
+      <span class="vwhen">${v.when}</span>
+      ${v.cmd ? `<pre>${esc(v.cmd)}</pre>` : ''}</div>`).join('')}</div></section>
+  <section class="sec">${secT('Where this usually goes wrong', p.traps.length)}
+    <p class="sec-d">Not theoretical risks — mistakes this house has made or nearly made.</p>
+    <div class="list">${p.traps.map(a => `<div class="card trap">
+      <span class="at">${a.t}</span><span class="ad">${a.d}</span></div>`).join('')}</div></section>`;
+}
+
+/* ---------- design: review ---------- */
+function lensCard(l, totalRounds) {
+  const ROT = { 'pass':'ok', 'pass with fixes':'fix', 'fail':'fail' };
+  return `<article class="card lens ${ROT[l.ver]==='ok'?'':ROT[l.ver]}">
+    <div class="lcab"><span class="lnm">${l.nm}</span>
+      <span class="status ${ROT[l.ver]==='ok'?'ok':ROT[l.ver]==='fix'?'warn':'bad'}">${l.ver}</span></div>
+    <p class="judges">${l.judges}</p>
+    <div class="verified"><b>verified</b>${l.verified.map(v=>`<span class="it">${v}</span>`).join('')}</div>
+    <div class="lquote"><b>read, and quotes</b><q>${l.quote}</q></div>
+    <div class="lmeta"><span><b>round</b> ${l.round} of ${totalRounds}</span>
+      <span><b>run</b> ${l.id}</span><span><b>findings</b> ${l.findings}</span></div>
+  </article>`;
+}
+function renderReview() {
+  const r = BLUEPRINT.design.review;
+  const count = v => r.lenses.filter(l => l.ver === v).length;
+  const missing = (r.expected || 9) - r.lenses.length;
+  return `
+  <p class="lede">${r.expected || 9} lenses, each one owning a subject. When one corrects, all
+  repeat — touching data touches contracts.</p>
+  <section class="sec">${secT('The scoreboard', `round ${r.round} of ${r.totalRounds}`)}
+    <div class="scoreboard">
+      <div class="pl ok"><span class="v">${count('pass')}</span><span class="l">passed clean</span></div>
+      <div class="pl fix"><span class="v">${count('pass with fixes')}</span><span class="l">passed after fixes</span></div>
+      <div class="pl fail"><span class="v">${count('fail')}</span><span class="l">did not pass</span></div>
+      <div class="pl na"><span class="v">${missing}</span><span class="l">did not run</span></div></div>
+    ${missing > 0 ? `<div class="warning"><b>A lens without a run invalidates the round</b>
+      <p>The run id comes from the system that dispatched the agent, not from the design text.
+      Without it, that scope was not reviewed — and the stage cannot close claiming it was.</p></div>` : ''}</section>
+  <section class="sec">${secT('Lens by lens', r.lenses.length)}
+    <p class="sec-d">Each one with what it verified, one quote from what it read, and the run id.
+    The quote proves the lens opened the document — a verdict without it is refused.</p>
+    <div class="list">${r.lenses.map(l => lensCard(l, r.totalRounds)).join('')}</div></section>`;
+}
+
+/* ---------- plan ---------- */
+function renderPlan() {
+  const p = BLUEPRINT.plan;
+  const map = `<div class="diagram"><div class="pwaves">${p.batches.map(o => `
+    <div class="pcol"><h4>Batch ${o.n}</h4>${o.items.map(i => `
+      <div class="pno ${i.critical?'critical':''} ${i.front?'front':''}"><b>${i.num}</b>${i.t}<span class="dep">${i.dep}</span></div>`).join('')}
+    </div>`).join('')}</div>
+    <div class="plegend"><span><i class="critical"></i>critical path</span>
+      <span><i class="front"></i>frontend</span><span><i></i>backend</span></div></div>`;
+  const cards = p.batches.map(o => `
+    <h3 class="ibatch"><b>Batch ${o.n}</b> · ${o.tit}</h3>
+    <div class="list">${o.items.map(i => `<article class="card icard">
+      <div class="icab"><span class="inum">${i.num}${i.gh ? ` → ${i.gh}` : ''}</span><h3>${i.card.title}</h3>
+        <span class="irepo">${i.repo}</span></div>
+      <p>${i.card.p}</p>
+      <div class="ichips">${(i.card.prod||[]).map(c=>`<span class="ichip prod">produces: ${c}</span>`).join('')}
+        ${(i.card.cons||[]).map(c=>`<span class="ichip">consumes: ${c}</span>`).join('')}</div>
+    </article>`).join('')}</div>`).join('');
+  const d = p.decisions || {};
+  const dec = `
+    ${d.decided?.length ? `<section class="sec">${secT('Decided in your place', d.decided.length)}
+      <p class="sec-d">These were your calls about the shape of the plan. I chose, marked, and wrote the argument.</p>
+      <div class="list">${d.decided.map(x => dcard(x, true)).join('')}</div></section>` : ''}
+    ${d.taken?.length ? `<section class="sec">${secT('Plan decisions', d.taken.length)}
+      <div class="list">${d.taken.map(x => dcard(x, false)).join('')}</div></section>` : ''}
+    ${d.assumed?.length ? `<section class="sec">${secT('What I assumed', d.assumed.length)}
+      <div class="list">${d.assumed.map(s => `<div class="card sup">
+        <p class="st1">${s.a}</p><p class="st2">${s.b}</p><p class="st3">${s.c}</p></div>`).join('')}
+      </div></section>` : ''}`;
+  const r = p.review;
+  const count = v => r.lenses.filter(l => l.ver === v).length;
+  const missing = (r.expected || 4) - r.lenses.length;
+  const rev = `
+  <section class="sec">${secT('The plan review', `round ${r.round} of ${r.totalRounds}`)}
+    <p class="sec-d">Whole-plan lenses plus one that reads each issue cold, alone, exactly as the
+    worker will receive it. When the plan corrects, the whole-plan lenses repeat; the cold one
+    repeats on the issues that changed.</p>
+    <div class="scoreboard">
+      <div class="pl ok"><span class="v">${count('pass')}</span><span class="l">passed clean</span></div>
+      <div class="pl fix"><span class="v">${count('pass with fixes')}</span><span class="l">passed after fixes</span></div>
+      <div class="pl fail"><span class="v">${count('fail')}</span><span class="l">did not pass</span></div>
+      <div class="pl na"><span class="v">${missing}</span><span class="l">did not run</span></div>
+      <div class="pl ${r.perIssue.pass === r.perIssue.total ? 'ok' : 'fix'}"><span class="v">${r.perIssue.pass}/${r.perIssue.total}</span>
+        <span class="l">issues pass the cold read</span></div></div>
+    ${missing > 0 ? `<div class="warning"><b>A lens without a run invalidates the round</b>
+      <p>The run id comes from the system that dispatched the agent, not from the plan text.
+      Without it, that scope was not reviewed — and the stage cannot close claiming it was.</p></div>` : ''}
+    <div class="list" style="margin-top:20px">${r.lenses.map(l => lensCard(l, r.totalRounds)).join('')}</div></section>`;
+  return `
+  <p class="lede">${p.intro}</p>
+  <div class="scoreboard" style="margin-top:22px;grid-template-columns:repeat(auto-fit,minmax(140px,1fr))">${p.cells.map(c =>
+    `<div class="pl"><span class="v">${c.v}</span><span class="l">${c.l}</span></div>`).join('')}</div>
+  <section class="sec">${secT('The batch map')}${map}</section>
+  <section class="sec">${secT('The issues, batch by batch')}${cards}</section>
+  ${dec}${rev}`;
+}
+
+/* ---------- execution ---------- */
+function renderExecution() {
+  const e = BLUEPRINT.execution;
+  const tl = `<div class="xtl">${e.timeline.map(i => `
+    <div class="xi ${i.tone || ''}"><div class="when">${i.when}</div>
+      <div class="what">${i.what}</div>${i.det ? `<div class="det">${i.det}</div>` : ''}</div>`).join('')}</div>`;
+  const smokeOut = esc(e.smoke.out)
+    .replace(/✓/g, '<span class="xok">✓</span>').replace(/✗/g, '<span class="xerr">✗</span>');
+  const caps = `<div class="list">${e.capabilities.map(c => `<article class="card icard">
+    <h3>${c.t}</h3><p>${c.p}</p>
+    <div class="ichips">${c.chips.map(x => `<span class="ichip ${x.ok ? 'prod' : ''}">${x.t}</span>`).join('')}</div>
+  </article>`).join('')}</div>`;
+  const proof = e.proof ? `<article class="card icard" style="margin-top:12px">
+    <h3>The central proof, verbatim</h3><p>${e.proof.p}</p><pre>${e.proof.pre}</pre>
+    ${e.proof.note ? `<p class="xnote">${e.proof.note}</p>` : ''}</article>` : '';
+  const r = e.rounds;
+  const TONE = { ok: 'xgreen', fail: 'xred' };
+  const rounds = `<div class="scroll"><table class="table">
+    <tr><th>Round</th>${r.scopes.map(s => `<th class="num">${s}</th>`).join('')}<th>Root cause → fix</th></tr>
+    ${r.rows.map(l => `<tr><td class="num">${l.r}</td>
+      ${l.scores.map(p => `<td class="num ${TONE[p.tone] || ''}">${p.v}</td>`).join('')}
+      <td>${l.cause}</td></tr>`).join('')}</table></div>`;
+  return `
+  <p class="lede">${e.intro}</p>
+  <section class="sec">${secT('Implementation timeline')}${tl}</section>
+  <section class="sec">${secT('Smoke', 'the floor before the round')}<pre>${smokeOut}</pre>
+    ${e.smoke.note ? `<p class="xnote">${e.smoke.note}</p>` : ''}</section>
+  <section class="sec">${secT('What exists now', `${e.capabilities.length} capabilities · each one proven`)}
+    ${caps}${proof}</section>
+  <section class="sec">${secT('e2e rounds', 'all-or-nothing · the convergence')}
+    ${r.intro ? `<p class="sec-d">${r.intro}</p>` : ''}${rounds}</section>
+  ${e.decisions?.length ? `<section class="sec">${secT('Decided in your place', 'during execution')}
+    <div class="list">${e.decisions.map(x => dcard(x, true)).join('')}</div></section>` : ''}
+  ${e.pending?.length ? `<section class="sec">${secT('Needs you', e.pending.length)}
+    <div class="list">${e.pending.map((p, i) => `<article class="card step">
+      <span class="pnum">${i + 1}</span><div class="pbody">
+      <p class="pt">${p.t}</p><p class="pd">${p.p}</p></div></article>`).join('')}</div></section>` : ''}`;
+}
+
+/* ---------- registry and boot ---------- */
 const RENDER = {
-  overview(d) {
-    return `
-    <section class="card"><h2>The frame</h2>
-      <h3>What</h3><p>${esc(d.what)}</p>
-      <h3>Who</h3><p>${esc(d.who)}</p>
-      <h3>The problem</h3><p>${esc(d.problem)}</p></section>
-    <section class="card"><h2>Wave map</h2>
-      ${(d.waves || []).map(s => `<div class="wave"><span class="n">${esc(s.n)}</span><span>${esc(s.name)} <span class="muted">— ${esc(s.state)}</span></span></div>`).join("")}
-    </section>`;
-  },
-  prfaq(d) {
-    return `
-    <section class="card"><h2>Press release</h2>
-      <p><b>${esc(d.headline)}</b></p><p>${esc(d.announcement)}</p>
-      <h3>The problem</h3><p>${esc(d.problem)}</p>
-      <h3>The solution</h3><p>${esc(d.solution)}</p>
-      <h3>How it works</h3><p>${esc(d.how)}</p></section>
-    <section class="card"><h2>External FAQ</h2>${qaList(d.faqExternal)}</section>
-    <section class="card"><h2>Internal FAQ</h2>${qaList(d.faqInternal)}</section>
-    <section class="card"><h2>What we are NOT building</h2>
-      <ul>${(d.notBuilding || []).map(x => `<li><b>${esc(x.item)}</b> — ${esc(x.reason)}</li>`).join("")}</ul></section>
-    <section class="card"><h2>What would have to be true</h2>
-      <ul>${(d.wouldHaveToBeTrue || []).map(x => `<li>${esc(x)}</li>`).join("")}</ul></section>`;
-  },
-  stories(list) {
-    return (list || []).map(s => `
-    <div class="story">
-      <span class="story-id">${esc(s.id)}</span>
-      <h3 class="story-name">${esc(s.name)}</h3>
-      <p class="muted">As a <b>${esc(s.asA)}</b>, I want <b>${esc(s.iWant)}</b>, so that <b>${esc(s.soThat)}</b>.</p>
-      <h3>Acceptance criteria</h3>
-      ${(s.acs || []).map(a => `<div class="ac"><span class="ac-id">${esc(a.id)}</span><span>${esc(a.text)}</span></div>`).join("")}
-      <h3>Bad paths</h3>
-      <div class="tablewrap"><table>
-        <tr><th>Category</th><th>Case</th><th>Defined behavior</th></tr>
-        ${(s.badPaths || []).map(b => `<tr><td>${esc(b.category)}</td><td>${esc(b.caseText)}</td><td>${esc(b.behavior)}</td></tr>`).join("")}
-      </table></div>
-      ${(s.out && s.out.length) ? `<h3>Out of this story</h3><ul>${s.out.map(o => `<li>${esc(o)}</li>`).join("")}</ul>` : ""}
-    </div>`).join("");
-  },
-  inferred(d) {
-    const chip = st => st === "confirmed" ? `<span class="chip ok">confirmed</span>`
-      : st === "corrected" ? `<span class="chip warn">corrected</span>`
-      : `<span class="chip bad">pending</span>`;
-    return `
-    <section class="card"><h2>Inferred while writing</h2>
-      <p class="muted">Facts the author had to assume — each one needs an explicit yes.</p>
-      ${(d.items || []).map(x => `<div class="pending">${chip(x.status)} ${esc(x.guess)}</div>`).join("") || "<p class='muted'>(none)</p>"}
-    </section>
-    <section class="card"><h2>Open points</h2>
-      ${(d.open && d.open.length) ? `<ul>${d.open.map(o => `<li>${esc(o)}</li>`).join("")}</ul>` : `<p><span class="chip ok">empty</span> <span class="muted">— required to approve.</span></p>`}
-    </section>`;
-  },
+  overview: renderOverview,
+  'discovery/prfaq': renderPrfaq,
+  'discovery/stories': renderStories,
+  'discovery/inferred': renderInferred,
+  'design/glossary': renderGlossary,
+  'design/flows': renderFlows,
+  'design/decisions': renderDecisions,
+  'design/data': renderData,
+  'design/infra': renderInfra,
+  'design/code': renderCode,
+  'design/security': renderSecurity,
+  'design/alarms': renderAlarms,
+  'design/live': renderLive,
+  'design/review': renderReview,
+  plan: renderPlan,
+  execution: renderExecution
 };
 
-(function boot() {
-  const h = new Date().getHours();
-  if (h >= 17 || h < 5) document.documentElement.classList.add("dark");
+document.getElementById('brand').innerHTML =
+  `${BLUEPRINT.workstream.slug}<span class="t">${BLUEPRINT.workstream.title} · wave ${BLUEPRINT.workstream.wave}</span>`;
+document.getElementById('topmeta').textContent = BLUEPRINT.overview.status;
 
-  document.body.append(el(`
-    <div class="masthead"><div class="masthead-inner">
-      <div>
-        <div class="kicker">workstream blueprint · stage: ${esc(BLUEPRINT.meta.stage)}</div>
-        <h1 class="feature">${esc(BLUEPRINT.meta.feature)}</h1>
-        <div class="slug">${esc(BLUEPRINT.meta.slug)} · updated ${esc(BLUEPRINT.meta.updated)}</div>
-      </div>
-      <button class="themebtn" id="themebtn">light / dark</button>
-    </div></div>
-    <nav class="tabs"><div class="tabs-inner" id="tabs" role="tablist"></div></nav>
-    <main id="content"></main>
-    <footer>fixed shell — stages fill the BLUEPRINT object and republish the same file path</footer>`));
+const tablist = document.getElementById('tablist');
+const subtabsEl = document.querySelector('.subtabs');
+const subtablist = document.getElementById('subtablist');
+const panels = document.getElementById('panels');
 
-  document.getElementById("themebtn").onclick = () =>
-    document.documentElement.classList.toggle("dark");
+STAGES.forEach(s => {
+  const ok = has(s.key);
+  tablist.insertAdjacentHTML('beforeend',
+    `<button class="tab" role="tab" id="t-${s.key}" aria-selected="false"${ok ? '' : ' disabled'}>${s.label}</button>`);
+  const targets = s.sections ? s.sections.map(x => `${s.key}/${x.key}`) : [s.key];
+  // Per-tab render guard: data out of shape in one tab must not take the
+  // whole page down — the broken tab declares the error, the others live.
+  const renderSafe = (id) => {
+    try { return RENDER[id]() }
+    catch (e) { return `<p style="color:var(--ink-3);padding:24px 0">This tab failed to render (${esc(String(e && e.message || e))}) — its data does not match the shape the shell expects. The other tabs remain intact.</p>` }
+  };
+  targets.forEach(id => panels.insertAdjacentHTML('beforeend',
+    `<section class="panel" id="p-${id.replace('/','--')}" role="tabpanel" hidden>${
+      ok && RENDER[id] ? renderSafe(id) : ''}</section>`));
+});
 
-  const tabsEl = document.getElementById("tabs");
-  const contentEl = document.getElementById("content");
-  const available = TAB_REGISTRY.filter(t => BLUEPRINT[t.key] != null && RENDER[t.key]);
+let stageNow = null;
+function paintSubtabs(s) {
+  if (!s.sections) { subtabsEl.hidden = true; subtablist.innerHTML = ''; return; }
+  subtabsEl.hidden = false;
+  subtablist.innerHTML = s.sections.map(x =>
+    `<button class="subtab" role="tab" data-id="${s.key}/${x.key}" aria-selected="false">${x.label}</button>`).join('');
+  subtablist.querySelectorAll('.subtab').forEach(b =>
+    b.addEventListener('click', () => select(b.dataset.id)));
+}
+function select(target) {
+  const [stKey, secKey] = target.split('/');
+  const s = STAGES.find(x => x.key === stKey);
+  if (!s || !has(stKey)) return;
+  if (stageNow !== stKey) { paintSubtabs(s); stageNow = stKey; }
+  const id = s.sections ? `${stKey}/${secKey || s.sections[0].key}` : stKey;
+  STAGES.forEach(x => document.getElementById('t-' + x.key)
+    .setAttribute('aria-selected', x.key === stKey ? 'true' : 'false'));
+  panels.querySelectorAll('.panel').forEach(p => { p.hidden = p.id !== 'p-' + id.replace('/','--'); });
+  subtablist.querySelectorAll('.subtab').forEach(b =>
+    b.setAttribute('aria-selected', b.dataset.id === id ? 'true' : 'false'));
+  history.replaceState(null, '', '#' + id);
+  window.scrollTo({ top: 0 });
+}
+STAGES.filter(s => has(s.key)).forEach(s =>
+  document.getElementById('t-' + s.key).addEventListener('click', () => select(s.key)));
+select(location.hash.slice(1) || 'overview');
 
-  function select(key) {
-    [...tabsEl.children].forEach(b => b.setAttribute("aria-selected", b.dataset.key === key));
-    contentEl.innerHTML = "";
-    contentEl.append(el(RENDER[key](BLUEPRINT[key])));
-    window.scrollTo(0, 0);
-  }
-  TAB_REGISTRY.forEach(t => {
-    const has = available.some(a => a.key === t.key);
-    const b = document.createElement("button");
-    b.className = "tab"; b.dataset.key = t.key; b.textContent = t.label;
-    b.setAttribute("role", "tab");
-    if (has) b.onclick = () => select(t.key); else b.disabled = true;
-    tabsEl.append(b);
-  });
-  if (available.length) select(available[0].key);
-})();
+
+/* scroll-spy for the PR-FAQ index */
+const links = [...document.querySelectorAll('.toc a')];
+if (links.length && 'IntersectionObserver' in window) {
+  const io = new IntersectionObserver(es => es.forEach(e => {
+    if (!e.isIntersecting) return;
+    const id = e.target.id.replace('q-', '');
+    links.forEach(l => l.classList.toggle('on', l.dataset.q === id));
+  }), { rootMargin: '-120px 0px -70% 0px' });
+  document.querySelectorAll('.answers .qa[id]').forEach(el => io.observe(el));
+}
+
+/* theme by the READER's clock: from 17h to 5h the page opens dark; light
+   otherwise. The button still rules. */
+const themeBtn = document.querySelector('.themeBtn');
+const applyTheme = (dark) => {
+  document.documentElement.classList.toggle('dark', dark);
+  themeBtn.textContent = dark ? '☀' : '☾';
+};
+const hour = new Date().getHours();
+applyTheme(hour >= 17 || hour < 5);
+themeBtn.addEventListener('click', () => {
+  applyTheme(!document.documentElement.classList.contains('dark'));
+});
 </script>
