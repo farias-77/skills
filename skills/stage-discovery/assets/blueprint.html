@@ -1,0 +1,283 @@
+<title>Workstream blueprint</title>
+
+<!--
+  FIXED BLUEPRINT SHELL — one artifact per workstream, one URL from discovery to
+  closure. Discovery creates the file from this shell; every later stage
+  fills its own key in `const BLUEPRINT` and republishes the SAME file path.
+
+  How to use: copy this file and replace ONLY the BLUEPRINT object between
+  the DATA / END DATA markers. Never edit the CSS or the render functions —
+  the identical shell across workstreams is what lets the reader find
+  everything without searching.
+
+  Tabs appear when their data key exists: discovery fills `overview`,
+  `prfaq`, `stories`, `inferred`. Later stages register their tabs in
+  TAB_REGISTRY (each stage's skill documents its data contract).
+
+  Theme: opens by the reader's clock (17h-05h dark, otherwise light) and
+  the button toggles the `.dark` class. Do not use prefers-color-scheme —
+  the host stamps its theme after this script runs. Diagrams are HTML/CSS
+  passed as strings in the data; text fields accept inline HTML
+  (<b>, <code>, <br>).
+-->
+
+<style>
+  :root {
+    --ground:#F7F7F4; --surface:#FFFFFF; --surface-2:#EFEFEA;
+    --line:#E3E3DC; --line-2:#CFCFC6;
+    --ink:#20211C; --ink-2:#5D5F55; --ink-3:#96988C;
+    --accent:#1F5F5B; --accent-ink:#174744; --band:#DDEEEC; --band-line:#B9D8D5;
+    --pending-bg:#FBF6EA; --pending-line:#E8D9B0;
+    --ok:#2F6B4F; --ok-bg:#E4F0E9;
+    --warn:#8A6410; --warn-bg:#F8E9C7;
+    --bad:#B32B24; --bad-bg:#F7DEDB;
+    --code-bg:#EFEFEA;
+    --shadow: 0 1px 2px rgba(24,22,18,.04), 0 10px 30px -18px rgba(24,22,18,.16);
+    --serif: Georgia, "Iowan Old Style", ui-serif, "Times New Roman", serif;
+    --sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    --mono: ui-monospace, "SF Mono", "Cascadia Code", Menlo, monospace;
+  }
+  :root.dark {
+    --ground:#151614; --surface:#1D1E1B; --surface-2:#252622;
+    --line:#30322C; --line-2:#42443D;
+    --ink:#F0F0EB; --ink-2:#A6A89C; --ink-3:#767870;
+    --accent:#8FC6C1; --accent-ink:#A8D6D2; --band:#1E3634; --band-line:#2F4F4C;
+    --pending-bg:#26221A; --pending-line:#4A3F26;
+    --ok:#7FC0A0; --ok-bg:#16291F;
+    --warn:#D9B23D; --warn-bg:#2E2410;
+    --bad:#E08279; --bad-bg:#331F1C;
+    --code-bg:#141513;
+    --shadow: none;
+  }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--ground); color:var(--ink);
+    font-family:var(--sans); line-height:1.6; font-size:15.5px; }
+  .masthead { background:var(--band); border-bottom:1px solid var(--band-line); }
+  .masthead-inner { max-width:920px; margin:0 auto; padding:26px 28px 18px;
+    display:flex; justify-content:space-between; align-items:flex-end; gap:16px; }
+  .kicker { font-family:var(--mono); font-size:11px; letter-spacing:.14em;
+    text-transform:uppercase; color:var(--accent-ink); }
+  h1.feature { font-family:var(--serif); font-size:30px; line-height:1.15;
+    margin:6px 0 2px; letter-spacing:-.01em; }
+  .slug { font-family:var(--mono); font-size:12px; color:var(--ink-2); }
+  .themebtn { appearance:none; border:1px solid var(--band-line);
+    background:var(--surface); color:var(--ink); border-radius:999px;
+    font-family:var(--mono); font-size:11px; padding:6px 12px; cursor:pointer; }
+  .tabs { background:var(--surface); border-bottom:1px solid var(--line);
+    position:sticky; top:0; z-index:5; }
+  .tabs-inner { display:flex; max-width:920px; margin:0 auto; padding:0 28px;
+    overflow-x:auto; }
+  .tab { appearance:none; background:none; border:none; cursor:pointer;
+    font-family:inherit; font-size:13.5px; color:var(--ink-2); padding:13px 14px 11px;
+    border-bottom:2.5px solid transparent; white-space:nowrap; }
+  .tab:hover:not([disabled]) { color:var(--ink); }
+  .tab[aria-selected="true"] { color:var(--ink); border-bottom-color:var(--accent);
+    font-weight:600; }
+  .tab[disabled] { color:var(--ink-3); cursor:default; }
+  main { max-width:920px; margin:0 auto; padding:30px 28px 80px; }
+  section.card { background:var(--surface); border:1px solid var(--line);
+    border-radius:10px; box-shadow:var(--shadow); padding:22px 26px; margin:0 0 18px; }
+  h2 { font-family:var(--serif); font-size:20px; margin:0 0 10px; letter-spacing:-.01em; }
+  h3 { font-size:14.5px; margin:18px 0 6px; }
+  p { margin:8px 0; }
+  ul { margin:8px 0; padding-left:20px; }
+  li { margin:5px 0; }
+  code { font-family:var(--mono); font-size:.87em; background:var(--code-bg);
+    border-radius:4px; padding:.08em .34em; }
+  .label { font-family:var(--mono); font-size:10.5px; letter-spacing:.12em;
+    text-transform:uppercase; color:var(--ink-3); }
+  .qa { border-left:3px solid var(--line-2); padding:2px 0 2px 14px; margin:12px 0; }
+  .qa .q { font-weight:600; margin:0; }
+  .qa .a { margin:4px 0 0; color:var(--ink-2); }
+  .chip { display:inline-block; font-family:var(--mono); font-size:10.5px;
+    letter-spacing:.06em; border-radius:999px; padding:2px 9px; vertical-align:middle; }
+  .chip.ok { color:var(--ok); background:var(--ok-bg); }
+  .chip.warn { color:var(--warn); background:var(--warn-bg); }
+  .chip.bad { color:var(--bad); background:var(--bad-bg); }
+  .story { border:1px solid var(--line); border-radius:10px; padding:18px 22px;
+    margin:14px 0; background:var(--surface); }
+  .story-id { font-family:var(--mono); font-size:12px; color:var(--accent-ink);
+    font-weight:700; }
+  .story h3.story-name { font-family:var(--serif); font-size:17px; margin:2px 0 8px; }
+  .ac { display:flex; gap:10px; margin:7px 0; align-items:baseline; }
+  .ac .ac-id { font-family:var(--mono); font-size:11px; color:var(--ink-3);
+    white-space:nowrap; }
+  .tablewrap { overflow-x:auto; margin:8px 0; }
+  table { border-collapse:collapse; width:100%; font-size:13.5px; }
+  th { text-align:left; font-family:var(--mono); font-size:10.5px;
+    letter-spacing:.1em; text-transform:uppercase; color:var(--ink-3);
+    border-bottom:1.5px solid var(--line-2); padding:6px 12px 6px 0; font-weight:600; }
+  td { border-bottom:1px solid var(--line); padding:7px 12px 7px 0; vertical-align:top; }
+  .pending { background:var(--pending-bg); border:1px solid var(--pending-line);
+    border-radius:8px; padding:10px 14px; margin:10px 0; }
+  .muted { color:var(--ink-2); }
+  .wave { display:flex; gap:12px; align-items:baseline; margin:6px 0; }
+  .wave .n { font-family:var(--mono); font-size:11px; color:var(--accent-ink);
+    font-weight:700; white-space:nowrap; }
+  footer { max-width:920px; margin:0 auto; padding:0 28px 40px;
+    font-family:var(--mono); font-size:11px; color:var(--ink-3); }
+</style>
+
+<script>
+/* ============================= DATA ==================================== */
+/* Replace ONLY this object. Text fields accept inline HTML.               */
+const BLUEPRINT = {
+  meta: {
+    feature: "Feature name",
+    slug: "YYYY-MM-DD-feature-slug",
+    stage: "discovery",            // discovery | design | planning | implementation | test | release | done
+    updated: "YYYY-MM-DD",
+  },
+
+  overview: {
+    what: "One paragraph: what this is, from the user's side.",
+    who: "Who it is for, and who it is explicitly not for.",
+    problem: "The problem it solves — concrete, with what it costs today.",
+    waves: [
+      { n: "wave 1", name: "the smallest end-to-end path", state: "this workstream" },
+      { n: "wave 2", name: "named next step", state: "starts when wave 1 ships" },
+    ],
+  },
+
+  prfaq: {
+    headline: "The product announced in one line.",
+    announcement: "The announcement paragraph, as if it shipped today.",
+    problem: "The problem paragraph.",
+    solution: "The solution paragraph — names the alternative used today.",
+    how: "The mechanism in ~5 lines. Behavior only.",
+    faqExternal: [ { q: "Customer question?", a: "Real answer." } ],
+    faqInternal: [ { q: "Hard internal question?", a: "Real answer." } ],
+    notBuilding: [ { item: "capability", reason: "out: reason. Wave 2." } ],
+    wouldHaveToBeTrue: [ "assumption whose falsity kills the product" ],
+  },
+
+  stories: [
+    {
+      id: "S-001",
+      name: "short story name",
+      asA: "persona", iWant: "capability", soThat: "outcome",
+      acs: [ { id: "SLUG-S-001-AC-1", text: "WHEN <condition>, the system SHALL <behavior>." } ],
+      badPaths: [ { category: "Boundary input", caseText: "email empty", behavior: "what happens" } ],
+      out: [ "what this story deliberately does not cover" ],
+    },
+  ],
+
+  inferred: {
+    items: [ { guess: "What the author had to assume, marked as a guess.", status: "pending" } ], // pending | confirmed | corrected
+    open: [],   // MUST be empty to approve — anything here is the next interview round
+  },
+};
+/* =========================== END DATA ================================== */
+
+/* Shell below — do not edit. */
+const TAB_REGISTRY = [
+  { key: "overview", label: "Overview" },
+  { key: "prfaq",    label: "PR-FAQ" },
+  { key: "stories",  label: "User Stories" },
+  { key: "inferred", label: "Inferred & Open" },
+  /* Later stages register here: design tabs, plan, execution report, release. */
+];
+
+const esc = s => String(s ?? "");
+function el(html) { const t = document.createElement("template"); t.innerHTML = html.trim(); return t.content; }
+function qaList(items) {
+  return (items || []).map(x => `<div class="qa"><p class="q">${esc(x.q)}</p><p class="a">${esc(x.a)}</p></div>`).join("");
+}
+
+const RENDER = {
+  overview(d) {
+    return `
+    <section class="card"><h2>The frame</h2>
+      <h3>What</h3><p>${esc(d.what)}</p>
+      <h3>Who</h3><p>${esc(d.who)}</p>
+      <h3>The problem</h3><p>${esc(d.problem)}</p></section>
+    <section class="card"><h2>Wave map</h2>
+      ${(d.waves || []).map(s => `<div class="wave"><span class="n">${esc(s.n)}</span><span>${esc(s.name)} <span class="muted">— ${esc(s.state)}</span></span></div>`).join("")}
+    </section>`;
+  },
+  prfaq(d) {
+    return `
+    <section class="card"><h2>Press release</h2>
+      <p><b>${esc(d.headline)}</b></p><p>${esc(d.announcement)}</p>
+      <h3>The problem</h3><p>${esc(d.problem)}</p>
+      <h3>The solution</h3><p>${esc(d.solution)}</p>
+      <h3>How it works</h3><p>${esc(d.how)}</p></section>
+    <section class="card"><h2>External FAQ</h2>${qaList(d.faqExternal)}</section>
+    <section class="card"><h2>Internal FAQ</h2>${qaList(d.faqInternal)}</section>
+    <section class="card"><h2>What we are NOT building</h2>
+      <ul>${(d.notBuilding || []).map(x => `<li><b>${esc(x.item)}</b> — ${esc(x.reason)}</li>`).join("")}</ul></section>
+    <section class="card"><h2>What would have to be true</h2>
+      <ul>${(d.wouldHaveToBeTrue || []).map(x => `<li>${esc(x)}</li>`).join("")}</ul></section>`;
+  },
+  stories(list) {
+    return (list || []).map(s => `
+    <div class="story">
+      <span class="story-id">${esc(s.id)}</span>
+      <h3 class="story-name">${esc(s.name)}</h3>
+      <p class="muted">As a <b>${esc(s.asA)}</b>, I want <b>${esc(s.iWant)}</b>, so that <b>${esc(s.soThat)}</b>.</p>
+      <h3>Acceptance criteria</h3>
+      ${(s.acs || []).map(a => `<div class="ac"><span class="ac-id">${esc(a.id)}</span><span>${esc(a.text)}</span></div>`).join("")}
+      <h3>Bad paths</h3>
+      <div class="tablewrap"><table>
+        <tr><th>Category</th><th>Case</th><th>Defined behavior</th></tr>
+        ${(s.badPaths || []).map(b => `<tr><td>${esc(b.category)}</td><td>${esc(b.caseText)}</td><td>${esc(b.behavior)}</td></tr>`).join("")}
+      </table></div>
+      ${(s.out && s.out.length) ? `<h3>Out of this story</h3><ul>${s.out.map(o => `<li>${esc(o)}</li>`).join("")}</ul>` : ""}
+    </div>`).join("");
+  },
+  inferred(d) {
+    const chip = st => st === "confirmed" ? `<span class="chip ok">confirmed</span>`
+      : st === "corrected" ? `<span class="chip warn">corrected</span>`
+      : `<span class="chip bad">pending</span>`;
+    return `
+    <section class="card"><h2>Inferred while writing</h2>
+      <p class="muted">Facts the author had to assume — each one needs an explicit yes.</p>
+      ${(d.items || []).map(x => `<div class="pending">${chip(x.status)} ${esc(x.guess)}</div>`).join("") || "<p class='muted'>(none)</p>"}
+    </section>
+    <section class="card"><h2>Open points</h2>
+      ${(d.open && d.open.length) ? `<ul>${d.open.map(o => `<li>${esc(o)}</li>`).join("")}</ul>` : `<p><span class="chip ok">empty</span> <span class="muted">— required to approve.</span></p>`}
+    </section>`;
+  },
+};
+
+(function boot() {
+  const h = new Date().getHours();
+  if (h >= 17 || h < 5) document.documentElement.classList.add("dark");
+
+  document.body.append(el(`
+    <div class="masthead"><div class="masthead-inner">
+      <div>
+        <div class="kicker">workstream blueprint · stage: ${esc(BLUEPRINT.meta.stage)}</div>
+        <h1 class="feature">${esc(BLUEPRINT.meta.feature)}</h1>
+        <div class="slug">${esc(BLUEPRINT.meta.slug)} · updated ${esc(BLUEPRINT.meta.updated)}</div>
+      </div>
+      <button class="themebtn" id="themebtn">light / dark</button>
+    </div></div>
+    <nav class="tabs"><div class="tabs-inner" id="tabs" role="tablist"></div></nav>
+    <main id="content"></main>
+    <footer>fixed shell — stages fill the BLUEPRINT object and republish the same file path</footer>`));
+
+  document.getElementById("themebtn").onclick = () =>
+    document.documentElement.classList.toggle("dark");
+
+  const tabsEl = document.getElementById("tabs");
+  const contentEl = document.getElementById("content");
+  const available = TAB_REGISTRY.filter(t => BLUEPRINT[t.key] != null && RENDER[t.key]);
+
+  function select(key) {
+    [...tabsEl.children].forEach(b => b.setAttribute("aria-selected", b.dataset.key === key));
+    contentEl.innerHTML = "";
+    contentEl.append(el(RENDER[key](BLUEPRINT[key])));
+    window.scrollTo(0, 0);
+  }
+  TAB_REGISTRY.forEach(t => {
+    const has = available.some(a => a.key === t.key);
+    const b = document.createElement("button");
+    b.className = "tab"; b.dataset.key = t.key; b.textContent = t.label;
+    b.setAttribute("role", "tab");
+    if (has) b.onclick = () => select(t.key); else b.disabled = true;
+    tabsEl.append(b);
+  });
+  if (available.length) select(available[0].key);
+})();
+</script>
