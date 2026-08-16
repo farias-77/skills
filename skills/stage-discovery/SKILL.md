@@ -101,6 +101,14 @@ work; use them by name.
 What is it, who is it for, what problem does it solve, what changes in the
 world when it exists.
 
+- **Settle the UI question early — when the feature has a UI at all.**
+  A backend-only demand skips this. If the feature touches a screen, ask:
+  *does a UI already exist for this, or are we building it too?* The
+  answer (no UI · UI exists · we build it) is recorded in the notes and
+  travels to stage 2, which plans the UI when it is ours to build —
+  surveying how the product looks today and designing how the feature
+  lands in it.
+
 - Open with **context-free questions** — questions that do not presuppose
   the solution. Keep them concrete and few: this is not a coaching
   session, and open-ended wandering is the enemy of moving fast. Ask what

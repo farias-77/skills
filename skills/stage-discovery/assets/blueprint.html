@@ -629,14 +629,13 @@ const STAGES = [
   { key:'design', label:'Design', sections: [
     { key:'glossary', label:'Glossary' },
     { key:'flows', label:'How it works' },
-    { key:'decisions', label:'Decisions' },
+    { key:'ui', label:'UI' },
     { key:'data', label:'Data' },
     { key:'infra', label:'Infra & cost' },
     { key:'code', label:'Code' },
     { key:'security', label:'Security' },
     { key:'alarms', label:'Alarms' },
-    { key:'live', label:'Going to production' },
-    { key:'review', label:'Review' }
+    { key:'live', label:'Going to production' }
   ]},
   { key:'plan', label:'Plan' },
   { key:'execution', label:'Execution Report' }
@@ -659,6 +658,9 @@ function renderOverview() {
     <div class="card" style="display:grid;padding:14px 16px">${p.waves.map(w => `<div class="wave ${w.state==='this wave'?'this':''}">
       <b>${w.n}</b><div><span class="wn">${w.name}</span><span class="ws">${w.state}</span></div></div>`).join('')}</div>
   </section>` : ''}
+  ${p.decidedForYou ? `<section class="sec">${secT('Decided in your place', p.decidedForYou)}
+    <div class="rule"><b>${p.decidedForYou} decision(s) taken in your place</b>
+    <p>Highlighted in orange inside the tab where each one applies — disagreeing there is cheap, nothing became code yet.</p></div></section>` : ''}
   ${(p.stages||[]).map(e => `<section class="sec">${secT(e.name, 'in numbers')}
     <div class="statgrid">${e.numbers.map(n =>
       `<div class="cell"><span class="v">${n.v}</span><span class="l">${n.l}</span></div>`).join('')}</div>
@@ -777,6 +779,7 @@ function renderGlossary() {
   <p class="lede">Every word that appears in the other tabs without explanation is here. The tag
   says where it comes from: what is <b>ours</b> is a decision and can be discussed; what comes
   from the <b>vendor</b> is a constraint and is not negotiable.</p>
+  ${inlineDecisions(g.decisions)}
   ${ess.length ? `<section class="sec">${secT('Without these, the rest does not close', ess.length)}
     <div class="list">${ess.map(t => gcard(t, true)).join('')}</div></section>` : ''}
   ${['vendor','ours','eng'].map(c => {
@@ -794,6 +797,7 @@ function renderFlows() {
   const f = BLUEPRINT.design.flows;
   return `
   <p class="lede">${f.intro}</p>
+  ${inlineDecisions(f.decisions)}
   <div class="repos" style="margin-top:22px">${f.repos.map(r =>
     `<div class="r"><span class="rn">${r.n}</span><span class="rp">${r.p}</span></div>`).join('')}</div>
   ${f.items.map((x,i) => `
@@ -804,39 +808,56 @@ function renderFlows() {
     ${x.diagram ? `<div class="diagram" style="margin-top:20px">${x.diagram}</div>` : ''}`).join('')}`;
 }
 
-/* ---------- design: decisions ---------- */
-function dcard(d, open) {
+/* ---------- decision cards (rendered INLINE in the tab they belong to) ---------- */
+function dcard(d) {
+  const mine = !!d.mine;   // mine: true => "decided in your place" (orange highlight)
   const ops = d.ops.map(o => {
     const marked = o.m === d.chosen;
-    const cls = marked ? (open ? 'rec' : 'chosen') : '';
-    const seal = (marked && open) ? '<span class="seal">what I decided</span>' : '';
+    const cls = marked ? (mine ? 'rec' : 'chosen') : '';
+    const seal = (marked && mine) ? '<span class="seal">what I decided</span>' : '';
     return `<div class="op ${cls}"><span class="m">${o.m}</span><span class="x">${o.x}${seal}</span></div>`;
   }).join('');
-  return `<article class="card dcard ${open?'open':''}">
-    ${open ? '<span class="waiting">Decided in your place</span>' : ''}
+  return `<article class="card dcard ${mine?'open':''}">
+    ${mine ? '<span class="waiting">Decided in your place</span>' : ''}
     <h3 class="dq">${d.q}</h3><p class="dctx">${d.ctx}</p>
     <div class="ops">${ops}</div>
-    <p class="dwhy"><span class="lbl">${open ? 'why I decided this way' : 'why'}</span>${d.why}
-      ${open && d.obs ? `<span class="obs2">${d.obs}</span>` : ''}</p></article>`;
+    <p class="dwhy"><span class="lbl">${mine ? 'why I decided this way' : 'why'}</span>${d.why}
+      ${mine && d.obs ? `<span class="obs2">${d.obs}</span>` : ''}</p></article>`;
 }
-function renderDecisions() {
-  const d = BLUEPRINT.design.decisions;
+/* Every design tab's data may carry `decisions: [...]` — the choices that
+   belong to THAT context, rendered right after the tab's intro. */
+function inlineDecisions(a) {
+  if (!a?.length) return '';
+  return `<section class="sec">${secT('Decisions in this area', a.length)}
+    <div class="list">${a.map(d => dcard(d)).join('')}</div></section>`;
+}
+
+/* ---------- design: ui ---------- */
+function renderUI() {
+  const u = BLUEPRINT.design.ui;
   return `
-  <p class="lede">Every decision is a question someone had to answer. The ones that were yours
-  are on top, already decided — disagreeing here is cheap, nothing became code yet.</p>
-  <section class="sec">${secT('Decided in your place', d.decided.length)}
-    <p class="sec-d">These were your calls. I chose, marked, and wrote the argument — you
-    disagree with the argument, not the letter.</p>
-    <div class="list">${d.decided.map(x => dcard(x, true)).join('')}</div></section>
-  <section class="sec">${secT('Decisions taken', d.taken.length)}
-    <p class="sec-d">The same question, already answered: the chosen way highlighted, the reason below.</p>
-    <div class="list">${d.taken.map(x => dcard(x, false)).join('')}</div>
-    ${d.tail ? `<p class="tail">${d.tail}</p>` : ''}</section>
-  <section class="sec">${secT('What I assumed without you saying it', d.assumed.length)}
-    <p class="sec-d">Decided on my own, and it changes the design if wrong. Only flag the ones
-    that are broken.</p>
-    <div class="list">${d.assumed.map(s => `<div class="card sup">
-      <p class="st1">${s.a}</p><p class="st2">${s.b}</p><p class="st3">${s.c}</p></div>`).join('')}
+  <p class="lede">${u.intro}</p>
+  ${u.exists ? `<div class="rule calm"><b>${u.exists.t}</b><p>${u.exists.p}</p></div>` : ''}
+  ${inlineDecisions(u.decisions)}
+  <section class="sec">${secT('How the UI works today', u.today.length)}
+    <p class="sec-d">The patterns this feature must grow, not fork — read from the front code${u.dsProject ? ` and the Claude Design project (<code>${u.dsProject}</code>)` : ''}.</p>
+    <div class="list">${u.today.map(t => `<div class="card" style="display:grid;gap:2px">
+      <b style="font-size:16px">${t.n}</b><span style="font-size:15px;color:var(--ink-2)">${t.d}</span></div>`).join('')}</div></section>
+  <section class="sec">${secT('Where the feature lands', `${u.screens.length} screens`)}
+    <div class="list">${u.screens.map(s => `<article class="card">
+      <h3>${s.name}</h3>
+      <p style="margin:0 0 10px;font-size:15.5px;color:var(--ink-2);line-height:1.65;max-width:78ch">${s.sub}</p>
+      <div style="display:grid;gap:9px">
+        <div class="kv"><b>carried by</b><span>${s.components}</span></div>
+        <div class="kv"><b>states</b><span>${s.states}</span></div>
+        ${s.newParts ? `<div class="kv"><b>new here</b><span>${s.newParts}</span></div>` : ''}
+      </div>
+      ${s.sketch ? `<div class="diagram" style="margin:14px 0 0">${s.sketch}</div>` : ''}
+    </article>`).join('')}</div></section>
+  <section class="sec">${secT('Sync')}
+    <div class="card" style="display:grid;gap:8px">
+      <div class="kv"><b>sketches</b><span>${u.sync.sketches}</span></div>
+      <div class="kv"><b>Claude Design</b><span>${u.sync.status}</span></div>
     </div></section>`;
 }
 
@@ -845,6 +866,7 @@ function renderData() {
   const d = BLUEPRINT.design.data;
   return `
   <p class="lede">${d.intro}</p>
+  ${inlineDecisions(d.decisions)}
   <section class="sec">${secT('How things connect')}
     <div class="diagram">${d.map}</div></section>
   <section class="sec">${secT('What gets stored', d.entities.length)}
@@ -880,6 +902,7 @@ function renderInfra() {
   const a = BLUEPRINT.design.infra;
   return `
   <p class="lede">The bill first; then, resource by resource, what this wave creates.</p>
+  ${inlineDecisions(a.decisions)}
   <section class="sec">${secT('The monthly bill')}
     <div class="scoreboard" style="grid-template-columns:repeat(auto-fit,minmax(200px,1fr))">${a.totals.map((t,i) => `
       <div class="pl bill ${i===0?'now':''}"><span class="l">${t.scale}</span>
@@ -916,6 +939,7 @@ function renderCode() {
   return `
   <p class="lede">The rules that hold the design, how backend and frontend split, and where the
   code grows without being rewritten.</p>
+  ${inlineDecisions(c.decisions)}
   <section class="sec">${secT('The patterns and what each one guarantees', c.patterns.length)}
     <p class="sec-d">A pattern without a consequence is personal preference. Each one comes with
     what it guarantees and the concrete deviation that voids it — which is what review hunts.</p>
@@ -957,6 +981,7 @@ function renderSecurity() {
   return `
   <p class="lede">The sweep covers ${s.classes.length} known failure classes. The list is fixed
   and the same in every workstream — a class without a line is a hole, not silence.</p>
+  ${inlineDecisions(s.decisions)}
   <div class="scoreboard" style="margin-top:22px">
     <div class="pl ok"><span class="v">${count('ok')}</span><span class="l">covered, with concrete mitigation</span></div>
     <div class="pl fix"><span class="v">${count('risk')}</span><span class="l">risks accepted, with reason and compensation</span></div>
@@ -977,6 +1002,7 @@ function renderAlarms() {
   return `
   <p class="lede">${a.items.length} alarms. Each one says what fires it, what normal looks like,
   when it can ring without a bug, and what to do when it rings.</p>
+  ${inlineDecisions(a.decisions)}
   <div class="rule" style="margin-top:20px"><b>An alarm without a written action is not an alarm, it is a dashboard number</b>
     <p>If an alarm has no action, it should not wake anyone — it becomes a chart on the ops
     panel. And an alarm that fires in normal operation, with nobody able to explain why,
@@ -1001,6 +1027,7 @@ function renderLive() {
   return `
   <p class="lede">${p.steps.length} steps, ${p.steps.filter(x=>x.gate).length} of them
   blocked on you. Nothing is irreversible.</p>
+  ${inlineDecisions(p.decisions)}
   <section class="sec">${secT('In thirty seconds')}
     <div class="card brief"><p class="phrase">${p.brief.phrase}</p>
       <div class="scoreboard" style="margin:0">${p.brief.cells.map(c => `
@@ -1030,7 +1057,7 @@ function renderLive() {
       <span class="at">${a.t}</span><span class="ad">${a.d}</span></div>`).join('')}</div></section>`;
 }
 
-/* ---------- design: review ---------- */
+/* ---------- lens cards (used by the plan review) ---------- */
 function lensCard(l, totalRounds) {
   const ROT = { 'pass':'ok', 'pass with fixes':'fix', 'fail':'fail' };
   return `<article class="card lens ${ROT[l.ver]==='ok'?'':ROT[l.ver]}">
@@ -1042,27 +1069,6 @@ function lensCard(l, totalRounds) {
     <div class="lmeta"><span><b>round</b> ${l.round} of ${totalRounds}</span>
       <span><b>run</b> ${l.id}</span><span><b>findings</b> ${l.findings}</span></div>
   </article>`;
-}
-function renderReview() {
-  const r = BLUEPRINT.design.review;
-  const count = v => r.lenses.filter(l => l.ver === v).length;
-  const missing = (r.expected || 9) - r.lenses.length;
-  return `
-  <p class="lede">${r.expected || 9} lenses, each one owning a subject. When one corrects, all
-  repeat — touching data touches contracts.</p>
-  <section class="sec">${secT('The scoreboard', `round ${r.round} of ${r.totalRounds}`)}
-    <div class="scoreboard">
-      <div class="pl ok"><span class="v">${count('pass')}</span><span class="l">passed clean</span></div>
-      <div class="pl fix"><span class="v">${count('pass with fixes')}</span><span class="l">passed after fixes</span></div>
-      <div class="pl fail"><span class="v">${count('fail')}</span><span class="l">did not pass</span></div>
-      <div class="pl na"><span class="v">${missing}</span><span class="l">did not run</span></div></div>
-    ${missing > 0 ? `<div class="warning"><b>A lens without a run invalidates the round</b>
-      <p>The run id comes from the system that dispatched the agent, not from the design text.
-      Without it, that scope was not reviewed — and the stage cannot close claiming it was.</p></div>` : ''}</section>
-  <section class="sec">${secT('Lens by lens', r.lenses.length)}
-    <p class="sec-d">Each one with what it verified, one quote from what it read, and the run id.
-    The quote proves the lens opened the document — a verdict without it is refused.</p>
-    <div class="list">${r.lenses.map(l => lensCard(l, r.totalRounds)).join('')}</div></section>`;
 }
 
 /* ---------- plan ---------- */
@@ -1087,9 +1093,9 @@ function renderPlan() {
   const dec = `
     ${d.decided?.length ? `<section class="sec">${secT('Decided in your place', d.decided.length)}
       <p class="sec-d">These were your calls about the shape of the plan. I chose, marked, and wrote the argument.</p>
-      <div class="list">${d.decided.map(x => dcard(x, true)).join('')}</div></section>` : ''}
+      <div class="list">${d.decided.map(x => dcard({...x, mine: true})).join('')}</div></section>` : ''}
     ${d.taken?.length ? `<section class="sec">${secT('Plan decisions', d.taken.length)}
-      <div class="list">${d.taken.map(x => dcard(x, false)).join('')}</div></section>` : ''}
+      <div class="list">${d.taken.map(x => dcard(x)).join('')}</div></section>` : ''}
     ${d.assumed?.length ? `<section class="sec">${secT('What I assumed', d.assumed.length)}
       <div class="list">${d.assumed.map(s => `<div class="card sup">
         <p class="st1">${s.a}</p><p class="st2">${s.b}</p><p class="st3">${s.c}</p></div>`).join('')}
@@ -1154,7 +1160,7 @@ function renderExecution() {
   <section class="sec">${secT('e2e rounds', 'all-or-nothing · the convergence')}
     ${r.intro ? `<p class="sec-d">${r.intro}</p>` : ''}${rounds}</section>
   ${e.decisions?.length ? `<section class="sec">${secT('Decided in your place', 'during execution')}
-    <div class="list">${e.decisions.map(x => dcard(x, true)).join('')}</div></section>` : ''}
+    <div class="list">${e.decisions.map(x => dcard({...x, mine: true})).join('')}</div></section>` : ''}
   ${e.pending?.length ? `<section class="sec">${secT('Needs you', e.pending.length)}
     <div class="list">${e.pending.map((p, i) => `<article class="card step">
       <span class="pnum">${i + 1}</span><div class="pbody">
@@ -1169,14 +1175,13 @@ const RENDER = {
   'discovery/inferred': renderInferred,
   'design/glossary': renderGlossary,
   'design/flows': renderFlows,
-  'design/decisions': renderDecisions,
+  'design/ui': renderUI,
   'design/data': renderData,
   'design/infra': renderInfra,
   'design/code': renderCode,
   'design/security': renderSecurity,
   'design/alarms': renderAlarms,
   'design/live': renderLive,
-  'design/review': renderReview,
   plan: renderPlan,
   execution: renderExecution
 };
