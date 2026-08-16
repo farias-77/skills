@@ -288,9 +288,14 @@ Present the blueprint URL and ask for review. Approval is explicit —
 silence, or a loose "looks good" without reading, does not close the
 stage. On approval: mark `.state.md` `stage: design`, move the Linear
 Project to its design status (if the MCP is available), commit the
-workstream folder, and hand off to `stage-design`. On "approved with
-fixes": apply, re-run the review round, close. On rejection: the reasons
-re-open the interview.
+workstream folder, and **suggest `/clear`** before stage 2 — not
+`/compact`: everything the design needs lives in the files by contract,
+and a generated summary is session memory smuggled past the source. If
+the design suffers after a clear, the bug is a missing file here, not
+missing context. After the clear, the founder re-enters with the
+workstream slug and `stage-design` resumes from `.state.md`. On
+"approved with fixes": apply, re-run the review round, close. On
+rejection: the reasons re-open the interview.
 
 ## Lifecycle of the files
 
