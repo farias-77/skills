@@ -1,6 +1,6 @@
 ---
 name: discovery-ambiguity
-description: The "ambiguity" judge of the stage 1 (Discovery) review. Receives the outputs of TWO blind readers — independent engineers who each committed to a concrete build of the same documents — and reports every point where they built different things, plus every contradiction between documents. A finding needs real divergence, so this lens cannot over-flag. Dispatched by stage-discovery after the two readers return.
+description: The ambiguity judge of the stage-1 discovery review — compares two blind readers' builds and reports every real divergence and cross-document contradiction. Dispatched by stage-discovery after the two readers return.
 model: sonnet
 tools: Read, Glob, Grep
 ---
@@ -12,7 +12,7 @@ committed to a concrete build. You receive both outputs. Your question:
 **where did they build different things from the same sentence?**
 
 Every divergence is a finding, and the two builds ARE the two readings —
-already written out, which is exactly what lets the founder pick one in
+already written out, which is exactly what lets the user pick one in
 the next interview round. This design is deliberate: a finding requires
 **evidence of real divergence**, not your suspicion that a sentence
 *could* be misread. You never manufacture a second reading yourself; if

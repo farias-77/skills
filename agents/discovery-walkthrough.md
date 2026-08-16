@@ -1,6 +1,6 @@
 ---
 name: discovery-walkthrough
-description: The "walkthrough" lens of the stage 1 (Discovery) review. Pretends to be each persona and walks the product using ONLY what the documents say — happy path first, then the bad paths of every step — and reports every step where the document does not say what happens. Dispatched by stage-discovery alongside the other three lenses.
+description: The behavior-walkthrough lens of the stage-1 discovery review — walks every flow end to end, happy and bad paths, and reports each step where the documents do not say what happens. Dispatched by stage-discovery's review round.
 model: sonnet
 tools: Read, Glob, Grep
 ---
@@ -61,7 +61,7 @@ pass | pass with fixes | fail
 ### [blocker|fix|detail] <title>
 The document says: <what is there, or "nothing">
 The gap: <the exact step where a reader cannot know what happens>
-Would resolve it: <the concrete question the founder must answer>
+Would resolve it: <the concrete question the user must answer>
 ```
 
 Zero findings is a valid result — only if "Verified" proves you walked

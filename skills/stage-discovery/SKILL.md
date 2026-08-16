@@ -1,6 +1,6 @@
 ---
 name: stage-discovery
-description: Conducts stage 1 (Discovery) of the pipeline — the front door for new demands. Interviews the founder turn by turn until scope is perfectly understood (every coverage category Clear, no open questions), then writes the PR-FAQ and User Stories from the interview notes — inferring is allowed, silent inferring is not — runs the four clarity reviewers with an audited round, and publishes the workstream blueprint for approval. Use when the user brings a new demand ("we have a demand"), asks to open a discovery, or an in-progress discovery needs resuming.
+description: Conducts stage 1 (Discovery) of the pipeline — the front door for new demands. Interviews the user turn by turn until scope is perfectly understood (every coverage category Clear, no open questions), then writes the PR-FAQ and User Stories from the interview notes — inferring is allowed, silent inferring is not — runs the four clarity reviewers with an audited round, and publishes the workstream blueprint for approval. Use when the user brings a new demand ("we have a demand"), asks to open a discovery, or an in-progress discovery needs resuming.
 disable-model-invocation: false
 argument-hint: "[slug]"
 allowed-tools: Read, Write, Edit, Glob, Grep, Agent, AskUserQuestion, Artifact, Bash(mkdir *), Bash(date *), Bash(ls *), Bash(cat *), Bash(rm *)
@@ -18,13 +18,13 @@ architecture, no data model, no technology. Discovery answers *what* and
 **The one rule everything else serves:** the interview ends when you can
 write both documents **without silently inventing anything**. Inferring is
 allowed — often good: it makes answering cheap — but every inference is
-**registered in the Inferred list** and reviewed by the founder. The sin is
+**registered in the Inferred list** and reviewed by the user. The sin is
 never the assumption; it is the assumption nobody can audit.
 
 ## The front door
 
 A new demand arrives in conversation. Before anything else, ask (one closed
-question): **open a discovery, or just talk?** The founder may want to
+question): **open a discovery, or just talk?** The user may want to
 think out loud, organize the ideas, weigh whether it is worth building at
 all, or break a big theme into pieces before committing to any of them —
 all of that is conversation, and conversation is welcome here. Only an
@@ -43,11 +43,11 @@ On open:
    cut is approved, the notes move into wave 1's `00-discovery/`. Notes
    are a working file: deleted when the stage closes (see Lifecycle).
 4. **Create the workstream's Project in Linear — via the Linear MCP, with
-   NO issues.** The Project is the founder's portfolio view of the
+   NO issues.** The Project is the user's portfolio view of the
    workstream (name = the workstream title, description = the one-line
    frame); issues never live here — they are born in GitHub at planning.
-   If the Linear MCP is not configured in this workspace, say so once and
-   continue — a tracker mirror never blocks a stage.
+   **Linear is the main tracking surface: the MCP missing is a halt** —
+   ask for it to be set up and stop; no stage proceeds without it.
 
 ## Breaking into waves
 
@@ -65,7 +65,7 @@ A large demand does not enter whole. Propose a cut into **waves**:
   as direction. Knowing the destination is what lets the design build
   wave 1 extensible in the right places instead of guessing.
 
-The founder approves the cut before the interview goes deep. When it is
+The user approves the cut before the interview goes deep. When it is
 approved, **all wave folders are born at once**, named
 `wNN-<what-it-delivers>` (order prefix + a 2-4 word kebab slug of what the
 wave ships):
@@ -114,7 +114,7 @@ world when it exists.
   session, and open-ended wandering is the enemy of moving fast. Ask what
   shapes construction ("who suffers most from this today?", "what must be
   true a month after launch for this to have worked?") and move on.
-- **Ladder up, then stop**: when the founder brings a solution ("add a
+- **Ladder up, then stop**: when the user brings a solution ("add a
   CSV export button"), ask why until you reach the business goal behind it
   ("accountants re-type this data every month") — then **stop laddering**.
   Chasing every "why" branch expands scope; this interview exists to close
@@ -137,7 +137,7 @@ Make behavior concrete. Never discuss requirements in the abstract.
 - At every step, probe **"and if...?"**: wrong input, empty state, repeat
   action, timeout, the dependency is down, the user lacks permission.
 - Sweep **who / what / when / where / how** per flow, so coverage does not
-  depend on how the founder happens to narrate.
+  depend on how the user happens to narrate.
 - **Infer to go faster** — propose the behavior you believe is right
   ("I assume the expired invite stays visible as `expired` — confirm?")
   instead of asking everything open. Confirmed on the spot, it is fact;
@@ -156,8 +156,8 @@ classified now.
 
 For each story, acceptance criteria that a stranger could judge without
 asking anyone. Before closing any item, **restate what you understood and
-ask for confirmation** — your rewrite of the founder's words, confirmed by
-the founder, is the contract. At decision points, offer **closed options**
+ask for confirmation** — your rewrite of the user's words, confirmed by
+the user, is the contract. At decision points, offer **closed options**
 (use AskUserQuestion), not open text: choices close ambiguity, prose opens
 it.
 
@@ -184,12 +184,12 @@ Rules:
   means mechanically: never ask what the notes already answer.
 - **At most 5 questions per round**, highest-impact cells first.
 - When every cell is Clear, do the **playback — always, before
-  finalizing**: present the complete understanding back to the founder in
+  finalizing**: present the complete understanding back to the user in
   one structured pass (what it is, the waves, every flow's behavior, the
   fence, the inferences so far) and get an explicit "that's it". The
   playback is where wrong assumptions die cheap.
 - Then the closing question: **"is there anything I should be asking that
-  I haven't?"** The founder's answer to that question has revealed a
+  I haven't?"** The user's answer to that question has revealed a
   missing item often enough that no checklist replaces it.
 
 ## Interviewer self-check (every turn, before sending)
@@ -200,7 +200,7 @@ Delete or rewrite any question that:
 2. Is a leading question — one that smuggles in its own answer ("don't you
    think X would be better?"). Proposing openly is welcome — we are
    building the company, suggestions are part of the job: "we could do X,
-   which buys us Y — want it in?" is a proposal the founder can refuse.
+   which buys us Y — want it in?" is a proposal the user can refuse.
    The sin is the question that only accepts one answer.
 3. Asks about a vague hypothetical instead of a concrete scenario.
 4. Is already answered in the notes.
@@ -225,7 +225,7 @@ templates — stage folders are numbered so they sort in pipeline order:
 
 **Nothing invented silently.** While writing, any fact you catch yourself
 assuming goes into the **Inferred** list with your best guess marked as a
-guess — the founder confirms each one explicitly at the checkpoint. An
+guess — the user confirms each one explicitly at the checkpoint. An
 empty Inferred list after honest writing is rare; treat suspiciously.
 
 ## The review round
@@ -257,11 +257,11 @@ quietly.
 2. Record the round in `reviews.md` **before acting on it**: one section
    per reviewer with its verdict, and one line per finding.
 3. Give **every finding a disposition**, written next to it in
-   `reviews.md`: `fixed` (document changed), `to-founder` (it is a real
+   `reviews.md`: `fixed` (document changed), `to-user` (it is a real
    question — goes into the next interview round's agenda), or `rejected`
-   (with the reason, and rejecting a blocker requires the founder's
+   (with the reason, and rejecting a blocker requires the user's
    explicit sign-off). No finding stays undispositioned.
-4. Fix the documents, take the `to-founder` items to the founder, then run
+4. Fix the documents, take the `to-user` items to the user, then run
    the **entire round again** — all reviewers, fresh. Repeat until a round
    comes back with **zero blockers**.
 
@@ -287,13 +287,9 @@ so any wave's blueprint locates itself in the whole) and the three
 Present the blueprint URL and ask for review. Approval is explicit —
 silence, or a loose "looks good" without reading, does not close the
 stage. On approval: mark `.state.md` `stage: design`, move the Linear
-Project to its design status (if the MCP is available), commit the
-workstream folder, and **suggest `/clear`** before stage 2 — not
-`/compact`: everything the design needs lives in the files by contract,
-and a generated summary is session memory smuggled past the source. If
-the design suffers after a clear, the bug is a missing file here, not
-missing context. After the clear, the founder re-enters with the
-workstream slug and `stage-design` resumes from `.state.md`. On
+Project to its design status (via the MCP — its absence halts), commit the
+workstream folder, and suggest `/clear` before stage 2 (house rule:
+stage transitions, in the repo's `CLAUDE.md`). On
 "approved with fixes": apply, re-run the review round, close. On
 rejection: the reasons re-open the interview.
 

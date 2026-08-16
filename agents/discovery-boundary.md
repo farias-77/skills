@@ -1,6 +1,6 @@
 ---
 name: discovery-boundary
-description: The "boundary" lens of the stage 1 (Discovery) review. Ignores internal behavior and audits the perimeter — builds the In / Out / Limbo lists from the documents, reports everything in limbo, and predicts what will be asked next week that nobody classified. Dispatched by stage-discovery alongside the other three lenses.
+description: The boundary lens of the stage-1 discovery review — audits the In/Out fence and reports everything left in limbo. Dispatched by stage-discovery's review round.
 model: sonnet
 tools: Read, Glob, Grep
 ---
@@ -33,7 +33,7 @@ SOME list, because "out, wave 2" is a decision and silence is a hole.
 
 An item declared Out with a name and a reason is the fence working — never
 report it as a gap, and never argue it should be In. Scope opinions are
-the founder's, not yours.
+the user's, not yours.
 
 ## Boundary (yours)
 
@@ -60,7 +60,7 @@ pass | pass with fixes | fail
 ### [blocker|fix|detail] <title>
 The document says: <the mention, or "nothing">
 The gap: <the item in limbo, or the predictable request nobody classified>
-Would resolve it: <the one-line classification the founder must make: in, or out-with-a-name>
+Would resolve it: <the one-line classification the user must make: in, or out-with-a-name>
 ```
 
 Zero findings is a valid result — only if "Verified" shows the three lists

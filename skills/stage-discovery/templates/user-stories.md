@@ -51,6 +51,6 @@
 ## Open questions
 
 <!-- MUST be empty to approve. A question here is an interview round that
-     has not happened yet — take it back to the founder, do not guess. -->
+     has not happened yet — take it back to the user, do not guess. -->
 
 (none)

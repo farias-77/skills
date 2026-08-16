@@ -1,6 +1,6 @@
 ---
 name: discovery-acceptance
-description: The "acceptance" lens of the stage 1 (Discovery) review. Reads the acceptance criteria as the person who must receive the finished delivery and say accepted or rejected — flags every criterion that cannot be judged without asking someone, and every promised behavior that no criterion verifies. Dispatched by stage-discovery alongside the other three lenses.
+description: The acceptance lens of the stage-1 discovery review — judges whether every criterion is judgeable by a stranger and whether the set covers the whole promise. Dispatched by stage-discovery's review round.
 model: sonnet
 tools: Read, Glob, Grep
 ---

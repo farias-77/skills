@@ -831,6 +831,15 @@ function inlineDecisions(a) {
   return `<section class="sec">${secT('Decisions in this area', a.length)}
     <div class="list">${a.map(d => dcard(d)).join('')}</div></section>`;
 }
+/* Every design tab's data may carry `references: [...]` — the roll-up of
+   what that tab's document leaned on (research files, URLs, code paths),
+   rendered at the bottom of the tab. */
+function refsBlock(a) {
+  if (!a?.length) return '';
+  return `<section class="sec">${secT('References', a.length)}
+    <div class="card"><ul style="margin:0;padding-left:20px">${a.map(r =>
+      `<li style="font-size:14px;color:var(--ink-2);line-height:1.7">${r}</li>`).join('')}</ul></div></section>`;
+}
 
 /* ---------- design: ui ---------- */
 function renderUI() {
@@ -1203,7 +1212,12 @@ STAGES.forEach(s => {
   // Per-tab render guard: data out of shape in one tab must not take the
   // whole page down — the broken tab declares the error, the others live.
   const renderSafe = (id) => {
-    try { return RENDER[id]() }
+    try {
+      let html = RENDER[id]();
+      const [st, sec] = id.split('/');
+      if (st === 'design' && BLUEPRINT.design?.[sec]?.references) html += refsBlock(BLUEPRINT.design[sec].references);
+      return html;
+    }
     catch (e) { return `<p style="color:var(--ink-3);padding:24px 0">This tab failed to render (${esc(String(e && e.message || e))}) — its data does not match the shape the shell expects. The other tabs remain intact.</p>` }
   };
   targets.forEach(id => panels.insertAdjacentHTML('beforeend',
