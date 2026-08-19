@@ -41,8 +41,8 @@
 
 ### Out of this story
 
-<!-- What this story deliberately does not cover — with the story or wave
-     that covers it, if any. -->
+<!-- What this story deliberately does not cover — with the story that
+     covers it, if any. -->
 
 - <capability> — <where it lives instead>
 

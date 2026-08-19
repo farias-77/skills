@@ -53,11 +53,12 @@ does Y. No architecture, no technology names — behavior only.>
 
 ## What we are NOT building
 
-<!-- The fence, named. One line of reason each. Next waves live here with
-     their names — wave 2 starts when wave 1 ships; this list is a queue,
-     not a graveyard. -->
+<!-- The fence, named. One line of reason each. Two kinds, both explicit:
+     not building (with the reason) and future direction (recorded from
+     the evolution question — where the product is heading, not a
+     commitment). -->
 
-- **<capability>** — out: <reason>. <If it is a next wave: "Wave 2, starts after this ships.">
+- **<capability>** — out: <reason>. <If it is direction: "future direction, not scheduled.">
 
 ## What would have to be true
 

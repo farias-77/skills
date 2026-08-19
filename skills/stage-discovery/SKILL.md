@@ -1,19 +1,23 @@
 ---
 name: stage-discovery
-description: Conducts stage 1 (Discovery) of the pipeline — the front door for new demands. Interviews the user turn by turn until scope is perfectly understood (every coverage category Clear, no open questions), then writes the PR-FAQ and User Stories from the interview notes — inferring is allowed, silent inferring is not — runs the four clarity reviewers with an audited round, and publishes the workstream blueprint for approval. Use when the user brings a new demand ("we have a demand"), asks to open a discovery, or an in-progress discovery needs resuming.
+description: Conducts stage 1 (Discovery) of the pipeline — the front door for new demands. Interviews the user turn by turn until scope is perfectly understood (every coverage category Clear, no open questions), then writes ONE PR-FAQ and ONE User Stories document covering the whole demand — inferring is allowed, silent inferring is not — runs the audited review round as a workflow (three lenses plus two blind readers and their judge), and publishes the workstream blueprint for approval. Use when the user brings a new demand ("we have a demand"), asks to open a discovery, or an in-progress discovery needs resuming.
 disable-model-invocation: false
 argument-hint: "[slug]"
-allowed-tools: Read, Write, Edit, Glob, Grep, Agent, AskUserQuestion, Artifact, Bash(mkdir *), Bash(date *), Bash(ls *), Bash(cat *), Bash(rm *)
+allowed-tools: Read, Write, Edit, Glob, Grep, Agent, Workflow, AskUserQuestion, Artifact, Bash(mkdir *), Bash(date *), Bash(ls *), Bash(cat *), Bash(rm *)
 ---
 
 # Stage 1: Discovery
 
 The engineering team interviewing the product owner: at the end of this
-stage, everything that needs to be built exists **in files** — a PR-FAQ and
-User Stories with no nuance left to interpretation — and four independent
-reviewers have failed to find a hole in them. Nothing here is design: no
-architecture, no data model, no technology. Discovery answers *what* and
-*why*; stage 2 answers *how*.
+stage, everything that needs to be built exists **in files** — one PR-FAQ
+and one User Stories document, covering the whole demand, with no nuance
+left to interpretation — and four independent review lenses have failed
+to find a hole in them. That pair is the package the demand's owner
+reviews **once**: after approval, the pipeline does not come back for
+more requirements. Nothing here is design: no architecture, no data
+model, no technology, no build sequencing — everything about HOW and in
+what order the thing gets built is engineering's problem, downstream.
+Discovery answers *what* and *why*; stage 2 answers *how*.
 
 **The one rule everything else serves:** the interview ends when you can
 write both documents **without silently inventing anything**. Inferring is
@@ -30,18 +34,24 @@ all, or break a big theme into pieces before committing to any of them —
 all of that is conversation, and conversation is welcome here. Only an
 explicit "open it" creates state.
 
+**Locate the user's starting point in the same breath**: how formed is
+this demand? A vague idea earns exploration first — brainstorm
+approaches, scope shapes, adjacent problems, cheapest-to-most-ambitious
+— because closing a fence around an unexplored idea locks in the first
+framing, not the best one. A formed spec goes straight to the interview.
+Depth of interview is proportional to how much territory the user has
+already covered on their own.
+
 On open:
 
 1. Derive the slug: `YYYY-MM-DD-<short-kebab-name>`.
 2. Create the workstream folder at the workspace's designs root (the
    consuming project's `CLAUDE.md` says where designs live) and the state
-   file: `designs-root/<slug>/.state.md` with `wave: (pending cut)` and
-   `stage: discovery`.
-3. Start `notes.md` at the workstream root **on the first turn** — the
-   interview notes are written as the conversation happens, so a dead
-   session loses nothing and resume is just re-reading them. When the wave
-   cut is approved, the notes move into wave 1's `00-discovery/`. Notes
-   are a working file: deleted when the stage closes (see Lifecycle).
+   file: `designs-root/<slug>/.state.md` with `stage: discovery`.
+3. Start `00-discovery/notes.md` **on the first turn** — the interview
+   notes are written as the conversation happens, so a dead session loses
+   nothing and resume is just re-reading them. Notes are a working file:
+   deleted when the stage closes (see Lifecycle).
 4. **Create the workstream's Project in Linear — via the Linear MCP, with
    NO issues.** The Project is the user's portfolio view of the
    workstream (name = the workstream title, description = the one-line
@@ -49,45 +59,29 @@ On open:
    **Linear is the main tracking surface: the MCP missing is a halt** —
    ask for it to be set up and stop; no stage proceeds without it.
 
-## Breaking into waves
-
-A large demand does not enter whole. Propose a cut into **waves**:
-
-- **Wave 1 is the MVP — the smallest thing that is still useful end to
-  end.** A user starts at the beginning and reaches the end, however
-  narrow the path, and gets real value from it.
-- **Each next wave builds on the previous one**, named and with one line
-  of scope — not a "future ideas" graveyard: wave 2 starts as soon as
-  wave 1 ships.
-- **Ask the evolution question**: *"how do you imagine this product
-  evolving?"* — things that will NOT enter this workstream and are not for
-  now, but show where the product is heading. Record them in the wave map
-  as direction. Knowing the destination is what lets the design build
-  wave 1 extensible in the right places instead of guessing.
-
-The user approves the cut before the interview goes deep. When it is
-approved, **all wave folders are born at once**, named
-`wNN-<what-it-delivers>` (order prefix + a 2-4 word kebab slug of what the
-wave ships):
+## What this stage produces
 
 ```
 designs-root/2026-08-15-workspace-invites/
-├── .state.md                      # wave: w01-invite-by-email · stage: discovery
-├── w01-invite-by-email/           # this wave — the full pipeline runs here
-│   ├── blueprint.html             # one blueprint PER WAVE (each wave runs all stages)
-│   └── 00-discovery/              # stage folders, numbered in pipeline order
-├── w02-resend-and-revoke/
-│   └── README.md                  # one page: what this wave builds, written NOW
-└── w03-bulk-csv-invites/
-    └── README.md
+├── .state.md                # stage: discovery
+├── blueprint.html           # the workstream's blueprint — Overview + Discovery filled here
+└── 00-discovery/
+    ├── notes.md             # working: the interview, live, with the coverage map
+    ├── reviews.md           # working: the review-round audit
+    ├── pr-faq.md            # permanent: the whole demand, narrated
+    └── user-stories.md      # permanent: every story and AC of the whole demand
 ```
 
-Each future wave starts with only a `README.md` — one page, written during
-the cut, describing what that wave delivers and its rough scope. **The
-README is the seed of that wave's discovery**: when a wave closes (stage
-7), the closure suggests opening the next one on the spot, and its
-discovery starts from the README plus what the previous wave shipped —
-next waves are a queue that moves, not a parking lot.
+The two documents cover **everything that will be built** — the entire
+demand, delimited in detail, reviewable in one sitting by someone who was
+not in the interview. Two things must never blur into each other:
+
+- **What will be built** — all of it lands in these two documents now,
+  and all of it is commitment: nothing in them is a maybe.
+- **Where the product is heading** — direction, not commitment. Captured
+  by the evolution question (below), recorded so stage 2 designs the
+  right things extensible, and explicitly NOT part of what these
+  documents promise.
 
 ## The interview
 
@@ -101,14 +95,6 @@ work; use them by name.
 What is it, who is it for, what problem does it solve, what changes in the
 world when it exists.
 
-- **Settle the UI question early — when the feature has a UI at all.**
-  A backend-only demand skips this. If the feature touches a screen, ask:
-  *does a UI already exist for this, or are we building it too?* The
-  answer (no UI · UI exists · we build it) is recorded in the notes and
-  travels to stage 2, which plans the UI when it is ours to build —
-  surveying how the product looks today and designing how the feature
-  lands in it.
-
 - Open with **context-free questions** — questions that do not presuppose
   the solution. Keep them concrete and few: this is not a coaching
   session, and open-ended wandering is the enemy of moving fast. Ask what
@@ -119,6 +105,20 @@ world when it exists.
   ("accountants re-type this data every month") — then **stop laddering**.
   Chasing every "why" branch expands scope; this interview exists to close
   it.
+- **Blindspot pass — teach before asking, when the user does not master
+  the territory.** An answer given from ignorance sounds like a
+  requirement but is a guess. When the demand enters a domain the user
+  shows little command of, invert the interview for a moment: lay out
+  the choice space — the dimensions that exist, what "good" looks like
+  there, and the ceiling (*"do you know how good this can get?"*) —
+  then collect the decision. A user deciding inside a map they have
+  seen decides once; a user deciding blind re-decides in stage 4.
+- **Ask for a reference when words run out.** Some requirements are
+  "I'll know it when I see it" — do not force them into prose. Ask:
+  *"is there something out there that already does this the way you
+  want?"* — a product, a site, a competitor, a library. The reference
+  goes into the notes and travels to stage 2, which can read the code
+  behind it, not just the screenshot.
 - **Anchor on the concrete.** When the demand touches something that
   already happens, ask about the real past case ("when did this last
   happen? what did you do?") — real behavior beats hypotheticals. When the
@@ -147,10 +147,17 @@ Make behavior concrete. Never discuss requirements in the abstract.
 
 Close the fence. Two explicit lists — **In** and **Out** — and nothing in
 limbo. Out has two kinds, both named: **not building** (with the reason)
-and **next wave / next workstream** (with the wave it lands in). "Bulk
-invites: out, wave 2" is a decision; silence about bulk invites is a bug
-this stage exists to prevent. Predictable follow-up requests get named and
-classified now.
+and **future direction** (not scheduled — see the evolution question).
+"Bulk invites: not building, revisit after launch" is a decision; silence
+about bulk invites is a bug this stage exists to prevent. Predictable
+follow-up requests get named and classified now.
+
+- **Ask the evolution question**: *"how do you imagine this product
+  evolving?"* — and make its purpose explicit to the user when asking:
+  **none of this gets built now**. The answers exist so we build today's
+  scope already pointed in the direction the product is walking — they
+  are recorded as **direction**, they never enter In, and they are what
+  lets stage 2 design the right places extensible instead of guessing.
 
 ### 4. Lock acceptance
 
@@ -175,22 +182,31 @@ updated every turn:
 | Edge cases (empty, limits, repeats, races) | Clear / Partial / Missing |
 | Constraints (legal, cost, deadline, platform) | Clear / Partial / Missing |
 | Terminology (every domain word defined) | Clear / Partial / Missing |
-| Boundary (In and Out lists closed; evolution mapped) | Clear / Partial / Missing |
+| Boundary (In and Out lists closed; direction mapped) | Clear / Partial / Missing |
 
 Rules:
 
 - A question may only target a **Partial or Missing** cell — if every cell
   is Clear, you have nothing to ask. This is what "no useless questions"
   means mechanically: never ask what the notes already answer.
-- **At most 5 questions per round**, highest-impact cells first.
+- **At most 5 questions per round.** Priority is not vague "impact":
+  the question goes first when a **wrong guess at its answer would
+  change what gets built** — architecture, data, scope. A question
+  whose any answer leads to the same construction can wait or die.
+  (This is the same razor stage 3's judge uses to triage a cold
+  reader's questions — the ruler is one, at both ends of the pipeline.)
+- **A taste requirement closes in the user's words.** Nothing visual is
+  built in this stage. When the demand carries taste ("premium",
+  "playful", "clean"), record how the user says it should FEEL — their
+  own words, plus the reference if one exists — and mark the cell Clear.
+  Do not chase EARS-grade precision for feel: turning those words into
+  pixels and validating them by the user's reaction is stage 2's job.
+  What the screen DOES still closes here, fully.
 - When every cell is Clear, do the **playback — always, before
   finalizing**: present the complete understanding back to the user in
-  one structured pass (what it is, the waves, every flow's behavior, the
-  fence, the inferences so far) and get an explicit "that's it". The
+  one structured pass (what it is, every flow's behavior, the fence, the
+  direction, the inferences so far) and get an explicit "that's it". The
   playback is where wrong assumptions die cheap.
-- Then the closing question: **"is there anything I should be asking that
-  I haven't?"** The user's answer to that question has revealed a
-  missing item often enough that no checklist replaces it.
 
 ## Interviewer self-check (every turn, before sending)
 
@@ -209,17 +225,15 @@ Delete or rewrite any question that:
 ## Writing the documents
 
 Write only when the coverage map is all Clear and the playback got its
-explicit "that's it". Two files inside the current wave's folder, from the
-templates — stage folders are numbered so they sort in pipeline order:
+explicit "that's it". Two files, from the templates:
 
-- `wNN-<wave>/00-discovery/pr-faq.md` —
-  [templates/pr-faq.md](templates/pr-faq.md).
+- `00-discovery/pr-faq.md` — [templates/pr-faq.md](templates/pr-faq.md).
   The product narrated: press release, external FAQ, internal FAQ, what we
   are NOT building, and what would have to be true.
-- `wNN-<wave>/00-discovery/user-stories.md` —
-  [templates/user-stories.md](templates/user-stories.md). Stories with IDs
-  (`S-001`, `S-002`, ...), acceptance criteria in EARS form (`WHEN
-  <condition>, the system SHALL <behavior>`) with IDs
+- `00-discovery/user-stories.md` —
+  [templates/user-stories.md](templates/user-stories.md). Stories with
+  IDs (`S-001`, `S-002`, ...), acceptance criteria in EARS form —
+  `WHEN <condition>, the system SHALL <behavior>` — with IDs
   (`<SLUG>-S-001-AC-1`), and bad paths enumerated per story. Those AC IDs
   are referenced by every later stage, through to the e2e round.
 
@@ -228,81 +242,79 @@ assuming goes into the **Inferred** list with your best guess marked as a
 guess — the user confirms each one explicitly at the checkpoint. An
 empty Inferred list after honest writing is rare; treat suspiciously.
 
-## The review round
+## The review round (a workflow, so it cannot be skipped)
 
-The round is **audited**: it exists in `00-discovery/reviews.md`, and the
-stage physically cannot close without that file complete. This is what
-makes skipping a reviewer impossible — the conductor has to do something
-with every review, so ignoring one is not a behavior that can happen
-quietly.
+Run [`discovery-review`](../../workflows/discovery-review.js) —
+`Workflow({name: 'discovery-review', args: {discoveryDir, round}})`.
+It is ONE invocation covering the whole round: the three document lenses
+and the two blind readers run concurrently, and the ambiguity judge
+closes with both builds in hand. **Every round is full — every lens,
+every time**; the full re-run is the regression guard.
 
-1. Dispatch **all reviewers of the round together, always** — never a
-   subset, never "just the one that failed last time" (a fix for one lens
-   regresses another; only the full round catches it). The round is:
+| Agent | Validates |
+|---|---|
+| `discovery-walkthrough` | every covered case runs end to end in behavior |
+| `discovery-acceptance` | the delivery as a whole is judgeable from the ACs |
+| `discovery-boundary` | In and Out are closed; nothing in limbo |
+| 2× `discovery-reader` → `discovery-ambiguity` | one reading only — two independent engineers build the same thing |
 
-   | Agent | Validates |
-   |---|---|
-   | `discovery-walkthrough` | every covered case runs end to end in behavior |
-   | `discovery-acceptance` | the delivery as a whole is judgeable from the ACs |
-   | `discovery-boundary` | In and Out are closed; nothing in limbo |
-   | 2× blind readers → `discovery-ambiguity` | one reading only — two independent engineers build the same thing |
+The blind readers are **`discovery-reader`** agents (Sonnet) — a
+standardized definition, never a prompt improvised by the conductor.
+Each reads the two documents alone and commits to a concrete build;
+`discovery-ambiguity` then judges the divergences between the two
+builds — divergence is the ambiguity signal, suspicion is not.
 
-   The ambiguity lens runs as a pipeline: dispatch **two blind readers**
-   (general-purpose agents, prompt in
-   [discovery-ambiguity's reader brief](../../agents/discovery-ambiguity.md))
-   in parallel with the other lenses; when both return, dispatch
-   `discovery-ambiguity` with the two builds attached to judge the
-   divergences.
+The round is audited in `00-discovery/reviews.md`:
 
-2. Record the round in `reviews.md` **before acting on it**: one section
-   per reviewer with its verdict, and one line per finding.
-3. Give **every finding a disposition**, written next to it in
-   `reviews.md`: `fixed` (document changed), `to-user` (it is a real
-   question — goes into the next interview round's agenda), or `rejected`
-   (with the reason, and rejecting a blocker requires the user's
-   explicit sign-off). No finding stays undispositioned.
-4. Fix the documents, take the `to-user` items to the user, then run
-   the **entire round again** — all reviewers, fresh. Repeat until a round
-   comes back with **zero blockers**.
+1. Record the round **before acting on it**: one section per reviewer
+   with its verdict, and one line per finding.
+2. Give **every finding a disposition**, written next to it:
+   `fixed` (document changed), `to-user` (a real question — goes into
+   the next interview round's agenda), or `rejected` (with the reason;
+   rejecting a blocker requires the user's explicit sign-off). No
+   finding stays undispositioned.
+3. Fix the documents, take the `to-user` items to the user, then run
+   the workflow again — **full, as always**. Repeat until a round comes
+   back with **zero blockers**.
 
-Reviewer contract: verdict (`pass` / `pass with fixes` / `fail`) +
-findings with severity (`blocker` / `fix` / `detail`); zero findings is
-valid only alongside a "Verified" list proving coverage — a zero-finding
-report without the enumeration is invalid and gets re-dispatched.
+Every lens answers under the house
+[reviewer contract](../../docs/standards/reviewer-contract.md) — the
+single source for verdict semantics, severities, verbatim proof, and the
+Verified rule; the workflow re-dispatches lazy passes on its own.
 
 ## The blueprint
 
-One artifact **per wave** (each wave runs the whole pipeline), one URL
-from its discovery to its closure. Copy
+One artifact per workstream, one URL from discovery to closure. Copy
 [assets/blueprint.html](assets/blueprint.html) to
-`wNN-<wave>/blueprint.html`, fill only the `BLUEPRINT` data object (never
+`<slug>/blueprint.html`, fill only the `BLUEPRINT` data object (never
 the shell), publish, and keep republishing the same file path at every
-later stage — the stage tabs light up as the wave advances. Discovery
-fills the **Overview** (the frame, the wave map — which shows ALL waves,
-so any wave's blueprint locates itself in the whole) and the three
-**Discovery** sections: PR-FAQ, User Stories, What was inferred.
+later stage — the stage tabs light up as the workstream advances.
+Discovery fills the **Overview** (the frame, and the product direction
+from the evolution question) and the three **Discovery** sections:
+PR-FAQ, User Stories, What was inferred.
 
 ## Closing
 
 Present the blueprint URL and ask for review. Approval is explicit —
 silence, or a loose "looks good" without reading, does not close the
-stage. On approval: mark `.state.md` `stage: design`, move the Linear
-Project to its design status (via the MCP — its absence halts), commit the
-workstream folder, and suggest `/clear` before stage 2 (house rule:
-stage transitions, in the repo's `CLAUDE.md`). On
-"approved with fixes": apply, re-run the review round, close. On
-rejection: the reasons re-open the interview.
+stage. On approval: mark `.state.md` `stage: design`, commit the
+workstream folder — push only with the user's explicit approval — and
+suggest `/clear` before stage 2 (house rule: stage transitions, in the
+repo's `CLAUDE.md`). On "approved with fixes": apply, re-run the review
+round, close. On rejection: the reasons re-open the interview. Moving
+the Linear Project forward is **not this skill's job**: each stage moves
+the Project to its own status when it actually starts — stage 2 will
+move it when it opens.
 
 ## Lifecycle of the files
 
 Working files die with the stage; the record survives it.
 
-- **Working (deleted at stage close):** `notes.md`,
-  `00-discovery/reviews.md`, the blind readers' outputs.
-- **Permanent:** the wave's blueprint (the artifact that accumulates the
-  wave, stage by stage), `00-discovery/pr-faq.md`,
-  `00-discovery/user-stories.md`, the future waves' READMEs, and
-  `.state.md`.
+- **Working (deleted at stage close):** `00-discovery/notes.md`,
+  `00-discovery/reviews.md`.
+- **Permanent:** the workstream's blueprint (the artifact that
+  accumulates the workstream, stage by stage), `00-discovery/pr-faq.md`,
+  `00-discovery/user-stories.md`, and `.state.md`.
 
 ## Resuming
 
