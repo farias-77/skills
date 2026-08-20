@@ -138,7 +138,7 @@ Present: the blueprint URL, the per-repo table (issues merged / halts
 / the FB), the rounds table, the smoke output, the count of decisions
 taken in the user's place, and any `pending` items. Approval is
 explicit. On approval: dismiss the conductors, `.state.md` →
-`stage: integrate`, commit the workstream folder — **push only with
+`stage: release`, commit the workstream folder — **push only with
 the user's explicit approval** — and suggest `/clear` before the next
 stage. On "approved with fixes": the fixes run through the same
 machinery (issue → conductor → round if behavior changed), then a new
