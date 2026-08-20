@@ -47,16 +47,22 @@ and your target directory `02-plan/<repo>/`.
    needs no skeleton.
 4. **Close with integration.** What only exists when the fan is done —
    final wiring, composition of the pieces.
-5. **Apply the special cases.** A breaking change to a shared contract
+5. **End with the docs true-up.** The last issue of every repo's plan,
+   depending on all the others: reconcile the repo's whole `docs/` tree
+   with its final state — every issue touched docs where it changed
+   behavior; this one reads the repo as it ended and trues the tree up
+   as a whole (index lines, promotions, cross-references, anything the
+   per-issue touches left inconsistent).
+6. **Apply the special cases.** A breaking change to a shared contract
    becomes an **expand → migrate → contract** chain, never one
    monolithic issue. A resource the design requires to be unique
    (a singleton component, a global registry) gets ONE owning issue;
    consumers reference it.
-6. **Fill the coverage map** (in `plan.md`): every story AC of this wave
+7. **Fill the coverage map** (in `plan.md`): every story AC of this wave
    that lands in this repo → the issue(s) that deliver it. An AC with no
    issue means an issue is missing; an issue with no AC must justify its
    existence. This is your self-check before any reviewer sees the plan.
-7. **Only then draw the edges.** An edge exists only when the consumer
+8. **Only then draw the edges.** An edge exists only when the consumer
    cannot compile, run, or test without the producer's artifact — with a
    one-line reason in `plan.md`. "Makes sense to come after" is not an
    edge; that is how a graph becomes a queue. **Zero edges to other
@@ -117,6 +123,11 @@ never a script. The rules the template stands on:
   **At least one AC exercises a bad path** — agents optimize the happy
   path unless the criteria force otherwise. Plain checklist only for
   pure schema validation.
+- **The smoke cases come from the contract, by name.** An issue that
+  creates or changes an endpoint carries, in its DoD, the named smoke
+  cases that endpoint owes — copied from the contract's `Smoke:` line,
+  never invented here. An issue that removes an endpoint deletes its
+  cases (a dead case does not hibernate).
 - **The verification map is fail-to-pass.** Each AC names the check that
   fails today and passes after the diff — unit at the use-case boundary,
   smoke against the deployed env, e2e pointing at the owning integration
