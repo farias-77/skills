@@ -16,7 +16,8 @@ Must-haves this template carries:
   where the risk is; the accepted bottleneck)
 - batches with intent; edges each with a ONE-LINE reason (longer than a
   line ⇒ not an edge); ZERO cross-repo edges, ever
-- the coverage map: every story AC landing in this repo → its issue(s)
+- the coverage map: every story AC waves.md assigns to this wave that
+  lands in this repo → its issue(s)
 - the issue index: bodies live in issues/, one file per issue — this
   file stays short
 - NO per-issue file lists: the worker is free to touch what it needs;
@@ -49,9 +50,9 @@ kept thin.>
 
 ## Coverage map
 
-Every story AC that lands in this repo. An AC deferred to a later wave
-carries its decision block; an issue delivering no AC justifies itself
-in its row.
+Every story AC `waves.md` assigns to this wave that lands in this repo —
+an AC assigned to a later wave is not this plan's to cover. An issue
+delivering no AC justifies itself in its row.
 
 | Story AC | Delivered by |
 |----------|--------------|

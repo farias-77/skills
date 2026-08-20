@@ -20,7 +20,8 @@
  *   Workflow({ name: 'plan-review', args: {
  *     planDir:      'absolute path to wNN-<wave>/02-plan',
  *     designDir:    'absolute path to wNN-<wave>/01-design',
- *     discoveryDir: 'absolute path to wNN-<wave>/00-discovery',
+ *     discoveryDir: 'absolute path to <slug>/00-discovery',
+ *     wavesPath:    'absolute path to <slug>/waves.md',
  *     issues:       [{ repo: 'api-x', path: '<abs>/02-plan/api-x/issues/03-accept.md' }, ...],
  *     round:        2   // 1-based; informational, shown in labels
  *   }})
@@ -102,7 +103,8 @@ const short = (p) => p.split('/').slice(-1)[0].replace(/\.md$/, '')
 const inputs = `Round ${round}.
 The plan: ${args.planDir}
 The design it decomposes: ${args.designDir}
-The discovery it must deliver: ${args.discoveryDir}/pr-faq.md and ${args.discoveryDir}/user-stories.md`
+The discovery it must deliver: ${args.discoveryDir}/pr-faq.md and ${args.discoveryDir}/user-stories.md
+The wave cut: ${args.wavesPath} — this wave's stories and ACs are the coverage universe`
 
 // Re-dispatch once on the two invalid shapes: a dead agent, or a lazy
 // clean pass (zero findings AND no verified enumeration proves nothing).

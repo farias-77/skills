@@ -24,9 +24,10 @@ re-run never duplicates.
    marker is the idempotency anchor. Build the map plan-id → existing
    #number.
 3. **Upsert each issue.**
-   - Not found ⇒ `gh issue create --repo <owner>/<repo>
-     --title "<title from the plan's index>" --label <workstream>
-     --body-file <issues/NN-*.md>`.
+   - Not found ⇒ create it:
+     ```
+     gh issue create --repo <owner>/<repo> --title "<title from the plan's index>" --label <workstream> --body-file <issues/NN-*.md>
+     ```
    - Found ⇒ `gh issue edit <number> --body-file <issues/NN-*.md>`
      (title too, if it changed). Never create a second issue for the
      same plan-id.

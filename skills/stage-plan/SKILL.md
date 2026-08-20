@@ -20,22 +20,31 @@ one writer, its `plan-author`, first draft to last fix.
 
 ## Preconditions
 
-`.state.md` says `stage: plan`; the wave's `01-design/` is approved
-(checkpoint #2 passed). Missing ⇒ halt. Move the Linear Project to its
-planning status via the Linear MCP — **the MCP missing is a halt, here
-and at every stage boundary**; ask for it to be set up and stop.
+`.state.md` says `stage: plan` and names the wave; the wave's
+`01-design/` is approved (checkpoint #2 passed). Missing ⇒ halt. Move
+the Linear Project to its planning status via the Linear MCP — **the MCP
+missing is a halt, here and at every stage boundary**; ask for it to be
+set up and stop. (Each stage moves the Project when it opens — closing
+does not move it.)
 
 ## What this stage produces
 
 ```
-wNN-<wave>/02-plan/
-├── <repo>/plan.md          ← one per repo: the logic, batches, edges, coverage map
-├── <repo>/issues/NN-*.md   ← one file per issue — the EXACT body the worker receives
-└── reviews.md              ← the round audit — permanent, the conductor's file
+designs-root/2026-08-15-workspace-invites/
+├── blueprint.html             # the same single blueprint — this stage fills
+│                              #   waves['wNN-<wave>'].plan and republishes
+├── waves.md                   # the cut (stage 2) — this wave's stories and ACs
+├── 00-discovery/              # the whole demand (stage 1, untouched here)
+└── w01-invite-by-email/
+    ├── 01-design/             # approved (stage 2, untouched here)
+    └── 02-plan/
+        ├── <repo>/plan.md          ← one per repo: the logic, batches, edges, coverage map
+        ├── <repo>/issues/NN-*.md   ← one file per issue — the EXACT body the worker receives
+        └── reviews.md              ← the round audit — permanent, the conductor's file
 ```
 
-Plus the **Plan tab** of the wave's blueprint (same URL as always), and —
-only after the user approves — the issues on GitHub.
+Plus this wave's **Plan tab** in the workstream's blueprint (same URL as
+always), and — only after the user approves — the issues on GitHub.
 
 ## 1 — Dispatch the authors, one per repo, in parallel
 
@@ -47,9 +56,10 @@ graph** with **zero cross-repo edges**, so no two authors ever touch the
 same file.
 
 Each dispatch hands its author: the wave folder path, the approved
-`01-design/` (contracts above all), the discovery documents (the story
-ACs its coverage map must trace), its repo's path with `CLAUDE.md` and
-`docs/`, and the target directory `02-plan/<repo>/`. The author does the
+`01-design/` (contracts above all), the workstream's `00-discovery/` and
+`waves.md` (the cut defines which story ACs are this wave's — the
+coverage universe), its repo's path with `CLAUDE.md` and `docs/`, and
+the target directory `02-plan/<repo>/`. The author does the
 rest — decomposition ruler, issue writing rules, and self-checks live in
 its agent definition. It returns a structured summary: batches, issue
 count, coverage map status, declared decisions, and any questions that
@@ -69,11 +79,12 @@ affected repo's author is notified) — never a local workaround.
 ## 2 — The review round (a workflow, so it cannot be skipped)
 
 Run [`plan-review`](../../workflows/plan-review.js) —
-`Workflow({name: 'plan-review', args: {planDir, designDir, discoveryDir,
-issues, round}})` — `issues` is the enumeration of every
-`02-plan/<repo>/issues/*.md` (repo + absolute path). **Every round is
-full: every issue, every lens, every time** — never narrow to what
-changed; the full re-run is the regression guard.
+`Workflow({name: 'plan-review', args: {...}})` with `planDir`,
+`designDir`, `discoveryDir`, `wavesPath`, `issues`, and `round` —
+`issues` is the enumeration of every `02-plan/<repo>/issues/*.md`
+(repo + absolute path). **Every round is full: every issue, every lens,
+every time** — never narrow to what changed; the full re-run is the
+regression guard.
 
 It is ONE workflow invocation covering the whole round, in three
 phases: the two halves below run concurrently, and `plan-coherence`
@@ -98,14 +109,13 @@ bar: if a Haiku can execute it, the worker certainly can.
 
 | Lens | Judges |
 |---|---|
-| `plan-gaps` | the negative: what NO issue covers — story ACs without an issue (walks the stories itself, never trusts the coverage map), issues without an AC, consumes without producer, "Out" without owner |
+| `plan-gaps` | the negative: what NO issue covers — this wave's story ACs without an issue (walks `waves.md` and the stories itself, never trusts the coverage map), issues without an AC, consumes without producer, "Out" without owner |
 | `plan-flow` | the graph as it will RUN: cycles, edges without a real reason, wasted parallelism, a skeleton owed, two big jobs on the same surface in the same batch |
 | `plan-coherence` | runs last, with all verdicts: the plans tell the design's story, and the two ends of every contract meet in the middle |
 
-Reviewer contract (house standard): verdict `pass` / `pass with fixes` /
-`fail`; findings `blocker` / `fix` / `detail`; verbatim quote; zero
-findings valid only with the "Verified" enumeration. A declared decision
-block is not a finding.
+Every reviewer answers under the house
+[reviewer contract](../../docs/standards/reviewer-contract.md); the
+workflow re-dispatches lazy passes on its own.
 
 ## 3 — Audit, dispositions, and the fix loop
 
@@ -122,11 +132,16 @@ rule). Repeat until a round returns **zero blockers**.
 
 ## 4 — The blueprint
 
-Fill the `plan` key of the wave's `blueprint.html` and republish the
-same file path: the plan's logic as the intro, the batch map, the issue
-cards (produces/consumes chips), decisions inline (`decided in your
-place` in orange, counted in the Overview), and the review scoreboard —
-including the per-issue cold-read score. Never mermaid.
+The workstream has **one blueprint, one URL, forever**. This stage fills
+**this wave's entry**: `waves['wNN-<wave>'].plan` in the `BLUEPRINT`
+object, and republishes the same file path — the Plan tab lights up
+under this wave's pill. The content: the plan's logic as the intro, the
+batch map, the issue cards (produces/consumes chips), decisions inline
+(`decided in your place` in orange, counted in the Overview), and the
+review scoreboard — including the per-issue cold-read score. The
+conductor owns the blueprint — it is a projection of the authors'
+files, not a doc. Never mermaid; diagrams are HTML/CSS with the shell's
+primitives.
 
 ## 5 — Checkpoint, bootstrap, and closing
 
