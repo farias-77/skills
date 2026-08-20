@@ -36,7 +36,7 @@ renders as a card in that tab's context). Fixed, greppable format:
 
 **The reference rule** — every claim about an external tool or an
 existing internal service points at its research file:
-`...expires links after 7 days ([fal.ai limits](research/fal-ai.md))`.
+`...expires links after 7 days ([provider limits](research/media-provider.md))`.
 No research file, no claim.
 
 **The epistemic label** — `fact` / `inference` / `heuristic`, assigned in
