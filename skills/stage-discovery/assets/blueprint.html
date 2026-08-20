@@ -86,6 +86,11 @@
 
   .subtabs { background:var(--ground); border-bottom:1px solid var(--line);
              position:sticky; top:49px; z-index:19; overflow-x:auto; }
+  .wavebar { background:var(--ground); border-bottom:1px solid var(--line); overflow-x:auto; }
+  .wavebar[hidden] { display:none; }
+  .wavebarinner { display:flex; gap:8px; align-items:center; max-width:920px; margin:0 auto; padding:9px 28px; }
+  .wavebarinner::before { content:'wave'; font-size:11px; font-weight:600; letter-spacing:.08em;
+                          text-transform:uppercase; color:var(--ink-3); margin-right:4px; }
   .subtabs[hidden] { display:none; }
   .subtabsinner { display:flex; gap:8px; max-width:920px; margin:0 auto; padding:11px 28px; }
   .subtab { appearance:none; border:1px solid transparent; background:none; cursor:pointer;
@@ -535,6 +540,7 @@
 </div></header>
 
 <nav class="tabs"><div class="tabsinner" role="tablist" aria-label="Stages" id="tablist"></div></nav>
+<nav class="wavebar" hidden><div class="wavebarinner" role="tablist" aria-label="Waves" id="wavelist"></div></nav>
 <nav class="subtabs" hidden><div class="subtabsinner" role="tablist" aria-label="Sections" id="subtablist"></div></nav>
 
 <main class="wrap" id="panels"></main>
@@ -546,7 +552,7 @@
    END OF DATA marker. Each stage skill documents its tab's contract.
    ══════════════════════════════════════════════════════════════════════════ */
 const BLUEPRINT = {
-  workstream: { slug: '<yyyy-mm-dd>-<slug>', title: 'Workstream name', wave: 1, stage: 'discovery' },
+  workstream: { slug: '<yyyy-mm-dd>-<slug>', title: 'Workstream name', wave: null /* current wave slug, set from stage 2 on */, stage: 'discovery' },
 
   overview: {
     summary: 'One paragraph saying what this wave builds and for whom, in product language.',
@@ -603,10 +609,12 @@ const BLUEPRINT = {
     ]
   },
 
-  /* Filled by later stages — each stage skill documents its contract. */
-  design: null,
-  plan: null,
-  execution: null
+  /* Filled from stage 2 on — PER WAVE, same keys and shapes as ever;
+     each stage skill documents its tab's contract. A wave that is named
+     but not started sits as null. */
+  waves: {
+    // 'w01-<what-it-delivers>': { design: {...}, plan: {...}, execution: {...} },
+  }
 };
 /* ══════════════ END OF DATA — do not edit below this line ══════════════ */
 </script>
@@ -616,7 +624,10 @@ const BLUEPRINT = {
 const esc = s => String(s).replace(/[&<>]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
 const jsonc = s => esc(s).replace(/\/\/(.*)$/gm, '<span class="c">//$1</span>');
 const nonEmpty = v => Array.isArray(v) ? v.length > 0 : !!v;
-const has = k => nonEmpty(BLUEPRINT[k]);
+const WAVED = ['design','plan','execution'];   // stage tabs that live per wave
+let waveNow = BLUEPRINT.workstream.wave || Object.keys(BLUEPRINT.waves || {})[0] || null;
+const W = () => (waveNow && BLUEPRINT.waves && BLUEPRINT.waves[waveNow]) || {};
+const has = k => WAVED.includes(k) ? nonEmpty(W()[k]) : nonEmpty(BLUEPRINT[k]);
 const secT = (t, n) => `<div class="sec-t"><h2>${t}</h2>${n != null ? `<span class="n">${n}</span>` : ''}</div>`;
 
 const STAGES = [
@@ -654,7 +665,7 @@ function renderOverview() {
     <div class="steps">${order.map((k,i) => `<div class="st ${i<at?'done':''} ${i===at?'now':''}">
       <span class="sn">${i+1}</span><span class="sw">${lbl[k]}</span></div>`).join('')}</div>
     <p style="margin:10px 0 0;color:var(--ink-2)">${p.status}</p></section>
-  ${p.waves?.length ? `<section class="sec">${secT('The wave map', `wave ${BLUEPRINT.workstream.wave} is this one`)}
+  ${p.waves?.length ? `<section class="sec">${secT('The wave map', waveNow ? `${waveNow} is current` : 'the cut arrives with the design')}
     <div class="card" style="display:grid;padding:14px 16px">${p.waves.map(w => `<div class="wave ${w.state==='this wave'?'this':''}">
       <b>${w.n}</b><div><span class="wn">${w.name}</span><span class="ws">${w.state}</span></div></div>`).join('')}</div>
   </section>` : ''}
@@ -772,7 +783,7 @@ function gcard(t, hero) {
     </div></article>`;
 }
 function renderGlossary() {
-  const g = BLUEPRINT.design.glossary;
+  const g = W().design.glossary;
   const ess = g.terms.filter(t => t.ess);
   const alpha = a => [...a].sort((x,y) => x.t.localeCompare(y.t,'en'));
   return `
@@ -794,7 +805,7 @@ function renderGlossary() {
 
 /* ---------- design: how it works ---------- */
 function renderFlows() {
-  const f = BLUEPRINT.design.flows;
+  const f = W().design.flows;
   return `
   <p class="lede">${f.intro}</p>
   ${inlineDecisions(f.decisions)}
@@ -843,7 +854,7 @@ function refsBlock(a) {
 
 /* ---------- design: ui ---------- */
 function renderUI() {
-  const u = BLUEPRINT.design.ui;
+  const u = W().design.ui;
   return `
   <p class="lede">${u.intro}</p>
   ${u.exists ? `<div class="rule calm"><b>${u.exists.t}</b><p>${u.exists.p}</p></div>` : ''}
@@ -872,7 +883,7 @@ function renderUI() {
 
 /* ---------- design: data ---------- */
 function renderData() {
-  const d = BLUEPRINT.design.data;
+  const d = W().design.data;
   return `
   <p class="lede">${d.intro}</p>
   ${inlineDecisions(d.decisions)}
@@ -908,7 +919,7 @@ function recCard(r, cls, withPrice) {
     ${r.end ? `<p class="end">${r.end}</p>` : ''}</article>`;
 }
 function renderInfra() {
-  const a = BLUEPRINT.design.infra;
+  const a = W().design.infra;
   return `
   <p class="lede">The bill first; then, resource by resource, what this wave creates.</p>
   ${inlineDecisions(a.decisions)}
@@ -944,7 +955,7 @@ function renderInfra() {
 
 /* ---------- design: code ---------- */
 function renderCode() {
-  const c = BLUEPRINT.design.code;
+  const c = W().design.code;
   return `
   <p class="lede">The rules that hold the design, how backend and frontend split, and where the
   code grows without being rewritten.</p>
@@ -984,7 +995,7 @@ function renderCode() {
 
 /* ---------- design: security ---------- */
 function renderSecurity() {
-  const s = BLUEPRINT.design.security;
+  const s = W().design.security;
   const EST = { ok:'covered', risk:'risk accepted', na:'does not apply' };
   const count = e => s.classes.filter(c => c.e === e).length;
   return `
@@ -1007,7 +1018,7 @@ function renderSecurity() {
 
 /* ---------- design: alarms ---------- */
 function renderAlarms() {
-  const a = BLUEPRINT.design.alarms;
+  const a = W().design.alarms;
   return `
   <p class="lede">${a.items.length} alarms. Each one says what fires it, what normal looks like,
   when it can ring without a bug, and what to do when it rings.</p>
@@ -1032,7 +1043,7 @@ function renderAlarms() {
 
 /* ---------- design: going to production ---------- */
 function renderLive() {
-  const p = BLUEPRINT.design.live;
+  const p = W().design.live;
   return `
   <p class="lede">${p.steps.length} steps, ${p.steps.filter(x=>x.gate).length} of them
   blocked on you. Nothing is irreversible.</p>
@@ -1082,7 +1093,7 @@ function lensCard(l, totalRounds) {
 
 /* ---------- plan ---------- */
 function renderPlan() {
-  const p = BLUEPRINT.plan;
+  const p = W().plan;
   const map = `<div class="diagram"><div class="pwaves">${p.batches.map(o => `
     <div class="pcol"><h4>Batch ${o.n}</h4>${o.items.map(i => `
       <div class="pno ${i.critical?'critical':''} ${i.front?'front':''}"><b>${i.num}</b>${i.t}<span class="dep">${i.dep}</span></div>`).join('')}
@@ -1139,7 +1150,7 @@ function renderPlan() {
 
 /* ---------- execution ---------- */
 function renderExecution() {
-  const e = BLUEPRINT.execution;
+  const e = W().execution;
   const tl = `<div class="xtl">${e.timeline.map(i => `
     <div class="xi ${i.tone || ''}"><div class="when">${i.when}</div>
       <div class="what">${i.what}</div>${i.det ? `<div class="det">${i.det}</div>` : ''}</div>`).join('')}</div>`;
@@ -1195,15 +1206,23 @@ const RENDER = {
   execution: renderExecution
 };
 
-document.getElementById('brand').innerHTML =
-  `${BLUEPRINT.workstream.slug}<span class="t">${BLUEPRINT.workstream.title} · wave ${BLUEPRINT.workstream.wave}</span>`;
+function paintBrand() {
+  document.getElementById('brand').innerHTML =
+    `${BLUEPRINT.workstream.slug}<span class="t">${BLUEPRINT.workstream.title}${waveNow ? ' · ' + waveNow : ''}</span>`;
+}
+paintBrand();
 document.getElementById('topmeta').textContent = BLUEPRINT.overview.status;
 
 const tablist = document.getElementById('tablist');
 const subtabsEl = document.querySelector('.subtabs');
 const subtablist = document.getElementById('subtablist');
 const panels = document.getElementById('panels');
+const wavebarEl = document.querySelector('.wavebar');
+const wavelist = document.getElementById('wavelist');
 
+function buildTabs() {
+stageNow = null;
+tablist.innerHTML = ''; panels.innerHTML = '';
 STAGES.forEach(s => {
   const ok = has(s.key);
   tablist.insertAdjacentHTML('beforeend',
@@ -1215,7 +1234,7 @@ STAGES.forEach(s => {
     try {
       let html = RENDER[id]();
       const [st, sec] = id.split('/');
-      if (st === 'design' && BLUEPRINT.design?.[sec]?.references) html += refsBlock(BLUEPRINT.design[sec].references);
+      if (st === 'design' && W().design?.[sec]?.references) html += refsBlock(W().design[sec].references);
       return html;
     }
     catch (e) { return `<p style="color:var(--ink-3);padding:24px 0">This tab failed to render (${esc(String(e && e.message || e))}) — its data does not match the shape the shell expects. The other tabs remain intact.</p>` }
@@ -1224,6 +1243,29 @@ STAGES.forEach(s => {
     `<section class="panel" id="p-${id.replace('/','--')}" role="tabpanel" hidden>${
       ok && RENDER[id] ? renderSafe(id) : ''}</section>`));
 });
+STAGES.filter(s => has(s.key)).forEach(s =>
+  document.getElementById('t-' + s.key).addEventListener('click', () => select(s.key)));
+setupSpy();
+}
+
+/* the wave pills: shown on per-wave stage tabs when the cut has 2+ waves */
+function paintWaves(stKey) {
+  const keys = Object.keys(BLUEPRINT.waves || {});
+  if (keys.length < 2 || !WAVED.includes(stKey)) { wavebarEl.hidden = true; return; }
+  wavebarEl.hidden = false;
+  wavelist.innerHTML = keys.map(k => {
+    const started = nonEmpty(BLUEPRINT.waves[k]);
+    return `<button class="subtab" role="tab" data-w="${k}" aria-selected="${k === waveNow}"${started ? '' : ' disabled title="not started yet"'}>${k}</button>`;
+  }).join('');
+  wavelist.querySelectorAll('[data-w]').forEach(b => b.addEventListener('click', () => {
+    if (b.dataset.w === waveNow) return;
+    const back = stageNow;
+    waveNow = b.dataset.w;
+    paintBrand();
+    buildTabs();
+    select(back && has(back) ? back : 'overview');
+  }));
+}
 
 let stageNow = null;
 function paintSubtabs(s) {
@@ -1239,6 +1281,7 @@ function select(target) {
   const s = STAGES.find(x => x.key === stKey);
   if (!s || !has(stKey)) return;
   if (stageNow !== stKey) { paintSubtabs(s); stageNow = stKey; }
+  paintWaves(stKey);
   const id = s.sections ? `${stKey}/${secKey || s.sections[0].key}` : stKey;
   STAGES.forEach(x => document.getElementById('t-' + x.key)
     .setAttribute('aria-selected', x.key === stKey ? 'true' : 'false'));
@@ -1248,21 +1291,21 @@ function select(target) {
   history.replaceState(null, '', '#' + id);
   window.scrollTo({ top: 0 });
 }
-STAGES.filter(s => has(s.key)).forEach(s =>
-  document.getElementById('t-' + s.key).addEventListener('click', () => select(s.key)));
-select(location.hash.slice(1) || 'overview');
-
-
-/* scroll-spy for the PR-FAQ index */
-const links = [...document.querySelectorAll('.toc a')];
-if (links.length && 'IntersectionObserver' in window) {
-  const io = new IntersectionObserver(es => es.forEach(e => {
-    if (!e.isIntersecting) return;
-    const id = e.target.id.replace('q-', '');
-    links.forEach(l => l.classList.toggle('on', l.dataset.q === id));
-  }), { rootMargin: '-120px 0px -70% 0px' });
-  document.querySelectorAll('.answers .qa[id]').forEach(el => io.observe(el));
+/* scroll-spy for the PR-FAQ index — re-attached on every build */
+function setupSpy() {
+  const links = [...document.querySelectorAll('.toc a')];
+  if (links.length && 'IntersectionObserver' in window) {
+    const io = new IntersectionObserver(es => es.forEach(e => {
+      if (!e.isIntersecting) return;
+      const id = e.target.id.replace('q-', '');
+      links.forEach(l => l.classList.toggle('on', l.dataset.q === id));
+    }), { rootMargin: '-120px 0px -70% 0px' });
+    document.querySelectorAll('.answers .qa[id]').forEach(el => io.observe(el));
+  }
 }
+
+buildTabs();
+select(location.hash.slice(1) || 'overview');
 
 /* theme by the READER's clock: from 17h to 5h the page opens dark; light
    otherwise. The button still rules. */

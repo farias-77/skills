@@ -1,6 +1,6 @@
 ---
 name: stage-design
-description: Conducts stage 2 (Design) of the pipeline — dispatches the design-author (a Fable agent that researches every external tool and internal service with dedicated deep-research workflows, then writes the complete design grounded on referenced facts, UI included), runs the ten-reviewer round as a deterministic workflow, loops findings back to the same author via SendMessage until zero blockers, and publishes the Design tabs in the wave's blueprint. Use after the wave's discovery is approved, or to resume a design in progress.
+description: Conducts stage 2 (Design) of the pipeline — dispatches the design-author (a Fable agent that cuts the demand into waves, researches every target with dedicated deep-research workflows, writes the complete design grounded on referenced facts, and authors and publishes the UI as the wave's design canvas), runs the ten-reviewer round as a deterministic workflow, loops findings back to the same author until zero blockers, and fills this wave's Design tabs in the workstream's single blueprint. Use after the discovery is approved, or to resume a design in progress.
 disable-model-invocation: false
 argument-hint: "<workstream-slug>"
 allowed-tools: Read, Write, Edit, Glob, Grep, Agent, SendMessage, Workflow, Artifact, AskUserQuestion, Bash(mkdir *), Bash(date *), Bash(ls *), Bash(cat *), Bash(git *), Bash(rm *)
@@ -8,152 +8,168 @@ allowed-tools: Read, Write, Edit, Glob, Grep, Agent, SendMessage, Workflow, Arti
 
 # Stage 2: Design
 
-The wave stops being "what we build" and becomes "how it works". A single
-author designs the whole thing; ten specialist reviewers try to break it;
-the user reviews the result in the blueprint — after, not during.
+The demand stops being "what we build" and becomes "how it works" — and
+gets its build order: the architect cuts it into waves and designs the
+current one. A single author designs the whole thing; ten specialist
+reviewers try to break it; the user reviews the result in the blueprint
+and the design canvas — after, not during.
 
-The session is the **conductor** here: it dispatches, audits, and relays.
-It never writes a design document — the author is the only writer, first
-draft to last fix. That single-writer rule is what keeps the fix loop
-honest: a finding is only "fixed" when the author changed the file.
+The session is the **conductor** here: it dispatches, audits, relays,
+publishes. It never writes a design file — the author is the only
+writer, first draft to last fix. That single-writer rule is what keeps
+the fix loop honest: a finding is only "fixed" when the author changed
+the file.
 
 ## Preconditions
 
-`.state.md` says `stage: design`; the wave's `00-discovery/` has the
-approved `pr-faq.md` and `user-stories.md`. Missing ⇒ halt, back to
+`.state.md` says `stage: design`; the workstream's `00-discovery/` has
+the approved `pr-faq.md` and `user-stories.md`. Missing ⇒ halt, back to
 stage 1. Move the Linear Project to its design status via the Linear
 MCP — **Linear is the main tracking surface: the MCP missing is a halt,
-here and at every stage boundary**, not a note; ask for it to be set up
-and stop.
+here and at every stage boundary**; ask for it to be set up and stop.
+(Each stage moves the Project when it opens — closing does not move it.)
+
+## What this stage produces
+
+```
+designs-root/2026-08-15-workspace-invites/
+├── .state.md                  # stage: design · wave: w01-invite-by-email
+├── blueprint.html             # THE blueprint — one per workstream, same URL forever;
+│                              #   Overview + Discovery are workstream-level, the
+│                              #   stage tabs from Design on are per wave (wave pills)
+├── waves.md                   # the cut — the architect's map of the whole demand
+├── 00-discovery/              # the whole demand (stage 1, untouched here)
+├── w01-invite-by-email/       # the current wave — the pipeline runs here
+│   └── 01-design/
+│       ├── research/          # one file per researched target
+│       ├── ui/                # the screens: <Screen>.dc.html + canvas.json
+│       ├── *.md               # architecture · data-model · contracts · ui · security · infra · observability · rollout
+│       └── reviews.md         # the round audit — permanent
+└── w02-resend-and-revoke/
+    └── README.md              # seed: what that wave delivers — its design starts here
+```
+
+Plus the wave's **design canvas** (a separate artifact — the screens,
+editable) and the **Design tabs** of the blueprint, under this wave.
 
 ## 1 — Dispatch the author
 
 One `Agent` call: **`design-author`** (Fable — this is the stage where
-the capability step pays for itself). The dispatch hands it the frozen
-inputs: the wave folder path, the discovery documents, the wave map, the
-consuming project's `CLAUDE.md` and `docs/`, and the discovery's answer
-to "does a UI already exist, or do we build it?".
+the capability step pays for itself). The dispatch hands it: the
+workstream folder path (discovery inside), the consuming project's
+`CLAUDE.md`, and the repo map. The author does the rest — its
+definition carries the method:
 
-The author does the rest — **including the research**: one dedicated
-deep-research workflow **per target** — one for tool A, another for tool
-B, another for internal service C — **never a single global research**;
-nothing inferred, every design claim carries a reference to its target's
-research file. It writes all of `01-design/` (architecture, data-model,
-contracts, ui, security, infra, observability, rollout), declares
-decisions inline where they apply, and returns a structured summary.
+- **The wave cut is its first act** — the architect's call, no
+  checkpoint of its own: `waves.md` at the workstream root (every story
+  and AC of the discovery in exactly one wave), the current wave's
+  folders, README seeds for the next ones. The cut is presented — and
+  contestable — with the rest of the design at the checkpoint.
+- **Research per target** (one deep-research workflow each, never a
+  global sweep), **the living docs of every touched repo** as input,
+  the eight documents, and the **UI artboards** in `01-design/ui/` —
+  which the author itself publishes as the wave's **design canvas**
+  (one artifact per wave, the link recorded in `ui.md`).
+- It designs under the house
+  [architecture standard](../../docs/standards/architecture.md).
 
-**The UI is designed IN Claude Design — that is the standard of work,
-not an option.** The author composes the screens from the product's real
-component library and publishes them as cards to the venture's Claude
-Design project via DesignSync (creating the project if it does not exist
-yet); the blueprint's UI tab carries the project link, which is where
-the user validates the visuals. DesignSync not authorized ⇒ that is a
-setup halt to report, never a silent local-only fallback.
-
-If the author hits a gap in the discovery, the path is always the same:
-**it becomes a question to the user** (relayed by you) and the design
-continues with the answer — the stage never goes back to stage 1. A big
-hole is still a stage-1 *failure* worth recording: note it in
-`dreaming-notes.md` so stage 7 fixes the discovery skill, but the
-resolution here is asking, not reopening.
+If the author hits a discovery gap, the path is always the same: **it
+becomes a question to the user** (relayed by you) and the design
+continues with the answer — the stage never goes back to stage 1.
 
 ## 2 — The review round (a workflow, so it cannot be skipped)
 
 Run [`design-review`](../../workflows/design-review.js) —
-`Workflow({name: 'design-review', args: {designDir, discoveryDir}})`.
-The workflow is the guarantee: it dispatches **all ten reviewers**, every
-round, with structured outputs — there is no code path that runs a
-subset. Nine run in parallel; `design-coherence` runs last with the nine
-verdicts in hand.
+`Workflow({name: 'design-review', args: {...}})` with `designDir`,
+`discoveryDir`, `wavesPath`, and `round`. The workflow is the guarantee:
+it dispatches **all ten reviewers**, every round, with structured outputs — there is no code
+path that runs a subset. Nine run in parallel; `design-coherence` runs
+last with the nine verdicts in hand. **Every round is full — every
+reviewer, every time**; the full re-run is the regression guard.
 
 | Reviewer | Specialist in | Judges (holistically — reads everything, reports its lens) |
 |---|---|---|
 | `design-data` | data | entities, keys, access patterns, growth, query cost |
-| `design-code` | code organization | patterns, decoupling, testability, performance, named extension points |
-| `design-infra` | infrastructure | service configs at their best, nothing open that should not be, cost at three scales, IAM, deploy order/cutover/rollback |
-| `design-security` | security | known breach-opening patterns, secrets, exposure, isolation, the fixed class sweep |
-| `design-contracts` | contracts | every API/event makes sense; the data each side needs actually arrives; evolution |
-| `design-alarms` | observability | alarms that make sense — no over-alarming, no daily false rings at low traffic, action written |
-| `design-coverage` | completeness | everything the discovery asked is designed; every AC is satisfiable by this design |
-| `design-facts` | evidence | every claim about an external tool or existing service traces to a research file; inference is not dressed as fact |
-| `design-ui` | UI | the UI plan matches how the product looks and behaves today; every story state has a home |
+| `design-code` | code organization | patterns, decoupling, extension points — and the architecture standard |
+| `design-infra` | infrastructure | configs at their best, exposure, IAM, cost at three scales vs real prices, rollout |
+| `design-security` | security | breach-opening patterns, secrets, isolation, the fixed class sweep |
+| `design-contracts` | contracts | every API/event defined whole — success AND error; the data each side needs arrives |
+| `design-alarms` | observability | alarms that make sense — the four fields, no over-alarming, no low-traffic false rings |
+| `design-coverage` | completeness | the cut covers the whole discovery; this wave's slice is fully designed |
+| `design-facts` | evidence | every claim about an external tool or existing service traces to research |
+| `design-ui` | UI | the artboards fit the product as it is today; every story state has a home |
 | `design-coherence` | cross-cutting | contradictions across the whole — runs last, with all verdicts |
 
-**Every reviewer reads the ENTIRE design** — the lens is the filter on
-what it reports, never on what it reads. All of them receive the
-discovery documents too (coverage needs the ACs; everyone benefits).
-
-Reviewer contract (same as stage 1): verdict `pass` / `pass with fixes` /
-`fail`; findings with `blocker` / `fix` / `detail`; a verbatim quote
-proving the read; **zero findings is valid here** — a design scope can be
-genuinely solid, and forced findings burn the user's trust in real
-ones — but only with the "Verified" enumeration; without it the workflow
-re-dispatches the reviewer. A declared decision block is not a finding —
-at most the reviewer contests the argument.
+Every reviewer answers under the house
+[reviewer contract](../../docs/standards/reviewer-contract.md); the
+workflow re-dispatches lazy passes on its own.
 
 ## 3 — Audit, dispositions, and the fix loop
 
-The round is audited in **`01-design/reviews.md` — permanent** (the
-Review tab left the blueprint; this file is the proof the review
-happened, and it survives the stage):
+The round is audited in **`01-design/reviews.md` — permanent**:
 
 1. Record the round: one section per reviewer — verdict, run id (from
    the workflow's journal, not from your prose), what it verified,
    findings.
 2. Give **every finding a disposition**: `fixed` / `to-user` /
-   `rejected` (with the reason; rejecting a blocker requires the
-   user's explicit sign-off).
+   `rejected` (with the reason; rejecting a blocker requires the user's
+   explicit sign-off).
 3. Send the `fixed` findings to the **same author** via SendMessage — it
-   revises the docs (single writer). `to-user` items go into the
+   revises the files (single writer). `to-user` items go into the
    checkpoint message.
 4. Run the workflow again — **all ten, always**; fixing data moves
-   contracts, fixing contracts moves code. Repeat until a round returns
-   **zero blockers**.
+   contracts, fixing contracts moves code. (A fix that touches a screen
+   also republishes the canvas — the author does it as part of the
+   fix.) Repeat until a round returns **zero blockers**.
 
 ## 4 — The blueprint
 
-Fill the `design` key of the wave's `blueprint.html` (the conductor owns
-the blueprint — it is a projection of the docs, not a doc) and republish
-the same file path. Nine Design subtabs: **Glossary · How it works · UI ·
+The workstream has **one blueprint, one URL, forever** — the file stage 1
+published at the workstream root. This stage fills **this wave's entry**:
+`waves['wNN-<wave>'].design` in the `BLUEPRINT` object, plus
+`workstream.wave` (the current wave) and the wave map in the Overview
+(all waves, from `waves.md`). Republish the same file path — the Design
+tab lights up, and the wave pills let the reader flip between waves.
+The conductor owns the blueprint — it is a projection of the author's
+files, not a doc. Nine Design subtabs: **Glossary · How it works · UI ·
 Data · Infra & cost · Code · Security · Alarms · Going to production**.
 
+- **The UI tab carries prints**: render each artboard and embed the
+  images, with the canvas link beside them — the prints are the
+  fast validation pass; the canvas is the deep one.
 - **Decisions permeate the tabs**: each tab's data carries the decision
   cards that belong to that context; the ones `decided in your place`
-  get the orange highlight, and the Overview shows the count so the
-  user knows how many to look for.
+  get the orange highlight, and the Overview shows the count.
 - Contracts have **no tab**: `contracts.md` is machine input — the
-  frozen bridge the planning stands on — reviewed by `design-contracts`,
-  consulted by whoever needs it.
+  frozen bridge the planning stands on.
 - Never mermaid; diagrams are HTML/CSS with the shell's primitives.
 
 ## 5 — Checkpoint and closing
 
-Present: the blueprint URL, the verdict table (all ten, from
-`reviews.md`), the `decided in your place` count, and any `to-user`
-items. Approval is explicit. On approval: `.state.md` → `stage: plan`,
-move the Linear Project (via the MCP — its absence halts, as at every
-stage boundary), commit the workstream
-folder — **push only with the user's explicit approval** — and
-suggest `/clear` before stage 3 (house rule: stage transitions, in the
-repo's `CLAUDE.md`). On "approved with fixes": author applies, full
-round again, close. On rejection: the reasons go back to the author —
-**never back to stage 1**; whatever is missing becomes questions to the
-user, answered in conversation and folded into the design.
+Present: the blueprint URL, the canvas URL, the wave cut (one line per
+wave), the verdict table (all ten, from `reviews.md`), the count of
+`decided in your place` flags, and any `to-user` items. Approval is explicit. On
+approval: `.state.md` → `stage: plan`, commit the workstream folder —
+**push only with the user's explicit approval** — and suggest `/clear`
+before stage 3 (house rule: stage transitions, in the repo's
+`CLAUDE.md`). On "approved with fixes": author applies, full round
+again, new checkpoint. On rejection: the reasons go back to the
+author — **never back to stage 1**; whatever is missing becomes
+questions to the user, answered in conversation and folded into the
+design. Moving the Linear Project forward is **not this skill's job**
+at close — stage 3 moves it when it opens.
 
 ## Lifecycle
 
-- **Permanent:** everything in `01-design/` — documents, `research/`,
-  `ui-screens/`, and `reviews.md`. (`ui-screens/` is the local SOURCE of
-  the screens published to Claude Design: DesignSync uploads files from
-  disk, so the screens live here in git — versioned with the wave — and
-  render there as the cards the user validates. Same content, two
-  homes: the repo is the source of record, the project is the viewing
-  surface.)
+- **Permanent:** `waves.md`, the future waves' READMEs, and everything
+  in `01-design/` — documents, `research/`, `ui/` (the artboards are
+  the source of record; the canvas artifact is the viewing surface),
+  and `reviews.md`.
 - **Working:** the author's scratch notes, if any — gone at close.
 
 ## Boundaries
 
-No issue decomposition (stage 3). No code (stage 4). The discovery fence
-does not reopen silently — unviable in-scope items become declared
+No issue decomposition (stage 3). No code (stage 4). The discovery
+fence does not reopen silently — unviable in-scope items become declared
 decisions. Frictions worth learning from go to the workstream's
 `dreaming-notes.md` on the spot; judging them is stage 7's job.

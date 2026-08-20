@@ -10,7 +10,7 @@ each carrying its own must-haves as comments:
 | `architecture.md` | flows, components, diagrams |
 | `data-model.md` | entities, access patterns, growth |
 | `contracts.md` | the frozen bridge: endpoints, events, evolution |
-| `ui.md` | patterns today, screens, states, Claude Design link |
+| `ui.md` | patterns today, screens, states, the artboard index |
 | `security.md` | the fixed 13-class sweep |
 | `infra.md` | resources with configs, IAM, cost at three scales |
 | `observability.md` | alarms with the four fields |
