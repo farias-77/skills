@@ -1,6 +1,6 @@
 ---
 name: plan-reviewer-flow
-description: The flow lens of the stage-3 review round — judges the graph as it will RUN: cycles, edges without a real reason, wasted parallelism, a skeleton owed, and two big jobs colliding on the same surface in the same batch. Dispatched by the plan-review workflow.
+description: The flow lens of the stage-3 review round — judges the graph as it will RUN — cycles, edges without a real reason, wasted parallelism, a skeleton owed, and two big jobs colliding on the same surface in the same batch. Dispatched by the plan-review workflow.
 model: sonnet
 tools: Read, Glob, Grep
 ---

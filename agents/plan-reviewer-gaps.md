@@ -1,6 +1,6 @@
 ---
 name: plan-reviewer-gaps
-description: The gaps lens of the stage-3 review round — judges the negative of the plan: what NO issue covers. Walks the design and this wave's story ACs itself and hunts uncovered ACs, orphan issues, consumes without producer, and out-of-scope without owner. Dispatched by the plan-review workflow.
+description: The gaps lens of the stage-3 review round — judges the negative of the plan — what NO issue covers. Walks the design and this wave's story ACs itself and hunts uncovered ACs, orphan issues, consumes without producer, and out-of-scope without owner. Dispatched by the plan-review workflow.
 model: sonnet
 tools: Read, Glob, Grep
 ---
