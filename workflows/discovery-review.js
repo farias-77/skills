@@ -34,7 +34,7 @@ export const meta = {
   description: 'Stage-1 review round: walkthrough, acceptance and boundary lenses plus two blind readers and their ambiguity judge — full every round, un-skippable by construction',
   phases: [
     { title: 'Lenses', detail: 'walkthrough, acceptance, boundary — each over both documents' },
-    { title: 'Blind reads', detail: 'two discovery-reader agents commit to concrete builds, alone' },
+    { title: 'Blind reads', detail: 'two disc-reader agents commit to concrete builds, alone' },
     { title: 'Ambiguity', detail: 'the judge compares the two builds and runs the cross-document pass' },
   ],
 }
@@ -106,12 +106,12 @@ const reviewed = async (dispatch, name) => {
     : { verdict: 'fail', verified: [], quote: '', findings: [], invalid: true }
 }
 
-const LENSES = ['discovery-walkthrough', 'discovery-acceptance', 'discovery-boundary']
+const LENSES = ['disc-reviewer-walkthrough', 'disc-reviewer-acceptance', 'disc-reviewer-boundary']
 
 const readBlind = async (n) => {
   const dispatch = () => agent(inputs, {
     label: `read#${n}r${round}`, phase: 'Blind reads',
-    agentType: 'discovery-reader', schema: READING,
+    agentType: 'disc-reader', schema: READING,
   })
   let r = await dispatch()
   if (!r) {
@@ -139,7 +139,7 @@ phase('Ambiguity')
 let ambiguity
 if (readings.length < 2) {
   log(`only ${readings.length} blind reading(s) survived after retry — the two-reader experiment is invalid this round`)
-  ambiguity = { lens: 'discovery-ambiguity', verdict: 'fail', verified: [], quote: '', findings: [], invalid: true }
+  ambiguity = { lens: 'disc-reviewer-ambiguity', verdict: 'fail', verified: [], quote: '', findings: [], invalid: true }
 } else {
   ambiguity = await reviewed(() =>
     agent(`${inputs}
@@ -151,9 +151,9 @@ ${JSON.stringify(readings[0], null, 2)}
 
 READER 2:
 ${JSON.stringify(readings[1], null, 2)}`, {
-      label: `discovery-ambiguity#r${round}`, phase: 'Ambiguity',
-      agentType: 'discovery-ambiguity', schema: REVIEW,
-    }), 'discovery-ambiguity').then(r => ({ lens: 'discovery-ambiguity', ...r }))
+      label: `disc-reviewer-ambiguity#r${round}`, phase: 'Ambiguity',
+      agentType: 'disc-reviewer-ambiguity', schema: REVIEW,
+    }), 'disc-reviewer-ambiguity').then(r => ({ lens: 'disc-reviewer-ambiguity', ...r }))
 }
 
 const lenses = [...lensResults, ambiguity]

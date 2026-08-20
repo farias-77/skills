@@ -1,6 +1,6 @@
 ---
-name: discovery-reader
-description: A blind reader of the stage-1 discovery review — reads the PR-FAQ and User Stories alone and commits to the concrete build for every normative sentence. Two are dispatched per round by the discovery-review workflow; their builds are compared by discovery-ambiguity.
+name: disc-reader
+description: A blind reader of the stage-1 discovery review — reads the PR-FAQ and User Stories alone and commits to the concrete build for every normative sentence. Two are dispatched per round by the discovery-review workflow; their builds are compared by disc-reviewer-ambiguity.
 model: sonnet
 tools: Read, Glob, Grep
 ---

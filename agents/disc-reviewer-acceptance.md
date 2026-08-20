@@ -1,5 +1,5 @@
 ---
-name: discovery-acceptance
+name: disc-reviewer-acceptance
 description: The acceptance lens of the stage-1 discovery review — judges whether every criterion is judgeable by a stranger and whether the set covers the whole promise. Dispatched by the discovery-review workflow.
 model: sonnet
 tools: Read, Glob, Grep

@@ -253,15 +253,15 @@ every time**; the full re-run is the regression guard.
 
 | Agent | Validates |
 |---|---|
-| `discovery-walkthrough` | every covered case runs end to end in behavior |
-| `discovery-acceptance` | the delivery as a whole is judgeable from the ACs |
-| `discovery-boundary` | In and Out are closed; nothing in limbo |
-| 2× `discovery-reader` → `discovery-ambiguity` | one reading only — two independent engineers build the same thing |
+| `disc-reviewer-walkthrough` | every covered case runs end to end in behavior |
+| `disc-reviewer-acceptance` | the delivery as a whole is judgeable from the ACs |
+| `disc-reviewer-boundary` | In and Out are closed; nothing in limbo |
+| 2× `disc-reader` → `disc-reviewer-ambiguity` | one reading only — two independent engineers build the same thing |
 
-The blind readers are **`discovery-reader`** agents (Sonnet) — a
+The blind readers are **`disc-reader`** agents (Sonnet) — a
 standardized definition, never a prompt improvised by the conductor.
 Each reads the two documents alone and commits to a concrete build;
-`discovery-ambiguity` then judges the divergences between the two
+`disc-reviewer-ambiguity` then judges the divergences between the two
 builds — divergence is the ambiguity signal, suspicion is not.
 
 The round is audited in `00-discovery/reviews.md`:

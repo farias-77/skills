@@ -1,5 +1,5 @@
 ---
-name: discovery-boundary
+name: disc-reviewer-boundary
 description: The boundary lens of the stage-1 discovery review — audits the In/Out fence and reports everything left in limbo. Dispatched by the discovery-review workflow.
 model: sonnet
 tools: Read, Glob, Grep
