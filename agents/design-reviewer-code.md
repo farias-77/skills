@@ -1,5 +1,5 @@
 ---
-name: design-code
+name: design-reviewer-code
 description: The code-organization reviewer of the stage-2 design review round — patterns, decoupling, extension points, and the house architecture standard. Dispatched by the design-review workflow.
 model: opus
 tools: Read, Glob, Grep

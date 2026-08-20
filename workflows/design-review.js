@@ -37,15 +37,15 @@ export const meta = {
 }
 
 const SPECIALISTS = [
-  'design-data',
-  'design-code',
-  'design-infra',
-  'design-security',
-  'design-contracts',
-  'design-alarms',
-  'design-coverage',
-  'design-facts',
-  'design-ui',
+  'design-reviewer-data',
+  'design-reviewer-code',
+  'design-reviewer-infra',
+  'design-reviewer-security',
+  'design-reviewer-contracts',
+  'design-reviewer-alarms',
+  'design-reviewer-coverage',
+  'design-reviewer-facts',
+  'design-reviewer-ui',
 ]
 
 const REVIEW = {
@@ -114,9 +114,9 @@ const coherence = await reviewed(() =>
 The nine specialists already ran. Their verdicts and findings:
 
 ${verdictBoard}`, {
-    label: `design-coherence#r${round}`, phase: 'Coherence',
-    agentType: 'design-coherence', schema: REVIEW,
-  }), 'design-coherence').then(r => ({ reviewer: 'design-coherence', ...r }))
+    label: `design-reviewer-coherence#r${round}`, phase: 'Coherence',
+    agentType: 'design-reviewer-coherence', schema: REVIEW,
+  }), 'design-reviewer-coherence').then(r => ({ reviewer: 'design-reviewer-coherence', ...r }))
 
 reviews.push(coherence)
 

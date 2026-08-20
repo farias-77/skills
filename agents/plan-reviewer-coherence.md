@@ -1,5 +1,5 @@
 ---
-name: plan-coherence
+name: plan-reviewer-coherence
 description: The coherence lens of the stage-3 review round — runs last, after the cold reads and the whole-plan lenses, with all their verdicts in hand. Judges what crosses the plans and the design and that no scoped lens sees alone. Dispatched by the plan-review workflow at the end of the round.
 model: sonnet
 tools: Read, Glob, Grep

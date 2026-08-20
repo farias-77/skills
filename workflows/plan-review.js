@@ -4,8 +4,8 @@
  * Why a workflow: the guarantee that no lens is skipped and every issue
  * gets its cold read must be physical, not discipline. One invocation
  * covers the whole round, three phases: per issue, three blind Haiku
- * readers then the plan-issue judge with their readings in hand; the
- * whole-plan lenses (gaps, flow) concurrently; plan-coherence closes
+ * readers then the plan-reviewer-issue judge with their readings in hand; the
+ * whole-plan lenses (gaps, flow) concurrently; plan-reviewer-coherence closes
  * with every verdict on the table. Every round is FULL — every issue,
  * every lens; the full re-run is the regression guard. A clean pass
  * without its "verified" enumeration is re-dispatched once (a lazy pass
@@ -39,8 +39,8 @@ export const meta = {
   name: 'plan-review',
   description: 'Stage-3 review round: three blind readers + a judge per issue, gaps and flow over the whole plan, coherence last — full every round, un-skippable by construction',
   phases: [
-    { title: 'Cold reads', detail: 'per issue: three Haiku blind readers, then the plan-issue judge with their readings' },
-    { title: 'Whole plan', detail: 'plan-gaps and plan-flow in parallel, each over every plan and issue' },
+    { title: 'Cold reads', detail: 'per issue: three Haiku blind readers, then the plan-reviewer-issue judge with their readings' },
+    { title: 'Whole plan', detail: 'plan-reviewer-gaps and plan-reviewer-flow in parallel, each over every plan and issue' },
     { title: 'Coherence', detail: 'the cross-cutting lens, with every verdict in hand' },
   ],
 }
@@ -125,7 +125,7 @@ const coldRead = (issue) =>
   parallel([1, 2, 3].map(n => () =>
     agent(`The issue file: ${issue.path}\nThe repo it belongs to: ${issue.repo}`, {
       label: `read:${short(issue.path)}#${n}r${round}`, phase: 'Cold reads',
-      agentType: 'plan-reader', schema: READING,
+      agentType: 'plan-blind-reader', schema: READING,
     })
   )).then(rs => rs.filter(Boolean))
 
@@ -140,7 +140,7 @@ The three blind readings of this issue:
 
 ${readings.map((x, i) => `READER ${i + 1}:\n${JSON.stringify(x, null, 2)}`).join('\n\n')}`, {
       label: `judge:${short(issue.path)}#r${round}`, phase: 'Cold reads',
-      agentType: 'plan-issue', schema: REVIEW,
+      agentType: 'plan-reviewer-issue', schema: REVIEW,
     }), `judge:${short(issue.path)}`)
   return { repo: issue.repo, path: issue.path, readings, ...r }
 }
@@ -150,7 +150,7 @@ ${readings.map((x, i) => `READER ${i + 1}:\n${JSON.stringify(x, null, 2)}`).join
 phase('Cold reads')
 const [cold, wholePlan] = await parallel([
   () => pipeline(issues, coldRead, judge),
-  () => parallel(['plan-gaps', 'plan-flow'].map(name => () =>
+  () => parallel(['plan-reviewer-gaps', 'plan-reviewer-flow'].map(name => () =>
     reviewed(() =>
       agent(inputs, { label: `${name}#r${round}`, phase: 'Whole plan', agentType: name, schema: REVIEW }),
       name).then(r => ({ lens: name, ...r }))
@@ -175,9 +175,9 @@ const coherence = await reviewed(() =>
 The verdicts and findings of everything that already ran this round:
 
 ${verdictBoard}`, {
-    label: `plan-coherence#r${round}`, phase: 'Coherence',
-    agentType: 'plan-coherence', schema: REVIEW,
-  }), 'plan-coherence').then(r => ({ lens: 'plan-coherence', ...r }))
+    label: `plan-reviewer-coherence#r${round}`, phase: 'Coherence',
+    agentType: 'plan-reviewer-coherence', schema: REVIEW,
+  }), 'plan-reviewer-coherence').then(r => ({ lens: 'plan-reviewer-coherence', ...r }))
 
 const lenses = [...wholePlan, coherence]
 const blockers =

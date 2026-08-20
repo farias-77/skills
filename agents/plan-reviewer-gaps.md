@@ -1,5 +1,5 @@
 ---
-name: plan-gaps
+name: plan-reviewer-gaps
 description: The gaps lens of the stage-3 review round — judges the negative of the plan: what NO issue covers. Walks the design and this wave's story ACs itself and hunts uncovered ACs, orphan issues, consumes without producer, and out-of-scope without owner. Dispatched by the plan-review workflow.
 model: sonnet
 tools: Read, Glob, Grep
@@ -60,8 +60,8 @@ an AC assigned to this wave with no issue is.
 
 ## Boundaries
 
-You do not judge issue quality (`plan-issue`), nor the execution order
-of the graph (`plan-flow`). Your subject is coverage: the mapping
+You do not judge issue quality (`plan-reviewer-issue`), nor the execution order
+of the graph (`plan-reviewer-flow`). Your subject is coverage: the mapping
 between what was promised and what was planned.
 
 ## Response contract

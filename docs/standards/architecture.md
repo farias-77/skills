@@ -1,7 +1,7 @@
 # The architecture standard
 
 How systems grow in this house. The single source — the `design-author`
-designs toward it, and the `design-code` lens audits against it.
+designs toward it, and the `design-reviewer-code` lens audits against it.
 
 ## Platform services
 

@@ -1,5 +1,5 @@
 ---
-name: design-ui
+name: design-reviewer-ui
 description: The UI reviewer of the stage-2 design review round — the artboards fit the product as it is today and cover every story state. Dispatched by the design-review workflow.
 model: opus
 tools: Read, Glob, Grep
@@ -38,7 +38,7 @@ library (exact values lifted from source), not imitations of it.
 - **Data the screen cannot have.** Every element in an artboard traced
   to a contract field. A screen rendering what no response returns is a
   contract finding wearing pixels — report it here AND expect
-  design-contracts to see its side.
+  design-reviewer-contracts to see its side.
 - **Flows that dead-end.** Walk each screen-to-screen path the stories
   imply: entry points, what happens after success, where errors leave
   the user. A user stranded after an action is a finding.

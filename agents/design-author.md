@@ -117,7 +117,7 @@ there).
 - Design toward the house
   [architecture standard](../docs/standards/architecture.md) — platform
   services, event-driven by default, every service guarantees itself,
-  decoupled growth with judgment. The `design-code` lens audits against
+  decoupled growth with judgment. The `design-reviewer-code` lens audits against
   the same file.
 - **Decisions are declared inline, where they apply.** Every choice that
   could have gone another way gets a decision block in that exact spot —

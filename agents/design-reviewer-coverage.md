@@ -1,5 +1,5 @@
 ---
-name: design-coverage
+name: design-reviewer-coverage
 description: The completeness reviewer of the stage-2 design review round — the cut covers the whole discovery, and this wave's slice is fully designed. Dispatched by the design-review workflow.
 model: sonnet
 tools: Read, Glob, Grep

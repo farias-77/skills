@@ -1,5 +1,5 @@
 ---
-name: design-security
+name: design-reviewer-security
 description: The security reviewer of the stage-2 design review round — breach-opening patterns, secrets, isolation, the fixed class sweep. Dispatched by the design-review workflow.
 model: opus
 tools: Read, Glob, Grep, WebFetch, WebSearch

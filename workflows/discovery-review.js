@@ -34,7 +34,7 @@ export const meta = {
   description: 'Stage-1 review round: walkthrough, acceptance and boundary lenses plus two blind readers and their ambiguity judge — full every round, un-skippable by construction',
   phases: [
     { title: 'Lenses', detail: 'walkthrough, acceptance, boundary — each over both documents' },
-    { title: 'Blind reads', detail: 'two disc-reader agents commit to concrete builds, alone' },
+    { title: 'Blind reads', detail: 'two disc-blind-reader agents commit to concrete builds, alone' },
     { title: 'Ambiguity', detail: 'the judge compares the two builds and runs the cross-document pass' },
   ],
 }
@@ -111,7 +111,7 @@ const LENSES = ['disc-reviewer-walkthrough', 'disc-reviewer-acceptance', 'disc-r
 const readBlind = async (n) => {
   const dispatch = () => agent(inputs, {
     label: `read#${n}r${round}`, phase: 'Blind reads',
-    agentType: 'disc-reader', schema: READING,
+    agentType: 'disc-blind-reader', schema: READING,
   })
   let r = await dispatch()
   if (!r) {

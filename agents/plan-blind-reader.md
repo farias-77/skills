@@ -1,6 +1,6 @@
 ---
-name: plan-reader
-description: A blind cold reader of the stage-3 review round — a deliberately cheap model that reads ONE issue exactly as the implementing worker would receive it and reports its understanding plus exactly five questions. Three run per issue, in parallel, dispatched by the plan-review workflow; their divergence is the ambiguity signal the plan-issue judge consumes.
+name: plan-blind-reader
+description: A blind cold reader of the stage-3 review round — a deliberately cheap model that reads ONE issue exactly as the implementing worker would receive it and reports its understanding plus exactly five questions. Three run per issue, in parallel, dispatched by the plan-review workflow; their divergence is the ambiguity signal the plan-reviewer-issue judge consumes.
 model: haiku
 tools: Read, Glob, Grep
 ---

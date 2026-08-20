@@ -87,14 +87,14 @@ every time** — never narrow to what changed; the full re-run is the
 regression guard.
 
 It is ONE workflow invocation covering the whole round, in three
-phases: the two halves below run concurrently, and `plan-coherence`
+phases: the two halves below run concurrently, and `plan-reviewer-coherence`
 closes with every verdict in hand.
 
-**Per issue — the cold-read probe.** Three **`plan-reader`** agents
+**Per issue — the cold-read probe.** Three **`plan-blind-reader`** agents
 (Haiku — cheap and deliberately weak) read the same issue blind, each
 alone, and return their **understanding** in their own words plus
 **exactly five questions** they would ask before starting — always
-five, so padding is expected by design. Then **`plan-issue`** (Sonnet)
+five, so padding is expected by design. Then **`plan-reviewer-issue`** (Sonnet)
 judges the issue WITH the three readings in hand: **real divergence
 between the understandings is the ambiguity signal** — if three weak
 models read the same issue three different ways, a strong one gets no
@@ -109,9 +109,9 @@ bar: if a Haiku can execute it, the worker certainly can.
 
 | Lens | Judges |
 |---|---|
-| `plan-gaps` | the negative: what NO issue covers — this wave's story ACs without an issue (walks `waves.md` and the stories itself, never trusts the coverage map), issues without an AC, consumes without producer, "Out" without owner |
-| `plan-flow` | the graph as it will RUN: cycles, edges without a real reason, wasted parallelism, a skeleton owed, two big jobs on the same surface in the same batch |
-| `plan-coherence` | runs last, with all verdicts: the plans tell the design's story, and the two ends of every contract meet in the middle |
+| `plan-reviewer-gaps` | the negative: what NO issue covers — this wave's story ACs without an issue (walks `waves.md` and the stories itself, never trusts the coverage map), issues without an AC, consumes without producer, "Out" without owner |
+| `plan-reviewer-flow` | the graph as it will RUN: cycles, edges without a real reason, wasted parallelism, a skeleton owed, two big jobs on the same surface in the same batch |
+| `plan-reviewer-coherence` | runs last, with all verdicts: the plans tell the design's story, and the two ends of every contract meet in the middle |
 
 Every reviewer answers under the house
 [reviewer contract](../../docs/standards/reviewer-contract.md); the

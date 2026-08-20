@@ -83,22 +83,22 @@ Run [`design-review`](../../workflows/design-review.js) —
 `Workflow({name: 'design-review', args: {...}})` with `designDir`,
 `discoveryDir`, `wavesPath`, and `round`. The workflow is the guarantee:
 it dispatches **all ten reviewers**, every round, with structured outputs — there is no code
-path that runs a subset. Nine run in parallel; `design-coherence` runs
+path that runs a subset. Nine run in parallel; `design-reviewer-coherence` runs
 last with the nine verdicts in hand. **Every round is full — every
 reviewer, every time**; the full re-run is the regression guard.
 
 | Reviewer | Specialist in | Judges (holistically — reads everything, reports its lens) |
 |---|---|---|
-| `design-data` | data | entities, keys, access patterns, growth, query cost |
-| `design-code` | code organization | patterns, decoupling, extension points — and the architecture standard |
-| `design-infra` | infrastructure | configs at their best, exposure, IAM, cost at three scales vs real prices, rollout |
-| `design-security` | security | breach-opening patterns, secrets, isolation, the fixed class sweep |
-| `design-contracts` | contracts | every API/event defined whole — success AND error; the data each side needs arrives |
-| `design-alarms` | observability | alarms that make sense — the four fields, no over-alarming, no low-traffic false rings |
-| `design-coverage` | completeness | the cut covers the whole discovery; this wave's slice is fully designed |
-| `design-facts` | evidence | every claim about an external tool or existing service traces to research |
-| `design-ui` | UI | the artboards fit the product as it is today; every story state has a home |
-| `design-coherence` | cross-cutting | contradictions across the whole — runs last, with all verdicts |
+| `design-reviewer-data` | data | entities, keys, access patterns, growth, query cost |
+| `design-reviewer-code` | code organization | patterns, decoupling, extension points — and the architecture standard |
+| `design-reviewer-infra` | infrastructure | configs at their best, exposure, IAM, cost at three scales vs real prices, rollout |
+| `design-reviewer-security` | security | breach-opening patterns, secrets, isolation, the fixed class sweep |
+| `design-reviewer-contracts` | contracts | every API/event defined whole — success AND error; the data each side needs arrives |
+| `design-reviewer-alarms` | observability | alarms that make sense — the four fields, no over-alarming, no low-traffic false rings |
+| `design-reviewer-coverage` | completeness | the cut covers the whole discovery; this wave's slice is fully designed |
+| `design-reviewer-facts` | evidence | every claim about an external tool or existing service traces to research |
+| `design-reviewer-ui` | UI | the artboards fit the product as it is today; every story state has a home |
+| `design-reviewer-coherence` | cross-cutting | contradictions across the whole — runs last, with all verdicts |
 
 Every reviewer answers under the house
 [reviewer contract](../../docs/standards/reviewer-contract.md); the

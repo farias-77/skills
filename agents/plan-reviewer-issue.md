@@ -1,5 +1,5 @@
 ---
-name: plan-issue
+name: plan-reviewer-issue
 description: The cold-issue judge of the stage-3 review round — receives ONE issue plus three blind Haiku readings of it, and rules whether the issue sustains first-shot implementation by a cold worker. Dispatched once per issue by the plan-review workflow.
 model: sonnet
 tools: Read, Glob, Grep
@@ -81,8 +81,8 @@ then use the readings as your instrument.
 
 ## Boundaries
 
-You do not judge the graph (order, batches, parallelism — `plan-flow`),
-nor design coverage (`plan-gaps`), nor the design itself. Do not demand
+You do not judge the graph (order, batches, parallelism — `plan-reviewer-flow`),
+nor design coverage (`plan-reviewer-gaps`), nor the design itself. Do not demand
 fields beyond the issue template — estimate, file lists, and deps in
 the body were removed on purpose.
 

@@ -1,5 +1,5 @@
 ---
-name: design-data
+name: design-reviewer-data
 description: The data reviewer of the stage-2 design review round — entities, keys, access patterns, growth, query cost. Dispatched by the design-review workflow.
 model: opus
 tools: Read, Glob, Grep

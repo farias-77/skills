@@ -14,16 +14,16 @@
 
 | Reviewer | Verdict | Run id | Findings |
 |---|---|---|---|
-| design-data | | | |
-| design-code | | | |
-| design-infra | | | |
-| design-security | | | |
-| design-contracts | | | |
-| design-alarms | | | |
-| design-coverage | | | |
-| design-facts | | | |
-| design-ui | | | |
-| design-coherence | | | |
+| design-reviewer-data | | | |
+| design-reviewer-code | | | |
+| design-reviewer-infra | | | |
+| design-reviewer-security | | | |
+| design-reviewer-contracts | | | |
+| design-reviewer-alarms | | | |
+| design-reviewer-coverage | | | |
+| design-reviewer-facts | | | |
+| design-reviewer-ui | | | |
+| design-reviewer-coherence | | | |
 
 ### Findings and dispositions
 
