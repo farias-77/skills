@@ -6,8 +6,14 @@
   endpoint: route, auth (who can call), request AND response with example
   payloads (realistic values — each repo builds its fixtures from these),
   EVERY error case with status + actionable body, idempotency story for
-  every mutation, pagination for every list. Per event: name, schema,
-  producer, consumers, delivery semantics. Plus the evolution rules.
+  every mutation, pagination for every list — and the Smoke line: the
+  named smoke cases this endpoint owes, one per promised behavior
+  (success + each declared error). The design names them, the planning
+  copies them into the issue's DoD, the worker writes the scripts — the
+  smoke suite is the executable mirror of this contract, and the list
+  born here is what makes the mirror auditable name by name. Per event:
+  name, schema, producer, consumers, delivery semantics. Plus the
+  evolution rules.
   Changes after approval are amendments (a decision block with the
   reason) — never silent edits.
 -->
@@ -32,6 +38,7 @@
 - **Errors:** `<status>` <when> — body `{ }` <what the client does with it>
 - **Idempotency:** <what the second identical call returns, and why>
 - **Pagination:** <page size, cursor semantics, ordering — for lists>
+- **Smoke:** `<method>-<behavior>.sh` · `<method>-<behavior>-<expected-error>.sh` <one named case per promised behavior — success + each error above>
 
 ## Events
 

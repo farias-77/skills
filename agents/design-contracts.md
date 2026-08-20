@@ -47,6 +47,11 @@ discovery pair, and the workstream's `waves.md`.
 - **Fixture guidance.** Each repo builds its own fixtures FROM this
   document — check it is concrete enough for that (example payloads with
   real-looking values, not just field lists).
+- **The Smoke line, complete.** Every endpoint names its smoke cases —
+  one per promised behavior: the success case plus one per declared
+  error. An error enumerated above with no named smoke case is the
+  mirror born broken: the design names the cases, the worker writes the
+  scripts, and what is not named here never gets proven in alpha.
 
 ## Standards
 
