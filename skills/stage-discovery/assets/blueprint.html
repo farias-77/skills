@@ -557,10 +557,7 @@ const BLUEPRINT = {
   overview: {
     summary: 'One paragraph saying what this wave builds and for whom, in product language.',
     status: 'Discovery written — awaiting your review',
-    waves: [
-      { n: 'wave 1', name: 'the MVP — smallest useful end-to-end path', state: 'this wave' },
-      { n: 'wave 2', name: 'named next step', state: 'starts when wave 1 ships' }
-    ],
+    /* waves: filled by stage 2 from waves.md — discovery never fills this */
     stages: [
       { name: 'Discovery', numbers: [ { l: 'stories', v: '0' }, { l: 'criteria', v: '0' } ] }
     ]
@@ -581,7 +578,7 @@ const BLUEPRINT = {
         { name: 'Product & use', questions: [ { id: 'E1', t: 'Question?', a: 'Answer.' } ] }
       ],
       notBuilding: [
-        { item: 'capability', reason: 'out: reason — or the wave it lands in' }
+        { item: 'capability', reason: 'out: reason — or: future direction, not scheduled' }
       ],
       mustBeTrue: [ 'assumption whose falsity kills the product' ],
       open: [
