@@ -286,9 +286,12 @@ Verified rule; the workflow re-dispatches lazy passes on its own.
 
 One artifact per workstream, one URL from discovery to closure. Copy
 [assets/blueprint.html](assets/blueprint.html) to
-`<slug>/blueprint.html`, fill only the `BLUEPRINT` data object (never
-the shell), publish, and keep republishing the same file path at every
-later stage — the stage tabs light up as the workstream advances.
+`<slug>/blueprint.html`, fill only the `BLUEPRINT` data object (the
+shell's visible strings are translated to the user's language if the
+conversation is not in English — words only, never structure; house
+rule in the repo's `CLAUDE.md`), publish, and keep republishing the
+same file path at every later stage — the stage tabs light up as the
+workstream advances.
 Discovery fills the **Overview** (the frame, and the product direction
 from the evolution question) and the three **Discovery** sections:
 PR-FAQ, User Stories, What was inferred.

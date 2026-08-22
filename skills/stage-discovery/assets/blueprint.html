@@ -8,7 +8,10 @@
   How to use: copy this file and replace ONLY the `const BLUEPRINT` object
   (between the DATA / END OF DATA markers). Never edit the CSS or the
   render code — the identical shell across workstreams is what lets the
-  reader find everything without searching.
+  reader find everything without searching. One exception: the shell's
+  visible strings (tab labels, section titles, subtitles, ledes) may be
+  translated to the user's language — words only, never structure (house
+  rule: the blueprint speaks the user's language).
 
   Tab data contracts live with the stage that fills them (each stage skill
   documents its key). Rules: the theme opens by the READER's clock (17h-05h
@@ -548,8 +551,9 @@
 
 <script>
 /* ══════════════════════════════════════════════════════════════════════════
-   DATA — replace ONLY this object. Do not edit anything below the
-   END OF DATA marker. Each stage skill documents its tab's contract.
+   DATA — replace ONLY this object. Below the END OF DATA marker, the
+   only admitted edit is translating the visible strings to the user's
+   language. Each stage skill documents its tab's contract.
    ══════════════════════════════════════════════════════════════════════════ */
 const BLUEPRINT = {
   workstream: { slug: '<yyyy-mm-dd>-<slug>', title: 'Workstream name', wave: null /* current wave slug, set from stage 2 on */, stage: 'discovery' },
