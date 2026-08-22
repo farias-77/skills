@@ -534,6 +534,15 @@
   .xnote { font-size:13.5px; color:var(--ink-3); margin-top:10px; }
 
   @media (max-width:860px) { .split { grid-template-columns:1fr; gap:20px; } .toc { position:static; } }
+
+  /* width discipline: grid/flex children may shrink (no min-width:auto), wide
+     things scroll inside their own box, long tokens wrap — the page never
+     scrolls sideways, whatever the data carries. */
+  .list > *, .card, .kv > *, .op > *, .comp > *, .step > *, .split > *, .gcard > *, .wave > * { min-width:0; }
+  .card pre { max-width:100%; }
+  code, .table td, .table th { overflow-wrap:anywhere; }
+  .rec-top, .rollback .vcab { flex-wrap:wrap; }
+  .rec .price, .qrow .qcost, .al .aq, .rollback .vtime { white-space:normal; }
 </style>
 
 <header class="topbar"><div class="wrap">
