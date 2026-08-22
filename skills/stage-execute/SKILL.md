@@ -130,7 +130,10 @@ output, verbatim) · `capabilities` (what exists now, each one proven,
 with chips) · `proof` (the central verbatim evidence) · `rounds` (the
 table: per round × per scope, and the root cause → fix column) ·
 `decisions` (decided-in-your-place cards, orange) · `pending` (needs
-you). Never mermaid.
+you). Never mermaid. Same altitude as every tab (house rule: the
+blueprint is the report, the files are the record): the timeline tells
+the story, the rounds table shows the pattern — the per-issue detail
+stays in the PRs and `reviews.md`.
 
 ## 5 — Checkpoint and closing
 

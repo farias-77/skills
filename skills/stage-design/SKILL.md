@@ -130,8 +130,11 @@ published at the workstream root. This stage fills **this wave's entry**:
 `workstream.wave` (the current wave) and the wave map in the Overview
 (all waves, from `waves.md`). Republish the same file path — the Design
 tab lights up, and the wave pills let the reader flip between waves.
-The conductor owns the blueprint — it is a projection of the author's
-files, not a doc. Nine Design subtabs: **Glossary · How it works · UI ·
+The conductor owns the blueprint — it is the **report** of the author's
+files, not their projection (house rule in the repo's `CLAUDE.md`: the
+blueprint is the report, the files are the record — the altitude test,
+the curated lists, the three-paragraph mechanism, the 20–30 minute
+ceiling). Nine Design subtabs: **Glossary · How it works · UI ·
 Data · Infra & cost · Code · Security · Alarms · Going to production**.
 
 - **The UI tab carries prints**: render each artboard and embed the

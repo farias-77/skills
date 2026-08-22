@@ -28,3 +28,47 @@ across workstreams is what lets the reader find everything without
 searching. Discovery does the translation once, when it creates the
 file; every later stage writes its data in the same language. One
 language on the page, the reader's.
+
+## The blueprint is the report; the files are the record
+
+The stage documents (`*.md` under the workstream) are written for the
+machine: as complete and exact as the next stage needs — every entity,
+every query, every alarm, every class of the sweep. **The blueprint is
+not their projection.** It is the team reporting to a technical lead
+who wants to understand how the thing works and what matters, in
+twenty minutes, not three hours. Same tabs, same shell; another
+altitude.
+
+- **The test for a detail:** it enters the blueprint if the reader
+  would decide something differently knowing it. Otherwise it stays in
+  the file — and the file is named as the authority ("the exact numbers
+  live in `data-model.md`"), so nobody reads the blueprint as source.
+- **The intro of every tab is the report.** Read only the opening
+  paragraph and you know what this is, how it is organized, what it
+  costs. Then, up front: *what needs your eye here* — the decisions
+  taken in the user's place, the tradeoffs assumed, the numbers that
+  encode a business rule. The rest is there to be trusted, and says so.
+- **Decisions taken in the user's place never leave.** They only
+  shrink: the question, the options in one line each, the pick, why —
+  three sentences.
+- **Lists are curated, never complete.** The entities that explain the
+  model, not all of them; the alarms that would wake someone; the
+  sweep's verdict and what it found, not the class-by-class checklist;
+  the resources that explain the bill. Group what is one idea ("the two
+  snapshots", "the content rows"). The counts in section titles count
+  what is shown, not what exists.
+- **Plain technical language.** "Takes a lock so two cycles never run
+  together", not "conditional put on the lock item keyed by run_id".
+  Technical names only when they are the name of the thing. Per
+  mechanism, three short paragraphs at most: *what happens · when it
+  goes wrong · worth a look* — the last one is the review hook.
+- **Machine provenance stays out:** reference lists to research files,
+  line-by-line JSON comments, projection expressions, per-round
+  history. Diagrams earn their place when they replace prose — the
+  whole cycle in one picture, yes; one per mechanism, no.
+- **Ceiling:** a wave's Design tab reads in 20–30 minutes — roughly
+  6–8 thousand words across its nine subtabs; a subtab in two or three.
+  Plan and Execution tabs hold the same altitude.
+
+Discovery is the exception: the PR-FAQ and the stories are the demand
+itself, and the user approves them there — shown whole.

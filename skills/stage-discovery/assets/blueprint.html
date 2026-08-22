@@ -14,7 +14,9 @@
   rule: the blueprint speaks the user's language).
 
   Tab data contracts live with the stage that fills them (each stage skill
-  documents its key). Rules: the theme opens by the READER's clock (17h-05h
+  documents its key). Altitude: the blueprint is the report, the files are
+  the record (house rule) — the data object carries what a technical lead
+  needs to understand and decide, never the documents' full detail. Rules: the theme opens by the READER's clock (17h-05h
   dark, light otherwise) and the button toggles the `.dark` class; never
   prefers-color-scheme (the host stamps its theme after this script runs).
   NEVER mermaid: diagrams are HTML/CSS built with this shell's primitives
@@ -797,8 +799,8 @@ function renderGlossary() {
   const ess = g.terms.filter(t => t.ess);
   const alpha = a => [...a].sort((x,y) => x.t.localeCompare(y.t,'en'));
   return `
-  <p class="lede">Every word that appears in the other tabs without explanation is here. The tag
-  says where it comes from: what is <b>ours</b> is a decision and can be discussed; what comes
+  <p class="lede">The words you need to read the other tabs — the ones that carry a decision or a
+  constraint, not every term the documents use. The tag says where each comes from: what is <b>ours</b> is a decision and can be discussed; what comes
   from the <b>vendor</b> is a constraint and is not negotiable.</p>
   ${inlineDecisions(g.decisions)}
   ${ess.length ? `<section class="sec">${secT('Without these, the rest does not close', ess.length)}
@@ -931,7 +933,8 @@ function recCard(r, cls, withPrice) {
 function renderInfra() {
   const a = W().design.infra;
   return `
-  <p class="lede">The bill first; then, resource by resource, what this wave creates.</p>
+  <p class="lede">The bill first; then what this wave creates — the resources that explain the bill,
+  not the inventory (that is <code>infra.md</code>).</p>
   ${inlineDecisions(a.decisions)}
   <section class="sec">${secT('The monthly bill')}
     <div class="scoreboard" style="grid-template-columns:repeat(auto-fit,minmax(200px,1fr))">${a.totals.map((t,i) => `
@@ -1009,8 +1012,9 @@ function renderSecurity() {
   const EST = { ok:'covered', risk:'risk accepted', na:'does not apply' };
   const count = e => s.classes.filter(c => c.e === e).length;
   return `
-  <p class="lede">The sweep covers ${s.classes.length} known failure classes. The list is fixed
-  and the same in every workstream — a class without a line is a hole, not silence.</p>
+  <p class="lede">The verdict of the sweep and what it found — ${s.classes.length} classes worth
+  your eye. The fixed class-by-class sweep lives in <code>security.md</code>; a line here is a
+  finding or a risk accepted, never a checkbox.</p>
   ${inlineDecisions(s.decisions)}
   <div class="scoreboard" style="margin-top:22px">
     <div class="pl ok"><span class="v">${count('ok')}</span><span class="l">covered, with concrete mitigation</span></div>
@@ -1030,8 +1034,8 @@ function renderSecurity() {
 function renderAlarms() {
   const a = W().design.alarms;
   return `
-  <p class="lede">${a.items.length} alarms. Each one says what fires it, what normal looks like,
-  when it can ring without a bug, and what to do when it rings.</p>
+  <p class="lede">The ${a.items.length} alarms that would wake someone — what fires each, what
+  normal looks like, what to do. The full set lives in <code>observability.md</code>.</p>
   ${inlineDecisions(a.decisions)}
   <div class="rule" style="margin-top:20px"><b>An alarm without a written action is not an alarm, it is a dashboard number</b>
     <p>If an alarm has no action, it should not wake anyone — it becomes a chart on the ops

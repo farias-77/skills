@@ -139,8 +139,9 @@ under this wave's pill. The content: the plan's logic as the intro, the
 batch map, the issue cards (produces/consumes chips), decisions inline
 (`decided in your place` in orange, counted in the Overview), and the
 review scoreboard — including the per-issue cold-read score. The
-conductor owns the blueprint — it is a projection of the authors'
-files, not a doc. Never mermaid; diagrams are HTML/CSS with the shell's
+conductor owns the blueprint — it is the report of the authors' files,
+not their projection (house rule: the blueprint is the report, the
+files are the record — same altitude as the Design tab). Never mermaid; diagrams are HTML/CSS with the shell's
 primitives.
 
 ## 5 — Checkpoint, bootstrap, and closing
