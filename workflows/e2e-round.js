@@ -7,7 +7,9 @@
  * script, the round is all-or-nothing by construction: EVERY scope
  * runs, always, and a single failure dirties the whole round.
  *
- * Invoked by exec-conductor-alpha via the Workflow tool, 1 run per round:
+ * Launched by the SESSION from the args exec-conductor-alpha returns —
+ * subagents cannot launch workflows; the result goes back to that
+ * conductor verbatim. 1 run per round:
  *   Workflow({ scriptPath: '<...>/workflows/e2e-round.js', args: {
  *     wave:          'w01-invite-by-email',
  *     contractsPath: '/abs/.../01-design/contracts.md',

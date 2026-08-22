@@ -1,6 +1,6 @@
 ---
 name: stage-execute
-description: Conducts stage 4 (Execute) of the pipeline — takes the bootstrapped plan to feature branches fully implemented, reviewed and proven in the staging environment. The session dispatches one repo conductor per repo (git of the repo — DAG, worktrees, impl-issue workflow per issue, merges) and one environment conductor for the wave (deploy, smoke, the all-or-nothing e2e round), routes every message between them, and closes with the Execution tab and the checkpoint. Use after the plan is bootstrapped, or to resume an execution in progress.
+description: Conducts stage 4 (Execute) of the pipeline — takes the bootstrapped plan to feature branches fully implemented, reviewed and proven in the staging environment. The session dispatches one repo conductor per repo (git of the repo — DAG, worktrees, one impl-issue brief per issue, merges) and one environment conductor for the wave (deploy, smoke, the all-or-nothing e2e round), launches every workflow the conductors brief (subagents cannot launch workflows), routes every result back, and closes with the Execution tab and the checkpoint. Use after the plan is bootstrapped, or to resume an execution in progress.
 disable-model-invocation: false
 argument-hint: "<workstream-slug>"
 allowed-tools: Read, Write, Edit, Glob, Grep, Agent, SendMessage, ListAgents, Workflow, Artifact, AskUserQuestion, ScheduleWakeup, Bash(mkdir *), Bash(date *), Bash(ls *), Bash(cat *), Bash(git *), Bash(gh *), Bash(rm *)
@@ -21,6 +21,10 @@ message between them, archives what needs archiving, and talks to the
 user. It never implements, never reviews, never merges, never deploys
 — the conductors and workflows do, and the quality gates are
 physically un-skippable inside `impl-issue.js` and `e2e-round.js`.
+**It is also the only one that can launch a workflow** — the runtime
+reserves the Workflow tool for the session — so the conductors work
+in turns: a turn ends with what to launch, you launch it, and you
+bring the result back to the same conductor.
 
 ## Preconditions
 
@@ -67,7 +71,8 @@ path, the wave, its repo (path + GitHub name), the feature branch name
 (`feature/<workstream>-wNN`), and your address for reports. The
 conductor derives everything else from GitHub — which is also what
 makes re-dispatching a dead conductor safe: it re-derives and
-continues, never duplicates.
+continues, never duplicates. Its first turn returns its **briefs**:
+the `impl-issue` args for each ready issue, up to WIP 3.
 
 **WIP is 3 per conductor**; the machine is protected by the guard in
 the npm scripts, not by admission control here.
@@ -79,6 +84,17 @@ Every cross-repo event lands in `03-execution/trace.md`; each repo
 conductor logs its own lane in `03-execution/<repo>/trace.md` (zero
 silent death: an outcome that is in no trace did not happen).
 
+- **Briefs → workflows:** every brief a conductor returns becomes one
+  `Workflow({scriptPath: workflows/impl-issue.js, args: brief})` — all
+  of a turn's briefs in the same message, one trace line per launch.
+  Pass the brief through untouched; you do not read issue bodies.
+- **Results → the same conductor:** a workflow's completion
+  notification carries its return object. Send it to that repo's
+  conductor verbatim with `SendMessage` — the same agent, alive for
+  the whole wave — one message per result. Its reply is the next
+  turn: merges done, halts, the next briefs. A conductor that died
+  gets a fresh `Agent` dispatch with the original inputs; it
+  re-derives and continues.
 - **Batch reports** → trace + a consolidated update to the user, one
   per completed batch — never per issue.
 - **Typed halts** from a workflow (issue conflict, lens stagnation,
@@ -98,7 +114,8 @@ silent death: an outcome that is in no trace did not happen).
 - **Fix issues** (from smoke or the round): archiving is ONE step —
   `gh issue create` from the draft AND the Linear association together
   — then route the number to the right repo conductor.
-- Waiting is event-driven: conductor reports re-invoke you. Use
+- Waiting is event-driven: workflow completions and conductor returns
+  re-invoke you. Use
   ScheduleWakeup only as a long fallback heartbeat in case a conductor
   goes silent — then re-derive from GitHub before acting.
 
@@ -108,13 +125,16 @@ When every repo conductor reports done, dispatch
 **`exec-conductor-alpha`** (Opus) — one per wave: the workstream path,
 the wave, the repos with their FBs and deploy order (from the design's
 rollout doc), the scenarios path, your address. It conducts deploy
-(producer-first, inheritance pre-check) → smoke → scenarios → the
-`e2e-round` workflow — and reports per event.
+(producer-first, inheritance pre-check) → smoke → scenarios, and its
+turn ends with **the round to launch** — the `e2e-round` args. You
+launch `Workflow({scriptPath: workflows/e2e-round.js, args})` and send
+the result back to it verbatim, same agent.
 
 The loop on `dirty`: you archive the issue drafts (one step, GitHub +
 Linear), route them to the repo conductors, and on fixes-merged nudge
 the environment conductor — it redeploys ONLY the affected repos,
-re-smokes, and runs the ENTIRE round again. **Round cap: 3** — 
+re-smokes, and returns the round again; you launch the ENTIRE round
+again. **Round cap: 3** — 
 exhausted is a wave halt, yours to escalate.
 
 `clean` closes the phase: the wave is proven on its feature branches.
@@ -155,6 +175,7 @@ when it opens.
 | Issue ready | all blockers merged on the FB (derived from GitHub) | stays queued |
 | WIP cap | 3 per repo conductor | dispatch waits |
 | The engine | `impl-issue.js` only returns ready-to-merge with lenses + verification + CI + final review green | typed halt (lane) |
+| Workflows from the session | every `impl-issue` / `e2e-round` run is launched by the session from a conductor's brief — subagents cannot launch workflows | a conductor that tries has no tool; re-brief |
 | Every fix through the lenses | CI-red and review fixes re-enter the lens round — no commit reaches the PR unreviewed | enforced by the workflow |
 | Merge counted | only after re-reading the PR state MERGED | conductor re-checks |
 | Producer-first | issue order, deploy order | re-sequence |

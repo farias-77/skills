@@ -14,7 +14,9 @@
  * Briefs carry INPUTS only; every instruction lives in the agent
  * definitions under agents/.
  *
- * Invoked by exec-conductor-repo via the Workflow tool:
+ * Launched by the SESSION from the brief exec-conductor-repo returns —
+ * subagents cannot launch workflows; the result goes back to that
+ * conductor verbatim:
  *   Workflow({ scriptPath: '<...>/workflows/impl-issue.js', args: {
  *     issue_number: 42,
  *     repo:         'owner/name',
