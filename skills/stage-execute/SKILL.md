@@ -88,6 +88,10 @@ silent death: an outcome that is in no trace did not happen).
   `Workflow({scriptPath: workflows/impl-issue.js, args: brief})` — all
   of a turn's briefs in the same message, one trace line per launch.
   Pass the brief through untouched; you do not read issue bodies.
+  Launch the repo script itself — never an inline wrapper around it
+  (`workflow()` nested in a script written at dispatch time): the
+  gates are the file, not a script improvised per issue. The same
+  holds for `e2e-round`.
 - **Results → the same conductor:** a workflow's completion
   notification carries its return object. Send it to that repo's
   conductor verbatim with `SendMessage` — the same agent, alive for
