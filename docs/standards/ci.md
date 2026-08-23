@@ -23,11 +23,31 @@ One workflow: `.github/workflows/ci.yml`, triggered on every
 |---|---|---|
 | **API / agent** | `app` | `npm ci` → `npm run lint` → `npm run build` → `npm test` → `npm run test:integration` (in `app/`) |
 | | `infra` | `npm ci` → `npm run build` → `npm run synth` (in `infra/`) |
+| **API / agent, infra only** (no `app/`) | `infra` | `npm ci` → `npm run lint` → `npm run build` → `npm run synth` → `npm test` (in `infra/`) |
 | **Front** | `app` | `npm ci` → `npm run lint` → `npm run build` (at the root) |
 
 The coverage threshold is enforced by the test config (the testing
 standard's test.6), not by CI arithmetic — `npm test` simply fails
 when coverage drops. Lint runs with zero warnings tolerated.
+
+**An infra-only repo has no `app/` job**, so the two gates that job
+normally carries have nowhere else to run: its `infra` job runs
+`npm run lint` and `npm test` beside `build` and `synth`. What `npm test`
+means there is the supply-chain audit — the exception the last section
+states, not a test of the stack.
+
+## The supply-chain audit
+
+**The canonical `test` script carries
+`npm audit --omit=dev --audit-level=high`** in every repo — inside the
+script, never as a CI-only step, so the one principle holds and an agent
+reproduces the failure with `npm test`. It runs on the runtime tree only
+(`--omit=dev`) and fails the job on `high` and `critical`.
+
+**Dependabot alerts are enabled on every repo**, because the audit only
+sees what the lockfile pins at the moment a PR runs: an advisory
+published after the last green run reaches us through the alert, not
+through CI.
 
 ### Skeleton (API repo)
 
@@ -62,6 +82,27 @@ jobs:
       - run: npm run synth
 ```
 
+### Skeleton (infra-only repo)
+
+Same workflow, one job — the steps the missing `app` job would have
+carried ride on `infra`:
+
+```yaml
+jobs:
+  infra:
+    runs-on: ubuntu-latest
+    defaults: { run: { working-directory: infra } }
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version-file: .nvmrc, cache: npm, cache-dependency-path: infra/package-lock.json }
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run build
+      - run: npm run synth
+      - run: npm test
+```
+
 `concurrency` cancels superseded runs on the same branch — a fix
 pushed mid-run never waits behind the commit it replaced. The Node
 version is pinned once per repo (`.nvmrc`), read by CI and by humans
@@ -76,7 +117,10 @@ alike.
   environment conductor, prod only at the release stage). CI proves
   the code; it never touches an environment.
 - **No infra tests** — the infra job ends at synth; the diff protocol
-  lives in the PR (testing standard §2).
+  lives in the PR (testing standard §2). **One exception, and only
+  one:** the supply-chain audit is not a test of the stack — it audits
+  the dependency tree — so in a repo with no `app/` job it is the one
+  thing the `infra` job runs past synth.
 
 ## Branch protection
 
