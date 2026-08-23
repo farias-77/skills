@@ -3,7 +3,7 @@ name: stage-execute
 description: Conducts stage 4 (Execute) as the MASTER session — takes the bootstrapped plan to feature branches fully implemented, reviewed and proven in the staging environment. Sets up the wave's other sessions (one worker session per repo running stage-execute-repo, one environment session running stage-execute-env), routes every message between them, archives fix issues, and closes with the Execution tab and the checkpoint. Use after the plan is bootstrapped, or to resume an execution in progress.
 disable-model-invocation: false
 argument-hint: "<workstream-slug>"
-allowed-tools: Read, Write, Edit, Glob, Grep, Agent, SendMessage, ListAgents, Artifact, AskUserQuestion, ScheduleWakeup, Bash(mkdir *), Bash(date *), Bash(ls *), Bash(cat *), Bash(git *), Bash(gh *), Bash(rm *)
+allowed-tools: Read, Write, Edit, Glob, Grep, Agent, SendMessage, ListAgents, Artifact, AskUserQuestion, Bash(mkdir *), Bash(date *), Bash(ls *), Bash(cat *), Bash(git *), Bash(gh *), Bash(rm *)
 ---
 
 # Stage 4: Execute — the master session
@@ -45,8 +45,8 @@ The user builds the team you ask for, sets the goal — possibly with a
 time budget — and says "team ready". **From that word on, the outcome
 of the wave is yours:** every repo's feature branch proven in staging,
 the checkpoint presented. The user is not in the loop: they hear from
-you every 30 minutes (the report), on the always-escalate list, and at
-the checkpoint — nothing else. Inside the wave you decide: what to
+you when they ask for status (the report), on the always-escalate
+list, and at the checkpoint — nothing else. Inside the wave you decide: what to
 amend, what to re-route, which fix issues to open, what to unblock
 first. You never stop early, never wait for the user on something the
 protocol lets you decide, and never do a session's work in its place
@@ -144,7 +144,6 @@ The user opens the sessions; you say which, then you start them.
    silent ⇒ `ping`; silent again ⇒ ask the user to reopen it with the
    same `-n`, then `assign` again. **Never improvise a subagent in its
    place**, and never launch an engine yourself.
-6. **Start the clock:** `ScheduleWakeup` 1800 s, prompt `exec/tick`.
 
 **WIP is 3 per worker session**; the machine is protected by the
 guard in the npm scripts, not by admission control here.
@@ -209,30 +208,27 @@ you:
   heartbeat): ask the user to reopen it with the same command — it
   re-derives from GitHub and continues, never duplicates. Never take
   over its lane.
-- Waiting is event-driven: session messages re-invoke you. The
-  clock (below) is the only other thing that wakes you.
+- Waiting is event-driven: session messages and the user re-invoke
+  you; nothing else does. On every event, before acting, the sweep:
+  `ListAgents`, a `status` to anything silent past its cadence,
+  offline ⇒ the user asked to reopen it.
 
-## The clock — `exec/tick`, every 30 minutes
+## Status — on request
 
-Self-chained: every tick ends by scheduling the next one
-(`ScheduleWakeup` 1800 s, prompt `exec/tick`) until the checkpoint.
-A tick, in order:
+No clock, no scheduled report. When the user asks how it is going —
+any phrasing — answer with the protocol's report (§8), in order:
 
-1. `ListAgents` — who is idle, busy, offline. Anything silent past
-   its cadence (a worker with lanes in flight and no `batch` for an
-   hour, the environment with a round launched and no `round`) gets a
-   `status`; offline gets the user asked to reopen it.
+1. The sweep: `ListAgents` — idle, busy, offline; `status` to the
+   silent, the user asked to reopen the offline.
 2. Re-derive: the traces, `gh` (PRs on the FBs, open fix issues).
-3. **The report to the user**, in the protocol's fixed shape (§8):
-   elapsed (and the budget, if the user set one), the team, per repo
-   merged / in flight / blocked / next, the environment's phase,
-   what you decided since the last report, what needs the user, what
-   the next 30 minutes should bring.
-4. Schedule the next tick.
+3. **The report**, fixed shape: elapsed (and the budget, if the user
+   set one), the team, per repo merged / in flight / blocked / next,
+   the environment's phase, what you decided since the last report,
+   what needs the user, what should happen next.
 
-The report is the user's whole window into the wave — derived fresh,
-never accumulated, never skipped because nothing changed ("nothing
-changed" is a report).
+Derived fresh every time, never accumulated; "nothing changed" is a
+report too. It is the user's whole window into the wave — between
+requests they hear only the always-escalate list and the checkpoint.
 
 ## 3 — The environment phase
 
@@ -272,8 +268,7 @@ Present: the blueprint URL, the per-repo table (issues merged / halts
 / the FB), the rounds table, the smoke output, the count of decisions
 taken in the user's place, and any `pending` items. Approval is
 explicit. On approval: `dismiss` every session (their `final`
-returns feed the trace; the user closes the terminals), stop the
-clock (no next tick), `.state.md` →
+returns feed the trace; the user closes the terminals), `.state.md` →
 `stage: release`, commit the workstream folder — **push only with
 the user's explicit approval** — and suggest `/clear` before the next
 stage. On "approved with fixes": the fixes run through the same
@@ -286,7 +281,7 @@ when it opens.
 | Gate | Criterion | On failure |
 |---|---|---|
 | One session per role | every repo has its worker session up, the env session too — names per `sessions.md`, presence per `ListAgents`, started by your `assign` | ask the user to open it; never a subagent in its place |
-| The report | every 30 minutes, the fixed shape, derived fresh — the user's only window | a missed tick is re-scheduled at once |
+| The report | on request, the fixed shape, derived fresh — the user's only window | never answered from memory |
 | Issue ready | all blockers merged on the FB (derived from GitHub) | stays queued |
 | WIP cap | 3 per worker session | launch waits |
 | The engine | `impl-issue.js` only returns ready-to-merge with lenses + verification + CI + final review green | typed halt (lane) |

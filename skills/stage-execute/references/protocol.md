@@ -101,9 +101,11 @@ exec/<kind> · <sender> · <subject>
   working its lane** (everything it does is re-derivable), writes its
   trace, and retries each report at its next event. It never stops
   because the hub is quiet.
-- The master's clock (a report every 30 minutes, §8) doubles as the
-  sweep: at every tick it looks at `ListAgents` and pings anything
-  silent for longer than its expected cadence.
+- The sweep runs on every event the master receives and on every
+  status request from the user (§8): `ListAgents`, then a `status` to
+  anything silent for longer than its expected cadence (a worker with
+  lanes in flight and no `batch` for an hour, the environment with a
+  round launched and no `round`).
 
 ## 7. What a session decides, and what goes up
 
@@ -123,14 +125,11 @@ an infra diff · a rejected blocker (the reviewer contract requires
 sign-off) · e2e rounds exhausted · anything that changes the plan's
 scope — and says so in the next report.
 
-## 8. The master's report — every 30 minutes, to the user
+## 8. The master's report — on request, to the user
 
-The clock is self-chained: at setup, and at the end of every tick,
-the master calls `ScheduleWakeup` for 1800 seconds with the prompt
-`exec/tick`. The tick does the report, the sweep (§6), and schedules
-the next tick — the chain ends only at the checkpoint. One message in
-the master's terminal, fixed shape, derived fresh at the tick
-(ListAgents, the traces, `gh`), never accumulated:
+There is no clock. When the user asks for status — any phrasing — the
+master runs the sweep (§6), re-derives (the traces, `gh`), and answers
+in one message of fixed shape, never accumulated:
 
 ```
 Wave <wave> · <elapsed> elapsed[ of <budget>] · <phase: build · environment · checkpoint>
@@ -140,8 +139,8 @@ Repos:
 Environment: scenarios <ready|—> · deploy <n/N> · smoke <green|red> · round <n>: <verdict|running>
 Decided since last report: <one line each, or none>
 Needs you: <one line each, or none>
-Next 30 min: <what should happen>
+Next: <what should happen>
 ```
 
-Nothing else reaches the user between reports except the
+Between status requests, nothing reaches the user except the
 always-escalate list (§7) and the checkpoint.
