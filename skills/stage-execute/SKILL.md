@@ -25,13 +25,33 @@ same machine, all in auto mode:
   routes every message between them, archives what needs archiving,
   keeps the cross-repo trace, and talks to the user. It never
   implements, reviews, merges, deploys, or launches a workflow.
-- **One worker session per repo** — `/stage-execute-repo <slug>
-  <repo>`. Everything git about that repo: the feature branch, the
-  DAG, the worktrees, the `impl-issue` engine launched per issue, the
-  merges.
-- **One environment session per wave** — `/stage-execute-env <slug>`.
+- **One worker session per repo** — runs `stage-execute-repo`.
+  Everything git about that repo: the feature branch, the DAG, the
+  worktrees, the `impl-issue` engine launched per issue, the merges.
+- **One environment session per wave** — runs `stage-execute-env`.
   The scenarios, the deploys, smoke, the `e2e-round` launched per
   round.
+
+The user opens the other sessions **named and empty** and types
+nothing in them; you start each one with an `exec/assign` message
+that names the skill and its arguments. The contract every session
+speaks — envelope, kinds, delivery, liveness, the report — is
+[`references/protocol.md`](references/protocol.md); read it before
+the first message.
+
+## Your mandate
+
+The user builds the team you ask for, sets the goal — possibly with a
+time budget — and says "team ready". **From that word on, the outcome
+of the wave is yours:** every repo's feature branch proven in staging,
+the checkpoint presented. The user is not in the loop: they hear from
+you every 30 minutes (the report), on the always-escalate list, and at
+the checkpoint — nothing else. Inside the wave you decide: what to
+amend, what to re-route, which fix issues to open, what to unblock
+first. You never stop early, never wait for the user on something the
+protocol lets you decide, and never do a session's work in its place
+— a silent session is pinged, then reopened by the user, never
+replaced by a subagent.
 
 Why sessions, not subagents: only a session can launch a workflow,
 each role keeps its own context for the whole wave, and a terminal per
@@ -80,9 +100,9 @@ Plus, outside the workstream folder: **one proven feature branch per
 repo** (every issue merged, e2e clean against the staging deploy of
 those branches) — the deliverable the next stage integrates.
 
-## 1 — Set up the sessions
+## 1 — Build the team
 
-The user opens the sessions; you tell them exactly what to open.
+The user opens the sessions; you say which, then you start them.
 
 1. **Know your own name.** `ListAgents` prints it ("This session is
    …"). That is the address every other session reports to.
@@ -102,23 +122,29 @@ The user opens the sessions; you tell them exactly what to open.
    `feature/<workstream>-wNN`. Deploy order from the design's rollout
    document; fallback producer-first (APIs before agents before
    fronts).
-3. **Print the commands, one block per session, all at once** — the
-   environment session opens with the workers: it authors the
-   scenarios while the repos build.
+3. **Print the team — names only, one open command per session:**
 
    ```
    cd <this session's directory>
    claude --model opus -n invites-hub
-   /stage-execute-repo 2026-08-15-workspace-invites hub
    ```
 
-   Auto mode in each. Say it once: every session is Opus, every
-   session is auto mode, every session stays open until you dismiss
-   it.
-4. **Wait for each session's `ready` message.** `ListAgents` shows
-   who is up (interactive · idle/busy). A name missing is a session
-   not opened yet — ask again; **never improvise a subagent in its
+   One block per worker and one for the environment, all opened now —
+   the environment session authors the scenarios while the repos
+   build. Tell the user: Opus, auto mode, type nothing in them, say
+   "team ready" when the terminals are up.
+4. **On "team ready": assign.** `ListAgents` — every name present?
+   Missing ⇒ say which and wait. Present ⇒ send each session its
+   `exec/assign` in the same turn (protocol §4): `skill:
+   stage-execute-repo`, `args: <slug> <repo>` for a worker; `skill:
+   stage-execute-env`, `args: <slug>` for the environment; `master:`
+   your name; `sessions:` the roster path. The session invokes the
+   skill itself and conducts end to end.
+5. **Expect `ready` within 10 minutes** per session (protocol §6):
+   silent ⇒ `ping`; silent again ⇒ ask the user to reopen it with the
+   same `-n`, then `assign` again. **Never improvise a subagent in its
    place**, and never launch an engine yourself.
+6. **Start the clock:** `ScheduleWakeup` 1800 s, prompt `exec/tick`.
 
 **WIP is 3 per worker session**; the machine is protected by the
 guard in the npm scripts, not by admission control here.
@@ -131,10 +157,10 @@ logs its own lane in `03-execution/<repo>/trace.md`, the environment
 session in `03-execution/e2e/trace.md` (zero silent death: an outcome
 that is in no trace did not happen).
 
-**The messages.** One message per event per recipient; when several
-sessions must hear something, send all of them in the same turn.
-Every message is re-derivable — anyone can lose one and recompute
-from GitHub.
+**The messages** are the protocol's kinds (`references/protocol.md`
+§4) — one event per message, all recipients of one event in the same
+turn, everything re-derivable from GitHub. What each one means for
+you:
 
 | From a worker | Carries | You |
 |---|---|---|
@@ -146,7 +172,7 @@ from GitHub.
 
 | From the environment session | Carries | You |
 |---|---|---|
-| `scenarios-ready` | the scenarios file path, the scopes | trace line |
+| `ready` | the scenarios file path, the scopes | trace line |
 | `deploy-halt` | an undeclared stateful deletion in the inheritance pre-check, or a persistent deploy failure | **escalate to the user, always** |
 | `smoke-regression` | a fix-issue draft (no round spent) | archive, route |
 | `round` | `clean` with the evidence · `dirty` with the issue drafts · `exhausted` | clean → §4 · dirty → archive, route · exhausted → wave halt, escalate |
@@ -183,10 +209,30 @@ from GitHub.
   heartbeat): ask the user to reopen it with the same command — it
   re-derives from GitHub and continues, never duplicates. Never take
   over its lane.
-- Waiting is event-driven: session messages re-invoke you. Use
-  ScheduleWakeup only as a long fallback heartbeat in case a session
-  goes silent — then `ListAgents` and re-derive from GitHub before
-  acting.
+- Waiting is event-driven: session messages re-invoke you. The
+  clock (below) is the only other thing that wakes you.
+
+## The clock — `exec/tick`, every 30 minutes
+
+Self-chained: every tick ends by scheduling the next one
+(`ScheduleWakeup` 1800 s, prompt `exec/tick`) until the checkpoint.
+A tick, in order:
+
+1. `ListAgents` — who is idle, busy, offline. Anything silent past
+   its cadence (a worker with lanes in flight and no `batch` for an
+   hour, the environment with a round launched and no `round`) gets a
+   `status`; offline gets the user asked to reopen it.
+2. Re-derive: the traces, `gh` (PRs on the FBs, open fix issues).
+3. **The report to the user**, in the protocol's fixed shape (§8):
+   elapsed (and the budget, if the user set one), the team, per repo
+   merged / in flight / blocked / next, the environment's phase,
+   what you decided since the last report, what needs the user, what
+   the next 30 minutes should bring.
+4. Schedule the next tick.
+
+The report is the user's whole window into the wave — derived fresh,
+never accumulated, never skipped because nothing changed ("nothing
+changed" is a report).
 
 ## 3 — The environment phase
 
@@ -225,8 +271,9 @@ stays in the PRs and the lane traces.
 Present: the blueprint URL, the per-repo table (issues merged / halts
 / the FB), the rounds table, the smoke output, the count of decisions
 taken in the user's place, and any `pending` items. Approval is
-explicit. On approval: `dismiss` every session (their final returns
-feed the trace; the user closes the terminals), `.state.md` →
+explicit. On approval: `dismiss` every session (their `final`
+returns feed the trace; the user closes the terminals), stop the
+clock (no next tick), `.state.md` →
 `stage: release`, commit the workstream folder — **push only with
 the user's explicit approval** — and suggest `/clear` before the next
 stage. On "approved with fixes": the fixes run through the same
@@ -238,7 +285,8 @@ when it opens.
 
 | Gate | Criterion | On failure |
 |---|---|---|
-| One session per role | every repo has its worker session up, the env session too — names per `sessions.md`, presence per `ListAgents` | ask the user to open it; never a subagent in its place |
+| One session per role | every repo has its worker session up, the env session too — names per `sessions.md`, presence per `ListAgents`, started by your `assign` | ask the user to open it; never a subagent in its place |
+| The report | every 30 minutes, the fixed shape, derived fresh — the user's only window | a missed tick is re-scheduled at once |
 | Issue ready | all blockers merged on the FB (derived from GitHub) | stays queued |
 | WIP cap | 3 per worker session | launch waits |
 | The engine | `impl-issue.js` only returns ready-to-merge with lenses + verification + CI + final review green | typed halt (lane) |

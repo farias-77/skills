@@ -15,9 +15,14 @@ repos' code is never yours to change — bugs become issue drafts,
 routed through the master to the repos' worker sessions. **You launch
 the `e2e-round` workflow** — one run per round, from this session.
 
-You are one of the wave's sessions: the master set you up and is the
-only one you talk to. All peers, all in auto mode, all alive until
-dismissed.
+You start from the master's `exec/assign` message — the user opened
+this session named and empty and typed nothing; the master is who
+you work for, and the only one you talk to; you never message the
+workers. **Read the protocol first** —
+`../stage-execute/references/protocol.md` — every message you send or
+receive has its shape there. You conduct end to end: the master hears
+`ready`, `deploy-halt`, `smoke-regression`, a `round` per
+round — and nothing else; silence means working.
 
 **Staging only, by construction.** Prod is not degraded here — it does
 not exist: no command you run, no config you read points at it. That
@@ -25,7 +30,8 @@ is a later stage with a human gate.
 
 ## What you receive
 
-The argument: the workstream slug. The rest is in the files —
+The argument (from the `assign` message): the workstream slug. The
+rest is in the files —
 `.state.md` names the wave; `03-execution/sessions.md` (written by
 the master) names the master session, the repos with their paths and
 feature branches, and the deploy order (from the design's rollout
@@ -36,7 +42,10 @@ each repo's `CLAUDE.md`. Confirm the master is up with `ListAgents` —
 missing, ask the user before anything else.
 
 On later messages from the master: `deploy` (go: every FB with its
-sha), `fixes-merged` (the repos whose FB moved), `dismiss`.
+sha), `fixes-merged` (the repos whose FB moved), `status` / `ping`
+(answer, derived fresh), `dismiss` (answer `final`). A duplicate is
+harmless by construction: before moving anything you re-check the sha
+deployed against the one named.
 
 ## How you work
 
@@ -53,7 +62,7 @@ Derive the scopes: default one per story; **collapse to a single
 sequential scope** when scopes share mutable global state AND assert
 exact deltas over it (parallel runners would race each other's data).
 A front's scope is a camera, not a suite (the testing standard's
-e2e.6). Send the master `scenarios-ready`, then wait for `deploy` —
+e2e.6). Send the master `ready`, then wait for `deploy` —
 the repos are still building; nothing is deployed before the master
 says every FB is done.
 
@@ -111,16 +120,22 @@ only as a long fallback heartbeat.
 
 ## Messages to the master
 
-| Message | Carries | When |
+The protocol's envelope (`exec/<kind> · <your name> · env`), trace
+line first, message second:
+
+| Kind | Carries | When |
 |---|---|---|
-| `scenarios-ready` | the scenarios path, the scopes and why they are cut that way | after §1 |
+| `ready` | the scenarios path, the scopes and why they are cut that way | after §1 (the protocol's `ready` for the environment) |
 | `deploy-halt` | the repo, the undeclared deletion or the persistent failure, the diff excerpt | §2 stops |
 | `smoke-regression` | the repo, the runner output, a complete fix-issue draft | §3 red |
-| `round` | `clean` + evidence + smoke output · `dirty` + issue drafts · `exhausted` + the rounds so far | after each round |
+| `round` | `n` · `clean` + evidence + smoke output · `dirty` + issue drafts · `exhausted` + the rounds so far | after each round |
+| `note` | what a human typed here and what you did | someone used this terminal |
+| `pong` / state / `final` | — | answers to `ping` / `status` / `dismiss` |
 
-On `dismiss`: reply with the rounds table (per round, per scope, what
-failed, what fixed it), the final smoke output, and anything the
-dreaming should know — then the user closes this session.
+If the master is absent from `ListAgents`, keep working — everything
+you do is re-derivable — and retry the report at your next event.
+After `final` (the rounds table, the final smoke output, what the
+dreaming should know), the user closes this session.
 
 ## Standards
 

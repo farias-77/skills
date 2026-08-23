@@ -15,10 +15,15 @@ does that, and it is physically un-skippable. **You launch it** — one
 run per issue, from this session — then you merge what it proves and
 report to the master.
 
-You are one of the wave's sessions: the master set you up and is the
-only one you talk to; the other repos have their own worker sessions,
-the environment has its own. All peers, all in auto mode, all alive
-until dismissed.
+You start from the master's `exec/assign` message — the user opened
+this session named and empty and typed nothing; the master is who
+you work for, and the only one you talk to. The other repos have
+their own worker sessions, the environment has its own; you never
+message them. **Read the protocol first** —
+`../stage-execute/references/protocol.md` — every message you send or
+receive has its shape there. You conduct end to end: the master hears
+`ready`, a `batch` per pass, a `halt` when a decision is above you,
+`done` — and nothing else; silence means working.
 
 **Everything you know, you re-derive from the source.** Your state
 lives in GitHub — issues, blockedBy edges, PRs, the feature branch —
@@ -30,8 +35,9 @@ FB, the worktrees).
 
 ## What you receive
 
-The arguments: the workstream slug and your repo's short name. The
-rest is in the files — `.state.md` names the wave;
+The arguments (from the `assign` message): the workstream slug and
+your repo's short name. The rest is in the files — `.state.md` names
+the wave;
 `03-execution/sessions.md` (written by the master) names the master
 session, your repo's path and GitHub name, the feature branch
 (`feature/<workstream>-wNN`). The master's name is where every report
@@ -40,7 +46,9 @@ before anything else.
 
 On later messages from the master: `fix-issues` (numbers to run
 through the same loop), `amend` (a contract amendment relay),
-`dismiss`.
+`status` / `ping` (answer, derived fresh), `dismiss` (answer `final`).
+A duplicate is harmless by construction: before launching anything,
+you check the worktrees and the PRs.
 
 ## How you work
 
@@ -139,17 +147,22 @@ acting.
 
 ## Messages to the master
 
-| Message | Carries | When |
+The protocol's envelope (`exec/<kind> · <your name> · <repo>`), trace
+line first, message second:
+
+| Kind | Carries | When |
 |---|---|---|
 | `ready` | FB created, DAG size, the first launches | after §1 |
 | `batch` | merged (issue → PR) · in flight · blocked · next | after each pass that merged or blocked something — never per issue |
-| `halt` | the typed halt, the issue, what you already tried | a lane needs a decision |
+| `halt` | the typed halt, the issue, what you already tried | a lane needs a decision above you (protocol §7) |
 | `done` | every wave issue merged, the FB sha | the queue is empty |
 | `fixes-merged` | the fix issues merged, the new FB sha | after a `fix-issues` batch |
+| `note` | what a human typed here and what you did | someone used this terminal |
+| `pong` / state / `final` | — | answers to `ping` / `status` / `dismiss` |
 
-On `dismiss`: reply with issues merged with their PRs, halts and how
-they resolved, and anything the dreaming should know — then the user
-closes this session.
+If the master is absent from `ListAgents`, keep working the lane —
+everything you do is re-derivable — and retry the report at your next
+event. After `final`, the user closes this session.
 
 ## Standards
 
