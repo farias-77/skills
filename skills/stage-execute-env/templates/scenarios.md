@@ -1,8 +1,8 @@
 # e2e scenarios — <wave>
 
 <!--
-Authored by exec-conductor-alpha at the entry of the environment
-phase; the round's runners execute EXACTLY what is written here.
+Authored by the environment session (stage-execute-env) while the
+repos build; the round's runners execute EXACTLY what is written here.
 
 Rules this template stands on:
 - one section per user story of the WAVE (from waves.md + the

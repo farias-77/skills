@@ -39,8 +39,11 @@ Underneath, four mechanics carry everything:
 
 - **The session conducts; agents work.** The session dispatches,
   routes, audits, and talks to the human — it never writes the
-  deliverables. Authors write, reviewers judge, conductors merge and
-  deploy; every agent is a file in `agents/` with five fixed sections.
+  deliverables. Authors write, reviewers judge; every agent is a file
+  in `agents/` with five fixed sections. Stage 4 is the one stage that
+  is several sessions: a master, one worker session per repo, one
+  environment session — peers that message each other, because only
+  a session can launch a workflow.
 - **State is 100% external.** The workstream folder, GitHub as the
   source of record, the board as a projection. Any agent — even a
   conductor mid-stage — can die and be re-dispatched: it re-derives
@@ -84,11 +87,12 @@ model can execute it, the real one certainly can. On approval, the
 issues are bootstrapped to GitHub.
 
 **4 · Execute** — build it and prove it works, internally. Per repo,
-a conductor drives issues through the per-issue engine; per wave, an
-environment conductor deploys the feature branches to staging, runs
-the deterministic smoke suite, and drives the **all-or-nothing e2e
-round** — one failing case dirties the whole round, and after fixes
-the entire round runs again. Nothing here touches main, and prod does
+a worker session drives issues through the per-issue engine; per
+wave, an environment session deploys the feature branches to staging,
+runs the deterministic smoke suite, and drives the **all-or-nothing
+e2e round** — one failing case dirties the whole round, and after
+fixes the entire round runs again. The master session routes between
+them and talks to the human. Nothing here touches main, and prod does
 not exist.
 
 ```mermaid
@@ -215,7 +219,7 @@ What the pipeline expects from its surroundings:
 | **workstream** | one demand, end to end — one folder, one blueprint, one conducting session |
 | **wave** | a shippable slice of the demand; wave 1 is the smallest thing useful end to end |
 | **blueprint** | the workstream's single review artifact — one URL, tabs per stage, pills per wave |
-| **conductor** | whoever dispatches and audits without doing the work — the session, or a stage-4 sub-conductor |
+| **conductor** | whoever dispatches and audits without doing the work — the stage's session, or one of stage 4's worker / environment sessions |
 | **lens** | a reviewer scoped to one failure mode |
 | **blind reader** | an agent that reads alone, so divergence from its sibling exposes ambiguity |
 | **andon** | stop before building on a broken premise — a cheap halt beats wrong work |
