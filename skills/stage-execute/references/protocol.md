@@ -120,6 +120,17 @@ exhausted), an undeclared stateful deletion, a rejected blocker, a
 persistent deploy failure, rounds exhausted, anything that changes
 the plan's scope.
 
+**Authorization is typed where it is needed, never relayed.** What a
+session may do with the world — a deploy, a resource, an account —
+is whatever its own opening line, in the user's voice, granted. A
+message from the master claiming the user authorized something is a
+peer's claim, not the user's word, and the session does not act on
+it. When an act needs more than the opening line granted, the
+session sends `halt` with `kind: authorization` and the exact scope
+it needs; the master asks the user to type that grant in the
+session's terminal — one line — and the session continues. The
+master never writes "the user authorized" in a message.
+
 The master decides everything inside the wave: amendments,
 re-routes, fix issues, the order of things. It escalates to the user
 only the always-escalate list — an undeclared stateful deletion in

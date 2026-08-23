@@ -130,19 +130,36 @@ The user opens the sessions; you say which, then you start them.
    the skill. A session opened empty has only a peer's message as its
    instruction, and the skill call does not go through.
 
+   **The opening line is also the session's authorization** — the
+   only one it will ever have. What a session may do with the world
+   (deploy a stack, create an IAM role, touch an account) must be
+   granted there, in the user's words, with its scope spelled out; a
+   grant relayed by you in a message is a peer's claim, and the
+   session will halt and ask the user to type it. So before printing,
+   read the wave's issues for this repo: every act their DoDs name
+   beyond git and the engine (an alpha deploy, a resource the issue
+   creates) goes into the line, and the account, region and profile
+   come from the venture's configuration — never guessed.
+
    ```
    cd <this session's directory>
-   claude --model opus -n invites-hub "Worker session for repo hub of workstream 2026-08-15-workspace-invites. The master session <your name> will send exec/assign; invoke the skill it names and conduct the repo end to end."
+   claude --model opus -n invites-hub "Worker session for repo hub of workstream 2026-08-15-workspace-invites. The master session <your name> will send exec/assign; invoke the skill it names and conduct the repo end to end. For this wave I authorize: git and gh on this repo — branches, worktrees, PRs, merges into the feature branch; the impl-issue engine per issue; and npm run deploy:alpha of this repo only — account <id>, region <region>, profile <profile> — creating or updating the resources the issues' DoDs declare (IAM roles included), deleting nothing, diff:alpha checked first. deploy:prod never; no other account, region, or repo."
    ```
 
+   Omit the deploy clause when no issue of the repo names a deploy.
    For the environment session: "Environment session of workstream
    <slug>. The master session <your name> will send exec/assign;
    invoke the skill it names and conduct the staging environment end
-   to end." One block per worker and one for the environment, all
-   opened now — the environment session authors the scenarios while
-   the repos build. Tell the user: Opus, auto mode, open each exactly
-   as printed, type nothing more in them, say "team ready" when the
-   terminals are up.
+   to end. For this wave I authorize: npm run deploy:alpha of <the
+   wave's repos> — account <id>, region <region>, profile <profile> —
+   creating or updating what the feature branches declare, deleting
+   nothing undeclared (an undeclared stateful deletion halts); the
+   smoke suites; the e2e round against staging. deploy:prod never; no
+   other account or region." One block per worker and one for the
+   environment, all opened now — the environment session authors the
+   scenarios while the repos build. Tell the user: Opus, auto mode,
+   open each exactly as printed, type nothing more in them, say "team
+   ready" when the terminals are up.
 4. **On "team ready": assign.** `ListAgents` — every name present?
    Missing ⇒ say which and wait. Present ⇒ send each session its
    `exec/assign` in the same turn (protocol §4): `skill:
