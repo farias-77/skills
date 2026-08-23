@@ -122,17 +122,27 @@ The user opens the sessions; you say which, then you start them.
    `feature/<workstream>-wNN`. Deploy order from the design's rollout
    document; fallback producer-first (APIs before agents before
    fronts).
-3. **Print the team — names only, one open command per session:**
+3. **Print the team — one open command per session, carrying the
+   intent.** The command's last argument is the session's opening
+   prompt, in the user's own voice: it states what the session is
+   for and who will assign it, so that when your `assign` arrives the
+   session's own transcript already holds the user's intent to run
+   the skill. A session opened empty has only a peer's message as its
+   instruction, and the skill call does not go through.
 
    ```
    cd <this session's directory>
-   claude --model opus -n invites-hub
+   claude --model opus -n invites-hub "Worker session for repo hub of workstream 2026-08-15-workspace-invites. The master session <your name> will send exec/assign; invoke the skill it names and conduct the repo end to end."
    ```
 
-   One block per worker and one for the environment, all opened now —
-   the environment session authors the scenarios while the repos
-   build. Tell the user: Opus, auto mode, type nothing in them, say
-   "team ready" when the terminals are up.
+   For the environment session: "Environment session of workstream
+   <slug>. The master session <your name> will send exec/assign;
+   invoke the skill it names and conduct the staging environment end
+   to end." One block per worker and one for the environment, all
+   opened now — the environment session authors the scenarios while
+   the repos build. Tell the user: Opus, auto mode, open each exactly
+   as printed, type nothing more in them, say "team ready" when the
+   terminals are up.
 4. **On "team ready": assign.** `ListAgents` — every name present?
    Missing ⇒ say which and wait. Present ⇒ send each session its
    `exec/assign` in the same turn (protocol §4): `skill:

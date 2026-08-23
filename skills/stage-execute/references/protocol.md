@@ -8,8 +8,10 @@ none of them improvises a message shape.
 ## 1. Roles and the only channel
 
 - **The user talks to the master, and only to the master.** The user
-  opens the other sessions named and empty, types nothing in them,
-  and says "team ready". From that word on, the outcome of the wave
+  opens the other sessions with the command the master printed — a
+  name and an opening line that states, in the user's voice, what the
+  session is for — types nothing more in them, and says "team
+  ready". From that word on, the outcome of the wave
   is the master's.
 - **Every session talks to the master, and only to the master.**
   Workers never message each other or the environment session; the
