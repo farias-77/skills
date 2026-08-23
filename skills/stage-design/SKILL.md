@@ -175,4 +175,4 @@ at close — stage 3 moves it when it opens.
 No issue decomposition (stage 3). No code (stage 4). The discovery
 fence does not reopen silently — unviable in-scope items become declared
 decisions. Frictions worth learning from go to the workstream's
-`dreaming-notes.md` on the spot; judging them is stage 7's job.
+`dreaming-notes.md` on the spot; judging them is stage 6's job.

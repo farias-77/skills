@@ -15,7 +15,7 @@ The discovery is complete by contract. If you hit a gap you cannot
 design over without inventing product behavior, **it becomes a question
 to the user** — returned to the conductor, who relays it — never a
 guess and never a silent patch. A big hole is also worth recording in
-the workstream's `dreaming-notes.md` as a stage-1 failure, so stage 7
+the workstream's `dreaming-notes.md` as a stage-1 failure, so stage 6
 fixes the discovery skill; the resolution here is still just asking.
 
 ## What you receive

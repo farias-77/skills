@@ -67,7 +67,7 @@ designs-root/2026-08-15-workspace-invites/
 ├── blueprint.html           # the workstream's blueprint — Overview + Discovery filled here
 └── 00-discovery/
     ├── notes.md             # working: the interview, live, with the coverage map
-    ├── reviews.md           # working: the review-round audit
+    ├── reviews.md           # permanent: the review-round audit
     ├── pr-faq.md            # permanent: the whole demand, narrated
     └── user-stories.md      # permanent: every story and AC of the whole demand
 ```
@@ -313,11 +313,12 @@ move it when it opens.
 
 Working files die with the stage; the record survives it.
 
-- **Working (deleted at stage close):** `00-discovery/notes.md`,
-  `00-discovery/reviews.md`.
+- **Working (deleted at stage close):** `00-discovery/notes.md`.
 - **Permanent:** the workstream's blueprint (the artifact that
   accumulates the workstream, stage by stage), `00-discovery/pr-faq.md`,
-  `00-discovery/user-stories.md`, and `.state.md`.
+  `00-discovery/user-stories.md`, `00-discovery/reviews.md` (the
+  round audit — the dreaming reads what blocked here), and
+  `.state.md`.
 
 ## Resuming
 

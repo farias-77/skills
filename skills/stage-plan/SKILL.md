@@ -187,4 +187,4 @@ question to the user and a declared decision. The plan is amendable, not
 sacred: in-flight adjustment (stage 4) navigates by Produces/Consumes —
 whoever consumes the corrected element is suspect, the rest untouched.
 Frictions worth learning from go to the workstream's
-`dreaming-notes.md` on the spot; judging them is stage 7's job.
+`dreaming-notes.md` on the spot; judging them is stage 6's job.

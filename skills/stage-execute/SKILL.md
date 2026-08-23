@@ -282,7 +282,10 @@ Present: the blueprint URL, the per-repo table (issues merged / halts
 / the FB), the rounds table, the smoke output, the count of decisions
 taken in the user's place, and any `pending` items. Approval is
 explicit. On approval: `dismiss` every session (their `final`
-returns feed the trace; the user closes the terminals), `.state.md` →
+returns feed the trace, and each one's "what the dreaming should
+know" is appended by the master to the workstream's
+`dreaming-notes.md` — one entry per session; the user closes the
+terminals), `.state.md` →
 `stage: release`, commit the workstream folder — **push only with
 the user's explicit approval** — and suggest `/clear` before the next
 stage. On "approved with fixes": the fixes run through the same
@@ -324,4 +327,4 @@ No integration to main (next stage). No prod, no release, no tags
 (later still). The design and plan fences hold: a hole becomes an
 amendment through the declared-decision path, never a silent patch.
 Frictions worth learning from go to the workstream's
-`dreaming-notes.md` on the spot; judging them is stage 7's job.
+`dreaming-notes.md` on the spot; judging them is stage 6's job.
