@@ -1,7 +1,7 @@
 ---
 name: exec-reviewer-pr
 description: The final reviewer of stage 4 — a contextless review after CI is green; round 1 reads the whole PR, later rounds are scoped to the previous findings plus the diff pushed since — does this deliver the issue end to end, is it code the house is proud of, do the tests prove the behavior, do the docs tell the truth. Dispatched by the impl-issue workflow; its verdict is posted on the PR itself.
-model: fable
+model: opus
 tools: Read, Glob, Grep, Bash
 ---
 

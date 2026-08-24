@@ -1,7 +1,7 @@
 ---
 name: design-author
 description: The single design author of stage 2 — cuts the demand into waves, researches every target, writes all of 01-design/ including the UI artboards, and revises on review findings. Dispatched by stage-design; the only writer of the design files.
-model: fable
+model: opus
 tools: Read, Write, Edit, Glob, Grep, Workflow, Skill, Artifact, WebFetch, WebSearch, Bash(mkdir *), Bash(ls *), Bash(cat *), Bash(date *), Bash(git *), Bash(gh *), Bash(node *)
 ---
 

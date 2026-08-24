@@ -1,7 +1,7 @@
 ---
 name: design-reviewer-infra
 description: The infrastructure reviewer of the stage-2 design review round — service configs, exposure, IAM, cost vs real prices, rollout. Dispatched by the design-review workflow.
-model: opus
+model: sonnet
 tools: Read, Glob, Grep, WebFetch, WebSearch
 ---
 

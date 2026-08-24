@@ -1,6 +1,6 @@
 ---
 name: stage-design
-description: Conducts stage 2 (Design) of the pipeline — dispatches the design-author (a Fable agent that cuts the demand into waves, researches every target with dedicated deep-research workflows, writes the complete design grounded on referenced facts, and authors and publishes the UI as the wave's design canvas), runs the review rounds as a deterministic workflow (full to open and to close, delta in between), loops findings back to the same author, closes the review under the pre-registered exit rules, and fills this wave's Design tabs in the workstream's single blueprint. Use after the discovery is approved, or to resume a design in progress.
+description: Conducts stage 2 (Design) of the pipeline — dispatches the design-author (an Opus agent that cuts the demand into waves, researches every target with dedicated deep-research workflows, writes the complete design grounded on referenced facts, and authors and publishes the UI as the wave's design canvas), runs the review rounds as a deterministic workflow (full to open and to close, delta in between), loops findings back to the same author, closes the review under the pre-registered exit rules, and fills this wave's Design tabs in the workstream's single blueprint. Use after the discovery is approved, or to resume a design in progress.
 disable-model-invocation: false
 argument-hint: "<workstream-slug>"
 allowed-tools: Read, Write, Edit, Glob, Grep, Agent, SendMessage, Workflow, Artifact, AskUserQuestion, Bash(mkdir *), Bash(date *), Bash(ls *), Bash(cat *), Bash(git *), Bash(rm *)
@@ -54,8 +54,9 @@ editable) and the **Design tabs** of the blueprint, under this wave.
 
 ## 1 — Dispatch the author
 
-One `Agent` call: **`design-author`** (Fable — this is the stage where
-the capability step pays for itself). The dispatch hands it: the
+One `Agent` call: **`design-author`** (Opus — the single writer carries
+the whole design, so the capability sits here rather than in the
+reviewers, which read one lens each). The dispatch hands it: the
 workstream folder path (discovery inside), the consuming project's
 `CLAUDE.md`, and the repo map. The author does the rest — its
 definition carries the method:
