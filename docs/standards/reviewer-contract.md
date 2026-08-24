@@ -19,6 +19,15 @@ pass**. The verdict is arithmetic, not mood.
 Never inflate severity to look productive — a reviewer is judged by the
 precision of its findings, not their count.
 
+## The materiality bar
+
+A `fix` must change what a competent implementer would build — a
+behavior, a contract, a number that encodes a rule, a cost, a decision.
+Anything below that bar — wording, formatting, a visual token, a style
+preference — is a `detail`, however correct the observation. Details
+are recorded and batched into one sweep at stage close; no round is run
+for them, and a reviewer is never judged smaller for a short list.
+
 ## Every finding carries
 
 1. **What the material says** — verbatim, or the literal word "nothing".
@@ -37,7 +46,8 @@ A clean pass is valid **only** alongside a "Verified" enumeration proving
 coverage — what was checked, and where the reviewer looked. A zero-finding
 report without that enumeration proves nothing, is invalid, and gets
 re-dispatched once; if it comes back lazy again, the round records it as
-INVALID.
+INVALID. A **verified** clean pass is a finished job, not a failure to
+produce.
 
 ## Declared decisions
 
