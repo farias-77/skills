@@ -96,9 +96,11 @@ last, with the specialist verdicts in hand.
 
 Rounds come in two shapes:
 
-- **Full — every lens of the wave's rigor tier** (all ten on `full`
-  and `standard`; the five core on `light`, via `lenses` — the
-  [rigor standard](../../docs/standards/rigor.md)). At most three
+- **Full — the opening round is all ten lenses in EVERY tier** (the
+  first look is where unknown-unknowns surface; no tier narrows it).
+  Later full rounds carry the wave's rigor tier: all ten on `full` and
+  `standard`, the five core on `light`, via `lenses` — the
+  [rigor standard](../../docs/standards/rigor.md). At most three
   rounds are full: the
   **opening round** (round 1), the **one round after a checkpoint
   fold-in**, and the **closing round** (the regression guard, §3). A

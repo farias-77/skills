@@ -24,10 +24,18 @@ The tier is per wave, so a workstream mixes them: the ingestion spine
 
 | | full | standard | light |
 |---|---|---|---|
-| Design — full-round lens set | all ten | all ten | five core: data, code, security, contracts, coherence |
+| Design — opening round | all ten | all ten | all ten |
+| Design — later full rounds (post-fold-in, closing) | all ten | all ten | five core: data, code, security, contracts, coherence |
 | Plan — blind readers per issue | 3 | 3 | 1 |
 | Execute — `impl-issue` caps | as coded | as coded | as coded |
 | Extra full design rounds past the cap | user may demand them | no | no |
+
+**The opening round is always all ten, in every tier.** The first look
+is where unknown-unknowns surface, and no tier may narrow it — the
+evidence is ops-tracking w2n3: on an internal tool, the opening round
+found six blockers in lenses outside the core set (alarms, infra,
+facts). The tier's savings come from the loop — delta rounds and the
+closing guard — never from the breadth of the first look.
 
 ## What never scales down
 
