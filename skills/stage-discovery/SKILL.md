@@ -279,8 +279,32 @@ The round is audited in `00-discovery/reviews.md`:
    rejecting a blocker requires the user's explicit sign-off). No
    finding stays undispositioned.
 3. Fix the documents, take the `to-user` items to the user, then run
-   the workflow again — **full, as always**. Repeat until a round comes
-   back with **zero blockers**.
+   the next round under the **exit rules** below.
+
+### Exit rules — pre-registered, from round 1
+
+The same protocol as stage 2 (`stage-design` §3), at this stage's
+scale: the round is six agents over two documents, so there are no
+delta rounds — what is capped is the loop, and deciding the exit
+mid-review, tired, is what these rules exist to prevent.
+
+- **A round returns blockers** → fix them, verify each one in the
+  documents (the sentence that changed, not the intention), then run
+  the closing round.
+- **A round returns zero blockers** → the loop ends: the remaining
+  `fix` items are applied in a mini-pass, verified the same way, and
+  the review closes.
+- **At most two full rounds** — the opening one and the closing one.
+  The closing round closes the review when it returns zero
+  blockers, or **≤1 blocker that is a loose wire in something the
+  first round's fixes introduced** (applied as a mini-pass, verified
+  in the documents). A third round requires the user's explicit
+  say-so.
+- **`detail` findings are never applied per round** — they batch into
+  one sweep at close.
+- **Simplify or remove:** when a finding shows a hole opened by a
+  previous fix, the disposition is to simplify or remove that fix —
+  never a third sentence patching the second.
 
 Every lens answers under the house
 [reviewer contract](../../docs/standards/reviewer-contract.md) — the

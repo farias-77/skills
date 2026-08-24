@@ -86,7 +86,8 @@ workflows root — e.g. `.claude/workflows/` — never by `name`: the name
 registry does not reliably carry these workflows; field-reported by
 ops-tracking w2n3) with `planDir`,
 `designDir`, `discoveryDir`, `wavesPath`, `issues`, `readers` (3 on a
-`full`/`standard` wave, 1 on `light` — the
+`full`/`standard` wave, 1 on `light`), `tier` (on `light`, reviewers
+report blockers and fixes only — the
 [rigor standard](../../docs/standards/rigor.md)), and `round`.
 `issues` is the enumeration of `02-plan/<repo>/issues/*.md` (repo +
 absolute path): **every issue on the opening round; on a re-round, only

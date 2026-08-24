@@ -30,6 +30,11 @@
  *     scope:        'what changed since the last round'  // optional,
  *                       // delta rounds: focus note; reviewers may still
  *                       // read everything
+ *     model:        'opus',   // optional: run every lens at this model —
+ *                       // a `full` wave buys depth back over the agents'
+ *                       // own tier (docs/standards/rigor.md)
+ *     tier:         'light'   // optional: on `light`, reviewers report
+ *                       // blockers and fixes only, never `detail`
  *   }})
  *
  * Returns { round, blockers, invalid, reviews: [{ reviewer, verdict,
@@ -99,11 +104,16 @@ const chosen = requested.length
   : SPECIALISTS
 const shape = chosen.length < SPECIALISTS.length ? 'delta' : 'full'
 
+const lensModel = args?.model ? { model: args.model } : {}
+const severityNote = args?.tier === 'light'
+  ? '\n\nThis wave is `rigor: light`: report `blocker` and `fix` findings only. Do NOT report `detail` findings — they are not applied on this wave, so recording them is pure cost. The materiality bar decides what counts as a `fix`.'
+  : ''
+
 const inputs = `Round ${round}${shape === 'delta' ? ' (delta round)' : ''}.
 The design: ${args.designDir} — everything under it, research/ and ui/ included.
 The discovery it must satisfy: ${args.discoveryDir}/pr-faq.md and ${args.discoveryDir}/user-stories.md
 The wave map: ${args.wavesPath}${args?.scope ? `
-Changed since the last round (the focus; the rest is context): ${args.scope}` : ''}`
+Changed since the last round (the focus; the rest is context): ${args.scope}` : ''}${severityNote}`
 
 // Re-dispatch once on the two invalid shapes: a dead agent, or a lazy
 // clean pass (zero findings AND no verified enumeration proves nothing).
@@ -122,7 +132,7 @@ phase('Specialists')
 log(`round ${round}: ${shape} — ${chosen.length}/${SPECIALISTS.length} specialists${shape === 'delta' ? ' (' + chosen.join(', ') + ')' : ''} + coherence`)
 const reviews = await parallel(chosen.map(name => () =>
   reviewed(() =>
-    agent(inputs, { label: `${name}#r${round}`, phase: 'Specialists', agentType: name, schema: REVIEW }),
+    agent(inputs, { label: `${name}#r${round}`, phase: 'Specialists', agentType: name, schema: REVIEW, ...lensModel }),
     name).then(r => ({ reviewer: name, ...r }))
 ))
 
@@ -139,7 +149,7 @@ The specialists of this round already ran (${chosen.length} of ${SPECIALISTS.len
 
 ${verdictBoard}`, {
     label: `design-reviewer-coherence#r${round}`, phase: 'Coherence',
-    agentType: 'design-reviewer-coherence', schema: REVIEW,
+    agentType: 'design-reviewer-coherence', schema: REVIEW, ...lensModel,
   }), 'design-reviewer-coherence').then(r => ({ reviewer: 'design-reviewer-coherence', ...r }))
 
 reviews.push(coherence)

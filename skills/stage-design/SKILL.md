@@ -101,11 +101,17 @@ Rounds come in two shapes:
   first look is where unknown-unknowns surface; no tier narrows it).
   Later full rounds carry the wave's rigor tier: all ten on `full` and
   `standard`, the five core on `light`, via `lenses` — the
-  [rigor standard](../../docs/standards/rigor.md). At most three
-  rounds are full: the
-  **opening round** (round 1), the **one round after a checkpoint
-  fold-in**, and the **closing round** (the regression guard, §3). A
-  fourth full round requires the user's explicit say-so.
+  [rigor standard](../../docs/standards/rigor.md). **At most three
+  rounds are full** — the **opening round** (round 1), the **one round
+  after a checkpoint fold-in**, and the **closing round** (the
+  regression guard, §3); **on a `light` wave, at most two** (opening
+  and closing — a fold-in runs as a delta). One more than the tier
+  allows requires the user's explicit say-so.
+- **The tier also sets the lens model and the detail policy:** a
+  `full` wave passes `model: 'opus'` (the reviewers run at their own
+  tier otherwise); a `light` wave passes `tier: 'light'`, and its
+  reviewers report blockers and fixes only — no `detail` findings, so
+  there is no closing sweep to run.
 - **Delta — pass `lenses: [...]`:** only the lenses whose findings were
   applied since the last round, **plus coherence (always)**, with a
   `scope` note naming what changed. Every intermediate round is a delta

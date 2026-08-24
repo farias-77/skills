@@ -32,6 +32,8 @@
  *                       // read everything)
  *     readers:      3,  // optional: blind readers per issue — 3 default,
  *                       // 1 on a `light` wave (docs/standards/rigor.md)
+ *     tier:         'light',  // optional: on `light`, reviewers report
+ *                       // blockers and fixes only, never `detail`
  *     round:        2   // 1-based; informational, shown in labels
  *   }})
  *
@@ -110,11 +112,15 @@ const issues = args?.issues ?? []
 const readerCount = Math.max(1, Math.min(3, args?.readers ?? 3))
 const short = (p) => p.split('/').slice(-1)[0].replace(/\.md$/, '')
 
+const severityNote = args?.tier === 'light'
+  ? '\n\nThis wave is `rigor: light`: report `blocker` and `fix` findings only. Do NOT report `detail` findings — they are not applied on this wave, so recording them is pure cost. The materiality bar decides what counts as a `fix`.'
+  : ''
+
 const inputs = `Round ${round}.
 The plan: ${args.planDir}
 The design it decomposes: ${args.designDir}
 The discovery it must deliver: ${args.discoveryDir}/pr-faq.md and ${args.discoveryDir}/user-stories.md
-The wave cut: ${args.wavesPath} — this wave's stories and ACs are the coverage universe`
+The wave cut: ${args.wavesPath} — this wave's stories and ACs are the coverage universe${severityNote}`
 
 // Re-dispatch once on the two invalid shapes: a dead agent, or a lazy
 // clean pass (zero findings AND no verified enumeration proves nothing).
@@ -148,7 +154,7 @@ Its plan: ${args.planDir}/${issue.repo}/plan.md
 
 The ${readings.length} blind reading(s) of this issue:
 
-${readings.map((x, i) => `READER ${i + 1}:\n${JSON.stringify(x, null, 2)}`).join('\n\n')}`, {
+${readings.map((x, i) => `READER ${i + 1}:\n${JSON.stringify(x, null, 2)}`).join('\n\n')}${severityNote}`, {
       label: `judge:${short(issue.path)}#r${round}`, phase: 'Cold reads',
       agentType: 'plan-reviewer-issue', schema: REVIEW,
     }), `judge:${short(issue.path)}`)
