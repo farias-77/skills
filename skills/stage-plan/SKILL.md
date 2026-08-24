@@ -1,6 +1,6 @@
 ---
 name: stage-plan
-description: Conducts stage 3 (Planning) of the pipeline — dispatches one plan-author per repo in parallel (the frozen contracts make each repo an independent, closed graph), runs the review round as a deterministic workflow (blind cold-readers per issue — count set by the wave's rigor tier — plus four lenses), loops findings back to the same repo's author, publishes the Plan tab in the wave's blueprint, and bootstraps the issues on GitHub only after the user approves. Use after the wave's design is approved, or to resume a planning in progress.
+description: Conducts stage 3 (Planning) of the pipeline — dispatches one plan-author per repo in parallel (the frozen contracts make each repo an independent, closed graph), runs the review round as a deterministic workflow (three blind cold-readers per issue plus four lenses), loops findings back to the same repo's author, publishes the Plan tab in the wave's blueprint, and bootstraps the issues on GitHub only after the user approves. Use after the wave's design is approved, or to resume a planning in progress.
 disable-model-invocation: false
 argument-hint: "<workstream-slug>"
 allowed-tools: Read, Write, Edit, Glob, Grep, Agent, SendMessage, Workflow, Artifact, AskUserQuestion, Bash(mkdir *), Bash(date *), Bash(ls *), Bash(cat *), Bash(git *), Bash(gh *)
@@ -85,10 +85,7 @@ Run [`plan-review`](../../workflows/plan-review.js) —
 workflows root — e.g. `.claude/workflows/` — never by `name`: the name
 registry does not reliably carry these workflows; field-reported by
 ops-tracking w2n3) with `planDir`,
-`designDir`, `discoveryDir`, `wavesPath`, `issues`, `readers` (3 on a
-`full`/`standard` wave, 1 on `light`), `tier` (on `light`, reviewers
-report blockers and fixes only — the
-[rigor standard](../../docs/standards/rigor.md)), and `round`.
+`designDir`, `discoveryDir`, `wavesPath`, `issues`, and `round`.
 `issues` is the enumeration of `02-plan/<repo>/issues/*.md` (repo +
 absolute path): **every issue on the opening round; on a re-round, only
 the issues whose files changed since the last one.** The three
@@ -99,9 +96,8 @@ It is ONE workflow invocation covering the whole round, in three
 phases: the two halves below run concurrently, and `plan-reviewer-coherence`
 closes with every verdict in hand.
 
-**Per issue — the cold-read probe.** The tier's blind
-**`plan-blind-reader`** agents (Haiku — cheap and deliberately weak;
-three on `full`/`standard`, one on `light`) read the same issue blind,
+**Per issue — the cold-read probe.** Three **`plan-blind-reader`**
+agents (Haiku — cheap and deliberately weak) read the same issue blind,
 each alone, and return their **understanding** in their own words plus
 **exactly five questions** they would ask before starting — always
 five, so padding is expected by design. Then **`plan-reviewer-issue`** (Sonnet)
@@ -137,13 +133,12 @@ requires the user's explicit sign-off).
 
 `fixed` findings go to the **author of that repo** via SendMessage — it
 revises its own files (single writer, per repo). Then run the next
-round under the **pre-registered exit rules** (the same shape as
-stage-design §3): a re-round carries only the issues whose files
-changed, plus the three whole-plan lenses (always); a round that
-returns **zero blockers closes the review** — the remaining `fix`
-items are applied in a mini-pass and verified on disk by the conductor
-(file + line per finding), with no further round; `detail` findings
-batch into one author sweep at close, never a round of their own.
+round in the **same shape as stage-design §3**: verify the applied
+findings on disk (file + line), then re-run only what has not passed —
+the issues whose files changed and the whole-plan lenses that did not
+pass. A lens or an issue that came back `pass` is finished. Repeat
+until nothing is open; that is the close. `detail` findings batch into
+one author sweep at close, never a round of their own.
 
 ## 4 — The blueprint
 

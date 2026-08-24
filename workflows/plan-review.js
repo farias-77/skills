@@ -3,7 +3,7 @@
  *
  * Why a workflow: the guarantee that no lens is skipped and every issue
  * gets its cold read must be physical, not discipline. One invocation
- * covers the whole round, three phases: per issue, the tier's blind Haiku
+ * covers the whole round, three phases: per issue, three blind Haiku
  * readers then the plan-reviewer-issue judge with their readings in hand; the
  * whole-plan lenses (gaps, flow) concurrently; plan-reviewer-coherence closes
  * with every verdict on the table. The whole-plan lenses read everything
@@ -30,10 +30,6 @@
  *                       // re-round, only the issues whose files changed
  *                       // (stage-plan §2 — the whole-plan lenses still
  *                       // read everything)
- *     readers:      3,  // optional: blind readers per issue — 3 default,
- *                       // 1 on a `light` wave (docs/standards/rigor.md)
- *     tier:         'light',  // optional: on `light`, reviewers report
- *                       // blockers and fixes only, never `detail`
  *     round:        2   // 1-based; informational, shown in labels
  *   }})
  *
@@ -48,9 +44,9 @@
 
 export const meta = {
   name: 'plan-review',
-  description: 'Stage-3 review round: blind readers (count per rigor tier) + a judge per issue, gaps and flow over the whole plan, coherence last — deterministic and un-skippable by construction',
+  description: 'Stage-3 review round: three blind readers + a judge per issue, gaps and flow over the whole plan, coherence last — deterministic and un-skippable by construction',
   phases: [
-    { title: 'Cold reads', detail: 'per issue: the tier\'s Haiku blind readers, then the plan-reviewer-issue judge with their readings' },
+    { title: 'Cold reads', detail: 'per issue: three Haiku blind readers, then the plan-reviewer-issue judge with their readings' },
     { title: 'Whole plan', detail: 'plan-reviewer-gaps and plan-reviewer-flow in parallel, each over every plan and issue' },
     { title: 'Coherence', detail: 'the cross-cutting lens, with every verdict in hand' },
   ],
@@ -109,18 +105,14 @@ const REVIEW = {
 
 const round = args?.round ?? 1
 const issues = args?.issues ?? []
-const readerCount = Math.max(1, Math.min(3, args?.readers ?? 3))
+const readerCount = 3
 const short = (p) => p.split('/').slice(-1)[0].replace(/\.md$/, '')
-
-const severityNote = args?.tier === 'light'
-  ? '\n\nThis wave is `rigor: light`: report `blocker` and `fix` findings only. Do NOT report `detail` findings — they are not applied on this wave, so recording them is pure cost. The materiality bar decides what counts as a `fix`.'
-  : ''
 
 const inputs = `Round ${round}.
 The plan: ${args.planDir}
 The design it decomposes: ${args.designDir}
 The discovery it must deliver: ${args.discoveryDir}/pr-faq.md and ${args.discoveryDir}/user-stories.md
-The wave cut: ${args.wavesPath} — this wave's stories and ACs are the coverage universe${severityNote}`
+The wave cut: ${args.wavesPath} — this wave's stories and ACs are the coverage universe`
 
 // Re-dispatch once on the two invalid shapes: a dead agent, or a lazy
 // clean pass (zero findings AND no verified enumeration proves nothing).
@@ -135,10 +127,10 @@ const reviewed = async (dispatch, name) => {
     : { verdict: 'fail', verified: [], quote: '', findings: [], invalid: true }
 }
 
-// ---------- cold reads: the tier's blind readers, then the judge ----------
+// ---------- cold reads: 3 blind readers, then the judge ----------
 
 const coldRead = (issue) =>
-  parallel(Array.from({ length: readerCount }, (_, i) => i + 1).map(n => () =>
+  parallel([1, 2, 3].map(n => () =>
     agent(`The issue file: ${issue.path}\nThe repo it belongs to: ${issue.repo}`, {
       label: `read:${short(issue.path)}#${n}r${round}`, phase: 'Cold reads',
       agentType: 'plan-blind-reader', schema: READING,
@@ -152,9 +144,9 @@ The issue file: ${issue.path}
 The repo it belongs to: ${issue.repo}
 Its plan: ${args.planDir}/${issue.repo}/plan.md
 
-The ${readings.length} blind reading(s) of this issue:
+The three blind readings of this issue:
 
-${readings.map((x, i) => `READER ${i + 1}:\n${JSON.stringify(x, null, 2)}`).join('\n\n')}${severityNote}`, {
+${readings.map((x, i) => `READER ${i + 1}:\n${JSON.stringify(x, null, 2)}`).join('\n\n')}`, {
       label: `judge:${short(issue.path)}#r${round}`, phase: 'Cold reads',
       agentType: 'plan-reviewer-issue', schema: REVIEW,
     }), `judge:${short(issue.path)}`)

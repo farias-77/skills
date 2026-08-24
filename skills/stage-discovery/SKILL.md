@@ -253,8 +253,7 @@ registry does not reliably carry these workflows; field-reported by
 ops-tracking w2n3).
 It is ONE invocation covering the whole round: the three document lenses
 and the two blind readers run concurrently, and the ambiguity judge
-closes with both builds in hand. **Every round is full — every lens,
-every time**; the full re-run is the regression guard.
+closes with both builds in hand.
 
 | Agent | Validates |
 |---|---|
@@ -281,25 +280,15 @@ The round is audited in `00-discovery/reviews.md`:
 3. Fix the documents, take the `to-user` items to the user, then run
    the next round under the **exit rules** below.
 
-### Exit rules — pre-registered, from round 1
+### The loop — the same single mode as stage 2
 
-The same protocol as stage 2 (`stage-design` §3), at this stage's
-scale: the round is six agents over two documents, so there are no
-delta rounds — what is capped is the loop, and deciding the exit
-mid-review, tired, is what these rules exist to prevent.
-
-- **A round returns blockers** → fix them, verify each one in the
-  documents (the sentence that changed, not the intention), then run
-  the closing round.
-- **A round returns zero blockers** → the loop ends: the remaining
-  `fix` items are applied in a mini-pass, verified the same way, and
-  the review closes.
-- **At most two full rounds** — the opening one and the closing one.
-  The closing round closes the review when it returns zero
-  blockers, or **≤1 blocker that is a loose wire in something the
-  first round's fixes introduced** (applied as a mini-pass, verified
-  in the documents). A third round requires the user's explicit
-  say-so.
+- **Round 1 is full** — every lens and both blind readers.
+- **Every later round re-runs only what did not pass.** A lens that
+  returned `pass` is finished and never runs again.
+- **Verify each applied finding in the documents** — the sentence that
+  changed, not the intention.
+- **Convergence is the only exit:** repeat until nothing is open.
+  There is no closing round and no re-run "to be sure".
 - **`detail` findings are never applied per round** — they batch into
   one sweep at close.
 - **Simplify or remove:** when a finding shows a hole opened by a

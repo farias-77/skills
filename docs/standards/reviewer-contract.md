@@ -26,9 +26,7 @@ behavior, a contract, a number that encodes a rule, a cost, a decision.
 Anything below that bar — wording, formatting, a visual token, a style
 preference — is a `detail`, however correct the observation. Details
 are recorded and batched into one sweep at stage close; no round is run
-for them, and a reviewer is never judged smaller for a short list. On a
-`rigor: light` wave the dispatch says so and details are not reported at
-all — nothing applies them there, so recording them is pure cost.
+for them, and a reviewer is never judged smaller for a short list.
 
 ## Every finding carries
 

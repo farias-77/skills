@@ -45,10 +45,7 @@ the discovery lands in exactly one wave** — the coverage lens audits
 this). Create the wave folders: the current wave's
 `wNN-<what-it-delivers>/01-design/`, and for each future wave a
 `wNN-*/README.md` seed (one page: what it delivers, its stories — the
-input its design will start from). Each wave's section carries a
-`rigor:` line — `full` / `standard` / `light` per the
-[rigor standard](../docs/standards/rigor.md) — with one line of why;
-the user confirms the tiers at the checkpoint.
+input its design will start from).
 
 ### 1. Research everything you do not own
 
