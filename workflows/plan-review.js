@@ -18,7 +18,9 @@
  * definitions under agents/.
  *
  * Invoked by the stage-plan conductor:
- *   Workflow({ name: 'plan-review', args: {
+ *   Workflow({ scriptPath: '<...>/workflows/plan-review.js', args: {
+ *                 // by scriptPath, never by name — the name registry
+ *                 // does not reliably carry these workflows
  *     planDir:      'absolute path to wNN-<wave>/02-plan',
  *     designDir:    'absolute path to wNN-<wave>/01-design',
  *     discoveryDir: 'absolute path to <slug>/00-discovery',

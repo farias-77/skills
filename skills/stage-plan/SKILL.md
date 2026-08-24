@@ -79,7 +79,12 @@ affected repo's author is notified) — never a local workaround.
 ## 2 — The review round (a workflow, so it cannot be skipped)
 
 Run [`plan-review`](../../workflows/plan-review.js) —
-`Workflow({name: 'plan-review', args: {...}})` with `planDir`,
+`Workflow({scriptPath: '<workflows-root>/plan-review.js', args: {...}})`
+(invoke by
+`scriptPath` pointing at the file under the consuming project's
+workflows root — e.g. `.claude/workflows/` — never by `name`: the name
+registry does not reliably carry these workflows; field-reported by
+ops-tracking w2n3) with `planDir`,
 `designDir`, `discoveryDir`, `wavesPath`, `issues`, `readers` (3 on a
 `full`/`standard` wave, 1 on `light` — the
 [rigor standard](../../docs/standards/rigor.md)), and `round`.

@@ -15,7 +15,9 @@
  * reviewer contract in docs/standards/reviewer-contract.md.
  *
  * Invoked by the stage-discovery conductor:
- *   Workflow({ name: 'discovery-review', args: {
+ *   Workflow({ scriptPath: '<...>/workflows/discovery-review.js', args: {
+ *                 // by scriptPath, never by name — the name registry
+ *                 // does not reliably carry these workflows
  *     discoveryDir: 'absolute path to <slug>/00-discovery',
  *     round:        2   // 1-based; informational, shown in labels
  *   }})

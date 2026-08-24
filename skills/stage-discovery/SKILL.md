@@ -245,7 +245,12 @@ empty Inferred list after honest writing is rare; treat suspiciously.
 ## The review round (a workflow, so it cannot be skipped)
 
 Run [`discovery-review`](../../workflows/discovery-review.js) —
-`Workflow({name: 'discovery-review', args: {discoveryDir, round}})`.
+`Workflow({scriptPath: '<workflows-root>/discovery-review.js', args:
+{discoveryDir, round}})` (invoke by
+`scriptPath` pointing at the file under the consuming project's
+workflows root — e.g. `.claude/workflows/` — never by `name`: the name
+registry does not reliably carry these workflows; field-reported by
+ops-tracking w2n3).
 It is ONE invocation covering the whole round: the three document lenses
 and the two blind readers run concurrently, and the ambiguity judge
 closes with both builds in hand. **Every round is full — every lens,

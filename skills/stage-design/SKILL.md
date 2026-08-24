@@ -83,8 +83,12 @@ continues with the answer — the stage never goes back to stage 1.
 ## 2 — The review round (a workflow, so it cannot be skipped)
 
 Run [`design-review`](../../workflows/design-review.js) —
-`Workflow({name: 'design-review', args: {...}})` with `designDir`,
-`discoveryDir`, `wavesPath`, and `round`. The workflow is the guarantee:
+`Workflow({scriptPath: '<workflows-root>/design-review.js', args: {...}})`
+with `designDir`, `discoveryDir`, `wavesPath`, and `round` (invoke by
+`scriptPath` pointing at the file under the consuming project's
+workflows root — e.g. `.claude/workflows/` — never by `name`: the name
+registry does not reliably carry these workflows; field-reported by
+ops-tracking w2n3). The workflow is the guarantee:
 the dispatch is deterministic, structured output is forced on every
 reviewer, and a lazy pass is re-dispatched — discipline made physical.
 Specialists run in parallel; `design-reviewer-coherence` always runs

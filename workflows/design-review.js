@@ -17,7 +17,9 @@
  * agents/ and in docs/standards/reviewer-contract.md.
  *
  * Invoked by the stage-design conductor:
- *   Workflow({ name: 'design-review', args: {
+ *   Workflow({ scriptPath: '<...>/workflows/design-review.js', args: {
+ *                 // by scriptPath, never by name — the name registry
+ *                 // does not reliably carry these workflows
  *     designDir:    'absolute path to wNN-<wave>/01-design',
  *     discoveryDir: 'absolute path to <slug>/00-discovery',
  *     wavesPath:    'absolute path to <slug>/waves.md',
