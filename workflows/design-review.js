@@ -1,12 +1,15 @@
 /*
  * design-review.js — the stage-2 review round as deterministic code.
  *
- * Why a workflow: the guarantee that no reviewer is skipped and no round
- * runs a subset must be physical, not discipline. This script dispatches
- * ALL ten reviewers every time — nine specialists in parallel, coherence
- * last with the nine verdicts in hand — forces structured output on
- * each, and re-dispatches once any reviewer that returns a clean pass
- * without its "verified" enumeration (a lazy pass is not a pass).
+ * Why a workflow: the round's shape must be physical, not discipline.
+ * A FULL round dispatches all ten reviewers; a DELTA round (args.lenses)
+ * dispatches only the named specialists — coherence ALWAYS runs last,
+ * either way, with the specialist verdicts in hand. Structured output is
+ * forced on each reviewer, and any clean pass without its "verified"
+ * enumeration is re-dispatched once (a lazy pass is not a pass). When a
+ * round may be delta, and which lenses it carries, is governed by the
+ * exit rules in skills/stage-design/SKILL.md §3 — this script only
+ * guarantees the dispatch is exactly what was declared.
  *
  * The briefs below carry INPUTS only — paths, round number, and the
  * verdict board. Every instruction (each lens's rules, the read-it-all
@@ -18,7 +21,13 @@
  *     designDir:    'absolute path to wNN-<wave>/01-design',
  *     discoveryDir: 'absolute path to <slug>/00-discovery',
  *     wavesPath:    'absolute path to <slug>/waves.md',
- *     round:        2   // 1-based; informational, shown in labels
+ *     round:        2,  // 1-based; informational, shown in labels
+ *     lenses:       ['design-reviewer-data'],  // optional: DELTA round —
+ *                       // only these specialists (+ coherence, always).
+ *                       // Omit for a FULL round (all ten).
+ *     scope:        'what changed since the last round'  // optional,
+ *                       // delta rounds: focus note; reviewers may still
+ *                       // read everything
  *   }})
  *
  * Returns { round, blockers, invalid, reviews: [{ reviewer, verdict,
@@ -29,10 +38,10 @@
 
 export const meta = {
   name: 'design-review',
-  description: 'Stage-2 review round: ten specialist reviewers over the whole design, coherence last — full every round, un-skippable by construction',
+  description: 'Stage-2 review round: full (all ten lenses) or delta (the touched lenses only), coherence always last — deterministic and un-skippable by construction',
   phases: [
-    { title: 'Specialists', detail: 'nine reviewers in parallel, each reads everything, reports its lens' },
-    { title: 'Coherence', detail: 'the cross-cutting reviewer, with all nine verdicts in hand' },
+    { title: 'Specialists', detail: 'the round specialists in parallel, each reads everything, reports its lens' },
+    { title: 'Coherence', detail: 'the cross-cutting reviewer, with the round verdicts in hand' },
   ],
 }
 
@@ -77,10 +86,22 @@ const REVIEW = {
 
 const round = args?.round ?? 1
 
-const inputs = `Round ${round}.
+// Round shape: full (default — all nine specialists) or delta —
+// args.lenses names the specialists this round dispatches; coherence
+// always runs last regardless of shape.
+const requested = Array.isArray(args?.lenses) ? args.lenses : []
+const unknown = requested.filter(n => !SPECIALISTS.includes(n))
+if (unknown.length) log(`unknown lens name(s) ignored: ${unknown.join(', ')}`)
+const chosen = requested.length
+  ? SPECIALISTS.filter(n => requested.includes(n))
+  : SPECIALISTS
+const shape = chosen.length < SPECIALISTS.length ? 'delta' : 'full'
+
+const inputs = `Round ${round}${shape === 'delta' ? ' (delta round)' : ''}.
 The design: ${args.designDir} — everything under it, research/ and ui/ included.
 The discovery it must satisfy: ${args.discoveryDir}/pr-faq.md and ${args.discoveryDir}/user-stories.md
-The wave map: ${args.wavesPath}`
+The wave map: ${args.wavesPath}${args?.scope ? `
+Changed since the last round (the focus; the rest is context): ${args.scope}` : ''}`
 
 // Re-dispatch once on the two invalid shapes: a dead agent, or a lazy
 // clean pass (zero findings AND no verified enumeration proves nothing).
@@ -96,7 +117,8 @@ const reviewed = async (dispatch, name) => {
 }
 
 phase('Specialists')
-const reviews = await parallel(SPECIALISTS.map(name => () =>
+log(`round ${round}: ${shape} — ${chosen.length}/${SPECIALISTS.length} specialists${shape === 'delta' ? ' (' + chosen.join(', ') + ')' : ''} + coherence`)
+const reviews = await parallel(chosen.map(name => () =>
   reviewed(() =>
     agent(inputs, { label: `${name}#r${round}`, phase: 'Specialists', agentType: name, schema: REVIEW }),
     name).then(r => ({ reviewer: name, ...r }))
@@ -111,7 +133,7 @@ phase('Coherence')
 const coherence = await reviewed(() =>
   agent(`${inputs}
 
-The nine specialists already ran. Their verdicts and findings:
+The specialists of this round already ran (${chosen.length} of ${SPECIALISTS.length}${shape === 'delta' ? ' — delta round: ' + (args?.scope ?? 'scoped to the applied findings') : ''}). Their verdicts and findings:
 
 ${verdictBoard}`, {
     label: `design-reviewer-coherence#r${round}`, phase: 'Coherence',

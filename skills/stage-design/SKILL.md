@@ -1,6 +1,6 @@
 ---
 name: stage-design
-description: Conducts stage 2 (Design) of the pipeline — dispatches the design-author (a Fable agent that cuts the demand into waves, researches every target with dedicated deep-research workflows, writes the complete design grounded on referenced facts, and authors and publishes the UI as the wave's design canvas), runs the ten-reviewer round as a deterministic workflow, loops findings back to the same author until zero blockers, and fills this wave's Design tabs in the workstream's single blueprint. Use after the discovery is approved, or to resume a design in progress.
+description: Conducts stage 2 (Design) of the pipeline — dispatches the design-author (a Fable agent that cuts the demand into waves, researches every target with dedicated deep-research workflows, writes the complete design grounded on referenced facts, and authors and publishes the UI as the wave's design canvas), runs the review rounds as a deterministic workflow (full to open and to close, delta in between), loops findings back to the same author, closes the review under the pre-registered exit rules, and fills this wave's Design tabs in the workstream's single blueprint. Use after the discovery is approved, or to resume a design in progress.
 disable-model-invocation: false
 argument-hint: "<workstream-slug>"
 allowed-tools: Read, Write, Edit, Glob, Grep, Agent, SendMessage, Workflow, Artifact, AskUserQuestion, Bash(mkdir *), Bash(date *), Bash(ls *), Bash(cat *), Bash(git *), Bash(rm *)
@@ -63,8 +63,11 @@ definition carries the method:
 - **The wave cut is its first act** — the architect's call, no
   checkpoint of its own: `waves.md` at the workstream root (every story
   and AC of the discovery in exactly one wave), the current wave's
-  folders, README seeds for the next ones. The cut is presented — and
-  contestable — with the rest of the design at the checkpoint.
+  folders, README seeds for the next ones. Each wave carries a
+  proposed **rigor tier** (`rigor:` in `waves.md` — the
+  [rigor standard](../../docs/standards/rigor.md)), one line of why.
+  The cut and the tiers are presented — and contestable — with the
+  rest of the design at the checkpoint.
 - **Research per target** (one deep-research workflow each, never a
   global sweep), **the living docs of every touched repo** as input,
   the eight documents, and the **UI artboards** in `01-design/ui/` —
@@ -82,10 +85,27 @@ continues with the answer — the stage never goes back to stage 1.
 Run [`design-review`](../../workflows/design-review.js) —
 `Workflow({name: 'design-review', args: {...}})` with `designDir`,
 `discoveryDir`, `wavesPath`, and `round`. The workflow is the guarantee:
-it dispatches **all ten reviewers**, every round, with structured outputs — there is no code
-path that runs a subset. Nine run in parallel; `design-reviewer-coherence` runs
-last with the nine verdicts in hand. **Every round is full — every
-reviewer, every time**; the full re-run is the regression guard.
+the dispatch is deterministic, structured output is forced on every
+reviewer, and a lazy pass is re-dispatched — discipline made physical.
+Specialists run in parallel; `design-reviewer-coherence` always runs
+last, with the specialist verdicts in hand.
+
+Rounds come in two shapes:
+
+- **Full — every lens of the wave's rigor tier** (all ten on `full`
+  and `standard`; the five core on `light`, via `lenses` — the
+  [rigor standard](../../docs/standards/rigor.md)). At most three
+  rounds are full: the
+  **opening round** (round 1), the **one round after a checkpoint
+  fold-in**, and the **closing round** (the regression guard, §3). A
+  fourth full round requires the user's explicit say-so.
+- **Delta — pass `lenses: [...]`:** only the lenses whose findings were
+  applied since the last round, **plus coherence (always)**, with a
+  `scope` note naming what changed. Every intermediate round is a delta
+  round. The evidence is w01-ingestion-spine: 17 full rounds in which
+  every blocker from round 12 on was a loose wire in a previous round's
+  addition — the full re-run was auditing its own fix surface, at ten
+  reviewers a round.
 
 | Reviewer | Specialist in | Judges (holistically — reads everything, reports its lens) |
 |---|---|---|
@@ -117,10 +137,35 @@ The round is audited in **`01-design/reviews.md` — permanent**:
 3. Send the `fixed` findings to the **same author** via SendMessage — it
    revises the files (single writer). `to-user` items go into the
    checkpoint message.
-4. Run the workflow again — **all ten, always**; fixing data moves
-   contracts, fixing contracts moves code. (A fix that touches a screen
-   also republishes the canvas — the author does it as part of the
-   fix.) Repeat until a round returns **zero blockers**.
+4. Run the next round under the **exit rules** below. (A fix that
+   touches a screen also republishes the canvas — the author does it as
+   part of the fix.)
+
+### Exit rules — pre-registered, from round 1
+
+Deciding the exit mid-review, tired, is what these rules exist to
+prevent. They are the protocol, not a fallback:
+
+- **A round returns blockers** → the author applies, the conductor
+  verifies **on disk** (file + line per finding — "marked fixed, not
+  applied" has happened), then a **delta round** over the touched
+  lenses confirms the blockers closed.
+- **A round returns zero blockers** → the loop ends: the remaining
+  `fix` items are applied in a mini-pass and verified on disk, then the
+  **closing full round** runs as the regression guard. If the round
+  that returned zero blockers was itself full (opening or post-fold-in),
+  it already is the guard — mini-pass, disk verification, close.
+- **The closing round returns zero blockers** — or **≤1 blocker that is
+  a loose wire in a previous round's addition** (applied as a mini-pass,
+  verified on disk) → **the review closes.** Never a round beyond it.
+- **`detail` findings are never applied per round.** They batch into a
+  single author sweep at close.
+- **Simplify or remove:** when a finding shows a loose wire in
+  something a previous round added, the disposition is to simplify or
+  remove the addition — never a third mechanism on top.
+- **Checkpoint fold-in:** the author folds the user's decisions in one
+  consolidated pass, then **one** full round; these same rules govern
+  it.
 
 ## 4 — The blueprint
 
@@ -150,13 +195,15 @@ Data · Infra & cost · Code · Security · Alarms · Going to production**.
 ## 5 — Checkpoint and closing
 
 Present: the blueprint URL, the canvas URL, the wave cut (one line per
-wave), the verdict table (all ten, from `reviews.md`), the count of
+wave, each with its proposed rigor tier — confirming the tiers is part
+of the approval), the verdict table (from `reviews.md`), the count of
 `decided in your place` flags, and any `to-user` items. Approval is explicit. On
 approval: `.state.md` → `stage: plan`, commit the workstream folder —
 **push only with the user's explicit approval** — and suggest `/clear`
 before stage 3 (house rule: stage transitions, in the repo's
-`CLAUDE.md`). On "approved with fixes": author applies, full round
-again, new checkpoint. On rejection: the reasons go back to the
+`CLAUDE.md`). On "approved with fixes": the fold-in rule (§3) —
+one consolidated author pass, one full round under the exit rules, new
+checkpoint. On rejection: the reasons go back to the
 author — **never back to stage 1**; whatever is missing becomes
 questions to the user, answered in conversation and folded into the
 design. Moving the Linear Project forward is **not this skill's job**
