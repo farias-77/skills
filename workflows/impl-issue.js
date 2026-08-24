@@ -45,7 +45,7 @@ export const meta = {
 const MAX_LENS_ROUNDS = 3     // +1 grace when the final round's blockers are all new
 const STAGNATION_LIMIT = 2    // identical blockers persisting ⇒ fixing is not working
 const MAX_CI_ROUNDS = 2
-const MAX_REVIEW_ROUNDS = 3
+const MAX_REVIEW_ROUNDS = 3   // +1 grace when the last round's findings are all new AND fewer (w01: convergence still happening is not stagnation)
 const LENSES = ['exec-reviewer-plan', 'exec-reviewer-code', 'exec-reviewer-security', 'exec-reviewer-tests']
 
 // ---------- schemas ----------
@@ -257,10 +257,18 @@ t('ci', `green — ${prUrl}`)
 if (!prUrl) return halt('pr_missing', 'pr-writer reported green without a PR url')
 
 phase('Review')
-while (reviewRounds < MAX_REVIEW_ROUNDS) {
+// Round 1 is the fresh whole-PR read; later rounds are SCOPED — verify
+// the previous findings landed and review the diff pushed since, never
+// a whole-PR re-read (w01: the re-read, not the reviewer, was the cost).
+let reviewBudget = MAX_REVIEW_ROUNDS
+let prevReviewKeys = new Set()
+let lastFindings = []
+while (reviewRounds < reviewBudget) {
   reviewRounds += 1
   const review = await agent(
-    `The PR: ${prUrl}\nThe repo: ${brief.repo}\nRound ${reviewRounds} — a previous round's findings, if any, must be verified in the diff, never assumed applied.`,
+    reviewRounds === 1
+      ? `The PR: ${prUrl}\nThe repo: ${brief.repo}\nRound 1 — the fresh, whole-PR read.`
+      : `The PR: ${prUrl}\nThe repo: ${brief.repo}\nRound ${reviewRounds} — SCOPED re-review, not a whole-PR re-read (that happened in round 1): verify each previous finding landed in the diff (never assume it applied), and review the commits pushed since the last round at your usual bar. Widen back to the whole only if a change reveals a seam that crosses it.\n\nThe previous round's findings:\n${lastFindings.map(f => `- ${f.what} → ${f.fix}${f.file ? ` (${f.file})` : ''}`).join('\n')}`,
     { label: `final-review#${brief.issue_number}r${reviewRounds}`, phase: 'Review',
       agentType: 'exec-reviewer-pr', schema: FINAL_REVIEW },
   )
@@ -270,7 +278,22 @@ while (reviewRounds < MAX_REVIEW_ROUNDS) {
     return { status: 'ready-to-merge', pr_url: prUrl, evidence: build.evidence, ac_map: build.ac_map,
       deltas: build.deltas || [], lens_rounds: lensRounds, ci_rounds: ciRounds, review_rounds: reviewRounds, trace }
   }
-  if (reviewRounds >= MAX_REVIEW_ROUNDS) break
+  const keys = new Set(review.findings.map(f => `${f.what}|${f.file || ''}`))
+  if (reviewRounds >= reviewBudget) {
+    // Pre-registered exit rule, decided cold: a final round whose
+    // findings are all NEW and FEWER than the last is convergence in
+    // motion — one grace round, once. A repeated finding never qualifies.
+    const allNew = [...keys].every(k => !prevReviewKeys.has(k))
+    if (allNew && lastFindings.length > 0 && review.findings.length < lastFindings.length && reviewBudget === MAX_REVIEW_ROUNDS) {
+      reviewBudget += 1
+      t('review-grace', `grace round: ${review.findings.length} finding(s), all new, decreasing`)
+    } else {
+      lastFindings = review.findings
+      break
+    }
+  }
+  prevReviewKeys = keys
+  lastFindings = review.findings
   phase('Implement')
   failed = await runToGreen(
     `## The final reviewer requested changes on PR ${prUrl} — resolve EXACTLY this\n` +
@@ -281,4 +304,6 @@ while (reviewRounds < MAX_REVIEW_ROUNDS) {
   if (!pr || pr.status !== 'green') return halt('review_fix_ci_failed', pr ? `${pr.status}: ${(pr.detail || '').slice(0, 300)}` : 'pr-writer dead')
   phase('Review')
 }
-return halt('review_not_converging', `${MAX_REVIEW_ROUNDS} final-review rounds without APPROVED`)
+// The halt carries the remaining findings verbatim — the resolution that
+// worked (w01) was re-dispatch with exactly the remaining finding.
+return halt('review_not_converging', `${reviewRounds} final-review rounds without APPROVED — remaining: ${lastFindings.map(f => `${f.what}${f.file ? ` (${f.file})` : ''}`).join(' · ').slice(0, 500) || 'none reported'}`)
