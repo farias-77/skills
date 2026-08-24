@@ -1,6 +1,6 @@
 ---
 name: stage-plan
-description: Conducts stage 3 (Planning) of the pipeline — dispatches one plan-author per repo in parallel (the frozen contracts make each repo an independent, closed graph), runs the review round as a deterministic workflow (three cheap blind readers per issue plus four lenses), loops findings back to the same repo's author, publishes the Plan tab in the wave's blueprint, and bootstraps the issues on GitHub only after the user approves. Use after the wave's design is approved, or to resume a planning in progress.
+description: Conducts stage 3 (Planning) of the pipeline — dispatches one plan-author per repo in parallel (the frozen contracts make each repo an independent, closed graph), runs the review round as a deterministic workflow (blind cold-readers per issue — count set by the wave's rigor tier — plus four lenses), loops findings back to the same repo's author, publishes the Plan tab in the wave's blueprint, and bootstraps the issues on GitHub only after the user approves. Use after the wave's design is approved, or to resume a planning in progress.
 disable-model-invocation: false
 argument-hint: "<workstream-slug>"
 allowed-tools: Read, Write, Edit, Glob, Grep, Agent, SendMessage, Workflow, Artifact, AskUserQuestion, Bash(mkdir *), Bash(date *), Bash(ls *), Bash(cat *), Bash(git *), Bash(gh *)
@@ -80,25 +80,29 @@ affected repo's author is notified) — never a local workaround.
 
 Run [`plan-review`](../../workflows/plan-review.js) —
 `Workflow({name: 'plan-review', args: {...}})` with `planDir`,
-`designDir`, `discoveryDir`, `wavesPath`, `issues`, and `round` —
-`issues` is the enumeration of every `02-plan/<repo>/issues/*.md`
-(repo + absolute path). **Every round is full: every issue, every lens,
-every time** — never narrow to what changed; the full re-run is the
-regression guard.
+`designDir`, `discoveryDir`, `wavesPath`, `issues`, `readers` (3 on a
+`full`/`standard` wave, 1 on `light` — the
+[rigor standard](../../docs/standards/rigor.md)), and `round`.
+`issues` is the enumeration of `02-plan/<repo>/issues/*.md` (repo +
+absolute path): **every issue on the opening round; on a re-round, only
+the issues whose files changed since the last one.** The three
+whole-plan lenses run every round regardless — they read everything and
+are the regression guard.
 
 It is ONE workflow invocation covering the whole round, in three
 phases: the two halves below run concurrently, and `plan-reviewer-coherence`
 closes with every verdict in hand.
 
-**Per issue — the cold-read probe.** Three **`plan-blind-reader`** agents
-(Haiku — cheap and deliberately weak) read the same issue blind, each
-alone, and return their **understanding** in their own words plus
+**Per issue — the cold-read probe.** The tier's blind
+**`plan-blind-reader`** agents (Haiku — cheap and deliberately weak;
+three on `full`/`standard`, one on `light`) read the same issue blind,
+each alone, and return their **understanding** in their own words plus
 **exactly five questions** they would ask before starting — always
 five, so padding is expected by design. Then **`plan-reviewer-issue`** (Sonnet)
-judges the issue WITH the three readings in hand: **real divergence
-between the understandings is the ambiguity signal** — if three weak
-models read the same issue three different ways, a strong one gets no
-guarantee either — and **triaging the fifteen questions is its job**:
+judges the issue WITH the readings in hand: **real divergence
+between the understandings is the ambiguity signal** — if weak
+models read the same issue in incompatible ways, a strong one gets no
+guarantee either — and **triaging the questions (five per reader) is its job**:
 a question answerable by exploring the code during implementation is
 noise; a question whose wrong guess would produce wrong work is a real
 gap in the issue. The judge also runs its own mechanical checks (broken
@@ -126,9 +130,14 @@ run ids from the workflow's journal. Every finding gets a disposition:
 requires the user's explicit sign-off).
 
 `fixed` findings go to the **author of that repo** via SendMessage — it
-revises its own files (single writer, per repo). Then run the workflow
-again — **always full: every issue, every lens** (the anti-regression
-rule). Repeat until a round returns **zero blockers**.
+revises its own files (single writer, per repo). Then run the next
+round under the **pre-registered exit rules** (the same shape as
+stage-design §3): a re-round carries only the issues whose files
+changed, plus the three whole-plan lenses (always); a round that
+returns **zero blockers closes the review** — the remaining `fix`
+items are applied in a mini-pass and verified on disk by the conductor
+(file + line per finding), with no further round; `detail` findings
+batch into one author sweep at close, never a round of their own.
 
 ## 4 — The blueprint
 

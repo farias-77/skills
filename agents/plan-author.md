@@ -91,6 +91,11 @@ and your target directory `02-plan/<repo>/`.
   put two LARGE jobs on the same surface in the same batch.
 - **"The system works after this merge"** kills the gap by construction:
   no issue leaves the branch broken waiting for a sibling.
+- **On the critical path, when the ruler allows two cuts, take the
+  smaller.** Issue size drives final-review rounds downstream (w01: one
+  ~20 KB issue body cost three review rounds by itself); a chain of
+  small PRs reviews faster than one big one, and the critical path is
+  where that difference is wall-clock.
 
 ### 2. Write each issue
 
