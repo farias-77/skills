@@ -80,6 +80,7 @@ evaluation fixtures) under `app/src/` and described in its
 | What | Convention |
 |---|---|
 | Files | `kebab-case.ts`, suffixed by kind: `project.service.ts` · `project.repository.ts` · `project.handler.ts` · `project.schema.ts` |
+| Lambda entrypoints | folder-per-lambda: `handlers/<name>/index.ts`, handler string `handlers/<name>/index.handler` — the Lambda runtime cuts the file basename at the first dot, so a dotted name like `project.handler.ts` can never be an entrypoint |
 | Tests | mirror the source name: `tests/unit/services/project.service.test.ts` |
 | Infra | `<name>.config.ts` · `<name>.construct.ts` · `<name>.stack.ts` (code standard §12) |
 | Smoke | `<method>-<behavior>[-<expected>].sh`, hyphens only (testing standard §3) |
