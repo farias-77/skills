@@ -1,6 +1,6 @@
 ---
 name: stage-plan
-description: Conducts stage 3 (Planning) of the pipeline — dispatches one plan-author per repo in parallel (the frozen contracts make each repo an independent, closed graph), runs the review round as a deterministic workflow (three blind cold-readers per issue plus four lenses), loops findings back to the same repo's author, publishes the Plan tab in the wave's blueprint, and bootstraps the issues on GitHub only after the user approves. Use after the wave's design is approved, or to resume a planning in progress.
+description: Conducts stage 3 (Planning) of the pipeline — dispatches one plan-author per repo in parallel (the frozen contracts make each repo an independent, closed graph; each author self-checks its issues with blind Haiku readers before delivering), runs the review round as a deterministic workflow (three fresh blind cold-readers per issue plus four lenses at the maximum bar, the plan-judge ruling every finding by the declared scrutiny), loops sustained findings back to the same repo's author, closes with one full final round, publishes the Plan tab in the wave's blueprint, and bootstraps the issues on GitHub only after the user approves. Use after the wave's design is approved, or to resume a planning in progress.
 disable-model-invocation: false
 argument-hint: "<workstream-slug>"
 allowed-tools: Read, Write, Edit, Glob, Grep, Agent, SendMessage, Workflow, Artifact, AskUserQuestion, Bash(mkdir *), Bash(date *), Bash(ls *), Bash(cat *), Bash(git *), Bash(gh *)
@@ -56,14 +56,20 @@ graph** with **zero cross-repo edges**, so no two authors ever touch the
 same file.
 
 Each dispatch hands its author: the wave folder path, the approved
-`01-design/` (contracts above all), the workstream's `00-discovery/` and
-`waves.md` (the cut defines which story ACs are this wave's — the
-coverage universe), its repo's path with `CLAUDE.md` and `docs/`, and
-the target directory `02-plan/<repo>/`. The author does the
-rest — decomposition ruler, issue writing rules, and self-checks live in
-its agent definition. It returns a structured summary: batches, issue
-count, coverage map status, declared decisions, and any questions that
-need the user.
+`01-design/` (contracts above all; `decisions.md` is the law of the
+design — the author details it, never re-decides it; `acceptance.md` is
+the frozen case spec each issue's DoD names its cases from; `code.md`
+is the file-tree compass — a guide for slicing, never a rule to
+enforce), the workstream's `00-discovery/` and `waves.md` (the cut
+defines which story ACs are this wave's — the coverage universe), its
+repo's path with `CLAUDE.md` and `docs/`, and the target directory
+`02-plan/<repo>/`. The author does the rest — decomposition ruler,
+issue writing rules, the blind-reader self-check, and its own checks
+live in its agent definition. It returns a structured summary: batches,
+issue count, coverage map status, self-check result, declared
+decisions, and any questions that need the user — **gathered in one
+batch** during authoring, not flagged `(decided in your place)` at the
+end; the target for oranges at checkpoint is near zero.
 
 **Keep the author ↔ repo mapping**: every fix for that repo goes back to
 the SAME author via SendMessage — that is the single-writer rule, per
@@ -92,9 +98,28 @@ the issues whose files changed since the last one.** The three
 whole-plan lenses run every round regardless — they read everything and
 are the regression guard.
 
-It is ONE workflow invocation covering the whole round, in three
-phases: the two halves below run concurrently, and `plan-reviewer-coherence`
-closes with every verdict in hand.
+It is ONE workflow invocation covering the whole round, in four
+phases: the two halves below run concurrently, `plan-reviewer-coherence`
+closes the reading with every verdict in hand, and `plan-judge` rules
+the round.
+
+**The judge closes rounds, not the lenses:**
+
+- **Reviewers report at the maximum bar; `plan-judge` (Opus) rules
+  every finding** — `sustained` / `deferred` / `dismissed` — against
+  the scrutiny ruler declared in the design session's `decisions.md`.
+  The workflow's `open` comes back **already judged**: an issue or lens
+  stays open only for a sustained blocker/fix; deferred and dismissed
+  findings hold nothing open.
+- **Every later round is the delta**: only the issues whose files
+  changed get fresh cold reads; the three whole-plan lenses reread
+  everything regardless — they are the regression guard.
+- **When `open` comes back empty, the close is ONE full final round**:
+  every issue cold-read again by fresh readers, every lens, once, over
+  the final state — mid-review fixes can break what had already
+  passed. The judge rules it by the same ruler; a final round with
+  nothing sustained is the close. Anything sustained there is fixed
+  and verified by a delta — the full round does not re-run.
 
 **Per issue — the cold-read probe.** Three **`plan-blind-reader`**
 agents (Haiku — cheap and deliberately weak) read the same issue blind,
@@ -118,27 +143,46 @@ bar: if a Haiku can execute it, the worker certainly can.
 | `plan-reviewer-gaps` | the negative: what NO issue covers — this wave's story ACs without an issue (walks `waves.md` and the stories itself, never trusts the coverage map), issues without an AC, consumes without producer, "Out" without owner |
 | `plan-reviewer-flow` | the graph as it will RUN: cycles, edges without a real reason, wasted parallelism, a skeleton owed, two big jobs on the same surface in the same batch |
 | `plan-reviewer-coherence` | runs last, with all verdicts: the plans tell the design's story, and the two ends of every contract meet in the middle |
+| `plan-judge` | not a lens — rules every finding of the round (cold reads and lenses alike) by the declared ruler, after coherence; decides what proceeds and therefore whether another round runs |
 
 Every reviewer answers under the house
-[reviewer contract](../../docs/standards/reviewer-contract.md); the
-workflow re-dispatches lazy passes on its own.
+[reviewer contract](../../docs/standards/reviewer-contract.md) — the
+maximum bar included: severity says how bad IF real, the judge says
+whether it proceeds. The workflow re-dispatches lazy passes and
+unruled findings on its own (an unruled finding counts as sustained —
+fail-safe).
 
-## 3 — Audit, dispositions, and the fix loop
+## 3 — Audit, rulings, and the fix loop
 
-The round is audited in **`02-plan/reviews.md` — permanent**: one
-section per lens and a per-issue scoreboard (verdict + divergence flag),
-run ids from the workflow's journal. Every finding gets a disposition:
-`fixed` / `to-user` / `rejected` (with the reason; rejecting a blocker
-requires the user's explicit sign-off).
+The round is audited in **`02-plan/reviews.md` — permanent**:
 
-`fixed` findings go to the **author of that repo** via SendMessage — it
-revises its own files (single writer, per repo). Then run the next
-round in the **same shape as stage-design §3**: verify the applied
-findings on disk (file + line), then re-run only what has not passed —
-the issues whose files changed and the whole-plan lenses that did not
-pass. A lens or an issue that came back `pass` is finished. Repeat
-until nothing is open; that is the close. `detail` findings batch into
-one author sweep at close, never a round of their own.
+1. Record the round: one section per lens and a per-issue scoreboard
+   (verdict + divergence flag), run ids from the workflow's journal
+   (not from your prose), findings **with the judge's ruling and
+   reason on each**.
+2. The rulings ARE the dispositions: `sustained` → fix now ·
+   `deferred` → the close batch · `dismissed` → dies, reason recorded.
+   Two overrides remain the user's: a sustained finding that actually
+   contests a user decision goes **to-user** in the checkpoint, and
+   overruling the judge in either direction is the user's call, never
+   silently yours.
+3. Send the sustained findings to the **author of that repo** via
+   SendMessage — it revises its own files (single writer, per repo).
+4. **Verify the applied findings on disk** — file and line per
+   finding. "Marked fixed, not applied" has happened; the author's
+   word is not the check.
+5. Run the next round with `issues` = the issues whose files changed
+   (the fixes, plus anything a whole-plan fix touched). When `open`
+   comes back empty, run **the full final round** (every issue again);
+   the close is a final round the judge clears.
+
+Two rules hold inside the loop:
+
+- **`deferred` rulings and `detail` findings are never applied per
+  round.** They batch into a single author sweep at close.
+- **Simplify or remove:** when a finding shows a loose wire in
+  something a previous round added, the fix is to simplify or remove
+  the addition — never a third mechanism on top.
 
 ## 4 — The blueprint
 
@@ -148,7 +192,8 @@ object, and republishes the same file path — the Plan tab lights up
 under this wave's pill. The content: the plan's logic as the intro, the
 batch map, the issue cards (produces/consumes chips), decisions inline
 (`decided in your place` in orange, counted in the Overview), and the
-review scoreboard — including the per-issue cold-read score. The
+review scoreboard — verdicts with the judge's rulings, including the
+per-issue cold-read score. The
 conductor owns the blueprint — it is the report of the authors' files,
 not their projection (house rule: the blueprint is the report, the
 files are the record — same altitude as the Design tab). Never mermaid; diagrams are HTML/CSS with the shell's

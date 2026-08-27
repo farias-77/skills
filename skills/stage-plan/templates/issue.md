@@ -12,8 +12,8 @@ Must-haves this template carries (see plan-author for the full rules):
   at least one AC exercises a bad path
 - verification map is fail-to-pass: each check fails today, passes
   after the diff; binary, observable, commandable
-- smoke cases copied BY NAME from the contract's Smoke line — never
-  invented at planning time
+- acceptance cases copied BY NAME from the design's acceptance.md (the
+  frozen spec) — never invented at planning time
 - every "Out" and every pending "Consumes" points at an issue (→ NN)
 - NO estimate, NO file list, NO deps in the body (deps live in the
   graph via addBlockedBy, fed from plan.md's edge table)
@@ -71,9 +71,11 @@ this issue. The slice, not the document.>
 
 - [ ] Test suite green, coverage without regression
 - [ ] `docs/` updated OR "no docs impact" stated in the PR evidence
-- [ ] Smoke cases this issue owes (from the contract's `Smoke:` line, by
-      name): `<method>-<behavior>.sh` · … — created/updated; removed
-      endpoints delete theirs <!-- omit the item when no endpoint is touched -->
+- [ ] Acceptance cases this issue owes (from
+      `01-design/acceptance.md`, by name): `<method>-<behavior>` · … —
+      transcribed into the repo's `smoke/` as `.sh`, spec's assert
+      verbatim; removed endpoints delete theirs
+      <!-- omit the item when no endpoint is touched -->
 - [ ] <issue-specific executable check>
 - [ ] System works after this merge alone — no waiting on sibling issues
 

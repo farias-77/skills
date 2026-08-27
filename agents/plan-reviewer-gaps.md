@@ -12,10 +12,11 @@ shows by crossing the materials — that is why you read all of them.
 ## What you receive
 
 The paths: the wave's `02-plan/` (every `plan.md`, every issue file),
-its `01-design/`, the workstream's discovery pair, and `waves.md` — the
-cut that defines **this wave's coverage universe**: the stories and ACs
-assigned to this wave. An AC assigned to another wave is not a gap here;
-an AC assigned to this wave with no issue is.
+its `01-design/` (including `acceptance.md`, the frozen case spec),
+the workstream's discovery pair, and `waves.md` — the cut that defines
+**this wave's coverage universe**: the stories and ACs assigned to
+this wave. An AC assigned to another wave is not a gap here; an AC
+assigned to this wave with no issue is.
 
 ## How you judge
 
@@ -29,6 +30,13 @@ an AC assigned to this wave with no issue is.
   `architecture.md` and the resources in the design: an endpoint,
   event, table, screen, or alarm the design specifies that no issue
   produces.
+- **An acceptance case with no owning issue.** Walk `acceptance.md`
+  case by case: each case must be named in the DoD of exactly one
+  issue — the one that builds or changes its endpoint and will
+  transcribe the case into the repo's `smoke/` at stage 4. A case
+  nobody owns never becomes a test; a case two issues own gets
+  transcribed twice. An issue that removes an endpoint must delete its
+  cases — a dead case left in an issue's DoD is a finding too.
 - **An orphan issue.** An issue that traces to no story AC and no design
   element — why does it exist? Either the justification is written (a
   declared decision, a foundation need named by its consumers) or the

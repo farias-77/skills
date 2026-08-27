@@ -17,7 +17,8 @@ Must-haves this template carries:
 - batches with intent; edges each with a ONE-LINE reason (longer than a
   line ⇒ not an edge); ZERO cross-repo edges, ever
 - the coverage map: every story AC waves.md assigns to this wave that
-  lands in this repo → its issue(s)
+  lands in this repo → its issue(s); every acceptance case of this
+  repo's endpoints → its ONE owning issue
 - the issue index: bodies live in issues/, one file per issue — this
   file stays short
 - NO per-issue file lists: the worker is free to touch what it needs;
@@ -58,6 +59,14 @@ delivering no AC justifies itself in its row.
 |----------|--------------|
 | `<SLUG>-S-001-AC-1` | 03 |
 | `<SLUG>-S-001-AC-2` | 03 · 04 |
+
+Every acceptance case `01-design/acceptance.md` assigns to this repo's
+endpoints → the ONE issue that owns it (names it in its DoD and
+transcribes it into `smoke/` at stage 4):
+
+| Acceptance case | Owned by |
+|-----------------|----------|
+| `<method>-<behavior>` | 03 |
 
 ## The issues
 

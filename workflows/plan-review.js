@@ -33,13 +33,26 @@
  *     round:        2   // 1-based; informational, shown in labels
  *   }})
  *
- * Returns { round, blockers, invalid, cold: [{ repo, path, verdict,
+ * THE JUDGE closes the round, not the lenses: reviewers report at the
+ * maximum bar (they always find something — that is by design), and
+ * plan-judge rules every finding sustained / deferred / dismissed
+ * against the scrutiny ruler declared in the design session's
+ * decisions.md. An unruled finding counts as sustained (fail-safe).
+ *
+ * Returns { round, blockers, sustained, open: { issues: [{ repo,
+ * path }], lenses: [names] }, invalid, cold: [{ repo, path, verdict,
  * findings, readings }], lenses: [{ lens, verdict, verified, quote,
- * findings, invalid }] } — the conductor writes reviews.md (run ids from
- * this run's journal), assigns dispositions, and loops findings to each
- * repo's plan-author via SendMessage. Verdict semantics and finding
- * severities are the house contract: pass / pass with fixes / fail;
- * blocker / fix / detail.
+ * findings, invalid }] } — each finding carries `id`, `ruling` and
+ * `reason` after judgment; `blockers`/`sustained` count only
+ * sustained-ruled findings; `open` holds what a sustained blocker/fix
+ * keeps open (empty means the round converged — the stage's close is
+ * then the full final round, every issue and every lens over the final
+ * state, judged by the same ruler). The conductor writes reviews.md
+ * (run ids from this run's journal, rulings included) and loops the
+ * sustained findings to each repo's plan-author via SendMessage —
+ * deferred rulings batch into the close sweep. Verdict semantics and
+ * finding severities are the house contract: pass / pass with fixes /
+ * fail; blocker / fix / detail.
  */
 
 export const meta = {
@@ -49,7 +62,29 @@ export const meta = {
     { title: 'Cold reads', detail: 'per issue: three Haiku blind readers, then the plan-reviewer-issue judge with their readings' },
     { title: 'Whole plan', detail: 'plan-reviewer-gaps and plan-reviewer-flow in parallel, each over every plan and issue' },
     { title: 'Coherence', detail: 'the cross-cutting lens, with every verdict in hand' },
+    { title: 'Judge', detail: 'plan-judge rules every finding sustained/deferred/dismissed by the ruler in decisions.md', model: 'opus' },
   ],
+}
+
+const JUDGE = 'plan-judge'
+
+const JUDGMENT = {
+  type: 'object', additionalProperties: false,
+  required: ['rulings'],
+  properties: {
+    rulings: {
+      type: 'array',
+      items: {
+        type: 'object', additionalProperties: false,
+        required: ['id', 'ruling', 'reason'],
+        properties: {
+          id: { type: 'string', description: 'the finding id exactly as given' },
+          ruling: { type: 'string', enum: ['sustained', 'deferred', 'dismissed'] },
+          reason: { type: 'string', description: 'one or two concrete sentences; cite the tier when the tier decided it' },
+        },
+      },
+    },
+  },
 }
 
 const READING = {
@@ -111,6 +146,8 @@ const short = (p) => p.split('/').slice(-1)[0].replace(/\.md$/, '')
 const inputs = `Round ${round}.
 The plan: ${args.planDir}
 The design it decomposes: ${args.designDir}
+The session's decisions (the law of this design, the scrutiny ruler inside): ${args.designDir}/decisions.md
+The frozen acceptance spec: ${args.designDir}/acceptance.md — every case needs an owning issue
 The discovery it must deliver: ${args.discoveryDir}/pr-faq.md and ${args.discoveryDir}/user-stories.md
 The wave cut: ${args.wavesPath} — this wave's stories and ACs are the coverage universe`
 
@@ -188,13 +225,75 @@ ${verdictBoard}`, {
   }), 'plan-reviewer-coherence').then(r => ({ lens: 'plan-reviewer-coherence', ...r }))
 
 const lenses = [...wholePlan, coherence]
+
+// ---- The judge: the lenses report, the judge closes ------------------
+// Every finding gets an id; plan-judge rules each one against the ruler
+// in decisions.md. An unruled finding counts as sustained — fail-safe,
+// never fail-silent.
+const allFindings = []
+for (const r of lenses) r.findings.forEach((f, i) => {
+  f.id = `${r.lens}#${i + 1}`
+  allFindings.push({ source: r.lens, f })
+})
+for (const c of coldResults) c.findings.forEach((f, i) => {
+  f.id = `${c.repo}/${short(c.path)}#${i + 1}`
+  allFindings.push({ source: `issue ${c.repo}/${short(c.path)}`, f })
+})
+
+if (allFindings.length) {
+  phase('Judge')
+  const board = allFindings.map(({ source, f }) =>
+    `[${f.id}] ${source} · ${f.severity} · ${f.title}
+  says: ${f.says}
+  gap: ${f.gap}
+  fix: ${f.fix}`).join('\n')
+  const dispatchJudge = () => agent(`${inputs}
+
+The round's cold reads and lenses have reported. Read the plan and decisions.md (the scrutiny ruler is declared there), then rule EVERY finding below, by its id.
+
+${board}`, { label: `${JUDGE}#r${round}`, phase: 'Judge', agentType: JUDGE, schema: JUDGMENT })
+
+  let judgment = await dispatchJudge()
+  const ruled = new Map((judgment?.rulings ?? []).map(x => [x.id, x]))
+  if (allFindings.some(({ f }) => !ruled.has(f.id))) {
+    log('judge: unruled finding(s) — re-dispatching once')
+    judgment = await dispatchJudge()
+    for (const x of judgment?.rulings ?? []) if (!ruled.has(x.id)) ruled.set(x.id, x)
+  }
+  for (const { f } of allFindings) {
+    const r = ruled.get(f.id)
+    f.ruling = r?.ruling ?? 'sustained'
+    f.reason = r?.reason ?? 'UNRULED — sustained by construction'
+  }
+}
+
+const sustainedOf = r => r.findings.filter(f => (f.ruling ?? 'sustained') === 'sustained')
 const blockers =
-  lenses.reduce((n, r) => n + r.findings.filter(f => f.severity === 'blocker').length, 0) +
-  coldResults.reduce((n, c) => n + c.findings.filter(f => f.severity === 'blocker').length, 0)
+  lenses.reduce((n, r) => n + sustainedOf(r).filter(f => f.severity === 'blocker').length, 0) +
+  coldResults.reduce((n, c) => n + sustainedOf(c).filter(f => f.severity === 'blocker').length, 0)
+const sustained =
+  lenses.reduce((n, r) => n + sustainedOf(r).length, 0) +
+  coldResults.reduce((n, c) => n + sustainedOf(c).length, 0)
 const invalid = [
   ...lenses.filter(r => r.invalid).map(r => r.lens),
   ...coldResults.filter(c => c.invalid).map(c => `cold:${short(c.path)}`),
 ]
-log(`round ${round}: ${blockers} blocker(s) · cold reads ${coldResults.filter(c => c.verdict === 'pass').length}/${coldResults.length} pass${invalid.length ? ' · INVALID: ' + invalid.join(', ') : ''}`)
+// What a sustained blocker/fix keeps open: the issues that need fixes
+// (fresh cold reads next round) and the lenses whose findings sustained
+// (informational — the whole-plan lenses reread everything every round
+// regardless; they are the regression guard). Deferred rulings batch
+// into the close sweep, dismissed ones die with their reason.
+const open = {
+  issues: coldResults
+    .filter(c => c.invalid || sustainedOf(c).some(f => f.severity !== 'detail'))
+    .map(c => ({ repo: c.repo, path: c.path })),
+  lenses: lenses
+    .filter(r => r.invalid || sustainedOf(r).some(f => f.severity !== 'detail'))
+    .map(r => r.lens),
+}
+log(`round ${round}: ${allFindings.length} finding(s) → ${sustained} sustained (${blockers} blocker(s)) · cold reads ${coldResults.filter(c => c.verdict === 'pass').length}/${coldResults.length} pass${invalid.length ? ' · INVALID: ' + invalid.join(', ') : ''}`)
+log(open.issues.length || open.lenses.length
+  ? `still open: ${[...open.issues.map(i => `${i.repo}/${short(i.path)}`), ...open.lenses].join(', ')}`
+  : 'converged — nothing holds a sustained finding')
 
-return { round, blockers, invalid, cold: coldResults, lenses }
+return { round, blockers, sustained, open, invalid, cold: coldResults, lenses }
