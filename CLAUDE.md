@@ -15,6 +15,18 @@ a clear, the bug is a missing file in the previous stage — fix the
 file, not the context. Re-entry is always by workstream slug: the stage
 skill resumes from `.state.md`.
 
+## "Note this for the dreaming"
+
+At any stage, when the user says to note something for the dreaming
+("anote no dreaming note", or words to that effect), append it to the
+workstream's `dreaming-notes.md` on the spot, marked **`[user]`** —
+his words as close to verbatim as the entry allows, plus what he
+already wants changed when he says it. These entries are first-class
+input to stage 6: he wrote them knowing what he wants, so the
+dreaming session confirms the edit instead of debating the class.
+This is separate from the standing rule that every stage notes its
+own frictions as they happen — both feed the same file.
+
 ## The blueprint speaks the user's language
 
 The blueprint is written in the language the user talks to you in —

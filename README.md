@@ -131,13 +131,15 @@ Prod verification is read-only — the smoke suite never touches
 production. The wave closes with its **Release Report** in the
 blueprint: the cutover story, the versions shipped, the way back.
 
-**6 · Close** — the wave archives itself and the pipeline learns.
-Every friction noted during the run is judged: **class, not
-incident** — what doesn't generalize is discarded with a reason.
-Pipeline-class lessons become direct edits to these very files, one
-revertible commit each, inside a declared autonomy boundary
-(topology, cost, human gates, prod, and product decisions always
-escalate to the human). Then the next wave opens, or the workstream
+**6 · Close** — the wave archives itself and the pipeline learns,
+**with the human in the chair**. Every friction noted during the run
+lands on one board — including the entries the human dictated
+mid-wave ("note this for the dreaming"). The session suggests: the
+class (**class, not incident** — what doesn't generalize is proposed
+as a discard), the destination, the concrete edit grounded in the
+standards; the human rules every entry — edit, discard, or park.
+Only ruled lessons become edits to these very files, one revertible
+`learn()` commit each. Then the next wave opens, or the workstream
 is done.
 
 ## The standards are the configuration surface
@@ -231,7 +233,7 @@ What the pipeline expects from its surroundings:
 | **judge** | the agent that rules every finding sustained/deferred/dismissed against the scrutiny ruler — reviewers report at the maximum bar; the judge closes the round |
 | **blind reader** | an agent that reads alone, so divergence from its sibling exposes ambiguity |
 | **andon** | stop before building on a broken premise — a cheap halt beats wrong work |
-| **dreaming** | the closing pass where frictions become edits to the pipeline itself |
+| **dreaming** | the closing session where frictions become edits to the pipeline itself — the session suggests, the human rules every lesson |
 
 ## License
 

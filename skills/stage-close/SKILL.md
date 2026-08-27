@@ -1,6 +1,6 @@
 ---
 name: stage-close
-description: Conducts stage 6 (Closure & Dreaming) of the pipeline — verifies the shipped wave's quiet window, writes the closure record, sweeps the boards, and runs the autonomous dreaming pass — every collected friction becomes a class or a discard, pipeline-class lessons become direct revertible edits to the skills within a declared boundary, and the next wave opens (or the workstream closes). Use after the release closes, or to resume a closure in progress.
+description: Conducts stage 6 (Closure & Dreaming) of the pipeline — verifies the shipped wave's quiet window, writes the closure record, sweeps the boards, and prepares the dreaming board — every collected friction presented with evidence and a suggested edit grounded in the house standards; the user rules each entry in session, and only ruled lessons become revertible learn() commits. Then the next wave opens (or the workstream closes). Use after the release closes, or to resume a closure in progress.
 disable-model-invocation: false
 argument-hint: "<workstream-slug>"
 allowed-tools: Read, Write, Edit, Glob, Grep, Agent, SendMessage, Artifact, AskUserQuestion, ScheduleWakeup, Bash(mkdir *), Bash(date *), Bash(ls *), Bash(cat *), Bash(git *), Bash(gh *), Bash(rm *)
@@ -12,8 +12,11 @@ The wave is live. This stage does two things nothing else does: it
 **archives the wave as a complete record**, and it **makes the
 pipeline better than it was when the wave started** — the frictions
 every stage noted on the spot become edits to the skills themselves.
-It is the most autonomous stage of the pipeline: one human gate, at
-the end, over the full report.
+The closure and the sweep run autonomously; **the dreaming does
+not**: the pipeline is the user's product, and editing it is an
+architecture decision — those are made with him, in session. The
+stage prepares everything so that session is short; it decides
+nothing alone.
 
 ## Preconditions
 
@@ -30,7 +33,7 @@ designs-root/2026-08-15-workspace-invites/
     └── 05-close/
         ├── closure.md             # the wave's final record — what shipped, what didn't, who owns what's left
         └── dreaming/
-            └── ledger.md          # every note judged: class, destination, action or discard — with reasons
+            └── ledger.md          # the board: every note with evidence + suggestion, closed with the user's ruling
 ```
 
 Plus: the pipeline repo's own commits (the dreaming's applied
@@ -58,76 +61,73 @@ wave closed or explicitly re-homed, the Linear Project to its final
 state for this wave. The blueprint gets the wave's final touch —
 shipped, dated, same URL forever.
 
-## 3 — Dreaming — the pipeline learns, inside a boundary
+## 3 — Dreaming — a working session, not an autonomous pass
 
 The input is the wave's full trace, not one file. Read, in order:
 the workstream's `dreaming-notes.md` (fed on the spot by every stage
 — every failure, every halt, every surprise — including the stage-4
-maestro's build and environment entries); every stage's review audit
-(`00-discovery/reviews.md`, `01-design/reviews.md`,
+maestro's build and environment entries, and the **`[user]` entries**
+the user dictated mid-wave, per the house rule); every stage's review
+audit (`00-discovery/reviews.md`, `01-design/reviews.md`,
 `02-plan/reviews.md`) — what blocked a round and what it cost to
 clear; **the judges' scoreboards** — the rulings in the review audits
 and the execution tab's sustained/deferred/dismissed totals: a lens
 whose findings are repeatedly dismissed is miscalibrated, a ruler
-line that never fired may be dead weight — both are pipeline-class
-candidates; and the execution and release traces
+line that never fired may be dead weight — both are candidates for
+the board; and the execution and release traces
 (`03-execution/trace.md`, the per-repo and `e2e` lane traces,
 `04-release/trace.md`) — the halts, the rounds, what dragged. A
 friction counts wherever it was recorded. The pass:
 
-1. **Ledger.** Every note becomes an entry in
+1. **The board.** Every note becomes an entry in
    `05-close/dreaming/ledger.md`: what happened, where it bit, the
-   evidence. No note is skipped — a note that goes nowhere is
-   recorded as a discard, never silently dropped.
-2. **Classes, not incidents.** The hard ruler: a lesson must
-   generalize — "this will bite again, anywhere this pattern
-   appears". Case-specific misfortune is discarded with one line of
-   why. When in doubt, it is an incident.
-3. **Triage by destination** — the pipeline repo is shared across
-   ventures, so every class is routed before it is written:
-   - **Pipeline-class** → a direct edit to THIS repo's skills,
-     agents, workflows, or standards;
-   - **Venture-class** → the venture's own `CLAUDE.md`/docs — never
-     into the public pipeline;
-   - **Repo-class** → a gotcha in that product repo's `docs/` (the
-     docs standard's self-healing, exercised from here).
-4. **Recurrence check — the git history is the index.** Every
-   applied pipeline lesson is a `learn(<stage>): <class>` commit
-   (step 5), so the history already records what the pipeline has
-   learned. Before applying each pipeline-class lesson, dispatch a
-   subagent (general-purpose; a cheaper model is fine) with the
-   candidate class and the proposed diff, to search
-   `git log --grep='^learn('` (default window: the whole history)
-   and answer in three lines: does a `learn(` commit already cover
-   this class — hash, what it changed, whether that rule still
-   stands in the current text. Nothing found ⇒ apply. Found and the
-   rule still stands ⇒ **the rule did not hold** — recurrence:
-   escalate with both hashes as evidence, never re-edit. Found but
-   since removed or rewritten ⇒ treat as new, citing the prior
-   commit. Venture- and repo-class lessons run the same check
-   against their own repo's history. "Same class" is a semantic
-   judgment — that is why a subagent, not a grep in the main
-   session.
-5. **The autonomy boundary.** Behavior adjustments — an agent's
-   prompt, a skill's rule, a standard's line — are applied
-   **directly**: one `learn(<stage>): <class>` commit per change,
-   revertible, the motivating ledger entry in the commit message —
-   the `learn(` type is what keeps the history searchable as the
-   lessons' index. **Escalates to the user,
-   always:** topology (who conducts what), model/cost choices, human
-   gates (adding, removing, or moving one), anything touching prod,
-   product decisions, and recurrence rules. An escalation is a ledger
-   entry with a proposal, not an edit.
-6. **Transparency is the gate.** The final report — the full ledger,
-   the applied edits with their commits, the discards with reasons,
-   the escalations awaiting the user — is this stage's single human
-   checkpoint. The edits are already live; the report is what makes
-   them auditable and cheap to revert.
-
-The editing itself obeys the house: surgical diffs, the standards'
-own rules applied to editing the standards, and **push only with the
-user's explicit approval** — the commits wait locally with everything
-else.
+   evidence — and the session's **suggestion**: the class it sees (or
+   "incident — suggest discard", one line of why), the destination,
+   and where it can, the concrete edit it would make, grounded in the
+   house standards — a line in a standard, a rule in an author or
+   reviewer prompt, a step in a skill, a change in the implementation
+   machinery. The suggestion ruler is still **class, not incident**:
+   a lesson must generalize — "this will bite again, anywhere this
+   pattern appears" — and the destination triage still routes before
+   writing: **pipeline-class** → this repo's skills, agents,
+   workflows, or standards; **venture-class** → the venture's own
+   `CLAUDE.md`/docs, never the public pipeline; **repo-class** → that
+   product repo's `docs/`. No note is skipped.
+2. **Recurrence check — before proposing.** Every applied pipeline
+   lesson is a `learn(<stage>): <class>` commit (step 4), so the git
+   history is the index of what the pipeline has learned. For each
+   pipeline-class candidate, dispatch a subagent (general-purpose; a
+   cheaper model is fine) with the candidate class and the suggested
+   diff, to search `git log --grep='^learn('` (default window: the
+   whole history) and answer in three lines: does a `learn(` commit
+   already cover this class — hash, what it changed, whether that
+   rule still stands in the current text. The answer rides along as
+   evidence in the entry: found and still standing ⇒ **the rule did
+   not hold** — the entry is presented as a recurrence, with both
+   hashes; that is a conversation, never a silent re-edit. Venture-
+   and repo-class candidates run the same check against their own
+   repo's history. "Same class" is a semantic judgment — that is why
+   a subagent, not a grep.
+3. **The session — the user rules.** Present the board, organized
+   for ruling: the `[user]` entries first — he wrote them knowing
+   what he wants; confirm the edit and move on — then the session's
+   candidates, ranked by what each would have saved this wave, then
+   the suggested discards, one line each, rescuable. The user rules
+   every entry: **edit as suggested** · **edit differently** (his
+   words become the diff) · **discard** · **park**. Nothing is
+   edited, and nothing is dropped, without his ruling — a discard is
+   a ruling too.
+4. **Apply what he ruled.** One `learn(<stage>): <class>` commit per
+   change, revertible, the ledger entry and his ruling in the commit
+   message — the `learn(` type is what keeps the history searchable
+   as the lessons' index. The editing obeys the house: surgical
+   diffs, the standards' own rules applied to editing the standards,
+   and **push only with the user's explicit approval** — the commits
+   wait locally with everything else.
+5. **The record.** The ledger closes with every ruling written next
+   to its entry — what was edited (and its commit), what was
+   discarded and why, what was parked. Nothing learned, or dropped,
+   in silence.
 
 ## 4 — The wave loop
 
@@ -147,13 +147,13 @@ Read `waves.md`:
 | Gate | Rule |
 |---|---|
 | Quiet window | closure only over a verified-quiet prod; noise routes back as a fix issue |
-| Every note judged | ledger covers 100% of the input — dreaming-notes, the review audits, the traces — action, escalation, or reasoned discard |
-| Recurrence check | no pipeline lesson applied without the subagent sweep of the `learn(` history; a repeated class escalates, never re-edits |
-| Class, not incident | what does not generalize does not edit anything |
+| Every note on the board | the ledger covers 100% of the input — dreaming-notes (the `[user]` entries leading), the review audits, the judges' scoreboards, the traces — each with evidence and a suggestion |
+| Recurrence check | no pipeline candidate reaches the board without the subagent sweep of the `learn(` history; a repeated class is presented as recurrence with both hashes, never silently re-edited |
+| Class, not incident | the ruler for the session's suggestions — what does not generalize is suggested as a discard; the user can overrule |
 | Destination triage | venture- and repo-class lessons never land in the public pipeline repo |
-| The boundary | behavior edits direct and revertible; topology/cost/gates/prod/product/recurrence escalate |
-| One commit per lesson | every applied edit is an independently revertible `learn(...)` commit, motivated in its message |
-| Transparency | the report is the gate — nothing learned in silence |
+| The user rules | no edit, no discard, no park without his ruling — the dreaming decides nothing alone |
+| One commit per lesson | every applied edit is an independently revertible `learn(...)` commit, the ruling in its message |
+| The record | the ledger closes with every ruling written next to its entry — nothing learned, or dropped, in silence |
 
 ## Lifecycle
 
