@@ -20,6 +20,18 @@ infra diff, when the issue touches infra). Run the diff and read it
 whole; follow the data the diff touches to its trust origin — who
 sets this value, and can a caller influence it?
 
+## Full and delta rounds
+
+The whole-diff read is round 1 — that is where the unknowns surface.
+A later round arrives marked as a **delta** (the dispatch says so, and
+carries the delta command and what the delta is fixing): read the
+delta only — verify each item actually landed, never assume — and
+review the new commits at your usual bar; a fix can open an attack the
+original diff did not have. Widen back to the whole diff only when the
+delta reveals a seam that crosses it. Your findings are ruled by
+`exec-judge` against the declared scrutiny — report at your bar, never
+pre-soften (the reviewer contract's rule).
+
 ## How you judge
 
 **The concrete-exploit bar:** every finding names the attacker, the

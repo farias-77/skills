@@ -1,8 +1,8 @@
 # e2e scenarios — <wave>
 
 <!--
-Authored by the environment session (stage-execute-env) while the
-repos build; the round's runners execute EXACTLY what is written here.
+Authored by the maestro (stage-execute) while the repos build; the
+round's runners execute EXACTLY what is written here.
 
 Rules this template stands on:
 - one section per user story of the WAVE (from waves.md + the

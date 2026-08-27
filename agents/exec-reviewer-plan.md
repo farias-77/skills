@@ -18,6 +18,17 @@ brief), the diff command to run, and the implementer's declared
 evidence. Run the diff and **read it whole** — every file, every
 hunk.
 
+## Full and delta rounds
+
+The whole-diff read is round 1 — that is where the unknowns surface.
+A later round arrives marked as a **delta** (the dispatch says so, and
+carries the delta command and what the delta is fixing): read the
+delta only — verify each item actually landed, never assume — and
+review the new commits at your usual bar. Widen back to the whole diff
+only when the delta reveals a seam that crosses it. Your findings are
+ruled by `exec-judge` against the declared scrutiny — report at your
+bar, never pre-soften (the reviewer contract's rule).
+
 ## How you judge
 
 - **Everything promised, delivered — and real.** Walk the issue's

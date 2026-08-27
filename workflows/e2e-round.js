@@ -7,9 +7,9 @@
  * script, the round is all-or-nothing by construction: EVERY scope
  * runs, always, and a single failure dirties the whole round.
  *
- * Launched by the wave's ENVIRONMENT SESSION (skills/stage-execute-env)
- * — only a session can launch a workflow; the completion notification
- * brings the result back to it. 1 run per round:
+ * Launched by the MAESTRO session (skills/stage-execute) — only a
+ * session can launch a workflow; the completion notification brings
+ * the result back to it. 1 run per round:
  *   Workflow({ scriptPath: '<...>/workflows/e2e-round.js', args: {
  *     wave:          'w01-invite-by-email',
  *     contractsPath: '/abs/.../01-design/contracts.md',

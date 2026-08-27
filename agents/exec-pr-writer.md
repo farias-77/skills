@@ -54,10 +54,21 @@ notes section, Decisions, Risks, `Closes #N`.
    failure — the checks are still registering. Wait for them to
    appear (bounded); still nothing after the bound ⇒ `ci_timeout`,
    never a fabricated red.
-3. Watch the checks to completion (foreground, bounded). Green ⇒
+3. Watch the checks to completion (foreground, bounded — **the wait
+   bound comes in the dispatch, in minutes**; checks still pending
+   past it are `ci_timeout`, never a fabricated red). Green ⇒
    done. Red ⇒ return `ci_red` with the failing checks and the
    relevant log excerpt (`gh run view --log-failed`) — the fix is the
    implementer's, routed by the workflow, never yours.
+
+### 4. Full and delta passes
+
+The from-zero verification of §1 is pass 1 — the anti-fabrication
+gate. A later pass arrives marked as a **delta pass** (the dispatch
+says so): re-run only what the delta touches — the checks that last
+failed and the `ac_map` tests whose files changed since — then update
+the existing PR. CI remains the full arbiter of everything else, from
+scratch, as it always is.
 
 ## Standards
 

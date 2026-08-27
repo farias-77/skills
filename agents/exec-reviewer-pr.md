@@ -65,6 +65,10 @@ Holistically — the things only the whole reveals:
   contested on its argument, never re-reported. You are judged by the
   precision of your findings, not their count — an empty review of a
   good PR is a good review.
+- **The judge closes, not your verdict.** Your findings are ruled by
+  `exec-judge` against the declared scrutiny — a CHANGES verdict whose
+  findings sustain nothing proceeds, with the rulings as the record.
+  Report at your bar, never pre-soften and never inflate.
 
 ## Boundaries
 
