@@ -71,6 +71,7 @@ smoke/
     env.sh                            # staging base URL, fixed ids — prod DOES NOT EXIST here
     auth.sh                           # test-account login, token cached per run
     common.sh                         # req(), assert_status(), assert_field(), reporting
+    db.sh                             # direct store reads for side-effect asserts
   <resource>/                         # one folder per domain resource
     post-create-lead.sh
     post-create-lead-no-auth-401.sh
@@ -82,8 +83,8 @@ smoke/
 | smoke.1 | **1 file = 1 case = 1 behavior.** Name: `<method>-<behavior>[-<expected-result>].sh` — hyphens only. A failure case carries its expectation in the name (`-no-auth-401`). The folder's listing IS the executable documentation of the resource's contract. | fix |
 | smoke.2 | **Self-contained, order-independent, self-cleaning:** a case creates the data it needs (prefixed `smoke-`), never depends on another case having run, and **deletes what it created on exit — including on failure** (trap-based cleanup). The environment is as clean after the run as before it. | blocker |
 | smoke.3 | **The suite is physically incapable of touching prod:** `env.sh` knows only the staging URL. No `--prod` flag, no environment variable that could point it elsewhere — by construction, not by discipline. | blocker |
-| smoke.4 | **The design names the cases, the worker writes them.** Every case comes, by name, from the contract's `Smoke:` line — copied into the issue's DoD at planning. An issue that changes an endpoint adjusts its cases; an issue that removes an endpoint DELETES them. A dead case does not hibernate. | fix |
-| smoke.5 | **`lib/` is the only shared code, and it stays small** — three files of curl+jq+auth helpers. Case never calls case; folder never imports folder. The day `lib/` outgrows "helpers", it became the problem. | fix |
+| smoke.4 | **The design writes the spec, the worker transcribes it.** Every case comes from the design's `acceptance.md` — one line per case: name, request, expected status and code, the side effect checked **directly in the store** (`lib/db.sh`, never via a read endpoint), the cleanup. The assert IS the contract: implementation proving it wrong is a declared design amendment, never a silent test edit; what legitimately varies at transcription is body mechanics only (auth, seeds, URLs). Cases are copied into the issue's DoD at planning; an issue that changes an endpoint adjusts its cases; an issue that removes an endpoint DELETES them. A dead case does not hibernate. | fix |
+| smoke.5 | **`lib/` is the only shared code, and it stays small** — four files of curl+jq+auth+store helpers. Case never calls case; folder never imports folder. The day `lib/` outgrows "helpers", it became the problem. | fix |
 | smoke.6 | **Elegance is a requirement:** a typical case is ≤ ~12 lines, zero comments — the file NAME documents the case, the body proves it. Longer means a missing `lib/` helper or a case testing two things. | detail |
 | smoke.7 | **Distillation:** an e2e case that stabilizes becomes a smoke case in the fix issue's DoD. Today's judgment call is tomorrow's deterministic regression. | fix |
 

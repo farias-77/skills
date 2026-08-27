@@ -32,6 +32,20 @@ depends on another service being watched. If every service keeps its own
 promise, the system works in harmony — that is the operating model the
 design must make true, not a slogan.
 
+## The simplest form that meets the demand
+
+The default is the simplest form that meets the demand **within this
+architecture** — event-driven, dedicated functions per responsibility
+(API, event consumers), each service guaranteeing itself. Every step up
+in complexity — an orchestrator where a scheduled function would do, a
+container where a function would do, a second store, a cache — names
+the requirement in the discovery (or the declared decision) that forces
+it; a mechanism nothing forces is a finding, however well built.
+**Simplicity is not plainness:** an internal tool still gets the house
+shape and the minimum floor — alarms, resilience, clean factoring. What
+scales with the system's criticality is the *scrutiny* (the judge's
+ruler, declared at the design session), never the floor.
+
 ## Grow decoupled, with judgment
 
 New capability plugs into what exists: a new consumer of existing

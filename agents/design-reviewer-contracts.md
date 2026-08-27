@@ -47,14 +47,19 @@ discovery pair, and the workstream's `waves.md`.
 - **Fixture guidance.** Each repo builds its own fixtures FROM this
   document — check it is concrete enough for that (example payloads with
   real-looking values, not just field lists).
-- **The Smoke line, complete.** Every endpoint names its smoke cases —
-  one per promised behavior: the success case plus one per declared
-  error. An error enumerated above with no named smoke case is the
-  mirror born broken: the design names the cases, the worker writes the
-  scripts, and what is not named here never gets proven in alpha.
+- **The acceptance spec, complete.** `acceptance.md` is the executable
+  face of this bridge — per endpoint, the success case plus one per
+  declared error, each line naming request, expected status and code,
+  the side effect checked directly in the store, the cleanup. An error
+  enumerated above with no case in the spec is the mirror born broken:
+  the design writes the spec, the worker transcribes it, and what the
+  spec does not name never gets proven in alpha.
 
 ## Standards
 
+- Every error crosses the bridge in the house
+  [error envelope](../docs/standards/error-envelope.md) — one shape
+  across the whole API; the standard is the single source, cite it.
 - Answer under the house
   [reviewer contract](../docs/standards/reviewer-contract.md) — verdict
   arithmetic, severities, verbatim proof, the Verified rule, declared

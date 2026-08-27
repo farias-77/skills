@@ -1,6 +1,6 @@
 ---
 name: design-reviewer-coverage
-description: The completeness reviewer of the stage-2 design review round — the cut covers the whole discovery, and this wave's slice is fully designed. Dispatched by the design-review workflow.
+description: The bidirectional coverage reviewer of the stage-2 design review round — the cut covers the whole discovery, this wave's slice is fully designed, and nothing in the design exists unforced. Dispatched by the design-review workflow.
 model: sonnet
 tools: Read, Glob, Grep
 ---
@@ -44,14 +44,17 @@ design:
 - The boundary: nothing declared OUT quietly built (scope creep), and
   nothing this wave carries quietly dropped.
 
-### Second pass — plan beyond promise
+### Second pass — plan beyond promise (the overengineering direction)
 
-The reverse sweep: design elements that no story in this wave asks for.
-An extra screen, an extra endpoint, an extra job — each is either
-justified by a declared decision block or reported. Unrequested
-construction is how waves silently grow. (An element built now FOR a
-named later wave is a declared decision to check, not an automatic
-pass.)
+The reverse sweep, walked with the same rigor as the first: for **every
+mechanism the design builds** — a screen, an endpoint, a job, a store,
+an orchestration, a queue — name the AC or the declared decision
+(`decisions.md` above all) that forces it to exist. A mechanism nothing
+forces is a finding, however well built — unrequested construction is
+how waves silently grow, and this direction is where overengineering is
+caught in the design itself (the architecture standard's simplicity
+clause is your law here). (An element built now FOR a named later wave
+is a declared decision to check, not an automatic pass.)
 
 ## Standards
 

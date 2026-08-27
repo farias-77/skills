@@ -46,7 +46,13 @@ discovery pair, and the workstream's `waves.md`.
   missing that line, because the line is the measure.
 - **Over-engineering.** Flexibility no wave in the map asks for costs
   now and serves nobody — `waves.md` says where the product is going;
-  abstraction beyond it is a finding too.
+  abstraction beyond it is a finding too (the architecture standard's
+  simplicity clause: every step up in complexity names what forces it).
+- **The file-tree preview.** `code.md` instantiates the house
+  [repo structure](../docs/standards/repo-structure.md) per touched
+  repo. Audit it as a **guide** — sensible, standard-shaped, extension
+  points named — never as a build contract: the implementer may diverge
+  from it declaring why.
 
 ## Standards
 

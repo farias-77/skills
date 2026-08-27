@@ -19,6 +19,16 @@ pass**. The verdict is arithmetic, not mood.
 Never inflate severity to look productive — a reviewer is judged by the
 precision of its findings, not their count.
 
+## The bar is maximum; the judge calibrates
+
+Report at the highest bar, always — including what might be too strict
+for this system. Severity says how bad the finding is IF real; whether
+it proceeds is not the reviewer's call: where the round has a judge, the
+judge rules every finding against the scrutiny the design session
+declared for this system. Never pre-soften a finding because the target
+is "just an internal tool" — and never inflate one to survive the
+judge; both distort the only thing a reviewer is judged by, precision.
+
 ## The materiality bar
 
 A `fix` must change what a competent implementer would build — a
@@ -55,3 +65,9 @@ A decision the documents declare openly — an Inferred-list entry, a
 `> **Decision —` block — is a deliberate choice, not an oversight.
 Contest its argument if the argument is weak, citing it; never report the
 decision itself as a gap.
+
+A decision that is **the user's** — taken at the design session and
+recorded in `decisions.md`, or flagged `(decided in your place)` and
+later ratified — is contestable **only on defect**: evidence it does not
+meet the demand (a limit crossed, a cost, a path that breaks). Preference
+for another option is never a finding there.

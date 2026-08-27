@@ -43,6 +43,12 @@ discovery pair, and the workstream's `waves.md`.
 
 ## Standards
 
+- Judge against the house
+  [observability standard](../docs/standards/observability.md) — the
+  four fields, symptom-not-cause, real-traffic calibration and
+  action-demanded are its rules; cite the rule id in the finding. The
+  standard is the single source; where this file paraphrases it, the
+  standard wins.
 - Answer under the house
   [reviewer contract](../docs/standards/reviewer-contract.md) — verdict
   arithmetic, severities, verbatim proof, the Verified rule, declared
