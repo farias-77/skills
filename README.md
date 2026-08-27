@@ -127,6 +127,9 @@ and re-smoked before prod opens. Versions are **semver derived
 mechanically from conventional commits**; tags are never retroactive
 — prod deploys from the tag. The cutover is supervised step by step,
 and no prod command runs before that repo's rollback plan is written.
+Prod verification is read-only — the smoke suite never touches
+production. The wave closes with its **Release Report** in the
+blueprint: the cutover story, the versions shipped, the way back.
 
 **6 · Close** — the wave archives itself and the pipeline learns.
 Every friction noted during the run is judged: **class, not

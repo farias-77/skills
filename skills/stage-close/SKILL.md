@@ -62,14 +62,18 @@ shipped, dated, same URL forever.
 
 The input is the wave's full trace, not one file. Read, in order:
 the workstream's `dreaming-notes.md` (fed on the spot by every stage
-— every failure, every halt, every surprise — plus what the execute
-master appended from the sessions' `final` returns); every stage's
-review audit (`00-discovery/reviews.md`, `01-design/reviews.md`,
+— every failure, every halt, every surprise — including the stage-4
+maestro's build and environment entries); every stage's review audit
+(`00-discovery/reviews.md`, `01-design/reviews.md`,
 `02-plan/reviews.md`) — what blocked a round and what it cost to
-clear; and the execution and release traces (`03-execution/trace.md`,
-the per-repo and `e2e` lane traces, `04-release/trace.md`) — the
-halts, the rounds, what dragged. A friction counts wherever it was
-recorded. The pass:
+clear; **the judges' scoreboards** — the rulings in the review audits
+and the execution tab's sustained/deferred/dismissed totals: a lens
+whose findings are repeatedly dismissed is miscalibrated, a ruler
+line that never fired may be dead weight — both are pipeline-class
+candidates; and the execution and release traces
+(`03-execution/trace.md`, the per-repo and `e2e` lane traces,
+`04-release/trace.md`) — the halts, the rounds, what dragged. A
+friction counts wherever it was recorded. The pass:
 
 1. **Ledger.** Every note becomes an entry in
    `05-close/dreaming/ledger.md`: what happened, where it bit, the

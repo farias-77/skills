@@ -625,7 +625,7 @@ const BLUEPRINT = {
      each stage skill documents its tab's contract. A wave that is named
      but not started sits as null. */
   waves: {
-    // 'w01-<what-it-delivers>': { design: {...}, plan: {...}, execution: {...} },
+    // 'w01-<what-it-delivers>': { design: {...}, plan: {...}, execution: {...}, release: {...} },
   }
 };
 /* ══════════════ END OF DATA — do not edit below this line ══════════════ */
@@ -636,7 +636,7 @@ const BLUEPRINT = {
 const esc = s => String(s).replace(/[&<>]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
 const jsonc = s => esc(s).replace(/\/\/(.*)$/gm, '<span class="c">//$1</span>');
 const nonEmpty = v => Array.isArray(v) ? v.length > 0 : !!v;
-const WAVED = ['design','plan','execution'];   // stage tabs that live per wave
+const WAVED = ['design','plan','execution','release'];   // stage tabs that live per wave
 let waveNow = BLUEPRINT.workstream.wave || Object.keys(BLUEPRINT.waves || {})[0] || null;
 const W = () => (waveNow && BLUEPRINT.waves && BLUEPRINT.waves[waveNow]) || {};
 const has = k => WAVED.includes(k) ? nonEmpty(W()[k]) : nonEmpty(BLUEPRINT[k]);
@@ -661,14 +661,15 @@ const STAGES = [
     { key:'live', label:'Going to production' }
   ]},
   { key:'plan', label:'Plan' },
-  { key:'execution', label:'Execution Report' }
+  { key:'execution', label:'Execution Report' },
+  { key:'release', label:'Release Report' }
 ];
 
 /* ---------- overview ---------- */
 function renderOverview() {
   const p = BLUEPRINT.overview;
-  const order = ['discovery','design','plan','execution'];
-  const lbl = { discovery:'Discovery', design:'Design', plan:'Plan', execution:'Execution' };
+  const order = ['discovery','design','plan','execution','release'];
+  const lbl = { discovery:'Discovery', design:'Design', plan:'Plan', execution:'Execution', release:'Release' };
   const at = order.indexOf(BLUEPRINT.workstream.stage);
   return `
   <section class="sec">${secT('What we are building')}
@@ -1201,6 +1202,37 @@ function renderExecution() {
       <p class="pt">${p.t}</p><p class="pd">${p.p}</p></div></article>`).join('')}</div></section>` : ''}`;
 }
 
+/* ---------- release ---------- */
+function renderRelease() {
+  const e = W().release;
+  const tl = `<div class="xtl">${e.timeline.map(i => `
+    <div class="xi ${i.tone || ''}"><div class="when">${i.when}</div>
+      <div class="what">${i.what}</div>${i.det ? `<div class="det">${i.det}</div>` : ''}</div>`).join('')}</div>`;
+  const versions = `<div class="scroll"><table class="table">
+    <tr><th>Repo</th><th>From</th><th>Shipped</th><th>Why this bump</th></tr>
+    ${e.versions.map(v => `<tr><td>${v.repo}</td><td class="num">${v.from}</td>
+      <td class="num"><b>${v.to}</b></td><td>${v.why}</td></tr>`).join('')}</table></div>`;
+  const smokeOut = e.smoke ? esc(e.smoke.out)
+    .replace(/✓/g, '<span class="xok">✓</span>').replace(/✗/g, '<span class="xerr">✗</span>') : '';
+  const back = e.rollback?.length ? `<div class="scroll"><table class="table">
+    <tr><th>Repo</th><th>The way back</th><th>Data</th></tr>
+    ${e.rollback.map(r => `<tr><td>${r.repo}</td><td>${r.back}</td><td>${r.data}</td></tr>`).join('')}</table></div>` : '';
+  return `
+  <p class="lede">${e.intro}</p>
+  <section class="sec">${secT('The release, step by step')}${tl}</section>
+  <section class="sec">${secT('Versions shipped', 'tags and GitHub Releases are live')}${versions}</section>
+  ${e.smoke ? `<section class="sec">${secT('Pre-prod confirmation', 'smoke over staging from main')}<pre>${smokeOut}</pre>
+    ${e.smoke.note ? `<p class="xnote">${e.smoke.note}</p>` : ''}</section>` : ''}
+  ${back ? `<section class="sec">${secT('The way back', 'documented before prod-go')}
+    ${e.rollbackNote ? `<p class="sec-d">${e.rollbackNote}</p>` : ''}${back}</section>` : ''}
+  ${e.decisions?.length ? `<section class="sec">${secT('Decided in your place', 'during the release')}
+    <div class="list">${e.decisions.map(x => dcard({...x, mine: true})).join('')}</div></section>` : ''}
+  ${e.pending?.length ? `<section class="sec">${secT('Needs you', e.pending.length)}
+    <div class="list">${e.pending.map((p, i) => `<article class="card step">
+      <span class="pnum">${i + 1}</span><div class="pbody">
+      <p class="pt">${p.t}</p><p class="pd">${p.p}</p></div></article>`).join('')}</div></section>` : ''}`;
+}
+
 /* ---------- registry and boot ---------- */
 const RENDER = {
   overview: renderOverview,
@@ -1217,7 +1249,8 @@ const RENDER = {
   'design/alarms': renderAlarms,
   'design/live': renderLive,
   plan: renderPlan,
-  execution: renderExecution
+  execution: renderExecution,
+  release: renderRelease
 };
 
 function paintBrand() {
