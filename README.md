@@ -62,10 +62,10 @@ Underneath, four mechanics carry everything:
 
 **1 · Discovery** — the demand is interviewed into a PR-FAQ and user
 stories: what gets built, what stays out, every acceptance criterion
-with an ID. A mixed-model panel of **blind readers** (5 Sonnet + 5
-Haiku by default) then describes what each would build from the
-documents alone — where the builds split into camps, the text is
-ambiguous, and the splits become findings. A **judge** rules
+with an ID. A panel of five **blind readers** then describes what
+each would build from the documents alone — where the builds split
+into camps, the text is ambiguous, and the splits become findings. A
+**judge** rules
 every finding by the discovery razor — a wrong guess would change what
 gets built — so only real holes loop the documents; review rounds
 re-run only what stayed open, and a stuck finding goes to the user as

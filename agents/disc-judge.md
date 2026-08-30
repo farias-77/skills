@@ -72,18 +72,17 @@ Stage-1 calibrations:
 
 - **Divergence is the signal, suspicion is not — and the camps are
   your triage.** An ambiguity finding arrives with the panel split
-  that produced it: how many readers in each camp, which models — the
-  panel mixes strong and weak readers on purpose, and the weak ones
-  misread more; that noise dies HERE, not in another round. Rule by
-  composition, never by vote: a split that crosses models, or divides
-  the strong readers among themselves, is a strong signal — camps
-  shipping concretely different products there is floor. A camp of
-  one weak reader against an otherwise unanimous panel is a misread —
-  dismissed — UNLESS you read the sentence yourself and it literally
-  admits that reading: then the text is at fault, not the reader, and
-  it sustains. Always read the sentence; camp size is evidence, never
-  the verdict. Different words for the same product ⇒ dismissed, at
-  any camp size.
+  that produced it: how many readers in each camp (and which models,
+  when the panel mixes them — weaker readers misread more, and that
+  noise dies HERE, not in another round). Rule by composition, never
+  by vote: a split with real membership on both sides is a strong
+  signal — camps shipping concretely different products there is
+  floor. A camp of one against an otherwise unanimous panel is a
+  misread — dismissed — UNLESS you read the sentence yourself and it
+  literally admits that reading: then the text is at fault, not the
+  reader, and it sustains. Always read the sentence; camp size is
+  evidence, never the verdict. Different words for the same product ⇒
+  dismissed, at any camp size.
 - **Fresh eyes manufacture work.** A finding on text no fix touched,
   raised for the first time in a late round, gets the razor at full
   strength — the earlier rounds read that same text and passed it.

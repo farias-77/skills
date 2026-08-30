@@ -1,6 +1,6 @@
 ---
 name: stage-discovery
-description: Conducts stage 1 (Discovery) of the pipeline — the front door for new demands. Interviews the user turn by turn until scope is perfectly understood (every coverage category Clear, no open questions), then writes ONE PR-FAQ and ONE User Stories document covering the whole demand — inferring is allowed, silent inferring is not — runs the audited review round as a workflow (three lenses plus a mixed-model blind-reader panel and its ambiguity pass, every finding ruled by disc-judge — deltas re-run only what stayed open, one full final round closes), and publishes the workstream blueprint for approval. Use when the user brings a new demand ("we have a demand"), asks to open a discovery, or an in-progress discovery needs resuming.
+description: Conducts stage 1 (Discovery) of the pipeline — the front door for new demands. Interviews the user turn by turn until scope is perfectly understood (every coverage category Clear, no open questions), then writes ONE PR-FAQ and ONE User Stories document covering the whole demand — inferring is allowed, silent inferring is not — runs the audited review round as a workflow (three lenses plus a five-reader blind panel and its ambiguity pass, every finding ruled by disc-judge — deltas re-run only what stayed open, one full final round closes), and publishes the workstream blueprint for approval. Use when the user brings a new demand ("we have a demand"), asks to open a discovery, or an in-progress discovery needs resuming.
 disable-model-invocation: false
 argument-hint: "[slug]"
 allowed-tools: Read, Write, Edit, Glob, Grep, Agent, Workflow, AskUserQuestion, Artifact, Bash(mkdir *), Bash(date *), Bash(ls *), Bash(cat *), Bash(rm *)
@@ -266,21 +266,21 @@ the discovery razor. Only sustained findings hold a lens open.
 | `disc-reviewer-walkthrough` | every covered case runs end to end in behavior |
 | `disc-reviewer-acceptance` | the delivery as a whole is judgeable from the ACs |
 | `disc-reviewer-boundary` | In and Out are closed; nothing in limbo |
-| 10× `disc-blind-reader` (5 Sonnet + 5 Haiku) → `disc-reviewer-ambiguity` | one reading only — independent engineers, decorrelated by model, build the same thing |
+| 5× `disc-blind-reader` (Sonnet) → `disc-reviewer-ambiguity` | one reading only — five independent engineers build the same thing |
 | `disc-judge` | the ruling — not a lens: judges every finding by the discovery razor, after the others; decides what proceeds and therefore whether another round runs |
 
 The blind readers are **`disc-blind-reader`** agents — one
-standardized definition, never a prompt improvised by the conductor;
-the panel mixes models on purpose (same-model readers share the same
-blind spots, and the weaker readers are the more sensitive ambiguity
-detector — the stage-3 principle at this end of the pipe). 5 Sonnet +
-5 Haiku is the default; the workflow's `readers` arg tunes it per
-demand. Each reads the two documents alone and commits to a concrete
-build; `disc-reviewer-ambiguity` clusters the panel's builds into
-camps per sentence — divergence is the ambiguity signal, suspicion is
-not — and the judge rules each split by its composition: camps that
-cross models are signal, a lone weak reader against a unanimous field
-is noise, unless the sentence itself admits that reading.
+standardized definition, never a prompt improvised by the conductor.
+5 Sonnet is the default; the workflow's `readers` arg tunes the panel
+per demand (a Haiku cohort is supported but off by default —
+field-reported latency stalled whole rounds, and a round only closes
+when its slowest reader returns). Each reads the two documents alone
+and commits to a concrete build; `disc-reviewer-ambiguity` clusters
+the panel's builds into camps per sentence — divergence is the
+ambiguity signal, suspicion is not — and the judge rules each split
+by its composition: real membership on both sides is signal, a lone
+reader against a unanimous field is noise, unless the sentence itself
+admits that reading.
 
 The round is audited in `00-discovery/reviews.md`:
 

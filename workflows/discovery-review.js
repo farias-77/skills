@@ -12,15 +12,15 @@
  * own work. A clean pass without its "verified" enumeration is
  * re-dispatched once (a lazy pass is not a pass).
  *
- * THE READER PANEL is mixed-model on purpose — breadth over laps:
- * same-model readers share the same blind spots and agree too easily;
- * mixing Sonnet and Haiku decorrelates the readings, and the weaker
- * readers are the more sensitive ambiguity detector (the stage-3
- * principle at this end of the pipe). The referee clusters the builds
- * into camps per sentence; the judge rules each camp split by its
- * composition — a lone weak reader against a unanimous field is noise
- * unless the text itself admits that reading. Default 5 Sonnet + 5
- * Haiku; `readers` tunes it per demand.
+ * THE READER PANEL is breadth over laps: five independent readings
+ * catch in one round what a pair misses until the final round. The
+ * referee clusters the builds into camps per sentence; the judge
+ * rules each camp split by its composition — a lone reader against a
+ * unanimous field is noise unless the text itself admits that
+ * reading. Default 5 Sonnet; `readers` tunes the panel per demand and
+ * still accepts a haiku cohort ({sonnet, haiku}) — off by default:
+ * field-reported (ops-dashboard, 30/08) haiku latency stalled whole
+ * rounds, and the round only closes when its slowest reader returns.
  *
  * THE JUDGE closes the round, not the lenses: reviewers report at the
  * maximum bar (they always find something — that is by design), and
@@ -51,7 +51,7 @@
  *     scope:        'what changed since the last round',  // optional;
  *                       // a focus note, not a fence — reviewers may
  *                       // still read everything
- *     readers:      { sonnet: 5, haiku: 5 }  // optional; the panel
+ *     readers:      { sonnet: 5, haiku: 0 }  // optional; the panel
  *                       // size per model — the default, tuned per
  *                       // demand by the conductor
  *   }})
@@ -72,10 +72,10 @@
 
 export const meta = {
   name: 'discovery-review',
-  description: 'Stage-1 review round: walkthrough, acceptance and boundary lenses plus a mixed-model blind-reader panel and its ambiguity pass — the judge rules every finding by the discovery razor; deltas re-run only what stayed open',
+  description: 'Stage-1 review round: walkthrough, acceptance and boundary lenses plus a blind-reader panel and its ambiguity pass — the judge rules every finding by the discovery razor; deltas re-run only what stayed open',
   phases: [
     { title: 'Lenses', detail: 'the round’s document lenses over both documents' },
-    { title: 'Blind reads', detail: 'the reader panel — 5 Sonnet + 5 Haiku by default — commits to concrete builds, alone; only while ambiguity is open' },
+    { title: 'Blind reads', detail: 'the reader panel — 5 Sonnet by default — commits to concrete builds, alone; only while ambiguity is open' },
     { title: 'Ambiguity', detail: 'the referee clusters the panel’s builds into camps and runs the cross-document pass' },
     { title: 'Judge', detail: 'disc-judge rules every finding sustained/deferred/dismissed by the discovery razor', model: 'opus' },
   ],
@@ -186,9 +186,10 @@ const reviewed = async (dispatch, name) => {
     : { verdict: 'fail', verified: [], quote: '', findings: [], invalid: true }
 }
 
-// The panel: mixed models, decorrelated readings. Every reader is the
-// same disc-blind-reader definition — the model is set per dispatch.
-const PANEL = { sonnet: 5, haiku: 5, ...(args?.readers ?? {}) }
+// The panel: every reader is the same disc-blind-reader definition —
+// the model is set per dispatch. Haiku cohort off by default (latency
+// stalls the round); `readers` re-enables it when wanted.
+const PANEL = { sonnet: 5, haiku: 0, ...(args?.readers ?? {}) }
 const panelSpec = [
   ...Array.from({ length: PANEL.sonnet ?? 0 }, (_, i) => ({ id: `s${i + 1}`, model: 'sonnet' })),
   ...Array.from({ length: PANEL.haiku ?? 0 }, (_, i) => ({ id: `h${i + 1}`, model: 'haiku' })),
