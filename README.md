@@ -62,10 +62,15 @@ Underneath, four mechanics carry everything:
 
 **1 · Discovery** — the demand is interviewed into a PR-FAQ and user
 stories: what gets built, what stays out, every acceptance criterion
-with an ID. Two **blind readers** then describe what they would build
-from the documents alone — where their builds diverge, the text is
-ambiguous, and a judge turns real divergence into findings. The
-business side reviews one package, once. In the ideal world, this
+with an ID. A mixed-model panel of **blind readers** (5 Sonnet + 5
+Haiku by default) then describes what each would build from the
+documents alone — where the builds split into camps, the text is
+ambiguous, and the splits become findings. A **judge** rules
+every finding by the discovery razor — a wrong guess would change what
+gets built — so only real holes loop the documents; review rounds
+re-run only what stayed open, and a stuck finding goes to the user as
+an interview question, never another lap. The business side reviews
+one package, once. In the ideal world, this
 stage isn't run *for* the business team but *by* it — the skill
 interviews whoever owns the demand, and engineering only enters at
 stage 2 with the ambiguity already wrung out.

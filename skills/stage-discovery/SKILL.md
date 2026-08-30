@@ -1,6 +1,6 @@
 ---
 name: stage-discovery
-description: Conducts stage 1 (Discovery) of the pipeline — the front door for new demands. Interviews the user turn by turn until scope is perfectly understood (every coverage category Clear, no open questions), then writes ONE PR-FAQ and ONE User Stories document covering the whole demand — inferring is allowed, silent inferring is not — runs the audited review round as a workflow (three lenses plus two blind readers and their judge), and publishes the workstream blueprint for approval. Use when the user brings a new demand ("we have a demand"), asks to open a discovery, or an in-progress discovery needs resuming.
+description: Conducts stage 1 (Discovery) of the pipeline — the front door for new demands. Interviews the user turn by turn until scope is perfectly understood (every coverage category Clear, no open questions), then writes ONE PR-FAQ and ONE User Stories document covering the whole demand — inferring is allowed, silent inferring is not — runs the audited review round as a workflow (three lenses plus a mixed-model blind-reader panel and its ambiguity pass, every finding ruled by disc-judge — deltas re-run only what stayed open, one full final round closes), and publishes the workstream blueprint for approval. Use when the user brings a new demand ("we have a demand"), asks to open a discovery, or an in-progress discovery needs resuming.
 disable-model-invocation: false
 argument-hint: "[slug]"
 allowed-tools: Read, Write, Edit, Glob, Grep, Agent, Workflow, AskUserQuestion, Artifact, Bash(mkdir *), Bash(date *), Bash(ls *), Bash(cat *), Bash(rm *)
@@ -189,12 +189,16 @@ Rules:
 - A question may only target a **Partial or Missing** cell — if every cell
   is Clear, you have nothing to ask. This is what "no useless questions"
   means mechanically: never ask what the notes already answer.
-- **At most 5 questions per round.** Priority is not vague "impact":
-  the question goes first when a **wrong guess at its answer would
-  change what gets built** — architecture, data, scope. A question
-  whose any answer leads to the same construction can wait or die.
-  (This is the same razor stage 3's judge uses to triage a cold
-  reader's questions — the ruler is one, at both ends of the pipeline.)
+- **The razor bounds the round, not a number.** Every question must
+  pass it: a **wrong guess at its answer would change what gets
+  built** — architecture, data, scope. A question whose any answer
+  leads to the same construction dies before it is asked. What
+  survives the razor gets asked — usually a handful, occasionally
+  more when the demand is genuinely that open — ordered by how much
+  construction hangs on each; never a wall that turns the interview
+  into a form. (This is the same razor stage 3's judge uses to triage
+  a cold reader's questions, and the one disc-judge rules findings by
+  — the ruler is one, at both ends of the pipeline.)
 - **A taste requirement closes in the user's words.** Nothing visual is
   built in this stage. When the demand carries taste ("premium",
   "playful", "clean"), record how the user says it should FEEL — their
@@ -246,59 +250,84 @@ empty Inferred list after honest writing is rare; treat suspiciously.
 
 Run [`discovery-review`](../../workflows/discovery-review.js) —
 `Workflow({scriptPath: '<workflows-root>/discovery-review.js', args:
-{discoveryDir, round}})` (invoke by
+{discoveryDir, round, lenses, scope}})` (invoke by
 `scriptPath` pointing at the file under the consuming project's
 workflows root — e.g. `.claude/workflows/` — never by `name`: the name
 registry does not reliably carry these workflows; field-reported by
 ops-tracking w2n3).
-It is ONE invocation covering the whole round: the three document lenses
-and the two blind readers run concurrently, and the ambiguity judge
-closes with both builds in hand.
+One invocation is one round: the round's document lenses run, the
+blind-reader panel runs **only while ambiguity is open**, the
+ambiguity pass clusters the builds — and **`disc-judge` closes the
+round**, ruling every finding sustained / deferred / dismissed against
+the discovery razor. Only sustained findings hold a lens open.
 
 | Agent | Validates |
 |---|---|
 | `disc-reviewer-walkthrough` | every covered case runs end to end in behavior |
 | `disc-reviewer-acceptance` | the delivery as a whole is judgeable from the ACs |
 | `disc-reviewer-boundary` | In and Out are closed; nothing in limbo |
-| 2× `disc-blind-reader` → `disc-reviewer-ambiguity` | one reading only — two independent engineers build the same thing |
+| 10× `disc-blind-reader` (5 Sonnet + 5 Haiku) → `disc-reviewer-ambiguity` | one reading only — independent engineers, decorrelated by model, build the same thing |
+| `disc-judge` | the ruling — not a lens: judges every finding by the discovery razor, after the others; decides what proceeds and therefore whether another round runs |
 
-The blind readers are **`disc-blind-reader`** agents (Sonnet) — a
-standardized definition, never a prompt improvised by the conductor.
-Each reads the two documents alone and commits to a concrete build;
-`disc-reviewer-ambiguity` then judges the divergences between the two
-builds — divergence is the ambiguity signal, suspicion is not.
+The blind readers are **`disc-blind-reader`** agents — one
+standardized definition, never a prompt improvised by the conductor;
+the panel mixes models on purpose (same-model readers share the same
+blind spots, and the weaker readers are the more sensitive ambiguity
+detector — the stage-3 principle at this end of the pipe). 5 Sonnet +
+5 Haiku is the default; the workflow's `readers` arg tunes it per
+demand. Each reads the two documents alone and commits to a concrete
+build; `disc-reviewer-ambiguity` clusters the panel's builds into
+camps per sentence — divergence is the ambiguity signal, suspicion is
+not — and the judge rules each split by its composition: camps that
+cross models are signal, a lone weak reader against a unanimous field
+is noise, unless the sentence itself admits that reading.
 
 The round is audited in `00-discovery/reviews.md`:
 
 1. Record the round **before acting on it**: one section per reviewer
-   with its verdict, and one line per finding.
-2. Give **every finding a disposition**, written next to it:
-   `fixed` (document changed), `to-user` (a real question — goes into
-   the next interview round's agenda), or `rejected` (with the reason;
-   rejecting a blocker requires the user's explicit sign-off). No
-   finding stays undispositioned.
-3. Fix the documents, take the `to-user` items to the user, then run
-   the next round under the **exit rules** below.
+   with its verdict, and one line per finding **with the judge's
+   ruling and reason on each**.
+2. The rulings ARE the dispositions: `sustained` → fix the documents
+   now (or interview agenda, when the judge's reason says only the
+   user can settle it) · `deferred` → the close batch · `dismissed` →
+   dies, reason recorded. Two overrides remain the user's: a sustained
+   finding that contests something the user already confirmed goes
+   **to-user**, and overruling the judge in either direction is the
+   user's call, never silently yours.
+3. Fix the documents, take the to-user items into the interview, then
+   run the next round under the **exit rules** below.
 
-### The loop — the same single mode as stage 2
+### The loop — the same shape as stages 2 and 3
 
-- **Round 1 is full** — every lens and both blind readers.
-- **Every later round re-runs only what did not pass.** A lens that
-  returned `pass` is finished and never runs again.
+- **Round 1 is full** — every lens, the whole reader panel, the judge.
+- **Every later round runs `lenses` = the previous round's `open`
+  list** — only what the judge kept open. The panel re-runs only
+  while ambiguity is open: fresh readers diverge on something new
+  every read, and re-running a converged experiment manufactures work.
 - **Verify each applied finding in the documents** — the sentence that
   changed, not the intention.
-- **Convergence is the only exit:** repeat until nothing is open.
-  There is no closing round and no re-run "to be sure".
-- **`detail` findings are never applied per round** — they batch into
-  one sweep at close.
+- **Convergence closes the deltas; the close is ONE full final
+  round** — every lens and a fresh reader panel over the final state,
+  judged by the same ruler. Loose wires from mid-review fixes are what
+  it exists to catch.
+- **The cap: three delta rounds.** A fourth round does not run —
+  whatever is still open becomes interview agenda, brought to the user
+  with the judge's reasons. This is the one stage where the user is
+  already in the room; a stuck finding costs a question, never
+  another lap.
+- **`detail` and `deferred` findings are never applied per round** —
+  they batch into one sweep at close.
 - **Simplify or remove:** when a finding shows a hole opened by a
   previous fix, the disposition is to simplify or remove that fix —
   never a third sentence patching the second.
 
 Every lens answers under the house
 [reviewer contract](../../docs/standards/reviewer-contract.md) — the
-single source for verdict semantics, severities, verbatim proof, and the
-Verified rule; the workflow re-dispatches lazy passes on its own.
+single source for verdict semantics, severities, verbatim proof, and
+the Verified rule, the maximum bar included: severity says how bad IF
+real, the judge says whether it proceeds. The workflow re-dispatches
+lazy passes and unruled findings on its own (an unruled finding counts
+as sustained — fail-safe).
 
 ## The blueprint
 
