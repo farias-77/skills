@@ -4,3 +4,6 @@ node_modules/
 .env
 .env.*
 settings.local.json
+
+# usage telemetry dumps — never tracked
+cc.json
