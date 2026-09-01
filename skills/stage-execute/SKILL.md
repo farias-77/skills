@@ -1,6 +1,6 @@
 ---
 name: stage-execute
-description: Conducts stage 4 (Execute) as the single MAESTRO session — takes the bootstrapped plan to feature branches fully implemented, reviewed, judged and proven in the staging environment. Derives each repo's DAG, pre-stages worktrees, launches the impl-issue engine per issue (5 in flight wave-wide), merges what it proves, authors the e2e scenarios, deploys producer-first, runs smoke and the all-or-nothing e2e round, and closes with the Execution tab and the checkpoint. Use after the plan is bootstrapped, or to resume an execution in progress.
+description: Conducts stage 4 (Execute) as the single MAESTRO session — takes the bootstrapped plan to feature branches fully implemented, reviewed within a fixed budget (two lens rounds per cycle, the judge ruling, what survives riding as PR notes), independently verified, CI-green, merged, and proven in the staging environment — end to end, autonomously; the user is called once, at the checkpoint, with the wave working. Derives each repo's DAG, pre-stages worktrees, launches the impl-issue engine per issue (5 in flight wave-wide), merges what it proves, authors the e2e scenarios, deploys producer-first, runs smoke and the all-or-nothing e2e round, and closes with the Execution tab and the checkpoint. Use after the plan is bootstrapped, or to resume an execution in progress.
 disable-model-invocation: false
 argument-hint: "<workstream-slug>"
 allowed-tools: Read, Write, Edit, Glob, Grep, Workflow, Agent, Artifact, AskUserQuestion, Bash(mkdir *), Bash(date *), Bash(ls *), Bash(cat *), Bash(pwd), Bash(git *), Bash(gh *), Bash(npm *), Bash(./smoke/*), Bash(rm *)
@@ -9,11 +9,14 @@ allowed-tools: Read, Write, Edit, Glob, Grep, Workflow, Agent, Artifact, AskUser
 # Stage 4: Execute — the maestro
 
 The plan stops being issues and becomes a proven feature branch per
-repo: every issue implemented test-first, reviewed by four lenses,
-ruled by the judge, independently verified, CI-green, approved by the
-final reviewer, merged — and the whole wave deployed to staging,
-smoke-checked, and taken through the all-or-nothing e2e round until
-clean. **Main is not touched here** (integration is the next stage),
+repo: every issue implemented test-first, read by four lenses and
+ruled by the judge **within a fixed budget — two lens rounds per
+cycle, never a third** — independently verified, CI-green, merged;
+then the whole wave deployed to staging, smoke-checked, and taken
+through the all-or-nothing e2e round until clean. End to end, with
+nobody waiting on anyone: what the review could not close inside its
+budget rides as a note on the PR for the checkpoint, never as another
+lap. **Main is not touched here** (integration is the next stage),
 and **prod does not exist here** (release is later still, behind a
 human gate).
 
@@ -49,9 +52,9 @@ which fix issues to open, what to unblock first. You never stop early
 and never wait for the user on something this skill lets you decide.
 
 **What escalates to the user, always:** an undeclared stateful
-deletion in an infra diff · a sustained floor finding you cannot route
-(the reviewer contract requires sign-off on a rejected blocker) · e2e
-rounds exhausted · anything that changes the plan's scope.
+deletion in an infra diff · e2e rounds exhausted · anything that
+changes the plan's scope. Everything else — a halted lane you could
+not re-route included — waits for the checkpoint.
 
 ## Preconditions
 
@@ -70,8 +73,8 @@ designs-root/2026-08-15-workspace-invites/
 ├── blueprint.html                  # this stage fills waves['wNN-<wave>'].execution
 └── w01-invite-by-email/
     └── 03-execution/
-        ├── trace.md                # the wave log: launches, merges, halts, rulings,
-        │                           #   amendments, escalations — yours
+        ├── trace.md                # the wave log: launches, merges, halts, the judge's
+        │                           #   totals, amendments, escalations — yours
         ├── <repo>/
         │   └── trace.md            # that repo's lane log — launches, outcomes, merges
         └── e2e/
@@ -99,11 +102,10 @@ Per repo, idempotent (resume is free):
    merged`; that is resume, for free.
 3. **Prune orphan worktrees** from previous runs — **after** sweeping
    them for surviving work (§3).
-4. **Read the tier** — the scrutiny ruler in
-   `01-design/decisions.md` (revenue path · operational dependency ·
-   internal tool). It travels in every `impl-issue` brief, with the
-   file's path: the engine's caps and the judge's ruler both come
-   from it.
+4. **Locate the judge's inputs** — the wave's `01-design/decisions.md`
+   and the house taste ledger (`docs/standards/taste.md` under the
+   pipeline root). Both paths travel in every `impl-issue` brief: the
+   judge rules by the design as decided and by how the user rules.
 
 ## 2 — Derive the DAGs, launch — 5 in flight, wave-wide
 
@@ -126,8 +128,8 @@ npm scripts no matter how many workflows run. Per launch:
 2. **Launch the engine** —
    `Workflow({scriptPath: workflows/impl-issue.js, args: brief})`,
    the brief being inputs only: issue number, repo, worktree, base
-   branch (the FB), the issue body verbatim, the tier, the
-   `decisions.md` path, the Linear issue id if the board is wired.
+   branch (the FB), the issue body verbatim, the `decisions.md` and
+   `taste.md` paths, the Linear issue id if the board is wired.
    All of a pass's launches in the same message; one trace line per
    launch. **Launch the repo script itself — never an inline wrapper
    around it**: the gates are the file, not a script improvised per
@@ -147,12 +149,15 @@ A completion notification brings one issue's return object:
   text** (the git standard's git.7): both sides are the team's work —
   read each side's issue and commit messages before choosing lines;
   re-launch the engine with the conflict as context when the
-  resolution needs real work. Never abort and hope.
-- **A typed `halt`** (issue conflict, judge halt, lens stagnation,
-  verification failed, CI/review exhausted, judge dead) ⇒ THAT lane
-  blocks, the line continues. Decide: amend and re-route, or escalate
-  if it is on the always-escalate list. Blocked lanes are reconsidered
-  every pass.
+  resolution needs real work. Never abort and hope. The return's
+  `notes` (what the judge sustained past the budget, and deferred)
+  and `rulings` totals go to the lane trace — they are the
+  checkpoint's scoreboard, not a reason to wait.
+- **A typed `halt`** (issue conflict, lens invalid, verification
+  failed, CI exhausted, PR conflicting) ⇒ THAT lane blocks, the line
+  continues. Decide: amend and re-route, or escalate if it is on the
+  always-escalate list. Blocked lanes are reconsidered every pass;
+  one you cannot clear is reported at the checkpoint, not before.
 - **Nothing** (the run died) ⇒ **sweep the worktree for surviving
   work** — the engine may have died after the commit or the PR; found
   work means resuming (`resumeFromRunId`, or a resume brief:
@@ -239,7 +244,7 @@ Runs in flight: <n>/5 · <issue → repo, phase> …
 Repos:
   <repo>: <merged>/<total> merged · <in flight> in flight · <blocked> blocked (<halt kinds>) · next: <issue>
 Environment: scenarios <ready|—> · deploy <n/N> · smoke <green|red> · round <n>: <verdict|running>
-Judge: <sustained/deferred/dismissed totals so far>
+Judge: <sustained/deferred/dismissed totals so far> · open notes on merged PRs: <n>
 Decided since last report: <one line each, or none>
 Needs you: <one line each, or none>
 Next: <what should happen>
@@ -264,17 +269,25 @@ you). Never mermaid. Same altitude as every tab (house rule: the
 blueprint is the report, the files are the record): the timeline tells
 the story, the rounds table shows the pattern — the per-issue detail
 stays in the PRs and the lane traces. The judge's rulings appear as
-the scoreboard, not the case-by-case.
+the scoreboard (per lens: raised · sustained · deferred · dismissed)
+and the open notes as a list per PR — the case-by-case stays on the
+PRs.
 
 ## 6 — Checkpoint and closing
 
 Present: the blueprint URL, the per-repo table (issues merged / halts
-/ the FB), the rounds table, the smoke output, the judge's scoreboard,
-the count of decisions taken in the user's place, and any `pending`
-items. Approval is explicit. On approval: append what the dreaming
-should know to the workstream's `dreaming-notes.md` (one entry for the
-build, one for the environment — frictions, halts, what the judge's
-rulings taught), `.state.md` → `stage: release`, commit the workstream
+/ the FB), the rounds table, the smoke output, **the judge's
+scoreboard and the open notes per PR** — what the review sustained
+past its budget and what it deferred, so the user reads the whole
+wave's residue in one sitting — the count of decisions taken in the
+user's place, and any `pending` items. Approval is explicit. A note he
+wants fixed becomes a fix issue through the same engine before the
+stage closes; a note he dismisses is recorded in the workstream's
+`rulings.md` with his reason (house rule) — the dreaming reads both.
+On approval: append what the dreaming should know to the workstream's
+`dreaming-notes.md` (one entry for the build, one for the environment
+— frictions, halts, what the judge's rulings taught), `.state.md` →
+`stage: release`, commit the workstream
 folder — **push only with the user's explicit approval** — and suggest
 `/clear` before the next stage. On "approved with fixes": the fixes
 run through the same machinery (issue → engine → round if behavior
@@ -285,9 +298,9 @@ the next stage's job when it opens.
 
 | Gate | Criterion | On failure |
 |---|---|---|
-| The engine | `impl-issue.js` only returns ready-to-merge with lenses + judge + verification + CI + final review green | typed halt (lane) |
-| The judge closes rounds | sustained loops the implementer · deferred rides as PR notes · dismissed dies · unruled = sustained | enforced by the workflow |
-| Every fix through the lenses | at delta cost after round 1 — no commit reaches the PR unreviewed | enforced by the workflow |
+| The engine | `impl-issue.js` only returns ready-to-merge with lenses + judge + verification + CI green | typed halt (lane) |
+| The budget is the bar | two lens rounds per cycle, never three: round-1 sustained → the one fix pass · round-2 sustained and deferred → PR notes · dismissed dies · unruled = sustained | enforced by the workflow |
+| Every fix through the lenses | the fix pass is read by round 2, a CI fix by its own two rounds — no commit reaches the PR unread | enforced by the workflow |
 | Workflows by scriptPath | the repo scripts themselves, never an inline wrapper | relaunch correctly |
 | WIP cap | 5 runs in flight wave-wide; the machine is the guard's | launch waits |
 | Issue ready | all blockers merged on the FB (derived from GitHub) | stays queued |
@@ -313,8 +326,9 @@ the next stage's job when it opens.
 
 No integration to main (next stage). No prod, no release, no tags
 (later still). You implement nothing and review nothing yourself — the
-engine's gates are not yours to shortcut, and a bug you spot becomes
-an issue through the machinery, never a direct commit. The design and
+engine's gates are not yours to shortcut, its budget is not yours to
+extend, and a bug you spot becomes an issue through the machinery,
+never a direct commit. The design and
 plan fences hold: a hole becomes an amendment through the
 declared-decision path, never a silent patch. Frictions worth learning
 from go to the workstream's `dreaming-notes.md` on the spot; judging

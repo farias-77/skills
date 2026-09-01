@@ -88,9 +88,9 @@ smoke suite per repo**. This kills the one new risk integration
 creates — "the FB proved it, the rebase changed it". A smoke
 regression here becomes a fix issue cut from `main`, through the same
 engine with the same launch as stage 4: a worktree from `main`, the
-brief carrying the issue body, the tier and `decisions.md` path,
-`Workflow({scriptPath: workflows/impl-issue.js, args})` — and the
-confirmation re-runs. **Two fix cycles are the budget:** a third red
+brief carrying the issue body and the `decisions.md` and `taste.md`
+paths, `Workflow({scriptPath: workflows/impl-issue.js, args})` — and
+the confirmation re-runs. **Two fix cycles are the budget:** a third red
 confirmation halts the stage to the user with the evidence —
 integration surfaced something stage 4 did not see, and that is a
 conversation, not a loop. Green opens the road to prod.

@@ -34,7 +34,7 @@ integration surface: issue PRs merge into it, and it only reaches
 | git.5 | **Rebase merges, linear history.** No merge commits, no squash — the atomic commits ARE the story; squashing erases it. |
 | git.6 | **A merge only counts when re-read:** after merging, confirm the PR state is actually `MERGED` — a merge command can exit clean with the PR still open (stale base). Acting on the exit code alone has marked unmerged work as done. |
 | git.7 | **Conflicts are resolved by intention, not by text.** Both sides of a conflict are the team's work: read each side's commit message and issue before choosing a line — resolving mechanically silently erases a colleague. Never abort a conflicted merge to "deal with it later": unwinding just moves the bomb to the next merge. |
-| git.8 | **Who merges is who conducts:** an issue PR is merged by the repo's conductor after the full gate (lenses, verification, CI, final review) — never by the agent that wrote it. |
+| git.8 | **Who merges is who conducts:** an issue PR is merged by the repo's conductor after the full gate (lenses and judge, verification, CI) — never by the agent that wrote it. |
 
 ## Hygiene
 

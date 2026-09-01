@@ -72,7 +72,7 @@ something to say.
 |---|---|
 | **Every issue's DoD** | `docs/` updated where behavior changed, OR "no docs impact" stated in the PR evidence — a fixed item |
 | **`exec-reviewer-plan`** (every diff) | behavior or contract changed with no diff in `docs/` = finding |
-| **`exec-reviewer-pr`** (the final review) | the updated doc MATCHES the diff — it exists AND tells the truth |
+| **`exec-reviewer-plan`**, round 2 (the delta read) | the updated doc MATCHES the diff — it exists AND tells the truth |
 
 Plus the wave's **docs true-up issue** (planned by stage 3, executed
 last), which trues the whole tree up — the per-issue touches keep the

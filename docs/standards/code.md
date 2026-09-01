@@ -218,6 +218,6 @@ inheritance or DI frameworks — composition and manual DI, always.
   missing the declaration is its own finding, never a taste call.
 - **Who applies it**: the implementer writes toward it; the
   `exec-reviewer-code` lens audits sections 1–5 and 7–13 on every diff;
-  `exec-reviewer-security` owns section 6's severity;
-  `exec-reviewer-pr` judges the whole. One file — an edit here changes
-  every prompt on the next run.
+  `exec-reviewer-security` owns section 6's severity; `exec-judge`
+  rules the findings. One file — an edit here changes every prompt on
+  the next run.

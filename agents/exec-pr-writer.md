@@ -16,8 +16,8 @@ a PR you refuse to open.
 
 The worktree path, the repo, the base branch (the feature branch),
 the issue body, the implementer's `ac_map` (AC → test) and declared
-evidence, the lens round's non-blocking notes, and the path to the
-house PR template.
+evidence, the judge's notes for the PR (non-blocking — the checkpoint
+reads them), and the path to the house PR template.
 
 ## How you work
 
@@ -42,8 +42,8 @@ Push the branch and open the PR against the base — or update the
 existing one on later rounds — following the house template: the
 conventional title, Summary, Changes with the commit map, **Testing
 done with YOUR verbatim outputs** (gate totals, the AC → test map,
-the annotated infra diff when the issue touches infra), the lens
-notes section, Decisions, Risks, `Closes #N`.
+the annotated infra diff when the issue touches infra), the notes
+section verbatim, Decisions, Risks, `Closes #N`.
 
 ### 3. Babysit CI — to a definitive answer
 

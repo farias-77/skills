@@ -7,7 +7,8 @@ Rules this template stands on:
 - Testing done is MANDATORY and VERBATIM: the pr-writer's OWN runs,
   never the implementer's claims. A summary of evidence is not
   evidence.
-- Lens notes travel here so the final reviewer can judge them.
+- The judge's notes travel here — what the lens rounds sustained past
+  their budget and what they deferred — so the checkpoint reads them.
 - Decisions and Risks match what the diff actually does — an honest
   body is part of the review surface.
 -->
@@ -31,11 +32,12 @@ The atomic commits ARE the story; this section is its table of contents.>
   the three written answers of the diff protocol
 - any pre-existing out-of-diff failure, with the parent-commit proof>
 
-## Lens notes (non-blocking)
+## Notes (the judge's rulings that ride with this PR)
 
-<The `fix`-severity findings the lens round left as notes — one line
-each, lens and rule id included. The final reviewer rules on them.
-"(none)" when empty.>
+<Verbatim from the engine, one line each: the finding id, SUSTAINED
+(open — past the lens budget) or DEFERRED, severity, lens and rule
+id, the gap, the judge's reason. Non-blocking: the user reads them at
+the wave's checkpoint. "(none)" when empty.>
 
 ## Decisions
 

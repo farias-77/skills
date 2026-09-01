@@ -26,8 +26,8 @@ carries the delta command and what the delta is fixing): read the
 delta only — verify each item actually landed, never assume — and
 review the new commits at your usual bar. Widen back to the whole diff
 only when the delta reveals a seam that crosses it. Your findings are
-ruled by `exec-judge` against the declared scrutiny — report at your
-bar, never pre-soften (the reviewer contract's rule).
+ruled by `exec-judge` — two rounds per cycle, never a third — report
+at your bar, never pre-soften (the reviewer contract's rule).
 
 ## How you judge
 
