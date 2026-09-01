@@ -39,7 +39,7 @@ Underneath, four mechanics carry everything:
 
 - **The session conducts; agents work.** The session dispatches,
   routes, audits, and talks to the human — it never writes the
-  deliverables. Authors write, reviewers judge, judges rule; every
+  deliverables. Authors write, reviewers report, the human rules; every
   agent is a file in `agents/` with five fixed sections. Even stage 4
   is one session: the maestro launches the per-issue and e2e engines
   as background workflows and merges what they prove.
@@ -75,28 +75,40 @@ stage isn't run *for* the business team but *by* it — the skill
 interviews whoever owns the demand, and engineering only enters at
 stage 2 with the ambiguity already wrung out.
 
-**2 · Design** — the architect cuts the demand into **waves**
-(wave 1 is the smallest thing useful end to end) and designs the
-current one: dedicated research per external target, architecture,
-data, contracts (the frozen bridge everything downstream stands on),
-the UI authored as artboards on a design canvas, security, infra,
-observability, rollout. Ten review lenses try to break it.
+**2 · Design** — the design is built **with the human, whole**. The
+session cuts the demand into **waves** (wave 1 is the smallest thing
+useful end to end) and then walks the current one document by
+document — architecture, data, contracts (the frozen bridge everything
+downstream stands on), UI, security, infra, observability, rollout,
+code, acceptance — one tradeoff card per decision, the conductor
+recommending, the human choosing; a taste ledger records what he
+chooses so the next proposal already comes his way. An author then
+consolidates the decisions into the files, with dedicated research per
+external target and the UI as artboards on a design canvas. Ten review
+lenses try to break it at the maximum bar, a judge proposes a ruling on
+every finding, and **the human confirms or overrules each one** — the
+rulings are what calibrate the lenses, and the judge, over time.
 
 **3 · Planning** — one plan author per repo decomposes the design
 into **cold-executable issues**: each issue is the complete brief for
 an implementer with zero conversation context. Three deliberately
-weak blind readers read each issue as that cold worker would; a judge
-treats their divergence as the ambiguity signal. The bar: if a weak
-model can execute it, the real one certainly can. On approval, the
-issues are bootstrapped to GitHub.
+weak blind readers read each issue as that cold worker would; an
+issue lens treats their divergence as the ambiguity signal. The bar:
+if a weak model can execute it, the real one certainly can. A judge
+proposes a ruling on every finding and **the human confirms or
+overrules each one**; on approval, the issues are bootstrapped to
+GitHub.
 
 **4 · Execute** — build it and prove it works, internally. One
 maestro session conducts the wave: it derives each repo's issue DAG,
 launches the per-issue engine as a background workflow (5 in flight
 wave-wide), and merges what the engine proves. Inside the engine, the
-four lenses read the whole diff once and only deltas after, and a
-**judge** rules every finding against the design session's scrutiny
-ruler — only sustained findings loop the implementer. Then the maestro
+four lenses read the whole diff, a **judge** rules every finding, the
+implementer fixes what was sustained, the lenses read the delta and
+the judge rules again — **and that is the whole budget: two rounds
+per cycle, never a third.** What is still sustained rides as a note on
+the PR for the checkpoint; the review catches bugs, it never holds the
+line. Then the maestro
 deploys the feature branches to staging producer-first, runs the
 deterministic smoke suite, and drives the **all-or-nothing e2e
 round** — one failing case dirties the whole round, and after fixes
@@ -105,23 +117,23 @@ not exist.
 
 ```mermaid
 flowchart LR
-  I["implementer"] --> L{"4 lenses (delta after r1)"}
+  I["implementer"] --> L{"4 lenses, whole diff"}
   L --> J{"judge"}
-  J -- "sustained" --> I
-  J -- "none" --> V["verify from zero, once"]
+  J -- "sustained" --> F["fix pass, once"]
+  F --> D{"4 lenses, delta"}
+  D --> J2{"judge — last word"}
+  J2 -- "notes on the PR" --> V["verify from zero"]
+  J -- "none" --> V
   V --> P["PR + CI"]
-  P -- "red" --> I
-  P -- "green" --> F["final review"]
-  F -- "findings" --> J
-  F -- "approved" --> M["merge to the feature branch"]
+  P -- "red (≤2)" --> I
+  P -- "green" --> M["merge to the feature branch"]
 ```
 
-Every fix — a lens blocker, a red CI, a rejected review — re-enters
-the same loop: **no commit reaches the PR without passing the
-lenses.** The verification step re-runs every gate from scratch
-(declared evidence is never trusted evidence), and the final review
-is a fresh, contextless read of the whole PR, its verdict posted on
-the PR itself.
+Every fix — the one fix pass, a red CI — re-enters the same path:
+**no commit reaches the PR without the lenses reading it**, and no
+path loops past its budget. The verification step re-runs every gate
+from scratch (declared evidence is never trusted evidence); the human
+reads the wave's notes at the checkpoint, once, with the wave working.
 
 **5 · Release** — now that it provably works, put it in the air
 safely. Two human gates (entry, and prod-go). The integration train
@@ -178,9 +190,9 @@ is meant to be edited.
 
 This pipeline is expensive to run today, and that was a deliberate
 non-concern. Every diff is read whole by four reviewers plus an
-independent verifier plus a strong final reviewer; every review round
-re-runs in full after every fix; ambiguity is hunted by dispatching
-multiple readers at the same document. That redundancy is exactly
+independent verifier; every design and plan round ends in one full
+final round; ambiguity is hunted by dispatching multiple readers at
+the same document. That redundancy is exactly
 where the quality comes from — and it is priced in tokens.
 
 We optimized for the trendline, not the invoice: models keep getting
@@ -235,7 +247,7 @@ What the pipeline expects from its surroundings:
 | **blueprint** | the workstream's single review artifact — one URL, tabs per stage, pills per wave |
 | **conductor** | whoever dispatches and audits without doing the work — the stage's session (stage 4 calls it the maestro) |
 | **lens** | a reviewer scoped to one failure mode |
-| **judge** | the agent that rules every finding sustained/deferred/dismissed against the scrutiny ruler — reviewers report at the maximum bar; the judge closes the round |
+| **judge** | the agent that rules every finding — sustained/deferred/dismissed, with the reason; reviewers report at the maximum bar. At design and plan the human confirms or overrules every ruling before the next round; at execution the judge rules alone inside a two-round budget |
 | **blind reader** | an agent that reads alone, so divergence from its sibling exposes ambiguity |
 | **andon** | stop before building on a broken premise — a cheap halt beats wrong work |
 | **dreaming** | the closing session where frictions become edits to the pipeline itself — the session suggests, the human rules every lesson |
