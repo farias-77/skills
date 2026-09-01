@@ -1,6 +1,6 @@
 ---
 name: stage-plan
-description: Conducts stage 3 (Planning) of the pipeline — dispatches one plan-author per repo in parallel (the frozen contracts make each repo an independent, closed graph; each author self-checks its issues with blind Haiku readers before delivering), runs the review round as a deterministic workflow (three fresh blind cold-readers per issue plus four lenses at the maximum bar, the plan-judge ruling every finding by the declared scrutiny), loops sustained findings back to the same repo's author, closes with one full final round, publishes the Plan tab in the wave's blueprint, and bootstraps the issues on GitHub only after the user approves. Use after the wave's design is approved, or to resume a planning in progress.
+description: Conducts stage 3 (Planning) of the pipeline — dispatches one plan-author per repo in parallel (the frozen contracts make each repo an independent, closed graph; each author self-checks its issues with blind Haiku readers before delivering), runs the review round as a deterministic workflow (three fresh blind cold-readers per issue plus four lenses at the maximum bar, the plan-judge proposing a ruling on every finding), puts every finding with the judge's ruling in front of the user through the question tool — he confirms or overrules each one — loops what he sustains back to the same repo's author, closes with one full final round he reads, publishes the Plan tab in the wave's blueprint, and bootstraps the issues on GitHub only after the user approves. Use after the wave's design is approved, or to resume a planning in progress.
 disable-model-invocation: false
 argument-hint: "<workstream-slug>"
 allowed-tools: Read, Write, Edit, Glob, Grep, Agent, SendMessage, Workflow, Artifact, AskUserQuestion, Bash(mkdir *), Bash(date *), Bash(ls *), Bash(cat *), Bash(git *), Bash(gh *)
@@ -56,8 +56,8 @@ graph** with **zero cross-repo edges**, so no two authors ever touch the
 same file.
 
 Each dispatch hands its author: the wave folder path, the approved
-`01-design/` (contracts above all; `decisions.md` is the law of the
-design — the author details it, never re-decides it; `acceptance.md` is
+`01-design/` (contracts above all; `decisions.md` is the design as the
+user decided it — the author details it, never re-decides it; `acceptance.md` is
 the frozen case spec each issue's DoD names its cases from; `code.md`
 is the file-tree compass — a guide for slicing, never a rule to
 enforce), the workstream's `00-discovery/` and `waves.md` (the cut
@@ -100,39 +100,41 @@ are the regression guard.
 
 It is ONE workflow invocation covering the whole round, in four
 phases: the two halves below run concurrently, `plan-reviewer-coherence`
-closes the reading with every verdict in hand, and `plan-judge` rules
-the round.
-
-**The judge closes rounds, not the lenses:**
+closes the reading with every verdict in hand, and `plan-judge`
+proposes a ruling on every finding. **The judge proposes, the user
+rules (§3):**
 
 - **Reviewers report at the maximum bar; `plan-judge` (Opus) rules
-  every finding** — `sustained` / `deferred` / `dismissed` — against
-  the scrutiny ruler declared in the design session's `decisions.md`.
-  The workflow's `open` comes back **already judged**: an issue or lens
-  stays open only for a sustained blocker/fix; deferred and dismissed
-  findings hold nothing open.
-- **Every later round is the delta**: only the issues whose files
-  changed get fresh cold reads; the three whole-plan lenses reread
-  everything regardless — they are the regression guard.
-- **When `open` comes back empty, the close is ONE full final round**:
-  every issue cold-read again by fresh readers, every lens, once, over
-  the final state — mid-review fixes can break what had already
-  passed. The judge rules it by the same ruler; a final round with
-  nothing sustained is the close. Anything sustained there is fixed
-  and verified by a delta — the full round does not re-run.
+  every finding** — `sustained` / `deferred` / `dismissed`, with a
+  one-line reason — calibrated by `decisions.md`, the round history in
+  `reviews.md` and the house taste ledger (pass `tastePath`). **Its
+  ruling is a proposal**: the round comes back with every finding
+  ruled, and the user confirms or overrules each one before anything
+  moves. `open` is the judge's guess at what stays open; his rulings
+  decide.
+- **Every later round is the delta**: only the issues whose files his
+  sustained findings changed get fresh cold reads; the three
+  whole-plan lenses reread everything regardless — they are the
+  regression guard.
+- **When a round comes back with nothing he sustains, ONE full final
+  round runs — always, once**: every issue cold-read again by fresh
+  readers, every lens, over the final state — mid-review fixes can
+  break what had already passed. It reaches him like any round; what
+  he sustains is fixed and verified by a delta, and **whether another
+  full round runs is decided with him, never automatically**.
 
 **Per issue — the cold-read probe.** Three **`plan-blind-reader`**
 agents (Haiku — cheap and deliberately weak) read the same issue blind,
 each alone, and return their **understanding** in their own words plus
 **exactly five questions** they would ask before starting — always
 five, so padding is expected by design. Then **`plan-reviewer-issue`** (Sonnet)
-judges the issue WITH the readings in hand: **real divergence
+reviews the issue WITH the readings in hand: **real divergence
 between the understandings is the ambiguity signal** — if weak
 models read the same issue in incompatible ways, a strong one gets no
 guarantee either — and **triaging the questions (five per reader) is its job**:
 a question answerable by exploring the code during implementation is
 noise; a question whose wrong guess would produce wrong work is a real
-gap in the issue. The judge also runs its own mechanical checks (broken
+gap in the issue. The issue lens also runs its own mechanical checks (broken
 references, consumes without origin, dishonest verification map). The
 bar: if a Haiku can execute it, the worker certainly can.
 
@@ -143,46 +145,86 @@ bar: if a Haiku can execute it, the worker certainly can.
 | `plan-reviewer-gaps` | the negative: what NO issue covers — this wave's story ACs without an issue (walks `waves.md` and the stories itself, never trusts the coverage map), issues without an AC, consumes without producer, "Out" without owner |
 | `plan-reviewer-flow` | the graph as it will RUN: cycles, edges without a real reason, wasted parallelism, a skeleton owed, two big jobs on the same surface in the same batch |
 | `plan-reviewer-coherence` | runs last, with all verdicts: the plans tell the design's story, and the two ends of every contract meet in the middle |
-| `plan-judge` | not a lens — rules every finding of the round (cold reads and lenses alike) by the declared ruler, after coherence; decides what proceeds and therefore whether another round runs |
+| `plan-judge` | not a lens — proposes a ruling with a reason on every finding of the round (cold reads and lenses alike), after coherence, calibrated by the decisions, the history and the taste ledger |
+| **the user** | confirms or overrules the judge on every finding, through the question tool; decides what proceeds and therefore whether another round runs |
 
 Every reviewer answers under the house
-[reviewer contract](../../docs/standards/reviewer-contract.md) — the
-maximum bar included: severity says how bad IF real, the judge says
-whether it proceeds. The workflow re-dispatches lazy passes and
-unruled findings on its own (an unruled finding counts as sustained —
-fail-safe).
+[reviewer contract](../../docs/standards/reviewer-contract.md) at the
+maximum bar, always: severity says how bad IF real; the judge says
+whether it should proceed; the user says whether it does. The workflow
+re-dispatches lazy passes and unruled findings on its own.
 
-## 3 — Audit, rulings, and the fix loop
+## 3 — The rulings are the user's; the judge proposes them
 
-The round is audited in **`02-plan/reviews.md` — permanent**:
+Every round comes back with **the judge's ruling and reason on every
+finding** — a proposal. Before anything is fixed, put every finding in
+front of the user **through the question tool, always** — never as
+prose he answers in chat:
+
+- **One question per finding.** The question text carries the context
+  he needs to rule without opening a file: the source (lens, or the
+  issue and its cold-read divergence) and severity, what the material
+  says (the quote), the gap in one line, the fix proposed, and **the
+  judge's reason**. Batch them four to a call, in the order the
+  workflow returned them.
+- **The answers are the judge's three rulings** — `sustained` ·
+  `deferred` · `dismissed` — and **the judge's pick comes first, marked
+  as his** (label it "— the judge's ruling"). The other two follow. He
+  confirms by picking the first, overrules by picking another, and
+  writes his reason in "Other" when he wants it recorded in his words.
+- **He may stop the round.** "Enough" through "Other" is a ruling: the
+  plan is executable as it stands, the remaining findings are recorded
+  as unaddressed by his call.
+
+The three rulings mean:
+
+- **sustained** → the author of that repo fixes it in this loop.
+- **deferred** → parked to the close; whether it ever enters is decided
+  there, with him (below).
+- **dismissed** → dies, with the reason recorded — the reasons are what
+  teach the lenses, and the judge.
+
+No round runs on the judge's ruling alone: an unruled finding reaches
+him as sustained by construction — it is still his to confirm. Every
+ruling also goes to the workstream's `rulings.md` (house rule) — the
+judge's proposal beside his ruling.
+
+The round is audited in **`02-plan/reviews.md` — permanent**, before
+anything is applied:
 
 1. Record the round: one section per lens and a per-issue scoreboard
    (verdict + divergence flag), run ids from the workflow's journal
    (not from your prose), findings **with the judge's ruling and
-   reason on each**.
-2. The rulings ARE the dispositions: `sustained` → fix now ·
-   `deferred` → the close batch · `dismissed` → dies, reason recorded.
-   Two overrides remain the user's: a sustained finding that actually
-   contests a user decision goes **to-user** in the checkpoint, and
-   overruling the judge in either direction is the user's call, never
-   silently yours.
-3. Send the sustained findings to the **author of that repo** via
+   reason, and his ruling and reason** ("confirmed", or his words).
+2. Send what he sustained to the **author of that repo** via
    SendMessage — it revises its own files (single writer, per repo).
-4. **Verify the applied findings on disk** — file and line per
+3. **Verify the applied findings on disk** — file and line per
    finding. "Marked fixed, not applied" has happened; the author's
    word is not the check.
-5. Run the next round with `issues` = the issues whose files changed
-   (the fixes, plus anything a whole-plan fix touched). When `open`
-   comes back empty, run **the full final round** (every issue again);
-   the close is a final round the judge clears.
+4. Run the next round with `issues` = the issues whose files changed
+   (the fixes, plus anything a whole-plan fix touched; the workflow's
+   `open` is the judge's guess — adjust it to his rulings). When a
+   round comes back with nothing he sustains, run **the full final
+   round** (every issue again). It reaches him the same way; what he
+   sustains loops as a delta, and **the two of you decide whether
+   another full round runs**.
+5. At close, write the **precision table**: per lens (the issue lens
+   included), findings raised · sustained · deferred · dismissed by
+   him, across all rounds — and **the judge's line**: rulings
+   confirmed, overruled, in which direction. Both are the stage's
+   telemetry, and stage 6's input to tighten the lens that cried wolf
+   and to recalibrate the judge.
 
 Two rules hold inside the loop:
 
-- **`deferred` rulings and `detail` findings are never applied per
-  round.** They batch into a single author sweep at close.
+- **Deferred findings and `detail` findings never enter on their
+  own.** At close, present the batch to him (question tool, one per
+  finding: enter / stay out) and decide together what enters — the
+  default is nothing. What enters is one author pass,
+  then the touched issues once more, ruled by him.
 - **Simplify or remove:** when a finding shows a loose wire in
-  something a previous round added, the fix is to simplify or remove
-  the addition — never a third mechanism on top.
+  something a previous round added, the fix to suggest is simplify or
+  remove the addition — never a third mechanism on top.
 
 ## 4 — The blueprint
 
@@ -192,7 +234,7 @@ object, and republishes the same file path — the Plan tab lights up
 under this wave's pill. The content: the plan's logic as the intro, the
 batch map, the issue cards (produces/consumes chips), decisions inline
 (`decided in your place` in orange, counted in the Overview), and the
-review scoreboard — verdicts with the judge's rulings, including the
+review scoreboard — verdicts with the user's rulings, including the
 per-issue cold-read score. The
 conductor owns the blueprint — it is the report of the authors' files,
 not their projection (house rule: the blueprint is the report, the
@@ -201,14 +243,17 @@ primitives.
 
 ## 5 — Checkpoint, bootstrap, and closing
 
-Present: the blueprint URL, the verdict table, the per-issue cold-read
-score, the `decided in your place` count, and any `to-user` items.
+Present: the blueprint URL, the verdict table (his rulings included),
+the precision table per lens, the per-issue cold-read score, the
+`decided in your place` count, the deferred batch and what he let in,
+and any open questions.
 Approval is explicit — and **the bootstrap runs ONLY on explicit
 authorization**, never inferred from a positive tone.
 
 On "approved with fixes" or rejection: the affected repos' authors
-apply (or reauthor, with the reasons as input), the round runs again —
-full, as always — and **a new checkpoint follows**. Every loop ends at
+apply (or reauthor, with the reasons as input), the touched issues run
+through the round again, he rules it, and **a new checkpoint
+follows**. Every loop ends at
 a checkpoint; there is no path from a fix straight to bootstrap.
 
 **The bootstrap** — after the authorization, and not by you: dispatch
