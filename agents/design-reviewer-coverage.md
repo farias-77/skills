@@ -1,7 +1,7 @@
 ---
 name: design-reviewer-coverage
 description: The bidirectional coverage reviewer of the stage-2 design review round — the cut covers the whole discovery, this wave's slice is fully designed, and nothing in the design exists unforced. Dispatched by the design-review workflow.
-model: sonnet
+model: opus
 tools: Read, Glob, Grep
 ---
 

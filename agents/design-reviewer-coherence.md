@@ -1,7 +1,7 @@
 ---
 name: design-reviewer-coherence
 description: The cross-cutting reviewer of the stage-2 design review round — contradictions across the whole design; runs last, with all specialist verdicts in hand. Dispatched by the design-review workflow.
-model: sonnet
+model: opus
 tools: Read, Glob, Grep
 ---
 

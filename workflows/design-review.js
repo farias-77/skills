@@ -9,16 +9,20 @@
  * pass without its "verified" enumeration is re-dispatched once (a lazy
  * pass is not a pass).
  *
- * THE JUDGE closes the round, not the lenses: reviewers report at the
- * maximum bar (they always find something — that is by design), and
- * design-judge rules every finding sustained / deferred / dismissed
- * against the scrutiny ruler declared in decisions.md. The returned
- * `open` list is JUDGED: a lens stays open only for sustained-ruled
- * blocker/fix findings — dismissed and deferred findings
- * hold nothing open. An unruled finding counts as sustained
- * (fail-safe). `open` is the next round's `lenses`; empty means the
- * deltas converged — the stage's close is then ONE full final round
- * (all lenses, no `lenses` arg) that the judge also clears.
+ * THE JUDGE PROPOSES, THE USER RULES: reviewers report at the maximum
+ * bar (they always find something — that is by design); design-judge
+ * (all lenses and the judge are Opus) rules every finding sustained /
+ * deferred / dismissed with a one-line reason, calibrated by
+ * decisions.md, reviews.md and the house taste ledger. Every ruling
+ * that comes back is the JUDGE'S PROPOSAL: the conductor puts every
+ * finding with it in front of the user, who confirms or overrules —
+ * and only his rulings run the next round. `open` lists the lenses the
+ * judge would keep open (a sustained blocker/fix); the conductor
+ * narrows or widens it to the user's rulings before passing it as the
+ * next round's `lenses`. An unruled finding reaches him as sustained
+ * (fail-safe). Nothing he sustains in a delta ⇒ the stage's close is
+ * ONE full final round (all lenses, no `lenses` arg), always, once;
+ * whether another runs is decided with him.
  *
  * The briefs below carry INPUTS only — paths, round number, and the
  * verdict board. Every instruction (each lens's rules, the read-it-all
@@ -36,29 +40,30 @@
  *     lenses:       ['design-reviewer-data'],  // the lenses this round
  *                       // runs — the previous round's `open` list.
  *                       // Omit on round 1: all ten.
- *     scope:        'what changed since the last round'  // optional;
+ *     scope:        'what changed since the last round',  // optional;
  *                       // a focus note, not a fence — reviewers may
  *                       // still read everything
+ *     tastePath:    'absolute path to docs/standards/taste.md'  // the
+ *                       // house taste ledger the judge calibrates by
  *   }})
  *
  * Returns { round, blockers, sustained, open, invalid, reviews:
  * [{ reviewer, verdict, verified, quote, findings, invalid }] } — each
- * finding carries `id`, `ruling` and `reason` after judgment;
- * `blockers`/`sustained` count only sustained-ruled findings; `open` is every
- * lens with a sustained blocker/fix (pass it back as the next round's
- * `lenses`; empty means this round converged). The conductor writes
- * reviews.md (run ids from this run's journal, rulings included), and
- * loops the sustained findings to the design-author via SendMessage —
- * deferred rulings batch into the close sweep.
+ * finding carries `id`, `ruling` and `reason` — the judge's proposal;
+ * `blockers`/`sustained` count the judge's sustained findings; `open`
+ * is every lens the judge would keep open. The conductor writes
+ * reviews.md (run ids from this run's journal, the judge's ruling and
+ * the user's on every finding), and loops what the USER sustained to
+ * the design-author via SendMessage.
  */
 
 export const meta = {
   name: 'design-review',
-  description: 'Stage-2 review round: all ten lenses to open, then only the lenses still open, coherence last, the judge ruling every finding against the declared scrutiny — deterministic and un-skippable by construction',
+  description: 'Stage-2 review round: all ten lenses to open, then only the lenses the user kept open, coherence last, the judge proposing a ruling on every finding for the user to confirm or overrule — deterministic and un-skippable by construction',
   phases: [
     { title: 'Specialists', detail: 'the round specialists in parallel, each reads everything, reports its lens' },
     { title: 'Coherence', detail: 'the cross-cutting reviewer, with the round verdicts in hand' },
-    { title: 'Judge', detail: 'design-judge rules every finding sustained/deferred/dismissed by the ruler in decisions.md', model: 'opus' },
+    { title: 'Judge', detail: 'design-judge proposes sustained/deferred/dismissed on every finding, with the reason — the user gives the final ruling', model: 'opus' },
   ],
 }
 
@@ -116,7 +121,7 @@ const JUDGMENT = {
         properties: {
           id: { type: 'string', description: 'the finding id exactly as given' },
           ruling: { type: 'string', enum: ['sustained', 'deferred', 'dismissed'] },
-          reason: { type: 'string', description: 'one or two concrete sentences; cite the tier when the tier decided it' },
+          reason: { type: 'string', description: 'one or two concrete sentences the user can check in a glance; name the recurrence when the ledger or the history decided it' },
         },
       },
     },
@@ -137,9 +142,9 @@ const chosen = named.filter(n => n !== COHERENCE)
 const withCoherence = named.includes(COHERENCE)
 const shape = named.length < ALL.length ? 'delta' : 'full'
 
-const inputs = `Round ${round}${shape === 'delta' ? ' (delta round — these lenses did not pass last round)' : ''}.
+const inputs = `Round ${round}${shape === 'delta' ? ' (delta round — the user kept these lenses open)' : ''}.
 The design: ${args.designDir} — everything under it, research/ and ui/ included.
-The session's decisions (the law of this design, the scrutiny ruler inside): ${args.designDir}/decisions.md
+The session's decisions (the design as the user decided it; a declared decision is contested only by defect): ${args.designDir}/decisions.md
 The discovery it must satisfy: ${args.discoveryDir}/pr-faq.md and ${args.discoveryDir}/user-stories.md
 The wave map: ${args.wavesPath}${args?.scope ? `
 Changed since the last round (the focus; the rest is context): ${args.scope}` : ''}`
@@ -184,10 +189,11 @@ ${verdictBoard}`, {
   reviews.push(coherence)
 }
 
-// ---- The judge: the lenses report, the judge closes ------------------
-// Every finding gets an id; design-judge rules each one against the
-// ruler in decisions.md. An unruled finding counts as sustained —
-// fail-safe, never fail-silent.
+// ---- The judge: the lenses report, the judge proposes, the user rules --
+// Every finding gets an id; design-judge rules each one with a reason,
+// calibrated by decisions.md, the round history and the taste ledger.
+// The ruling is a proposal for the user. An unruled finding reaches
+// him as sustained — fail-safe, never fail-silent.
 const allFindings = []
 for (const r of reviews) r.findings.forEach((f, i) => {
   f.id = `${r.reviewer}#${i + 1}`
@@ -203,7 +209,10 @@ if (allFindings.length) {
   fix: ${f.fix}`).join('\n')
   const dispatchJudge = () => agent(`${inputs}
 
-The round's lenses have reported. Read the design and decisions.md (the scrutiny ruler is declared there), then rule EVERY finding below, by its id.
+The round audit so far (the user's rulings on the earlier rounds): ${args.designDir}/reviews.md
+The house taste ledger (how the user has ruled before): ${args?.tastePath ?? '<pipeline root>/docs/standards/taste.md'}
+
+The round's lenses have reported. Read the design, decisions.md, the audit and the ledger, then rule EVERY finding below, by its id — your ruling is the proposal the user confirms or overrules.
 
 ${board}`, { label: `${JUDGE}#r${round}`, phase: 'Judge', agentType: JUDGE, schema: JUDGMENT })
 
@@ -225,14 +234,13 @@ const sustainedOf = r => r.findings.filter(f => (f.ruling ?? 'sustained') === 's
 const blockers = reviews.reduce((n, r) => n + sustainedOf(r).filter(f => f.severity === 'blocker').length, 0)
 const sustained = reviews.reduce((n, r) => n + sustainedOf(r).length, 0)
 const invalid = reviews.filter(r => r.invalid).map(r => r.reviewer)
-// A lens stays open only for a sustained blocker/fix (or an invalid
-// run). Everything else is finished for the deltas — deferred rulings
-// batch into the close sweep, dismissed ones die with their reason. The
-// stage's close is the full final round, judged by the same ruler.
+// The judge would keep a lens open for a sustained blocker/fix (or an
+// invalid run). The user's rulings decide what actually stays open —
+// the conductor adjusts this list to them before the next round.
 const open = reviews.filter(r =>
   r.invalid || sustainedOf(r).some(f => f.severity !== 'detail')
 ).map(r => r.reviewer)
 log(`round ${round}: ${allFindings.length} finding(s) → ${sustained} sustained (${blockers} blocker(s)) · ${reviews.length - open.length}/${reviews.length} closed${invalid.length ? ' · INVALID: ' + invalid.join(', ') : ''}`)
-log(open.length ? `still open (next round's lenses): ${open.join(', ')}` : 'converged — no lens holds a sustained finding')
+log(open.length ? `the judge would keep open: ${open.join(', ')} — the user rules` : 'the judge sustains nothing — the user confirms')
 
 return { round, blockers, sustained, open, invalid, reviews }

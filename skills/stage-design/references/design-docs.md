@@ -17,8 +17,8 @@ each carrying its own must-haves as comments:
 | `rollout.md` | deploy order, cutover, rollback |
 | `code.md` | the file-tree preview per repo — a guide, never a build contract |
 | `acceptance.md` | the executable acceptance spec, frozen with `contracts.md` — the exec transcribes it into each repo's `smoke/` |
-| `decisions.md` | the design session's record — the CONDUCTOR's file, the law the author details and never edits |
-| `reviews.md` | the round audit — the conductor's file, not the author's |
+| `decisions.md` | the design session's record — the whole design in decisions, the CONDUCTOR's file; the author transcribes it and never edits it |
+| `reviews.md` | the round audit with the user's rulings — the conductor's file, not the author's |
 
 These files are machine input — reviewers and planning consume them; the
 user reads the blueprint. Write to be consumed, not admired: no

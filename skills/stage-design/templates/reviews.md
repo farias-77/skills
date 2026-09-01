@@ -2,15 +2,18 @@
 
 <!--
   Written by the CONDUCTOR, never the author. Permanent — this file is
-  the proof the review happened (the blueprint has no Review tab). MUST
-  have, per round: every one of the ten reviewers with verdict + run id
+  the proof the review happened (the blueprint has no Review tab), and
+  the record of the USER's rulings: the judge proposes, he rules.
+  MUST have, per round: every reviewer that ran with verdict + run id
   (from the workflow journal, not prose) + verified list; every finding
-  with a disposition — fixed / to-user / rejected (+ reason; rejecting a
-  blocker carries the user's explicit sign-off). The stage cannot close
-  without the last round complete at zero blockers.
+  with the judge's ruling and reason AND his ruling — sustained /
+  deferred / dismissed — with his reason ("confirmed", or his words).
+  Written before anything is applied. The close carries the precision
+  table per lens, the judge's confirmed/overruled line, and the
+  deferred batch's fate — all decided with him.
 -->
 
-## Round <N> — <date>
+## Round <N> — <date> · run <id> · full | delta (<lenses>)
 
 | Reviewer | Verdict | Run id | Findings |
 |---|---|---|---|
@@ -25,9 +28,33 @@
 | design-reviewer-ui | | | |
 | design-reviewer-coherence | | | |
 
-### Findings and dispositions
+### Findings and rulings
 
-#### [<severity>] <reviewer> — <title>
+#### [<severity>] <reviewer>#<n> — <title>
 
 - **Finding:** <gap>
-- **Disposition:** fixed / to-user / rejected — <the fix applied · the question asked · the reason + sign-off>
+- **Judge:** <ruling — its reason, one line>
+- **Ruling (user):** sustained / deferred / dismissed — <"confirmed", or his reason>
+
+### Round close
+
+<sustained N (blockers N) · deferred N · dismissed N · next: delta on <lenses> | full final round | closed by the user>
+
+## Close
+
+### Precision per lens
+
+| Lens | Findings | Sustained | Deferred | Dismissed |
+|---|---|---|---|---|
+
+### The judge
+
+<rulings proposed N · confirmed N · overruled N (N toward sustained, N toward dismissed)>
+
+### Deferred batch
+
+<what the user let in (one author pass, touched lenses once more) · what stays out>
+
+### Taste ledger entries added
+
+<one line each, as written to docs/standards/taste.md>

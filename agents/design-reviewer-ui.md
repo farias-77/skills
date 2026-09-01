@@ -1,7 +1,7 @@
 ---
 name: design-reviewer-ui
 description: The UI reviewer of the stage-2 design review round — the artboards fit the product as it is today and cover every story state. Dispatched by the design-review workflow.
-model: sonnet
+model: opus
 tools: Read, Glob, Grep
 ---
 
