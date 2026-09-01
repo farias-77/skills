@@ -70,11 +70,12 @@ maestro's build and environment entries, and the **`[user]` entries**
 the user dictated mid-wave, per the house rule); every stage's review
 audit (`00-discovery/reviews.md`, `01-design/reviews.md`,
 `02-plan/reviews.md`) — what blocked a round and what it cost to
-clear; **the judges' scoreboards** — the rulings in the review audits
-and the execution tab's sustained/deferred/dismissed totals: a lens
-whose findings are repeatedly dismissed is miscalibrated, a ruler
-line that never fired may be dead weight — both are candidates for
-the board; and the execution and release traces
+clear; **the user's rulings** — the workstream's `rulings.md` (every
+ruling he gave, at every stage, with his reason), the precision tables
+per lens in the review audits and the execution tab: a lens whose
+findings he repeatedly dismisses is miscalibrated, a suggestion he
+repeatedly overrules is a taste entry the ledger is missing — both are
+candidates for the board; and the execution and release traces
 (`03-execution/trace.md`, the per-repo and `e2e` lane traces,
 `04-release/trace.md`) — the halts, the rounds, what dragged. A
 friction counts wherever it was recorded. The pass:
@@ -147,7 +148,7 @@ Read `waves.md`:
 | Gate | Rule |
 |---|---|
 | Quiet window | closure only over a verified-quiet prod; noise routes back as a fix issue |
-| Every note on the board | the ledger covers 100% of the input — dreaming-notes (the `[user]` entries leading), the review audits, the judges' scoreboards, the traces — each with evidence and a suggestion |
+| Every note on the board | the ledger covers 100% of the input — dreaming-notes (the `[user]` entries leading), `rulings.md`, the review audits and their precision tables, the traces — each with evidence and a suggestion |
 | Recurrence check | no pipeline candidate reaches the board without the subagent sweep of the `learn(` history; a repeated class is presented as recurrence with both hashes, never silently re-edited |
 | Class, not incident | the ruler for the session's suggestions — what does not generalize is suggested as a discard; the user can overrule |
 | Destination triage | venture- and repo-class lessons never land in the public pipeline repo |

@@ -27,6 +27,36 @@ dreaming session confirms the edit instead of debating the class.
 This is separate from the standing rule that every stage notes its
 own frictions as they happen — both feed the same file.
 
+## The user's rulings are the record
+
+At design and plan the user gives the final ruling on every review
+finding: the judge agent proposes (ruling + reason) and he rules.
+**The rulings are asked through the question tool, always**: one
+question per finding, the context in the question itself (source,
+severity, quote, gap, fix, the judge's reason), the three rulings as
+the answers with the judge's pick first and marked as his, four to a
+call. Never a board he answers in prose. At execution the judge rules
+alone inside its budget and the user reads the residue — the PR
+notes — at the checkpoint; a note he rules on there is a ruling too.
+Every ruling is appended, as it happens, to the workstream's
+**`rulings.md`** (workstream root; created on the first ruling), one
+line each:
+
+```
+2026-09-01 · design r3 · design-reviewer-infra#2 · judge: dismissed · ruled: sustained · "the cost line encodes the SLA, it stays"
+```
+
+Date · stage and round (or the PR at stage 4) · the finding id · what
+the judge proposed · what he ruled · his reason, verbatim where he
+gave one.
+The stage's own audit (`reviews.md`, the lane trace) keeps the detail;
+`rulings.md` is the index the dreaming reads first, next to
+`dreaming-notes.md`. A pattern in it — a ruling he keeps overruling, a
+class he keeps dismissing — is proposed back to him as an entry in the
+house **taste ledger** (`docs/standards/taste.md`), written only on his
+confirmation; the ledger is what every conductor and every judge reads
+before proposing anything to him.
+
 ## The blueprint speaks the user's language
 
 The blueprint is written in the language the user talks to you in —

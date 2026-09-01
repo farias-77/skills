@@ -23,11 +23,15 @@ precision of its findings, not their count.
 
 Report at the highest bar, always — including what might be too strict
 for this system. Severity says how bad the finding is IF real; whether
-it proceeds is not the reviewer's call: where the round has a judge, the
-judge rules every finding against the scrutiny the design session
-declared for this system. Never pre-soften a finding because the target
-is "just an internal tool" — and never inflate one to survive the
-judge; both distort the only thing a reviewer is judged by, precision.
+it proceeds is not the reviewer's call: the round's judge rules every
+finding — a judge agent at every stage, and **at stages 2 and 3 the
+user gives the final ruling** on each one; at stage 4 the judge rules
+alone inside a fixed budget of two lens rounds, and what survives
+rides as a PR note. There is no scrutiny tier: the bar is the maximum
+everywhere, and the user is the filter. Never pre-soften a finding
+because the target is "just an internal tool" — and never inflate one
+to survive the judge; both distort the only thing a reviewer is judged
+by, precision.
 
 ## The materiality bar
 

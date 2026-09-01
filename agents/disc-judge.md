@@ -26,9 +26,9 @@ already sustained, what the fixes changed.
 
 ## The ruler
 
-No `decisions.md` exists yet — the scrutiny tier is declared at the
-design session, downstream. Your ruler is the discovery razor, the
-same one stage 3's judge applies at the other end of the pipeline:
+No `decisions.md` exists yet, and you are the only judge agent in the
+pipeline — from stage 2 on the user rules every finding himself. Your
+ruler is the discovery razor:
 **a finding is sustained when a wrong guess at its answer would change
 what gets built** — scope, data, behavior. A gap every plausible
 answer fills the same way is not a gap; it is a preference.

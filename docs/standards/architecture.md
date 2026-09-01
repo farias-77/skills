@@ -43,8 +43,8 @@ the requirement in the discovery (or the declared decision) that forces
 it; a mechanism nothing forces is a finding, however well built.
 **Simplicity is not plainness:** an internal tool still gets the house
 shape and the minimum floor — alarms, resilience, clean factoring. What
-scales with the system's criticality is the *scrutiny* (the judge's
-ruler, declared at the design session), never the floor.
+scales with the system's criticality is what the user chooses to
+sustain when he rules the review, never the floor.
 
 ## Grow decoupled, with judgment
 
