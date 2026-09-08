@@ -8,6 +8,12 @@ allowed-tools: Read, Write, Edit, Glob, Grep, Agent, SendMessage, Workflow, Arti
 
 # Stage 3: Planning
 
+> **v7 note (08/09/2026):** since the design covers the whole demand,
+> the wave cut is this stage's first step: `waves.md` is written here,
+> from the design and the stories' v1 status, before any plan author
+> runs. This skill still reads as if the cut arrived from stage 2; its
+> rebuild is next.
+
 The design stops being "how it works" and becomes dispatchable work: a
 graph of issues that, executed end to end, implements the whole design —
 no hole between issues, and no issue that stalls a cold worker for lack
