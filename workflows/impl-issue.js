@@ -34,7 +34,6 @@
  *     base_branch:    'feature/<workstream>-wNN',
  *     issue_md:       '<the full issue body, verbatim>',
  *     decisions_path: '/abs/.../01-design/decisions.md',   // the design as decided
- *     taste_path:     '/abs/.../docs/standards/taste.md',  // the house taste ledger
  *     linear_issue:   'ABC-123'            // optional; board projection
  *   }})
  *
@@ -218,7 +217,6 @@ const judgeRound = async (findings, roundLabel, last) => {
     `${CORE}
 
 The design as the user decided it: ${brief.decisions_path || '(decisions.md path not provided)'}
-The house taste ledger (how the user rules): ${brief.taste_path || '<pipeline root>/docs/standards/taste.md'}
 ${last ? 'THIS IS THE SECOND AND LAST LENS ROUND OF THIS CYCLE: nothing you sustain here is fixed in this run — it rides as an open note on the PR. Verify the round-1 fixes landed; a NEW finding sustains only if shipping it is worse than a note.' : 'This is round 1 of this cycle: what you sustain becomes the one fix pass; round 2 reads the delta and is the last.'}
 
 ## The round history — findings and your previous rulings

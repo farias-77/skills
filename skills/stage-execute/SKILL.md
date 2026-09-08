@@ -102,10 +102,9 @@ Per repo, idempotent (resume is free):
    merged`; that is resume, for free.
 3. **Prune orphan worktrees** from previous runs — **after** sweeping
    them for surviving work (§3).
-4. **Locate the judge's inputs** — the wave's `01-design/decisions.md`
-   and the house taste ledger (`docs/standards/taste.md` under the
-   pipeline root). Both paths travel in every `impl-issue` brief: the
-   judge rules by the design as decided and by how the user rules.
+4. **Locate the judge's input** — the wave's `01-design/decisions.md`.
+   Its path travels in every `impl-issue` brief: the judge rules by
+   the design as the user decided it.
 
 ## 2 — Derive the DAGs, launch — 5 in flight, wave-wide
 
@@ -128,8 +127,8 @@ npm scripts no matter how many workflows run. Per launch:
 2. **Launch the engine** —
    `Workflow({scriptPath: workflows/impl-issue.js, args: brief})`,
    the brief being inputs only: issue number, repo, worktree, base
-   branch (the FB), the issue body verbatim, the `decisions.md` and
-   `taste.md` paths, the Linear issue id if the board is wired.
+   branch (the FB), the issue body verbatim, the `decisions.md` path,
+   the Linear issue id if the board is wired.
    All of a pass's launches in the same message; one trace line per
    launch. **Launch the repo script itself — never an inline wrapper
    around it**: the gates are the file, not a script improvised per

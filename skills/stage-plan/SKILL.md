@@ -106,9 +106,9 @@ rules (§3):**
 
 - **Reviewers report at the maximum bar; `plan-judge` (Opus) rules
   every finding** — `sustained` / `deferred` / `dismissed`, with a
-  one-line reason — calibrated by `decisions.md`, the round history in
-  `reviews.md` and the house taste ledger (pass `tastePath`). **Its
-  ruling is a proposal**: the round comes back with every finding
+  one-line reason — calibrated by `decisions.md` and the round history
+  in `reviews.md`, the user's rulings included. **Its ruling is a
+  proposal**: the round comes back with every finding
   ruled, and the user confirms or overrules each one before anything
   moves. `open` is the judge's guess at what stays open; his rulings
   decide.
@@ -145,7 +145,7 @@ bar: if a Haiku can execute it, the worker certainly can.
 | `plan-reviewer-gaps` | the negative: what NO issue covers — this wave's story ACs without an issue (walks `waves.md` and the stories itself, never trusts the coverage map), issues without an AC, consumes without producer, "Out" without owner |
 | `plan-reviewer-flow` | the graph as it will RUN: cycles, edges without a real reason, wasted parallelism, a skeleton owed, two big jobs on the same surface in the same batch |
 | `plan-reviewer-coherence` | runs last, with all verdicts: the plans tell the design's story, and the two ends of every contract meet in the middle |
-| `plan-judge` | not a lens — proposes a ruling with a reason on every finding of the round (cold reads and lenses alike), after coherence, calibrated by the decisions, the history and the taste ledger |
+| `plan-judge` | not a lens — proposes a ruling with a reason on every finding of the round (cold reads and lenses alike), after coherence, calibrated by the decisions and the round history |
 | **the user** | confirms or overrules the judge on every finding, through the question tool; decides what proceeds and therefore whether another round runs |
 
 Every reviewer answers under the house
@@ -213,7 +213,9 @@ anything is applied:
    him, across all rounds — and **the judge's line**: rulings
    confirmed, overruled, in which direction. Both are the stage's
    telemetry, and stage 6's input to tighten the lens that cried wolf
-   and to recalibrate the judge.
+   and to recalibrate the judge. Every overrule whose reason is a
+   pattern goes to the workstream's `taste-notes.md` (house rule) —
+   noted, not decided.
 
 Two rules hold inside the loop:
 

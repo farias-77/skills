@@ -6,7 +6,7 @@
   single-writer rule). Every entry is the user's call, taken live, in
   the fixed decision-block format so the blueprint renders them as
   cards — with the conductor's recommendation kept beside the choice,
-  so a divergence is greppable and can become a taste-ledger entry.
+  so a divergence is greppable and becomes a line in taste-notes.md.
   This file is the whole design in decisions: layer 1 is the macro
   shape, layer 2 one section per document, all ten. The author
   transcribes it into the design files and never reopens a call;

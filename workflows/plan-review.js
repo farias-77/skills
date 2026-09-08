@@ -30,16 +30,14 @@
  *                       // re-round, only the issues whose files changed
  *                       // (stage-plan §2 — the whole-plan lenses still
  *                       // read everything)
- *     round:        2,  // 1-based; informational, shown in labels
- *     tastePath:    'absolute path to docs/standards/taste.md'  // the
- *                       // house taste ledger the judge calibrates by
+ *     round:        2   // 1-based; informational, shown in labels
  *   }})
  *
  * THE JUDGE PROPOSES, THE USER RULES: reviewers report at the maximum
  * bar (they always find something — that is by design), and plan-judge
  * rules every finding sustained / deferred / dismissed with a one-line
- * reason, calibrated by decisions.md, reviews.md and the house taste
- * ledger. Every ruling that comes back is the JUDGE'S PROPOSAL: the
+ * reason, calibrated by decisions.md and reviews.md (the user's rulings
+ * inside). Every ruling that comes back is the JUDGE'S PROPOSAL: the
  * conductor puts every finding with it in front of the user, who
  * confirms or overrules — and only his rulings run the next round. An
  * unruled finding reaches him as sustained (fail-safe).
@@ -233,7 +231,7 @@ const lenses = [...wholePlan, coherence]
 
 // ---- The judge: the lenses report, the judge proposes, the user rules --
 // Every finding gets an id; plan-judge rules each one with a reason,
-// calibrated by decisions.md, the round history and the taste ledger.
+// calibrated by decisions.md and the round history (the user's rulings).
 // The ruling is a proposal for the user. An unruled finding reaches
 // him as sustained — fail-safe, never fail-silent.
 const allFindings = []
@@ -256,9 +254,8 @@ if (allFindings.length) {
   const dispatchJudge = () => agent(`${inputs}
 
 The round audit so far (the user's rulings on the earlier rounds): ${args.planDir}/reviews.md
-The house taste ledger (how the user has ruled before): ${args?.tastePath ?? '<pipeline root>/docs/standards/taste.md'}
 
-The round's cold reads and lenses have reported. Read the plan, decisions.md, the audit and the ledger, then rule EVERY finding below, by its id — your ruling is the proposal the user confirms or overrules.
+The round's cold reads and lenses have reported. Read the plan, decisions.md and the audit, then rule EVERY finding below, by its id — your ruling is the proposal the user confirms or overrules.
 
 ${board}`, { label: `${JUDGE}#r${round}`, phase: 'Judge', agentType: JUDGE, schema: JUDGMENT })
 

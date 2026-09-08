@@ -52,10 +52,13 @@ gave one.
 The stage's own audit (`reviews.md`, the lane trace) keeps the detail;
 `rulings.md` is the index the dreaming reads first, next to
 `dreaming-notes.md`. A pattern in it — a ruling he keeps overruling, a
-class he keeps dismissing — is proposed back to him as an entry in the
-house **taste ledger** (`docs/standards/taste.md`), written only on his
-confirmation; the ledger is what every conductor and every judge reads
-before proposing anything to him.
+class he keeps dismissing, a design card where he chose against the
+recommendation — is noted on the spot in the workstream's
+**`taste-notes.md`** (workstream root; created on the first note), one
+line each, as the pattern rather than the instance. Nothing there is a
+rule: the dreaming reads it next to `dreaming-notes.md` and decides,
+with him, what each note becomes — a standard, a skill line, an agent
+prompt — or whether it is dropped.
 
 ## The blueprint speaks the user's language
 

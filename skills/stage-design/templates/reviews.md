@@ -55,6 +55,6 @@
 
 <what the user let in (one author pass, touched lenses once more) · what stays out>
 
-### Taste ledger entries added
+### Taste notes added
 
-<one line each, as written to docs/standards/taste.md>
+<one line each, as written to the workstream's taste-notes.md>

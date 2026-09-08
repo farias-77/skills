@@ -68,16 +68,14 @@ overengineering dies, and it is the stage's highest-leverage hours. It
 runs in two layers, both on the same primitive: **one tradeoff card per
 decision**, presented in conversation — the options in one line each
 with their cost said out loud, your recommendation, the user's call.
-Before it, read the discovery, the consuming project's `CLAUDE.md`, the
-touched repos — and the house
-[taste ledger](../../docs/standards/taste.md): what the
-user has chosen and rejected in past sessions, and why. **Your
-recommendation is shaped by it**: the point of the joint build is that
-over time the first proposal already comes the way he would take it,
-and the ledger is how the pipeline learns that. Dispatch a single
-surgical research agent only when a fact (a price, a service limit)
-would change a decision — the full per-target research belongs to the
-author, after, scoped to what was decided.
+Before it, read the discovery, the consuming project's `CLAUDE.md` and
+the touched repos. Dispatch a single surgical research agent only when
+a fact (a price, a service limit) would change a decision — the full
+per-target research belongs to the author, after, scoped to what was
+decided. The point of the joint build is that over time the first
+proposal already comes the way he would take it: what he chooses
+against the recommendation is noted (below) and the dreaming turns it
+into the rules the next session runs under.
 
 **Layer 1 — the macro shape.** The fixed agenda:
 
@@ -130,14 +128,14 @@ sitting; the file is the state between them. The author transcribes it
 and never edits it; reviewers contest it only on defect (the reviewer
 contract's clause).
 
-The session closes in two steps, both in conversation, no artifact:
-the user's explicit ok on the recorded decisions; then **the ledger
-delta** — every card where his choice diverged from your
-recommendation, proposed back to him as a taste entry (the pattern,
-not the instance: "prefers a Lambda cron over Step Functions until a
-flow needs a human wait", never "chose B on card 7"). He confirms,
-rewrites or drops each; what he confirms is written to the ledger
-now, by you. Next session's recommendations start from it.
+The session closes with the user's explicit ok on the recorded
+decisions — in conversation, no artifact. Then, without asking, note
+**every card where his choice diverged from your recommendation** in
+the workstream's `taste-notes.md` (house rule in the repo's
+`CLAUDE.md`) — the pattern, not the instance: "prefers a Lambda cron
+over Step Functions until a flow needs a human wait", never "chose B
+on card 7". Nothing there is a rule yet: the dreaming decides, with
+him, what each note becomes.
 
 ## 2 — Dispatch the author
 
@@ -195,9 +193,9 @@ last, with the specialist verdicts in hand.
   unknown-unknowns surface, so nothing narrows it.
 - **Reviewers report at the maximum bar; `design-judge` (Opus) rules
   every finding** — `sustained` / `deferred` / `dismissed`, with a
-  one-line reason — calibrated by `decisions.md`, the round history in
-  `reviews.md` and the house taste ledger (pass `tastePath`). **Its
-  ruling is a proposal**: the round comes back with every finding
+  one-line reason — calibrated by `decisions.md` and the round history
+  in `reviews.md`, the user's rulings included. **Its ruling is a
+  proposal**: the round comes back with every finding
   ruled, and the user confirms or overrules each one before anything
   moves. `open` is the judge's guess at what stays open; his rulings
   decide.
@@ -232,7 +230,7 @@ record next time.
 | `design-reviewer-facts` | evidence | every claim about an external tool or existing service traces to research |
 | `design-reviewer-ui` | UI | the artboards fit the product as it is today; every story state has a home |
 | `design-reviewer-coherence` | cross-cutting | contradictions across the whole — runs last, with all verdicts |
-| `design-judge` | the proposal | not a lens — rules every finding with a reason, after coherence, calibrated by the decisions, the history and the taste ledger; a proposal |
+| `design-judge` | the proposal | not a lens — rules every finding with a reason, after coherence, calibrated by the decisions and the round history; a proposal |
 | **the user** | the ruling | confirms or overrules the judge on every finding, through the question tool; decides what proceeds and therefore whether another round runs |
 
 Every reviewer is **Opus** — the rounds are few now, so the strongest
@@ -301,10 +299,9 @@ The round is audited in **`01-design/reviews.md` — permanent**
    **the judge's line**: how many of its rulings he confirmed, how many
    he overruled, in which direction. Both go into the stage's
    telemetry (§6); stage 6 uses them to tighten the lens that cried
-   wolf and to recalibrate the judge. And the **ledger delta of the
-   review**: every overrule whose reason is a pattern (not a one-off)
-   is proposed to him as a taste entry, same rule as the session's —
-   confirmed, it is written now.
+   wolf and to recalibrate the judge. And every overrule whose reason
+   is a pattern (not a one-off) goes to `taste-notes.md`, same rule as
+   the session's — noted, not decided.
 
 Three rules hold inside the loop:
 
@@ -367,7 +364,7 @@ then the files as the named authority.
 Present: the blueprint URL, the canvas URL, the wave cut (one line per
 wave), the verdict table (from `reviews.md`, his rulings included), the
 precision table per lens, the count of `decided in your place` flags,
-the deferred batch and what he let in, the ledger entries this wave
+the deferred batch and what he let in, the taste notes this wave
 added — and **the stage's own
 telemetry**: rounds run, agents dispatched, approximate cost, so the
 user calibrates the next wave with data, not sensation. Approval is

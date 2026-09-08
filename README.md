@@ -81,8 +81,9 @@ useful end to end) and then walks the current one document by
 document — architecture, data, contracts (the frozen bridge everything
 downstream stands on), UI, security, infra, observability, rollout,
 code, acceptance — one tradeoff card per decision, the conductor
-recommending, the human choosing; a taste ledger records what he
-chooses so the next proposal already comes his way. An author then
+recommending, the human choosing; what he chooses against the
+recommendation is noted for the closing stage, which turns it into
+the rules the next session runs under. An author then
 consolidates the decisions into the files, with dedicated research per
 external target and the UI as artboards on a design canvas. Ten review
 lenses try to break it at the maximum bar, a judge proposes a ruling on

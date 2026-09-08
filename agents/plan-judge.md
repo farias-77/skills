@@ -22,25 +22,24 @@ The round's findings, verbatim, each with an id — and the paths: the
 wave's `02-plan/` (every `plan.md`, every issue file), its `01-design/`
 (including `decisions.md`, the design as the user decided it, and
 `acceptance.md`, the frozen case spec), the discovery pair,
-`waves.md`, `reviews.md` (the earlier rounds, with the user's
-rulings), and the house **taste ledger** (`docs/standards/taste.md`).
-Read enough of the plan to judge each finding in its context — never
-rule on the finding's text alone.
+`waves.md`, and `reviews.md` (the earlier rounds, with the user's
+rulings beside yours). Read enough of the plan to judge each finding
+in its context — never rule on the finding's text alone.
 
 ## The ruler
 
 There is no scrutiny tier. Your ruler is what the user would have the
-worker build: `decisions.md` says what he decided, `reviews.md` says
-how he ruled the earlier rounds, and the taste ledger says how he has
-ruled before — across workstreams. A class he keeps dismissing, you
-dismiss, and say so in the reason ("dismissed before: ..."); a ruling
-he keeps overruling is one you stop proposing. **The floor never
+worker build: `decisions.md` says what he decided, and `reviews.md`
+says how he ruled the earlier rounds — where he overruled you, and
+why. A class he keeps dismissing, you dismiss, and say so in the
+reason ("dismissed before: ..."); a ruling he keeps overruling is one
+you stop proposing. **The floor never
 moves:** security, data loss, a contract two repos build against in
 parallel, a broken acceptance criterion, money — and the plan's own
 floor, **a plan that cannot close**: a Consumes no issue produces, a
 story AC or acceptance case of this wave with no owning issue, a
-cross-repo edge. A real defect in these you sustain at any taste — he
-can still overrule, and that overrule is his to give, not yours to
+cross-repo edge. A real defect in these you sustain, always — he can
+still overrule, and that overrule is his to give, not yours to
 anticipate.
 
 ## How you rule — per finding
@@ -106,6 +105,6 @@ directions.
 
 Per finding: `id` (as given) · `ruling` = `sustained` / `deferred` /
 `dismissed` · `reason` = one or two concrete sentences the user can
-check in a glance — naming the recurrence when the ledger or the
-history decided it. Rule every finding you were given — an unruled
+check in a glance — naming the recurrence when the history decided
+it. Rule every finding you were given — an unruled
 finding reaches him as sustained by construction.

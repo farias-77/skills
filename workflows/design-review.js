@@ -13,7 +13,7 @@
  * bar (they always find something — that is by design); design-judge
  * (all lenses and the judge are Opus) rules every finding sustained /
  * deferred / dismissed with a one-line reason, calibrated by
- * decisions.md, reviews.md and the house taste ledger. Every ruling
+ * decisions.md and reviews.md (the user's rulings inside). Every ruling
  * that comes back is the JUDGE'S PROPOSAL: the conductor puts every
  * finding with it in front of the user, who confirms or overrules —
  * and only his rulings run the next round. `open` lists the lenses the
@@ -40,11 +40,9 @@
  *     lenses:       ['design-reviewer-data'],  // the lenses this round
  *                       // runs — the previous round's `open` list.
  *                       // Omit on round 1: all ten.
- *     scope:        'what changed since the last round',  // optional;
+ *     scope:        'what changed since the last round'  // optional;
  *                       // a focus note, not a fence — reviewers may
  *                       // still read everything
- *     tastePath:    'absolute path to docs/standards/taste.md'  // the
- *                       // house taste ledger the judge calibrates by
  *   }})
  *
  * Returns { round, blockers, sustained, open, invalid, reviews:
@@ -191,7 +189,7 @@ ${verdictBoard}`, {
 
 // ---- The judge: the lenses report, the judge proposes, the user rules --
 // Every finding gets an id; design-judge rules each one with a reason,
-// calibrated by decisions.md, the round history and the taste ledger.
+// calibrated by decisions.md and the round history (the user's rulings).
 // The ruling is a proposal for the user. An unruled finding reaches
 // him as sustained — fail-safe, never fail-silent.
 const allFindings = []
@@ -210,9 +208,8 @@ if (allFindings.length) {
   const dispatchJudge = () => agent(`${inputs}
 
 The round audit so far (the user's rulings on the earlier rounds): ${args.designDir}/reviews.md
-The house taste ledger (how the user has ruled before): ${args?.tastePath ?? '<pipeline root>/docs/standards/taste.md'}
 
-The round's lenses have reported. Read the design, decisions.md, the audit and the ledger, then rule EVERY finding below, by its id — your ruling is the proposal the user confirms or overrules.
+The round's lenses have reported. Read the design, decisions.md and the audit, then rule EVERY finding below, by its id — your ruling is the proposal the user confirms or overrules.
 
 ${board}`, { label: `${JUDGE}#r${round}`, phase: 'Judge', agentType: JUDGE, schema: JUDGMENT })
 
