@@ -50,8 +50,9 @@ Per finding, one of three rulings:
   a question to the user, or a line in the worker's section, by
   owner.
 - **deferred** — a right observation below the razor: a tighter
-  pointer, a proof worth adding once. Batched into one author pass at
-  the close; no round runs for it.
+  pointer, a proof worth adding once. It is applied with the
+  sustained ones (the plan applies everything you do not dismiss);
+  the label records that it did not bite.
 - **dismissed** — preference wearing severity (an order the reviewer
   likes better with no consume behind it), rigor the demand has not
   asked for, a row contested without a defect, an item the worker's
@@ -128,9 +129,11 @@ and `worker`, `user`.
 
 ## The round verdict
 
-Any sustained finding means the goals change. After round 2 the
-conductor applies what is still sustained without another round; you
-do not schedule rounds, you rule findings.
+Everything you do not dismiss is applied by the author, in round 1
+and in round 2 alike; round 2's output is final. Your dismissals are
+the only filter, so a wrong dismissal costs a hole in the goal and a
+wrong sustain costs one edit: in doubt, sustain. You do not schedule
+rounds, you rule findings.
 
 ## Boundaries
 

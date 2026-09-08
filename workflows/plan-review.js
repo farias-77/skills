@@ -4,10 +4,10 @@
  * Why a workflow: the guarantee that no lens is skipped must be
  * physical, not discipline. Every round is whole: the three lenses in
  * parallel with, per wave's goal, two blind readers and a referee;
- * then the judge. There are no delta rounds and no final round: the
- * budget is two whole rounds, and what is still sustained after the
- * second is applied without re-review (a third round only on the
- * user's explicit call).
+ * then the judge. There are no delta rounds and no final round: two
+ * whole rounds, always. Everything round 1's judge does not dismiss
+ * is applied (findings and suggestions alike); round 2 runs over the
+ * result and its output is applied and final.
  *
  * THE BLIND READS are per goal: two Haiku readers build one wave each,
  * alone, one build per key (`wave`, `row:<N.k>` per row heading,
@@ -52,8 +52,8 @@
  * verified, quote, findings, invalid }] with the referees merged as
  * one `plan-reviewer-ambiguity` entry; unread lists the goal ids whose
  * readings did not survive. The conductor writes reviews.md, sends the
- * `author` and `worker` fixes to plan-author, asks the user the `user`
- * ones, and runs round 2 whole if any text changed.
+ * `author` and `worker` fixes to plan-author, rules the `user` ones
+ * against the approved cut, and runs round 2 whole over the result.
  */
 
 export const meta = {
