@@ -626,11 +626,16 @@ const BLUEPRINT = {
      closes. */
   design: null,
 
-  /* Filled from stage 3 on — PER WAVE (the cut is stage 3's), same keys
-     and shapes as ever; each stage skill documents its tab's contract. A
-     wave that is named but not started sits as null. */
+  /* Filled by stage 3 — the whole sequence at once: the waves as
+     checkpoints, the rows of each, the review (stage-plan documents
+     the shape). Null until the plan closes. */
+  plan: null,
+
+  /* Filled from stage 4 on — PER WAVE, same keys and shapes as ever;
+     each stage skill documents its tab's contract. A wave that is
+     named but not started sits as null. */
   waves: {
-    // 'w01-<what-it-delivers>': { design: {...}, plan: {...}, execution: {...}, release: {...} },
+    // 'w01-<what-it-delivers>': { execution: {...}, release: {...} },
   }
 };
 /* ══════════════ END OF DATA — do not edit below this line ══════════════ */
@@ -641,12 +646,13 @@ const BLUEPRINT = {
 const esc = s => String(s).replace(/[&<>]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
 const jsonc = s => esc(s).replace(/\/\/(.*)$/gm, '<span class="c">//$1</span>');
 const nonEmpty = v => Array.isArray(v) ? v.length > 0 : !!v;
-const WAVED = ['plan','execution','release'];   // stage tabs that live per wave (design is workstream-level)
+const WAVED = ['execution','release'];   // stage tabs that live per wave (design and plan are workstream-level)
 let waveNow = BLUEPRINT.workstream.wave || Object.keys(BLUEPRINT.waves || {})[0] || null;
 const W = () => (waveNow && BLUEPRINT.waves && BLUEPRINT.waves[waveNow]) || {};
-// the design: workstream-level since v7; a blueprint written before then keeps it under its wave
+// design and plan: workstream-level since v7; a blueprint written before then keeps them under a wave
 const D = () => BLUEPRINT.design || W().design || {};
-const has = k => k === 'design' ? nonEmpty(D()) : WAVED.includes(k) ? nonEmpty(W()[k]) : nonEmpty(BLUEPRINT[k]);
+const P = () => BLUEPRINT.plan || W().plan || {};
+const has = k => k === 'design' ? nonEmpty(D()) : k === 'plan' ? nonEmpty(P()) : WAVED.includes(k) ? nonEmpty(W()[k]) : nonEmpty(BLUEPRINT[k]);
 const secT = (t, n) => `<div class="sec-t"><h2>${t}</h2>${n != null ? `<span class="n">${n}</span>` : ''}</div>`;
 
 const STAGES = [
@@ -685,7 +691,7 @@ function renderOverview() {
     <div class="steps">${order.map((k,i) => `<div class="st ${i<at?'done':''} ${i===at?'now':''}">
       <span class="sn">${i+1}</span><span class="sw">${lbl[k]}</span></div>`).join('')}</div>
     <p style="margin:10px 0 0;color:var(--ink-2)">${p.status}</p></section>
-  ${p.waves?.length ? `<section class="sec">${secT('The wave map', waveNow ? `${waveNow} is current` : 'the cut arrives with the design')}
+  ${p.waves?.length ? `<section class="sec">${secT('The wave map', waveNow ? `${waveNow} is current` : 'the cut arrives with the plan')}
     <div class="card" style="display:grid;padding:14px 16px">${p.waves.map(w => `<div class="wave ${w.state==='this wave'?'this':''}">
       <b>${w.n}</b><div><span class="wn">${w.name}</span><span class="ws">${w.state}</span></div></div>`).join('')}</div>
   </section>` : ''}
@@ -1115,22 +1121,29 @@ function lensCard(l, totalRounds) {
 
 /* ---------- plan ---------- */
 function renderPlan() {
-  const p = W().plan;
-  const map = `<div class="diagram"><div class="pwaves">${p.batches.map(o => `
-    <div class="pcol"><h4>Batch ${o.n}</h4>${o.items.map(i => `
-      <div class="pno ${i.critical?'critical':''} ${i.front?'front':''}"><b>${i.num}</b>${i.t}<span class="dep">${i.dep}</span></div>`).join('')}
+  const p = P();
+  const waves = p.waves || [];
+  // the sequence: one column per wave, its rows as cards; a wave is a checkpoint
+  const map = `<div class="diagram"><div class="pwaves">${waves.map(w => `
+    <div class="pcol"><h4>${w.n}${w.state ? ` · ${w.state}` : ''}</h4>${(w.rows || []).map(i => `
+      <div class="pno ${i.front?'front':''}"><b>${i.num} · ${i.repo}</b>${i.t}<span class="dep">${i.dep && i.dep !== '—' ? `after ${i.dep}` : ''}${i.par ? ` · ∥ ${i.par}` : ''}</span></div>`).join('')}
+      <div class="pno critical"><b>checkpoint</b>${w.ready}</div>
     </div>`).join('')}</div>
-    <div class="plegend"><span><i class="critical"></i>critical path</span>
-      <span><i class="front"></i>frontend</span><span><i></i>backend</span></div></div>`;
-  const cards = p.batches.map(o => `
-    <h3 class="ibatch"><b>Batch ${o.n}</b> · ${o.tit}</h3>
-    <div class="list">${o.items.map(i => `<article class="card icard">
-      <div class="icab"><span class="inum">${i.num}${i.gh ? ` → ${i.gh}` : ''}</span><h3>${i.card.title}</h3>
-        <span class="irepo">${i.repo}</span></div>
-      <p>${i.card.p}</p>
-      <div class="ichips">${(i.card.prod||[]).map(c=>`<span class="ichip prod">produces: ${c}</span>`).join('')}
-        ${(i.card.cons||[]).map(c=>`<span class="ichip">consumes: ${c}</span>`).join('')}</div>
-    </article>`).join('')}</div>`).join('');
+    <div class="plegend"><span><i class="critical"></i>the checkpoint: alpha green, PR open</span>
+      <span><i class="front"></i>frontend</span><span><i></i>backend · infra</span></div></div>`;
+  const cards = waves.map(w => `
+    <h3 class="ibatch"><b>${w.n}</b> · ${w.name}${w.state ? ` <span class="status ${w.state==='done'?'ok':w.state==='this wave'?'warn':''}">${w.state}</span>` : ''}</h3>
+    <article class="card icard">
+      <p>${w.delivers}</p>
+      <div class="ichips"><span class="ichip prod">ready when: ${w.ready}</span>${w.stories ? `<span class="ichip">${w.stories}</span>` : ''}</div>
+      <div class="scroll" style="margin-top:12px"><table class="table">
+        <tr><th>#</th><th>Repo</th><th>Work</th><th>Ready when</th><th>After</th></tr>
+        ${(w.rows || []).map(i => `<tr><td class="num">${i.num}</td><td><code>${i.repo}</code></td><td>${i.t}</td><td>${i.ready || ''}</td><td class="num">${i.dep || '—'}</td></tr>`).join('')}
+      </table></div>
+      ${w.parallel ? `<p class="xnote">in parallel: ${w.parallel}</p>` : ''}
+      ${w.out ? `<p class="xnote">out of this wave: ${w.out}</p>` : ''}
+      ${w.user ? `<p class="xnote">stays with you: ${w.user}</p>` : ''}
+    </article>`).join('');
   const d = p.decisions || {};
   const dec = `
     ${d.decided?.length ? `<section class="sec">${secT('Decided in your place', d.decided.length)}
@@ -1143,30 +1156,33 @@ function renderPlan() {
         <p class="st1">${s.a}</p><p class="st2">${s.b}</p><p class="st3">${s.c}</p></div>`).join('')}
       </div></section>` : ''}`;
   const r = p.review;
-  const count = v => r.lenses.filter(l => l.ver === v).length;
-  const missing = (r.expected || 4) - r.lenses.length;
-  const rev = `
+  const rev = r ? (() => {
+    const count = v => r.lenses.filter(l => l.ver === v).length;
+    const missing = (r.expected || 4) - r.lenses.length;
+    const blind = r.blind || {};
+    return `
   <section class="sec">${secT('The plan review', `round ${r.round} of ${r.totalRounds}`)}
-    <p class="sec-d">Whole-plan lenses plus one that reads each issue cold, alone, exactly as the
-    worker will receive it. When the plan corrects, the whole-plan lenses repeat; the cold one
-    repeats on the issues that changed.</p>
+    <p class="sec-d">Three lenses read the whole sequence (coverage, verifiability, order); two blind
+    readers build each wave from its goal alone and a referee compares what they built. A judge rules
+    every finding; the user rules what is his.</p>
     <div class="scoreboard">
       <div class="pl ok"><span class="v">${count('pass')}</span><span class="l">passed clean</span></div>
       <div class="pl fix"><span class="v">${count('pass with fixes')}</span><span class="l">passed after fixes</span></div>
       <div class="pl fail"><span class="v">${count('fail')}</span><span class="l">did not pass</span></div>
       <div class="pl na"><span class="v">${missing}</span><span class="l">did not run</span></div>
-      <div class="pl ${r.perIssue.pass === r.perIssue.total ? 'ok' : 'fix'}"><span class="v">${r.perIssue.pass}/${r.perIssue.total}</span>
-        <span class="l">issues pass the cold read</span></div></div>
+      ${blind.total ? `<div class="pl ${blind.pass === blind.total ? 'ok' : 'fix'}"><span class="v">${blind.pass}/${blind.total}</span>
+        <span class="l">waves built the same way by both readers</span></div>` : ''}</div>
     ${missing > 0 ? `<div class="warning"><b>A lens without a run invalidates the round</b>
       <p>The run id comes from the system that dispatched the agent, not from the plan text.
       Without it, that scope was not reviewed — and the stage cannot close claiming it was.</p></div>` : ''}
     <div class="list" style="margin-top:20px">${r.lenses.map(l => lensCard(l, r.totalRounds)).join('')}</div></section>`;
+  })() : '';
   return `
   <p class="lede">${p.intro}</p>
-  <div class="scoreboard" style="margin-top:22px;grid-template-columns:repeat(auto-fit,minmax(140px,1fr))">${p.cells.map(c =>
-    `<div class="pl"><span class="v">${c.v}</span><span class="l">${c.l}</span></div>`).join('')}</div>
-  <section class="sec">${secT('The batch map')}${map}</section>
-  <section class="sec">${secT('The issues, batch by batch')}${cards}</section>
+  ${p.cells?.length ? `<div class="scoreboard" style="margin-top:22px;grid-template-columns:repeat(auto-fit,minmax(140px,1fr))">${p.cells.map(c =>
+    `<div class="pl"><span class="v">${c.v}</span><span class="l">${c.l}</span></div>`).join('')}</div>` : ''}
+  <section class="sec">${secT('The sequence', `${waves.length} wave${waves.length === 1 ? '' : 's'}, each a checkpoint in alpha`)}${map}</section>
+  <section class="sec">${secT('Wave by wave')}${cards}</section>
   ${dec}${rev}`;
 }
 
