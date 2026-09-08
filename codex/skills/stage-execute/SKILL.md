@@ -1,6 +1,6 @@
 ---
 name: stage-execute
-description: Build a workstream's waves from its approved plan — feature branch, stories, review, alpha, PR — wave after wave until the last one is proven. Use when the user names a workstream whose .state.md says stage execute.
+description: Build a workstream's waves from its approved plan — feature branch, stories, review, alpha, PR — wave after wave into the workstream branch, and the fix wave the audit sends back. Use in Codex when the user names a workstream whose .state.md says stage execute with chair codex (phase build or fix); the audit phase belongs to the Claude chair.
 ---
 
 # Stage 4: Execute
