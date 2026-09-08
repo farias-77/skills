@@ -1,4 +1,4 @@
-# Rollout — <wave>
+# Rollout — <workstream>
 
 <!--
   The way in and out of production. MUST have: deploy order across repos
@@ -28,6 +28,14 @@
 | From step | How to go back | Takes |
 |---|---|---|
 | <N> | <the steps, not hope> | <minutes> |
+
+## The implementer decides
+
+<!-- The latitude the user granted for this document (decisions.md)
+     plus what transcription left open on purpose. One line each.
+     Never a hard class. -->
+
+- <item>
 
 ## References
 

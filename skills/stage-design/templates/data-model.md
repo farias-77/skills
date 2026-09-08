@@ -1,4 +1,4 @@
-# Data model — <wave>
+# Data model — <workstream>
 
 <!--
   What is stored and how it is reached. MUST have: every entity with an
@@ -36,6 +36,14 @@
 | current | | |
 | 10× | | |
 | 100× | | |
+
+## The implementer decides
+
+<!-- The latitude the user granted for this document (decisions.md)
+     plus what transcription left open on purpose. One line each.
+     Never a hard class. -->
+
+- <item>
 
 ## References
 

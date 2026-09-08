@@ -1,4 +1,4 @@
-# Security — <wave>
+# Security — <workstream>
 
 <!--
   The fixed class sweep. MUST have: every one of the 13 classes with one
@@ -28,6 +28,14 @@
 ## The worst case, written out
 
 <for each risk accepted: what the worst realistic abuse looks like, end to end>
+
+## The implementer decides
+
+<!-- The latitude the user granted for this document (decisions.md)
+     plus what transcription left open on purpose. One line each.
+     Never a hard class. -->
+
+- <item>
 
 ## References
 

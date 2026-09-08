@@ -1,4 +1,4 @@
-# Code — <wave>
+# Code — <workstream>
 
 <!--
   The file-tree PREVIEW per touched repo — a guide of organization,
@@ -23,6 +23,14 @@ smoke/
 
 - **Patterns:** <the ones this repo follows — house standard first, its own docs second>
 - **Extension points:** <what enters, by implementing what — and what does NOT change>
+
+## The implementer decides
+
+<!-- The latitude the user granted for this document (decisions.md)
+     plus what transcription left open on purpose. One line each.
+     Never a hard class. -->
+
+- <item>
 
 ## References
 

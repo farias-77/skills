@@ -1,4 +1,4 @@
-# Contracts — <wave>
+# Contracts — <workstream>
 
 <!--
   THE FROZEN BRIDGE: after approval, repos are planned and built in
@@ -55,6 +55,14 @@
 ## Evolution rules
 
 - <how a field is added without breaking the other side; versioning; who owns the schema>
+
+## The implementer decides
+
+<!-- The latitude the user granted for this document (decisions.md)
+     plus what transcription left open on purpose. One line each.
+     Never a hard class. -->
+
+- <item>
 
 ## References
 

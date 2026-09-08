@@ -1,4 +1,4 @@
-# Infra & cost — <wave>
+# Infra & cost — <workstream>
 
 <!--
   What exists after this ships, configured on purpose. MUST have: every
@@ -37,6 +37,14 @@ Assumptions: <the traffic numbers these tables stand on>
 | Variable | current | 10× | 100× |
 |---|---|---|---|
 | <driver> | | | |
+
+## The implementer decides
+
+<!-- The latitude the user granted for this document (decisions.md)
+     plus what transcription left open on purpose. One line each.
+     Never a hard class. -->
+
+- <item>
 
 ## References
 

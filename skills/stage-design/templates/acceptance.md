@@ -1,4 +1,4 @@
-# Acceptance — <wave>
+# Acceptance — <workstream>
 
 <!--
   The executable acceptance SPEC — frozen with contracts.md, one line
@@ -21,6 +21,14 @@
 | `post-create-<x>-201` | `POST /<x>` <valid payload, the fixture fields> | 201 + <envelope fields> | <item exists, the fields that must match> | delete created item |
 | `post-create-<x>-no-auth-401` | no token | 401 `UNAUTHORIZED` envelope | none | — |
 | `post-create-<x>-invalid-422` | <the invalid shape> | 422 `<CODE>` envelope | nothing written | — |
+
+## The implementer decides
+
+<!-- The latitude the user granted for this document (decisions.md)
+     plus what transcription left open on purpose. One line each.
+     Never a hard class. -->
+
+- <item>
 
 ## References
 

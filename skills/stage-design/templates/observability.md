@@ -1,4 +1,4 @@
-# Observability — <wave>
+# Observability — <workstream>
 
 <!--
   The alarms, most important first. MUST have, per alarm, the four
@@ -23,6 +23,14 @@
 ## Dashboard (watched, never pages)
 
 - <metric> — <why it is worth a chart but not a page>
+
+## The implementer decides
+
+<!-- The latitude the user granted for this document (decisions.md)
+     plus what transcription left open on purpose. One line each.
+     Never a hard class. -->
+
+- <item>
 
 ## References
 

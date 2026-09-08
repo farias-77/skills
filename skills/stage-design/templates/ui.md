@@ -1,4 +1,4 @@
-# UI — <wave>
+# UI — <workstream>
 
 <!--
   How the UI works today and how this feature lands in it. MUST have:
@@ -32,6 +32,14 @@
 
 - **Link:** <the wave's design canvas — where the user validates and edits>
 - **Artboards:** <the list, as in canvas.json>
+
+## The implementer decides
+
+<!-- The latitude the user granted for this document (decisions.md)
+     plus what transcription left open on purpose. One line each.
+     Never a hard class. -->
+
+- <item>
 
 ## References
 
