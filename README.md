@@ -99,8 +99,9 @@ contracts, security and cost, the implementer for declared latitude.
 Two rounds at most; the residue is written down, not chased. The wave
 cut is stage 3's.
 
-**3 · Plan** — the design becomes a sequence, built with the user in
-a session: waves that are each a **verifiable checkpoint in alpha**
+**3 · Plan** — the design becomes a sequence. The conductor proposes
+the cut and the human approves or rejects it, wave by wave; the rest
+is mechanical: waves that are each a **verifiable checkpoint in alpha**
 (one feature branch per repo, the whole smoke suite green, a PR to
 main open), rows inside each wave (one story in one repo, with a
 "ready when" a person can observe), the order and what runs in
@@ -111,8 +112,10 @@ never re-deciding it. A whole review round runs: three lenses
 referee per goal (would two engineers build the same wave and prove
 it the same way?); a judge rules every finding and marks who owns the
 fix — the author for wording, the human for the sequence, the worker
-for execution latitude. Two rounds at most. The goals are files; the
-execution chair reads them wave by wave.
+for execution latitude; what would be the human's is ruled by the
+conductor against the approved cut and listed at the close for veto.
+Two rounds at most. The goals are files, and each wave closes with the
+prompt the human pastes into the execution chair to start it.
 
 ## On cost
 

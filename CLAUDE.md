@@ -36,7 +36,11 @@ contract shape, security posture, the sequence and confirmed
 decisions go to him; at design a real observation that is declared
 latitude goes to the implementer, as one line in the document's "The
 implementer decides" section, and at plan to the worker, as one line
-in the goal's "The worker decides" section. He rules what is his.
+in the goal's "The worker decides" section. He rules what is his,
+except at plan: there the conductor rules the user-owned findings
+against the cut he approved (marked `ruled: conductor` in
+`rulings.md`) and lists them at the close for veto; only a finding
+that would change what a wave delivers reaches him as a question.
 Plus one veto question over what the author fixed alone. The budget
 at discovery, design and plan is two whole rounds; a third only on
 his explicit call. His validation of every story (confirm / reduce /

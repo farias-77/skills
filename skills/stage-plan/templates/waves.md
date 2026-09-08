@@ -1,9 +1,9 @@
 # Waves — <workstream> — the sequence
 
 <!--
-  Written by the CONDUCTOR during the plan session, as the session
-  happens. The one plan file the author never edits; the execution
-  chair fills the Status column as rows and waves close. Every wave
+  Written by the CONDUCTOR, whole, once the user approved the cut
+  wave by wave. The author never edits it; the execution chair fills
+  the Status column as rows and waves close. Every wave
   is a checkpoint: one feature branch per repo, deployed to alpha,
   the whole smoke suite green, a PR to main open for the user. The
   next wave's branches are cut from this wave's. Prod is stage 5's.
