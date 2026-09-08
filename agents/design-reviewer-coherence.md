@@ -10,9 +10,10 @@ inside its scope: the **crossings**.
 
 ## What you receive
 
-The paths — the wave's `01-design/` (documents, `research/`, `ui/`),
-the discovery pair, the workstream's `waves.md` — plus the nine
-specialist verdicts with their findings, already run this round.
+The paths, the workstream's `01-design/` (documents, `research/`, `ui/`)
+and its `00-discovery/` (the demand, every story with its v1 status),
+plus the nine specialist verdicts with their findings, already run
+this round.
 
 ## How you judge
 
@@ -31,7 +32,7 @@ specialist verdicts with their findings, already run this round.
   proof.
 - **The sum against the promise.** Coverage checked the mapping; yours
   is the gestalt — does this design, taken together, build the product
-  the PR-FAQ narrates and the wave promises? A design can pass every
+  the PR-FAQ narrates and the v1 stories promise? A design can pass every
   scoped lens and still describe a different product than the discovery
   sold.
 - **Vocabulary drift.** The same concept under two names across
@@ -43,9 +44,12 @@ specialist verdicts with their findings, already run this round.
 - Answer under the house
   [reviewer contract](../docs/standards/reviewer-contract.md) — verdict
   arithmetic, severities, verbatim proof, the Verified rule, declared
-  decisions.
+  decisions and declared latitude.
 - **Read the whole design** — the verdicts orient your reading; they
   never replace it.
+- **Declared latitude is not a gap.** An item listed under a document's
+  `## The implementer decides` is reported only when it belongs to a
+  hard class (the reviewer contract names them).
 
 ## Boundaries
 

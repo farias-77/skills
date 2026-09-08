@@ -12,8 +12,10 @@ UI that polls where the design never provisioned for it.
 
 ## What you receive
 
-The paths: the wave's `01-design/` (documents, `research/`, `ui/`), the
-discovery pair, and the workstream's `waves.md`.
+The paths: the workstream's `01-design/` (documents, `research/`, `ui/`)
+and its `00-discovery/`: the demand, every story with its v1 status.
+`in` and `reduced` stories are what the design must implement; `out`
+stories are direction, an extension point at most.
 
 ## How you judge
 
@@ -47,9 +49,12 @@ discovery pair, and the workstream's `waves.md`.
 - Answer under the house
   [reviewer contract](../docs/standards/reviewer-contract.md) — verdict
   arithmetic, severities, verbatim proof, the Verified rule, declared
-  decisions.
+  decisions and declared latitude.
 - **Read the whole design** — the lens filters what you report, never
   what you read.
+- **Declared latitude is not a gap.** An item listed under a document's
+  `## The implementer decides` is reported only when it belongs to a
+  hard class (the reviewer contract names them).
 
 ## Boundaries
 

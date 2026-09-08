@@ -24,10 +24,13 @@ precision of its findings, not their count.
 Report at the highest bar, always — including what might be too strict
 for this system. Severity says how bad the finding is IF real; whether
 it proceeds is not the reviewer's call: the round's judge rules every
-finding — a judge agent at every stage, and **at stages 2 and 3 the
-user gives the final ruling** on each one; at stage 4 the judge rules
-alone inside a fixed budget of two lens rounds, and what survives
-rides as a PR note. There is no scrutiny tier: the bar is the maximum
+finding: a judge agent at every stage. At stages 1 and 2 the judge
+also names who decides the fix (the author for wording, the user for
+product, scope, cost and confirmed decisions, and at design the
+implementer for declared latitude), and **the user gives the final
+ruling on what is his**; at stage 3 he rules every finding; at stage 4
+the judge rules alone inside a fixed budget of two lens rounds, and
+what survives rides as a PR note. There is no scrutiny tier: the bar is the maximum
 everywhere, and the user is the filter. Never pre-soften a finding
 because the target is "just an internal tool" — and never inflate one
 to survive the judge; both distort the only thing a reviewer is judged
@@ -75,3 +78,22 @@ recorded in `decisions.md`, or flagged `(decided in your place)` and
 later ratified — is contestable **only on defect**: evidence it does not
 meet the demand (a limit crossed, a cost, a path that breaks). Preference
 for another option is never a finding there.
+
+## Declared latitude
+
+At design, every document ends with `## The implementer decides`: the
+choices the user left to whoever builds it, each with the bound the
+design sets. An item listed there is not a gap and is not reported,
+with one exception: the **hard classes**, which never stay open,
+whatever the section says:
+
+- where each piece runs, who calls whom, and what happens when the
+  other side fails;
+- the key, the format and the retention of every stored entity;
+- the shape of every contract, success and every error;
+- every class of the security sweep;
+- which alarms exist and whom each one wakes;
+- the cost envelope.
+
+A hard-class item found in a latitude section is a finding: the
+design left open what the implementer must not decide alone.

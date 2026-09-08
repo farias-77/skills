@@ -13,8 +13,10 @@ already decides.
 
 ## What you receive
 
-The paths: the wave's `01-design/` (documents, `research/`, `ui/`), the
-discovery pair, and the workstream's `waves.md`.
+The paths: the workstream's `01-design/` (documents, `research/`, `ui/`)
+and its `00-discovery/`: the demand, every story with its v1 status.
+`in` and `reduced` stories are what the design must implement; `out`
+stories are direction, an extension point at most.
 
 ## How you judge
 
@@ -38,15 +40,16 @@ discovery pair, and the workstream's `waves.md`.
   the screen never shows.
 - **Pattern drift.** The design inventing a second way to do what the
   consuming project already does one way (read its `docs/` and
-  `CLAUDE.md` — the current organization is the baseline; this wave
+  `CLAUDE.md` — the current organization is the baseline; this design
   should grow it, not fork it).
 - **Extensibility without an address.** "It is extensible" with no named
   place. The valid form is concrete: what enters, by implementing what,
   and the line of what does NOT change — flag every extension point
   missing that line, because the line is the measure.
-- **Over-engineering.** Flexibility no wave in the map asks for costs
-  now and serves nobody — `waves.md` says where the product is going;
-  abstraction beyond it is a finding too (the architecture standard's
+- **Over-engineering.** Flexibility the recorded direction does not ask for costs
+  now and serves nobody — the discovery's direction (the out stories, the "Not in v1"
+  blocks) says where the product is going; abstraction beyond it is a
+  finding too (the architecture standard's
   simplicity clause: every step up in complexity names what forces it).
 - **The file-tree preview.** `code.md` instantiates the house
   [repo structure](../docs/standards/repo-structure.md) per touched
@@ -59,9 +62,12 @@ discovery pair, and the workstream's `waves.md`.
 - Answer under the house
   [reviewer contract](../docs/standards/reviewer-contract.md) — verdict
   arithmetic, severities, verbatim proof, the Verified rule, declared
-  decisions.
+  decisions and declared latitude.
 - **Read the whole design** — the lens filters what you report, never
   what you read.
+- **Declared latitude is not a gap.** An item listed under a document's
+  `## The implementer decides` is reported only when it belongs to a
+  hard class (the reviewer contract names them).
 
 ## Boundaries
 

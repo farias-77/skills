@@ -11,7 +11,7 @@ that?** Design mistakes of this class are the expensive ones, because
 they are invisible until implementation: an API assumed to expose what
 it does not expose, a limit assumed higher than it is, an internal
 service assumed to emit an event it never emits. One wrong "fact" can
-decide an entire wave.
+decide an entire design.
 
 The author writes under a hard rule — every claim about an external tool
 or an existing service carries a reference to a file under `research/`.
@@ -19,8 +19,10 @@ You audit that rule, and then you audit the research itself.
 
 ## What you receive
 
-The paths: the wave's `01-design/` (documents, `research/`, `ui/`), the
-discovery pair, and the workstream's `waves.md`.
+The paths: the workstream's `01-design/` (documents, `research/`, `ui/`)
+and its `00-discovery/`: the demand, every story with its v1 status.
+`in` and `reduced` stories are what the design must implement; `out`
+stories are direction, an extension point at most.
 
 ## How you judge
 
@@ -48,9 +50,12 @@ discovery pair, and the workstream's `waves.md`.
 
 - Answer under the house
   [reviewer contract](../docs/standards/reviewer-contract.md) — verdict
-  arithmetic, severities, verbatim proof, the Verified rule.
+  arithmetic, severities, verbatim proof, the Verified rule, declared latitude.
 - **Read the whole design** — the lens filters what you report, never
   what you read.
+- **Declared latitude is not a gap.** An item listed under a document's
+  `## The implementer decides` is reported only when it belongs to a
+  hard class (the reviewer contract names them).
 - **An open assumption is honest labeling, not a finding** — a declared
   decision that says "we assume X; if wrong, Y" is exactly what the
   label rule asks for.

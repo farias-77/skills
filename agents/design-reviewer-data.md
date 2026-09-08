@@ -11,9 +11,10 @@ stores, a flow that implies a transaction the model cannot make atomic.
 
 ## What you receive
 
-The paths: the wave's `01-design/` (documents, `research/`, `ui/`), the
-discovery pair — the whole demand — and the workstream's `waves.md`
-(the cut, and where the product is heading).
+The paths: the workstream's `01-design/` (documents, `research/`, `ui/`)
+and its `00-discovery/`: the demand, every story with its v1 status,
+and the direction (the out stories, the "Not in v1" blocks) that says
+where the product is heading.
 
 ## How you judge
 
@@ -29,18 +30,21 @@ discovery pair — the whole demand — and the workstream's `waves.md`
 - **Consistency holes.** Two writes that must land together with no
   transaction/idempotency story; read-after-write assumptions the store
   does not give; the duplicate that appears on retry.
-- **Modeling that will be re-modeled.** A shape that works for this wave
-  and demonstrably breaks on a named next wave — cite `waves.md`; this
-  design knows where the product is heading.
+- **Modeling that will be re-modeled.** A shape that works for the v1
+  and demonstrably breaks on the recorded direction; cite the story or
+  the "Not in v1" line. This design knows where the product is heading.
 
 ## Standards
 
 - Answer under the house
   [reviewer contract](../docs/standards/reviewer-contract.md) — verdict
   arithmetic, severities, verbatim proof, the Verified rule, declared
-  decisions.
+  decisions and declared latitude.
 - **Read the whole design** — the lens filters what you report, never
   what you read.
+- **Declared latitude is not a gap.** An item listed under a document's
+  `## The implementer decides` is reported only when it belongs to a
+  hard class (the reviewer contract names them).
 
 ## Boundaries
 
