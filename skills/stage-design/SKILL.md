@@ -1,6 +1,6 @@
 ---
 name: stage-design
-description: Conducts stage 2 (Design) — takes an approved discovery and produces, with the user, how the whole demand works: the macro shape and then the ten documents one by one, every call recorded as a decision card; one Fable author transcribes the decisions into the design files, the research and the UI artboards; a whole review round runs (ten Opus lenses, two blind readers and a referee per flow, an Opus judge that marks who owns each fix: author, user or implementer); the author fixes wording, the user rules what changes the product, the implementer keeps declared latitude; two rounds at most; the blueprint's Design tab is published for approval. Runs in Claude Code with a Fable session. Use after a discovery is approved, or to resume a design in progress.
+description: Conducts stage 2 (Design) — takes an approved discovery and produces, with the user, how the whole demand works: the macro shape and then the ten documents one by one, every call recorded as a decision card; one Fable author transcribes the decisions into the design files, the research and the UI artboards; a whole review round runs (nine Opus lenses, two blind readers and a referee per flow, an Opus judge that marks who owns each fix: author, user or implementer); the author fixes wording, the user rules what changes the product, the implementer keeps declared latitude; two rounds at most; the blueprint's Design tab is published for approval. Runs in Claude Code with a Fable session. Use after a discovery is approved, or to resume a design in progress.
 disable-model-invocation: false
 argument-hint: "<workstream-slug>"
 allowed-tools: Read, Write, Edit, Glob, Grep, Agent, SendMessage, Workflow, AskUserQuestion, Artifact, WebSearch, WebFetch, Bash(mkdir *), Bash(date *), Bash(ls *), Bash(cat *), Bash(rm *), Bash(git *)
@@ -57,7 +57,7 @@ turn on a plan or a promise; do the work.
               the ten documents, the artboards, the canvas. Its questions come
               back in one batch; you ask the user and send the answers.
 3. Review     the design-review workflow, whole: nine Opus lenses beside two
-              Haiku readers and a referee per flow, coherence, the Opus judge.
+              Haiku readers and a referee per flow, then the Opus judge.
 4. Rule       author-owned and implementer-owned findings go to the author.
               User-owned findings go to the user, one question each, grouped by
               document, the rulings board open beside. One veto question.
@@ -260,11 +260,10 @@ Scripts cannot read files; you pass the text.
 | `design-reviewer-security` | the abuse paths; the class sweep answered with mechanisms |
 | `design-reviewer-contracts` | every contract whole, success and error; the data each side needs arrives |
 | `design-reviewer-alarms` | every alarm has its four fields and would not ring on a quiet day |
-| `design-reviewer-coverage` | every story has its home; nothing in the design is unforced |
+| `design-reviewer-coverage` | every story has its home; the whole builds the product the PR-FAQ narrates; nothing in the design is unforced |
 | `design-reviewer-facts` | every claim about the outside world traces to research |
 | `design-reviewer-ui` | the screens fit the product as it is; every story state has a home |
 | 2× `design-blind-reader` → `design-reviewer-ambiguity`, per flow | would two engineers implement the same flow from these steps? |
-| `design-reviewer-coherence` | contradictions across the documents, with all verdicts in hand |
 | `design-judge` | could the implementer place this and build it one way? and who decides the fix: the author, the user, or the implementer? |
 
 The round runs whole every time. Every reviewer answers under the

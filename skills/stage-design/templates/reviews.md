@@ -26,7 +26,6 @@
 | design-reviewer-coverage | | | |
 | design-reviewer-facts | | | |
 | design-reviewer-ui | | | |
-| design-reviewer-coherence | | | |
 
 ### Blind reads
 

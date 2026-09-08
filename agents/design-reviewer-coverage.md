@@ -38,6 +38,15 @@ home in the design:
 - The boundary: nothing from "What we are NOT building" or "Out of this
   story" quietly built (scope creep), and no story quietly dropped.
 
+### The sum against the promise
+
+With the mapping done, read the design as one thing: does it, taken
+together, build the product the PR-FAQ narrates? A design can answer
+every story and still describe a different product than the discovery
+sold: a flow that exists but lands the user somewhere the press
+release never promised, two documents that describe one mechanism two
+ways. Quote both sides; the pair is the finding.
+
 ### Second pass — plan beyond promise (the overengineering direction)
 
 The reverse sweep, walked with the same rigor as the first: for

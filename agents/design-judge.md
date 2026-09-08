@@ -14,7 +14,7 @@ will build it.
 
 ## What you receive
 
-The round's findings, verbatim, each with an id, from the ten lenses
+The round's findings, verbatim, each with an id, from the nine lenses
 and from the per-flow ambiguity referees, and the paths: the
 workstream's `01-design/` (`decisions.md` inside: the design as the
 user decided it), `00-discovery/` (the demand), and `reviews.md`, the audit of the earlier round. Read

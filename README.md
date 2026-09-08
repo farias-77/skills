@@ -90,7 +90,7 @@ decision, the conductor recommending, the human choosing, and every
 document ending with what the implementer is free to decide. One
 Fable author transcribes the decisions into the files, with dedicated
 research per external target and the UI as artboards on a design
-canvas. A whole review round runs: ten Opus lenses beside, per flow,
+canvas. A whole review round runs: nine Opus lenses beside, per flow,
 two **blind readers** and a referee reporting where they would build
 different things; a **judge** rules every finding by the design razor
 (could the implementer place this and build it one way?) and marks who

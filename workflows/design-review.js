@@ -2,9 +2,8 @@
  * design-review.js — the stage-2 review round as deterministic code.
  *
  * Why a workflow: the guarantee that no lens is skipped must be
- * physical, not discipline. Every round is whole: the nine specialist
- * lenses in parallel with, per flow, two blind readers and a referee;
- * then coherence, with the specialist verdicts in hand; then the
+ * physical, not discipline. Every round is whole: the nine lenses in
+ * parallel with, per flow, two blind readers and a referee; then the
  * judge. There are no delta rounds and no final round: the budget is
  * two whole rounds, and what is still sustained after the second is
  * applied without re-review (a third round only on the user's
@@ -60,16 +59,15 @@
 
 export const meta = {
   name: 'design-review',
-  description: 'Stage-2 review round, always whole: nine Opus lenses in parallel with two Haiku blind readers and a Sonnet referee per flow, coherence last, the Opus judge ruling every finding by the design razor and marking its owner (author, user or implementer)',
+  description: 'Stage-2 review round, always whole: nine Opus lenses in parallel with two Haiku blind readers and a Sonnet referee per flow, the Opus judge ruling every finding by the design razor and marking its owner (author, user or implementer)',
   phases: [
-    { title: 'Specialists', detail: 'the nine specialist lenses in parallel, each reads everything, reports its lens', model: 'opus' },
+    { title: 'Lenses', detail: 'the nine lenses in parallel, each reads everything, reports its lens', model: 'opus' },
     { title: 'Blind reads', detail: 'per flow: two Haiku readers build it alone, a Sonnet referee compares them key by key' },
-    { title: 'Coherence', detail: 'the cross-cutting lens, with the specialist verdicts in hand', model: 'opus' },
     { title: 'Judge', detail: 'design-judge rules every finding sustained / deferred / dismissed and marks the owner', model: 'opus' },
   ],
 }
 
-const SPECIALISTS = [
+const LENSES = [
   'design-reviewer-data',
   'design-reviewer-code',
   'design-reviewer-infra',
@@ -80,7 +78,6 @@ const SPECIALISTS = [
   'design-reviewer-facts',
   'design-reviewer-ui',
 ]
-const COHERENCE = 'design-reviewer-coherence'
 const REFEREE = 'design-reviewer-ambiguity'
 const READER = 'design-blind-reader'
 const JUDGE = 'design-judge'
@@ -273,15 +270,15 @@ ${JSON.stringify(readings[1].builds, null, 2)}`, {
   return { flow: f.id, ...r }
 }
 
-// ---------- the round: specialists and per-flow reads, concurrently ----------
+// ---------- the round: lenses and per-flow reads, concurrently ----------
 
-phase('Specialists')
-log(`round ${round}: ${SPECIALISTS.length} specialists · ${flows.length} flows × (2 readers + referee) · then coherence · then the judge`)
+phase('Lenses')
+log(`round ${round}: ${LENSES.length} lenses · ${flows.length} flows × (2 readers + referee) · then the judge`)
 
-const [specialistResults, flowResults] = await parallel([
-  () => parallel(SPECIALISTS.map(name => () =>
+const [lensResults, flowResults] = await parallel([
+  () => parallel(LENSES.map(name => () =>
     reviewed(() =>
-      agent(docInputs, { label: `${name}·r${round}`, phase: 'Specialists', agentType: name, model: 'opus', schema: REVIEW }),
+      agent(docInputs, { label: `${name}·r${round}`, phase: 'Lenses', agentType: name, model: 'opus', schema: REVIEW }),
       name).then(r => ({ lens: name, ...r }))
   )),
   () => pipeline(
@@ -293,7 +290,6 @@ const [specialistResults, flowResults] = await parallel([
   ),
 ])
 
-const specialists = (specialistResults ?? []).filter(Boolean)
 
 // The referees merge into one ambiguity lens entry: the judge and the
 // audit see one lens with per-flow findings.
@@ -313,25 +309,7 @@ const ambiguity = {
   keys: perFlow.map(r => ({ flow: r.flow, keys: r.keys })),
 }
 
-// ---------- coherence, with the verdicts in hand ----------
-
-phase('Coherence')
-const board = [...specialists, ...(flows.length ? [ambiguity] : [])].map(r =>
-  `- ${r.lens}: ${r.invalid ? 'INVALID (no valid output after retry)' : r.verdict} · ${r.findings.length} finding(s)` +
-  r.findings.map(f => `\n    [${f.severity}] ${f.title}: ${f.gap}`).join('')
-).join('\n')
-
-const coherence = await reviewed(() =>
-  agent(`${docInputs}
-
-The specialists and the per-flow referees of this round already ran. Their verdicts and findings:
-
-${board}`, {
-    label: `${COHERENCE}·r${round}`, phase: 'Coherence',
-    agentType: COHERENCE, model: 'opus', schema: REVIEW,
-  }), COHERENCE).then(r => ({ lens: COHERENCE, ...r }))
-
-const lenses = [...specialists, ...(flows.length ? [ambiguity] : []), coherence]
+const lenses = [...(lensResults ?? []).filter(Boolean), ...(flows.length ? [ambiguity] : [])]
 
 // ---------- the judge ----------
 

@@ -36,6 +36,20 @@ because the target is "just an internal tool" — and never inflate one
 to survive the judge; both distort the only thing a reviewer is judged
 by, precision.
 
+## Wrong, and missing
+
+A reviewer reports what is wrong and what is missing: the state no
+screen carries, the failure no flow handles, the alarm no one wrote,
+the field a consumer needs and no contract returns. Both are
+findings, and both carry a fix. **The fix is a proposal at the
+simplest form that meets the house standard**: it names the concrete
+change, and when it adds a mechanism it names what forces it (an AC,
+a decision, a standard rule). A fix that adds a mechanism nothing
+forces is overengineering wearing a finding; the judge dismisses it,
+and the coverage lens reports it if it ever lands. The goal of the
+panel is the best-built thing that still fits the demand and the
+standards, not the most complete one.
+
 ## The materiality bar
 
 A `fix` must change what a competent implementer would build — a
