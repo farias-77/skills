@@ -8,6 +8,13 @@ allowed-tools: Read, Write, Edit, Glob, Grep, Workflow, Agent, Artifact, AskUser
 
 # Stage 4: Execute — the maestro
 
+> **v7 note (08/09/2026):** stage 3 no longer produces GitHub issues.
+> It produces `waves.md` (the sequence) and one goal per wave under
+> `02-plan/goals/`: the whole brief for a wave, built as one feature
+> branch per repo, proved in alpha, handed back as a PR to `main`.
+> The execution chair (Codex) takes the goals in order. This skill
+> still reads as if issues arrived from stage 3; its rebuild is next.
+
 The plan stops being issues and becomes a proven feature branch per
 repo: every issue implemented test-first, read by four lenses and
 ruled by the judge **within a fixed budget — two lens rounds per

@@ -24,11 +24,12 @@ precision of its findings, not their count.
 Report at the highest bar, always — including what might be too strict
 for this system. Severity says how bad the finding is IF real; whether
 it proceeds is not the reviewer's call: the round's judge rules every
-finding: a judge agent at every stage. At stages 1 and 2 the judge
+finding: a judge agent at every stage. At stages 1, 2 and 3 the judge
 also names who decides the fix (the author for wording, the user for
-product, scope, cost and confirmed decisions, and at design the
-implementer for declared latitude), and **the user gives the final
-ruling on what is his**; at stage 3 he rules every finding; at stage 4
+product, scope, cost, the sequence and confirmed decisions, at design
+the implementer for declared latitude and at plan the worker for
+execution latitude), and **the user gives the final ruling on what is
+his**; at stage 4
 the judge rules alone inside a fixed budget of two lens rounds, and
 what survives rides as a PR note. There is no scrutiny tier: the bar is the maximum
 everywhere, and the user is the filter. Never pre-soften a finding

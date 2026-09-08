@@ -29,16 +29,17 @@ own frictions as they happen — both feed the same file.
 
 ## The user's rulings are the record
 
-At plan the user gives the final ruling on every review finding: the
-judge agent proposes (ruling + reason) and he rules. At discovery and
-design the judge also names the owner of each sustained finding:
-wording goes to the author without a question; product, scope, cost,
-data format, contract shape, security posture and confirmed decisions
-go to him; at design a real observation that is declared latitude
-goes to the implementer, as one line in the document's "The
-implementer decides" section. Plus one veto question over what the
-author fixed alone. The budget at discovery and design is two whole
-rounds; a third only on his explicit call. His validation of every story (confirm / reduce /
+At discovery, design and plan the judge agent proposes (ruling +
+reason) and names the owner of each sustained finding: wording goes
+to the author without a question; product, scope, cost, data format,
+contract shape, security posture, the sequence and confirmed
+decisions go to him; at design a real observation that is declared
+latitude goes to the implementer, as one line in the document's "The
+implementer decides" section, and at plan to the worker, as one line
+in the goal's "The worker decides" section. He rules what is his.
+Plus one veto question over what the author fixed alone. The budget
+at discovery, design and plan is two whole rounds; a third only on
+his explicit call. His validation of every story (confirm / reduce /
 adjust / cut) is a ruling too, recorded the same way.
 **The rulings are asked through the question tool, always**: one
 question per finding, the context in the question itself (source,

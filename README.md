@@ -28,7 +28,7 @@ through them.
 ```mermaid
 flowchart LR
   D1["1 · Discovery"] --> D2["2 · Design"]
-  D2 --> D3["3 · Planning"]
+  D2 --> D3["3 · Plan"]
   D3 --> D4["4 · Execute"]
   D4 --> D5["5 · Release"]
   D5 --> D6["6 · Close"]
@@ -99,109 +99,26 @@ contracts, security and cost, the implementer for declared latitude.
 Two rounds at most; the residue is written down, not chased. The wave
 cut is stage 3's.
 
-**3 · Planning** — one plan author per repo decomposes the design
-into **cold-executable issues**: each issue is the complete brief for
-an implementer with zero conversation context. Three deliberately
-weak blind readers read each issue as that cold worker would; an
-issue lens treats their divergence as the ambiguity signal. The bar:
-if a weak model can execute it, the real one certainly can. A judge
-proposes a ruling on every finding and **the human confirms or
-overrules each one**; on approval, the issues are bootstrapped to
-GitHub.
-
-**4 · Execute** — build it and prove it works, internally. One
-maestro session conducts the wave: it derives each repo's issue DAG,
-launches the per-issue engine as a background workflow (5 in flight
-wave-wide), and merges what the engine proves. Inside the engine, the
-four lenses read the whole diff, a **judge** rules every finding, the
-implementer fixes what was sustained, the lenses read the delta and
-the judge rules again — **and that is the whole budget: two rounds
-per cycle, never a third.** What is still sustained rides as a note on
-the PR for the checkpoint; the review catches bugs, it never holds the
-line. Then the maestro
-deploys the feature branches to staging producer-first, runs the
-deterministic smoke suite, and drives the **all-or-nothing e2e
-round** — one failing case dirties the whole round, and after fixes
-the entire round runs again. Nothing here touches main, and prod does
-not exist.
-
-```mermaid
-flowchart LR
-  I["implementer"] --> L{"4 lenses, whole diff"}
-  L --> J{"judge"}
-  J -- "sustained" --> F["fix pass, once"]
-  F --> D{"4 lenses, delta"}
-  D --> J2{"judge — last word"}
-  J2 -- "notes on the PR" --> V["verify from zero"]
-  J -- "none" --> V
-  V --> P["PR + CI"]
-  P -- "red (≤2)" --> I
-  P -- "green" --> M["merge to the feature branch"]
-```
-
-Every fix — the one fix pass, a red CI — re-enters the same path:
-**no commit reaches the PR without the lenses reading it**, and no
-path loops past its budget. The verification step re-runs every gate
-from scratch (declared evidence is never trusted evidence); the human
-reads the wave's notes at the checkpoint, once, with the wave working.
-
-**5 · Release** — now that it provably works, put it in the air
-safely. Two human gates (entry, and prod-go). The integration train
-runs producer-first in two lanes — a front whose hosting auto-builds
-prod from main merges only after its producers are live, because its
-merge IS its deploy. Staging is redeployed from the integrated main
-and re-smoked before prod opens. Versions are **semver derived
-mechanically from conventional commits**; tags are never retroactive
-— prod deploys from the tag. The cutover is supervised step by step,
-and no prod command runs before that repo's rollback plan is written.
-Prod verification is read-only — the smoke suite never touches
-production. The wave closes with its **Release Report** in the
-blueprint: the cutover story, the versions shipped, the way back.
-
-**6 · Close** — the wave archives itself and the pipeline learns,
-**with the human in the chair**. Every friction noted during the run
-lands on one board — including the entries the human dictated
-mid-wave ("note this for the dreaming"). The session suggests: the
-class (**class, not incident** — what doesn't generalize is proposed
-as a discard), the destination, the concrete edit grounded in the
-standards; the human rules every entry — edit, discard, or park.
-Only ruled lessons become edits to these very files, one revertible
-`learn()` commit each. Then the next wave opens, or the workstream
-is done.
-
-## The standards are the configuration surface
-
-Everything in `docs/standards/` was written for **our** stack and
-taste — TypeScript everywhere, serverless AWS with CDK, 100% coverage
-as a physical threshold, one error envelope, comments as a last
-resort. Yours are probably different, and that is the point of the
-architecture: agents never carry rules inline — they **point** at the
-standards, one source file per subject:
-
-| Standard | Governs |
-|---|---|
-| [code.md](docs/standards/code.md) | how code is written — typing, architecture, readability, comments, the CDK pattern |
-| [testing.md](docs/standards/testing.md) | the proof ladder — unit rules, the smoke suite, the e2e round |
-| [repo-structure.md](docs/standards/repo-structure.md) | one tree per repo type, canonical npm scripts, the build guard |
-| [ci.md](docs/standards/ci.md) | the standardized pipeline, branch protection, the CD seam |
-| [git.md](docs/standards/git.md) | atomic conventional commits, branch names, merges by intention |
-| [docs.md](docs/standards/docs.md) | the living docs tree every repo keeps |
-| [error-envelope.md](docs/standards/error-envelope.md) | the one error shape across every API |
-| [observability.md](docs/standards/observability.md) | alarms with runbooks, structured logs |
-| [architecture.md](docs/standards/architecture.md) | platform services, event-driven by default |
-| [reviewer-contract.md](docs/standards/reviewer-contract.md) | how every reviewer in the pipeline answers |
-
-Rewrite any of these to say **your** rules, and every implementer,
-every review lens, and every conductor reflects them on their next
-run — no agent needs touching. The standards are where this pipeline
-is meant to be edited.
+**3 · Plan** — the design becomes a sequence, built with the user in
+a session: waves that are each a **verifiable checkpoint in alpha**
+(one feature branch per repo, the whole smoke suite green, a PR to
+main open), rows inside each wave (one story in one repo, with a
+"ready when" a person can observe), the order and what runs in
+parallel. One Fable author writes the **goal** of every wave: the
+whole brief the execution chair receives, pointing at the design and
+never re-deciding it. A whole review round runs: three lenses
+(coverage, verifiability, order) beside two blind readers and a
+referee per goal (would two engineers build the same wave and prove
+it the same way?); a judge rules every finding and marks who owns the
+fix — the author for wording, the human for the sequence, the worker
+for execution latitude. Two rounds at most. The goals are files; the
+execution chair reads them wave by wave.
 
 ## On cost
 
 This pipeline is expensive to run today, and that was a deliberate
 non-concern. Every diff is read whole by four reviewers plus an
-independent verifier; every plan round ends in one full final round;
-discovery and design run two whole rounds; ambiguity is hunted by dispatching multiple readers at
+independent verifier; discovery and design run two whole rounds; ambiguity is hunted by dispatching multiple readers at
 the same document. That redundancy is exactly
 where the quality comes from — and it is priced in tokens.
 
@@ -254,7 +171,7 @@ What the pipeline expects from its surroundings:
 | **blueprint** | the workstream's single review artifact — one URL, tabs per stage, pills per wave |
 | **conductor** | whoever dispatches and audits without doing the work — the stage's session (stage 4 calls it the maestro) |
 | **lens** | a reviewer scoped to one failure mode |
-| **judge** | the agent that rules every finding — sustained/deferred/dismissed, with the reason; reviewers report at the maximum bar. At discovery and design the judge also names who owns the fix (author, human, or at design the implementer) and the human rules what is his; at plan he confirms or overrules every ruling; at execution the judge rules alone inside a two-round budget |
+| **judge** | the agent that rules every finding — sustained/deferred/dismissed, with the reason; reviewers report at the maximum bar. At discovery, design and plan the judge also names who owns the fix (author, human, or at design the implementer and at plan the worker) and the human rules what is his; at execution the judge rules alone inside a two-round budget |
 | **blind reader** | an agent that reads alone, so divergence from its sibling exposes ambiguity |
 | **andon** | stop before building on a broken premise — a cheap halt beats wrong work |
 | **dreaming** | the closing session where frictions become edits to the pipeline itself — the session suggests, the human rules every lesson |
