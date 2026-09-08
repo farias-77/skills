@@ -353,8 +353,10 @@ stage 1 created; same path, same URL forever): the nine Design
 sections the shell renders (Glossary · How it works · UI · Data ·
 Infra & cost · Code · Security · Alarms · Going to production), each
 with its `references` list. The blueprint is the report, not the
-files' projection (house rule): the altitude test, curated lists, the
-three-paragraph mechanism, the 20–30 minute ceiling. "How it works"
+files' projection (house rule): natural to read above all, every
+section opening with a picture, a chart or a table and the prose in
+support; the altitude test, curated lists, the three-paragraph
+mechanism, the 20–30 minute ceiling. "How it works"
 opens with the whole system in one diagram (each service a box with
 where it runs written on it; arrows are the data), the lens verdict
 table with the user's rulings beside the judge's, the cost at three

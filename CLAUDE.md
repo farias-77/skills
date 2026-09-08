@@ -93,6 +93,13 @@ who wants to understand how the thing works and what matters, in
 twenty minutes, not three hours. Same tabs, same shell; another
 altitude.
 
+- **Natural to read, first of all.** Short sentences, plain words, one
+  idea per paragraph. Every section opens with a picture, a diagram,
+  a chart or a table, and the prose supports it, never the reverse.
+  Nothing dense: a reader who skims the visuals and the first lines
+  has the shape of the thing; the text is there for whoever wants
+  the next layer. If a paragraph needs a second read, it is a
+  diagram or a table that was not drawn.
 - **The test for a detail:** it enters the blueprint if the reader
   would decide something differently knowing it. Otherwise it stays in
   the file — and the file is named as the authority ("the exact numbers
