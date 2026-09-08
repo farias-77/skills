@@ -17,15 +17,17 @@ carries; every merge is deliberate.
 
 | Branch | Named | Cut from |
 |---|---|---|
-| Wave branch (one per repo per wave) | `feat/wNN-<repo>` | the previous wave's branch; `main` on the first wave |
+| Workstream branch (one per repo per demand) | `feat/<workstream>` | `main` |
+| Wave branch (one per repo per wave) | `feat/wNN-<repo>` | the workstream branch |
 | Story branch | `feat/wNN-<repo>/<N.k>-<slug>` | the wave branch |
 | Chore (hygiene, tooling) | `chore/<slug>` | wherever it lands |
 | Hotfix | `hotfix/<slug>` | **`origin/main`, always** — never a local checkout, which may be sitting on another branch's world |
 
 `main` never receives work directly — everything lands via PR under
 branch protection (the CI standard). The wave branch is the wave's
-integration surface: story PRs merge into it, and it reaches `main` at
-the release stage, after the wave's proof in alpha.
+integration surface: story PRs merge into it; the wave PR merges into
+the workstream branch after the wave's proof in alpha; the workstream
+branch reaches `main` at the release stage, after the audit.
 
 ## Merges
 

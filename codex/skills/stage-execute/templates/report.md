@@ -2,7 +2,7 @@
 
 <!--
   Created when the wave opens, grown story by story, complete when
-  the wave closes. This is what the user reads at the end, next to
+  the wave closes. This is what the user reads at the audit, next to
   the wave PRs. Written for a technical lead with twenty minutes:
   numbers in tables, the rest in short sentences. The exact detail
   lives in trace.md, reviews/ and proof/. Language: the goal's.

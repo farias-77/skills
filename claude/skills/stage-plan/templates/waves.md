@@ -5,8 +5,9 @@
   wave by wave. The author never edits it; the execution chair fills
   the Status column as rows and waves close. Every wave
   is a checkpoint: one feature branch per repo, deployed to alpha,
-  the whole smoke suite green, a PR to main open for the user. The
-  next wave's branches are cut from this wave's. Prod is stage 5's.
+  the whole smoke suite green, its PR merged into the workstream
+  branch `feat/<workstream>`. The next wave is cut from that branch.
+  `main` and prod are stage 5's.
 
   The rows are the work: one row per story × repo (a mesh repo, an
   infra step or a seed is a row too, with its "where"). Every row
@@ -35,7 +36,7 @@
 ## w01-<slug>
 
 **Delivers:** <one paragraph: what exists in alpha when this wave closes, and for whom>
-**Branches:** `feat/w01-<repo>` from `main` · the next wave cuts from these
+**Branches:** `feat/w01-<repo>` from `feat/<workstream>` (cut from `main` at the first wave) · every wave merges into `feat/<workstream>`
 **Deploy order:** <repo → repo, when one reads what the other creates>
 
 | # | Repo | Work | Ready when | Depends on | Status |

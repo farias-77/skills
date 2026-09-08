@@ -12,9 +12,9 @@ A definition of how it works comes in: the design of the whole demand.
 A sequence comes out: the order in which it gets built, cut so that
 every step is something a person can verify in alpha. The unit of the
 sequence is the **wave**: one feature branch per repo, implemented row
-by row, deployed to alpha, the whole smoke suite green, a PR to
-`main` open for the user. The next wave's branches cut from this
-one's. Prod is stage 5's. The execution chair receives one goal per
+by row, deployed to alpha, the whole smoke suite green, its PR merged
+into the workstream branch `feat/<workstream>`. The next wave cuts
+from that branch. `main` and prod are stage 5's. The execution chair receives one goal per
 wave and builds them in order, without coming back here.
 
 Inside a wave, the unit is the **row**: one story in one repo (a mesh

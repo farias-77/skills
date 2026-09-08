@@ -22,7 +22,7 @@
 ## Before you start
 
 - Read: `<designs-root>/<workstream>/01-design/` (the design; `decisions.md` is the law), the consuming project's `CLAUDE.md`, each repo's `CLAUDE.md` and `docs/`.
-- Branches: `feat/wNN-<repo>` from `<the previous wave's branch, or main>`; one branch per row from it; PR of each row into the wave branch; the wave's PR into `main` at the end, **never merged by you**.
+- Branches: `feat/wNN-<repo>` from `feat/<workstream>` (the workstream branch, cut from `main` at the first wave, carrying every wave merged so far); one branch per row from it; PR of each row into the wave branch; the wave's PR into `feat/<workstream>` at the end, merged after the wave's proof. `main` is stage 5's.
 - Environment: alpha only. Prod does not exist here.
 - Deploy order across repos: <repo → repo, why>.
 

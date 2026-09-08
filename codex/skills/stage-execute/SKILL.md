@@ -10,14 +10,20 @@ one goal per wave under `02-plan/goals/`) says what to build and how
 each piece is proved; the design (`01-design/`, `decisions.md` as the
 law) says how it works; the repos and the house standards say how code
 is written here. You run the whole demand from the wave the state
-names to the last wave, on your own. The user reads the result at the
-end: the wave PRs open on `main`, the reports, the improvements you
-applied and the places where you left the standard on purpose.
+names to the last wave, on your own. Every wave merges into the
+workstream branch `feat/<workstream>`; when the last wave is in, the
+user audits the whole in the Claude chair: the reports, the wave PRs,
+the improvements you applied and the places where you left the
+standard on purpose. What the audit sends back, you build as a fix
+wave.
 
 Read `<designs-root>/<workstream>/.state.md` first. It names the wave
 in flight. Then read that wave's goal whole, the wave's section of
 `waves.md`, and `03-execution/<wave>/trace.md` if it exists: the trace
-and the PRs on GitHub are what was done; your memory is not.
+and the PRs on GitHub are what was done; your memory is not. When
+`.state.md` says `phase: fix`, the goal is the Fixes section of
+`03-execution/audit.md`, built as one more wave (see the fix wave in
+[references/wave.md](references/wave.md)).
 
 ## What done means
 
@@ -26,11 +32,12 @@ branch with its two review rounds recorded and its "ready when" proved
 in alpha; the wave branch of every repo is deployed to alpha in the
 goal's order; the whole smoke suite of every repo is green against
 alpha; the walk in "The wave's proof" was done and its evidence saved;
-one PR per repo from the wave branch to `main` is open, never merged;
-the Status column of `waves.md`, `report.md` and the blueprint's
+one PR per repo from the wave branch to `feat/<workstream>` is merged
+by you after the proof; the Status column of `waves.md`, `report.md` and the blueprint's
 execution entry for the wave are filled. Then the next wave starts
-from this wave's branches. The stage is done when the last wave is
-done and `.state.md` says `stage: release`.
+from the workstream branch. Your part ends when the last wave is done,
+`feat/<workstream>` is deployed to alpha and `.state.md` says
+`phase: audit`; it resumes if the audit writes fixes (`phase: fix`).
 
 Do not stop for review after the first implementation. Deploying to
 alpha, running the smoke suite, fixing what fails and rerunning are
@@ -40,9 +47,9 @@ in [references/wave.md](references/wave.md).
 ## The cycle
 
 Per wave, in [references/wave.md](references/wave.md): cut
-`feat/wNN-<repo>` from the previous wave's branch (or `main`), open the
-trace, build the stories, prove the wave, open the wave PR, fill the
-report, move the state, continue.
+`feat/wNN-<repo>` from `feat/<workstream>` (itself cut from `main` on
+the first wave), open the trace, build the stories, prove the wave,
+merge the wave PR, fill the report, move the state, continue.
 
 Per story, in [references/story.md](references/story.md): a builder on
 a story branch, tests first; five lenses in parallel on the diff, you
@@ -76,8 +83,8 @@ of the goal. Code, commit messages and branch names are English.
 
 ## Boundaries
 
-Never deploy prod, never touch `main`, never merge a wave PR. Never a
-secret in a file, an argument, a log or a commit. Never a Secrets
+Never deploy prod, never touch `main`: a wave PR merges into the
+workstream branch, never into `main`. Never a secret in a file, an argument, a log or a commit. Never a Secrets
 Manager secret; the account id never in code. Where the goal and the
 design are silent, choose the simplest thing that keeps the system
 consistent and record it in the report; where they are wrong, say so

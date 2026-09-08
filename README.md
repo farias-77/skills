@@ -105,8 +105,8 @@ cut is stage 3's.
 **3 · Plan** — the design becomes a sequence. The conductor proposes
 the cut and the human approves or rejects it, wave by wave; the rest
 is mechanical: waves that are each a **verifiable checkpoint in alpha**
-(one feature branch per repo, the whole smoke suite green, a PR to
-main open), rows inside each wave (one story in one repo, with a
+(one feature branch per repo, the whole smoke suite green, merged
+into the workstream branch), rows inside each wave (one story in one repo, with a
 "ready when" a person can observe), the order and what runs in
 parallel. One Fable author writes the **goal** of every wave: the
 whole brief the execution chair receives, pointing at the design and
@@ -131,13 +131,16 @@ conductor rules again, and what is left rides as a note. The story is
 deployed to alpha and its smoke folder proved before its PR is merged
 into the wave branch. When the wave's stories are in, the whole suite
 runs green against alpha, the walk the goal describes is done with
-evidence saved, one PR per repo is opened on `main` and never merged,
-the report is written, and the next wave starts from this one's
-branches. Improvements inside the standard are applied and listed;
+evidence saved, the wave PR is merged into the workstream branch
+`feat/<workstream>`, the report is written, and the next wave starts
+from there. Improvements inside the standard are applied and listed;
 departures from the standard are applied only when the system gets
-simpler, and listed with the rule they leave. The human reads the
-reports, the PRs, the improvements and the departures when the last
-wave is done.
+simpler, and listed with the rule they leave. When the last wave is
+in, the stage moves to the Claude chair for the **audit**: the human
+reads the reports, the PRs, the improvements and the departures, rules
+each one through the question tool, and what he sends back the Codex
+chair builds as a fix wave. Stage 4 ends with the workstream branch
+consolidated, verified in alpha and audited; `main` is stage 5's.
 
 ## On cost
 
@@ -212,7 +215,7 @@ What the pipeline expects from its surroundings:
 | **blueprint** | the workstream's single review artifact — one URL, tabs per stage, pills per wave |
 | **conductor** | whoever dispatches and audits without doing the work — the stage's session; at stage 4, the Codex session |
 | **lens** | a reviewer scoped to one failure mode |
-| **judge** | the agent that rules every finding — sustained/deferred/dismissed, with the reason; reviewers report at the maximum bar. At discovery, design and plan the judge also names who owns the fix (author, human, or at design the implementer and at plan the worker) and the human rules what is his; at execution the conductor of the Codex chair rules alone inside two rounds per story, and the residue rides as PR notes the human reads at the end |
+| **judge** | the agent that rules every finding — sustained/deferred/dismissed, with the reason; reviewers report at the maximum bar. At discovery, design and plan the judge also names who owns the fix (author, human, or at design the implementer and at plan the worker) and the human rules what is his; at execution the conductor of the Codex chair rules alone inside two rounds per story, and the residue rides as PR notes the human rules at the audit that closes stage 4 |
 | **blind reader** | an agent that reads alone, so divergence from its sibling exposes ambiguity |
 | **andon** | stop before building on a broken premise — a cheap halt beats wrong work |
 | **dreaming** | the closing session where frictions become edits to the pipeline itself — the session suggests, the human rules every lesson |

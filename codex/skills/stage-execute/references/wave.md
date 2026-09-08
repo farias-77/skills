@@ -1,8 +1,9 @@
 # The wave
 
 One wave is one checkpoint: one feature branch per repo, deployed to
-alpha, the whole smoke suite green, one PR per repo open on `main`.
-Waves chain: the next one's branches are cut from this one's.
+alpha, the whole smoke suite green, one PR per repo merged into the
+workstream branch `feat/<workstream>`. Waves chain through that
+branch: the next one is cut from it, with every earlier wave inside.
 
 ## Open
 
@@ -12,9 +13,9 @@ Waves chain: the next one's branches are cut from this one's.
    `CLAUDE.md`, or `AGENTS.md` where it exists, and the `docs/` pages
    the goal names. The standards under `.codex/docs/standards/` are
    the ruler for everything you and your agents write.
-2. In every repo the goal names: `git fetch`, then cut
-   `feat/wNN-<repo>` from the branch the goal names (the previous
-   wave's branch, or `main` on the first wave) and push it. If the
+2. In every repo the goal names: `git fetch`. On the first wave, cut
+   `feat/<workstream>` from `main` and push it. Then cut
+   `feat/wNN-<repo>` from `feat/<workstream>` and push it. If the wave
    branch exists, it is a resume: read `trace.md` and the open and
    merged PRs on it before doing anything.
 3. Create `03-execution/wNN-<slug>/` with `trace.md` and `report.md`
@@ -56,8 +57,10 @@ Three red suite runs in one wave stop the wave.
 
 ## Close
 
-1. One PR per repo from `feat/wNN-<repo>` to `main`, body from
-   [templates/pr-wave.md](../templates/pr-wave.md). Do not merge it.
+1. One PR per repo from `feat/wNN-<repo>` to `feat/<workstream>`,
+   body from [templates/pr-wave.md](../templates/pr-wave.md). CI
+   green, rebase merge, the state read back as `MERGED`. The
+   workstream branch now carries every wave so far.
 2. `waves.md`: fill the Status column of every row
    (`done <date> — PR <url>`) and of the wave; a row that changed
    shape gets one dated line under Amendments.
@@ -69,10 +72,27 @@ Three red suite runs in one wave stop the wave.
    verbatim but trimmed. The Claude chair republishes the URL later.
 5. Commit the workstream folder (the `designs` repo) with a
    conventional message. Push only if the user said so.
-6. `.state.md`: `wave:` moves to the next wave of `waves.md`. When
-   there is none, `stage: release`.
+6. `.state.md`: `wave:` moves to the next wave of `waves.md`.
 
-Then open the next wave from this wave's branches.
+Then open the next wave from the workstream branch. When there is no
+next wave: deploy `feat/<workstream>` of every repo to alpha in the
+last goal's order (the diff should be empty), run the whole suite once
+more, set `.state.md` to `phase: audit · chair: fable`, commit, and
+stop. Tell the user the workstream branch is consolidated and verified
+and that the audit runs in the Claude chair with
+`/stage-execute <workstream-slug>`.
+
+## The fix wave
+
+The audit writes what it wants changed as rows `A.1`, `A.2`… in the
+Fixes section of `03-execution/audit.md`, in the goal's row format,
+and sets `.state.md` to `phase: fix · chair: codex · wave: wNN-audit`.
+That section is the goal of one more wave: branch `feat/wNN-audit-<repo>`
+from `feat/<workstream>`, the story cycle per row, the wave's proof
+(the whole suite), the PR merged into the workstream branch, its own
+`03-execution/wNN-audit/` folder and report. At its close, `phase:
+audit` again. Two fix waves are the budget; a third request is the
+user's call, not yours.
 
 ## Stop
 

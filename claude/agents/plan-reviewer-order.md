@@ -37,9 +37,10 @@ what a row reads) and each repo's path with its `CLAUDE.md` and
   another creates (a parameter by name, a pool id, a route on the
   hub), the goal's deploy order says so and the earlier row is in an
   earlier position. `rollout.md` is the reference.
-- **The branches cut from the right place.** Wave N's branches come
-  from wave N-1's, never from `main` once a wave is open; the first
-  wave's from `main`. A mesh repo briefed whole has its own row.
+- **The branches cut from the right place.** Every wave's branches
+  come from the workstream branch `feat/<workstream>`, which carries
+  the waves merged before it; never from `main` directly. A mesh repo
+  briefed whole has its own row.
 - **Nothing runs twice.** A row that rebuilds what an earlier row
   built (a second seed, a second table) is a finding.
 - **The first wave proves the junction.** When the demand opens a

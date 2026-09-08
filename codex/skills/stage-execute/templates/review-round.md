@@ -4,7 +4,7 @@
   Written by the conductor before the findings go to the builder.
   Every finding of every lens, verbatim in its substance, with the
   ruling and the reason. The PR body carries the numbers; this file
-  carries the detail the user audits at the end.
+  carries the detail the user audits at the end of the stage.
 -->
 
 Diff: `<the diff command, base..head>` · <n> files · +<n> −<n>

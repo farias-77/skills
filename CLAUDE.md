@@ -51,8 +51,9 @@ severity, quote, gap, fix, the judge's reason), the three rulings as
 the answers with the judge's pick first and marked as his, four to a
 call. Never a board he answers in prose. At execution the conductor of
 the Codex chair rules alone inside two rounds per story; the residue
-rides as PR notes and in the wave report, and the user reads it at
-the end of all waves; a note he rules on there is a ruling too.
+rides as PR notes and in the wave report, and the user rules it at
+the audit that closes stage 4; a note he rules on there is a ruling
+too.
 Every ruling is appended, as it happens, to the workstream's
 **`rulings.md`** (workstream root; created on the first ruling), one
 line each:

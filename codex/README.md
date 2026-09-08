@@ -36,5 +36,9 @@ $stage-execute <workstream-slug>
 ```
 
 The skill reads the workstream's `.state.md`, takes the wave it names
-and runs to the last wave, or to a stop condition. A second session
-with the same line resumes from the trace and the PRs.
+and runs to the last wave, or to a stop condition; every wave merges
+into the workstream branch `feat/<workstream>`. When the last wave is
+in, the stage moves to the Claude chair for the audit
+(`/stage-execute <workstream-slug>` there); what the audit sends back
+comes to this chair as a fix wave, with the same line. A second
+session with the same line resumes from the trace and the PRs.

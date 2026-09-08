@@ -1,8 +1,9 @@
 <!--
-  The body of a wave PR (feat/wNN-<repo> → main), one per repo.
-  Opened by the conductor at the wave's close, never merged by it.
+  The body of a wave PR (feat/wNN-<repo> → feat/<workstream>), one per
+  repo. Opened and merged by the conductor at the wave's close, after
+  the wave's proof.
   Title: `feat: wNN-<slug> — <what the wave delivers, in this repo>`.
-  The user reads this at the end of all waves, next to report.md.
+  The user reads this at the audit, next to report.md.
 -->
 
 ## Delivers
