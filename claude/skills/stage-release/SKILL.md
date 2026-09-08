@@ -1,195 +1,213 @@
 ---
 name: stage-release
-description: Conducts stage 5 (Release) of the pipeline — takes the proven feature branches to production, safely. Two human gates (entry and prod-go), the two-lane integration train (fronts whose hosting auto-builds prod merge only after their producers are live), the alpha-from-main confirmation, semver derived from conventional commits with tags that are never retroactive, the supervised step-by-step cutover with a documented rollback per repo, and the wave's Release Report published in the blueprint. Use after the wave's execution is approved, or to resume a release in progress.
+description: Conducts stage 5 (Release) — takes the audited workstream branch to production: one integration PR per repo into main in producer-first order, alpha redeployed from main and the whole suite green, semver derived from the conventional commits, the prod-go gate with a written rollback per repo, the supervised cutover step by step with read-only verification, the Release tab published. Two explicit human gates: the entry and prod-go. Runs in Claude Code with a Fable session. Use when a workstream's .state.md says stage release, or to resume a release in progress.
 disable-model-invocation: false
 argument-hint: "<workstream-slug>"
-allowed-tools: Read, Write, Edit, Glob, Grep, Agent, SendMessage, Workflow, Artifact, AskUserQuestion, ScheduleWakeup, Bash(mkdir *), Bash(date *), Bash(ls *), Bash(cat *), Bash(git *), Bash(gh *), Bash(npm *), Bash(rm *)
+allowed-tools: Read, Write, Edit, Glob, Grep, Agent, Artifact, AskUserQuestion, ScheduleWakeup, Bash(mkdir *), Bash(date *), Bash(ls *), Bash(cat *), Bash(git *), Bash(gh *), Bash(npm *), Bash(rm *)
 ---
 
 # Stage 5: Release
 
-Stage 4 built it and proved it works, internally. This stage puts it
-in the air, safely: integration into `main`, a version that means
-something, and a supervised path to production with a documented way
-back. **This is the only stage where production exists** — and
-because of that, nothing here moves on inferred approval: the stage
-opens on an explicit go, and prod opens on a second one.
+Stage 4 built the demand into the workstream branch `feat/<workstream>`
+of every repo, proved it in alpha and audited it with the user. This
+stage puts it in the air: `main` receives the branch, a version that
+means something is cut, and production is reached step by step with a
+documented way back. **This is the only stage where production
+exists**, so nothing here moves on inferred approval: the stage opens
+on an explicit go, and prod opens on a second one.
 
-The session conducts directly — the work is sequential and
-human-gated by nature; a workflow's guarantee (order without
-supervision) is the opposite of what this stage needs. One mechanical
-agent (`release-scribe`) does the version/notes grind; the session
-merges, deploys, and verifies, step by confirmed step.
+The session conducts directly. The work is sequential and human-gated
+by nature, so no workflow runs here; one mechanical agent,
+`release-scribe`, does the version and notes grind, and the session
+merges, deploys and verifies, step by confirmed step. Code is never
+written in this chair: a regression found here goes back to the
+Codex chair as a fix, through the same story cycle as everything else.
+
+## Two modes
+
+**Session mode** (the two gates and the cutover). The user is in the
+room; every gate is his explicit go through the question tool, and
+every cutover step waits for his confirmation before the next. Never
+run ahead of him here.
+
+**Autonomous mode** (the integration, the confirmation, the scribe,
+the report). The user is waiting. Merge, deploy alpha, run the suite,
+dispatch the scribe, write the trace and the tab, without asking
+permission for any of it. Say in one line what you are about to do,
+and close with a recap that stands on its own.
+
+## The pattern
+
+```
+1. Entry gate    what ships, the audit's close, the open residue; his explicit go.
+2. Integrate     one PR per repo feat/<workstream> → main, producer-first; fronts
+                 whose hosting auto-builds prod are prepared, merged in the train.
+3. Confirm       alpha redeployed from main, the whole suite green; two fix cycles.
+4. Version       release-scribe derives the semver and drafts the notes; creates nothing.
+5. Prod-go gate  the train order, the versions, the rollback per repo written; his go
+                 creates the tags and the GitHub Releases.
+6. Cutover       one repo at a time, he confirms every step; read-only verification.
+7. Report        the Release tab, .state.md → close, /clear.
+```
 
 ## Preconditions
 
-`.state.md` says `stage: release`; every wave of `waves.md` has its
-Status filled, its PR per repo open on `main` and its
-`03-execution/wNN-<slug>/report.md` complete (the proof this stage
-stands on). Missing ⇒ halt, back to stage 4. First thing: republish
-the blueprint at its URL — the Codex chair writes the execution entries
-into the file but cannot publish. Waves chain (each branch was cut
-from the previous wave's), so the last wave's branch per repo carries
-every wave; that is what integrates, and the earlier wave PRs are
-closed as superseded once it is merged.
-
-**The entry gate:** present what is about to ship — the repos, the
-wave PRs in order, the highlights of every wave's report (its "What
-needs your eye" section is this gate's open questions: the
-departures from the standard, the choices where the documents were
-silent, the notes still open) — and get the explicit go.
-Structural reason: a front whose hosting auto-builds prod from `main`
-makes "merge" and "deploy" the same act, so even integration sits
-behind the gate.
-
-## What this stage produces
+`.state.md` says `stage: release` and `chair: fable`;
+`03-execution/audit.md` has its Close section written (the audit
+ended with nothing left to send back); every repo's `feat/<workstream>`
+is at the sha the audit's branch check names, alpha at that sha.
+Missing ⇒ halt, back to stage 4.
 
 ```
-designs-root/2026-08-15-workspace-invites/
-├── blueprint.html                  # this stage fills waves['wNN-<wave>'].release
-└── w01-invite-by-email/
-    └── 04-release/
-        ├── trace.md               # the release log — every train step and verification
-        └── rollback/
-            └── <repo>.md          # the documented way back, per repo — written BEFORE prod-go
+<workstream>/
+├── .state.md                  # stage: release · chair: fable
+├── blueprint.html             # this stage fills BLUEPRINT.release
+└── 04-release/
+    ├── trace.md               # every train step and verification, one line each
+    └── rollback/<repo>.md     # the documented way back, per repo, written BEFORE prod-go
 ```
 
-Plus, outside the workstream folder: the wave on `main` in every
-repo, a semver tag and GitHub Release per repo, and **production
-running the wave** — verified step by step.
+Plus, outside the folder: the demand on `main` in every repo, a semver
+tag and a GitHub Release per repo, and production running it, verified.
 
-## 1 — The integration train, two lanes
+## Step 1 — the entry gate
 
-The order comes from the design's `rollout.md` (fallback
-producer-first: APIs → agents → fronts). Repos split by one flag the
+Present what is about to ship: the repos and their `feat/<workstream>`
+shas, the waves as `waves.md` lists them, the audit's Close section
+(what he kept as a departure, the residue he accepted), and anything
+in "Stays with the user" that has a placeholder in the code and no
+real value yet. Get the explicit go through the question tool. A
+front whose hosting auto-builds prod from `main` makes merge and
+deploy the same act, so even the integration sits behind this gate.
+
+## Step 2 — integrate, two lanes
+
+The order comes from the design's `rollout.md`; fallback
+producer-first (APIs → agents → fronts). Repos split by the flag the
 venture declares in each front's `CLAUDE.md`:
 
-- **Lane A — merge ≠ deploy** (backends, agents): the wave PR
-  `feat/wNN-<repo>` → `main` is already open (stage 4 opened it, the
-  report as its body) → CI green → rebase merge → **re-read the state
-  as MERGED**. If `main` moved since the branch was cut, rebase the
-  branch onto `main` first — conflicts by intention (the git
-  standard), CI again — then merge.
-- **Lane B — merge IS deploy** (fronts with prod auto-build): the
-  integration PR is **prepared** here — opened, CI green — but merged
-  only in the prod train (§5), after its producers are live. The
-  merge is that repo's deploy step, and it waits its turn.
+- **Lane A, merge ≠ deploy** (backends, agents): open the PR
+  `feat/<workstream>` → `main` (body: the waves, the wave PRs, the
+  audit and the blueprint URL) → CI green → rebase merge → **re-read
+  the state as `MERGED`** (the git standard's git.6). If `main` moved
+  since the branch was cut, rebase the branch onto `main` first,
+  conflicts by intention (git.7), CI again, then merge.
+- **Lane B, merge is deploy** (fronts with prod auto-build): the PR
+  is **prepared** here, opened and CI green, and merged only in the
+  train (step 6), after its producers are live.
 
 **Stop-the-train:** a red CI or a conflict stops the whole train at
-that repo — a consumer never integrates ahead of a producer that
-didn't make it. CI waits are external waits: ScheduleWakeup +
+that repo; a consumer never integrates ahead of a producer that did
+not make it. CI waits are external waits: ScheduleWakeup and
 re-check, never a background watch.
 
-## 2 — Pre-prod confirmation
+## Step 3 — confirm from main
 
-With Lane A integrated: redeploy the staging environment **from
-`main`** — the inheritance pre-check first, same rule as stage 4:
-`diff:alpha`, listing EVERY deletion; a stateful resource deletion
-this integration does not explain is another workstream's inheritance
-— STOP that repo and escalate, never deploy over it. Then the **full
-smoke suite per repo**. This kills the one new risk integration
-creates — "the FB proved it, the rebase changed it". A smoke
-regression here becomes a fix branch cut from `main`, built in the
-Codex chair through the story cycle of stage 4 (the user opens
-`$stage-execute` with the fix named) — and the confirmation re-runs. **Two fix cycles are the budget:** a third red
-confirmation halts the stage to the user with the evidence —
-integration surfaced something stage 4 did not see, and that is a
-conversation, not a loop. Green opens the road to prod.
+With Lane A integrated: redeploy alpha **from `main`**, the
+inheritance pre-check first (`diff:alpha` or what the repo names,
+every deletion read; a stateful deletion this integration does not
+explain is another workstream's inheritance: stop that repo and
+escalate, never deploy over it). Then the **whole smoke suite per
+repo**. This kills the one new risk integration creates: the branch
+proved it, the rebase changed it.
 
-## 3 — Version: the release-scribe proposes
+A red suite becomes a fix: `.state.md` → `stage: release · phase:
+fix · chair: codex`, the fix described in `04-release/trace.md` as a
+row in the goal's format (repo, what, ready when), and the user opens
+the Codex chair with `$stage-execute <workstream-slug>`; it builds the
+fix on a branch from `main`, proves it in alpha, opens the PR to
+`main`, and this stage merges it and confirms again. **Two fix
+cycles are the budget:** a third red confirmation halts the stage to
+the user with the evidence.
 
-Dispatch **`release-scribe`** (Sonnet) with the repos and their
+## Step 4 — version
+
+Dispatch `release-scribe` (Sonnet) with the repos and their
 integrated `main` shas. Per repo it derives the semver bump from the
-conventional commits since the last tag — `BREAKING CHANGE`/`!` ⇒
-major · `feat` ⇒ minor · otherwise patch; no tag yet ⇒ `v1.0.0` —
-and drafts the release notes grouped by type. **It proposes; it
-creates nothing.** Its table feeds the next gate.
+conventional commits since the last tag (`BREAKING CHANGE` or `!` ⇒
+major · `feat` ⇒ minor · otherwise patch; no tag yet ⇒ `v1.0.0`) and
+drafts the notes grouped by type. It proposes; it creates nothing.
 
-## 4 — Prod-go: the second gate
+## Step 5 — the prod-go gate
 
 One table, everything on it: the train order · the proposed version
-per repo · **the rollback plan per repo** — written NOW, from
-[templates/rollback.md](templates/rollback.md), into
-`04-release/rollback/<repo>.md` (the previous tag, the exact way
-back, the data considerations — the plan's expand→migrate→contract
-chains are what make rolling back safe — and how to verify the way
-back worked) · any open risks the blueprint's Execution Report tab
-named in `pending` or its decision cards. Documented,
-not rehearsed. **The explicit go releases the train** — and only then
-are the tags created on the integrated shas (**a tag is what goes up,
-never retroactive: prod deploys FROM the tag**) and the GitHub
+per repo · **the rollback plan per repo**, written now from
+[templates/rollback.md](templates/rollback.md) into
+`04-release/rollback/<repo>.md` (the previous tag, the exact way back,
+the data considerations, how to verify the way back worked) · any
+residue the audit accepted that touches production. Documented, not
+rehearsed. **His explicit go releases the train**, and only then are
+the tags created on the integrated shas (**a tag is what goes up,
+never retroactive: prod deploys from the tag**) and the GitHub
 Releases published with the scribe's notes.
 
-## 5 — The prod train: supervised cutover
+## Step 6 — the cutover
 
-One repo at a time, in order — **the user present, every step
+One repo at a time, in order, **the user present, every step
 confirmed before the next**:
 
-- **Lane A**: checkout the tag → `deploy:prod` under the guard →
-  **verify the step** before moving on — the checks come from the
-  design's `rollout.md` (stage 2 wrote the cutover gates; this stage
-  executes them): health, the version live, the key read-only flow.
-- **Lane B**: merge the prepared PR (that IS the deploy) → verify the
-  live site — routes served, the version stamped.
+- **Lane A:** checkout the tag → `deploy:prod` under the repo's guard
+  → verify the step before moving on, with the checks the design's
+  `rollout.md` wrote (health, the version live, the key read-only
+  flow).
+- **Lane B:** merge the prepared PR (that is the deploy) → verify the
+  live site: routes served, the version stamped.
 - A failed verification **stops the train**: the step's rollback is
-  the documented one, executed and verified; the failure becomes an
-  issue. The train never limps forward past a red step.
+  the documented one, executed and verified; the failure goes to the
+  Codex chair as a fix. The train never limps past a red step.
 
-**Prod stays clean.** Every prod verification is read-only — the
-rollout's checks, never the smoke suite: smoke runs on staging only
-(§2), and nothing in this train writes test data, test accounts, or
-any other residue into production. A check that would need to write
-to prove itself is a staging check, already paid in §2.
+**Prod stays clean.** Every prod verification is read-only: the
+rollout's checks, never the smoke suite; nothing here writes test
+data, test accounts or any residue into production. A check that
+would need to write to prove itself is an alpha check, already paid
+in step 3.
 
-Every step lands in `04-release/trace.md` — the command, the
+Every step lands in `04-release/trace.md`: the command, the
 verification, the confirmation.
 
-## 6 — Closing
+## Step 7 — the report
 
-The rollout's post-deploy checklist verified → the wave PRs closed
-→ the wave branches deleted (their content lives on `main` and in the
-tags) → **the Release Report**: fill this wave's
-`waves['wNN-<wave>'].release` in the `BLUEPRINT` object and republish
-at the same file path. The shell's contract for the tab: `intro` ·
-`timeline` (the release story, one entry per meaningful event —
-integration, confirmation, the gates, every cutover step with its
-verification; `tone` marks the reds) · `versions` (rows: `repo`,
-`from`, `to`, `why` — the scribe's table as shipped) · `smoke` (the
-§2 confirmation output, verbatim) · `rollback` (rows: `repo`, `back`,
-`data` — one line each; the files in `04-release/rollback/` stay the
-authority, and `rollbackNote` says so) · `decisions` · `pending`.
-Same altitude as every tab: the timeline tells the story, the exact
-commands live in `trace.md`. The Overview's wave map is marked
-shipped — same URL as always → `.state.md` → `stage: close`, commit
-the workstream folder — **push only with the user's explicit
-approval** — and suggest `/clear` before stage 6.
+Fill `BLUEPRINT.release` (workstream-level, like the plan; the shape
+is in the shell's comment: `intro` · `timeline` with `tone` marking
+the reds · `versions` · `smoke` · `rollback` with `rollbackNote` ·
+`decisions` · `pending`) and republish at the same URL. Same altitude
+as every tab: the timeline tells the story, the exact commands live
+in `trace.md`. Then `.state.md` → `stage: close · chair: fable`,
+commit the workstream folder (push only with the user's explicit
+approval), suggest `/clear`.
 
 ## Gates
 
 | Gate | Rule |
 |---|---|
-| Human entry | nothing moves without the explicit go — entry and prod-go are separate gates |
+| Two human gates | entry and prod-go are separate explicit goes; nothing moves on inferred approval |
 | Stop-the-train | red or conflict stops the whole train at that repo; consumers never pass producers |
 | Lane B sequencing | an auto-build front merges only with its producers already live in prod |
-| Pre-prod smoke | the prod train opens only on green smoke over alpha-from-main |
-| Confirmation budget | two fix cycles in §2; the third red halts to the user |
-| Prod stays clean | prod verification is read-only — no smoke suite, no test data, no residue in production |
+| Pre-prod confirmation | the train opens only on the whole suite green over alpha-from-main |
+| Fix budget | two fix cycles in step 3, each built by the Codex chair; the third red halts to the user |
+| Prod stays clean | prod verification is read-only; no suite, no test data, no residue |
 | Tag never retroactive | tags on the integrated sha, after prod-go; prod deploys from the tag |
-| Rollback before prod | no deploy:prod without that repo's documented plan in `04-release/rollback/` |
-| Supervised steps | verification confirmed between repos; a red step means stop + documented rollback |
-| External waits | ScheduleWakeup + re-check, always — never a background watch |
+| Rollback before prod | no `deploy:prod` without that repo's plan in `04-release/rollback/` |
+| Supervised steps | verification confirmed between repos; a red step means stop and rollback |
+| External waits | ScheduleWakeup and re-check, always; never a background watch |
 | Zero silent death | every train step is a trace line |
 
-## Lifecycle
+## Files
 
-- **Permanent:** everything under `04-release/` — the trace and the
-  rollback plans — plus the tags and Releases on GitHub.
-- **Working:** the scribe's drafts before the gate — gone at close.
+- **Permanent:** everything under `04-release/`, `blueprint.html`,
+  `.state.md`; the tags and Releases on GitHub.
+- **Working:** the scribe's drafts before the gate, gone at close.
+
+## Resuming
+
+Read `.state.md`, then `04-release/trace.md` and GitHub: which PRs
+are merged (re-read, never assumed), which tags exist, which repos
+are live at which version. Continue from the first step whose trace
+line is missing. `phase: fix` means the Codex chair is working: stop
+and say so. Never from memory.
 
 ## Boundaries
 
-No new features, no fixes beyond what the confirmation smoke demands
-— this stage ships what stage 4 proved, nothing else. The design and
-plan fences hold. Frictions worth learning from go to the
-workstream's `dreaming-notes.md` on the spot; judging them is the
-closing stage's job.
+No new features, no code in this chair. The design and plan fences
+hold. Frictions worth learning from go to the workstream's
+`dreaming-notes.md` on the spot; judging them is the close stage's.

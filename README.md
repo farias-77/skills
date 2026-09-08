@@ -142,6 +142,28 @@ each one through the question tool, and what he sends back the Codex
 chair builds as a fix wave. Stage 4 ends with the workstream branch
 consolidated, verified in alpha and audited; `main` is stage 5's.
 
+**5 · Release** — the audited branch goes to production, in the
+Claude chair, behind two explicit human gates. The entry gate shows
+what ships and what the audit left; then one integration PR per repo
+into `main`, producer-first, fronts whose hosting auto-builds prod
+prepared and merged last; alpha redeployed from `main` and the whole
+suite green (a regression goes back to the Codex chair as a fix, two
+cycles at most); the version derived from the conventional commits;
+the prod-go gate with a written rollback per repo; the cutover one
+repo at a time, the human confirming each step, verification
+read-only, tags never retroactive. The Release tab is the report.
+
+**6 · Close** — the demand is archived and the pipeline learns. The
+closure record says what shipped, what did not, who owns what is
+left, and the demand's numbers against the previous one; the repos
+and GitHub are swept so the next demand starts clean. Then the
+**dreaming**, a working session: every friction the stages noted on
+the spot, every ruling, every departure the human kept at the audit,
+becomes an entry on a board with evidence and a suggested edit to a
+standard, a skill or an agent; the human rules each entry, and only
+ruled lessons become one revertible `learn()` commit each. Nothing
+waits on production: what hurts later reopens the demand as a fix.
+
 ## On cost
 
 This pipeline is expensive to run today, and that was a deliberate

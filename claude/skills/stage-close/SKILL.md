@@ -1,6 +1,6 @@
 ---
 name: stage-close
-description: Conducts stage 6 (Closure & Dreaming) of the pipeline — verifies the shipped wave's quiet window, writes the closure record, sweeps the boards, and prepares the dreaming board — every collected friction presented with evidence and a suggested edit grounded in the house standards; the user rules each entry in session, and only ruled lessons become revertible learn() commits. Then the next wave opens (or the workstream closes). Use after the release closes, or to resume a closure in progress.
+description: Conducts stage 6 (Closure & Dreaming) — writes the workstream's closure record, sweeps the repos and GitHub so the house is ready for the next demand, and prepares the dreaming board: every friction collected across the six stages presented with evidence and a suggested edit grounded in the house standards; the user rules each entry in session, and only ruled lessons become revertible learn() commits. Runs in Claude Code with a Fable session. Use when a workstream's .state.md says stage close, or to resume a closure in progress.
 disable-model-invocation: false
 argument-hint: "<workstream-slug>"
 allowed-tools: Read, Write, Edit, Glob, Grep, Agent, SendMessage, Artifact, AskUserQuestion, ScheduleWakeup, Bash(mkdir *), Bash(date *), Bash(ls *), Bash(cat *), Bash(git *), Bash(gh *), Bash(rm *)
@@ -8,63 +8,81 @@ allowed-tools: Read, Write, Edit, Glob, Grep, Agent, SendMessage, Artifact, AskU
 
 # Stage 6: Closure & Dreaming
 
-The wave is live. This stage does two things nothing else does: it
-**archives the wave as a complete record**, and it **makes the
-pipeline better than it was when the wave started** — the frictions
-every stage noted on the spot become edits to the skills themselves.
+The demand is live. This stage does two things nothing else does: it
+**archives the workstream as a complete record** and leaves the repos
+ready for the next demand, and it **makes the pipeline better than it
+was when the demand started**: the frictions every stage noted on the
+spot become edits to the skills themselves. There is no waiting
+period before closing: if production hurts later, the demand is
+reopened as a fix, it does not hold the close.
 The closure and the sweep run autonomously; **the dreaming does
 not**: the pipeline is the user's product, and editing it is an
 architecture decision — those are made with him, in session. The
 stage prepares everything so that session is short; it decides
 nothing alone.
 
-## Preconditions
-
-`.state.md` says `stage: close` and names the wave; the release trace
-shows the prod train completed. Missing ⇒ halt, back to stage 5.
-
-## What this stage produces
+## The pattern
 
 ```
-designs-root/2026-08-15-workspace-invites/
-└── w01-invite-by-email/
-    └── 05-close/
-        ├── closure.md             # the wave's final record — what shipped, what didn't, who owns what's left
-        └── dreaming/
-            └── ledger.md          # the board: every note with evidence + suggestion, closed with the user's ruling
+1. Closure    05-close/closure.md: what shipped, what did not, pendencies with owners,
+              the numbers against the previous workstream.
+2. Sweep      GitHub and the repos: wave and workstream branches gone, PRs closed,
+              alpha reseeded, the blueprint final at the same URL.
+3. Dreaming   the board from every stage's record; the user rules every entry;
+              one learn() commit per applied lesson.
+4. Done       .state.md → closed; the pipeline commits presented for push.
+```
+
+## Preconditions
+
+`.state.md` says `stage: close` and `chair: fable`; `04-release/trace.md`
+shows the prod train completed and verified. Missing ⇒ halt, back to
+stage 5.
+
+```
+<workstream>/
+├── .state.md                  # stage: close · chair: fable → closed
+└── 05-close/
+    ├── closure.md             # the final record — what shipped, what didn't, who owns what's left
+    └── dreaming/
+        └── ledger.md          # the board: every note with evidence + suggestion, closed with the user's ruling
 ```
 
 Plus: the pipeline repo's own commits (the dreaming's applied
-lessons, one per change, revertible), the boards swept, and the next
-wave opened — or the workstream Done.
+lessons, one per change, revertible) and the repos swept.
 
-## 1 — The quiet window
-
-Prod has been live since the release; before closing, verify it is
-**quietly** live: the alarms silent over the window the rollout
-defined, no error-rate drift, nothing in the release's `pending`
-still burning. Noise here is not this stage's to fix — it is a fix
-issue routed back through the machinery; the closure waits.
-
-## 2 — Closure
+## 1 — Closure
 
 Write `05-close/closure.md` from
 [templates/closure.md](templates/closure.md): what shipped (versions,
-the wave's stories), what was deliberately left out and why, the
-pendencies with named owners, and the numbers that tell the wave's
-story (stories, rounds, stops) — set against the previous wave's
-`closure.md` when one exists, so faster-or-slower is measured, not
-felt. Sweep GitHub: every wave PR merged or explicitly re-homed, every
-story branch gone. The blueprint gets the wave's final touch —
-shipped, dated, same URL forever.
+the waves and their stories), what was deliberately left out and why,
+the pendencies with named owners, and the numbers that tell the
+demand's story (from `03-execution/audit.md`, the wave reports and the
+release trace: stories, review rounds, findings per lens and what
+survived, fix passes, suite runs, stops, departures, choices where
+the documents were silent, the audit's reversals, tokens per wave),
+set against the previous workstream's `closure.md` when one exists,
+so faster-or-slower is measured, not felt.
+
+## 2 — Sweep
+
+GitHub and the repos, per repo: every wave PR and the workstream PR
+merged (re-read) or explicitly re-homed; the story, wave and
+workstream branches deleted (their content lives on `main` and in the
+tags); no open PR left from this demand; the local clones on `main`
+with no stray worktree. Alpha: at `main`, the smoke fixtures reseeded
+so the next demand starts on a clean stage. The blueprint gets its
+final touch: shipped, dated, republished at the same URL. A repo left
+in any other state is a pendency with an owner in `closure.md`, never
+a silence.
 
 ## 3 — Dreaming — a working session, not an autonomous pass
 
-The input is the wave's full trace, not one file. Read, in order:
-the workstream's `dreaming-notes.md` (fed on the spot by every stage
-— every failure, every halt, every surprise — including the stage-4
-conductor's trace and report entries, and the **`[user]` entries**
-the user dictated mid-wave, per the house rule); every stage's review
+The input is the demand's full record, not one file. Read, in order:
+the workstream's `dreaming-notes.md` (fed on the spot by every stage,
+every failure, every stop, every surprise, including the Codex chair's
+trace and report entries, and the **`[user]` entries** the user
+dictated along the way, per the house rule); every stage's review
 audit (`00-discovery/reviews.md`, `01-design/reviews.md`,
 `02-plan/reviews.md`) — what blocked a round and what it cost to
 clear; **the user's rulings** — the workstream's `rulings.md` (every
@@ -78,9 +96,12 @@ that will hold again, noted raw by the stages: each note is an entry
 on the board in its own right, and this session decides with him what
 it becomes (a standard line, a skill rule, a judge or author prompt)
 or whether it is dropped — nothing in it is a rule before that; and
-the execution and release traces
+**the audit** (`03-execution/audit.md`: every departure he kept is
+a standard candidate, every reversal is a lesson for the builder or a
+lens, every choice where the documents were silent is a plan or design
+gap); and the execution and release traces
 (`03-execution/wNN-<slug>/trace.md` and `report.md` per wave,
-`04-release/trace.md`) — the halts, the rounds, what dragged. A
+`04-release/trace.md`): the stops, the rounds, what dragged. A
 friction counts wherever it was recorded. The pass:
 
 1. **The board.** Every note becomes an entry in
@@ -115,7 +136,7 @@ friction counts wherever it was recorded. The pass:
 3. **The session — the user rules.** Present the board, organized
    for ruling: the `[user]` entries first — he wrote them knowing
    what he wants; confirm the edit and move on — then the session's
-   candidates, ranked by what each would have saved this wave, then
+   candidates, ranked by what each would have saved this demand, then
    the suggested discards, one line each, rescuable. The user rules
    every entry: **edit as suggested** · **edit differently** (his
    words become the diff) · **discard** · **park**. Nothing is
@@ -133,25 +154,20 @@ friction counts wherever it was recorded. The pass:
    discarded and why, what was parked. Nothing learned, or dropped,
    in silence.
 
-## 4 — The wave loop
+## 4 — Done
 
-Read `waves.md`:
-
-- **A next wave exists** ⇒ `.state.md` → `stage: design · wave: wNN+1`
-  — its design starts from the README seed the cut created; commit the
-  workstream folder and suggest `/clear`: the session continues into
-  stage 2 of the new wave, with the shipped wave as living context in
-  the repos' docs.
-- **That was the last wave** ⇒ the workstream is **Done**: the
-  folder committed, the blueprint final. Say so
-  plainly — done is done.
+`.state.md` → `stage: closed`, with one line saying what is live where
+and what is pending with whom. Commit the workstream folder. Present
+the pipeline repo's `learn(` commits and the workstream commits for
+push; push only with the user's explicit approval. Say plainly that
+the workstream is done and the repos are ready for the next demand.
 
 ## Gates
 
 | Gate | Rule |
 |---|---|
-| Quiet window | closure only over a verified-quiet prod; noise routes back as a fix issue |
-| Every note on the board | the ledger covers 100% of the input — dreaming-notes (the `[user]` entries leading), `taste-notes.md`, `rulings.md`, the review audits and their precision tables, the traces — each with evidence and a suggestion |
+| No waiting | the close does not wait on production; what hurts later reopens the demand as a fix |
+| Every note on the board | the ledger covers 100% of the input — dreaming-notes (the `[user]` entries leading), `taste-notes.md`, `rulings.md`, the review audits and their precision tables, the audit, the traces — each with evidence and a suggestion |
 | Recurrence check | no pipeline candidate reaches the board without the subagent sweep of the `learn(` history; a repeated class is presented as recurrence with both hashes, never silently re-edited |
 | Class, not incident | the ruler for the session's suggestions — what does not generalize is suggested as a discard; the user can overrule |
 | Destination triage | venture- and repo-class lessons never land in the public pipeline repo |
@@ -168,7 +184,8 @@ Read `waves.md`:
 
 ## Boundaries
 
-No new features, no fixes beyond routing what the quiet window
-surfaces. The dreaming edits process, never product. This is the last
+No new features, no fixes: what production surfaces after the close
+reopens the demand through the Codex chair, it does not run here. The
+dreaming edits process, never product. This is the last
 stage: what it does not close, it re-homes with a named owner — a
 workstream never ends with unowned loose ends.

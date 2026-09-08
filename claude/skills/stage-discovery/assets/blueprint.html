@@ -631,10 +631,23 @@ const BLUEPRINT = {
      the shape). Null until the plan closes. */
   plan: null,
 
+  /* Filled by the audit that closes stage 4 (the Claude chair):
+     audit: { intro, cells: [{v, l}],
+              items: [{ id, list, t, where, ruling, why }],   // list: departure | choice | note | stop · ruling: keep | fix | revert
+              fixes: [{ num, repo, t, from, pr, status }] }   // the fix wave's rows
+     Null until the audit closes. */
+  audit: null,
+
+  /* Filled by stage 5 — WORKSTREAM-LEVEL since v7 (one release per
+     demand): { intro, timeline: [{when, what, det, tone}], versions: [{repo, from, to, why}],
+     smoke: {out, note}, rollback: [{repo, back, data}], rollbackNote, decisions, pending }.
+     Null until the release closes. */
+  release: null,
+
   /* Filled from stage 4 on — PER WAVE. A wave that is named but not
      started sits as null. The Codex chair writes `execution` at the
      wave's close (the stage-execute skill's templates/report.md is
-     the source); the release stage writes `release` and republishes.
+     the source); a blueprint written before v7 keeps `release` here.
      execution: {
        intro,                               // the wave in one paragraph
        cells: [{v, l}],                     // stories · PRs · suite · tokens
@@ -660,13 +673,14 @@ const BLUEPRINT = {
 const esc = s => String(s).replace(/[&<>]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
 const jsonc = s => esc(s).replace(/\/\/(.*)$/gm, '<span class="c">//$1</span>');
 const nonEmpty = v => Array.isArray(v) ? v.length > 0 : !!v;
-const WAVED = ['execution','release'];   // stage tabs that live per wave (design and plan are workstream-level)
+const WAVED = ['execution'];   // stage tabs that live per wave (design, plan and release are workstream-level)
 let waveNow = BLUEPRINT.workstream.wave || Object.keys(BLUEPRINT.waves || {})[0] || null;
 const W = () => (waveNow && BLUEPRINT.waves && BLUEPRINT.waves[waveNow]) || {};
 // design and plan: workstream-level since v7; a blueprint written before then keeps them under a wave
 const D = () => BLUEPRINT.design || W().design || {};
 const P = () => BLUEPRINT.plan || W().plan || {};
-const has = k => k === 'design' ? nonEmpty(D()) : k === 'plan' ? nonEmpty(P()) : WAVED.includes(k) ? nonEmpty(W()[k]) : nonEmpty(BLUEPRINT[k]);
+const R = () => BLUEPRINT.release || W().release || {};
+const has = k => k === 'design' ? nonEmpty(D()) : k === 'plan' ? nonEmpty(P()) : k === 'release' ? nonEmpty(R()) : WAVED.includes(k) ? nonEmpty(W()[k]) : nonEmpty(BLUEPRINT[k]);
 const secT = (t, n) => `<div class="sec-t"><h2>${t}</h2>${n != null ? `<span class="n">${n}</span>` : ''}</div>`;
 
 const STAGES = [
@@ -697,7 +711,7 @@ function renderOverview() {
   const p = BLUEPRINT.overview;
   const order = ['discovery','design','plan','execution','release'];
   const lbl = { discovery:'Discovery', design:'Design', plan:'Plan', execution:'Execution', release:'Release' };
-  const at = order.indexOf(BLUEPRINT.workstream.stage);
+  const at = BLUEPRINT.workstream.stage === 'closed' ? order.length : order.indexOf(BLUEPRINT.workstream.stage);
   return `
   <section class="sec">${secT('What we are building')}
     <p class="lede">${p.summary}</p></section>
@@ -1234,12 +1248,32 @@ function renderExecution() {
   ${group('Stops and their resolution', eye.stops)}
   ${group('Improvements applied', e.improvements, `${e.improvements?.length || 0} · inside the standard`)}
   ${e.amendments?.length ? `<section class="sec">${secT('Amendments to the plan', e.amendments.length)}
-    <div class="card"><ul style="margin:0;padding-left:20px">${e.amendments.map(a => `<li>${a}</li>`).join('')}</ul></div></section>` : ''}`;
+    <div class="card"><ul style="margin:0;padding-left:20px">${e.amendments.map(a => `<li>${a}</li>`).join('')}</ul></div></section>` : ''}
+  ${renderAudit()}`;
+}
+
+function renderAudit() {
+  const a = BLUEPRINT.audit;
+  if (!nonEmpty(a)) return '';
+  const RUL = { keep: 'xgreen', fix: 'xred', revert: 'xred' };
+  const cells = a.cells?.length ? `<div class="scoreboard" style="margin-top:14px;grid-template-columns:repeat(auto-fit,minmax(140px,1fr))">${a.cells.map(c =>
+    `<div class="pl"><span class="v">${c.v}</span><span class="l">${c.l}</span></div>`).join('')}</div>` : '';
+  const items = a.items?.length ? `<div class="scroll"><table class="table">
+    <tr><th>#</th><th>List</th><th>Item</th><th>Where</th><th>Ruling</th><th>Why</th></tr>
+    ${a.items.map(x => `<tr><td class="num">${x.id}</td><td>${x.list}</td><td>${x.t}</td><td>${x.where || ''}</td>
+      <td class="${RUL[x.ruling] || ''}">${x.ruling}</td><td>${x.why || ''}</td></tr>`).join('')}</table></div>` : '';
+  const fixes = a.fixes?.length ? `<div class="scroll"><table class="table">
+    <tr><th>#</th><th>Repo</th><th>Fix</th><th>From</th><th>PR</th><th>Status</th></tr>
+    ${a.fixes.map(f => `<tr><td class="num">${f.num}</td><td><code>${f.repo}</code></td><td>${f.t}</td><td class="num">${f.from || ''}</td>
+      <td>${f.pr ? `<a href="${f.pr}">PR</a>` : '—'}</td><td>${f.status || ''}</td></tr>`).join('')}</table></div>` : '';
+  return `<section class="sec">${secT('The audit', 'the close of stage 4 · the whole demand, ruled by you')}
+    <p class="sec-d">${a.intro}</p>${cells}${items}
+    ${fixes ? `<h3 style="margin-top:18px">The fix wave</h3>${fixes}` : ''}</section>`;
 }
 
 /* ---------- release ---------- */
 function renderRelease() {
-  const e = W().release;
+  const e = R();
   const tl = `<div class="xtl">${e.timeline.map(i => `
     <div class="xi ${i.tone || ''}"><div class="when">${i.when}</div>
       <div class="what">${i.what}</div>${i.det ? `<div class="det">${i.det}</div>` : ''}</div>`).join('')}</div>`;
