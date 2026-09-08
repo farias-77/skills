@@ -1,291 +1,376 @@
 ---
 name: stage-plan
-description: Conducts stage 3 (Planning) of the pipeline — dispatches one plan-author per repo in parallel (the frozen contracts make each repo an independent, closed graph; each author self-checks its issues with blind Haiku readers before delivering), runs the review round as a deterministic workflow (three fresh blind cold-readers per issue plus four lenses at the maximum bar, the plan-judge proposing a ruling on every finding), puts every finding with the judge's ruling in front of the user through the question tool — he confirms or overrules each one — loops what he sustains back to the same repo's author, closes with one full final round he reads, publishes the Plan tab in the wave's blueprint, and bootstraps the issues on GitHub only after the user approves. Use after the wave's design is approved, or to resume a planning in progress.
+description: Conducts stage 3 (Plan) — takes an approved design and produces, with the user, the sequence in which the whole demand is built: waves that are each a verifiable checkpoint in alpha (one feature branch per repo, the suite green, a PR open), rows inside each wave (one story × repo, with a "ready when" a person can observe), the order and what runs in parallel; one Fable author writes the goal of every wave, the whole brief the execution chair receives; a whole review round runs (three Opus lenses, two blind readers and a referee per goal, an Opus judge marking who owns each fix: author, user or worker); two rounds at most; the blueprint's Plan tab is published for approval. Runs in Claude Code with a Fable session. Use after a design is approved, or to resume a plan in progress.
 disable-model-invocation: false
 argument-hint: "<workstream-slug>"
-allowed-tools: Read, Write, Edit, Glob, Grep, Agent, SendMessage, Workflow, Artifact, AskUserQuestion, Bash(mkdir *), Bash(date *), Bash(ls *), Bash(cat *), Bash(git *), Bash(gh *)
+allowed-tools: Read, Write, Edit, Glob, Grep, Agent, SendMessage, Workflow, AskUserQuestion, Artifact, Bash(mkdir *), Bash(date *), Bash(ls *), Bash(cat *), Bash(rm *), Bash(git *)
 ---
 
-# Stage 3: Planning
+# Stage 3: Plan
 
-> **v7 note (08/09/2026):** since the design covers the whole demand,
-> the wave cut is this stage's first step: `waves.md` is written here,
-> from the design and the stories, before any plan author
-> runs. This skill still reads as if the cut arrived from stage 2; its
-> rebuild is next.
+A definition of how it works comes in: the design of the whole demand.
+A sequence comes out: the order in which it gets built, cut so that
+every step is something a person can verify in alpha. The unit of the
+sequence is the **wave**: one feature branch per repo, implemented row
+by row, deployed to alpha, the whole smoke suite green, a PR to
+`main` open for the user. The next wave's branches cut from this
+one's. Prod is stage 5's. The execution chair receives one goal per
+wave and builds them in order, without coming back here.
 
-The design stops being "how it works" and becomes dispatchable work: a
-graph of issues that, executed end to end, implements the whole design —
-no hole between issues, and no issue that stalls a cold worker for lack
-of input. Every issue is written for an agent with **zero conversation
-context**: the issue file is the entire brief.
+Inside a wave, the unit is the **row**: one story in one repo (a mesh
+repo, an infra step or a seed is a row too), with a "ready when" that
+is a command or an observation: a smoke folder green, a screen
+rendered against the real API, a resource visible. The design says
+how everything works; the plan says in what order it exists in alpha
+and how each step is proved. It re-decides nothing.
 
-The session is the **conductor**: it dispatches, audits, relays, and owns
-the blueprint. It never writes a plan or an issue — each repo has exactly
-one writer, its `plan-author`, first draft to last fix.
+This stage runs in Claude Code, in a Fable session. It depends on the
+question tool and the Workflow tool.
+
+The session is the conductor. It runs the plan session with the user,
+writes `waves.md` as the session happens, dispatches the author, runs
+the review workflow, relays the rulings, and publishes the blueprint.
+It writes exactly one plan file, `waves.md`, and never any other: the
+author is the only writer of the goals, first draft to last fix. A
+finding is only fixed when the author changed the file.
+
+## Two modes
+
+**Session mode** (step 1, step 4, and the questions of step 2). The
+user is in the room and decisions are the work. Never run ahead of
+the user, never dispatch the author from a session that is not
+closed, never decide in the user's place. Closed choices go through
+the question tool; open discussion goes in prose. No agent runs
+during the session; a fact you need, you look up yourself, inline.
+
+**Autonomous mode** (steps 2, 3, 5 and the file work of 6). The user
+is waiting, not answering. Dispatch the author, run the workflow,
+write the audit, publish the blueprint, update the state, without
+asking permission for any of it. Say in one line what you are about
+to do, and close with a recap that stands on its own. Do not end a
+turn on a plan or a promise; do the work.
+
+## The pattern
+
+```
+1. Session    you and the user: the sequence, whole. You propose it as a table
+              from the stories and the design; he changes it row by row; a card
+              at every real fork. Written to waves.md as you go. Ends with the
+              playback and an explicit "that's it".
+2. Write      one dispatch of plan-author: waves.md + the design → one goal per
+              wave. Its questions come back in one batch; you ask the user and
+              send the answers.
+3. Review     the plan-review workflow, whole: three Opus lenses beside two
+              Haiku readers and a referee per goal, then the Opus judge.
+4. Rule       author-owned and worker-owned findings go to the author.
+              User-owned findings go to the user, one question each, grouped by
+              wave, the rulings board open beside. One veto question.
+5. Iterate    text changed? run step 3 again, whole, once. What is still
+              sustained after round 2 is applied without a third round.
+6. Close      blueprint Plan tab, explicit approval, state moved, /clear.
+```
+
+The user is interrupted at four points: the session (1), the author's
+questions (end of 2), the rulings (4, once per round) and the approval
+(6). Everything else runs without him.
 
 ## Preconditions
 
-`.state.md` says `stage: plan` and names the wave; the wave's
-`01-design/` is approved (checkpoint #2 passed). Missing ⇒ halt.
-
-## What this stage produces
+`.state.md` says `stage: plan`; `01-design/` is approved (the Design
+tab published, the user's explicit ok recorded). Missing: halt, back
+to stage 2. Keep `chair: fable` in `.state.md`.
 
 ```
 designs-root/2026-08-15-workspace-invites/
-├── blueprint.html             # the same single blueprint — this stage fills
-│                              #   waves['wNN-<wave>'].plan and republishes
-├── waves.md                   # the cut (stage 2) — this wave's stories and ACs
-├── 00-discovery/              # the whole demand (stage 1, untouched here)
-└── w01-invite-by-email/
-    ├── 01-design/             # approved (stage 2, untouched here)
-    └── 02-plan/
-        ├── <repo>/plan.md          ← one per repo: the logic, batches, edges, coverage map
-        ├── <repo>/issues/NN-*.md   ← one file per issue — the EXACT body the worker receives
-        └── reviews.md              ← the round audit — permanent, the conductor's file
+├── .state.md                  # stage: plan · chair: fable
+├── blueprint.html             # the workstream's blueprint; this stage fills BLUEPRINT.plan
+├── rulings.md · taste-notes.md
+├── waves.md                   # the sequence: the conductor's file; Status filled by stage 4
+├── 00-discovery/ · 01-design/ # untouched here
+└── 02-plan/
+    ├── goals/                 # one per wave: wNN-<slug>.md — the execution chair's brief
+    ├── reviews/               # round-N.json: each round's return value, as it came
+    └── reviews.md             # the round audit: the conductor's file
 ```
 
-Plus this wave's **Plan tab** in the workstream's blueprint (same URL as
-always), and — only after the user approves — the issues on GitHub.
+## Step 1 — the plan session
 
-## 1 — Dispatch the authors, one per repo, in parallel
+Before it, read the discovery, the design whole (`decisions.md`,
+`architecture.md`, `contracts.md`, `rollout.md`, `acceptance.md`
+above all), the consuming project's `CLAUDE.md`, and the `CLAUDE.md`
+and `docs/` of every repo the design names: the smoke layout and the
+deploy commands are what make a "ready when" concrete. Create
+`waves.md` from [templates/waves.md](templates/waves.md) on the first
+turn and write to it every turn; the session may span more than one
+sitting, and the file is the state between them.
 
-List the repos the design touches (the contracts and architecture name
-them). One `Agent` call **per repo**, all in the same message:
-**`plan-author`** (Opus). Parallel is safe by construction — the frozen
-`contracts.md` is the bridge; each repo is a **closed, self-sufficient
-graph** with **zero cross-repo edges**, so no two authors ever touch the
-same file.
+The session is a joint construction, not a questionnaire. Its unit is
+the sequence, and it runs in five moves:
 
-Each dispatch hands its author: the wave folder path, the approved
-`01-design/` (contracts above all; `decisions.md` is the design as the
-user decided it — the author details it, never re-decides it; `acceptance.md` is
-the frozen case spec each issue's DoD names its cases from; `code.md`
-is the file-tree compass — a guide for slicing, never a rule to
-enforce), the workstream's `00-discovery/` and `waves.md` (the cut
-defines which story ACs are this wave's — the coverage universe), its
-repo's path with `CLAUDE.md` and `docs/`, and the target directory
-`02-plan/<repo>/`. The author does the rest — decomposition ruler,
-issue writing rules, the blind-reader self-check, and its own checks
-live in its agent definition. It returns a structured summary: batches,
-issue count, coverage map status, self-check result, declared
-decisions, and any questions that need the user — **gathered in one
-batch** during authoring, not flagged `(decided in your place)` at the
-end; the target for oranges at checkpoint is near zero.
+1. **Ask first whether the user has something in mind.** One open
+   question: what should exist first, what is he anxious to see
+   working, is there a deadline that shapes the cut. When he has a
+   sequence in his head, he talks first and you complete; when he
+   does not, you propose.
+2. **Propose the whole sequence as a table**, at conversation
+   altitude: the waves in order, one line each with what it delivers
+   and what a person can do in alpha at its end; then, per wave, the
+   rows with repo, work, "ready when" and what depends on what. You
+   know the house and the design, so the first proposal is yours. No
+   options yet. The shape that has worked: the mesh first when it is
+   new (hub, identity, whole), then a foundation wave (the skeleton of
+   every repo the demand touches, one thin flow crossing everything,
+   login), then one wave per adjacent domain, the API rows before the
+   front rows that render them, two rows in parallel when they touch
+   different surfaces.
+3. **Discuss freely.** He moves rows, merges waves, splits one, cuts a
+   row to "later", asks "and if this came first". You check a
+   dependency inline (does the front row consume a route no earlier
+   row builds?) and say what you found. The sequence is born here.
+4. **A card is what is left as a real fork.** When the conversation
+   reaches a choice with two cuts and different costs (one bigger
+   wave or two smaller ones: one cycle less against a later first
+   checkpoint; the walking skeleton as its own wave or as the first
+   rows of the foundation; the seed as a row or as latitude), that
+   goes through the question tool as a card: the options in one line
+   each with their cost, your recommendation first and marked as
+   yours, his call. What you settled in prose without a fork is
+   written to `waves.md` as a card with its "Chosen" line and no
+   question.
+5. **Close each wave** with three lines: out of this wave (what looks
+   like the wave's and is a later row or direction), stays with the
+   user (texts, credentials, third-party contracts, and what the wave
+   does without them), and the parallel pairs.
 
-**Keep the author ↔ repo mapping**: every fix for that repo goes back to
-the SAME author via SendMessage — that is the single-writer rule, per
-repo.
+Three rules inside the session:
 
-If an author hits a design gap it cannot plan over, the path is the same
-as stage 2: **it becomes a question to the user** (relayed by you), and
-the answer is folded in as a declared decision — the stage never reopens
-the design in silence. A contract that proves wrong is a design amendment
-(the conductor relays it to the user, the design doc is amended, every
-affected repo's author is notified) — never a local workaround.
+- **Every wave is a checkpoint a person can verify.** Its "ready
+  when" is what someone does in alpha at its end, in one sentence
+  ("the first real leader logs in and sees only his region"). A wave
+  that ends on "the tables exist" is not a checkpoint; fold it into
+  the next one or give it a thin flow that proves it.
+- **Every row's "ready when" is a command or an observation.** A
+  smoke folder green, with the bad paths; a screen rendered against
+  the alpha API; a resource listed. "Works" is not a ready-when. When
+  the design's `acceptance.md` names the cases, the row names the
+  folder that holds them.
+- **The sequence covers the whole demand, and nothing else.** Every
+  story of the discovery lands in a row; the PR-FAQ's "What we are
+  NOT building" and the stories' "Out of this story" never do. The
+  design's latitude stays latitude: the plan does not fix what the
+  design left to the implementer.
 
-## 2 — The review round (a workflow, so it cannot be skipped)
+> **Example of a card** — "The equipment inventory: A) rows 2.4 and
+> 2.6 inside the people wave (one checkpoint, the wave grows to seven
+> rows and its suite to ~150 cases); B) its own wave after people
+> (one more PR and one more alpha cycle, the people checkpoint lands
+> two days earlier). Recommended: A, the two domains share the
+> person's screen." Two cuts, one line of cost each, a recommendation.
+>
+> **Example of a row** — "1.4 · `labs-api-tracking` · S-002
+> accesses: `POST /tracking/users` (a leader is born in his region;
+> a subleader by his leader), `PATCH` name and e-mail, `POST
+> …/password`, `GET /tracking/users` · ready when smoke `users/` is
+> green, the 403 and the 422 among the cases · depends on 1.3."
 
-Run [`plan-review`](../../workflows/plan-review.js) —
-`Workflow({scriptPath: '<workflows-root>/plan-review.js', args: {...}})`
-(invoke by
-`scriptPath` pointing at the file under the consuming project's
-workflows root — e.g. `.claude/workflows/` — never by `name`: the name
-registry does not reliably carry these workflows; field-reported by
-ops-tracking w2n3) with `planDir`,
-`designDir`, `discoveryDir`, `wavesPath`, `issues`, and `round`.
-`issues` is the enumeration of `02-plan/<repo>/issues/*.md` (repo +
-absolute path): **every issue on the opening round; on a re-round, only
-the issues whose files changed since the last one.** The three
-whole-plan lenses run every round regardless — they read everything and
-are the regression guard.
+A fork goes through the question tool: the header is the wave, the
+question carries the card, the answers are the options with your
+recommendation first and marked as yours. Record every card in
+`waves.md` as you go, recommendation beside choice. Every card where
+the user chose against the recommendation goes to `taste-notes.md` on
+the spot, as the pattern rather than the instance (house rule).
 
-It is ONE workflow invocation covering the whole round, in four
-phases: the two halves below run concurrently, `plan-reviewer-coherence`
-closes the reading with every verdict in hand, and `plan-judge`
-proposes a ruling on every finding. **The judge proposes, the user
-rules (§3):**
+**The playback.** When no wave has a card left, present the whole
+sequence back in one pass: the table of waves with their checkpoints,
+then each wave's rows. Get an explicit "that's it". The session
+closes with that ok, in conversation, no artifact.
 
-- **Reviewers report at the maximum bar; `plan-judge` (Opus) rules
-  every finding** — `sustained` / `deferred` / `dismissed`, with a
-  one-line reason — calibrated by `decisions.md` and the round history
-  in `reviews.md`, the user's rulings included. **Its ruling is a
-  proposal**: the round comes back with every finding
-  ruled, and the user confirms or overrules each one before anything
-  moves. `open` is the judge's guess at what stays open; his rulings
-  decide.
-- **Every later round is the delta**: only the issues whose files his
-  sustained findings changed get fresh cold reads; the three
-  whole-plan lenses reread everything regardless — they are the
-  regression guard.
-- **When a round comes back with nothing he sustains, ONE full final
-  round runs — always, once**: every issue cold-read again by fresh
-  readers, every lens, over the final state — mid-review fixes can
-  break what had already passed. It reaches him like any round; what
-  he sustains is fixed and verified by a delta, and **whether another
-  full round runs is decided with him, never automatically**.
+## Step 2 — write
 
-**Per issue — the cold-read probe.** Three **`plan-blind-reader`**
-agents (Haiku — cheap and deliberately weak) read the same issue blind,
-each alone, and return their **understanding** in their own words plus
-**exactly five questions** they would ask before starting — always
-five, so padding is expected by design. Then **`plan-reviewer-issue`** (Sonnet)
-reviews the issue WITH the readings in hand: **real divergence
-between the understandings is the ambiguity signal** — if weak
-models read the same issue in incompatible ways, a strong one gets no
-guarantee either — and **triaging the questions (five per reader) is its job**:
-a question answerable by exploring the code during implementation is
-noise; a question whose wrong guess would produce wrong work is a real
-gap in the issue. The issue lens also runs its own mechanical checks (broken
-references, consumes without origin, dishonest verification map). The
-bar: if a Haiku can execute it, the worker certainly can.
+One `Agent` dispatch of **`plan-author`** in write mode, with: the
+workstream path, `waves.md`, the design folder, the consuming
+project's `CLAUDE.md`, the repo map (name and path of every repo the
+sequence names), and the language of the documents (the user's). The
+author writes one goal per wave under `02-plan/goals/` and returns
+its questions in one batch.
 
-**Whole plan — the graph lenses.**
+Ask the user the batch through the question tool, one question per
+item, the author's options as the answers with its recommendation
+first. Send the answers to the same author in one message; it folds
+them in. An answer that changes a row is written by you to `waves.md`
+first, as a dated amendment; the author reads it there.
 
-| Lens | Judges |
+When the author returns, read every goal. Check that every row of
+`waves.md` is a `### N.k` section in the same order, that every
+"ready when" is a command or an observation, that every goal has its
+proof, its four closing sections and an empty "Questions". Anything
+missing goes back to the author in one message before the review
+starts.
+
+## Step 3 — the review round
+
+Autonomous mode. Run
+[`plan-review`](../../workflows/plan-review.js) by `scriptPath`
+(never by name), with `planDir`, `wavesPath`, `designDir`,
+`discoveryDir`, `repos` (name and path), `round`, and `goals`: one
+`{id, text, wave}` per goal, the goal file verbatim and the wave's
+section of `waves.md` verbatim. Scripts cannot read files; you pass
+the text.
+
+| Agent | Question |
 |---|---|
-| `plan-reviewer-gaps` | the negative: what NO issue covers — this wave's story ACs without an issue (walks `waves.md` and the stories itself, never trusts the coverage map), issues without an AC, consumes without producer, "Out" without owner |
-| `plan-reviewer-flow` | the graph as it will RUN: cycles, edges without a real reason, wasted parallelism, a skeleton owed, two big jobs on the same surface in the same batch |
-| `plan-reviewer-coherence` | runs last, with all verdicts: the plans tell the design's story, and the two ends of every contract meet in the middle |
-| `plan-judge` | not a lens — proposes a ruling with a reason on every finding of the round (cold reads and lenses alike), after coherence, calibrated by the decisions and the round history |
-| **the user** | confirms or overrules the judge on every finding, through the question tool; decides what proceeds and therefore whether another round runs |
+| `plan-reviewer-coverage` | every story AC and every acceptance case lands in exactly one row; both ends of every contract are built by the time a row consumes them; no row builds what nothing forces |
+| `plan-reviewer-verifiability` | every "ready when" is a command or an observation a person can make in alpha with what exists by then; the wave's checkpoint proves the wave; nothing needs prod |
+| `plan-reviewer-order` | every consume has a producer that ran; every dependency is real and every real one is declared; parallel pairs do not collide; the deploy order across repos holds; the branches cut from the right place |
+| 2× `plan-blind-reader` → `plan-reviewer-ambiguity`, per goal | would two engineers build the same wave from this goal, and call each row done on the same evidence? |
+| `plan-judge` | could the execution chair build this row one way and prove it? and who decides the fix: the author, the user, or the worker? |
 
-Every reviewer answers under the house
-[reviewer contract](../../docs/standards/reviewer-contract.md) at the
-maximum bar, always: severity says how bad IF real; the judge says
-whether it should proceed; the user says whether it does. The workflow
-re-dispatches lazy passes and unruled findings on its own.
+The round runs whole every time. Every reviewer answers under the
+[reviewer contract](../../docs/standards/reviewer-contract.md).
 
-## 3 — The rulings are the user's; the judge proposes them
+Record the round before acting on it, with no agent and no rewriting:
+save the workflow's return value as it came in
+`02-plan/reviews/round-N.json` (the machine record), and write the
+human index in `02-plan/reviews.md`
+([template](templates/reviews.md)) from it with one `Write`: the
+verdict table per lens with the run id (from the workflow's journal),
+the blind-read table, and one line per finding, to which your rulings
+are appended in step 4. The JSON is the authority; the index is what
+a reader opens.
 
-Every round comes back with **the judge's ruling and reason on every
-finding** — a proposal. Before anything is fixed, put every finding in
-front of the user **through the question tool, always** — never as
-prose he answers in chat:
+## Step 4 — rule
 
-- **One question per finding.** The question text carries the context
-  he needs to rule without opening a file: the source (lens, or the
-  issue and its cold-read divergence) and severity, what the material
-  says (the quote), the gap in one line, the fix proposed, and **the
-  judge's reason**. Batch them four to a call, in the order the
-  workflow returned them.
-- **The answers are the judge's three rulings** — `sustained` ·
-  `deferred` · `dismissed` — and **the judge's pick comes first, marked
-  as his** (label it "— the judge's ruling"). The other two follow. He
-  confirms by picking the first, overrules by picking another, and
-  writes his reason in "Other" when he wants it recorded in his words.
-- **He may stop the round.** "Enough" through "Other" is a ruling: the
-  plan is executable as it stands, the remaining findings are recorded
-  as unaddressed by his call.
+Three lists come back.
 
-The three rulings mean:
+**Owner `author`.** A pointer, a count, a "ready when" made
+commandable with what the design already fixes, a dependency the
+consume plainly implies, propagation to the next goal: send them to
+`plan-author` in one apply batch. Its report carries the mentions
+table and the final lines; a fix without pasted lines is not done,
+send it back. Then verify a sample on disk yourself, file and line.
 
-- **sustained** → the author of that repo fixes it in this loop.
-- **deferred** → parked to the close; whether it ever enters is decided
-  there, with him (below).
-- **dismissed** → dies, with the reason recorded — the reasons are what
-  teach the lenses, and the judge.
+**Owner `worker`.** Real, but execution: they go in the same batch,
+and the author writes each as one line in that goal's "The worker
+decides" section. No row changes.
 
-No round runs on the judge's ruling alone: an unruled finding reaches
-him as sustained by construction — it is still his to confirm. Every
-ruling also goes to the workstream's `rulings.md` (house rule) — the
-judge's proposal beside his ruling.
+**Owner `user`.** A row of `waves.md` changes (add, split, merge,
+move, re-pair), a wave's checkpoint changes, a cut or an order is
+contested, two readings, something only the user has. These go to
+the user through the question tool, one question per finding, four
+per call, **grouped by wave, one wave at a time**, in the sequence's
+order. The judge's proposed fix comes first and is marked as the
+judge's; the context is in the question itself: lens, severity,
+quote, gap, fix, reason. Before the first question, publish the
+**rulings board**: an artifact with one card per finding, in the same
+order and numbering as the questions, so the user reads on one screen
+and answers on the other.
 
-The round is audited in **`02-plan/reviews.md` — permanent**, before
-anything is applied:
+> **Example** — header `w02-people`, question: "coverage#2 (blocker):
+> S-004 AC-6, the signed term, is in no row; the design has the flow
+> (`architecture.md` §'Accept the terms'). Judge: sustained, owner
+> user; which row carries it changes the wave." Answers: "Into row
+> 2.1 with the sign-up (judge's proposal)" · "A new row 2.1b after
+> 2.1" · "Deferred" · "Dismissed".
 
-1. Record the round: one section per lens and a per-issue scoreboard
-   (verdict + divergence flag), run ids from the workflow's journal
-   (not from your prose), findings **with the judge's ruling and
-   reason, and his ruling and reason** ("confirmed", or his words).
-2. Send what he sustained to the **author of that repo** via
-   SendMessage — it revises its own files (single writer, per repo).
-3. **Verify the applied findings on disk** — file and line per
-   finding. "Marked fixed, not applied" has happened; the author's
-   word is not the check.
-4. Run the next round with `issues` = the issues whose files changed
-   (the fixes, plus anything a whole-plan fix touched; the workflow's
-   `open` is the judge's guess — adjust it to his rulings). When a
-   round comes back with nothing he sustains, run **the full final
-   round** (every issue again). It reaches him the same way; what he
-   sustains loops as a delta, and **the two of you decide whether
-   another full round runs**.
-5. At close, write the **precision table**: per lens (the issue lens
-   included), findings raised · sustained · deferred · dismissed by
-   him, across all rounds — and **the judge's line**: rulings
-   confirmed, overruled, in which direction. Both are the stage's
-   telemetry, and stage 6's input to tighten the lens that cried wolf
-   and to recalibrate the judge. Every overrule whose reason is a
-   pattern goes to the workstream's `taste-notes.md` (house rule) —
-   noted, not decided.
+A user ruling that changes a row is written by you to `waves.md`
+(the row in place, the amendment dated under "Amendments") before it
+goes to the author as a fix. Then one veto question, at the end: the
+list of what the author fixed alone and what went to the worker's
+section, with "keep all" as the first answer. A vetoed fix is
+reverted by the author.
 
-Two rules hold inside the loop:
+Deferred findings batch into one author pass at close. Dismissed
+findings die with their reason in `reviews.md`. Every user ruling
+goes to `rulings.md` as it happens, and every overrule whose reason
+is a pattern goes to `taste-notes.md`.
 
-- **Deferred findings and `detail` findings never enter on their
-  own.** At close, present the batch to him (question tool, one per
-  finding: enter / stay out) and decide together what enters — the
-  default is nothing. What enters is one author pass,
-  then the touched issues once more, ruled by him.
-- **Simplify or remove:** when a finding shows a loose wire in
-  something a previous round added, the fix to suggest is simplify or
-  remove the addition — never a third mechanism on top.
+## Step 5 — iterate
 
-## 4 — The blueprint
+If any text changed in step 4, run step 3 again, whole, and rule
+again. That is the whole budget: two rounds. What is still sustained
+after round 2 is not re-reviewed: the author applies the `author` and
+`worker` fixes with proof by line, you verify them on disk, and the
+`user` ones are ruled and applied the same way. A third round runs
+only when the user asks for it explicitly, and his words go in
+`reviews.md`.
 
-The workstream has **one blueprint, one URL, forever**. This stage fills
-**this wave's entry**: `waves['wNN-<wave>'].plan` in the `BLUEPRINT`
-object, and republishes the same file path — the Plan tab lights up
-under this wave's pill. The content: the plan's logic as the intro, the
-batch map, the issue cards (produces/consumes chips), decisions inline
-(`decided in your place` in orange, counted in the Overview), and the
-review scoreboard — verdicts with the user's rulings, including the
-per-issue cold-read score. The
-conductor owns the blueprint — it is the report of the authors' files,
-not their projection (house rule: the blueprint is the report, the
-files are the record — same altitude as the Design tab). Never mermaid; diagrams are HTML/CSS with the shell's
-primitives.
+## Step 6 — close
 
-## 5 — Checkpoint, bootstrap, and closing
+Fill `BLUEPRINT.plan` in the workstream's `blueprint.html` (the file
+stage 1 created; same path, same URL forever). The shape the shell
+renders:
 
-Present: the blueprint URL, the verdict table (his rulings included),
-the precision table per lens, the per-issue cold-read score, the
-`decided in your place` count, the deferred batch and what he let in,
-and any open questions.
-Approval is explicit — and **the bootstrap runs ONLY on explicit
-authorization**, never inferred from a positive tone.
+```js
+plan: {
+  intro, cells: [{v, l}],                 // the sequence in one paragraph; waves · rows · repos · cases
+  waves: [{ n: 'w01', name, state,        // state: 'this wave' | 'done' | 'next' | ''
+            delivers, ready, stories,     // ready = the checkpoint sentence
+            rows: [{ num, repo, front, t, ready, dep, par }],
+            parallel, out, user }],
+  decisions: { taken: [...], decided: [...] },   // the session's cards, house card shape
+  review: { round, totalRounds, expected: 4, blind: { pass, total }, lenses: [...] },
+}
+```
 
-On "approved with fixes" or rejection: the affected repos' authors
-apply (or reauthor, with the reasons as input), the touched issues run
-through the round again, he rules it, and **a new checkpoint
-follows**. Every loop ends at
-a checkpoint; there is no path from a fix straight to bootstrap.
+The blueprint is the report, not the files' projection (house rule):
+natural to read above all. The tab opens with the sequence as one
+picture (a column per wave, its rows as cards, the checkpoint at the
+bottom of each column), then one block per wave with its rows as a
+table, then the session's cards with the rejected option in one line
+each, then the review scoreboard. The reader who skims the columns
+knows what exists in alpha after each wave and when they get to look.
 
-**The bootstrap** — after the authorization, and not by you: dispatch
-one Sonnet `Agent` (general-purpose) with a self-contained brief — the
-`plan.md` files and issue files, plus the mechanics in
-[references/github-bootstrap.md](references/github-bootstrap.md):
-idempotent labels, `gh issue create --body-file`, upsert keyed on the
-`plan-id` marker, dependencies via `addBlockedBy` (never in the body).
-The agent returns the plan-id → #number map; you verify every issue got
-a number, and record the numbers in each `plan.md`. Re-running the brief
-is safe — upsert by plan-id never duplicates.
+Present: the blueprint URL, the sequence table, the verdict table,
+the precision table per lens and the judge's line (from
+`reviews.md`), the residue, the taste notes this stage added, and the
+stage's own telemetry: rounds run, agents dispatched, approximate
+cost. Approval is explicit; silence or a loose "looks good" does not
+close the stage. On approval: `.state.md` to `stage: execute` with
+`wave: w01-<slug>` and `chair: codex`, commit the workstream folder
+(push only with the user's explicit approval), and suggest `/clear`
+before stage 4 (house rule). On "approved with fixes": one author
+pass, verify on disk, close. On rejection: the reasons go to the
+author as fixes, or to the user as questions; never back to stage 2.
 
-Then: `.state.md` → `stage: execute`, commit the workstream folder —
-**push only with the user's explicit approval** — and suggest `/clear`
-before stage 4 (house rule: stage transitions).
+## During execution
 
-## Lifecycle
+The plan is amendable, not sacred. When a wave changes while being
+built (a row proves wrong, a simpler cut appears, the user adds a
+row mid-wave), the execution chair edits the row in `waves.md` and
+the goal in place and writes the amendment, dated, under
+"Amendments" in `waves.md`, in the user's words where he gave them.
+The Status column of `waves.md` is stage 4's to fill, row by row.
+Nothing comes back to this stage for it.
 
-- **Permanent:** everything under `02-plan/` — the plans, the issue
-  files, and `reviews.md`.
-- **Working:** the authors' scratch notes, if any — gone at close.
+## How to write, in every file and every question
+
+Say what you mean. Literal sentences, concrete values, no metaphor.
+One idea per sentence. The user's words, in quotation marks, where
+they decide something. A card names its options by what they cost,
+not by adjectives. A "ready when" names a folder, a screen, a
+resource, a count.
+
+## Files
+
+- **Working, deleted at close:** the author's scratch notes, if any.
+- **Permanent:** `waves.md`, everything in `02-plan/` (`goals/`,
+  `reviews/`, `reviews.md`), `rulings.md`, `taste-notes.md`,
+  `blueprint.html`, `.state.md`.
+
+## Resuming
+
+Everything is in files. Read `.state.md`, then `waves.md` (a wave
+without rows says where the session stopped), then `02-plan/goals/`
+and `reviews.md` if they exist. Continue from the first step whose
+output is missing. Never from memory of a previous session.
 
 ## Boundaries
 
-No implementation — not even "just the scaffolding to get ahead"
-(stage 4). The design fence does not reopen silently — a hole becomes a
-question to the user and a declared decision. The plan is amendable, not
-sacred: in-flight adjustment (stage 4) navigates by Produces/Consumes —
-whoever consumes the corrected element is suspect, the rest untouched.
-Frictions worth learning from go to the workstream's
-`dreaming-notes.md` on the spot; judging them is stage 6's job.
+No code, no tests, no branches, no deploy (stage 4). No re-decision
+of the design: a row that cannot be built as designed becomes a
+question to the user and, answered, a dated amendment in
+`decisions.md`, never a local workaround in a goal. The discovery
+fence does not reopen: a story lands in a row or the user cuts it in
+the discovery, with the record there. Frictions worth learning from
+go to the workstream's `dreaming-notes.md` on the spot; judging them
+is stage 6's job.
