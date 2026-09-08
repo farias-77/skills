@@ -136,10 +136,10 @@ evidence saved, the wave PR is merged into the workstream branch
 from there. Improvements inside the standard are applied and listed;
 departures from the standard are applied only when the system gets
 simpler, and listed with the rule they leave. When the last wave is
-in, the stage moves to the Claude chair for the **audit**: the human
-reads the reports, the PRs, the improvements and the departures, rules
-each one through the question tool, and what he sends back the Codex
-chair builds as a fix wave. Stage 4 ends with the workstream branch
+in, the same session runs the **audit** with the human: the blueprint
+served locally, the departures, choices, open notes and stops asked
+four at a time, each ruled keep, fix or revert; what he sends back is
+built as a fix wave. Stage 4 ends with the workstream branch
 consolidated, verified in alpha and audited; `main` is stage 5's.
 
 **5 · Release** — the audited branch goes to production, in the

@@ -38,7 +38,8 @@ $stage-execute <workstream-slug>
 The skill reads the workstream's `.state.md`, takes the wave it names
 and runs to the last wave, or to a stop condition; every wave merges
 into the workstream branch `feat/<workstream>`. When the last wave is
-in, the stage moves to the Claude chair for the audit
-(`/stage-execute <workstream-slug>` there); what the audit sends back
-comes to this chair as a fix wave, with the same line. A second
-session with the same line resumes from the trace and the PRs.
+in, the same session runs the audit with the user: it serves the
+workstream's `blueprint.html` locally, asks the rulings four at a
+time, builds what he sends back as a fix wave, and closes the stage
+for the release in the Claude chair. A second session with the same
+line resumes from the trace, the PRs and `audit.md`.

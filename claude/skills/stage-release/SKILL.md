@@ -72,8 +72,10 @@ tag and a GitHub Release per repo, and production running it, verified.
 
 ## Step 1 — the entry gate
 
-Present what is about to ship: the repos and their `feat/<workstream>`
-shas, the waves as `waves.md` lists them, the audit's Close section
+Republish the blueprint at its URL first: the Codex chair wrote the
+execution and audit entries and served the file locally, but cannot
+publish. Then present what is about to ship: the repos and their
+`feat/<workstream>` shas, the waves as `waves.md` lists them, the audit's Close section
 (what he kept as a departure, the residue he accepted), and anything
 in "Stays with the user" that has a placeholder in the code and no
 real value yet. Get the explicit go through the question tool. A

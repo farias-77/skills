@@ -1,6 +1,6 @@
 ---
 name: stage-execute
-description: Build a workstream's waves from its approved plan — feature branch, stories, review, alpha, PR — wave after wave into the workstream branch, and the fix wave the audit sends back. Use in Codex when the user names a workstream whose .state.md says stage execute with chair codex (phase build or fix); the audit phase belongs to the Claude chair.
+description: Build a workstream's waves from its approved plan — feature branch, stories, review, alpha, PR — wave after wave into the workstream branch, then audit the whole with the user and build the fixes. Use when the user names a workstream whose .state.md says stage execute.
 ---
 
 # Stage 4: Execute
@@ -12,18 +12,19 @@ law) says how it works; the repos and the house standards say how code
 is written here. You run the whole demand from the wave the state
 names to the last wave, on your own. Every wave merges into the
 workstream branch `feat/<workstream>`; when the last wave is in, the
-user audits the whole in the Claude chair: the reports, the wave PRs,
-the improvements you applied and the places where you left the
-standard on purpose. What the audit sends back, you build as a fix
-wave.
+user audits the whole with you, in this session: the reports, the
+wave PRs, the improvements you applied and the places where you left
+the standard on purpose. What he sends back, you build as a fix wave.
+The stage closes when nothing is left to send back.
 
 Read `<designs-root>/<workstream>/.state.md` first. It names the wave
 in flight. Then read that wave's goal whole, the wave's section of
 `waves.md`, and `03-execution/<wave>/trace.md` if it exists: the trace
 and the PRs on GitHub are what was done; your memory is not. When
-`.state.md` says `phase: fix`, the goal is the Fixes section of
-`03-execution/audit.md`, built as one more wave (see the fix wave in
-[references/wave.md](references/wave.md)).
+`.state.md` says `phase: audit`, continue in
+[references/audit.md](references/audit.md); when it says `phase: fix`,
+the goal is the Fixes section of `03-execution/audit.md`, built as one
+more wave (the fix wave in [references/wave.md](references/wave.md)).
 
 ## What done means
 
@@ -35,9 +36,10 @@ alpha; the walk in "The wave's proof" was done and its evidence saved;
 one PR per repo from the wave branch to `feat/<workstream>` is merged
 by you after the proof; the Status column of `waves.md`, `report.md` and the blueprint's
 execution entry for the wave are filled. Then the next wave starts
-from the workstream branch. Your part ends when the last wave is done,
-`feat/<workstream>` is deployed to alpha and `.state.md` says
-`phase: audit`; it resumes if the audit writes fixes (`phase: fix`).
+from the workstream branch. The stage is done when the last wave is
+done, `feat/<workstream>` is deployed to alpha, the audit
+([references/audit.md](references/audit.md)) ended with nothing left
+to send back, and `.state.md` says `stage: release`.
 
 Do not stop for review after the first implementation. Deploying to
 alpha, running the smoke suite, fixing what fails and rerunning are
@@ -60,22 +62,27 @@ a PR into the wave branch with the review numbers; you merge.
 The review rules, the improvement rule and what lives in
 `reviews/` are in [references/review.md](references/review.md). Who
 you spawn, at which effort, with what boundary, is in
-[references/team.md](references/team.md).
+[references/team.md](references/team.md). After the last wave, the
+audit with the user, the fix wave and the close of the stage are in
+[references/audit.md](references/audit.md).
 
 ## Files
 
 ```
 <workstream>/
-├── .state.md                       # stage · chair: codex · wave in flight
+├── .state.md                       # stage · chair: codex · phase: build | audit | fix · wave in flight
+├── rulings.md · taste-notes.md     # the audit's rulings, appended as he gives them
 ├── waves.md                        # Status column and Amendments are yours
 ├── 02-plan/goals/wNN-<slug>.md     # the brief; read-only, except an amendment
 ├── blueprint.html                  # waves['wNN-<slug>'].execution is yours
-└── 03-execution/wNN-<slug>/
-    ├── trace.md                    # one line per event, as it happens (templates/trace.md)
-    ├── report.md                   # the wave's report, grown story by story (templates/report.md)
-    ├── reviews/<N.k>/round-1.md    # every finding with its ruling (templates/review-round.md)
-    ├── reviews/<N.k>/round-2.md
-    └── proof/                      # smoke output, screenshots, resource listings
+└── 03-execution/
+    ├── audit.md                    # the audit: items, rulings, the fix rows (templates/audit.md)
+    └── wNN-<slug>/
+        ├── trace.md                # one line per event, as it happens (templates/trace.md)
+        ├── report.md               # the wave's report, grown story by story (templates/report.md)
+        ├── reviews/<N.k>/round-1.md  # every finding with its ruling (templates/review-round.md)
+        ├── reviews/<N.k>/round-2.md
+        └── proof/                  # smoke output, screenshots, resource listings
 ```
 
 Trace, report, review files and PR bodies are written in the language
@@ -90,4 +97,5 @@ design are silent, choose the simplest thing that keeps the system
 consistent and record it in the report; where they are wrong, say so
 in the report and build the simplest reading. The design is not
 re-decided here. The user's instructions in the session take
-precedence over this skill.
+precedence over this skill. At the audit nothing is decided in his
+place: you recommend, he rules.

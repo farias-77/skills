@@ -69,7 +69,8 @@ Three red suite runs in one wave stop the wave.
 4. `blueprint.html`: fill `waves['wNN-<slug>'].execution` following
    the shape in the shell's comment, in the language of the page.
    Numbers from `report.md`; the smoke output and the central proof
-   verbatim but trimmed. The Claude chair republishes the URL later.
+   verbatim but trimmed. The file is served locally at the audit;
+   the release stage republishes the URL.
 5. Commit the workstream folder (the `designs` repo) with a
    conventional message. Push only if the user said so.
 6. `.state.md`: `wave:` moves to the next wave of `waves.md`.
@@ -77,17 +78,15 @@ Three red suite runs in one wave stop the wave.
 Then open the next wave from the workstream branch. When there is no
 next wave: deploy `feat/<workstream>` of every repo to alpha in the
 last goal's order (the diff should be empty), run the whole suite once
-more, set `.state.md` to `phase: audit · chair: fable`, commit, and
-stop. Tell the user the workstream branch is consolidated and verified
-and that the audit runs in the Claude chair with
-`/stage-execute <workstream-slug>`.
+more, set `.state.md` to `phase: audit`, commit, and go to
+[audit.md](audit.md).
 
 ## The fix wave
 
-The audit writes what it wants changed as rows `A.1`, `A.2`… in the
-Fixes section of `03-execution/audit.md`, in the goal's row format,
-and sets `.state.md` to `phase: fix · chair: codex · wave: wNN-audit`.
-That section is the goal of one more wave: branch `feat/wNN-audit-<repo>`
+The audit ([audit.md](audit.md)) writes what the user wants changed
+as rows `A.1`, `A.2`… in the Fixes section of `03-execution/audit.md`,
+in the goal's row format, and sets `.state.md` to `phase: fix · wave:
+wNN-audit`. That section is the goal of one more wave: branch `feat/wNN-audit-<repo>`
 from `feat/<workstream>`, the story cycle per row, the wave's proof
 (the whole suite), the PR merged into the workstream branch, its own
 `03-execution/wNN-audit/` folder and report. At its close, `phase:

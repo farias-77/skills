@@ -1,10 +1,9 @@
 # Audit — <workstream> — the close of stage 4
 
 <!--
-  Written by the CONDUCTOR of the Claude chair from the Codex chair's
-  reports, PRs, reviews and proof, before the session; the rulings
-  appended as the user gives them; the Fixes section is the goal of
-  the fix wave the Codex chair builds. Items quote the code, the goal
+  Written by the conductor from the wave reports, PRs, reviews and
+  proof, before asking anything; the rulings appended as the user
+  gives them; the Fixes section is the goal of the fix wave. Items quote the code, the goal
   and the standard side by side. Language: the goal's.
 -->
 
