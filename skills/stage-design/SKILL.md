@@ -90,6 +90,7 @@ designs-root/2026-08-15-workspace-invites/
     ├── decisions.md           # the session's record: the conductor's file
     ├── research/              # one file per researched target
     ├── ui/                    # the screens: <Screen>.dc.html + canvas.json
+    ├── reviews/               # round-N.json: each round's return value, as it came
     ├── architecture.md · data-model.md · contracts.md · ui.md · security.md
     ├── infra.md · observability.md · rollout.md · code.md · acceptance.md
     └── reviews.md             # the round audit: the conductor's file
@@ -270,11 +271,16 @@ The round runs whole every time. Every reviewer answers under the
 [reviewer contract](../../docs/standards/reviewer-contract.md),
 declared latitude included.
 
-Record the round in `01-design/reviews.md` before acting on it
-([template](templates/reviews.md)): one section per lens with its
-verdict and run id (from the workflow's journal), the blind-read
-table, one line per finding with the judge's ruling, owner and
-reason, and the flows reported unread.
+Record the round before acting on it, with no agent and no rewriting:
+save the workflow's return value as it came in
+`01-design/reviews/round-N.json` (the machine record: every finding
+with ruling, owner and reason, the lens verdicts, the unread flows),
+and write the human index in `01-design/reviews.md`
+([template](templates/reviews.md)) from it with one `Write`: the
+verdict table per lens with the run id (from the workflow's journal),
+the blind-read table, and one line per finding, to which your rulings
+are appended in step 4. The JSON is the authority; the index is what
+a reader opens.
 
 ## Step 4 — rule
 
@@ -387,7 +393,7 @@ findings, options). Keep the session itself in prose.
 
 - **Working, deleted at close:** the author's scratch notes, if any.
 - **Permanent:** everything in `01-design/` (`decisions.md`, the ten
-  documents, `research/`, `ui/`, `reviews.md`), `rulings.md`,
+  documents, `research/`, `ui/`, `reviews/`, `reviews.md`), `rulings.md`,
   `taste-notes.md`, `blueprint.html`, `.state.md`.
 
 ## Resuming

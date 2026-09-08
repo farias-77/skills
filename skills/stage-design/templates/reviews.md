@@ -1,9 +1,12 @@
 # Design review audit — <workstream>
 
 <!--
-  Written by the CONDUCTOR, never the author. Permanent: the proof the
-  review happened (the blueprint has no Review tab), and the record of
-  the rulings. MUST have, per round: every lens that ran with verdict,
+  Written by the CONDUCTOR, never the author, with no scribe agent:
+  the workflow's return value is saved as is in reviews/round-N.json
+  (the authority), and this file is the index written from it in one
+  pass, the user's rulings appended as they happen. Permanent: the
+  proof the review happened (the blueprint has no Review tab), and the
+  record of the rulings. MUST have, per round: every lens that ran with verdict,
   run id (from the workflow journal, not prose) and verified list; the
   flows read blind, with the keys where the two readers built
   different products; every finding with the judge's ruling, owner and
