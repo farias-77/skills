@@ -621,9 +621,14 @@ const BLUEPRINT = {
     ]
   },
 
-  /* Filled from stage 2 on — PER WAVE, same keys and shapes as ever;
-     each stage skill documents its tab's contract. A wave that is named
-     but not started sits as null. */
+  /* Filled by stage 2 — the design of the WHOLE demand, workstream-level
+     (stage-design documents its nine sections). Null until the design
+     closes. */
+  design: null,
+
+  /* Filled from stage 3 on — PER WAVE (the cut is stage 3's), same keys
+     and shapes as ever; each stage skill documents its tab's contract. A
+     wave that is named but not started sits as null. */
   waves: {
     // 'w01-<what-it-delivers>': { design: {...}, plan: {...}, execution: {...}, release: {...} },
   }
@@ -636,10 +641,12 @@ const BLUEPRINT = {
 const esc = s => String(s).replace(/[&<>]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
 const jsonc = s => esc(s).replace(/\/\/(.*)$/gm, '<span class="c">//$1</span>');
 const nonEmpty = v => Array.isArray(v) ? v.length > 0 : !!v;
-const WAVED = ['design','plan','execution','release'];   // stage tabs that live per wave
+const WAVED = ['plan','execution','release'];   // stage tabs that live per wave (design is workstream-level)
 let waveNow = BLUEPRINT.workstream.wave || Object.keys(BLUEPRINT.waves || {})[0] || null;
 const W = () => (waveNow && BLUEPRINT.waves && BLUEPRINT.waves[waveNow]) || {};
-const has = k => WAVED.includes(k) ? nonEmpty(W()[k]) : nonEmpty(BLUEPRINT[k]);
+// the design: workstream-level since v7; a blueprint written before then keeps it under its wave
+const D = () => BLUEPRINT.design || W().design || {};
+const has = k => k === 'design' ? nonEmpty(D()) : WAVED.includes(k) ? nonEmpty(W()[k]) : nonEmpty(BLUEPRINT[k]);
 const secT = (t, n) => `<div class="sec-t"><h2>${t}</h2>${n != null ? `<span class="n">${n}</span>` : ''}</div>`;
 
 const STAGES = [
@@ -796,7 +803,7 @@ function gcard(t, hero) {
     </div></article>`;
 }
 function renderGlossary() {
-  const g = W().design.glossary;
+  const g = D().glossary;
   const ess = g.terms.filter(t => t.ess);
   const alpha = a => [...a].sort((x,y) => x.t.localeCompare(y.t,'en'));
   return `
@@ -818,7 +825,7 @@ function renderGlossary() {
 
 /* ---------- design: how it works ---------- */
 function renderFlows() {
-  const f = W().design.flows;
+  const f = D().flows;
   return `
   <p class="lede">${f.intro}</p>
   ${inlineDecisions(f.decisions)}
@@ -867,7 +874,7 @@ function refsBlock(a) {
 
 /* ---------- design: ui ---------- */
 function renderUI() {
-  const u = W().design.ui;
+  const u = D().ui;
   return `
   <p class="lede">${u.intro}</p>
   ${u.exists ? `<div class="rule calm"><b>${u.exists.t}</b><p>${u.exists.p}</p></div>` : ''}
@@ -896,7 +903,7 @@ function renderUI() {
 
 /* ---------- design: data ---------- */
 function renderData() {
-  const d = W().design.data;
+  const d = D().data;
   return `
   <p class="lede">${d.intro}</p>
   ${inlineDecisions(d.decisions)}
@@ -932,7 +939,7 @@ function recCard(r, cls, withPrice) {
     ${r.end ? `<p class="end">${r.end}</p>` : ''}</article>`;
 }
 function renderInfra() {
-  const a = W().design.infra;
+  const a = D().infra;
   return `
   <p class="lede">The bill first; then what this wave creates — the resources that explain the bill,
   not the inventory (that is <code>infra.md</code>).</p>
@@ -969,7 +976,7 @@ function renderInfra() {
 
 /* ---------- design: code ---------- */
 function renderCode() {
-  const c = W().design.code;
+  const c = D().code;
   return `
   <p class="lede">The rules that hold the design, how backend and frontend split, and where the
   code grows without being rewritten.</p>
@@ -1009,7 +1016,7 @@ function renderCode() {
 
 /* ---------- design: security ---------- */
 function renderSecurity() {
-  const s = W().design.security;
+  const s = D().security;
   const EST = { ok:'covered', risk:'risk accepted', na:'does not apply' };
   const count = e => s.classes.filter(c => c.e === e).length;
   return `
@@ -1033,7 +1040,7 @@ function renderSecurity() {
 
 /* ---------- design: alarms ---------- */
 function renderAlarms() {
-  const a = W().design.alarms;
+  const a = D().alarms;
   return `
   <p class="lede">The ${a.items.length} alarms that would wake someone — what fires each, what
   normal looks like, what to do. The full set lives in <code>observability.md</code>.</p>
@@ -1058,7 +1065,7 @@ function renderAlarms() {
 
 /* ---------- design: going to production ---------- */
 function renderLive() {
-  const p = W().design.live;
+  const p = D().live;
   return `
   <p class="lede">${p.steps.length} steps, ${p.steps.filter(x=>x.gate).length} of them
   blocked on you. Nothing is irreversible.</p>
@@ -1281,7 +1288,7 @@ STAGES.forEach(s => {
     try {
       let html = RENDER[id]();
       const [st, sec] = id.split('/');
-      if (st === 'design' && W().design?.[sec]?.references) html += refsBlock(W().design[sec].references);
+      if (st === 'design' && D()?.[sec]?.references) html += refsBlock(D()[sec].references);
       return html;
     }
     catch (e) { return `<p style="color:var(--ink-3);padding:24px 0">This tab failed to render (${esc(String(e && e.message || e))}) — its data does not match the shape the shell expects. The other tabs remain intact.</p>` }
