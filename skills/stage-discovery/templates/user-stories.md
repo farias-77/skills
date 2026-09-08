@@ -6,6 +6,12 @@
   (planning issues, tests, the e2e round), so they never change after
   approval.
 
+  Every story carries a v1 status, set by the user at validation:
+  - in       — built as written
+  - reduced  — built with the cuts listed under "Not in v1"
+  - out      — not built now; the whole story is direction
+  Stage 2 designs `in` and `reduced` stories only.
+
   ACs are written in EARS form: "WHEN <condition>, the system SHALL
   <behavior>" (state-driven: "WHILE <state>..."; unwanted behavior:
   "IF <error condition>, THEN the system SHALL..."). One check per AC —
@@ -21,7 +27,17 @@
   - permission (the actor who must NOT be able to do this)
 -->
 
+Personas: **<persona>** (<who>), ...
+
+Vocabulary:
+
+- **<word>** — <definition, from the interview notes>
+
+---
+
 ## S-001 — <short story name>
+
+**v1:** in
 
 **As a** <persona>, **I want** <capability>, **so that** <outcome>.
 
@@ -39,6 +55,14 @@
 | Dependency failure | <e.g. email provider down> | <what the system does> |
 | Permission | <e.g. non-admin tries to invite> | <what the system does> |
 
+### Not in v1
+
+<!-- Filled at validation when the status is `reduced`: what the user
+     cut from this story, one line each, as direction. An `in` story
+     writes "(nothing)". -->
+
+- <capability the user cut> — future direction, not scheduled
+
 ### Out of this story
 
 <!-- What this story deliberately does not cover — with the story that
@@ -47,6 +71,15 @@
 - <capability> — <where it lives instead>
 
 ---
+
+## Inferred
+
+<!-- Every fact the author assumed while writing, with the guess marked
+     as a guess. The user confirms or rejects each one at validation;
+     a confirmed inference is rewritten as fact and removed from here.
+     MUST be empty to approve. -->
+
+- **I-1** — <the assumption> — in <story / AC id>
 
 ## Open questions
 
