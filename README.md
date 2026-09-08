@@ -60,20 +60,23 @@ Underneath, four mechanics carry everything:
 
 ## The six stages
 
-**1 · Discovery** — the demand is interviewed into a PR-FAQ and user
-stories: what gets built, what stays out, every acceptance criterion
-with an ID. A panel of five **blind readers** then describes what
-each would build from the documents alone — where the builds split
-into camps, the text is ambiguous, and the splits become findings. A
-**judge** rules
-every finding by the discovery razor — a wrong guess would change what
-gets built — so only real holes loop the documents; review rounds
-re-run only what stayed open, and a stuck finding goes to the user as
-an interview question, never another lap. The business side reviews
-one package, once. In the ideal world, this
-stage isn't run *for* the business team but *by* it — the skill
-interviews whoever owns the demand, and engineering only enters at
-stage 2 with the ambiguity already wrung out.
+**1 · Discovery** — the engineering team interviewing the demand's
+owner, one fluid conversation with notes written as it happens, until
+the unknowns that would change what gets built are gone. One author
+then writes the PR-FAQ and the user stories from the notes: what gets
+built, what stays out, every acceptance criterion with an ID. **The
+owner validates every story by hand**, one question each, and closes
+the v1 story by story: confirm, reduce, adjust, or cut. A whole review
+round runs, cheap by design (Sonnet and Haiku): three lenses read the
+documents while, per story, two **blind readers** describe what each
+would build and a referee reports where they built different products;
+a **judge** rules every finding by the discovery razor — a wrong guess
+would change what gets built — and marks who decides the fix: the
+author alone when it is wording, the owner when it is product, scope,
+cost or a confirmed fact. The round runs again, whole, once. In the
+ideal world, this stage isn't run *for* the business team but *by*
+it — the skill interviews whoever owns the demand, and engineering
+only enters at stage 2 with the ambiguity already wrung out.
 
 **2 · Design** — the design is built **with the human, whole**. The
 session cuts the demand into **waves** (wave 1 is the smallest thing

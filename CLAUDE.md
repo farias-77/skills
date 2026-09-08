@@ -30,7 +30,12 @@ own frictions as they happen — both feed the same file.
 ## The user's rulings are the record
 
 At design and plan the user gives the final ruling on every review
-finding: the judge agent proposes (ruling + reason) and he rules.
+finding: the judge agent proposes (ruling + reason) and he rules. At
+discovery the judge also names the owner of each sustained finding:
+wording goes to the author without a question; product, scope, cost
+and confirmed facts go to him, plus one veto question over what the
+author fixed alone. His validation of every story (confirm / reduce /
+adjust / cut) is a ruling too, recorded the same way.
 **The rulings are asked through the question tool, always**: one
 question per finding, the context in the question itself (source,
 severity, quote, gap, fix, the judge's reason), the three rulings as

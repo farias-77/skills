@@ -151,7 +151,9 @@ definition carries the method:
   root from the decided cut (every story and AC of the discovery in
   exactly one wave — the coverage lens audits the mapping in both
   directions), the current wave's folders, README seeds for the next
-  ones.
+  ones. The stories carry a v1 status set at discovery: `in` and
+  `reduced` stories are the demand; an `out` story is direction and
+  enters no wave.
 - **Research per target** (one deep-research workflow each, never a
   global sweep), scoped to the decisions taken, **the living docs of
   every touched repo** as input, the documents — `code.md` (the
