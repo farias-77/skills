@@ -104,16 +104,42 @@ touches. Create `01-design/decisions.md` from
 write to it every turn; the session may span more than one sitting,
 and the file is the state between them.
 
-The primitive is one card per decision: the question, the options in
-one line each with their cost said out loud, your recommendation, the
-user's call. A card is written for a choice the user would want made
-differently, or one that encodes a business rule, a cost or a risk.
-Everything else (the request body, the DDL, the IAM statement, the
-artboard's pixels) is transcription, and the author does it. Do not
-walk the user through transcription; do not transcribe a decision in
-his place.
+The session is a joint construction, not a questionnaire. Its unit
+is the document, and each document runs the same way:
 
-**Layer 1, the macro shape.** The fixed agenda, in this order:
+1. **Ask first whether the user has something in mind.** One open
+   question. When he does, he talks first and you complete; when he
+   does not, you propose.
+2. **Propose the whole document in prose**, at conversation altitude,
+   already in the form you believe he would take: for architecture,
+   the components, where each runs, the flows and how each works;
+   for observability, the alarms and whom each wakes. You know the
+   house (the project's `CLAUDE.md`, the standards, the repos), so the
+   first proposal is yours. No options yet.
+3. **Discuss freely.** He changes, adds, cuts, asks "and if". You
+   look up a fact inline when one weighs. The design is born here.
+4. **A card is what is left as a real fork.** When the conversation
+   reaches a choice with two paths and different costs (which store,
+   sum per request or an aggregate table, alarm on 5xx or on latency),
+   that goes through the question tool as a card: the options in one
+   line each with their cost, your recommendation first and marked as
+   yours, his call. What you settled in prose without a fork is
+   written to `decisions.md` as a card with its "Chosen" line and no
+   question.
+5. **Close the document** with "what here does the implementer
+   decide?", and write the answer as the section's Latitude list.
+
+A card exists for a choice the user would want made differently, or
+one that encodes a business rule, a cost or a risk. Everything else
+(the request body, the DDL, the IAM statement, the artboard's pixels)
+is transcription, and the author does it. Do not walk the user
+through transcription; do not transcribe a decision in his place. On
+the ops-dashboard w01 this shape gives about ten macro cards and two
+or three forks per document, not ten questions per document.
+
+**Layer 1, the macro shape.** Run as one document: the proposal in
+prose covers the fixed agenda below, in this order, and the forks
+become cards:
 
 1. Data: what is stored, where, and what is not stored.
 2. Compute: what runs where.
@@ -131,9 +157,8 @@ his place.
     does not change when it does.
 
 **Layer 2, the ten documents, one by one.** With the macro shape
-decided, walk every document in writing order and propose the cards
-it needs. You prepare the proposal; the user rules. Nothing is
-skipped: the user wants to see the alarms, the rollout and the
+decided, walk every document in writing order, each through the five
+moves above. Nothing is skipped: the user wants to see the alarms, the rollout and the
 acceptance convention as much as the flows, so that he knows what is
 alarming and what proves the thing works.
 
@@ -181,10 +206,10 @@ Three rules inside the session:
 > Cognito calls, within the Lambda's 10 s budget." A bound the design
 > sets, a choice the implementer makes.
 
-Closed choices go through the question tool: the header is the
-document, the question carries the card, the answers are the options
-with your recommendation first and marked as yours. Record every call
-in `decisions.md` as you go, recommendation beside choice. Every card
+A fork goes through the question tool: the header is the document,
+the question carries the card, the answers are the options with your
+recommendation first and marked as yours. Record every card in
+`decisions.md` as you go, recommendation beside choice. Every card
 where the user chose against the recommendation goes to
 `taste-notes.md` on the spot, as the pattern rather than the instance
 (house rule).
