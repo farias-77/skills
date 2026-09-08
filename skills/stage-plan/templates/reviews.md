@@ -9,9 +9,10 @@
   workflow journal, not prose) and verified list; the goals read
   blind, with the rows where the two readers built or proved
   different things; every finding with the judge's ruling, owner and
-  reason, and, for the user's, his ruling and reason. The budget is
-  two whole rounds; a third only on the user's explicit call,
-  recorded here with his words.
+  reason, and, for the user's, the conductor's ruling in his place.
+  Two whole rounds, always: round 1's non-dismissed findings and
+  suggestions applied, round 2 over the result, its output applied
+  and final.
 -->
 
 ## Round <N> — <date> · run <id> · whole
@@ -38,7 +39,7 @@
 
 ### Round close
 
-<sustained N (author N · user N · worker N) · deferred N · dismissed N · next: round 2 | applied without re-review | closed>
+<applied N (author N · user N · worker N · deferred-applied N) · dismissed N · parked for the close N · next: round 2 | final>
 
 ## Close
 
@@ -53,7 +54,7 @@
 
 ### Residue
 
-<what stayed sustained after round 2 and was applied without re-review, with the line proof; what the user accepted as is, with his words>
+<what round 2 returned and was applied, with the line proof; what was sent back to the author twice and left unapplied; what the user vetoed or changed at the close, with his words>
 
 ### Taste notes added
 

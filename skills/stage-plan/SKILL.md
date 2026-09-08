@@ -67,16 +67,20 @@ a plan or a promise; do the work.
 2. Write       one dispatch of plan-author: waves.md + the design → one goal per
                wave. Its questions come back in one batch; you answer them
                against the approved sequence and the design.
-3. Review      the plan-review workflow, whole: three Opus lenses beside two
+3. Round 1     the plan-review workflow, whole: three Opus lenses beside two
                Haiku readers and a referee per goal, then the Opus judge.
-4. Rule        author-owned and worker-owned findings go to the author.
-               User-owned findings you rule yourself, against the sequence he
-               approved; every such ruling is listed at the close for veto.
-5. Iterate     text changed? run step 3 again, whole, once. What is still
-               sustained after round 2 is applied without a third round.
+4. Apply       everything the judge did not dismiss is applied: findings and
+               suggestions alike. Author-owned and worker-owned go to the author;
+               user-owned you rule yourself against the approved sequence.
+5. Round 2     the workflow again, whole, over the applied goals. What it
+               returns is applied the same way and is final: no third round.
 6. Close       blueprint Plan tab, the prompts for Codex, explicit approval,
                state moved, /clear. The user pastes the first prompt.
 ```
+
+Two rounds, always, whatever round 1 returned: the second reads the
+applied fixes, and that is what makes the result final without a
+third.
 
 The user is interrupted twice: the cut (1) and the close (6).
 Everything else runs without him.
@@ -130,7 +134,8 @@ wave or as the first rows of the foundation), the alternatives are
 the other answers, one line of cost each; otherwise "Change" is the
 only other answer and he says what in "Other". A rejected or
 changed wave gets a second proposal in the next call, not a
-discussion. When every wave is approved, write `waves.md` from
+discussion; if he rejects that one too, the wave is what he wrote in
+"Other", transcribed as is. When every wave is approved, write `waves.md` from
 [templates/waves.md](templates/waves.md), whole, in one pass, the
 forks recorded as cards with the recommendation beside the choice.
 Every wave where he chose against the recommendation goes to
@@ -195,7 +200,7 @@ proof, its four closing sections and an empty "Questions". Anything
 missing goes back to the author in one message before the review
 starts.
 
-## Step 3 — the review round
+## Step 3 — round 1
 
 Autonomous mode. Run
 [`plan-review`](../../workflows/plan-review.js) by `scriptPath`
@@ -226,16 +231,22 @@ the blind-read table, and one line per finding, to which your rulings
 are appended in step 4. The JSON is the authority; the index is what
 a reader opens.
 
-## Step 4 — rule
+## Step 4 — apply
 
-Three lists come back.
+Everything the judge did not dismiss is applied: sustained and
+deferred alike, the suggestions with the findings. The judge's job
+here is to kill what is wrong (plain wrong, a row contested without a
+defect, detail the worker finds in the code); what survives is work
+for the author, not a decision for the close. Three lists come back.
 
 **Owner `author`.** A pointer, a count, a "ready when" made
 commandable with what the design already fixes, a dependency the
 consume plainly implies, propagation to the next goal: send them to
 `plan-author` in one apply batch. Its report carries the mentions
-table and the final lines; a fix without pasted lines is not done,
-send it back. Then verify a sample on disk yourself, file and line.
+table and the final lines; a fix without pasted lines is sent back
+once; a second time, it is recorded in `reviews.md` as not applied
+and left for round 2 to find. Then verify a sample on disk yourself,
+file and line.
 
 **Owner `worker`.** Real, but execution: they go in the same batch,
 and the author writes each as one line in that goal's "The worker
@@ -260,19 +271,21 @@ the user's place goes to `rulings.md` as it happens, marked
 > move: you take the judge's proposal, edit row 2.1 in `waves.md`,
 > send the fix to the author, and the close lists it.
 
-Deferred findings batch into one author pass at close. Dismissed
-findings die with their reason in `reviews.md`. A ruling whose
-reason is a pattern goes to `taste-notes.md`.
+Dismissed findings die with their reason in `reviews.md`. A ruling
+whose reason is a pattern goes to `taste-notes.md`.
 
-## Step 5 — iterate
+## Step 5 — round 2
 
-If any text changed in step 4, run step 3 again, whole, and rule
-again. That is the whole budget: two rounds. What is still sustained
-after round 2 is not re-reviewed: the author applies the `author` and
-`worker` fixes with proof by line, you verify them on disk, and the
-`user` ones are ruled and applied the same way. A third round runs
-only when the user asks for it explicitly, and his words go in
-`reviews.md`.
+Run step 3 again, whole, over the applied goals, and apply what it
+returns exactly as in step 4. That is the whole budget, and it is
+spent every time: two rounds, the second reading the first's fixes.
+What round 2 returns is final: applied, verified on disk, and taken
+to the close. There is no third round; what the user finds at the
+close is a fix pass, not a round.
+
+Told to find errors, reviewers always find errors. The fixed budget
+is what turns that into a calibrated pass instead of an infinite
+loop; the second round is the proof that the first's fixes landed.
 
 ## Step 6 — close
 
@@ -310,12 +323,13 @@ closing message; the others wait in the folder for stage 4.
 Present: the blueprint URL, the sequence table, the verdict table,
 the precision table per lens and the judge's line (from
 `reviews.md`), the residue, the taste notes this stage added, the
-stage's own telemetry (rounds run, agents dispatched, approximate
-cost), and then the two lists he approves or vetoes through the
-question tool: everything you decided in his place (the author's
-questions you answered, the user-owned findings you ruled), one line
-each, "keep all" first; and the findings you parked because they
-would change a wave's checkpoint, one question each. Approval is
+stage's own telemetry (agents dispatched, approximate cost), and
+then the two lists he approves or vetoes through the question tool:
+everything you decided in his place (the author's questions you
+answered, the user-owned findings you ruled), one line each, "keep
+all" first; and the findings you parked because they would change a
+wave's checkpoint, one question each. This is his review of the
+final result: what round 2 left is what he reads. Approval is
 explicit; silence or a loose "looks good" does not close the stage.
 On approval: `.state.md` to `stage: execute` with `wave: w01-<slug>`
 and `chair: codex`, commit the workstream folder (push only with the
