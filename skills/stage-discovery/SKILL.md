@@ -81,9 +81,6 @@ On open:
    [templates/notes.md](templates/notes.md) on the first turn, and
    write to it every turn. A dead session loses nothing; resuming is
    reading it.
-4. Create the workstream's Project in Linear through the Linear MCP,
-   with no issues: name = the workstream title, description = the
-   one-line frame. The MCP missing is a halt: ask for it and stop.
 
 ```
 designs-root/2026-08-15-workspace-invites/
@@ -330,8 +327,7 @@ to `stage: design`, delete `notes.md`, commit the workstream folder
 (push only with the user's explicit approval), and suggest `/clear`
 before stage 2 (house rule). On "approved with fixes": apply, run
 step 4 once more, close. On rejection: the reasons reopen the
-interview. The Linear Project moves forward when stage 2 opens, not
-here.
+interview.
 
 ## How to write, in every file and every question
 

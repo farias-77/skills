@@ -25,10 +25,7 @@ merges, deploys, and verifies, step by confirmed step.
 
 `.state.md` says `stage: release` and names the wave; the wave's
 Execution tab is published (the proof this stage stands on). Missing ⇒
-halt, back to stage 4. Move the Linear Project to its release status
-via the Linear MCP — **the MCP missing is a halt, here and at every
-stage boundary**. (Each stage moves the Project when it opens —
-closing does not move it.)
+halt, back to stage 4.
 
 **The entry gate:** present what is about to ship — the repos, the
 FBs, the highlights of the blueprint's Execution Report tab (its
@@ -145,8 +142,8 @@ verification, the confirmation.
 
 ## 6 — Closing
 
-The rollout's post-deploy checklist verified → Linear: the wave's
-issues to done → the feature branches deleted (their content lives on
+The rollout's post-deploy checklist verified → the wave's GitHub
+issues closed → the feature branches deleted (their content lives on
 `main` and in the tags) → **the Release Report**: fill this wave's
 `waves['wNN-<wave>'].release` in the `BLUEPRINT` object and republish
 at the same file path. The shell's contract for the tab: `intro` ·

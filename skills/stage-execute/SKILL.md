@@ -60,11 +60,7 @@ not re-route included — waits for the checkpoint.
 
 `.state.md` says `stage: execute` and names the wave; every plan under
 `02-plan/` is `Bootstrapped` (the issues exist on GitHub with their
-numbers recorded). Missing ⇒ halt, back to stage 3. Move the Linear
-Project to its execution status via the Linear MCP — **the MCP missing
-is a halt, here and at every stage boundary**; ask for it to be set up
-and stop. (Each stage moves the Project when it opens — closing does
-not move it.)
+numbers recorded). Missing ⇒ halt, back to stage 3.
 
 ## What this stage produces
 
@@ -127,8 +123,7 @@ npm scripts no matter how many workflows run. Per launch:
 2. **Launch the engine** —
    `Workflow({scriptPath: workflows/impl-issue.js, args: brief})`,
    the brief being inputs only: issue number, repo, worktree, base
-   branch (the FB), the issue body verbatim, the `decisions.md` path,
-   the Linear issue id if the board is wired.
+   branch (the FB), the issue body verbatim, the `decisions.md` path.
    All of a pass's launches in the same message; one trace line per
    launch. **Launch the repo script itself — never an inline wrapper
    around it**: the gates are the file, not a script improvised per
@@ -210,8 +205,8 @@ escalates.
 
 **Smoke — the floor.** `./smoke/run.sh` per deployed repo. Green is
 the precondition of the round. A regression here is a fix issue
-DIRECTLY — archive it (one step: `gh issue create` AND the Linear
-association together) and run it through the same engine; no e2e round
+DIRECTLY — archive it (`gh issue create`) and run it through the same
+engine; no e2e round
 is spent on a broken floor. Keep the formatted runner output verbatim
 — it travels to the blueprint.
 
@@ -223,7 +218,7 @@ one failure dirties the whole round; dead runners and empty reports
 are re-runs, not passes. On the result:
 
 - **clean** ⇒ the wave is proven — §5.
-- **dirty** ⇒ archive the issue drafts (GitHub + Linear, one step),
+- **dirty** ⇒ archive the issue drafts on GitHub,
   run the fixes through `impl-issue` on their repos' lanes; when a
   repo's fixes merge, **redeploy ONLY the affected repos** (pre-check
   again — the template moved), smoke again, then the **ENTIRE round
@@ -290,8 +285,7 @@ On approval: append what the dreaming should know to the workstream's
 folder — **push only with the user's explicit approval** — and suggest
 `/clear` before the next stage. On "approved with fixes": the fixes
 run through the same machinery (issue → engine → round if behavior
-changed), then a new checkpoint. Moving the Linear Project forward is
-the next stage's job when it opens.
+changed), then a new checkpoint.
 
 ## Gates
 

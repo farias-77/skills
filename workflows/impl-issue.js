@@ -34,7 +34,6 @@
  *     base_branch:    'feature/<workstream>-wNN',
  *     issue_md:       '<the full issue body, verbatim>',
  *     decisions_path: '/abs/.../01-design/decisions.md',   // the design as decided
- *     linear_issue:   'ABC-123'            // optional; board projection
  *   }})
  *
  * Returns { status: 'ready-to-merge'|'halt', pr_url?, halt?,
@@ -150,15 +149,6 @@ The diff command: git -C ${brief.worktree} diff origin/${brief.base_branch}...HE
 ## The issue (#${brief.issue_number} — your entire brief)
 ${brief.issue_md}`
 
-// Board projection — fire-and-forget, never blocking, never awaited early.
-let linMove = null
-if (brief.linear_issue) {
-  linMove = agent(
-    `Move the Linear issue ${brief.linear_issue} to its "In Progress" state using the Linear MCP tools (load them via ToolSearch). If anything fails, return "skip" — this is never blocking. Return ok|skip.`,
-    { label: `linear#${brief.issue_number}`, phase: 'Implement', model: 'haiku', effort: 'low' },
-  )
-}
-
 // ---------- one implementer pass ----------
 const implement = async (feedback, cycle) => {
   phase('Implement')
@@ -168,7 +158,6 @@ const implement = async (feedback, cycle) => {
   )
   if (!build) return halt('implementer_dead', 'no output from the implementer (platform)')
   if (build.status === 'blocked') return halt('issue_conflict', build.block_reason || 'andon without a stated reason')
-  if (linMove) { t('linear', `in-progress: ${String((await linMove) || 'skip').slice(0, 40)}`); linMove = null }
   return null
 }
 

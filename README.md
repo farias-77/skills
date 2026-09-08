@@ -241,9 +241,6 @@ What the pipeline expects from its surroundings:
 
 - **Claude Code**, with the `gh` CLI authenticated — GitHub is the
   source of record.
-- A **Linear MCP** connection if you want the board projection — the
-  stages treat its absence as a halt by design; strip those lines if
-  you track elsewhere.
 - Project specifics — environments, credentials, deploy targets, the
   build-guard slot count — live in **your** project's `CLAUDE.md`,
   never in these files.

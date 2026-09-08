@@ -21,9 +21,7 @@ nothing alone.
 ## Preconditions
 
 `.state.md` says `stage: close` and names the wave; the release trace
-shows the prod train completed. Missing ⇒ halt, back to stage 5. The
-Linear Project moves to its closing status via the Linear MCP — **the
-MCP missing is a halt**. (Each stage moves the Project when it opens.)
+shows the prod train completed. Missing ⇒ halt, back to stage 5.
 
 ## What this stage produces
 
@@ -57,8 +55,7 @@ pendencies with named owners, and the numbers that tell the wave's
 story (issues, rounds, halts) — set against the previous wave's
 `closure.md` when one exists, so faster-or-slower is measured, not
 felt. Sweep the boards: every issue of the
-wave closed or explicitly re-homed, the Linear Project to its final
-state for this wave. The blueprint gets the wave's final touch —
+wave closed or explicitly re-homed. The blueprint gets the wave's final touch —
 shipped, dated, same URL forever.
 
 ## 3 — Dreaming — a working session, not an autonomous pass
@@ -145,8 +142,8 @@ Read `waves.md`:
   workstream folder and suggest `/clear`: the session continues into
   stage 2 of the new wave, with the shipped wave as living context in
   the repos' docs.
-- **That was the last wave** ⇒ the workstream is **Done**: the Linear
-  Project closed, the folder committed, the blueprint final. Say so
+- **That was the last wave** ⇒ the workstream is **Done**: the
+  folder committed, the blueprint final. Say so
   plainly — done is done.
 
 ## Gates

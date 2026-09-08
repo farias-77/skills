@@ -27,11 +27,7 @@ one writer, its `plan-author`, first draft to last fix.
 ## Preconditions
 
 `.state.md` says `stage: plan` and names the wave; the wave's
-`01-design/` is approved (checkpoint #2 passed). Missing ⇒ halt. Move
-the Linear Project to its planning status via the Linear MCP — **the MCP
-missing is a halt, here and at every stage boundary**; ask for it to be
-set up and stop. (Each stage moves the Project when it opens — closing
-does not move it.)
+`01-design/` is approved (checkpoint #2 passed). Missing ⇒ halt.
 
 ## What this stage produces
 
@@ -276,10 +272,7 @@ is safe — upsert by plan-id never duplicates.
 
 Then: `.state.md` → `stage: execute`, commit the workstream folder —
 **push only with the user's explicit approval** — and suggest `/clear`
-before stage 4 (house rule: stage transitions). Moving the Linear
-Project forward is **not this skill's job**: each stage moves the
-Project to its own status when it actually starts — stage 4 will move
-it when it opens.
+before stage 4 (house rule: stage transitions).
 
 ## Lifecycle
 

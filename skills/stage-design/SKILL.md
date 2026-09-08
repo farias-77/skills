@@ -75,9 +75,6 @@ questions (end of 2), the rulings (4, once per round) and the approval
 `.state.md` says `stage: design`; `00-discovery/` has the approved
 `pr-faq.md` and `user-stories.md`.
 Missing: halt, back to stage 1. Set `chair: fable` in `.state.md`.
-Move the Linear Project to its design status through the Linear MCP;
-the MCP missing is a halt, ask for it and stop. Each stage moves the
-Project when it opens; closing does not move it.
 
 ```
 designs-root/2026-08-15-workspace-invites/
@@ -378,8 +375,7 @@ workstream folder (push only with the user's explicit approval), and
 suggest `/clear` before stage 3 (house rule). On "approved with
 fixes": one author pass, verify on disk, close. On rejection: the
 reasons go to the author as fixes, or to the user as questions; never
-back to stage 1. The Linear Project moves forward when stage 3 opens,
-not here.
+back to stage 1.
 
 ## How to write, in every file and every question
 
