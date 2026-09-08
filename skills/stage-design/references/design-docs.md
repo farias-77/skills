@@ -38,14 +38,35 @@ renders as a card in that tab's context). Fixed, greppable format:
 > Chosen: <letter> — <why, one or two sentences; the tradeoff said out loud>
 ```
 
-**The latitude section.** Every document ends with `## The implementer
-decides`, before `## References`: the items the user left to the
-implementer at the session (the Latitude list of that document's
-section in `decisions.md`) plus what the author's transcription left
-open on purpose. One line each, concrete ("retry count and backoff,
-within 3 attempts and 10 s total"). Reviewers do not report an item
-listed there unless it belongs to a hard class. The hard classes never
-sit in this section:
+**The implementer decides.** Every document ends with `## The
+implementer decides`, before `## References`. "Latitude" is the word
+for what goes there: a choice left to whoever builds it, with the
+bound the design sets ("retries on the Cognito calls, within the
+Lambda's 10 s budget"). The section holds the items the user left
+open at the session (the Latitude list of that document's section in
+`decisions.md`) plus what the author's transcription left open on
+purpose, one concrete line each. Reviewers do not report an item
+listed there unless it belongs to a hard class.
+
+The rule behind the split: the design fixes what changes the
+**shape** of the system; the implementer decides what changes only
+the **execution** inside that shape, and the design says the bound.
+
+| Document | The design fixes (never left open) | The implementer decides |
+|---|---|---|
+| architecture | the components and where each runs; who calls whom; every flow as steps with what is read, written and returned; what happens when the other side fails; the mechanisms that guard a rule (lock, idempotency, cutoff); the extension points | the internal order of steps that does not change the result; retry and backoff values within the stated bound; helpers and the code organization of a flow |
+| data-model | entities, keys, indexes, the format of every field, retention, the access pattern of every screen | secondary attribute names; internal pagination; an extra index that only optimizes without changing the model |
+| contracts | routes, auth, whole request and response, every error with code and envelope, idempotency, pagination | field order; validation messages that are not business rules |
+| ui | the screens, the states of each, what is reused from the product | spacing, microcopy, animation, component order that does not change a state |
+| security | the 13 classes answered (covered how, risk accepted why, n/a why) | the library used for each mitigation, as long as it does what the class asks |
+| infra | resources, every config that encodes a rule or a cost (timeout, memory, PITR, region), IAM by the verb, cost at three scales | resource names within the convention; tags; stack organization |
+| observability | which alarms exist, what each catches, whom it wakes, the threshold and its argument | log format beyond the required fields; dashboard metrics without an alarm |
+| rollout | deploy order, gates, rollback per step | the exact script of each step, as long as it meets its "confirmed when" |
+| code | where the layout departs from the house structure | everything else in the layout: the house standard is the rule, `code.md` a guide |
+| acceptance | the case list and what each one proves | request bodies, fixtures, execution order |
+
+The hard classes, the left column condensed, never sit in the
+section, whatever the user said at the session:
 
 - where each piece runs, who calls whom, what happens when the other
   side fails;
