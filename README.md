@@ -224,6 +224,12 @@ What the pipeline expects from its surroundings:
   4, both with the `gh` CLI authenticated — GitHub is the source of
   record. The Codex session for stage 4 opens at the project root,
   where `.codex/` is.
+- The Workflow tool only launches a script it can read from the
+  working directory or an added directory, and it resolves the
+  symlink: add the clone to the project's settings
+  (`permissions.additionalDirectories: ["~/skills"]` in
+  `.claude/settings.local.json`), or the review workflows refuse to
+  start.
 - Project specifics — environments, credentials, deploy targets, the
   build-guard slot count — live in **your** project's `CLAUDE.md`,
   never in these files.
