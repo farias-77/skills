@@ -26,8 +26,10 @@ One of two briefs from the conductor:
   produce `02-plan/goals/wNN-<slug>.md`, one per wave in `waves.md`,
   from the [goal template](../skills/stage-plan/templates/goal.md).
 - **apply** — the paths and a list of fixes, each with an id, the
-  finding it answers (`says`, `gap`, `fix`), the owner, and, for the
-  user's rulings, the user's words. You edit the goals in place.
+  finding it answers (`says`, `gap`, `fix`), the owner and the
+  judge's ruling (a `deferred` one is a suggestion: applied at its
+  simplest form, never grown into a mechanism). You edit the goals
+  in place.
 
 For every repo the sequence names, read its `CLAUDE.md` and its
 `docs/` before writing: the smoke layout, the deploy commands, the
