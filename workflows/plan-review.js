@@ -1,75 +1,145 @@
 /*
  * plan-review.js — the stage-3 review round as deterministic code.
  *
- * Why a workflow: the guarantee that no lens is skipped and every issue
- * gets its cold read must be physical, not discipline. One invocation
- * covers the whole round, three phases: per issue, three blind Haiku
- * readers then the plan-reviewer-issue judge with their readings in hand; the
- * whole-plan lenses (gaps, flow) concurrently; plan-reviewer-coherence closes
- * with every verdict on the table. The whole-plan lenses read everything
- * every round — they are the regression guard; `issues` carries every
- * issue on the opening round, only the changed ones on a re-round. A
- * clean pass without its "verified" enumeration is re-dispatched once
- * (a lazy pass is not a pass).
+ * Why a workflow: the guarantee that no lens is skipped must be
+ * physical, not discipline. Every round is whole: the three lenses in
+ * parallel with, per wave's goal, two blind readers and a referee;
+ * then the judge. There are no delta rounds and no final round: the
+ * budget is two whole rounds, and what is still sustained after the
+ * second is applied without re-review (a third round only on the
+ * user's explicit call).
  *
- * The briefs below carry INPUTS only — paths, round number, and data
- * produced earlier in the round. Every instruction (each lens's rules,
- * the reader's contract, the judge's triage) lives in the agent
- * definitions under agents/.
+ * THE BLIND READS are per goal: two Haiku readers build one wave each,
+ * alone, one build per key (`wave`, `row:<N.k>` per row heading,
+ * `proof` for the wave's proof). A Sonnet referee compares the two
+ * readings key by key; only a `different-product` verdict becomes a
+ * finding. The keys make the comparison mechanical: a reading that
+ * misses a key is invalid and re-dispatched once; a goal whose two
+ * readings do not both survive is reported as unread, never silently
+ * skipped.
+ *
+ * THE JUDGE closes the round: every finding is ruled sustained /
+ * deferred / dismissed by the plan razor, and every sustained finding
+ * carries an owner: `author` (wording, pointers, counts, propagation;
+ * the author applies it alone), `user` (a row of waves.md changes, a
+ * checkpoint changes, a cut or an order is contested, two readings,
+ * something only the user has) or `worker` (execution latitude; one
+ * line in the goal's "The worker decides" section). An unruled
+ * finding counts as sustained with owner `user` (fail-safe).
+ *
+ * The briefs below carry INPUTS only. Every instruction lives in the
+ * agent definitions under agents/ and in the shared reviewer contract
+ * (docs/standards/reviewer-contract.md).
  *
  * Invoked by the stage-plan conductor:
  *   Workflow({ scriptPath: '<...>/workflows/plan-review.js', args: {
- *                 // by scriptPath, never by name — the name registry
- *                 // does not reliably carry these workflows
- *     planDir:      'absolute path to wNN-<wave>/02-plan',
- *     designDir:    'absolute path to wNN-<wave>/01-design',
- *     discoveryDir: 'absolute path to <slug>/00-discovery',
+ *                 // by scriptPath, never by name
+ *     planDir:      'absolute path to <slug>/02-plan',
  *     wavesPath:    'absolute path to <slug>/waves.md',
- *     issues:       [{ repo: 'api-x', path: '<abs>/02-plan/api-x/issues/03-accept.md' }, ...],
- *                       // every issue on the opening round; on a
- *                       // re-round, only the issues whose files changed
- *                       // (stage-plan §2 — the whole-plan lenses still
- *                       // read everything)
- *     round:        2   // 1-based; informational, shown in labels
+ *     designDir:    'absolute path to <slug>/01-design',
+ *     discoveryDir: 'absolute path to <slug>/00-discovery',
+ *     repos:        [{ name: 'labs-api-tracking', path: '/abs/path' }, ...],
+ *     round:        1,          // 1 or 2; shown in labels and ids
+ *     goals: [                  // one entry per wave, verbatim: scripts
+ *       { id: 'w01-foundation', text: '<the goal file>', wave: '<the wave section of waves.md>' },
+ *     ],                        // cannot read files; the conductor passes the text
  *   }})
  *
- * THE JUDGE PROPOSES, THE USER RULES: reviewers report at the maximum
- * bar (they always find something — that is by design), and plan-judge
- * rules every finding sustained / deferred / dismissed with a one-line
- * reason, calibrated by decisions.md and reviews.md (the user's rulings
- * inside). Every ruling that comes back is the JUDGE'S PROPOSAL: the
- * conductor puts every finding with it in front of the user, who
- * confirms or overrules — and only his rulings run the next round. An
- * unruled finding reaches him as sustained (fail-safe).
- *
- * Returns { round, blockers, sustained, open: { issues: [{ repo,
- * path }], lenses: [names] }, invalid, cold: [{ repo, path, verdict,
- * findings, readings }], lenses: [{ lens, verdict, verified, quote,
- * findings, invalid }] } — each finding carries `id`, `ruling` and
- * `reason`, the judge's proposal; `blockers`/`sustained` count the
- * judge's sustained findings; `open` holds what the judge would keep
- * open — the conductor adjusts it to the user's rulings before the next
- * round (nothing he sustains ⇒ the full final round, every issue and
- * every lens, always, once). The conductor writes reviews.md (run ids
- * from this run's journal, the judge's ruling and the user's on every
- * finding) and loops what the USER sustained to each repo's
- * plan-author via SendMessage. Verdict semantics and
- * finding severities are the house contract: pass / pass with fixes /
- * fail; blocker / fix / detail.
+ * Returns { round, findings, sustained, lenses, unread } — findings is
+ * every finding with its id, lens, goal (for referee findings),
+ * severity, title, says, gap, fix, ruling, owner, reason; sustained is
+ * { author: n, user: n, worker: n }; lenses is [{ lens, verdict,
+ * verified, quote, findings, invalid }] with the referees merged as
+ * one `plan-reviewer-ambiguity` entry; unread lists the goal ids whose
+ * readings did not survive. The conductor writes reviews.md, sends the
+ * `author` and `worker` fixes to plan-author, asks the user the `user`
+ * ones, and runs round 2 whole if any text changed.
  */
 
 export const meta = {
   name: 'plan-review',
-  description: 'Stage-3 review round: three blind readers + the issue lens per issue, gaps and flow over the whole plan, coherence last, the judge proposing a ruling on every finding for the user to confirm or overrule — deterministic and un-skippable by construction',
+  description: 'Stage-3 review round, always whole: three Opus lenses in parallel with two Haiku blind readers and a Sonnet referee per wave goal, the Opus judge ruling every finding by the plan razor and marking its owner (author, user or worker)',
   phases: [
-    { title: 'Cold reads', detail: 'per issue: three Haiku blind readers, then plan-reviewer-issue with their readings in hand' },
-    { title: 'Whole plan', detail: 'plan-reviewer-gaps and plan-reviewer-flow in parallel, each over every plan and issue' },
-    { title: 'Coherence', detail: 'the cross-cutting lens, with every verdict in hand' },
-    { title: 'Judge', detail: 'plan-judge proposes sustained/deferred/dismissed on every finding, with the reason — the user gives the final ruling', model: 'opus' },
+    { title: 'Lenses', detail: 'coverage, verifiability and order in parallel, each reads everything', model: 'opus' },
+    { title: 'Blind reads', detail: 'per goal: two Haiku readers build the wave alone, a Sonnet referee compares them row by row' },
+    { title: 'Judge', detail: 'plan-judge rules every finding sustained / deferred / dismissed and marks the owner', model: 'opus' },
   ],
 }
 
+const LENSES = [
+  'plan-reviewer-coverage',
+  'plan-reviewer-verifiability',
+  'plan-reviewer-order',
+]
+const REFEREE = 'plan-reviewer-ambiguity'
+const READER = 'plan-blind-reader'
 const JUDGE = 'plan-judge'
+
+const FINDING = {
+  type: 'object', additionalProperties: false,
+  required: ['severity', 'title', 'says', 'gap', 'fix'],
+  properties: {
+    severity: { type: 'string', enum: ['blocker', 'fix', 'detail'] },
+    title: { type: 'string' },
+    says: { type: 'string', description: 'what the material says, verbatim or "nothing"' },
+    gap: { type: 'string', description: 'the concrete problem, through this lens' },
+    fix: { type: 'string', description: 'the concrete change that would resolve it' },
+  },
+}
+
+const REVIEW = {
+  type: 'object', additionalProperties: false,
+  required: ['verdict', 'verified', 'quote', 'findings'],
+  properties: {
+    verdict: { type: 'string', enum: ['pass', 'pass with fixes', 'fail'] },
+    verified: { type: 'array', items: { type: 'string', description: 'one point this reviewer actually checked, with where it looked' } },
+    quote: { type: 'string', description: 'verbatim sentence from the material it judged — the proof it read' },
+    findings: { type: 'array', items: FINDING },
+  },
+}
+
+const READING = {
+  type: 'object', additionalProperties: false,
+  required: ['goal', 'builds'],
+  properties: {
+    goal: { type: 'string' },
+    builds: {
+      type: 'array', minItems: 1,
+      items: {
+        type: 'object', additionalProperties: false,
+        required: ['key', 'sentence', 'build'],
+        properties: {
+          key: { type: 'string', description: 'wave, row:<N.k>, or proof' },
+          sentence: { type: 'string', description: 'the line, verbatim' },
+          build: { type: 'string', description: 'what this reader would build and how it would prove it done; at most sixty words' },
+        },
+      },
+    },
+  },
+}
+
+const REFEREE_REVIEW = {
+  type: 'object', additionalProperties: false,
+  required: ['goal', 'keys', 'verdict', 'verified', 'quote', 'findings'],
+  properties: {
+    goal: { type: 'string' },
+    keys: {
+      type: 'array',
+      items: {
+        type: 'object', additionalProperties: false,
+        required: ['key', 'verdict'],
+        properties: {
+          key: { type: 'string' },
+          verdict: { type: 'string', enum: ['same', 'same-in-other-words', 'different-product'] },
+        },
+      },
+    },
+    verdict: REVIEW.properties.verdict,
+    verified: REVIEW.properties.verified,
+    quote: REVIEW.properties.quote,
+    findings: REVIEW.properties.findings,
+  },
+}
 
 const JUDGMENT = {
   type: 'object', additionalProperties: false,
@@ -79,62 +149,12 @@ const JUDGMENT = {
       type: 'array',
       items: {
         type: 'object', additionalProperties: false,
-        required: ['id', 'ruling', 'reason'],
+        required: ['id', 'ruling', 'owner', 'reason'],
         properties: {
           id: { type: 'string', description: 'the finding id exactly as given' },
           ruling: { type: 'string', enum: ['sustained', 'deferred', 'dismissed'] },
-          reason: { type: 'string', description: 'one or two concrete sentences the user can check in a glance; name the recurrence when the ledger or the history decided it' },
-        },
-      },
-    },
-  },
-}
-
-const READING = {
-  type: 'object', additionalProperties: false,
-  required: ['understanding', 'build', 'acChecks', 'questions', 'brokenRefs'],
-  properties: {
-    understanding: { type: 'string', description: 'short text, in the reader\'s own words: what the issue asks and how it would approach it' },
-    build: {
-      type: 'array', minItems: 1,
-      items: { type: 'string', description: 'one ordered step of what this reader would build — concrete, named things' },
-    },
-    acChecks: {
-      type: 'array',
-      items: { type: 'string', description: 'one AC in order: where it turns green — the test or command' },
-    },
-    questions: {
-      type: 'array', minItems: 5, maxItems: 5,
-      items: { type: 'string', description: 'a question this reader would ask before starting — real blockers first, smallest uncertainties last' },
-    },
-    brokenRefs: {
-      type: 'array',
-      items: { type: 'string', description: 'a Reading-map reference that does not exist or does not say what the issue promises' },
-    },
-  },
-}
-
-const REVIEW = {
-  type: 'object', additionalProperties: false,
-  required: ['verdict', 'verified', 'quote', 'findings'],
-  properties: {
-    verdict: { type: 'string', enum: ['pass', 'pass with fixes', 'fail'] },
-    verified: {
-      type: 'array', minItems: 0,
-      items: { type: 'string', description: 'one point this reviewer actually checked, with where it looked' },
-    },
-    quote: { type: 'string', description: 'verbatim sentence from the material it judged — the proof it read' },
-    findings: {
-      type: 'array',
-      items: {
-        type: 'object', additionalProperties: false,
-        required: ['severity', 'title', 'says', 'gap', 'fix'],
-        properties: {
-          severity: { type: 'string', enum: ['blocker', 'fix', 'detail'] },
-          title: { type: 'string' },
-          says: { type: 'string', description: 'what the material says, verbatim or "nothing"' },
-          gap: { type: 'string', description: 'the concrete problem, through this lens' },
-          fix: { type: 'string', description: 'the concrete change that would resolve it' },
+          owner: { type: 'string', enum: ['author', 'user', 'worker', 'none'], description: 'author, user or worker on a sustained finding; none otherwise' },
+          reason: { type: 'string', description: 'one or two concrete sentences' },
         },
       },
     },
@@ -142,17 +162,49 @@ const REVIEW = {
 }
 
 const round = args?.round ?? 1
-const issues = args?.issues ?? []
-const readerCount = 3
-const short = (p) => p.split('/').slice(-1)[0].replace(/\.md$/, '')
+const goals = Array.isArray(args?.goals) ? args.goals.filter(g => g && g.id && g.text) : []
+const repos = Array.isArray(args?.repos) ? args.repos : []
+if (!goals.length) log('no goals passed in args — the blind reads are skipped this round; pass goals: [{id, text, wave}] to run them')
 
-const inputs = `Round ${round}.
-The plan: ${args.planDir}
-The design it decomposes: ${args.designDir}
-The session's decisions (the design as the user decided it; a declared decision is contested only by defect): ${args.designDir}/decisions.md
-The frozen acceptance spec: ${args.designDir}/acceptance.md — every case needs an owning issue
-The discovery it must deliver: ${args.discoveryDir}/pr-faq.md and ${args.discoveryDir}/user-stories.md
-The wave cut: ${args.wavesPath} — this wave's stories and ACs are the coverage universe`
+const docInputs = `Round ${round}.
+The sequence (as the user closed it; a row, a cut or an order is contested only by defect): ${args.wavesPath}
+The goals, one per wave: ${args.planDir}/goals/
+The design (decisions.md inside is the law): ${args.designDir}
+The demand: ${args.discoveryDir}/pr-faq.md and ${args.discoveryDir}/user-stories.md
+The repos: ${repos.map(r => `${r.name} at ${r.path}`).join(' · ') || 'none passed'}
+The round audit so far: ${args.planDir}/reviews.md`
+
+// ---------- mechanical checks on a reading ----------
+
+// The keys a goal defines: `wave`, one `row:<N.k>` per "### N.k" row
+// heading, `proof` when the goal has a "## The wave's proof" section.
+const expectedKeys = (text) => {
+  const keys = new Set(['wave'])
+  for (const raw of text.split('\n')) {
+    const line = raw.trim()
+    const row = line.match(/^###\s+(\d+\.\d+[a-z]?)\b/)
+    if (row) { keys.add(`row:${row[1]}`); continue }
+    if (/^##\s+the wave'?s proof/i.test(line)) keys.add('proof')
+  }
+  return keys
+}
+
+const HEDGE = /\b(or|either|depends|could be|probably|maybe|possibly)\b/i
+const normalizeKey = (k) => String(k).trim().replace(/^`|`$/g, '').replace(/\s+/g, '').toLowerCase()
+
+const readingProblems = (reading, expected) => {
+  if (!reading) return ['no output']
+  const problems = []
+  const got = new Map(reading.builds.map(b => [normalizeKey(b.key), b]))
+  for (const k of expected) if (!got.has(k)) problems.push(`missing key ${k}`)
+  for (const [k, b] of got) {
+    if (!b.build || !b.build.trim()) problems.push(`empty build at ${k}`)
+    else if (HEDGE.test(b.build)) problems.push(`hedged build at ${k}`)
+  }
+  return problems
+}
+
+// ---------- dispatch helpers ----------
 
 // Re-dispatch once on the two invalid shapes: a dead agent, or a lazy
 // clean pass (zero findings AND no verified enumeration proves nothing).
@@ -167,139 +219,122 @@ const reviewed = async (dispatch, name) => {
     : { verdict: 'fail', verified: [], quote: '', findings: [], invalid: true }
 }
 
-// ---------- cold reads: 3 blind readers, then the issue lens ----------
+const goalInputs = (g) => `Round ${round}. Goal ${g.id}.
+The design folder, for looking up a section the goal points at: ${args.designDir}
 
-const coldRead = (issue) =>
-  parallel([1, 2, 3].map(n => () =>
-    agent(`The issue file: ${issue.path}\nThe repo it belongs to: ${issue.repo}`, {
-      label: `read:${short(issue.path)}#${n}r${round}`, phase: 'Cold reads',
-      agentType: 'plan-blind-reader', schema: READING,
-    })
-  )).then(rs => rs.filter(Boolean))
+THE WAVE IN waves.md:
+${g.wave ?? ''}
 
-const issueLens = async (readings, issue) => {
-  const r = await reviewed(() =>
-    agent(`Round ${round}.
-The issue file: ${issue.path}
-The repo it belongs to: ${issue.repo}
-Its plan: ${args.planDir}/${issue.repo}/plan.md
+THE GOAL:
+${g.text}`
 
-The three blind readings of this issue:
-
-${readings.map((x, i) => `READER ${i + 1}:\n${JSON.stringify(x, null, 2)}`).join('\n\n')}`, {
-      label: `issue:${short(issue.path)}#r${round}`, phase: 'Cold reads',
-      agentType: 'plan-reviewer-issue', schema: REVIEW,
-    }), `issue:${short(issue.path)}`)
-  return { repo: issue.repo, path: issue.path, readings, ...r }
+const readBlind = async (g, n) => {
+  const expected = expectedKeys(g.text)
+  const dispatch = () => agent(goalInputs(g), {
+    label: `${g.id}·read${n}·r${round}`, phase: 'Blind reads',
+    agentType: READER, model: 'haiku', schema: READING,
+  })
+  let r = await dispatch()
+  let problems = readingProblems(r, expected)
+  if (problems.length) {
+    log(`${g.id} reader ${n}: ${problems.join(', ')} — re-dispatching`)
+    r = await dispatch()
+    problems = readingProblems(r, expected)
+  }
+  if (problems.length) { log(`${g.id} reader ${n}: still invalid (${problems.join(', ')}) — dropped`); return null }
+  return { reader: n, builds: r.builds.map(b => ({ ...b, key: normalizeKey(b.key) })) }
 }
 
-// ---------- the round: both halves concurrently, coherence last ----------
+const referee = async (g, readings) => {
+  const r = await reviewed(() => agent(`${goalInputs(g)}
 
-phase('Cold reads')
-const [cold, wholePlan] = await parallel([
-  () => pipeline(issues, coldRead, issueLens),
-  () => parallel(['plan-reviewer-gaps', 'plan-reviewer-flow'].map(name => () =>
+READING 1:
+${JSON.stringify(readings[0].builds, null, 2)}
+
+READING 2:
+${JSON.stringify(readings[1].builds, null, 2)}`, {
+    label: `${g.id}·referee·r${round}`, phase: 'Blind reads',
+    agentType: REFEREE, model: 'sonnet', schema: REFEREE_REVIEW,
+  }), `${g.id} referee`)
+  return { goal: g.id, ...r }
+}
+
+// ---------- the round: lenses and per-goal reads, concurrently ----------
+
+phase('Lenses')
+log(`round ${round}: ${LENSES.length} lenses · ${goals.length} goals × (2 readers + referee) · then the judge`)
+
+const [lensResults, goalResults] = await parallel([
+  () => parallel(LENSES.map(name => () =>
     reviewed(() =>
-      agent(inputs, { label: `${name}#r${round}`, phase: 'Whole plan', agentType: name, schema: REVIEW }),
+      agent(docInputs, { label: `${name}·r${round}`, phase: 'Lenses', agentType: name, model: 'opus', schema: REVIEW }),
       name).then(r => ({ lens: name, ...r }))
-  )).then(rs => rs.filter(Boolean)),
+  )),
+  () => pipeline(
+    goals,
+    (g) => parallel([() => readBlind(g, 1), () => readBlind(g, 2)]).then(rs => rs.filter(Boolean)),
+    (readings, g) => readings.length === 2
+      ? referee(g, readings)
+      : Promise.resolve({ goal: g.id, unread: true }),
+  ),
 ])
 
-const coldResults = (cold ?? []).filter(Boolean)
-const verdictBoard = [
-  ...wholePlan.map(r =>
-    `- ${r.lens}: ${r.invalid ? 'INVALID (no valid output after retry)' : r.verdict} · ${r.findings.length} finding(s)` +
-    r.findings.map(f => `\n    [${f.severity}] ${f.title}: ${f.gap}`).join('')),
-  `- cold reads: ${coldResults.filter(c => c.verdict === 'pass').length}/${coldResults.length} issues pass` +
-  coldResults.filter(c => c.verdict !== 'pass').map(c =>
-    `\n    ${c.repo}/${short(c.path)}: ${c.invalid ? 'INVALID' : c.verdict}` +
-    c.findings.map(f => `\n      [${f.severity}] ${f.title}: ${f.gap}`).join('')).join(''),
-].join('\n')
+// The referees merge into one ambiguity lens entry: the judge and the
+// audit see one lens with per-goal findings.
+const refereed = (goalResults ?? []).filter(Boolean)
+const unread = refereed.filter(r => r.unread).map(r => r.goal)
+const perGoal = refereed.filter(r => !r.unread)
+if (unread.length) log(`unread this round (readings did not survive): ${unread.join(', ')}`)
 
-phase('Coherence')
-const coherence = await reviewed(() =>
-  agent(`${inputs}
+const ambiguity = {
+  lens: REFEREE,
+  verdict: perGoal.some(r => r.verdict === 'fail') ? 'fail'
+    : perGoal.some(r => r.verdict === 'pass with fixes') ? 'pass with fixes' : 'pass',
+  verified: perGoal.flatMap(r => r.verified.map(v => `${r.goal}: ${v}`)),
+  quote: perGoal[0]?.quote ?? '',
+  findings: perGoal.flatMap(r => r.findings.map(f => ({ ...f, goal: r.goal }))),
+  invalid: perGoal.some(r => r.invalid) || (goals.length > 0 && perGoal.length === 0),
+  keys: perGoal.map(r => ({ goal: r.goal, keys: r.keys })),
+}
 
-The verdicts and findings of everything that already ran this round:
+const lenses = [...(lensResults ?? []).filter(Boolean), ...(goals.length ? [ambiguity] : [])]
 
-${verdictBoard}`, {
-    label: `plan-reviewer-coherence#r${round}`, phase: 'Coherence',
-    agentType: 'plan-reviewer-coherence', schema: REVIEW,
-  }), 'plan-reviewer-coherence').then(r => ({ lens: 'plan-reviewer-coherence', ...r }))
+// ---------- the judge ----------
 
-const lenses = [...wholePlan, coherence]
-
-// ---- The judge: the lenses report, the judge proposes, the user rules --
-// Every finding gets an id; plan-judge rules each one with a reason,
-// calibrated by decisions.md and the round history (the user's rulings).
-// The ruling is a proposal for the user. An unruled finding reaches
-// him as sustained — fail-safe, never fail-silent.
-const allFindings = []
+const findings = []
 for (const r of lenses) r.findings.forEach((f, i) => {
   f.id = `${r.lens}#${i + 1}`
-  allFindings.push({ source: r.lens, f })
-})
-for (const c of coldResults) c.findings.forEach((f, i) => {
-  f.id = `${c.repo}/${short(c.path)}#${i + 1}`
-  allFindings.push({ source: `issue ${c.repo}/${short(c.path)}`, f })
+  findings.push({ lens: r.lens, ...f })
 })
 
-if (allFindings.length) {
-  phase('Judge')
-  const board = allFindings.map(({ source, f }) =>
-    `[${f.id}] ${source} · ${f.severity} · ${f.title}
-  says: ${f.says}
-  gap: ${f.gap}
-  fix: ${f.fix}`).join('\n')
-  const dispatchJudge = () => agent(`${inputs}
+phase('Judge')
+let judgment = null
+if (findings.length) {
+  const brief = `${docInputs}
 
-The round audit so far (the user's rulings on the earlier rounds): ${args.planDir}/reviews.md
+The round's findings, each with its id:
 
-The round's cold reads and lenses have reported. Read the plan, decisions.md and the audit, then rule EVERY finding below, by its id — your ruling is the proposal the user confirms or overrules.
-
-${board}`, { label: `${JUDGE}#r${round}`, phase: 'Judge', agentType: JUDGE, schema: JUDGMENT })
-
-  let judgment = await dispatchJudge()
-  const ruled = new Map((judgment?.rulings ?? []).map(x => [x.id, x]))
-  if (allFindings.some(({ f }) => !ruled.has(f.id))) {
-    log('judge: unruled finding(s) — re-dispatching once')
-    judgment = await dispatchJudge()
-    for (const x of judgment?.rulings ?? []) if (!ruled.has(x.id)) ruled.set(x.id, x)
-  }
-  for (const { f } of allFindings) {
-    const r = ruled.get(f.id)
-    f.ruling = r?.ruling ?? 'sustained'
-    f.reason = r?.reason ?? 'UNRULED — sustained by construction'
+${findings.map(f => JSON.stringify(f, null, 2)).join('\n\n')}`
+  const dispatch = () => agent(brief, { label: `${JUDGE}·r${round}`, phase: 'Judge', agentType: JUDGE, model: 'opus', schema: JUDGMENT })
+  judgment = await dispatch()
+  const ruled = new Set((judgment?.rulings ?? []).map(x => x.id))
+  if (findings.some(f => !ruled.has(f.id))) {
+    log(`judge left ${findings.filter(f => !ruled.has(f.id)).length} finding(s) unruled — re-dispatching once`)
+    const again = await dispatch()
+    judgment = { rulings: [...(judgment?.rulings ?? []), ...(again?.rulings ?? []).filter(x => !ruled.has(x.id))] }
   }
 }
-
-const sustainedOf = r => r.findings.filter(f => (f.ruling ?? 'sustained') === 'sustained')
-const blockers =
-  lenses.reduce((n, r) => n + sustainedOf(r).filter(f => f.severity === 'blocker').length, 0) +
-  coldResults.reduce((n, c) => n + sustainedOf(c).filter(f => f.severity === 'blocker').length, 0)
-const sustained =
-  lenses.reduce((n, r) => n + sustainedOf(r).length, 0) +
-  coldResults.reduce((n, c) => n + sustainedOf(c).length, 0)
-const invalid = [
-  ...lenses.filter(r => r.invalid).map(r => r.lens),
-  ...coldResults.filter(c => c.invalid).map(c => `cold:${short(c.path)}`),
-]
-// What the judge would keep open: the issues with a sustained
-// blocker/fix (fresh cold reads next round) and the lenses whose
-// findings sustained (informational — the whole-plan lenses reread
-// everything every round regardless). The user's rulings decide what
-// actually stays open — the conductor adjusts this before the next round.
-const open = {
-  issues: coldResults
-    .filter(c => c.invalid || sustainedOf(c).some(f => f.severity !== 'detail'))
-    .map(c => ({ repo: c.repo, path: c.path })),
-  lenses: lenses
-    .filter(r => r.invalid || sustainedOf(r).some(f => f.severity !== 'detail'))
-    .map(r => r.lens),
+const OWNERS = ['author', 'user', 'worker']
+const rulings = new Map((judgment?.rulings ?? []).map(x => [x.id, x]))
+for (const f of findings) {
+  const r = rulings.get(f.id)
+  f.ruling = r?.ruling ?? 'sustained'
+  f.owner = f.ruling === 'sustained' ? (OWNERS.includes(r?.owner) ? r.owner : 'user') : 'none'
+  f.reason = r?.reason ?? 'unruled — counted as sustained, owner user (fail-safe)'
 }
-log(`round ${round}: ${allFindings.length} finding(s) → ${sustained} sustained (${blockers} blocker(s)) · cold reads ${coldResults.filter(c => c.verdict === 'pass').length}/${coldResults.length} pass${invalid.length ? ' · INVALID: ' + invalid.join(', ') : ''}`)
-log(open.issues.length || open.lenses.length
-  ? `still open: ${[...open.issues.map(i => `${i.repo}/${short(i.path)}`), ...open.lenses].join(', ')}`
-  : 'the judge sustains nothing — the user confirms')
 
-return { round, blockers, sustained, open, invalid, cold: coldResults, lenses }
+const count = (owner) => findings.filter(f => f.ruling === 'sustained' && f.owner === owner).length
+const sustained = { author: count('author'), user: count('user'), worker: count('worker') }
+log(`round ${round}: ${findings.length} finding(s) → ${sustained.author} for the author · ${sustained.user} for the user · ${sustained.worker} to the worker · ${findings.filter(f => f.ruling === 'deferred').length} deferred · ${findings.filter(f => f.ruling === 'dismissed').length} dismissed${lenses.some(l => l.invalid) ? ' · INVALID: ' + lenses.filter(l => l.invalid).map(l => l.lens).join(', ') : ''}`)
+
+return { round, findings, sustained, lenses, unread }
