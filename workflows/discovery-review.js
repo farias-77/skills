@@ -2,109 +2,79 @@
  * discovery-review.js — the stage-1 review round as deterministic code.
  *
  * Why a workflow: the guarantee that no lens is skipped must be
- * physical, not discipline. One mode: round 1 dispatches everything —
- * the three document lenses, the blind-reader panel and its ambiguity
- * pass; every later round passes `lenses` and dispatches only those —
- * the ones the judge kept open. The blind-reader experiment re-runs
- * only while `disc-reviewer-ambiguity` is in the set: fresh readers
- * diverge on something new every time they read, and re-running them
- * when ambiguity already converged is how the round manufactures its
- * own work. A clean pass without its "verified" enumeration is
- * re-dispatched once (a lazy pass is not a pass).
+ * physical, not discipline. Every round is whole: the three document
+ * lenses and, per story, two blind readers and a referee, all in
+ * parallel; then the judge. There are no delta rounds — the round is
+ * cheap (Sonnet and Haiku only) and running it whole after every fix
+ * is what catches the loose wire a scoped re-read misses.
  *
- * THE READER PANEL is breadth over laps: five independent readings
- * catch in one round what a pair misses until the final round. The
- * referee clusters the builds into camps per sentence; the judge
- * rules each camp split by its composition — a lone reader against a
- * unanimous field is noise unless the text itself admits that
- * reading. Default 5 Sonnet; `readers` tunes the panel per demand and
- * still accepts a haiku cohort ({sonnet, haiku}) — off by default:
- * field-reported (ops-dashboard, 30/08) haiku latency stalled whole
- * rounds, and the round only closes when its slowest reader returns.
+ * THE BLIND READS are per story: two Haiku readers build one story
+ * each, alone, one build per key (the story's AC ids, its bad-path
+ * rows, the story sentence). A Sonnet referee compares the two
+ * readings key by key; only a `different-product` verdict becomes a
+ * finding. The keys make the comparison mechanical: a reading that
+ * misses a key is invalid and re-dispatched once; a story whose two
+ * readings do not both survive is reported as unread, never silently
+ * skipped.
  *
- * THE JUDGE closes the round, not the lenses: reviewers report at the
- * maximum bar (they always find something — that is by design), and
- * disc-judge rules every finding sustained / deferred / dismissed
- * against the discovery razor (a wrong guess would change what gets
- * built — the same razor stage 3's judge holds at the other end). The
- * returned `open` list is JUDGED: a lens stays open only for
- * sustained-ruled blocker/fix findings. An unruled finding counts as
- * sustained (fail-safe). `open` is the next round's `lenses`; empty
- * means the deltas converged — the stage's close is then ONE full
- * final round (no `lenses` arg) that the judge also clears.
+ * THE JUDGE closes the round: every finding is ruled sustained /
+ * deferred / dismissed by the discovery razor, and every sustained
+ * finding carries an owner — `author` (wording; the author applies it
+ * alone) or `user` (product, scope, cost, a confirmed fact; the user
+ * rules it through the question tool). An unruled finding counts as
+ * sustained with owner `user` (fail-safe, never fail-silent).
  *
- * The briefs below carry INPUTS only — paths and round number. Every
- * instruction (each lens's rules, the reader's contract, the judge's
- * ruler) lives in the agent definitions under agents/, and the shared
- * reviewer contract in docs/standards/reviewer-contract.md.
+ * The briefs below carry INPUTS only. Every instruction lives in the
+ * agent definitions under agents/ and in the shared reviewer contract
+ * (docs/standards/reviewer-contract.md).
  *
  * Invoked by the stage-discovery conductor:
  *   Workflow({ scriptPath: '<...>/workflows/discovery-review.js', args: {
- *                 // by scriptPath, never by name — the name registry
- *                 // does not reliably carry these workflows
+ *                 // by scriptPath, never by name
  *     discoveryDir: 'absolute path to <slug>/00-discovery',
- *     round:        2,  // 1-based; informational, shown in labels
- *     lenses:       ['disc-reviewer-boundary'],  // the lenses this
- *                       // round runs — the previous round's `open`
- *                       // list. Omit on round 1 and on the full final
- *                       // round: everything runs.
- *     scope:        'what changed since the last round',  // optional;
- *                       // a focus note, not a fence — reviewers may
- *                       // still read everything
- *     readers:      { sonnet: 5, haiku: 0 }  // optional; the panel
- *                       // size per model — the default, tuned per
- *                       // demand by the conductor
+ *     round:        1,          // 1-based; shown in labels and ids
+ *     vocabulary:   '<the stories file's vocabulary block, verbatim>',
+ *     stories: [                // one entry per story block, verbatim —
+ *       { id: 'S-001', text: '## S-001 — ...\n...' },   // scripts cannot
+ *     ],                        // read files: the conductor splits the
+ *                               // file at every "## S-" heading
  *   }})
  *
- * Returns { round, blockers, sustained, open, invalid, readings,
- * lenses } — lenses is [{ lens, verdict, verified, quote, findings,
- * invalid }] including the ambiguity pass; each finding carries `id`,
- * `ruling` and `reason` after judgment; `blockers`/`sustained` count
- * only sustained-ruled findings; `open` is every lens with a sustained
- * blocker/fix (pass it back as the next round's `lenses`; empty means
- * this round converged); readings is the panel's surviving builds,
- * each tagged with its reader id and model (kept for the audit). The conductor writes reviews.md (rulings included),
- * fixes the documents itself (stage 1's conductor is the writer),
- * takes to the interview what the judge marked "for the user", and
- * loops under the stage's exit rules — three delta rounds without
- * convergence turn everything still open into interview agenda.
+ * Returns { round, findings, sustained, lenses, unread } — findings is
+ * every finding with its id, lens, story (for referee findings),
+ * severity, title, says, gap, fix, ruling, owner, reason; sustained is
+ * { author: n, user: n }; lenses is [{ lens, verdict, verified, quote,
+ * findings, invalid }] with the referees merged as one
+ * `disc-reviewer-ambiguity` entry; unread lists the story ids whose
+ * readings did not survive. The conductor writes reviews.md, sends the
+ * `author` fixes to disc-author, asks the user the `user` ones, and
+ * runs the round again, whole, if any text changed (cap: two rounds).
  */
 
 export const meta = {
   name: 'discovery-review',
-  description: 'Stage-1 review round: walkthrough, acceptance and boundary lenses plus a blind-reader panel and its ambiguity pass — the judge rules every finding by the discovery razor; deltas re-run only what stayed open',
+  description: 'Stage-1 review round, always whole: three document lenses in parallel with two Haiku blind readers and a Sonnet referee per story; the judge rules every finding by the discovery razor and marks its owner (author or user)',
   phases: [
-    { title: 'Lenses', detail: 'the round’s document lenses over both documents' },
-    { title: 'Blind reads', detail: 'the reader panel — 5 Sonnet by default — commits to concrete builds, alone; only while ambiguity is open' },
-    { title: 'Ambiguity', detail: 'the referee clusters the panel’s builds into camps and runs the cross-document pass' },
-    { title: 'Judge', detail: 'disc-judge rules every finding sustained/deferred/dismissed by the discovery razor', model: 'opus' },
+    { title: 'Lenses', detail: 'walkthrough, acceptance and boundary over both documents' },
+    { title: 'Blind reads', detail: 'per story: two Haiku readers build it alone, a Sonnet referee compares them key by key' },
+    { title: 'Judge', detail: 'disc-judge rules every finding sustained / deferred / dismissed and marks the owner' },
   ],
 }
 
-const AMBIGUITY = 'disc-reviewer-ambiguity'
-const JUDGE = 'disc-judge'
 const DOC_LENSES = ['disc-reviewer-walkthrough', 'disc-reviewer-acceptance', 'disc-reviewer-boundary']
-const ALL = [...DOC_LENSES, AMBIGUITY]
+const REFEREE = 'disc-reviewer-ambiguity'
+const READER = 'disc-blind-reader'
+const JUDGE = 'disc-judge'
 
-const READING = {
+const FINDING = {
   type: 'object', additionalProperties: false,
-  required: ['builds', 'covered'],
+  required: ['severity', 'title', 'says', 'gap', 'fix'],
   properties: {
-    builds: {
-      type: 'array', minItems: 1,
-      items: {
-        type: 'object', additionalProperties: false,
-        required: ['sentence', 'build'],
-        properties: {
-          sentence: { type: 'string', description: 'the normative sentence, verbatim' },
-          build: { type: 'string', description: 'the concrete thing this reader would build — exact values, time anchors, actor, persistence, visibility' },
-        },
-      },
-    },
-    covered: {
-      type: 'array', minItems: 1,
-      items: { type: 'string', description: 'a story ID or PR-FAQ section this reader swept' },
-    },
+    severity: { type: 'string', enum: ['blocker', 'fix', 'detail'] },
+    title: { type: 'string' },
+    says: { type: 'string', description: 'what the material says, verbatim or "nothing"' },
+    gap: { type: 'string', description: 'the concrete problem, through this lens' },
+    fix: { type: 'string', description: 'the concrete change that would resolve it' },
   },
 }
 
@@ -113,25 +83,52 @@ const REVIEW = {
   required: ['verdict', 'verified', 'quote', 'findings'],
   properties: {
     verdict: { type: 'string', enum: ['pass', 'pass with fixes', 'fail'] },
-    verified: {
-      type: 'array', minItems: 0,
-      items: { type: 'string', description: 'one point this reviewer actually checked, with where it looked' },
-    },
+    verified: { type: 'array', items: { type: 'string', description: 'one point this reviewer actually checked, with where it looked' } },
     quote: { type: 'string', description: 'verbatim sentence from the material it judged — the proof it read' },
-    findings: {
-      type: 'array',
+    findings: { type: 'array', items: FINDING },
+  },
+}
+
+const READING = {
+  type: 'object', additionalProperties: false,
+  required: ['story', 'builds'],
+  properties: {
+    story: { type: 'string' },
+    builds: {
+      type: 'array', minItems: 1,
       items: {
         type: 'object', additionalProperties: false,
-        required: ['severity', 'title', 'says', 'gap', 'fix'],
+        required: ['key', 'sentence', 'build'],
         properties: {
-          severity: { type: 'string', enum: ['blocker', 'fix', 'detail'] },
-          title: { type: 'string' },
-          says: { type: 'string', description: 'what the material says, verbatim or "nothing"' },
-          gap: { type: 'string', description: 'the concrete problem, through this lens' },
-          fix: { type: 'string', description: 'the concrete change that would resolve it' },
+          key: { type: 'string', description: 'an AC id, bad-path:<category>, or story' },
+          sentence: { type: 'string', description: 'the sentence, verbatim' },
+          build: { type: 'string', description: 'what this reader would build — exact values, anchors, actor, persistence, visibility; at most sixty words' },
         },
       },
     },
+  },
+}
+
+const REFEREE_REVIEW = {
+  type: 'object', additionalProperties: false,
+  required: ['story', 'keys', 'verdict', 'verified', 'quote', 'findings'],
+  properties: {
+    story: { type: 'string' },
+    keys: {
+      type: 'array',
+      items: {
+        type: 'object', additionalProperties: false,
+        required: ['key', 'verdict'],
+        properties: {
+          key: { type: 'string' },
+          verdict: { type: 'string', enum: ['same', 'same-in-other-words', 'different-product'] },
+        },
+      },
+    },
+    verdict: REVIEW.properties.verdict,
+    verified: REVIEW.properties.verified,
+    quote: REVIEW.properties.quote,
+    findings: REVIEW.properties.findings,
   },
 }
 
@@ -143,11 +140,12 @@ const JUDGMENT = {
       type: 'array',
       items: {
         type: 'object', additionalProperties: false,
-        required: ['id', 'ruling', 'reason'],
+        required: ['id', 'ruling', 'owner', 'reason'],
         properties: {
           id: { type: 'string', description: 'the finding id exactly as given' },
           ruling: { type: 'string', enum: ['sustained', 'deferred', 'dismissed'] },
-          reason: { type: 'string', description: 'one or two concrete sentences; say "for the user" when only the user can settle it, name the recurrence when the history shows one' },
+          owner: { type: 'string', enum: ['author', 'user', 'none'], description: 'author or user on a sustained finding; none otherwise' },
+          reason: { type: 'string', description: 'one or two concrete sentences' },
         },
       },
     },
@@ -155,23 +153,62 @@ const JUDGMENT = {
 }
 
 const round = args?.round ?? 1
+const stories = Array.isArray(args?.stories) ? args.stories.filter(s => s && s.id && s.text) : []
+const vocabulary = args?.vocabulary ?? ''
+if (!stories.length) log('no stories passed in args — the blind reads are skipped this round; pass stories: [{id, text}] to run them')
 
-// The round runs exactly the lenses it was given — the previous round's
-// `open` list — or everything when none is named (round 1, and the full
-// final round). The blind readers belong to the ambiguity pass: they
-// run only when it does.
-const requested = Array.isArray(args?.lenses) ? args.lenses : []
-const unknown = requested.filter(n => !ALL.includes(n))
-if (unknown.length) log(`unknown lens name(s) ignored: ${unknown.join(', ')}`)
-const named = requested.length ? ALL.filter(n => requested.includes(n)) : ALL
-const docLenses = named.filter(n => n !== AMBIGUITY)
-const withAmbiguity = named.includes(AMBIGUITY)
-const shape = named.length < ALL.length ? 'delta' : 'full'
-
-const inputs = `Round ${round}${shape === 'delta' ? ' (delta round — these lenses did not pass last round)' : ''}.
+const docInputs = `Round ${round}.
 The documents: ${args.discoveryDir}/pr-faq.md and ${args.discoveryDir}/user-stories.md
-The round audit so far: ${args.discoveryDir}/reviews.md${args?.scope ? `
-Changed since the last round (the focus; the rest is context): ${args.scope}` : ''}`
+The round audit so far: ${args.discoveryDir}/reviews.md`
+
+// ---------- mechanical checks on a reading ----------
+
+// The keys a story defines: every AC id, one per bad-path row, and the
+// story sentence. AC ids look like <SLUG>-S-001-AC-1; bad-path rows are
+// the table lines under "### Bad paths" whose first cell names the
+// category.
+const expectedKeys = (text) => {
+  const keys = new Set(['story'])
+  for (const m of text.matchAll(/`?([A-Za-z0-9]+-S-\d{3}-AC-\d+)`?/g)) keys.add(m[1])
+  const bad = text.split(/###\s*Bad paths/i)[1]?.split(/\n###/)[0] ?? ''
+  for (const line of bad.split('\n')) {
+    const cells = line.split('|').map(c => c.trim()).filter(Boolean)
+    if (cells.length < 3 || /^-+$/.test(cells[0]) || /^category$/i.test(cells[0])) continue
+    const cat = cells[0].toLowerCase()
+    if (/boundary/.test(cat)) keys.add('bad-path:boundary')
+    else if (/repeat|concurren/.test(cat)) keys.add('bad-path:repeat')
+    else if (/dependen/.test(cat)) keys.add('bad-path:dependency')
+    else if (/permission/.test(cat)) keys.add('bad-path:permission')
+  }
+  return keys
+}
+
+const HEDGE = /\b(or|either|depends|could be|probably|maybe|possibly)\b/i
+const normalizeKey = (k) => {
+  const s = String(k).trim().replace(/^`|`$/g, '')
+  const bp = s.match(/^bad-path:\s*(.+)$/i)
+  if (!bp) return s
+  const cat = bp[1].toLowerCase()
+  if (/boundary/.test(cat)) return 'bad-path:boundary'
+  if (/repeat|concurren/.test(cat)) return 'bad-path:repeat'
+  if (/dependen/.test(cat)) return 'bad-path:dependency'
+  if (/permission/.test(cat)) return 'bad-path:permission'
+  return s
+}
+
+const readingProblems = (reading, expected) => {
+  if (!reading) return ['no output']
+  const problems = []
+  const got = new Map(reading.builds.map(b => [normalizeKey(b.key), b]))
+  for (const k of expected) if (!got.has(k)) problems.push(`missing key ${k}`)
+  for (const [k, b] of got) {
+    if (!b.build || !b.build.trim()) problems.push(`empty build at ${k}`)
+    else if (HEDGE.test(b.build)) problems.push(`hedged build at ${k}`)
+  }
+  return problems
+}
+
+// ---------- dispatch helpers ----------
 
 // Re-dispatch once on the two invalid shapes: a dead agent, or a lazy
 // clean pass (zero findings AND no verified enumeration proves nothing).
@@ -186,119 +223,121 @@ const reviewed = async (dispatch, name) => {
     : { verdict: 'fail', verified: [], quote: '', findings: [], invalid: true }
 }
 
-// The panel: every reader is the same disc-blind-reader definition —
-// the model is set per dispatch. Haiku cohort off by default (latency
-// stalls the round); `readers` re-enables it when wanted.
-const PANEL = { sonnet: 5, haiku: 0, ...(args?.readers ?? {}) }
-const panelSpec = [
-  ...Array.from({ length: PANEL.sonnet ?? 0 }, (_, i) => ({ id: `s${i + 1}`, model: 'sonnet' })),
-  ...Array.from({ length: PANEL.haiku ?? 0 }, (_, i) => ({ id: `h${i + 1}`, model: 'haiku' })),
-]
-// The experiment stands on breadth: below half the panel (min 2) the
-// divergence signal is not the one the judge is calibrated for.
-const QUORUM = Math.max(2, Math.ceil(panelSpec.length / 2))
+const storyInputs = (s) => `Round ${round}. Story ${s.id}.
 
-const readBlind = async (spec) => {
-  const dispatch = () => agent(inputs, {
-    label: `read#${spec.id}r${round}`, phase: 'Blind reads',
-    agentType: 'disc-blind-reader', model: spec.model, schema: READING,
+VOCABULARY:
+${vocabulary}
+
+STORY:
+${s.text}`
+
+const readBlind = async (s, n) => {
+  const expected = expectedKeys(s.text)
+  const dispatch = () => agent(storyInputs(s), {
+    label: `${s.id}·read${n}·r${round}`, phase: 'Blind reads',
+    agentType: READER, model: 'haiku', schema: READING,
   })
   let r = await dispatch()
-  if (!r) {
-    log(`reader ${spec.id} (${spec.model}): no output — re-dispatching`)
+  let problems = readingProblems(r, expected)
+  if (problems.length) {
+    log(`${s.id} reader ${n}: ${problems.join(', ')} — re-dispatching`)
     r = await dispatch()
+    problems = readingProblems(r, expected)
   }
-  return r ? { reader: spec.id, model: spec.model, ...r } : null
+  if (problems.length) { log(`${s.id} reader ${n}: still invalid (${problems.join(', ')}) — dropped`); return null }
+  return { reader: n, builds: r.builds.map(b => ({ ...b, key: normalizeKey(b.key) })) }
 }
 
-// ---------- the round: doc lenses and (when open) readers, concurrently ----------
+const referee = async (s, readings) => {
+  const r = await reviewed(() => agent(`${storyInputs(s)}
+
+READING 1:
+${JSON.stringify(readings[0].builds, null, 2)}
+
+READING 2:
+${JSON.stringify(readings[1].builds, null, 2)}`, {
+    label: `${s.id}·referee·r${round}`, phase: 'Blind reads',
+    agentType: REFEREE, model: 'sonnet', schema: REFEREE_REVIEW,
+  }), `${s.id} referee`)
+  return { story: s.id, ...r }
+}
+
+// ---------- the round: lenses and per-story reads, concurrently ----------
 
 phase('Lenses')
-log(`round ${round}: ${shape} — ${named.length}/${ALL.length} lens(es)${shape === 'delta' ? ': ' + named.join(', ') : ''}`)
-const [lensResults, readings] = await parallel([
-  () => parallel(docLenses.map(name => () =>
+log(`round ${round}: 3 lenses · ${stories.length} stories × (2 readers + referee)`)
+
+const [lensResults, storyResults] = await parallel([
+  () => parallel(DOC_LENSES.map(name => () =>
     reviewed(() =>
-      agent(inputs, { label: `${name}#r${round}`, phase: 'Lenses', agentType: name, schema: REVIEW }),
+      agent(docInputs, { label: `${name}·r${round}`, phase: 'Lenses', agentType: name, schema: REVIEW }),
       name).then(r => ({ lens: name, ...r }))
   )),
-  () => withAmbiguity
-    ? parallel(panelSpec.map(spec => () => readBlind(spec))).then(rs => rs.filter(Boolean))
-    : Promise.resolve([]),
+  () => pipeline(
+    stories,
+    (s) => parallel([() => readBlind(s, 1), () => readBlind(s, 2)]).then(rs => rs.filter(Boolean)),
+    (readings, s) => readings.length === 2
+      ? referee(s, readings)
+      : Promise.resolve({ story: s.id, unread: true }),
+  ),
 ])
 
-// ---------- the ambiguity pass, with both builds in hand ----------
+// The referees merge into one ambiguity lens entry: the judge and the
+// audit see one lens with per-story findings, as before.
+const refereed = (storyResults ?? []).filter(Boolean)
+const unread = refereed.filter(r => r.unread).map(r => r.story)
+const perStory = refereed.filter(r => !r.unread)
+if (unread.length) log(`unread this round (readings did not survive): ${unread.join(', ')}`)
 
-const lenses = [...lensResults]
-if (withAmbiguity) {
-  phase('Ambiguity')
-  if (readings.length < QUORUM) {
-    log(`only ${readings.length}/${panelSpec.length} blind reading(s) survived after retry (quorum ${QUORUM}) — the panel experiment is invalid this round`)
-    lenses.push({ lens: AMBIGUITY, verdict: 'fail', verified: [], quote: '', findings: [], invalid: true })
-  } else {
-    const builds = readings.map(r =>
-      `READER ${r.reader} (${r.model}):
-${JSON.stringify({ builds: r.builds, covered: r.covered }, null, 2)}`).join('\n\n')
-    lenses.push(await reviewed(() =>
-      agent(`${inputs}
-
-The panel's ${readings.length} blind builds of these documents (${panelSpec.length} dispatched — mixed models, decorrelated on purpose):
-
-${builds}`, {
-        label: `${AMBIGUITY}#r${round}`, phase: 'Ambiguity',
-        agentType: AMBIGUITY, schema: REVIEW,
-      }), AMBIGUITY).then(r => ({ lens: AMBIGUITY, ...r })))
-  }
+const ambiguity = {
+  lens: REFEREE,
+  verdict: perStory.some(r => r.verdict === 'fail') ? 'fail'
+    : perStory.some(r => r.verdict === 'pass with fixes') ? 'pass with fixes' : 'pass',
+  verified: perStory.flatMap(r => r.verified.map(v => `${r.story}: ${v}`)),
+  quote: perStory[0]?.quote ?? '',
+  findings: perStory.flatMap(r => r.findings.map(f => ({ ...f, story: r.story }))),
+  invalid: perStory.some(r => r.invalid) || (stories.length > 0 && perStory.length === 0),
+  keys: perStory.map(r => ({ story: r.story, keys: r.keys })),
 }
+const lenses = [...(lensResults ?? []).filter(Boolean), ...(stories.length ? [ambiguity] : [])]
 
-// ---- The judge: the lenses report, the judge closes ------------------
-// Every finding gets an id; disc-judge rules each one against the
-// discovery razor. An unruled finding counts as sustained — fail-safe,
-// never fail-silent.
-const allFindings = []
+// ---------- the judge ----------
+
+const findings = []
 for (const r of lenses) r.findings.forEach((f, i) => {
   f.id = `${r.lens}#${i + 1}`
-  allFindings.push({ lens: r.lens, f })
+  findings.push({ lens: r.lens, ...f })
 })
 
-if (allFindings.length) {
-  phase('Judge')
-  const board = allFindings.map(({ lens, f }) =>
-    `[${f.id}] ${lens} · ${f.severity} · ${f.title}
-  says: ${f.says}
-  gap: ${f.gap}
-  fix: ${f.fix}`).join('\n')
-  const dispatchJudge = () => agent(`${inputs}
+phase('Judge')
+let judgment = null
+if (findings.length) {
+  const brief = `${docInputs}
 
-The round's lenses have reported. Read the documents and the round audit (reviews.md — the history of what was already sustained and fixed), then rule EVERY finding below, by its id.
+The round's findings, each with its id:
 
-${board}`, { label: `${JUDGE}#r${round}`, phase: 'Judge', agentType: JUDGE, schema: JUDGMENT })
-
-  let judgment = await dispatchJudge()
-  const ruled = new Map((judgment?.rulings ?? []).map(x => [x.id, x]))
-  if (allFindings.some(({ f }) => !ruled.has(f.id))) {
-    log('judge: unruled finding(s) — re-dispatching once')
-    judgment = await dispatchJudge()
-    for (const x of judgment?.rulings ?? []) if (!ruled.has(x.id)) ruled.set(x.id, x)
-  }
-  for (const { f } of allFindings) {
-    const r = ruled.get(f.id)
-    f.ruling = r?.ruling ?? 'sustained'
-    f.reason = r?.reason ?? 'UNRULED — sustained by construction'
+${findings.map(f => JSON.stringify(f, null, 2)).join('\n\n')}`
+  const dispatch = () => agent(brief, { label: `${JUDGE}·r${round}`, phase: 'Judge', agentType: JUDGE, model: 'sonnet', schema: JUDGMENT })
+  judgment = await dispatch()
+  const ruled = new Set((judgment?.rulings ?? []).map(x => x.id))
+  if (findings.some(f => !ruled.has(f.id))) {
+    log(`judge left ${findings.filter(f => !ruled.has(f.id)).length} finding(s) unruled — re-dispatching once`)
+    const again = await dispatch()
+    judgment = { rulings: [...(judgment?.rulings ?? []), ...(again?.rulings ?? []).filter(x => !ruled.has(x.id))] }
   }
 }
+const rulings = new Map((judgment?.rulings ?? []).map(x => [x.id, x]))
+for (const f of findings) {
+  const r = rulings.get(f.id)
+  f.ruling = r?.ruling ?? 'sustained'
+  f.owner = f.ruling === 'sustained' ? (r?.owner === 'author' ? 'author' : 'user') : 'none'
+  f.reason = r?.reason ?? 'unruled — counted as sustained, owner user (fail-safe)'
+}
 
-const sustainedOf = r => r.findings.filter(f => (f.ruling ?? 'sustained') === 'sustained')
-const blockers = lenses.reduce((n, r) => n + sustainedOf(r).filter(f => f.severity === 'blocker').length, 0)
-const sustained = lenses.reduce((n, r) => n + sustainedOf(r).length, 0)
-const invalid = lenses.filter(r => r.invalid).map(r => r.lens)
-// A lens stays open only for a sustained blocker/fix (or an invalid
-// run). Everything else is finished for the deltas — deferred rulings
-// batch into the close sweep, dismissed ones die with their reason. The
-// stage's close is the full final round, judged by the same ruler.
-const open = lenses.filter(r =>
-  r.invalid || sustainedOf(r).some(f => f.severity !== 'detail')
-).map(r => r.lens)
-log(`round ${round}: ${allFindings.length} finding(s) → ${sustained} sustained (${blockers} blocker(s)) · ${lenses.length - open.length}/${lenses.length} closed${invalid.length ? ' · INVALID: ' + invalid.join(', ') : ''}`)
-log(open.length ? `still open (next round's lenses): ${open.join(', ')}` : 'converged — no lens holds a sustained finding')
+const sustained = {
+  author: findings.filter(f => f.ruling === 'sustained' && f.owner === 'author').length,
+  user: findings.filter(f => f.ruling === 'sustained' && f.owner === 'user').length,
+}
+log(`round ${round}: ${findings.length} finding(s) → ${sustained.author} for the author · ${sustained.user} for the user · ${findings.filter(f => f.ruling === 'deferred').length} deferred · ${findings.filter(f => f.ruling === 'dismissed').length} dismissed${lenses.some(l => l.invalid) ? ' · INVALID: ' + lenses.filter(l => l.invalid).map(l => l.lens).join(', ') : ''}`)
 
-return { round, blockers, sustained, open, invalid, readings, lenses }
+return { round, findings, sustained, lenses, unread }
