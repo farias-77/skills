@@ -631,9 +631,23 @@ const BLUEPRINT = {
      the shape). Null until the plan closes. */
   plan: null,
 
-  /* Filled from stage 4 on — PER WAVE, same keys and shapes as ever;
-     each stage skill documents its tab's contract. A wave that is
-     named but not started sits as null. */
+  /* Filled from stage 4 on — PER WAVE. A wave that is named but not
+     started sits as null. The Codex chair writes `execution` at the
+     wave's close (the stage-execute skill's templates/report.md is
+     the source); the release stage writes `release` and republishes.
+     execution: {
+       intro,                               // the wave in one paragraph
+       cells: [{v, l}],                     // stories · PRs · suite · tokens
+       stories: [{ num, repo, t, pr,        // one row per story of the goal
+                   r1: {f, s, d, x}, r2: {f, s, d, x},   // findings · sustained · deferred · dismissed
+                   alpha, status }],
+       smoke: { out, note },                // the whole-suite runner output, trimmed
+       proof: { p, pre, files: [] },        // the walk; pre = the central evidence verbatim
+       eye: { departures: [{t, p}], chosen: [{t, p}], notes: [{t, p}], stops: [{t, p}] },
+       improvements: [{t, p}],
+       amendments: [],                      // the dated lines added to waves.md
+       prs: [{repo, url}],                  // the wave PRs on main, open
+     } */
   waves: {
     // 'w01-<what-it-delivers>': { execution: {...}, release: {...} },
   }
@@ -1189,40 +1203,38 @@ function renderPlan() {
 /* ---------- execution ---------- */
 function renderExecution() {
   const e = W().execution;
-  const tl = `<div class="xtl">${e.timeline.map(i => `
-    <div class="xi ${i.tone || ''}"><div class="when">${i.when}</div>
-      <div class="what">${i.what}</div>${i.det ? `<div class="det">${i.det}</div>` : ''}</div>`).join('')}</div>`;
-  const smokeOut = esc(e.smoke.out)
-    .replace(/✓/g, '<span class="xok">✓</span>').replace(/✗/g, '<span class="xerr">✗</span>');
-  const caps = `<div class="list">${e.capabilities.map(c => `<article class="card icard">
-    <h3>${c.t}</h3><p>${c.p}</p>
-    <div class="ichips">${c.chips.map(x => `<span class="ichip ${x.ok ? 'prod' : ''}">${x.t}</span>`).join('')}</div>
-  </article>`).join('')}</div>`;
+  const cells = e.cells?.length ? `<div class="scoreboard" style="margin-top:22px;grid-template-columns:repeat(auto-fit,minmax(140px,1fr))">${e.cells.map(c =>
+    `<div class="pl"><span class="v">${c.v}</span><span class="l">${c.l}</span></div>`).join('')}</div>` : '';
+  const rr = r => r ? `${r.f} · <span class="${r.s ? 'xred' : 'xgreen'}">${r.s}</span> · ${r.d} · ${r.x}` : '—';
+  const stories = `<div class="scroll"><table class="table">
+    <tr><th>#</th><th>Repo</th><th>Story</th><th>PR</th><th class="num">Round 1</th><th class="num">Round 2</th><th>Alpha</th><th>Status</th></tr>
+    ${(e.stories||[]).map(st => `<tr><td class="num">${st.num}</td><td><code>${st.repo}</code></td><td>${st.t}</td>
+      <td>${st.pr ? `<a href="${st.pr}">PR</a>` : '—'}</td><td class="num">${rr(st.r1)}</td><td class="num">${rr(st.r2)}</td>
+      <td>${st.alpha || '—'}</td><td>${st.status || ''}</td></tr>`).join('')}</table></div>
+    <p class="xnote">round columns: findings · sustained · deferred · dismissed</p>`;
+  const smokeOut = e.smoke ? esc(e.smoke.out)
+    .replace(/✓|PASS/g, m => `<span class="xok">${m}</span>`).replace(/✗|FAIL/g, m => `<span class="xerr">${m}</span>`) : '';
   const proof = e.proof ? `<article class="card icard" style="margin-top:12px">
-    <h3>The central proof, verbatim</h3><p>${e.proof.p}</p><pre>${e.proof.pre}</pre>
-    ${e.proof.note ? `<p class="xnote">${e.proof.note}</p>` : ''}</article>` : '';
-  const r = e.rounds;
-  const TONE = { ok: 'xgreen', fail: 'xred' };
-  const rounds = `<div class="scroll"><table class="table">
-    <tr><th>Round</th>${r.scopes.map(s => `<th class="num">${s}</th>`).join('')}<th>Root cause → fix</th></tr>
-    ${r.rows.map(l => `<tr><td class="num">${l.r}</td>
-      ${l.scores.map(p => `<td class="num ${TONE[p.tone] || ''}">${p.v}</td>`).join('')}
-      <td>${l.cause}</td></tr>`).join('')}</table></div>`;
+    <h3>The walk</h3><p>${e.proof.p}</p>${e.proof.pre ? `<pre>${esc(e.proof.pre)}</pre>` : ''}
+    ${e.proof.files?.length ? `<div class="ichips">${e.proof.files.map(f => `<span class="ichip">${f}</span>`).join('')}</div>` : ''}</article>` : '';
+  const group = (title, items, sub) => items?.length ? `<section class="sec">${secT(title, sub ?? items.length)}
+    <div class="list">${items.map((x, i) => `<article class="card step"><span class="pnum">${i + 1}</span>
+      <div class="pbody"><p class="pt">${x.t}</p><p class="pd">${x.p}</p></div></article>`).join('')}</div></section>` : '';
+  const eye = e.eye || {};
+  const prs = e.prs?.length ? `<p class="xnote">wave PRs on main, open: ${e.prs.map(x => `<a href="${x.url}"><code>${x.repo}</code></a>`).join(' · ')}</p>` : '';
   return `
-  <p class="lede">${e.intro}</p>
-  <section class="sec">${secT('Implementation timeline')}${tl}</section>
-  <section class="sec">${secT('Smoke', 'the floor before the round')}<pre>${smokeOut}</pre>
-    ${e.smoke.note ? `<p class="xnote">${e.smoke.note}</p>` : ''}</section>
-  <section class="sec">${secT('What exists now', `${e.capabilities.length} capabilities · each one proven`)}
-    ${caps}${proof}</section>
-  <section class="sec">${secT('e2e rounds', 'all-or-nothing · the convergence')}
-    ${r.intro ? `<p class="sec-d">${r.intro}</p>` : ''}${rounds}</section>
-  ${e.decisions?.length ? `<section class="sec">${secT('Decided in your place', 'during execution')}
-    <div class="list">${e.decisions.map(x => dcard({...x, mine: true})).join('')}</div></section>` : ''}
-  ${e.pending?.length ? `<section class="sec">${secT('Needs you', e.pending.length)}
-    <div class="list">${e.pending.map((p, i) => `<article class="card step">
-      <span class="pnum">${i + 1}</span><div class="pbody">
-      <p class="pt">${p.t}</p><p class="pd">${p.p}</p></div></article>`).join('')}</div></section>` : ''}`;
+  <p class="lede">${e.intro}</p>${cells}${prs}
+  <section class="sec">${secT('Stories', `${(e.stories||[]).length} · each one reviewed twice and proved in alpha before its merge`)}${stories}</section>
+  ${e.smoke ? `<section class="sec">${secT('The whole suite', 'against alpha, after the last merge')}<pre>${smokeOut}</pre>
+    ${e.smoke.note ? `<p class="xnote">${e.smoke.note}</p>` : ''}</section>` : ''}
+  ${proof ? `<section class="sec">${secT("The wave's proof", 'what a person can do in alpha now')}${proof}</section>` : ''}
+  ${group('Departures from the standard', eye.departures, `${eye.departures?.length || 0} · applied, for your audit`)}
+  ${group('Chosen where the documents were silent', eye.chosen)}
+  ${group('Notes still open', eye.notes, `${eye.notes?.length || 0} · what two review rounds left`)}
+  ${group('Stops and their resolution', eye.stops)}
+  ${group('Improvements applied', e.improvements, `${e.improvements?.length || 0} · inside the standard`)}
+  ${e.amendments?.length ? `<section class="sec">${secT('Amendments to the plan', e.amendments.length)}
+    <div class="card"><ul style="margin:0;padding-left:20px">${e.amendments.map(a => `<li>${a}</li>`).join('')}</ul></div></section>` : ''}`;
 }
 
 /* ---------- release ---------- */
