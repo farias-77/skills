@@ -1,399 +1,384 @@
 ---
 name: stage-design
-description: Conducts stage 2 (Design) of the pipeline — runs the design session with the user in two layers (the macro cards, then the mechanisms document by document, every call recorded in decisions.md as the complete design in decisions), dispatches the design-author (an Opus agent that transcribes the session's decisions into the design files, researches every target, and publishes the UI as the wave's design canvas), runs the review rounds as a deterministic workflow (ten Opus lenses at the maximum bar, the design-judge proposing a ruling on every finding), and puts every finding with the judge's ruling in front of the user through the question tool — he confirms or overrules each one, what he sustains loops the author, deltas re-run only what he kept open, one full final round always runs and he reads it. Fills this wave's Design tabs in the workstream's single blueprint. Use after the discovery is approved, or to resume a design in progress.
+description: Conducts stage 2 (Design) — takes an approved discovery and produces, with the user, how the whole demand works: the macro shape and then the ten documents one by one, every call recorded as a decision card; one Fable author transcribes the decisions into the design files, the research and the UI artboards; a whole review round runs (ten Opus lenses, two blind readers and a referee per flow, an Opus judge that marks who owns each fix: author, user or implementer); the author fixes wording, the user rules what changes the product, the implementer keeps declared latitude; two rounds at most; the blueprint's Design tab is published for approval. Runs in Claude Code with a Fable session. Use after a discovery is approved, or to resume a design in progress.
 disable-model-invocation: false
 argument-hint: "<workstream-slug>"
-allowed-tools: Read, Write, Edit, Glob, Grep, Agent, SendMessage, Workflow, Artifact, AskUserQuestion, Bash(mkdir *), Bash(date *), Bash(ls *), Bash(cat *), Bash(git *), Bash(rm *)
+allowed-tools: Read, Write, Edit, Glob, Grep, Agent, SendMessage, Workflow, AskUserQuestion, Artifact, WebSearch, WebFetch, Bash(mkdir *), Bash(date *), Bash(ls *), Bash(cat *), Bash(rm *), Bash(git *)
 ---
 
 # Stage 2: Design
 
-The demand stops being "what we build" and becomes "how it works" — and
-gets its build order. The design is defined **with the user, whole**:
-the macro shape and the mechanisms, live, in the design session that
-opens the stage. A single author transcribes what was decided into the
-design files; ten specialist reviewers try to break it at the maximum
-bar, always at the maximum; a judge proposes a ruling on each finding;
-**the user gives the final ruling on every one**. Nothing in this stage is decided
-in his place and shown later — the fait accompli is the failure mode
-this shape exists to kill, and the ops-dashboard w01 run is the
-evidence: 149 lines of macro decisions became 7,300 lines of design the
-author chose alone, and 158 findings and 14 rounds were the price of
-re-litigating them.
+A defined scope comes in: the discovery, every story with its v1
+status. A definition of how it works comes out: what the pieces are,
+where each one runs, how they talk to each other, what is stored and
+how, what alarms, how it reaches production, and what the implementer
+is free to decide. The design covers the whole demand; the cut into
+waves and issues is stage 3's. The design is not a build contract and
+does not try to be perfect: it is the guarantee that the system grows
+in one shape, and it says explicitly where it stops deciding.
 
-The session is the **conductor** here: it runs the design session,
-dispatches, audits, relays, publishes. It writes exactly one design
-file — `decisions.md`, the session's record — and never any other: the
-author is the only writer of everything else, first draft to last fix.
-That single-writer rule is what keeps the fix loop honest: a finding is
-only "fixed" when the author changed the file.
+This stage runs in Claude Code, in a Fable session. It is not
+harness-neutral: the question tool, the design canvas and the
+Workflow tool are Claude Code features, and the stage depends on all
+three.
+
+The session is the conductor. It runs the design session with the
+user, writes `decisions.md` as the session happens, dispatches the
+author, runs the review workflow, relays the rulings, and publishes
+the blueprint. It writes exactly one design file, `decisions.md`, and
+never any other: the author is the only writer of everything else,
+first draft to last fix. A finding is only fixed when the author
+changed the file.
+
+## Two modes
+
+**Session mode** (steps 1 and 4, and the questions of step 2). The
+user is in the room and decisions are the work. One document, one
+card at a time. Never run ahead of the user, never dispatch the author
+from a session that is not closed, never decide in the user's place.
+Closed choices go through the question tool; open discussion goes in
+prose. No agent runs during the session; a fact you need, you look up
+yourself, inline, and say what you found.
+
+**Autonomous mode** (steps 2, 3, 5 and the file work of 6). The user
+is waiting, not answering. Dispatch the author, run the workflow,
+write the audit, publish the blueprint, update the state, without
+asking permission for any of it. Say in one line what you are about
+to do, and close with a recap that stands on its own. Do not end a
+turn on a plan or a promise; do the work.
+
+## The pattern
+
+```
+1. Session    you and the user: the macro shape, then the ten documents one by
+              one, one card per decision, written to decisions.md as you go.
+              Ends with the playback and an explicit "that's it".
+2. Write      one dispatch of design-author: decisions.md + discovery → research,
+              the ten documents, the artboards, the canvas. Its questions come
+              back in one batch; you ask the user and send the answers.
+3. Review     the design-review workflow, whole: nine Opus lenses beside two
+              Haiku readers and a referee per flow, coherence, the Opus judge.
+4. Rule       author-owned and implementer-owned findings go to the author.
+              User-owned findings go to the user, one question each, grouped by
+              document, the rulings board open beside. One veto question.
+5. Iterate    text changed? run step 3 again, whole, once. What is still
+              sustained after round 2 is applied without a third round.
+6. Close      blueprint Design tab, explicit approval, state moved, /clear.
+```
+
+The user is interrupted at four points: the session (1), the author's
+questions (end of 2), the rulings (4, once per round) and the approval
+(6). Everything else runs without them.
 
 ## Preconditions
 
-`.state.md` says `stage: design`; the workstream's `00-discovery/` has
-the approved `pr-faq.md` and `user-stories.md`. Missing ⇒ halt, back to
-stage 1. Move the Linear Project to its design status via the Linear
-MCP — **Linear is the main tracking surface: the MCP missing is a halt,
-here and at every stage boundary**; ask for it to be set up and stop.
-(Each stage moves the Project when it opens — closing does not move it.)
-
-## What this stage produces
+`.state.md` says `stage: design`; `00-discovery/` has the approved
+`pr-faq.md` and `user-stories.md`, every story carrying a v1 status.
+Missing: halt, back to stage 1. Set `chair: fable` in `.state.md`.
+Move the Linear Project to its design status through the Linear MCP;
+the MCP missing is a halt, ask for it and stop. Each stage moves the
+Project when it opens; closing does not move it.
 
 ```
 designs-root/2026-08-15-workspace-invites/
-├── .state.md                  # stage: design · wave: w01-invite-by-email
-├── blueprint.html             # THE blueprint — one per workstream, same URL forever;
-│                              #   Overview + Discovery are workstream-level, the
-│                              #   stage tabs from Design on are per wave (wave pills)
-├── waves.md                   # the cut — decided at the session, instantiated by the author
-├── 00-discovery/              # the whole demand (stage 1, untouched here)
-├── w01-invite-by-email/       # the current wave — the pipeline runs here
-│   └── 01-design/
-│       ├── decisions.md       # the design session's record — the whole design in decisions; the conductor's file
-│       ├── research/          # one file per researched target
-│       ├── ui/                # the screens: <Screen>.dc.html + canvas.json
-│       ├── *.md               # architecture · data-model · contracts · ui · security · infra · observability · rollout · code · acceptance
-│       └── reviews.md         # the round audit, the user's rulings on every finding — permanent
-└── w02-resend-and-revoke/
-    └── README.md              # seed: what that wave delivers — its design starts here
+├── .state.md                  # stage: design · chair: fable
+├── blueprint.html             # the workstream's blueprint; this stage fills BLUEPRINT.design
+├── rulings.md                 # every ruling, appended as it happens (house rule)
+├── taste-notes.md             # what the user chose against the recommendation (house rule)
+├── 00-discovery/              # the demand (stage 1, untouched here)
+└── 01-design/                 # the whole demand's design
+    ├── decisions.md           # the session's record: the conductor's file
+    ├── research/              # one file per researched target
+    ├── ui/                    # the screens: <Screen>.dc.html + canvas.json
+    ├── architecture.md · data-model.md · contracts.md · ui.md · security.md
+    ├── infra.md · observability.md · rollout.md · code.md · acceptance.md
+    └── reviews.md             # the round audit: the conductor's file
 ```
 
-Plus the wave's **design canvas** (a separate artifact — the screens,
-editable) and the **Design tabs** of the blueprint, under this wave.
+## Step 1 — the design session
 
-## 1 — The design session (you and the user; no fan-out)
+Before it, read the discovery whole, the consuming project's
+`CLAUDE.md`, and the `CLAUDE.md` and `docs/` of every repo the demand
+touches. Create `01-design/decisions.md` from
+[templates/decisions.md](templates/decisions.md) on the first turn and
+write to it every turn; the session may span more than one sitting,
+and the file is the state between them.
 
-The design is the user's, taken live — this session is where
-overengineering dies, and it is the stage's highest-leverage hours. It
-runs in two layers, both on the same primitive: **one tradeoff card per
-decision**, presented in conversation — the options in one line each
-with their cost said out loud, your recommendation, the user's call.
-Before it, read the discovery, the consuming project's `CLAUDE.md` and
-the touched repos. Dispatch a single surgical research agent only when
-a fact (a price, a service limit) would change a decision — the full
-per-target research belongs to the author, after, scoped to what was
-decided. The point of the joint build is that over time the first
-proposal already comes the way he would take it: what he chooses
-against the recommendation is noted (below) and the dreaming turns it
-into the rules the next session runs under.
+The primitive is one card per decision: the question, the options in
+one line each with their cost said out loud, your recommendation, the
+user's call. A card is written for a choice the user would want made
+differently, or one that encodes a business rule, a cost or a risk.
+Everything else (the request body, the DDL, the IAM statement, the
+artboard's pixels) is transcription, and the author does it. Do not
+walk the user through transcription; do not transcribe a decision in
+his place.
 
-**Layer 1 — the macro shape.** The fixed agenda:
+**Layer 1, the macro shape.** The fixed agenda, in this order:
 
-1. **The wave cut** — how the demand slices; wave size is where cost scale is set.
-2. **Data** — what is stored, where; and what is NOT stored.
-3. **Compute** — what runs where.
-4. **Messaging** — event vs sync, per boundary (the architecture standard's default).
-5. **Identity and access** — who calls what, with which credential.
-6. **Repos** — new repo or existing.
-7. **Build vs buy** — what is not built.
-8. **Cost envelope** — the accepted monthly ceiling at three scales, declared before the design exists; the infra lens enforces it.
-9. **Alarm philosophy** — what wakes someone, given who actually answers.
-10. **Environment and rollout macro** — alpha, profiles, names, test credentials; the acceptance spec needs them early.
+1. Data: what is stored, where, and what is not stored.
+2. Compute: what runs where.
+3. Messaging: event or sync, per boundary.
+4. Identity and access: who calls what, with which credential.
+5. Repos: new or existing.
+6. Build vs buy: what is not built.
+7. Cost envelope: the accepted monthly ceiling at three scales,
+   declared before the design exists.
+8. Alarm philosophy: what wakes someone, given who actually answers.
+9. Environment and rollout macro: alpha, profiles, names, test
+   credentials.
+10. Extension points: where the direction the discovery recorded
+    (the out stories, the "Not in v1" blocks) will land, and what
+    does not change when it does.
 
-**Layer 2 — the mechanisms, document by document.** With the macro
-shape decided, walk **all ten documents** in the order they will be
-written, and for each one propose the decisions it needs as cards —
-you prepare the proposal (you have read the discovery, the repos and
-the ledger; the recommendation is yours), the user rules. Nothing is
-skipped: the design is built together here, whole, and the author
-afterwards only consolidates it into the files.
+**Layer 2, the ten documents, one by one.** With the macro shape
+decided, walk every document in writing order and propose the cards
+it needs. You prepare the proposal; the user rules. Nothing is
+skipped: the user wants to see the alarms, the rollout and the
+acceptance convention as much as the flows, so that he knows what is
+alarming and what proves the thing works.
 
 | Document | What earns a card |
 |---|---|
-| `architecture.md` | each flow end to end; the components and what each guarantees; every mechanism that guards a rule (a lock, idempotency, a retry, a cutoff) |
+| `architecture.md` | each flow end to end; the components, where each runs and what each guarantees; every mechanism that guards a rule (a lock, idempotency, a retry, a cutoff); what happens when the other side fails |
 | `data-model.md` | the entities and their keys; the access patterns; what is retained and for how long |
 | `contracts.md` | the list of endpoints and events, who calls each, the error classes; the exact shapes are transcription |
 | `ui.md` | the screens and the states that matter; what is reused from the product as it is |
-| `security.md` | every class of the fixed sweep that needs a call — risk accepted, or covered how |
+| `security.md` | every class of the fixed sweep that needs a call: risk accepted, or covered how |
 | `infra.md` | the resources, and every config that encodes a rule or a cost |
-| `observability.md` | which alarms exist, and what each one wakes |
+| `observability.md` | which alarms exist, and whom each one wakes |
 | `rollout.md` | the deploy order, the cutover gates, the way back |
 | `code.md` | the repo layout where it departs from the house structure |
-| `acceptance.md` | which cases prove the wave — the case list, not the request bodies |
+| `acceptance.md` | which cases prove the demand: the case list, not the request bodies |
 
-**The test for a card is the blueprint's test:** it is a decision if
-the user would want it made differently, or if it encodes a business
-rule, a cost, or a risk. Everything else — the request body, the DDL,
-the IAM statement, the artboard's pixels — is transcription, and the
-author does it. Do not walk the user through transcription; do not
-transcribe a decision in his place.
+Three rules inside the session:
 
-Record every call in `wNN-<wave>/01-design/decisions.md`
-([template](templates/decisions.md)) **as you go**, one section per
-layer-2 document, every card carrying **what you recommended and what
-he chose** — **the one design file the conductor writes**, the declared
-exception to the single-writer rule: it is the session's record and
-the whole design in decisions. The session may span more than one
-sitting; the file is the state between them. The author transcribes it
-and never edits it; reviewers contest it only on defect (the reviewer
-contract's clause).
+- **A mechanism card shows the whole kit.** When the choice is a piece
+  of infra or a platform mechanism, the card lists what it drags in:
+  resources, rollout steps, runbooks, acceptance cases, the monthly
+  line. The user decides on the set, not on the piece.
+- **A fact that would change a decision is looked up before the
+  decision, by you, inline.** A price, a service limit, whether an
+  API exposes a field. Say what you found and where. A cost
+  difference of thirty percent or more on one line of the envelope
+  triggers the lookup before the card is answered. Nothing is
+  dispatched to an agent during the session.
+- **Every document's section ends with its latitude.** Ask, per
+  document: what here does the implementer decide? Write the answer
+  as the section's Latitude list. The hard classes (the
+  [design-docs reference](references/design-docs.md) lists them)
+  never go there; if the user tries to leave one open, say which
+  class it is and ask for the call.
 
-The session closes with the user's explicit ok on the recorded
-decisions — in conversation, no artifact. Then, without asking, note
-**every card where his choice diverged from your recommendation** in
-the workstream's `taste-notes.md` (house rule in the repo's
-`CLAUDE.md`) — the pattern, not the instance: "prefers a Lambda cron
-over Step Functions until a flow needs a human wait", never "chose B
-on card 7". Nothing there is a rule yet: the dreaming decides, with
-him, what each note becomes.
+> **Example of a card** — "Where does the panel's aggregation run?
+> A) the API sums the recordings per request, no aggregate table
+> (simplest; a person with 5,000 recordings costs one query of ~1 MB);
+> B) a nightly job writes per-person totals (a second table, a job,
+> an alarm for the job). Recommended: A until a screen reads more
+> than a month at once." Two builds, one line of cost each, a
+> recommendation with its trigger for change.
+>
+> **Example of a latitude line** — "architecture: retries on the
+> Cognito calls, within the Lambda's 10 s budget." A bound the design
+> sets, a choice the implementer makes.
 
-## 2 — Dispatch the author
+Closed choices go through the question tool: the header is the
+document, the question carries the card, the answers are the options
+with your recommendation first and marked as yours. Record every call
+in `decisions.md` as you go, recommendation beside choice. Every card
+where the user chose against the recommendation goes to
+`taste-notes.md` on the spot, as the pattern rather than the instance
+(house rule).
 
-One `Agent` call: **`design-author`** (Opus — the single writer carries
-the whole design, so the capability sits here rather than in the
-reviewers, which read one lens each). The dispatch hands it: the
-workstream folder path (discovery inside), **`decisions.md` — the
-design it transcribes, never redesigns**, the consuming project's
-`CLAUDE.md`, and the repo map. The author does the rest — its
-definition carries the method:
+**The playback.** When no document has a card left, present the whole
+design back in one structured pass: the one-sentence frame, the macro
+shape, per document the cards and the latitude. Get an explicit
+"that's it". The session closes with that ok, in conversation, no
+artifact.
 
-- **It instantiates the session's cut**: `waves.md` at the workstream
-  root from the decided cut (every story and AC of the discovery in
-  exactly one wave — the coverage lens audits the mapping in both
-  directions), the current wave's folders, README seeds for the next
-  ones. The stories carry a v1 status set at discovery: `in` and
-  `reduced` stories are the demand; an `out` story is direction and
-  enters no wave.
-- **Research per target** (one deep-research workflow each, never a
-  global sweep), scoped to the decisions taken, **the living docs of
-  every touched repo** as input, the documents — `code.md` (the
-  file-tree preview, a guide) and `acceptance.md` (the executable
-  acceptance spec, frozen with `contracts.md`) included — and the
-  **UI artboards** in `01-design/ui/`, which the author itself
-  publishes as the wave's **design canvas** (one artifact per wave,
-  the link recorded in `ui.md`).
-- It writes under the house
-  [architecture standard](../../docs/standards/architecture.md),
-  simplicity clause included — the decisions already chose the
-  simplest form; the transcription does not add a mechanism.
+## Step 2 — write
 
-If the author finds a decision the session did not take, or one the
-detail proves untenable, the path is always the same: **it becomes a
-question to the user** (relayed by you, in one batch where possible)
-and the transcription continues with the answer — the stage never goes
-back to stage 1, and the author never decides in his place. The
-`(decided in your place)` flag exists for the case the user answers
-"you decide"; its target at checkpoint is zero.
+One `Agent` dispatch of **`design-author`** in write mode, with: the
+workstream path, `decisions.md`, the consuming project's `CLAUDE.md`,
+the repo map, and the language of the documents (the user's). The
+author researches every target, writes the ten documents, draws the
+artboards, publishes the canvas, and returns its questions in one
+batch.
 
-## 3 — The review round (a workflow, so it cannot be skipped)
+Ask the user the batch through the question tool, one question per
+item, the author's options as the answers with its recommendation
+first. Send the answers to the same author in one message; it folds
+them in and writes them into `decisions.md`'s "Questions answered
+after the session" section is yours: you write that section from the
+answers, the author reads it.
 
-Run [`design-review`](../../workflows/design-review.js) —
-`Workflow({scriptPath: '<workflows-root>/design-review.js', args: {...}})`
-with `designDir`, `discoveryDir`, `wavesPath`, and `round` (invoke by
-`scriptPath` pointing at the file under the consuming project's
-workflows root — e.g. `.claude/workflows/` — never by `name`: the name
-registry does not reliably carry these workflows; field-reported by
-ops-tracking w2n3). The workflow is the guarantee:
-the dispatch is deterministic, structured output is forced on every
-reviewer, and a lazy pass is re-dispatched — discipline made physical.
-Specialists run in parallel; `design-reviewer-coherence` always runs
-last, with the specialist verdicts in hand.
+When the author returns, read the ten documents. Check that every
+`in` and `reduced` story has a flow or a screen, that every flow
+follows the flow format (numbered steps, a failure table), that every
+document ends with its latitude section and its references, and that
+`ui.md` carries the canvas link. Anything missing goes back to the
+author in one message before the review starts.
 
-**The lenses report, the judge proposes, the user rules (§4):**
+## Step 3 — the review round
 
-- **Round 1 is the full ten** — the first look is where
-  unknown-unknowns surface, so nothing narrows it.
-- **Reviewers report at the maximum bar; `design-judge` (Opus) rules
-  every finding** — `sustained` / `deferred` / `dismissed`, with a
-  one-line reason — calibrated by `decisions.md` and the round history
-  in `reviews.md`, the user's rulings included. **Its ruling is a
-  proposal**: the round comes back with every finding
-  ruled, and the user confirms or overrules each one before anything
-  moves. `open` is the judge's guess at what stays open; his rulings
-  decide.
-- **Every later round is the delta**: pass `lenses: [...]` = the
-  lenses whose findings the user sustained, plus a `scope` note naming
-  what changed.
-- **When a delta comes back with nothing the user sustains, ONE full
-  final round runs — always, once**: every lens, over the final state —
-  mid-review fixes can break what had already passed, and on
-  ops-dashboard the final round caught a defect the deltas could not
-  see three times out of four. It reaches him like any round;
-  **whether another final round runs is decided with him, never
-  automatically**.
+Autonomous mode. Run
+[`design-review`](../../workflows/design-review.js) by `scriptPath`
+(never by name), with `designDir`, `discoveryDir`, `round`, the
+design's glossary block, and `flows`: one `{id, text}` per flow of
+`architecture.md`, split at every `### ` heading under `## Flows`.
+Scripts cannot read files; you pass the text.
 
-Told to find errors, reviewers always find errors — that is by design,
-not a defect. What turns it from an infinite loop into a calibrated one
-is who rules: on ops-dashboard w01 the judge, ruling alone, dismissed
-5 findings in 158 and deferred 84, and the deferred sweeps reopened
-three finals. Now the judge proposes and the user rules by what he
-would build; every overrule is recorded, and the judge reads that
-record next time.
+| Agent | Question |
+|---|---|
+| `design-reviewer-data` | every read has a key path; growth is bounded; writes that must land together do |
+| `design-reviewer-code` | the house architecture standard holds; coupling, seams, extension points with their "does not change" line |
+| `design-reviewer-infra` | configs on purpose, IAM by the verb, cost at three scales against real prices, the way in and out |
+| `design-reviewer-security` | the abuse paths; the class sweep answered with mechanisms |
+| `design-reviewer-contracts` | every contract whole, success and error; the data each side needs arrives |
+| `design-reviewer-alarms` | every alarm has its four fields and would not ring on a quiet day |
+| `design-reviewer-coverage` | every `in`/`reduced` story has its home; nothing in the design is unforced |
+| `design-reviewer-facts` | every claim about the outside world traces to research |
+| `design-reviewer-ui` | the screens fit the product as it is; every story state has a home |
+| 2× `design-blind-reader` → `design-reviewer-ambiguity`, per flow | would two engineers implement the same flow from these steps? |
+| `design-reviewer-coherence` | contradictions across the documents, with all verdicts in hand |
+| `design-judge` | could the implementer place this and build it one way? and who decides the fix: the author, the user, or the implementer? |
 
-| Reviewer | Specialist in | Judges (holistically — reads everything, reports its lens) |
-|---|---|---|
-| `design-reviewer-data` | data | entities, keys, access patterns, growth, query cost |
-| `design-reviewer-code` | code organization | patterns, decoupling, extension points — and the architecture standard |
-| `design-reviewer-infra` | infrastructure | configs at their best, exposure, IAM, cost at three scales vs real prices, rollout |
-| `design-reviewer-security` | security | breach-opening patterns, secrets, isolation, the fixed class sweep |
-| `design-reviewer-contracts` | contracts | every API/event defined whole — success AND error; the data each side needs arrives |
-| `design-reviewer-alarms` | observability | alarms that make sense — the four fields, no over-alarming, no low-traffic false rings |
-| `design-reviewer-coverage` | coverage, both ways | the cut covers the whole discovery; this wave's slice is fully designed; nothing in the design exists unforced |
-| `design-reviewer-facts` | evidence | every claim about an external tool or existing service traces to research |
-| `design-reviewer-ui` | UI | the artboards fit the product as it is today; every story state has a home |
-| `design-reviewer-coherence` | cross-cutting | contradictions across the whole — runs last, with all verdicts |
-| `design-judge` | the proposal | not a lens — rules every finding with a reason, after coherence, calibrated by the decisions and the round history; a proposal |
-| **the user** | the ruling | confirms or overrules the judge on every finding, through the question tool; decides what proceeds and therefore whether another round runs |
+The round runs whole every time. Every reviewer answers under the
+[reviewer contract](../../docs/standards/reviewer-contract.md),
+declared latitude included.
 
-Every reviewer is **Opus** — the rounds are few now, so the strongest
-read is affordable where it matters — and answers under the house
-[reviewer contract](../../docs/standards/reviewer-contract.md) at the
-maximum bar, always: severity says how bad IF real; the judge says
-whether it should proceed; the user says whether it does. The workflow
-re-dispatches lazy passes and unruled findings on its own.
+Record the round in `01-design/reviews.md` before acting on it
+([template](templates/reviews.md)): one section per lens with its
+verdict and run id (from the workflow's journal), the blind-read
+table, one line per finding with the judge's ruling, owner and
+reason, and the flows reported unread.
 
-## 4 — The rulings are the user's; the judge proposes them
+## Step 4 — rule
 
-Every round comes back with **the judge's ruling and reason on every
-finding** — a proposal. Before anything is fixed, put every finding in
-front of the user **through the question tool, always** — never as
-prose he answers in chat:
+Three lists come back.
 
-- **One question per finding.** The question text carries the context
-  he needs to rule without opening a file: the lens and severity, what
-  the document says (the quote), the gap in one line, the fix the lens
-  proposes, and **the judge's reason**. Batch them four to a call, in
-  the order the workflow returned them; the same loose wire across
-  three documents is still one finding per lens.
-- **The answers are the judge's three rulings** — `sustained` ·
-  `deferred` · `dismissed` — and **the judge's pick comes first, marked
-  as his** (label it "— the judge's ruling"). The other two follow. He
-  confirms by picking the first, overrules by picking another, and
-  writes his reason in "Other" when he wants it recorded in his words.
-- **He may stop the round.** "Enough" through "Other" is a ruling: the
-  design is buildable as it stands, the remaining findings are recorded
-  as unaddressed by his call.
+**Owner `author`.** Wording, propagation, a value the decisions
+already fix: send them to `design-author` in one apply batch. Its
+report carries the mentions table and the final lines; a fix without
+pasted lines is not done, send it back. Then verify a sample on disk
+yourself, file and line.
 
-The three rulings mean:
+**Owner `implementer`.** Real, but latitude: they go in the same
+batch, and the author writes each as one line in that document's
+"The implementer decides" section. No mechanism changes.
 
-- **sustained** → the author fixes it in this loop.
-- **deferred** → parked to the close; whether it ever enters is decided
-  there, with him (below).
-- **dismissed** → dies, with the reason recorded — the reasons are what
-  teach the lenses, and the judge.
+**Owner `user`.** Behavior, a data format, a contract's shape, the
+security posture, cost, a decision contested, two readings. These go
+to the user through the question tool, one question per finding,
+four per call, **grouped by document, one document at a time**, in
+the documents' writing order, so the user keeps one context per
+batch. The judge's proposed fix comes first and is marked as the
+judge's; the context is in the question itself: lens, severity, quote,
+gap, fix, reason. Before the first question, publish the **rulings
+board**: an artifact with one card per finding, in the same order and
+numbering as the questions, so the user reads on one screen and
+answers on the other.
 
-No round runs on the judge's ruling alone: an unruled finding reaches
-him as sustained by construction — it is still his to confirm. Every
-ruling also goes to the workstream's `rulings.md` (house rule in the
-repo's `CLAUDE.md`) — the judge's proposal beside his ruling.
+> **Example** — header `contracts`, question: "contracts#3 (blocker,
+> from the ambiguity referee on the flow 'new password by the
+> superior'): the flow says 'the open sessions end'. Reader 1 revokes
+> the refresh tokens (an access token lives up to 60 min). Reader 2
+> adds a password epoch checked on every request (ends within one
+> request). Judge: sustained, owner user; the two builds differ in
+> what the user experiences and in the data model." Answers: "Revoke
+> the refresh tokens (judge's proposal)" · "Epoch per request" ·
+> "Deferred" · "Dismissed". One finding, one decision, answerable
+> without opening a file.
 
-The round is audited in **`01-design/reviews.md` — permanent**
-([template](templates/reviews.md)), **before anything is applied**:
+Then one veto question, at the end: the list of what the author fixed
+alone and what went to latitude, with "keep all" as the first answer.
+A vetoed fix is reverted by the author.
 
-1. Record the round: one section per reviewer — verdict, run id (from
-   the workflow's journal, not from your prose), what it verified,
-   findings **with the judge's ruling and reason, and his ruling and
-   reason** ("confirmed", or his words).
-2. Send what he sustained to the **same author** via SendMessage —
-   it revises the files (single writer).
-3. **Verify the applied findings on disk** — file and line per
-   finding. "Marked fixed, not applied" has happened twice; the
-   author's word is not the check. (A fix that touches a screen also
-   republishes the canvas — the author does it as part of the fix.)
-4. Run the next round with `lenses` = the lenses whose findings he
-   sustained (the workflow's `open` is the judge's guess — adjust it
-   to his rulings). When a delta comes back with nothing he sustains,
-   run **the full final round** (no `lenses` arg). It reaches him the
-   same way; what he sustains there loops as a delta, and **the two of
-   you decide whether another final round runs**.
-5. At close, write the **precision table**: per lens, findings raised ·
-   sustained · deferred · dismissed by him, across all rounds — and
-   **the judge's line**: how many of its rulings he confirmed, how many
-   he overruled, in which direction. Both go into the stage's
-   telemetry (§6); stage 6 uses them to tighten the lens that cried
-   wolf and to recalibrate the judge. And every overrule whose reason
-   is a pattern (not a one-off) goes to `taste-notes.md`, same rule as
-   the session's — noted, not decided.
+Deferred findings batch into one author pass at close. Dismissed
+findings die with their reason in `reviews.md`. Every user ruling goes
+to `rulings.md` as it happens, and every overrule whose reason is a
+pattern goes to `taste-notes.md`.
 
-Three rules hold inside the loop:
+A user ruling that contradicts a card in `decisions.md` amends the
+card: write the amendment there, dated, before sending it to the
+author.
 
-- **Deferred findings never enter on their own.** At close, present the
-  batch to the user (question tool, one per finding: enter / stay out)
-  and decide together what enters — the default is nothing: on
-  ops-dashboard the deferred sweeps were what reopened the final
-  rounds. What enters is one author pass, then the touched lenses once
-  more, ruled by him.
-- **Simplify or remove:** when a finding shows a loose wire in
-  something a previous round added, the disposition to suggest is
-  simplify or remove the addition — never a third mechanism on top.
-- **Checkpoint fold-in:** the author folds the user's decisions in one
-  consolidated pass; the lenses whose material it touched go back into
-  the next delta, alongside whatever was already open.
+## Step 5 — iterate
 
-## 5 — The blueprint
+If any text changed in step 4, run step 3 again, whole, and rule
+again. That is the whole budget: two rounds. What is still sustained
+after round 2 is not re-reviewed: the author applies the `author` and
+`implementer` fixes with proof by line, you verify them on disk, and
+the `user` ones are ruled and applied the same way. A third round runs
+only when the user asks for it explicitly, and his words go in
+`reviews.md`.
 
-The workstream has **one blueprint, one URL, forever** — the file stage 1
-published at the workstream root. This stage fills **this wave's entry**:
-`waves['wNN-<wave>'].design` in the `BLUEPRINT` object, plus
-`workstream.wave` (the current wave) and the wave map in the Overview
-(all waves, from `waves.md`). Republish the same file path — the Design
-tab lights up, and the wave pills let the reader flip between waves.
-The conductor owns the blueprint — it is the **report** of the author's
-files, not their projection (house rule in the repo's `CLAUDE.md`: the
-blueprint is the report, the files are the record — the altitude test,
-the curated lists, the three-paragraph mechanism, the 20–30 minute
-ceiling). Ten Design subtabs: **The proposal · Glossary · How it
-works · UI · Data · Infra & cost · Code · Security · Alarms · Going to
-production** — layered for reading: 30 seconds, 5 minutes, 20 minutes,
-then the files as the named authority.
+Told to find errors, reviewers always find errors. The budget is what
+turns that into a calibrated pass instead of an infinite loop; the
+residue is written down, not chased.
 
-- **"The proposal" opens the tab — the 30-second layer.** One
-  full-width architecture diagram (each service a box with what runs
-  where written on it; arrows are the data), the lens verdict table
-  (the user's rulings, the judge's agreement beside them), the cost at three scales as a chart — then, the
-  5-minute layer, the session's decision cards with the rejected option
-  in one line each. A reader who stops here knows the system.
-- **Every other subtab opens with its own diagram**; the prose
-  supports it, never the reverse.
-- **The UI tab carries prints**: render each artboard and embed the
-  images, with the canvas link beside them — the prints are the
-  fast validation pass; the canvas is the deep one.
-- **The Code subtab carries the file-tree preview** from `code.md`,
-  said as what it is: a guide the implementer may diverge from,
-  compared with the real tree at wave close.
-- **Decisions permeate the tabs**: each tab's data carries the decision
-  cards that belong to that context — the session's, in the tab of the
-  document they shaped. The `decided in your place` orange is the
-  exception now — the Overview shows the count, and zero is the target.
-- Contracts have **no tab**: `contracts.md` is machine input — the
-  frozen bridge the planning stands on. Its human face is the
-  **acceptance case listing**: the case names from `acceptance.md` are
-  the readable contract, rendered where contracts would be.
-- Never mermaid; diagrams are HTML/CSS with the shell's primitives.
+## Step 6 — close
 
-## 6 — Checkpoint and closing
+Fill `BLUEPRINT.design` in the workstream's `blueprint.html` (the file
+stage 1 created; same path, same URL forever): the nine Design
+sections the shell renders (Glossary · How it works · UI · Data ·
+Infra & cost · Code · Security · Alarms · Going to production), each
+with its `references` list. The blueprint is the report, not the
+files' projection (house rule): the altitude test, curated lists, the
+three-paragraph mechanism, the 20–30 minute ceiling. "How it works"
+opens with the whole system in one diagram (each service a box with
+where it runs written on it; arrows are the data), the lens verdict
+table with the user's rulings beside the judge's, the cost at three
+scales, then the session's cards with the rejected option in one line
+each. The UI section embeds a render of each artboard with the canvas
+link beside it. Every section carries the decision cards that belong
+to its document and a short "the implementer decides" list. Contracts
+have no section: their human face is the acceptance case list,
+rendered where contracts would be. Never mermaid; diagrams are
+HTML/CSS with the shell's primitives.
 
-Present: the blueprint URL, the canvas URL, the wave cut (one line per
-wave), the verdict table (from `reviews.md`, his rulings included), the
-precision table per lens, the count of `decided in your place` flags,
-the deferred batch and what he let in, the taste notes this wave
-added — and **the stage's own
-telemetry**: rounds run, agents dispatched, approximate cost, so the
-user calibrates the next wave with data, not sensation. Approval is
-explicit. On approval: `.state.md` → `stage: plan`, commit the
-workstream folder — **push only with the user's explicit approval** —
-and suggest `/clear` before stage 3 (house rule: stage transitions, in
-the repo's `CLAUDE.md`). On "approved with fixes": the fold-in rule
-(§4) — one consolidated author pass, then the touched lenses back into
-the delta, new checkpoint. On rejection: the reasons go back to the
-author — **never back to stage 1**; whatever is missing becomes
-questions to the user, answered in conversation and folded into the
-design. Moving the Linear Project forward is **not this skill's job**
-at close — stage 3 moves it when it opens.
+Present: the blueprint URL, the canvas URL, the verdict table, the
+precision table per lens and the judge's line (from `reviews.md`),
+the residue, the taste notes this stage added, and the stage's own
+telemetry: rounds run, agents dispatched, approximate cost. Approval
+is explicit; silence or a loose "looks good" does not close the
+stage. On approval: `.state.md` to `stage: plan`, commit the
+workstream folder (push only with the user's explicit approval), and
+suggest `/clear` before stage 3 (house rule). On "approved with
+fixes": one author pass, verify on disk, close. On rejection: the
+reasons go to the author as fixes, or to the user as questions; never
+back to stage 1. The Linear Project moves forward when stage 3 opens,
+not here.
 
-## Lifecycle
+## How to write, in every file and every question
 
-- **Permanent:** `waves.md`, the future waves' READMEs, and everything
-  in `01-design/` — `decisions.md`, documents, `research/`, `ui/` (the
-  artboards are the source of record; the canvas artifact is the
-  viewing surface), and `reviews.md`.
-- **Working:** the author's scratch notes, if any — gone at close.
+Say what you mean. Literal sentences, concrete values, no metaphor.
+One idea per sentence. The user's words, in quotation marks, where
+they decide something or describe a taste. A card names its options
+by what they cost, not by adjectives.
+
+Use lists and tables where the content has parallel items (cards,
+findings, options). Keep the session itself in prose.
+
+## Files
+
+- **Working, deleted at close:** the author's scratch notes, if any.
+- **Permanent:** everything in `01-design/` (`decisions.md`, the ten
+  documents, `research/`, `ui/`, `reviews.md`), `rulings.md`,
+  `taste-notes.md`, `blueprint.html`, `.state.md`.
+
+## Resuming
+
+Everything is in files. Read `.state.md`, then `decisions.md` (the
+sections without cards say where the session stopped), then the
+documents and `reviews.md` if they exist. Continue from the first
+step whose output is missing. Never from memory of a previous session.
 
 ## Boundaries
 
-No issue decomposition (stage 3). No code (stage 4) — and no
-executable tests either: `acceptance.md` is the spec; the `.sh` live in
-each repo's `smoke/`, written at stage 4 by transcription. The discovery
-fence does not reopen silently — unviable in-scope items become declared
-decisions. Frictions worth learning from go to the workstream's
+No wave cut, no issue decomposition (stage 3). No code and no
+executable tests (stage 4): `acceptance.md` is the spec; the `.sh`
+live in each repo's `smoke/`. The discovery fence does not reopen
+silently: an in-scope item the design proves unviable becomes a
+question to the user and, answered, a dated amendment in
+`decisions.md`. Frictions worth learning from go to the workstream's
 `dreaming-notes.md` on the spot; judging them is stage 6's job.
