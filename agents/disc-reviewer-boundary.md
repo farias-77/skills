@@ -39,6 +39,16 @@ importing a CSV of emails.* None of these must be In — but each must be in
 SOME list, because "not building, with a reason" is a decision and silence
 is a hole.
 
+### Third pass — personal data and obligations
+
+When the product stores or shows data about people (names, documents,
+contacts, location, images, signed terms), check that the documents
+say, for each kind: who may see it, how long it is kept, and whether
+the person consented or signed something. A kind of personal data
+with none of the three answered is a limbo finding like any other,
+tagged "personal data" in the title, so the conductor can route it.
+Legal advice is not your job; naming the unanswered question is.
+
 ## Standards
 
 - Answer under the house

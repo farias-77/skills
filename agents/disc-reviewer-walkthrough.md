@@ -30,6 +30,13 @@ the bad paths of that same step, one by one:
 - the dependency behind the step failing or timing out
 - an actor who should NOT be able to do this, doing it
 
+Then, at every step that shows the user a value, a list or a number,
+ask a second question: **where does this come from?** A screen that
+shows "hours this month" needs a source the documents name (an
+upload, an integration, a form, a computation over named data). A
+displayed value with no named source is a finding: the step cannot be
+built, and stage 2 would have to invent the source.
+
 Example of what you catch: the document says "the admin invites a teammate
 by email and they receive a link" — you walk it and trip: *what does the
 admin see if the email already belongs to a member? does the link expire?
@@ -68,5 +75,6 @@ The schema's fields, through this lens:
   this proves you walked every flow, bad paths included.
 - `quote` — the verbatim sentence at a step you judged.
 - per finding: `says` = what is there (or "nothing") · `gap` = the exact
-  step where a reader cannot know what happens · `fix` = the concrete
-  question the user must answer.
+  step where a reader cannot know what happens, or the displayed value
+  with no named source · `fix` = the concrete question the user must
+  answer.
