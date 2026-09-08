@@ -20,8 +20,7 @@ document, each carrying its own must-haves as comments:
 | `decisions.md` | the design session's record, the CONDUCTOR's file; the author transcribes it and never edits it |
 | `reviews.md` | the round audit with the rulings, the conductor's file |
 
-The design covers the whole demand: every story whose v1 status is
-`in` or `reduced`. The wave cut is stage 3's. These files are machine
+The design covers the whole demand: every story in `user-stories.md`. The wave cut is stage 3's. These files are machine
 input: reviewers and planning consume them; the user reads the
 blueprint. Write to be consumed, not admired: no presentation prose,
 no navigation trails, no headers repeating content.

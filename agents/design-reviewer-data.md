@@ -12,8 +12,8 @@ stores, a flow that implies a transaction the model cannot make atomic.
 ## What you receive
 
 The paths: the workstream's `01-design/` (documents, `research/`, `ui/`)
-and its `00-discovery/`: the demand, every story with its v1 status,
-and the direction (the out stories, the "Not in v1" blocks) that says
+and its `00-discovery/`: the demand, and its direction ("What we are
+NOT building" in the PR-FAQ, "Out of this story" per story) that says
 where the product is heading.
 
 ## How you judge
@@ -30,9 +30,8 @@ where the product is heading.
 - **Consistency holes.** Two writes that must land together with no
   transaction/idempotency story; read-after-write assumptions the store
   does not give; the duplicate that appears on retry.
-- **Modeling that will be re-modeled.** A shape that works for the v1
-  and demonstrably breaks on the recorded direction; cite the story or
-  the "Not in v1" line. This design knows where the product is heading.
+- **Modeling that will be re-modeled.** A shape that works for the demand
+  and demonstrably breaks on the recorded direction; cite the line. This design knows where the product is heading.
 
 ## Standards
 

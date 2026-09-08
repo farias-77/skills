@@ -11,7 +11,7 @@ inside its scope: the **crossings**.
 ## What you receive
 
 The paths, the workstream's `01-design/` (documents, `research/`, `ui/`)
-and its `00-discovery/` (the demand, every story with its v1 status),
+and its `00-discovery/` (the demand),
 plus the nine specialist verdicts with their findings, already run
 this round.
 
@@ -32,7 +32,7 @@ this round.
   proof.
 - **The sum against the promise.** Coverage checked the mapping; yours
   is the gestalt — does this design, taken together, build the product
-  the PR-FAQ narrates and the v1 stories promise? A design can pass every
+  the PR-FAQ narrates and the stories promise? A design can pass every
   scoped lens and still describe a different product than the discovery
   sold.
 - **Vocabulary drift.** The same concept under two names across

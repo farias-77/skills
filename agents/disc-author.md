@@ -37,8 +37,6 @@ notes, write the story or stories it produces:
 - The bad-path table from the theme's confirmed facts; a category the
   notes do not settle gets your best guess, marked in the Inferred
   list.
-- `**v1:** in` on every story. The user sets the real status at
-  validation.
 - "Out of this story" from the theme's **Out** block, with the reason
   or the direction as the notes give it.
 
@@ -76,6 +74,13 @@ For every fix in the batch:
 
 A fix that would contradict a fact the user confirmed is not applied:
 report it back with the two sentences that conflict.
+
+A validation batch is an apply batch with three more edits: a
+**reduce** rewrites the story in the minimum the conductor hands you
+and moves what came out to its "Out of this story" list; an
+**adjust** changes what the user said; a **cut** removes the story
+from `user-stories.md` and adds it to the PR-FAQ under "What we are
+NOT building" as direction. Story and AC ids are never renumbered.
 
 ## Standards
 

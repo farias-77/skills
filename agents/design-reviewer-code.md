@@ -14,9 +14,9 @@ already decides.
 ## What you receive
 
 The paths: the workstream's `01-design/` (documents, `research/`, `ui/`)
-and its `00-discovery/`: the demand, every story with its v1 status.
-`in` and `reduced` stories are what the design must implement; `out`
-stories are direction, an extension point at most.
+and its `00-discovery/`: the demand. Every story is what the design
+must implement; the PR-FAQ's "What we are NOT building" list and each
+story's "Out of this story" are direction, an extension point at most.
 
 ## How you judge
 
@@ -47,8 +47,8 @@ stories are direction, an extension point at most.
   and the line of what does NOT change — flag every extension point
   missing that line, because the line is the measure.
 - **Over-engineering.** Flexibility the recorded direction does not ask for costs
-  now and serves nobody — the discovery's direction (the out stories, the "Not in v1"
-  blocks) says where the product is going; abstraction beyond it is a
+  now and serves nobody — the discovery's direction ("What we are NOT building", "Out of
+  this story") says where the product is going; abstraction beyond it is a
   finding too (the architecture standard's
   simplicity clause: every step up in complexity names what forces it).
 - **The file-tree preview.** `code.md` instantiates the house

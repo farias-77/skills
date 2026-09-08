@@ -6,11 +6,11 @@
   (planning issues, tests, the e2e round), so they never change after
   approval.
 
-  Every story carries a v1 status, set by the user at validation:
-  - in       — built as written
-  - reduced  — built with the cuts listed under "Not in v1"
-  - out      — not built now; the whole story is direction
-  Stage 2 designs `in` and `reduced` stories only.
+  The document leaves discovery holding only what gets built. The
+  user validates every story: a story he reduces is rewritten in its
+  minimum and what came out goes to its "Out of this story" list; a
+  story he cuts is removed from this file and listed in the PR-FAQ
+  under "What we are NOT building". No status field anywhere.
 
   ACs are written in EARS form: "WHEN <condition>, the system SHALL
   <behavior>" (state-driven: "WHILE <state>..."; unwanted behavior:
@@ -37,8 +37,6 @@ Vocabulary:
 
 ## S-001 — <short story name>
 
-**v1:** in
-
 **As a** <persona>, **I want** <capability>, **so that** <outcome>.
 
 ### Acceptance criteria
@@ -54,14 +52,6 @@ Vocabulary:
 | Repeat / concurrency | <e.g. same invite sent twice> | <what the system does> |
 | Dependency failure | <e.g. email provider down> | <what the system does> |
 | Permission | <e.g. non-admin tries to invite> | <what the system does> |
-
-### Not in v1
-
-<!-- Filled at validation when the status is `reduced`: what the user
-     cut from this story, one line each, as direction. An `in` story
-     writes "(nothing)". -->
-
-- <capability the user cut> — future direction, not scheduled
 
 ### Out of this story
 

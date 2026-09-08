@@ -16,9 +16,9 @@ honesty expects.
 ## What you receive
 
 The paths: the workstream's `01-design/` (documents, `research/`, `ui/`)
-and its `00-discovery/`: the demand, every story with its v1 status.
-`in` and `reduced` stories are what the design must implement; `out`
-stories are direction, an extension point at most.
+and its `00-discovery/`: the demand. Every story is what the design
+must implement; the PR-FAQ's "What we are NOT building" list and each
+story's "Out of this story" are direction, an extension point at most.
 
 ## How you judge
 

@@ -66,7 +66,8 @@ the unknowns that would change what gets built are gone. One author
 then writes the PR-FAQ and the user stories from the notes: what gets
 built, what stays out, every acceptance criterion with an ID. **The
 owner validates every story by hand**, one question each, and closes
-the v1 story by story: confirm, reduce, adjust, or cut. A whole review
+the scope story by story: confirm, reduce, adjust, or cut; what
+leaves discovery is only what gets built. A whole review
 round runs, cheap by design (Sonnet and Haiku): three lenses read the
 documents while, per story, two **blind readers** describe what each
 would build and a referee reports where they built different products;

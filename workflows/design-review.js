@@ -179,7 +179,7 @@ if (!flows.length) log('no flows passed in args — the blind reads are skipped 
 const docInputs = `Round ${round}.
 The design: ${args.designDir} — everything under it, research/ and ui/ included.
 The session's decisions (the design as the user decided it; a declared decision is contested only by defect): ${args.designDir}/decisions.md
-The demand it must satisfy, every story with its v1 status: ${args.discoveryDir}/pr-faq.md and ${args.discoveryDir}/user-stories.md
+The demand it must satisfy: ${args.discoveryDir}/pr-faq.md and ${args.discoveryDir}/user-stories.md
 The round audit so far: ${args.designDir}/reviews.md`
 
 // ---------- mechanical checks on a reading ----------

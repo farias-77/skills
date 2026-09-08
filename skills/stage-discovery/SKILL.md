@@ -1,6 +1,6 @@
 ---
 name: stage-discovery
-description: Conducts stage 1 (Discovery) — helps the user find out what to build and put it into words. One fluid interview with notes written as it happens, then one author writes the PR-FAQ and the User Stories, the user validates every story and closes the v1 story by story, a whole review round runs (three lenses, two blind readers and a referee per story, a judge), the author fixes wording, the user rules everything else, and the blueprint is published for approval. Runs in Claude Code with a Fable session. Use when the user brings a new demand, asks to open a discovery, or resumes one.
+description: Conducts stage 1 (Discovery) — helps the user find out what to build and put it into words. One fluid interview with notes written as it happens, then one author writes the PR-FAQ and the User Stories, the user validates every story and closes the scope story by story, a whole review round runs (three lenses, two blind readers and a referee per story, a judge), the author fixes wording, the user rules everything else, and the blueprint is published for approval. Runs in Claude Code with a Fable session. Use when the user brings a new demand, asks to open a discovery, or resumes one.
 disable-model-invocation: false
 argument-hint: "[slug]"
 allowed-tools: Read, Write, Edit, Glob, Grep, Agent, Workflow, AskUserQuestion, Artifact, WebSearch, WebFetch, Bash(mkdir *), Bash(date *), Bash(ls *), Bash(cat *), Bash(rm *), Bash(git *)
@@ -10,7 +10,7 @@ allowed-tools: Read, Write, Edit, Glob, Grep, Agent, Workflow, AskUserQuestion, 
 
 You help the user discover what they are going to build and put it
 into words. The output is two files, `pr-faq.md` and `user-stories.md`,
-that an engineer who was not in the room can build from, with the v1
+that an engineer who was not in the room can build from, with the scope
 closed story by story by the user. Nothing here is design: no
 architecture, no data model, no technology, no build order. Discovery
 answers what and why; stage 2 answers how.
@@ -45,7 +45,7 @@ turn on a plan or a promise; do the work.
                 Ends with the playback and an explicit "that's it".
 2. Write        one dispatch of disc-author: notes.md → pr-faq.md + user-stories.md.
 3. Validate     every story, with the user, through the question tool: confirm,
-                reduce, adjust, or cut from the v1. One author batch applies it.
+                reduce, adjust, or cut. One author batch applies it to the text.
 4. Review       the discovery-review workflow, whole: three lenses in parallel with
                 two Haiku readers and a referee per story; the judge rules.
 5. Rule         author-owned findings go to the author. User-owned findings go to
@@ -94,7 +94,7 @@ designs-root/2026-08-15-workspace-invites/
     ├── notes.md             # working: the interview, written as it happens
     ├── reviews.md           # permanent: the review-round audit
     ├── pr-faq.md            # permanent: the whole demand, narrated
-    └── user-stories.md      # permanent: every story and AC, with its v1 status
+    └── user-stories.md      # permanent: every story and AC that gets built
 ```
 
 ## Step 1 — the interview
@@ -217,18 +217,22 @@ one message before validation starts.
 ## Step 3 — validate every story
 
 Interview mode. This is the contract: the user validates every story
-by hand and closes the v1, one question per story, four stories per
+by hand and closes the scope, one question per story, four stories per
 call of the question tool. The question carries the story's substance:
 what it does, its ACs in one line each, its bad paths, the inferences
 that landed in it, and the minimum you propose. The answers, the
 recommended one first and marked as recommended:
 
-- **Confirm** — as written; `v1: in`.
-- **Reduce** — the proposed minimum; what is cut moves to "Not in v1"
-  as direction; `v1: reduced`.
-- **Adjust** — the user says what changes; the story stays in.
-- **Cut from v1** — `v1: out`; the story stays in the document as
-  direction.
+- **Confirm** — as written.
+- **Reduce** — the author rewrites the story in the proposed minimum;
+  what came out goes to its "Out of this story" list as direction.
+- **Adjust** — the user says what changes; the author applies it.
+- **Cut** — the author removes the story from `user-stories.md` and
+  lists it in the PR-FAQ under "What we are NOT building", as
+  direction. AC ids of the removed story are never reused.
+
+The documents leave this step holding only what gets built. No
+status field: a story in the file is a story to build.
 
 > **Example** — header `S-005`, question: "S-005 Lifecycle — a person
 > is active or inactive; whoever has the person in scope marks
@@ -237,7 +241,7 @@ recommended one first and marked as recommended:
 > Proposed minimum: that. Cut: cancel/renew as a cycle, transfer
 > between subleaders. Inferred here: I-4 (inactive people stay in the
 > tree, greyed)." Answers: "Reduce as proposed (recommended)" ·
-> "Confirm complete" · "Adjust" · "Cut from v1". This is one story,
+> "Confirm complete" · "Adjust" · "Cut". This is one story,
 > one decision, and the user can rule it without opening the file.
 
 Ask about the Inferred list in the same pass: each inference is
@@ -245,7 +249,7 @@ confirmed (rewritten as fact) or rejected (the author rewrites the
 sentence). A story the user adjusts is re-asked once the author has
 applied the change.
 
-Send everything to the author in one apply batch: statuses, cuts,
+Send everything to the author in one apply batch: reductions, cuts,
 adjustments, inference rulings. Read the result before moving on.
 Record every ruling in `rulings.md` (house rule).
 
@@ -316,7 +320,7 @@ Copy [assets/blueprint.html](assets/blueprint.html) to
 `<slug>/blueprint.html` (the shell's visible strings translated to the
 user's language, words only; house rule), fill the `BLUEPRINT` data:
 Overview (the frame, the direction) and the three Discovery sections
-(PR-FAQ, User Stories with their v1 status, What was inferred: what
+(PR-FAQ, User Stories, What was inferred: what
 was confirmed and what was rejected). Publish, and keep the same file
 path at every later stage.
 

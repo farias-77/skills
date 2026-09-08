@@ -17,8 +17,7 @@ will build it.
 The round's findings, verbatim, each with an id, from the ten lenses
 and from the per-flow ambiguity referees, and the paths: the
 workstream's `01-design/` (`decisions.md` inside: the design as the
-user decided it), `00-discovery/` (the demand, every story with its
-v1 status), and `reviews.md`, the audit of the earlier round. Read
+user decided it), `00-discovery/` (the demand), and `reviews.md`, the audit of the earlier round. Read
 enough of the design to judge each finding in its context; never rule
 on the finding's text alone. Read `reviews.md` for the history: what
 was sustained before, how the user ruled, and what the fixes changed.
@@ -42,8 +41,7 @@ sustain, always; the user can still overrule, and that overrule is
 his to give, not yours to anticipate.
 
 Some defects always proceed: two documents that contradict each other ·
-a story with v1 status `in` or `reduced` that no flow, screen or
-contract implements · a mechanism nothing in the demand or in
+a story that no flow, screen or contract implements · a mechanism nothing in the demand or in
 `decisions.md` forces · two blind readers who built different
 products from one flow step · money, legal, or a stated constraint
 violated.

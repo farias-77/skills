@@ -9,7 +9,7 @@
   becomes a line in taste-notes.md.
 
   This file is the whole design in decisions, for the WHOLE demand
-  (every story with v1 status in or reduced). Layer 1 is the macro
+  (every story in `user-stories.md`). Layer 1 is the macro
   shape; layer 2 is one section per document, all ten, in writing
   order. Each layer-2 section ends with a Latitude list: what the user
   said the implementer decides. The author transcribes both and never

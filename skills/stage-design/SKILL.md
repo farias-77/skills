@@ -8,8 +8,8 @@ allowed-tools: Read, Write, Edit, Glob, Grep, Agent, SendMessage, Workflow, AskU
 
 # Stage 2: Design
 
-A defined scope comes in: the discovery, every story with its v1
-status. A definition of how it works comes out: what the pieces are,
+A defined scope comes in: the discovery, the stories as the user
+closed them. A definition of how it works comes out: what the pieces are,
 where each one runs, how they talk to each other, what is stored and
 how, what alarms, how it reaches production, and what the implementer
 is free to decide. The design covers the whole demand; the cut into
@@ -73,7 +73,7 @@ questions (end of 2), the rulings (4, once per round) and the approval
 ## Preconditions
 
 `.state.md` says `stage: design`; `00-discovery/` has the approved
-`pr-faq.md` and `user-stories.md`, every story carrying a v1 status.
+`pr-faq.md` and `user-stories.md`.
 Missing: halt, back to stage 1. Set `chair: fable` in `.state.md`.
 Move the Linear Project to its design status through the Linear MCP;
 the MCP missing is a halt, ask for it and stop. Each stage moves the
@@ -127,7 +127,7 @@ his place.
 9. Environment and rollout macro: alpha, profiles, names, test
    credentials.
 10. Extension points: where the direction the discovery recorded
-    (the out stories, the "Not in v1" blocks) will land, and what
+    ("What we are NOT building", "Out of this story") will land, and what
     does not change when it does.
 
 **Layer 2, the ten documents, one by one.** With the macro shape
@@ -212,7 +212,7 @@ after the session" section is yours: you write that section from the
 answers, the author reads it.
 
 When the author returns, read the ten documents. Check that every
-`in` and `reduced` story has a flow or a screen, that every flow
+story has a flow or a screen, that every flow
 follows the flow format (numbered steps, a failure table), that every
 document ends with its latitude section and its references, and that
 `ui.md` carries the canvas link. Anything missing goes back to the
@@ -235,7 +235,7 @@ Scripts cannot read files; you pass the text.
 | `design-reviewer-security` | the abuse paths; the class sweep answered with mechanisms |
 | `design-reviewer-contracts` | every contract whole, success and error; the data each side needs arrives |
 | `design-reviewer-alarms` | every alarm has its four fields and would not ring on a quiet day |
-| `design-reviewer-coverage` | every `in`/`reduced` story has its home; nothing in the design is unforced |
+| `design-reviewer-coverage` | every story has its home; nothing in the design is unforced |
 | `design-reviewer-facts` | every claim about the outside world traces to research |
 | `design-reviewer-ui` | the screens fit the product as it is; every story state has a home |
 | 2× `design-blind-reader` → `design-reviewer-ambiguity`, per flow | would two engineers implement the same flow from these steps? |
