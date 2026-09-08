@@ -23,14 +23,21 @@ merges, deploys, and verifies, step by confirmed step.
 
 ## Preconditions
 
-`.state.md` says `stage: release` and names the wave; the wave's
-Execution tab is published (the proof this stage stands on). Missing ⇒
-halt, back to stage 4.
+`.state.md` says `stage: release`; every wave of `waves.md` has its
+Status filled, its PR per repo open on `main` and its
+`03-execution/wNN-<slug>/report.md` complete (the proof this stage
+stands on). Missing ⇒ halt, back to stage 4. First thing: republish
+the blueprint at its URL — the Codex chair writes the execution entries
+into the file but cannot publish. Waves chain (each branch was cut
+from the previous wave's), so the last wave's branch per repo carries
+every wave; that is what integrates, and the earlier wave PRs are
+closed as superseded once it is merged.
 
 **The entry gate:** present what is about to ship — the repos, the
-FBs, the highlights of the blueprint's Execution Report tab (its
-`pending` items are this gate's open questions) — and get the
-explicit go.
+wave PRs in order, the highlights of every wave's report (its "What
+needs your eye" section is this gate's open questions: the
+departures from the standard, the choices where the documents were
+silent, the notes still open) — and get the explicit go.
 Structural reason: a front whose hosting auto-builds prod from `main`
 makes "merge" and "deploy" the same act, so even integration sits
 behind the gate.
@@ -57,12 +64,11 @@ The order comes from the design's `rollout.md` (fallback
 producer-first: APIs → agents → fronts). Repos split by one flag the
 venture declares in each front's `CLAUDE.md`:
 
-- **Lane A — merge ≠ deploy** (backends, agents): open the PR
-  `feature/<workstream>-wNN` → `main` (body: the wave, its issues,
-  the blueprint URL — its Execution Report tab is the proof this PR
-  stands on) → CI green → rebase merge → **re-read
-  the state as MERGED**. If `main` moved since the FB was cut, rebase
-  the FB onto `main` first — conflicts by intention (the git
+- **Lane A — merge ≠ deploy** (backends, agents): the wave PR
+  `feat/wNN-<repo>` → `main` is already open (stage 4 opened it, the
+  report as its body) → CI green → rebase merge → **re-read the state
+  as MERGED**. If `main` moved since the branch was cut, rebase the
+  branch onto `main` first — conflicts by intention (the git
   standard), CI again — then merge.
 - **Lane B — merge IS deploy** (fronts with prod auto-build): the
   integration PR is **prepared** here — opened, CI green — but merged
@@ -83,11 +89,9 @@ this integration does not explain is another workstream's inheritance
 — STOP that repo and escalate, never deploy over it. Then the **full
 smoke suite per repo**. This kills the one new risk integration
 creates — "the FB proved it, the rebase changed it". A smoke
-regression here becomes a fix issue cut from `main`, through the same
-engine with the same launch as stage 4: a worktree from `main`, the
-brief carrying the issue body and the `decisions.md` path,
-`Workflow({scriptPath: workflows/impl-issue.js, args})` — and the
-confirmation re-runs. **Two fix cycles are the budget:** a third red
+regression here becomes a fix branch cut from `main`, built in the
+Codex chair through the story cycle of stage 4 (the user opens
+`$stage-execute` with the fix named) — and the confirmation re-runs. **Two fix cycles are the budget:** a third red
 confirmation halts the stage to the user with the evidence —
 integration surfaced something stage 4 did not see, and that is a
 conversation, not a loop. Green opens the road to prod.
@@ -142,9 +146,9 @@ verification, the confirmation.
 
 ## 6 — Closing
 
-The rollout's post-deploy checklist verified → the wave's GitHub
-issues closed → the feature branches deleted (their content lives on
-`main` and in the tags) → **the Release Report**: fill this wave's
+The rollout's post-deploy checklist verified → the wave PRs closed
+→ the wave branches deleted (their content lives on `main` and in the
+tags) → **the Release Report**: fill this wave's
 `waves['wNN-<wave>'].release` in the `BLUEPRINT` object and republish
 at the same file path. The shell's contract for the tab: `intro` ·
 `timeline` (the release story, one entry per meaningful event —

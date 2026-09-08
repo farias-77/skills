@@ -1,8 +1,10 @@
 # skills
 
 An opinionated, stage-gated development pipeline for AI agent teams —
-built as [Claude Code](https://claude.com/claude-code) skills, agents,
-and workflows, extracted from production use at a real software
+built as [Claude Code](https://claude.com/claude-code) skills, agents
+and workflows for the stages where the human thinks, and as a
+[Codex](https://developers.openai.com/codex) skill and agents for the
+stage that builds; extracted from production use at a real software
 company and published as-is.
 
 **This is not a framework.** It is one team's working pipeline, made
@@ -40,9 +42,10 @@ Underneath, four mechanics carry everything:
 - **The session conducts; agents work.** The session dispatches,
   routes, audits, and talks to the human — it never writes the
   deliverables. Authors write, reviewers report, the human rules; every
-  agent is a file in `agents/` with five fixed sections. Even stage 4
-  is one session: the maestro launches the per-issue and e2e engines
-  as background workflows and merges what they prove.
+  agent is a file under `claude/agents/` or `codex/agents/` with five
+  fixed sections. Stage 4 runs in a second chair: a Codex session
+  conducts, spawning builders and lenses as project agents and ruling
+  their findings itself.
 - **State is 100% external.** The workstream folder, GitHub as the
   source of record, the board as a projection. Any agent — even a
   conductor mid-stage — can die and be re-dispatched: it re-derives
@@ -114,14 +117,33 @@ it the same way?); a judge rules every finding and marks who owns the
 fix — the author for wording, the human for the sequence, the worker
 for execution latitude; what would be the human's is ruled by the
 conductor against the approved cut and listed at the close for veto.
-Two rounds at most. The goals are files, and each wave closes with the
-prompt the human pastes into the execution chair to start it.
+Two rounds at most. The goals are files: the brief the execution chair
+reads.
+
+**4 · Execute** — the plan becomes proven branches. This stage runs in
+the other chair: a Codex session on GPT-6 Astra conducts, and the human
+is not in the loop until the last wave. Per story, a builder (Astra,
+low effort) writes the tests first and the code on its own branch;
+five lenses (fidelity to the goal, the code standard, the proof, the
+attack, operations) read the diff in parallel, the conductor rules
+every finding, the builder fixes, the five read the delta, the
+conductor rules again, and what is left rides as a note. The story is
+deployed to alpha and its smoke folder proved before its PR is merged
+into the wave branch. When the wave's stories are in, the whole suite
+runs green against alpha, the walk the goal describes is done with
+evidence saved, one PR per repo is opened on `main` and never merged,
+the report is written, and the next wave starts from this one's
+branches. Improvements inside the standard are applied and listed;
+departures from the standard are applied only when the system gets
+simpler, and listed with the rule they leave. The human reads the
+reports, the PRs, the improvements and the departures when the last
+wave is done.
 
 ## On cost
 
 This pipeline is expensive to run today, and that was a deliberate
-non-concern. Every diff is read whole by four reviewers plus an
-independent verifier; discovery and design run two whole rounds; ambiguity is hunted by dispatching multiple readers at
+non-concern. Every story's diff is read whole by five reviewers, twice;
+discovery, design and plan run two whole rounds; ambiguity is hunted by dispatching multiple readers at
 the same document. That redundancy is exactly
 where the quality comes from — and it is priced in tokens.
 
@@ -135,11 +157,16 @@ we chose.
 ## Layout
 
 ```
-skills/        one folder per stage — SKILL.md + templates + references
-agents/        every agent, named <stage>-<role>[-<lens>], five fixed sections
-workflows/     the deterministic review rounds and engines (plain JS, single-file)
+claude/                 the thinking chair — stages 1, 2, 3, 5 and 6, Claude Code
+  skills/               one folder per stage — SKILL.md + templates + references
+  agents/               every agent, named <stage>-<role>[-<lens>], five fixed sections
+  workflows/            the deterministic review rounds (plain JS, single-file)
+codex/                  the building chair — stage 4, Codex
+  skills/stage-execute/ SKILL.md (a router) + references + templates
+  agents/               exec-builder, five exec-lens-*, exec-scout (TOML)
+  config.toml           the project config block: conductor model, thread limit
 docs/
-  standards/   the single-source rulers everything points at
+  standards/            the single-source rulers both chairs point at
 ```
 
 ## Installing into a project
@@ -150,17 +177,28 @@ source:
 
 ```bash
 git clone https://github.com/farias-77/skills.git ~/skills
+
+# the Claude chair
 cd <your-project>/.claude
-ln -s ~/skills/skills skills
-ln -s ~/skills/agents agents
-ln -s ~/skills/workflows workflows
+ln -s ~/skills/claude/skills skills
+ln -s ~/skills/claude/agents agents
+ln -s ~/skills/claude/workflows workflows
 ln -s ~/skills/docs docs
+
+# the Codex chair (see codex/README.md)
+ln -s ~/skills/codex/skills/stage-execute ~/.codex/skills/stage-execute
+cd <your-project>/.codex
+ln -s ~/skills/codex/agents agents
+ln -s ~/skills/docs docs
+cp ~/skills/codex/config.toml config.toml
 ```
 
 What the pipeline expects from its surroundings:
 
-- **Claude Code**, with the `gh` CLI authenticated — GitHub is the
-  source of record.
+- **Claude Code** for stages 1, 2, 3, 5 and 6 and **Codex** for stage
+  4, both with the `gh` CLI authenticated — GitHub is the source of
+  record. The Codex session for stage 4 opens at the project root,
+  where `.codex/` is.
 - Project specifics — environments, credentials, deploy targets, the
   build-guard slot count — live in **your** project's `CLAUDE.md`,
   never in these files.
@@ -172,9 +210,9 @@ What the pipeline expects from its surroundings:
 | **workstream** | one demand, end to end — one folder, one blueprint, one conducting session |
 | **wave** | a shippable slice of the demand; wave 1 is the smallest thing useful end to end |
 | **blueprint** | the workstream's single review artifact — one URL, tabs per stage, pills per wave |
-| **conductor** | whoever dispatches and audits without doing the work — the stage's session (stage 4 calls it the maestro) |
+| **conductor** | whoever dispatches and audits without doing the work — the stage's session; at stage 4, the Codex session |
 | **lens** | a reviewer scoped to one failure mode |
-| **judge** | the agent that rules every finding — sustained/deferred/dismissed, with the reason; reviewers report at the maximum bar. At discovery, design and plan the judge also names who owns the fix (author, human, or at design the implementer and at plan the worker) and the human rules what is his; at execution the judge rules alone inside a two-round budget |
+| **judge** | the agent that rules every finding — sustained/deferred/dismissed, with the reason; reviewers report at the maximum bar. At discovery, design and plan the judge also names who owns the fix (author, human, or at design the implementer and at plan the worker) and the human rules what is his; at execution the conductor of the Codex chair rules alone inside two rounds per story, and the residue rides as PR notes the human reads at the end |
 | **blind reader** | an agent that reads alone, so divergence from its sibling exposes ambiguity |
 | **andon** | stop before building on a broken premise — a cheap halt beats wrong work |
 | **dreaming** | the closing session where frictions become edits to the pipeline itself — the session suggests, the human rules every lesson |

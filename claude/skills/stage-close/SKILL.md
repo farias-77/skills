@@ -52,10 +52,10 @@ Write `05-close/closure.md` from
 [templates/closure.md](templates/closure.md): what shipped (versions,
 the wave's stories), what was deliberately left out and why, the
 pendencies with named owners, and the numbers that tell the wave's
-story (issues, rounds, halts) — set against the previous wave's
+story (stories, rounds, stops) — set against the previous wave's
 `closure.md` when one exists, so faster-or-slower is measured, not
-felt. Sweep the boards: every issue of the
-wave closed or explicitly re-homed. The blueprint gets the wave's final touch —
+felt. Sweep GitHub: every wave PR merged or explicitly re-homed, every
+story branch gone. The blueprint gets the wave's final touch —
 shipped, dated, same URL forever.
 
 ## 3 — Dreaming — a working session, not an autonomous pass
@@ -63,7 +63,7 @@ shipped, dated, same URL forever.
 The input is the wave's full trace, not one file. Read, in order:
 the workstream's `dreaming-notes.md` (fed on the spot by every stage
 — every failure, every halt, every surprise — including the stage-4
-maestro's build and environment entries, and the **`[user]` entries**
+conductor's trace and report entries, and the **`[user]` entries**
 the user dictated mid-wave, per the house rule); every stage's review
 audit (`00-discovery/reviews.md`, `01-design/reviews.md`,
 `02-plan/reviews.md`) — what blocked a round and what it cost to
@@ -79,7 +79,7 @@ on the board in its own right, and this session decides with him what
 it becomes (a standard line, a skill rule, a judge or author prompt)
 or whether it is dropped — nothing in it is a rule before that; and
 the execution and release traces
-(`03-execution/trace.md`, the per-repo and `e2e` lane traces,
+(`03-execution/wNN-<slug>/trace.md` and `report.md` per wave,
 `04-release/trace.md`) — the halts, the rounds, what dragged. A
 friction counts wherever it was recorded. The pass:
 

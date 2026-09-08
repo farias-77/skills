@@ -17,15 +17,15 @@ carries; every merge is deliberate.
 
 | Branch | Named | Cut from |
 |---|---|---|
-| Feature branch (one per repo per wave) | `feature/<workstream>-wNN` | `main` |
-| Issue branch | `issue/<NN>-<slug>` | the feature branch |
+| Wave branch (one per repo per wave) | `feat/wNN-<repo>` | the previous wave's branch; `main` on the first wave |
+| Story branch | `feat/wNN-<repo>/<N.k>-<slug>` | the wave branch |
 | Chore (hygiene, tooling) | `chore/<slug>` | wherever it lands |
 | Hotfix | `hotfix/<slug>` | **`origin/main`, always** — never a local checkout, which may be sitting on another branch's world |
 
 `main` never receives work directly — everything lands via PR under
-branch protection (the CI standard). The feature branch is the wave's
-integration surface: issue PRs merge into it, and it only reaches
-`main` after the wave's e2e round is clean.
+branch protection (the CI standard). The wave branch is the wave's
+integration surface: story PRs merge into it, and it reaches `main` at
+the release stage, after the wave's proof in alpha.
 
 ## Merges
 
@@ -34,12 +34,12 @@ integration surface: issue PRs merge into it, and it only reaches
 | git.5 | **Rebase merges, linear history.** No merge commits, no squash — the atomic commits ARE the story; squashing erases it. |
 | git.6 | **A merge only counts when re-read:** after merging, confirm the PR state is actually `MERGED` — a merge command can exit clean with the PR still open (stale base). Acting on the exit code alone has marked unmerged work as done. |
 | git.7 | **Conflicts are resolved by intention, not by text.** Both sides of a conflict are the team's work: read each side's commit message and issue before choosing a line — resolving mechanically silently erases a colleague. Never abort a conflicted merge to "deal with it later": unwinding just moves the bomb to the next merge. |
-| git.8 | **Who merges is who conducts:** an issue PR is merged by the repo's conductor after the full gate (lenses and judge, verification, CI) — never by the agent that wrote it. |
+| git.8 | **Who merges is who conducts:** a story PR is merged by the conductor after the full gate (two lens rounds ruled, the alpha proof, CI) — never by the agent that wrote it. |
 
 ## Hygiene
 
-- Worktrees for parallel issue work — the main clone stays untouched;
-  a worktree is removed when its issue closes, success or failure.
+- Worktrees for parallel story work — the main clone stays untouched;
+  a worktree is removed when its story closes, success or failure.
 - No force-push on shared branches, ever (protection enforces it).
 - Nothing generated gets committed: build output, coverage reports and
   lockfile churn outside the change's scope stay out of the diff.

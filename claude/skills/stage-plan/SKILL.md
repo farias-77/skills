@@ -1,6 +1,6 @@
 ---
 name: stage-plan
-description: Conducts stage 3 (Plan) — takes an approved design and proposes the sequence in which the whole demand is built: waves that are each a verifiable checkpoint in alpha (one feature branch per repo, the suite green, a PR open), rows inside each wave (one story × repo, with a "ready when" a person can observe), the order and what runs in parallel; the user approves or rejects the cut, and the rest is mechanical: one Fable author writes the goal of every wave, the whole brief the execution chair receives; a whole review round runs (three Opus lenses, two blind readers and a referee per goal, an Opus judge marking who owns each fix); two rounds at most; the blueprint's Plan tab is published, and the user gets the prompt that starts the first wave in Codex. Runs in Claude Code with a Fable session. Use after a design is approved, or to resume a plan in progress.
+description: Conducts stage 3 (Plan) — takes an approved design and proposes the sequence in which the whole demand is built: waves that are each a verifiable checkpoint in alpha (one feature branch per repo, the suite green, a PR open), rows inside each wave (one story × repo, with a "ready when" a person can observe), the order and what runs in parallel; the user approves or rejects the cut, and the rest is mechanical: one Fable author writes the goal of every wave, the whole brief the execution chair receives; a whole review round runs (three Opus lenses, two blind readers and a referee per goal, an Opus judge marking who owns each fix); two rounds at most; the blueprint's Plan tab is published, and the user opens the Codex session that builds the waves. Runs in Claude Code with a Fable session. Use after a design is approved, or to resume a plan in progress.
 disable-model-invocation: false
 argument-hint: "<workstream-slug>"
 allowed-tools: Read, Write, Edit, Glob, Grep, Agent, SendMessage, Workflow, AskUserQuestion, Artifact, Bash(mkdir *), Bash(date *), Bash(ls *), Bash(cat *), Bash(rm *), Bash(git *)
@@ -30,9 +30,9 @@ question tool and the Workflow tool.
 The session is the conductor. It proposes the cut, writes `waves.md`
 once the user approves it, dispatches the author, runs the review
 workflow, rules what the review leaves against the approved sequence,
-publishes the blueprint and hands the user the prompt that starts the
-first wave. It writes two plan files, `waves.md` and the prompts, and
-never a goal: the author is the only writer of the goals, first draft
+publishes the blueprint and hands the user the line that starts the
+execution chair. It writes one plan file, `waves.md`, and never a
+goal: the author is the only writer of the goals, first draft
 to last fix. A finding is only fixed when the author changed the file.
 
 The design is where the user thinks; the plan is mechanical. He is
@@ -53,7 +53,7 @@ look up yourself, inline.
 is waiting, not answering. Dispatch the author, answer its questions
 against the approved sequence, run the workflow, rule what the judge
 hands the user against that same sequence, write the audit, publish
-the blueprint, write the prompts, update the state, without asking
+the blueprint, update the state, without asking
 permission for any of it. Say in one line what you are about to do,
 and close with a recap that stands on its own. Do not end a turn on
 a plan or a promise; do the work.
@@ -74,8 +74,8 @@ a plan or a promise; do the work.
                user-owned you rule yourself against the approved sequence.
 5. Round 2     the workflow again, whole, over the applied goals. What it
                returns is applied the same way and is final: no third round.
-6. Close       blueprint Plan tab, the prompts for Codex, explicit approval,
-               state moved, /clear. The user pastes the first prompt.
+6. Close       blueprint Plan tab, explicit approval, state moved, /clear.
+               The user opens Codex with `$stage-execute <slug>`.
 ```
 
 Two rounds, always, whatever round 1 returned: the second reads the
@@ -100,7 +100,6 @@ designs-root/2026-08-15-workspace-invites/
 ├── 00-discovery/ · 01-design/ # untouched here
 └── 02-plan/
     ├── goals/                 # one per wave: wNN-<slug>.md — the execution chair's brief
-    ├── prompts/               # one per wave: the text the user pastes into Codex
     ├── reviews/               # round-N.json: each round's return value, as it came
     └── reviews.md             # the round audit: the conductor's file
 ```
@@ -313,12 +312,11 @@ table, then the session's cards with the rejected option in one line
 each, then the review scoreboard. The reader who skims the columns
 knows what exists in alpha after each wave and when they get to look.
 
-**Write the prompts.** One per wave, under `02-plan/prompts/
-wNN-<slug>.md`, from [templates/codex-prompt.md](templates/codex-prompt.md):
-the text the user pastes into Codex to start that wave, self-sufficient,
-absolute paths, the branch to cut from, the repos, what "done" is,
-what to report. The first wave's prompt is pasted whole in the
-closing message; the others wait in the folder for stage 4.
+**Nothing else to write for the chair.** The goals are the brief. The
+execution chair is a Codex session opened at the consuming project's
+root (where `.codex/` lives) with the line
+`$stage-execute <workstream-slug>`: its skill reads `.state.md`, takes
+the wave it names and runs to the last one.
 
 Present: the blueprint URL, the sequence table, the verdict table,
 the precision table per lens and the judge's line (from
@@ -333,9 +331,10 @@ final result: what round 2 left is what he reads. Approval is
 explicit; silence or a loose "looks good" does not close the stage.
 On approval: `.state.md` to `stage: execute` with `wave: w01-<slug>`
 and `chair: codex`, commit the workstream folder (push only with the
-user's explicit approval), paste the first prompt, and suggest
-`/clear` (house rule). On a veto or a parked finding he sustains: one
-author pass, verify on disk, the touched prompt rewritten, close. On
+user's explicit approval), give the user the line
+`$stage-execute <workstream-slug>` to type in a Codex session opened at
+the project root, and suggest `/clear` (house rule). On a veto or a
+parked finding he sustains: one author pass, verify on disk, close. On
 rejection: the reasons go to the author as fixes; never back to
 stage 2.
 
@@ -361,14 +360,14 @@ resource, a count.
 
 - **Working, deleted at close:** the author's scratch notes, if any.
 - **Permanent:** `waves.md`, everything in `02-plan/` (`goals/`,
-  `prompts/`, `reviews/`, `reviews.md`), `rulings.md`,
+  `reviews/`, `reviews.md`), `rulings.md`,
   `taste-notes.md`, `blueprint.html`, `.state.md`.
 
 ## Resuming
 
 Everything is in files. Read `.state.md`, then `waves.md` (absent
 means the cut was not approved), then `02-plan/goals/`, `reviews.md`
-and `prompts/` if they exist. Continue from the first step whose
+if they exist. Continue from the first step whose
 output is missing. Never from memory of a previous session.
 
 ## Boundaries
