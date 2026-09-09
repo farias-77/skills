@@ -183,7 +183,7 @@ const expectedKeys = (text) => {
   return keys
 }
 
-const HEDGE = /\b(or|either|depends|could be|probably|maybe|possibly)\b/i
+const HEDGE = /\b(either|depends|could be|probably|maybe|possibly)\b/i
 const normalizeKey = (k) => {
   const s = String(k).trim().replace(/^`|`$/g, '')
   const bp = s.match(/^bad-path:\s*(.+)$/i)
