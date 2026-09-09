@@ -15,9 +15,10 @@ runs lint, build, tests and synth, commits in conventional atomic
 commits, pushes the branch, and reports: the commit list, the choices
 made where the documents were silent, the evidence of its own runs.
 
-Mark a story hard, and spawn the builder at medium effort, when the
-row touches more than one layer of a repo with a new mechanism, a
-cross-repo contract, or infra with state. Everything else is low.
+The builder is Luna at max effort. It is escalated to Astra at low
+effort only after it failed the story twice ([team.md](team.md));
+read its report as a claim and check the runner's lines it pastes
+against the branch before the lenses run.
 
 ## 2. Review, twice
 
