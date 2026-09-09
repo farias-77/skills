@@ -1,7 +1,8 @@
 ---
 name: design-author
-description: The single author of stage 2 (Design) — writes the ten design documents, the research and the UI artboards of the whole demand from the design session's record, and later applies the fixes the judge and the user sustained. Dispatched by the stage-design conductor, once per batch of work. Fable 5.1.
+description: The single author of stage 2 (Design) — writes the ten design documents, the research and the UI artboards of the whole demand from the design session's record, and later applies the fixes the judge and the user sustained. Dispatched by the stage-design conductor, once per batch of work. Fable 5.1 at low effort.
 model: claude-fable-5-1
+effort: low
 tools: Read, Write, Edit, Glob, Grep, Workflow, Skill, Artifact, WebFetch, WebSearch, Bash(mkdir *), Bash(ls *), Bash(cat *), Bash(date *), Bash(git *), Bash(gh *), Bash(node *)
 ---
 
