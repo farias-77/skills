@@ -54,8 +54,9 @@ turn on a plan or a promise; do the work.
               one, one card per decision, written to decisions.md as you go.
               Ends with the playback and an explicit "that's it".
 2. Write      one dispatch of design-author: decisions.md + discovery → research,
-              the ten documents, the artboards, the canvas. Its questions come
-              back in one batch; you ask the user and send the answers.
+              the ten documents, the artboards, the canvas, and the blueprint's
+              Design tab in the same pass. Its questions come back in one batch;
+              you ask the user and send the answers.
 3. Review     the design-review workflow, whole: nine Opus lenses beside two
               Haiku readers and a referee per flow, then the Opus judge.
 4. Rule       author-owned and implementer-owned findings go to the author.
@@ -63,7 +64,8 @@ turn on a plan or a promise; do the work.
               document, the rulings board open beside. One veto question.
 5. Iterate    text changed? run step 3 again, whole, once. What is still
               sustained after round 2 is applied without a third round.
-6. Close      blueprint Design tab, explicit approval, state moved, /clear.
+6. Close      the review block into the Design tab, explicit approval, state
+              moved, /clear.
 ```
 
 The user is interrupted at four points: the session (1), the author's
@@ -224,8 +226,11 @@ One `Agent` dispatch of **`design-author`** in write mode, with: the
 workstream path, `decisions.md`, the consuming project's `CLAUDE.md`,
 the repo map, and the language of the documents (the user's). The
 author researches every target, writes the ten documents, draws the
-artboards, publishes the canvas, and returns its questions in one
-batch.
+artboards, publishes the canvas, writes `BLUEPRINT.design` in the
+workstream's `blueprint.html`, and returns its questions in one
+batch. The tab is written here, not at the close: the rounds change
+sentences, and the author carries what they change into the tab in
+its apply passes.
 
 Ask the user the batch through the question tool, one question per
 item, the author's options as the answers with its recommendation
@@ -238,8 +243,10 @@ When the author returns, read the ten documents. Check that every
 story has a flow or a screen, that every flow
 follows the flow format (numbered steps, a failure table), that every
 document ends with its latitude section and its references, and that
-`ui.md` carries the canvas link. Anything missing goes back to the
-author in one message before the review starts.
+`ui.md` carries the canvas link. Open `blueprint.html` and check the
+Design tab renders (both scripts parse; the nine sections are there;
+the altitude reads as a report, not a projection). Anything missing
+goes back to the author in one message before the review starts.
 
 ## Step 3 — the review round
 
@@ -345,25 +352,15 @@ residue is written down, not chased.
 
 ## Step 6 — close
 
-Fill `BLUEPRINT.design` in the workstream's `blueprint.html` (the file
-stage 1 created; same path, same URL forever): the nine Design
-sections the shell renders (Glossary · How it works · UI · Data ·
-Infra & cost · Code · Security · Alarms · Going to production), each
-with its `references` list. The blueprint is the report, not the
-files' projection (house rule): natural to read above all, every
-section opening with a picture, a chart or a table and the prose in
-support; the altitude test, curated lists, the three-paragraph
-mechanism, the 20–30 minute ceiling. "How it works"
-opens with the whole system in one diagram (each service a box with
-where it runs written on it; arrows are the data), the lens verdict
-table with the user's rulings beside the judge's, the cost at three
-scales, then the session's cards with the rejected option in one line
-each. The UI section embeds a render of each artboard with the canvas
-link beside it. Every section carries the decision cards that belong
-to its document and a short "the implementer decides" list. Contracts
-have no section: their human face is the acceptance case list,
-rendered where contracts would be. Never mermaid; diagrams are
-HTML/CSS with the shell's primitives.
+The author wrote `BLUEPRINT.design` at step 2 and carried every
+applied fix into it. Here you add what only the close knows, in one
+edit: the lens verdict table with the user's rulings beside the
+judge's, the residue, the stage's telemetry. Then read the tab once
+as the user will (same path, same URL forever): the nine sections,
+every section opening with a picture or a table, the cards with the
+rejected option in one line, the 6–8 thousand words. What is off
+goes to the author as one fix batch, not to you: the tab is the
+author's file.
 
 Present: the blueprint URL, the canvas URL, the verdict table, the
 precision table per lens and the judge's line (from `reviews.md`),

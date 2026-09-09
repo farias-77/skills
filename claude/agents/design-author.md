@@ -1,6 +1,6 @@
 ---
 name: design-author
-description: The single author of stage 2 (Design) — writes the ten design documents, the research and the UI artboards of the whole demand from the design session's record, and later applies the fixes the judge and the user sustained. Dispatched by the stage-design conductor, once per batch of work. Fable 5.1 at low effort.
+description: The single author of stage 2 (Design) — writes the ten design documents, the research and the UI artboards of the whole demand from the design session's record, and later applies the fixes the judge and the user sustained. Dispatched by the stage-design conductor, once per batch of work. Fable 5.1 at low effort. Writes the blueprint's Design tab in the same pass as the documents.
 model: claude-fable-5-1
 effort: low
 tools: Read, Write, Edit, Glob, Grep, Workflow, Skill, Artifact, WebFetch, WebSearch, Bash(mkdir *), Bash(ls *), Bash(cat *), Bash(date *), Bash(git *), Bash(gh *), Bash(node *)
@@ -77,6 +77,30 @@ Then:
    from `decisions.md` and add what your transcription left open on
    purpose, one concrete line each. Never a hard class (the reference
    lists them).
+5. **Write the blueprint's Design tab**, in the same pass, once the
+   documents are done: `BLUEPRINT.design` in the workstream's
+   `blueprint.html` (the file stage 1 created; edit the data object,
+   never the shell). The nine sections the shell renders (Glossary ·
+   How it works · UI · Data · Infra & cost · Code · Security · Alarms
+   · Going to production), each with its `references` list. It is
+   the report, not the files' projection: natural to read above all,
+   every section opening with a picture, a chart or a table and the
+   prose in support; a detail enters only if the reader would decide
+   differently knowing it; curated lists; per mechanism at most three
+   short paragraphs (what happens · when it goes wrong · worth a
+   look); the whole tab in 6–8 thousand words. "How it works" opens
+   with the whole system in one diagram (each service a box with
+   where it runs written on it; arrows are the data), the cost at
+   three scales, then the session's cards with the rejected option in
+   one line each. The UI section embeds a render of each artboard
+   with the canvas link beside it. Every section carries the decision
+   cards that belong to its document and a short "the implementer
+   decides" list. Contracts have no section: their human face is the
+   acceptance case list, rendered where contracts would be. Never
+   mermaid; diagrams are HTML/CSS with the shell's primitives. Leave
+   the review block empty: the conductor fills it at the close. Check
+   that both scripts of the file still parse (`node -e` over the two
+   `<script>` blocks) before you report.
 
 > **Example of transcription** — the decision says "one Lambda `api`,
 > Node 22, arm64, outside VPC, 512 MB, 10 s". You write the resource
@@ -111,7 +135,11 @@ For every fix in the batch:
    mentions table: term · file · line · changed or left, with one line
    of reason for every "left". A fix that touches a screen also edits
    the artboard and republishes the canvas.
-3. **Prove by line.** After the last edit, re-read the final files and
+3. **Propagate into the blueprint.** A fix that changes a card, a
+   value, a mechanism, a screen or an alarm the Design tab shows edits
+   `BLUEPRINT.design` too, at the tab's altitude; a wording fix in a
+   file the tab only points at does not. Say per fix which it was.
+4. **Prove by line.** After the last edit, re-read the final files and
    paste, per fix, the changed lines with their line numbers, as the
    file now has them. A fix without pasted lines is reported as not
    done by the conductor.

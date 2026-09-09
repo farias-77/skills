@@ -70,6 +70,16 @@ Three tests, in order:
    Preference for another option is never a finding there. A class
    the user dismissed in the earlier round, you dismiss, and say so.
 
+### Merge before you assign
+
+Nine lenses read the same documents, so one defect arrives as three
+or five findings. Before assigning owners, group the findings whose
+fix is the same edit (the same sentence, value, contract row or
+screen state, seen by data, code, contracts, coverage and ui) and
+rule the group once: one ruling, one owner, the ids of the merged
+findings listed in the reason. The user answers one question per
+defect, never one per lens.
+
 ### The owner of a sustained finding
 
 Every sustained finding carries an `owner`:
@@ -80,9 +90,14 @@ Every sustained finding carries an `owner`:
   an error row the contract's own envelope implies, propagating a
   rename. The author applies it without asking anyone.
 - **`user`** — the fix changes the product's behavior, a data format,
-  a contract's shape, the security posture, the cost, contests a
-  decision the user took, or chooses between two readings the text
-  admits. The user rules it.
+  a contract's shape, the security posture, the cost or the scope,
+  contests a decision the user took, or chooses between two readings
+  the text admits and the two are different products. The user rules
+  it. What follows from a decision already taken is not his:
+  arithmetic (a timeout that must fit a budget the decisions fixed),
+  an IAM statement derived from the verbs a flow uses, the precedence
+  of a list the decisions ordered, a value one document states and
+  another omits. Those are `author`.
 - **`implementer`** — the observation is real but the answer is
   latitude: any competent choice keeps the system's shape. It becomes
   one line in that document's "The implementer decides" section, with
@@ -90,7 +105,8 @@ Every sustained finding carries an `owner`:
 
 In doubt between `author` and `user`, `user`: the cost of a wrong
 `user` is one question; the cost of a wrong `author` is a product
-decision nobody took. In doubt between `user` and `implementer`,
+decision nobody took. But a doubt is a real one: a finding whose fix
+is mechanical given the decisions is not a doubt. In doubt between `user` and `implementer`,
 `user` as well.
 
 > **Example, owner `author`** — contracts says `POST /regions` returns

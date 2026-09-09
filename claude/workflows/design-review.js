@@ -200,13 +200,17 @@ const expectedKeys = (text) => {
   return keys
 }
 
-const HEDGE = /\b(or|either|depends|could be|probably|maybe|possibly)\b/i
+const HEDGE = /\b(either|depends|could be|probably|maybe|possibly)\b/i
 const normalizeKey = (k) => String(k).trim().replace(/^`|`$/g, '').replace(/\s+/g, '').toLowerCase()
 
 const readingProblems = (reading, expected) => {
   if (!reading) return ['no output']
   const problems = []
   const got = new Map(reading.builds.map(b => [normalizeKey(b.key), b]))
+  if (!got.has('flow') && reading.flow && reading.flow.trim()) {
+    reading.builds.push({ key: 'flow', sentence: reading.flow, build: reading.flow })
+    got.set('flow', reading.builds[reading.builds.length - 1])
+  }
   for (const k of expected) if (!got.has(k)) problems.push(`missing key ${k}`)
   for (const [k, b] of got) {
     if (!b.build || !b.build.trim()) problems.push(`empty build at ${k}`)
