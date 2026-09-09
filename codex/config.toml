@@ -1,11 +1,11 @@
 # The Codex chair's project config — copy into <project>/.codex/config.toml
 # (or merge with what is there). The conductor of stage 4 runs on Astra
-# at high effort; the agents under .codex/agents/ carry their own model
+# at medium effort; the agents under .codex/agents/ carry their own model
 # and effort. The thread limit lets the five lenses of a review round
 # run at the same time next to a builder.
 
 model = "gpt-6-astra"
-model_reasoning_effort = "high"
+model_reasoning_effort = "medium"
 
 [agents]
 max_concurrent_threads_per_session = 8
