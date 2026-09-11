@@ -189,7 +189,7 @@ const expectedKeys = (text) => {
   return keys
 }
 
-const HEDGE = /\b(or|either|depends|could be|probably|maybe|possibly)\b/i
+const HEDGE = /\b(either|depends|could be|probably|maybe|possibly)\b/i
 const normalizeKey = (k) => String(k).trim().replace(/^`|`$/g, '').replace(/\s+/g, '').toLowerCase()
 
 const readingProblems = (reading, expected) => {

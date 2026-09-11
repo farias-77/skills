@@ -20,8 +20,8 @@ The session conducts directly. The work is sequential and human-gated
 by nature, so no workflow runs here; one mechanical agent,
 `release-scribe`, does the version and notes grind, and the session
 merges, deploys and verifies, step by confirmed step. Code is never
-written in this chair: a regression found here goes back to the
-Codex chair as a fix, through the same story cycle as everything else.
+written by this session: a regression found here goes back to stage
+4 as a fix, through the same story cycle as everything else.
 
 ## Two modes
 
@@ -72,9 +72,8 @@ tag and a GitHub Release per repo, and production running it, verified.
 
 ## Step 1 — the entry gate
 
-Republish the blueprint at its URL first: the Codex chair wrote the
-execution and audit entries and served the file locally, but cannot
-publish. Then present what is about to ship: the repos and their
+Republish the blueprint at its URL first, with the execution and
+audit entries stage 4 wrote. Then present what is about to ship: the repos and their
 `feat/<workstream>` shas, the waves as `waves.md` lists them, the audit's Close section
 (what he kept as a departure, the residue he accepted), and anything
 in "Stays with the user" that has a placeholder in the code and no
@@ -114,11 +113,11 @@ repo**. This kills the one new risk integration creates: the branch
 proved it, the rebase changed it.
 
 A red suite becomes a fix: `.state.md` → `stage: release · phase:
-fix · chair: codex`, the fix described in `04-release/trace.md` as a
-row in the goal's format (repo, what, ready when), and the user opens
-the Codex chair with `$stage-execute <workstream-slug>`; it builds the
-fix on a branch from `main`, proves it in alpha, opens the PR to
-`main`, and this stage merges it and confirms again. **Two fix
+fix`, the fix described in `04-release/trace.md` as a row in the
+goal's format (repo, what, ready when), and the user opens
+`/stage-execute <workstream-slug>`; it builds the fix on a branch from
+`main`, proves it in alpha, opens the PR to `main`, and this stage
+merges it and confirms again. **Two fix
 cycles are the budget:** a third red confirmation halts the stage to
 the user with the evidence.
 
@@ -155,8 +154,8 @@ confirmed before the next**:
 - **Lane B:** merge the prepared PR (that is the deploy) → verify the
   live site: routes served, the version stamped.
 - A failed verification **stops the train**: the step's rollback is
-  the documented one, executed and verified; the failure goes to the
-  Codex chair as a fix. The train never limps past a red step.
+  the documented one, executed and verified; the failure goes to
+  stage 4 as a fix. The train never limps past a red step.
 
 **Prod stays clean.** Every prod verification is read-only: the
 rollout's checks, never the smoke suite; nothing here writes test
@@ -186,7 +185,7 @@ approval), suggest `/clear`.
 | Stop-the-train | red or conflict stops the whole train at that repo; consumers never pass producers |
 | Lane B sequencing | an auto-build front merges only with its producers already live in prod |
 | Pre-prod confirmation | the train opens only on the whole suite green over alpha-from-main |
-| Fix budget | two fix cycles in step 3, each built by the Codex chair; the third red halts to the user |
+| Fix budget | two fix cycles in step 3, each built through stage 4; the third red halts to the user |
 | Prod stays clean | prod verification is read-only; no suite, no test data, no residue |
 | Tag never retroactive | tags on the integrated sha, after prod-go; prod deploys from the tag |
 | Rollback before prod | no `deploy:prod` without that repo's plan in `04-release/rollback/` |
@@ -205,7 +204,7 @@ approval), suggest `/clear`.
 Read `.state.md`, then `04-release/trace.md` and GitHub: which PRs
 are merged (re-read, never assumed), which tags exist, which repos
 are live at which version. Continue from the first step whose trace
-line is missing. `phase: fix` means the Codex chair is working: stop
+line is missing. `phase: fix` means stage 4 is working the fix: stop
 and say so. Never from memory.
 
 ## Boundaries

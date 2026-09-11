@@ -49,11 +49,8 @@ adjust / cut) is a ruling too, recorded the same way.
 question per finding, the context in the question itself (source,
 severity, quote, gap, fix, the judge's reason), the three rulings as
 the answers with the judge's pick first and marked as his, four to a
-call. Never a board he answers in prose. In the Codex chair, where
-no question tool exists, the same shape in chat: four items per
-message, each whole, the three answers numbered with the
-recommendation first, his answer recorded before the next four. At execution the conductor of
-the Codex chair rules alone inside two rounds per story; the residue
+call. Never a board he answers in prose. At execution the conductor
+rules alone inside the story's review budget; the residue
 rides as PR notes and in the wave report, and the user rules it at
 the audit that closes stage 4; a note he rules on there is a ruling
 too.

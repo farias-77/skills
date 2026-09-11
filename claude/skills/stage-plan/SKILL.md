@@ -1,6 +1,6 @@
 ---
 name: stage-plan
-description: Conducts stage 3 (Plan) — takes an approved design and proposes the sequence in which the whole demand is built: waves that are each a verifiable checkpoint in alpha (one feature branch per repo, the suite green, a PR open), rows inside each wave (one story × repo, with a "ready when" a person can observe), the order and what runs in parallel; the user approves or rejects the cut, and the rest is mechanical: one Fable author writes the goal of every wave, the whole brief the execution chair receives; a whole review round runs (three Opus lenses, two blind readers and a referee per goal, an Opus judge marking who owns each fix); two rounds at most; the blueprint's Plan tab is published, and the user opens the Codex session that builds the waves. Runs in Claude Code with a Fable session. Use after a design is approved, or to resume a plan in progress.
+description: Conducts stage 3 (Plan) — takes an approved design and proposes the sequence in which the whole demand is built: waves that are each a verifiable checkpoint in alpha (one feature branch per repo, the suite green, a PR open), rows inside each wave (one story × repo, with a "ready when" a person can observe), the order and what runs in parallel; the user approves or rejects the cut, and the rest is mechanical: one Fable author writes the goal of every wave, the whole brief the execution chair receives; a whole review round runs (three Opus lenses, two blind readers and a referee per goal, an Opus judge marking who owns each fix); two rounds at most; the blueprint's Plan tab is published, and the user opens stage 4. Runs in Claude Code with a Fable session. Use after a design is approved, or to resume a plan in progress.
 disable-model-invocation: false
 argument-hint: "<workstream-slug>"
 allowed-tools: Read, Write, Edit, Glob, Grep, Agent, SendMessage, Workflow, AskUserQuestion, Artifact, Bash(mkdir *), Bash(date *), Bash(ls *), Bash(cat *), Bash(rm *), Bash(git *)
@@ -75,7 +75,7 @@ a plan or a promise; do the work.
 5. Round 2     the workflow again, whole, over the applied goals. What it
                returns is applied the same way and is final: no third round.
 6. Close       blueprint Plan tab, explicit approval, state moved, /clear.
-               The user opens Codex with `$stage-execute <slug>`.
+               The user opens `/stage-execute <slug>`.
 ```
 
 Two rounds, always, whatever round 1 returned: the second reads the
@@ -312,11 +312,9 @@ table, then the session's cards with the rejected option in one line
 each, then the review scoreboard. The reader who skims the columns
 knows what exists in alpha after each wave and when they get to look.
 
-**Nothing else to write for the chair.** The goals are the brief. The
-execution chair is a Codex session opened at the consuming project's
-root (where `.codex/` lives) with the line
-`$stage-execute <workstream-slug>`: its skill reads `.state.md`, takes
-the wave it names and runs to the last one.
+**Nothing else to write for stage 4.** The goals are the brief:
+`/stage-execute <workstream-slug>` reads `.state.md`, takes the wave
+it names and runs to the last one.
 
 Present: the blueprint URL, the sequence table, the verdict table,
 the precision table per lens and the judge's line (from
@@ -329,11 +327,9 @@ all" first; and the findings you parked because they would change a
 wave's checkpoint, one question each. This is his review of the
 final result: what round 2 left is what he reads. Approval is
 explicit; silence or a loose "looks good" does not close the stage.
-On approval: `.state.md` to `stage: execute` with `wave: w01-<slug>`
-and `chair: codex`, commit the workstream folder (push only with the
-user's explicit approval), give the user the line
-`$stage-execute <workstream-slug>` to type in a Codex session opened at
-the project root, and suggest `/clear` (house rule). On a veto or a
+On approval: `.state.md` to `stage: execute` with `wave: w01-<slug>`,
+commit the workstream folder (push only with the user's explicit
+approval), and suggest `/clear` before `/stage-execute` (house rule). On a veto or a
 parked finding he sustains: one author pass, verify on disk, close. On
 rejection: the reasons go to the author as fixes; never back to
 stage 2.

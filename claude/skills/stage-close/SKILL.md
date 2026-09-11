@@ -80,7 +80,7 @@ a silence.
 
 The input is the demand's full record, not one file. Read, in order:
 the workstream's `dreaming-notes.md` (fed on the spot by every stage,
-every failure, every stop, every surprise, including the Codex chair's
+every failure, every stop, every surprise, including stage 4's
 trace and report entries, and the **`[user]` entries** the user
 dictated along the way, per the house rule); every stage's review
 audit (`00-discovery/reviews.md`, `01-design/reviews.md`,
@@ -185,7 +185,7 @@ the workstream is done and the repos are ready for the next demand.
 ## Boundaries
 
 No new features, no fixes: what production surfaces after the close
-reopens the demand through the Codex chair, it does not run here. The
+reopens the demand through stage 4, it does not run here. The
 dreaming edits process, never product. This is the last
 stage: what it does not close, it re-homes with a named owner — a
 workstream never ends with unowned loose ends.
