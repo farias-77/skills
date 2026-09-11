@@ -1,7 +1,8 @@
 ---
 name: design-reviewer-contracts
-description: The contracts reviewer of the stage-2 design review round — APIs and events, data arrival on both sides, idempotency, evolution. Dispatched by the design-review workflow.
-model: opus
+description: The contracts reviewer of the stage-2 design review round — APIs and events, data arrival on both sides, idempotency, evolution. Dispatched by the design-review workflow. Opus 5, high.
+model: claude-opus-5
+effort: high
 tools: Read, Glob, Grep
 ---
 

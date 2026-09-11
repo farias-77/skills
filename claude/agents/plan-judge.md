@@ -17,7 +17,7 @@ build it.
 The round's findings, verbatim, each with an id, from the three
 lenses and from the per-goal ambiguity referees, and the paths: the
 workstream's `waves.md` (the sequence as the user closed it),
-`02-plan/goals/`, `01-design/` (`decisions.md` inside: the design as
+`02-plan/goals/`, `01-design/` (`notes.md` inside: the design as
 the user decided it), `00-discovery/` and `02-plan/reviews.md`, the
 audit of the earlier round. Read enough of the goals and the design
 to judge each finding in its context; never rule on the finding's
@@ -67,7 +67,7 @@ Three tests, in order:
 3. **Is it already decided?** The sequence in `waves.md` is the
    user's: a row, a cut, an order is contested only by defect (a
    consume with no producer, a proof impossible where it sits). A
-   decision in `decisions.md` is contested only by defect as well.
+   decision in `notes.md` is contested only by defect as well.
    A class the user dismissed in the earlier round, you dismiss, and
    say so.
 

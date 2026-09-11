@@ -14,6 +14,7 @@ works in harmony without anyone watching everything.
 | obs.3 | **Calibrated to real traffic.** An absence alarm ("no events for N hours") on a low-volume flow is a false positive by construction — at a handful of events per day, silence is the normal state. Absence alarms only where baseline volume makes silence significant; everywhere else, alarm on the failure itself (DLQ, error rate). |
 | obs.4 | **Every alarm demands an action.** If an alarm rings and the answer is "known, ignore", the alarm is a defect — fix its threshold or delete it. Alert fatigue is a system failure: the alarm that cried wolf silences the one that matters. |
 | obs.5 | **Alarms are code.** Declared in the monitoring stack (the code standard's CDK pattern), never clicked together in a console — reviewable, reproducible per stage, and impossible to lose in a migration. |
+| obs.6 | **A window is not a clock.** An alarm's evaluation windows align to an arbitrary minute and drift in flight; an expression that depends on where a window sits on the clock (`HOUR`, `MINUTE`, an edge) is fragile by construction. Build the window so the event lands inside it by construction: period = the event's spacing, datapoints = the consecutive misses that mean harm. The first false alarm this house sent to a CTO was a `HOUR()` on one-hour windows that aligned to :01. |
 
 ## Logs
 

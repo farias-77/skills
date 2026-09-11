@@ -46,13 +46,23 @@ why that answer is an option: what it costs, what it buys, when it is
 the right one. The recommended option comes first and says so. Four
 questions to a call, at most. Never a board he answers in prose.
 
+## Every reply in the terminal is built to be followed at a glance
+
+The user reads a lot of pipeline output in a day and skims. A reply
+that names agents, options, findings or steps is a table; a sequence
+or a pipeline is a flow drawn in a code block; a list is short
+topics, one or two lines each; a paragraph is for the one argument
+that is prose. A table carries no more columns than the reader needs
+to decide. This holds for every stage skill and every message the
+conductor writes.
+
 ## The user's rulings are the record
 
-At discovery the conductor judges every finding by the stage's
-`references/judging.md`; at design and plan the judge agent proposes
+At discovery and at design the conductor judges every finding by the
+stage's `references/judging.md`; at plan the judge agent proposes
 (ruling + reason). Either way the ruling names the owner of each
 sustained finding: wording goes
-to the author without a question; product, scope, cost, data format,
+to the author (at design: the document's writer) without a question; product, scope, cost, data format,
 contract shape, security posture, the sequence and confirmed
 decisions go to him; at design a real observation that is declared
 latitude goes to the implementer, as one line in the document's "The
@@ -63,12 +73,14 @@ against the cut he approved (marked `ruled: conductor` in
 `rulings.md`) and lists them at the close for veto; only a finding
 that would change what a wave delivers reaches him as a question.
 Plus one veto question over what the author fixed alone. The budget
-at discovery, design and plan is two whole rounds; a third only on
-his explicit call. His validation of every story (confirm / reduce /
+at discovery is three rounds at most, the user asked after each; at
+design, round 1 is whole and automatic and rounds 2 and 3 run only on
+his word and only over the delta, three at most; at plan it is two
+whole rounds, a third only on his explicit call. His validation of every story (confirm / reduce /
 adjust / cut) is a ruling too, recorded the same way.
 **The rulings are asked through the question tool, always**, in the
-house shape: one question per finding at design and plan, one
-question per **decision** at discovery (findings that resolve by the
+house shape: one question per finding at plan, one question per
+**decision** at discovery and design (findings that resolve by the
 same choice are one question); the context in the question itself
 (source, severity, quote, gap, fix, the judge's reason), the rulings
 as the answers with the judge's pick first and marked as his, four to

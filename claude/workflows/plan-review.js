@@ -169,7 +169,7 @@ if (!goals.length) log('no goals passed in args — the blind reads are skipped 
 const docInputs = `Round ${round}.
 The sequence (as the user closed it; a row, a cut or an order is contested only by defect): ${args.wavesPath}
 The goals, one per wave: ${args.planDir}/goals/
-The design (decisions.md inside is the law): ${args.designDir}
+The design (notes.md inside is the law): ${args.designDir}
 The demand: ${args.discoveryDir}/pr-faq.md and ${args.discoveryDir}/user-stories.md
 The repos: ${repos.map(r => `${r.name} at ${r.path}`).join(' · ') || 'none passed'}
 The round audit so far: ${args.planDir}/reviews.md`

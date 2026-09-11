@@ -1,7 +1,8 @@
 ---
 name: design-reviewer-ambiguity
-description: The ambiguity referee of the stage-2 design review — compares the two blind readers' builds of ONE flow, key by key, and reports every step or failure row where they built different products. Dispatched by the design-review workflow, once per flow, after its readers return. Sonnet.
-model: sonnet
+description: The ambiguity referee of the stage-2 design review — compares the two blind readers' builds of ONE flow, key by key, and reports every step or failure row where they built different products. Dispatched by the design-review workflow, once per flow, after its readers return. Sonnet 5, low.
+model: claude-sonnet-5
+effort: low
 tools: Read
 ---
 

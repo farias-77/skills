@@ -1,7 +1,8 @@
 ---
 name: design-reviewer-facts
-description: The evidence reviewer of the stage-2 design review round — every claim about an external tool or internal service traces to research. Dispatched by the design-review workflow.
-model: opus
+description: The evidence reviewer of the stage-2 design review round — every claim about an external tool or internal service traces to research. Dispatched by the design-review workflow. Opus 5, high.
+model: claude-opus-5
+effort: high
 tools: Read, Glob, Grep, WebFetch, WebSearch, Bash(gh *), Bash(git *), Bash(ls *), Bash(cat *)
 ---
 

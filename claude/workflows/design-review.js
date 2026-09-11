@@ -2,31 +2,31 @@
  * design-review.js — the stage-2 review round as deterministic code.
  *
  * Why a workflow: the guarantee that no lens is skipped must be
- * physical, not discipline. Every round is whole: the nine lenses in
- * parallel with, per flow, two blind readers and a referee; then the
- * judge. There are no delta rounds and no final round: the budget is
- * two whole rounds, and what is still sustained after the second is
- * applied without re-review (a third round only on the user's
- * explicit call).
+ * physical, not discipline. Round 1 is whole: the ten lenses in
+ * parallel with, per flow, two blind readers and a referee. Rounds 2
+ * and 3 run only on the user's word and only over the delta: the
+ * lenses receive the documents and flows that changed and the fixes
+ * that were applied, and check that each fix landed and did not break
+ * its surroundings; the blind readers reopen only the flows whose text
+ * changed. Three rounds at most; the conductor enforces the count.
  *
  * THE BLIND READS are per flow of architecture.md: two Haiku readers
- * build one flow each, alone, one build per key (`flow`, `step:<n>`
- * per numbered step, `failure:<n>` per failure-table row). A Sonnet
- * referee compares the two readings key by key; only a
- * `different-product` verdict becomes a finding. The keys make the
- * comparison mechanical: a reading that misses a key is invalid and
- * re-dispatched once; a flow whose two readings do not both survive is
- * reported as unread, never silently skipped.
+ * (4.5, high) build one flow each, alone, in the documents' language,
+ * one build per key (`flow`, `step:<n>` per numbered step,
+ * `failure:<n>` per failure-table row). A Sonnet referee (5, low)
+ * compares the two readings key by key; only a `different-product`
+ * verdict becomes a finding. A reading that misses a key, hedges, or
+ * is written in another language is invalid and re-dispatched once; a
+ * flow whose two readings do not both survive is reported as unread.
+ * A round in which no flow was read is INVALID (`valid: false`): the
+ * conductor fixes the cause and runs it again instead of proceeding
+ * with the ambiguity lens empty.
  *
- * THE JUDGE closes the round: every finding is ruled sustained /
- * deferred / dismissed by the design razor, and every sustained
- * finding carries an owner: `author` (wording and propagation; the
- * author applies it alone), `user` (behavior, data format, contract
- * shape, security posture, cost, a decision contested, two readings;
- * the user rules it through the question tool) or `implementer`
- * (declared latitude; one line in the document's "The implementer
- * decides" section). An unruled finding counts as sustained with
- * owner `user` (fail-safe, never fail-silent).
+ * THERE IS NO JUDGE AGENT. The conductor judges every finding by
+ * stage-design/references/judging.md, with the session in its head:
+ * merge by fix, sustained / deferred / dismissed, owner writer / user /
+ * implementer. The workflow returns the findings as the lenses gave
+ * them, ids assigned.
  *
  * The briefs below carry INPUTS only. Every instruction lives in the
  * agent definitions under agents/ and in the shared reviewer contract
@@ -37,33 +37,35 @@
  *                 // by scriptPath, never by name
  *     designDir:    'absolute path to <slug>/01-design',
  *     discoveryDir: 'absolute path to <slug>/00-discovery',
- *     round:        1,          // 1 or 2; shown in labels and ids
+ *     round:        1,            // 1, 2 or 3; shown in labels and ids
+ *     language:     'pt-BR',      // the documents' language; the readers build in it
  *     glossary:     '<the glossary block of the design, verbatim>',
- *     flows: [                  // one entry per flow of architecture.md,
+ *     flows: [                    // one entry per flow of architecture.md,
  *       { id: 'create-leader', text: '### Create a leader (covers S-002)\n...' },
- *     ],                        // verbatim: scripts cannot read files;
- *                               // the conductor splits the Flows section
- *                               // at every "### " heading
+ *     ],                          // verbatim: scripts cannot read files; the
+ *                                 // conductor splits the Flows section at every "### "
+ *     // rounds 2 and 3 only — the delta:
+ *     changed: { docs: ['contracts', 'infra'], flows: ['create-leader'] },
+ *     fixes:   [ { id: 'design-reviewer-data#1', doc: 'contracts', fix: 'what was applied, one line' } ],
  *   }})
  *
- * Returns { round, findings, sustained, lenses, unread } — findings is
- * every finding with its id, lens, flow (for referee findings),
- * severity, title, says, gap, fix, ruling, owner, reason; sustained is
- * { author: n, user: n, implementer: n }; lenses is [{ lens, verdict,
+ * Returns { round, mode, valid, findings, lenses, unread } — findings
+ * is every finding with its id, lens, flow (for referee findings),
+ * severity, title, says, gap, fix; lenses is [{ lens, verdict,
  * verified, quote, findings, invalid }] with the referees merged as
  * one `design-reviewer-ambiguity` entry; unread lists the flow ids
- * whose readings did not survive. The conductor writes reviews.md,
- * sends the `author` and `implementer` fixes to design-author, asks
- * the user the `user` ones, and runs round 2 whole if any text changed.
+ * whose readings did not survive; valid is false when the round read
+ * no flow it was asked to read. The conductor writes reviews.md,
+ * judges, sends the writer fixes, asks the user the rest, and asks
+ * him whether another (delta) round runs.
  */
 
 export const meta = {
   name: 'design-review',
-  description: 'Stage-2 review round, always whole: nine Opus lenses in parallel with two Haiku blind readers and a Sonnet referee per flow, the Opus judge ruling every finding by the design razor and marking its owner (author, user or implementer)',
+  description: 'Stage-2 review round: ten Opus lenses in parallel with two Haiku blind readers and a Sonnet referee per flow; whole in round 1, delta only after; no judge agent — the conductor judges',
   phases: [
-    { title: 'Lenses', detail: 'the nine lenses in parallel, each reads everything, reports its lens', model: 'opus' },
+    { title: 'Lenses', detail: 'the ten lenses in parallel, each reads everything (or the delta), reports its lens', model: 'opus' },
     { title: 'Blind reads', detail: 'per flow: two Haiku readers build it alone, a Sonnet referee compares them key by key' },
-    { title: 'Judge', detail: 'design-judge rules every finding sustained / deferred / dismissed and marks the owner', model: 'opus' },
   ],
 }
 
@@ -77,10 +79,10 @@ const LENSES = [
   'design-reviewer-coverage',
   'design-reviewer-facts',
   'design-reviewer-ui',
+  'design-reviewer-consistency',
 ]
 const REFEREE = 'design-reviewer-ambiguity'
 const READER = 'design-blind-reader'
-const JUDGE = 'design-judge'
 
 const FINDING = {
   type: 'object', additionalProperties: false,
@@ -118,7 +120,7 @@ const READING = {
         properties: {
           key: { type: 'string', description: 'flow, step:<n>, or failure:<n>' },
           sentence: { type: 'string', description: 'the line, verbatim' },
-          build: { type: 'string', description: 'what this reader would build — component, reads, writes, returns, values, anchors; at most sixty words' },
+          build: { type: 'string', description: 'what this reader would build — component, reads, writes, returns, values, anchors; at most sixty words; in the documents\' language' },
         },
       },
     },
@@ -148,36 +150,28 @@ const REFEREE_REVIEW = {
   },
 }
 
-const JUDGMENT = {
-  type: 'object', additionalProperties: false,
-  required: ['rulings'],
-  properties: {
-    rulings: {
-      type: 'array',
-      items: {
-        type: 'object', additionalProperties: false,
-        required: ['id', 'ruling', 'owner', 'reason'],
-        properties: {
-          id: { type: 'string', description: 'the finding id exactly as given' },
-          ruling: { type: 'string', enum: ['sustained', 'deferred', 'dismissed'] },
-          owner: { type: 'string', enum: ['author', 'user', 'implementer', 'none'], description: 'author, user or implementer on a sustained finding; none otherwise' },
-          reason: { type: 'string', description: 'one or two concrete sentences' },
-        },
-      },
-    },
-  },
-}
-
 const round = args?.round ?? 1
-const flows = Array.isArray(args?.flows) ? args.flows.filter(f => f && f.id && f.text) : []
+const language = args?.language ?? 'en'
 const glossary = args?.glossary ?? ''
-if (!flows.length) log('no flows passed in args — the blind reads are skipped this round; pass flows: [{id, text}] to run them')
+const allFlows = Array.isArray(args?.flows) ? args.flows.filter(f => f && f.id && f.text) : []
+const delta = round > 1 && args?.changed ? { docs: args.changed.docs ?? [], flows: args.changed.flows ?? [] } : null
+const fixes = Array.isArray(args?.fixes) ? args.fixes : []
+const mode = delta ? 'delta' : 'whole'
+// whole round: every flow; delta round: only the flows whose text changed
+const flows = delta ? allFlows.filter(f => delta.flows.includes(f.id)) : allFlows
+if (!allFlows.length) log('no flows passed in args — the blind reads are skipped this round; pass flows: [{id, text}] to run them')
+if (delta) log(`delta round: docs ${delta.docs.join(', ') || '(none)'} · flows ${delta.flows.join(', ') || '(none)'} · ${fixes.length} fix(es) applied`)
 
-const docInputs = `Round ${round}.
+const docInputs = `Round ${round}, ${mode}.
 The design: ${args.designDir} — everything under it, research/ and ui/ included.
-The session's decisions (the design as the user decided it; a declared decision is contested only by defect): ${args.designDir}/decisions.md
+The session's notes (the design as the user decided it; a card is contested only by defect): ${args.designDir}/notes.md
 The demand it must satisfy: ${args.discoveryDir}/pr-faq.md and ${args.discoveryDir}/user-stories.md
-The round audit so far: ${args.designDir}/reviews.md`
+The round audit so far: ${args.designDir}/reviews.md
+Language of the documents: ${language}${delta ? `
+
+THIS IS A DELTA ROUND. The documents that changed since the last round: ${delta.docs.join(', ') || '(none)'}. The flows whose text changed: ${delta.flows.join(', ') || '(none)'}. The fixes that were applied, each with the finding it answers:
+${fixes.map(f => `- ${f.id} (${f.doc}): ${f.fix}`).join('\n') || '(none listed)'}
+Read the changed documents whole and every other document for what the fixes touched. Report: a fix that did not land as described, a fix that broke its surroundings or another document, and anything new in the changed text. Text no fix touched was read and passed last round; a finding on it needs the razor at full strength.` : ''}`
 
 // ---------- mechanical checks on a reading ----------
 
@@ -194,13 +188,16 @@ const expectedKeys = (text) => {
     if (step) { keys.add(`step:${step[1]}`); continue }
     if (!line.startsWith('|')) continue
     const cells = line.split('|').map(c => c.trim()).filter(Boolean)
-    if (!cells.length || cells.every(c => /^:?-+:?$/.test(c)) || /^fails when$/i.test(cells[0])) continue
+    if (!cells.length || cells.every(c => /^:?-+:?$/.test(c)) || /^(fails when|falha quando)$/i.test(cells[0])) continue
     keys.add(`failure:${++failures}`)
   }
   return keys
 }
 
-const HEDGE = /\b(either|depends|could be|probably|maybe|possibly)\b/i
+// Doubt words only — never a plain "or"/"ou": an enumeration is not a
+// hedge. English and pt-BR, because the readers build in the
+// documents' language.
+const HEDGE = /\b(either|depends|could be|probably|maybe|possibly|talvez|provavelmente|possivelmente|depende|poderia ser|pode ser que)\b/i
 const normalizeKey = (k) => String(k).trim().replace(/^`|`$/g, '').replace(/\s+/g, '').toLowerCase()
 
 const readingProblems = (reading, expected) => {
@@ -235,6 +232,7 @@ const reviewed = async (dispatch, name) => {
 }
 
 const flowInputs = (f) => `Round ${round}. Flow ${f.id}.
+Language of the documents (write every build in it): ${language}
 The design folder, for looking up a route, a field or a table the flow names: ${args.designDir}
 
 GLOSSARY:
@@ -247,7 +245,7 @@ const readBlind = async (f, n) => {
   const expected = expectedKeys(f.text)
   const dispatch = () => agent(flowInputs(f), {
     label: `${f.id}·read${n}·r${round}`, phase: 'Blind reads',
-    agentType: READER, model: 'haiku', schema: READING,
+    agentType: READER, schema: READING,
   })
   let r = await dispatch()
   let problems = readingProblems(r, expected)
@@ -269,7 +267,7 @@ ${JSON.stringify(readings[0].builds, null, 2)}
 READING 2:
 ${JSON.stringify(readings[1].builds, null, 2)}`, {
     label: `${f.id}·referee·r${round}`, phase: 'Blind reads',
-    agentType: REFEREE, model: 'sonnet', schema: REFEREE_REVIEW,
+    agentType: REFEREE, schema: REFEREE_REVIEW,
   }), `${f.id} referee`)
   return { flow: f.id, ...r }
 }
@@ -277,12 +275,12 @@ ${JSON.stringify(readings[1].builds, null, 2)}`, {
 // ---------- the round: lenses and per-flow reads, concurrently ----------
 
 phase('Lenses')
-log(`round ${round}: ${LENSES.length} lenses · ${flows.length} flows × (2 readers + referee) · then the judge`)
+log(`round ${round} (${mode}): ${LENSES.length} lenses · ${flows.length} flows × (2 readers + referee) · the conductor judges`)
 
 const [lensResults, flowResults] = await parallel([
   () => parallel(LENSES.map(name => () =>
     reviewed(() =>
-      agent(docInputs, { label: `${name}·r${round}`, phase: 'Lenses', agentType: name, model: 'opus', schema: REVIEW }),
+      agent(docInputs, { label: `${name}·r${round}`, phase: 'Lenses', agentType: name, schema: REVIEW }),
       name).then(r => ({ lens: name, ...r }))
   )),
   () => pipeline(
@@ -294,9 +292,8 @@ const [lensResults, flowResults] = await parallel([
   ),
 ])
 
-
-// The referees merge into one ambiguity lens entry: the judge and the
-// audit see one lens with per-flow findings.
+// The referees merge into one ambiguity lens entry: the conductor and
+// the audit see one lens with per-flow findings.
 const refereed = (flowResults ?? []).filter(Boolean)
 const unread = refereed.filter(r => r.unread).map(r => r.flow)
 const perFlow = refereed.filter(r => !r.unread)
@@ -315,7 +312,7 @@ const ambiguity = {
 
 const lenses = [...(lensResults ?? []).filter(Boolean), ...(flows.length ? [ambiguity] : [])]
 
-// ---------- the judge ----------
+// ---------- ids; the conductor judges from here ----------
 
 const findings = []
 for (const r of lenses) r.findings.forEach((f, i) => {
@@ -323,34 +320,11 @@ for (const r of lenses) r.findings.forEach((f, i) => {
   findings.push({ lens: r.lens, ...f })
 })
 
-phase('Judge')
-let judgment = null
-if (findings.length) {
-  const brief = `${docInputs}
+// A round that was asked to read flows and read none is not a round.
+const valid = !(flows.length > 0 && perFlow.length === 0)
+if (!valid) log(`round ${round} is INVALID: ${flows.length} flow(s) to read, none survived — fix the cause (language, keys, hedge) and run the round again`)
 
-The round's findings, each with its id:
+const bySeverity = (s) => findings.filter(f => f.severity === s).length
+log(`round ${round}: ${findings.length} finding(s) — ${bySeverity('blocker')} blocker · ${bySeverity('fix')} fix · ${bySeverity('detail')} detail${lenses.some(l => l.invalid) ? ' · INVALID lens: ' + lenses.filter(l => l.invalid).map(l => l.lens).join(', ') : ''} → the conductor judges by references/judging.md`)
 
-${findings.map(f => JSON.stringify(f, null, 2)).join('\n\n')}`
-  const dispatch = () => agent(brief, { label: `${JUDGE}·r${round}`, phase: 'Judge', agentType: JUDGE, model: 'opus', schema: JUDGMENT })
-  judgment = await dispatch()
-  const ruled = new Set((judgment?.rulings ?? []).map(x => x.id))
-  if (findings.some(f => !ruled.has(f.id))) {
-    log(`judge left ${findings.filter(f => !ruled.has(f.id)).length} finding(s) unruled — re-dispatching once`)
-    const again = await dispatch()
-    judgment = { rulings: [...(judgment?.rulings ?? []), ...(again?.rulings ?? []).filter(x => !ruled.has(x.id))] }
-  }
-}
-const OWNERS = ['author', 'user', 'implementer']
-const rulings = new Map((judgment?.rulings ?? []).map(x => [x.id, x]))
-for (const f of findings) {
-  const r = rulings.get(f.id)
-  f.ruling = r?.ruling ?? 'sustained'
-  f.owner = f.ruling === 'sustained' ? (OWNERS.includes(r?.owner) ? r.owner : 'user') : 'none'
-  f.reason = r?.reason ?? 'unruled — counted as sustained, owner user (fail-safe)'
-}
-
-const count = (owner) => findings.filter(f => f.ruling === 'sustained' && f.owner === owner).length
-const sustained = { author: count('author'), user: count('user'), implementer: count('implementer') }
-log(`round ${round}: ${findings.length} finding(s) → ${sustained.author} for the author · ${sustained.user} for the user · ${sustained.implementer} to latitude · ${findings.filter(f => f.ruling === 'deferred').length} deferred · ${findings.filter(f => f.ruling === 'dismissed').length} dismissed${lenses.some(l => l.invalid) ? ' · INVALID: ' + lenses.filter(l => l.invalid).map(l => l.lens).join(', ') : ''}`)
-
-return { round, findings, sustained, lenses, unread }
+return { round, mode, valid, findings, lenses, unread }

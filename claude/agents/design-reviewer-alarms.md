@@ -1,7 +1,8 @@
 ---
 name: design-reviewer-alarms
-description: The observability reviewer of the stage-2 design review round — alarm sense, over-alarming, low-traffic false rings. Dispatched by the design-review workflow.
-model: opus
+description: The observability reviewer of the stage-2 design review round — alarm sense, over-alarming, low-traffic false rings. Dispatched by the design-review workflow. Opus 5, high.
+model: claude-opus-5
+effort: high
 tools: Read, Glob, Grep
 ---
 
@@ -40,6 +41,13 @@ story's "Out of this story" are direction, an extension point at most.
   expensive — the queue backing up, the webhook silently failing, the
   dependency timing out — with no alarm at all. Report only the ones
   with real consequence; padding the list is the disease, not the cure.
+- **A window is not a clock.** An alarm's evaluation windows align to
+  an arbitrary minute and drift in flight; a metric-math expression
+  that depends on where a window sits on the clock (`HOUR`, `MINUTE`,
+  a window edge) is fragile by construction and is a **blocker**
+  unless the period equals the event's spacing, so the event lands
+  inside the window by construction (observability standard obs.6).
+  The first end-to-end run's only production defect was this.
 - **Thresholds without an argument.** A number with no line explaining
   why that number — five minutes of what, relative to what baseline.
 

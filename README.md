@@ -86,24 +86,37 @@ it — the skill interviews whoever owns the demand, and engineering
 only enters at stage 2 with the ambiguity already wrung out.
 
 **2 · Design** — a defined scope in, how the whole demand works out.
-The design is built **with the human**: the macro shape first (data,
-compute, messaging, identity, repos, build vs buy, the cost envelope,
-the alarm philosophy, rollout, extension points), then the ten
-documents one by one — architecture, data, contracts (the frozen
-bridge everything downstream stands on), UI, security, infra,
-observability, rollout, code, acceptance — one tradeoff card per
-decision, the conductor recommending, the human choosing, and every
-document ending with what the implementer is free to decide. One
-Fable author transcribes the decisions into the files, with dedicated
-research per external target and the UI as artboards on a design
-canvas. A whole review round runs: nine Opus lenses beside, per flow,
-two **blind readers** and a referee reporting where they would build
-different things; a **judge** rules every finding by the design razor
-(could the implementer place this and build it one way?) and marks who
-owns the fix — the author for wording, the human for product, data,
-contracts, security and cost, the implementer for declared latitude.
-Two rounds at most; the residue is written down, not chased. The wave
-cut is stage 3's.
+The design is built **with the human**, in a session the conductor
+(Fable 5.1, high) runs from a fixed script: the macro shape first
+(boundary and repos, data, compute, how the blocks talk, identity,
+build vs buy, the cost envelope, the alarm philosophy, rollout,
+extension points), then the ten subjects one by one — architecture,
+data, contracts (the frozen bridge everything downstream stands on),
+screens, security, infra, observability, rollout, code, acceptance —
+the conductor proposing the house and industry patterns, the human
+shaping, one card per real fork, every decision written to `notes.md`
+as it happens, every subject closing with what the implementer is
+free to decide. Then a **deep-research workflow per topic**
+(Sonnet 5, high: planner, blind searchers, synthesizer, critic,
+citer) writes a sourced file per external API, price list or repo,
+and the conductor plays every subject back with the research in it
+before a line is written. **Ten writers (Sonnet 5, high) write the ten
+documents in parallel** from the same notes and research, deciding
+nothing (a gap is a question back), each also writing its blueprint
+JSON. A whole review round runs: ten lenses (Opus 5, high) —
+data, code, infra, security, contracts, alarms, coverage, facts, UI
+and consistency, the one that reads the ten documents as one system
+— beside, per flow, two **blind readers** (Haiku 4.5, high) and a
+referee (Sonnet 5, low) reporting where they would build different
+things. **The conductor judges** every finding by the design razor
+(could the implementer place this and build it one way?) with a
+closed list of classes never dismissed; wording goes to the writer
+without a question, decisions go to the human one question per
+decision, latitude to the implementer. The human then says whether a
+second or a third round runs, each over the delta only. The
+blueprint's Design tab is built from the JSON and read by the human
+at the close, where his adjustments are noted and applied in a batch.
+The wave cut is stage 3's.
 
 **3 · Plan** — the design becomes a sequence. The conductor proposes
 the cut and the human approves or rejects it, wave by wave; the rest
@@ -172,7 +185,7 @@ waits on production: what hurts later reopens the demand as a fix.
 
 This pipeline is expensive to run today, and that was a deliberate
 non-concern. Every story's diff is read whole by five reviewers, twice;
-discovery, design and plan run two whole rounds; ambiguity is hunted by dispatching multiple readers at
+discovery and design run up to three rounds, plan two; ambiguity is hunted by dispatching multiple readers at
 the same document. That redundancy is exactly
 where the quality comes from — and it is priced in tokens.
 
@@ -235,7 +248,7 @@ What the pipeline expects from its surroundings:
 | **blueprint** | the workstream's single review artifact — one URL, tabs per stage, pills per wave |
 | **conductor** | whoever dispatches and audits without doing the work — the stage's session |
 | **lens** | a reviewer scoped to one failure mode |
-| **judge** | whoever rules every finding — sustained/deferred/dismissed, with the reason; reviewers report at the maximum bar. At discovery it is the conductor itself; at design and plan a judge agent proposes. The ruling names who owns the fix (author, human, or at design the implementer and at plan the worker) and the human rules what is his; at execution the conductor rules alone inside the story's review budget, and the residue rides as PR notes the human rules at the audit that closes stage 4 |
+| **judge** | whoever rules every finding — sustained/deferred/dismissed, with the reason; reviewers report at the maximum bar. At discovery and at design the conductor judges by the stage's `references/judging.md`; at plan a judge agent proposes and the conductor rules in the user's place against the approved cut; at execution the conductor rules alone inside the story's budget. |
 | **blind reader** | an agent that reads alone, so divergence from its sibling exposes ambiguity |
 | **andon** | stop before building on a broken premise — a cheap halt beats wrong work |
 | **dreaming** | the closing session where frictions become edits to the pipeline itself — the session suggests, the human rules every lesson |

@@ -40,7 +40,7 @@ Assumptions: <the traffic numbers these tables stand on>
 
 ## The implementer decides
 
-<!-- The latitude the user granted for this document (decisions.md)
+<!-- The latitude the user granted for this document (notes.md)
      plus what transcription left open on purpose. One line each.
      Never a hard class. -->
 

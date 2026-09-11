@@ -54,7 +54,9 @@ standards, not the most complete one.
 ## The materiality bar
 
 A `fix` must change what a competent implementer would build — a
-behavior, a contract, a number that encodes a rule, a cost, a decision.
+behavior, a contract, a number that encodes a rule, a decision, a cost
+— above a few dollars a month or a tenth of the cost envelope; below
+that, a cost is a `detail` the conductor decides and notes.
 Anything below that bar — wording, formatting, a visual token, a style
 preference — is a `detail`, however correct the observation. Details
 are recorded and batched into one sweep at stage close; no round is run
@@ -89,7 +91,7 @@ Contest its argument if the argument is weak, citing it; never report the
 decision itself as a gap.
 
 A decision that is **the user's** — taken at the design session and
-recorded in `decisions.md`, or flagged `(decided in your place)` and
+recorded in `notes.md`, or flagged `(decided in your place)` and
 later ratified — is contestable **only on defect**: evidence it does not
 meet the demand (a limit crossed, a cost, a path that breaks). Preference
 for another option is never a finding there.

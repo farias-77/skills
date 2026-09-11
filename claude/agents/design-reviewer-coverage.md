@@ -1,7 +1,8 @@
 ---
 name: design-reviewer-coverage
-description: The bidirectional coverage reviewer of the stage-2 design review round — every story has its home in the design, every AC is satisfiable, and nothing in the design exists unforced. Dispatched by the design-review workflow.
-model: opus
+description: The bidirectional coverage reviewer of the stage-2 design review round — every story has its home in the design, every AC is satisfiable, and nothing in the design exists unforced. Dispatched by the design-review workflow. Opus 5, high.
+model: claude-opus-5
+effort: high
 tools: Read, Glob, Grep
 ---
 
@@ -52,7 +53,7 @@ ways. Quote both sides; the pair is the finding.
 The reverse sweep, walked with the same rigor as the first: for
 **every mechanism the design builds** (a screen, an endpoint, a job, a
 store, an orchestration, a queue) name the AC or the declared decision
-(`decisions.md` above all) that forces it to exist. A mechanism
+(`notes.md` above all) that forces it to exist. A mechanism
 nothing forces is a finding, however well built: unrequested
 construction is how systems silently grow, and this direction is
 where overengineering is caught in the design itself (the architecture

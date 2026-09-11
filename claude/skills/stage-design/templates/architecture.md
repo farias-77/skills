@@ -50,7 +50,7 @@ Trigger: <the business event that starts it>
 ## The implementer decides
 
 <!-- The latitude the user granted for this document, copied from
-     decisions.md and completed by the author with what transcription
+     notes.md and completed by the writer with what transcription
      left open on purpose. One line each. Never a hard class: where a
      piece runs, who calls whom, what happens when the other side
      fails. -->

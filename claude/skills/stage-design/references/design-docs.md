@@ -1,6 +1,6 @@
 # The design documents — shared rules
 
-Everything the design-author writes under the workstream's `01-design/`
+Everything the ten design writers write under the workstream's `01-design/`
 starts from a template in [../templates/](../templates/), one per
 document, each carrying its own must-haves as comments:
 
@@ -17,8 +17,9 @@ document, each carrying its own must-haves as comments:
 | `rollout.md` | deploy order, cutover, rollback |
 | `code.md` | the file-tree preview per repo, a guide, never a build contract |
 | `acceptance.md` | the executable acceptance spec, frozen with `contracts.md`; the exec transcribes it into each repo's `smoke/` |
-| `decisions.md` | the design session's record, the CONDUCTOR's file; the author transcribes it and never edits it |
+| `notes.md` | the design session's record, the CONDUCTOR's file; the writers transcribe it and never edit it |
 | `reviews.md` | the round audit with the rulings, the conductor's file |
+| `blueprint/design/<doc>.json` | the document's report layer, written by its writer with the document, in the shapes and word caps of `claude/blueprint/schema/design.md` |
 
 The design covers the whole demand: every story in `user-stories.md`. The wave cut is stage 3's. These files are machine
 input: reviewers and planning consume them; the user reads the
@@ -44,7 +45,7 @@ for what goes there: a choice left to whoever builds it, with the
 bound the design sets ("retries on the Cognito calls, within the
 Lambda's 10 s budget"). The section holds the items the user left
 open at the session (the Latitude list of that document's section in
-`decisions.md`) plus what the author's transcription left open on
+`notes.md`) plus what the writer's transcription left open on
 purpose, one concrete line each. Reviewers do not report an item
 listed there unless it belongs to a hard class.
 
@@ -83,6 +84,20 @@ one row per way the flow fails. The review workflow splits the Flows
 section at the headings and keys the steps and rows by position; two
 blind readers build from each flow and a referee compares the builds.
 A step that leaves room produces two builds and a finding.
+
+**Ten writers, one system.** Each document is written by its own
+writer from the same notes and research, in parallel; none reads the
+others. So every document names the thing the way the notes name it,
+takes every value from the notes or the research (never from memory),
+and says where the exact form lives when it is another document's
+("the whole shape is in `contracts.md`"). The consistency lens reads
+the ten together and reports every drift.
+
+**Infra is proved by synth.** No acceptance case runs a test under
+`infra/`; an alarm expression, a schedule, an IAM statement or a
+resource config is proved by a check over the synthesized template,
+the diff protocol and smoke against the deployed stage (testing
+standard §2).
 
 **The reference rule.** Every claim about an external tool or an
 existing internal service points at its research file:

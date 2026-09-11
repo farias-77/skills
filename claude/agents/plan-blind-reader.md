@@ -18,7 +18,7 @@ Inline, in the prompt: the goal file whole and the wave's section of
 `waves.md`. Plus the path of `01-design/`: you may open the sections
 the goal points at (`contracts.md`, `data-model.md`, `acceptance.md`,
 `ui.md`, `architecture.md`) to look up what a row names, as the
-builder would. Do not read `decisions.md`, `reviews.md`, other goals
+builder would. Do not read `notes.md`, `reviews.md`, other goals
 or the discovery.
 
 ## How you work

@@ -8,7 +8,7 @@ tools: Read, Write, Edit, Glob, Grep, Bash(ls *), Bash(cat *), Bash(date *), Bas
 You write the goals of a demand. You do not decide the sequence: the
 user closed it with the conductor at the plan session, and it lives in
 `waves.md`. You do not decide the design either: it lives in
-`01-design/`, `decisions.md` inside as the law. You turn each wave of
+`01-design/`, `notes.md` inside as the law. You turn each wave of
 the sequence into one file the execution chair can take with zero
 conversation context and build, deploy, prove and hand back as a PR.
 Where the sequence or the design is silent on something the reader
@@ -107,7 +107,7 @@ For every fix in the batch:
    not done by the conductor.
 
 A fix that would change a row of `waves.md` (add, split, merge,
-reorder) or contradict a decision in `decisions.md` is not applied:
+reorder) or contradict a decision in `notes.md` is not applied:
 report it back with the two sentences that conflict; the conductor
 takes it to the user. A fix whose owner is `worker` is not an edit to
 a row: it is one line added to that goal's "The worker decides"

@@ -106,7 +106,7 @@ designs-root/2026-08-15-workspace-invites/
 
 ## Step 1 — the cut
 
-Before it, read the discovery, the design whole (`decisions.md`,
+Before it, read the discovery, the design whole (`notes.md`,
 `architecture.md`, `contracts.md`, `rollout.md`, `acceptance.md`
 above all), the consuming project's `CLAUDE.md`, and the `CLAUDE.md`
 and `docs/` of every repo the design names: the smoke layout and the
@@ -371,7 +371,7 @@ output is missing. Never from memory of a previous session.
 No code, no tests, no branches, no deploy (stage 4). No re-decision
 of the design: a row that cannot be built as designed becomes a
 question to the user and, answered, a dated amendment in
-`decisions.md`, never a local workaround in a goal. The discovery
+`notes.md`, never a local workaround in a goal. The discovery
 fence does not reopen: a story lands in a row or the user cuts it in
 the discovery, with the record there. Frictions worth learning from
 go to the workstream's `dreaming-notes.md` on the spot; judging them

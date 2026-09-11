@@ -1,7 +1,8 @@
 ---
 name: design-blind-reader
-description: A blind reader of the stage-2 design review — reads ONE flow of architecture.md alone and commits to the concrete build for every step and every failure row. Two are dispatched per flow by the design-review workflow; a referee compares their builds. Haiku.
-model: haiku
+description: A blind reader of the stage-2 design review — reads ONE flow of architecture.md alone and commits to the concrete build for every step and every failure row. Two are dispatched per flow by the design-review workflow; a referee compares their builds. Haiku 4.5, high.
+model: claude-haiku-4-5
+effort: high
 tools: Read, Glob, Grep
 ---
 
@@ -18,7 +19,7 @@ Inline, in the prompt: the flow block (its heading, the trigger, the
 numbered steps, the failure table) and the design's glossary. Plus the
 path of `01-design/`: you may read `contracts.md` and `data-model.md`
 to look up a route, a field or a table the flow names, as an
-implementer would. Do not read `decisions.md`, `reviews.md` or the
+implementer would. Do not read `notes.md`, `reviews.md` or the
 discovery.
 
 ## How you work
@@ -47,6 +48,11 @@ text; when the text leaves room, choose and write the choice.
 
 ## Standards
 
+- **Write every build in the language of the flow.** The documents
+  are in the workstream's language (the brief names it); a build in
+  another language is invalid. This also keeps the hedge check honest:
+  a plain "or" in an enumeration is not a hedge, and the check looks
+  for doubt words, not conjunctions.
 - One build per key, every key present. A missing key makes your
   reading invalid and it is thrown away.
 - Never hedge. No "or", "either", "depends", "could be", "probably".
