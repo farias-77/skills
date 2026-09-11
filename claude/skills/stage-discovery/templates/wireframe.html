@@ -1,0 +1,54 @@
+<!--
+  A wireframe: one screen, grey boxes and real labels, no styling
+  beyond what makes the boxes readable. It fixes WHAT is on the screen,
+  what each thing does, and where the user goes next. The design
+  stage owns the look. Copy to 00-discovery/wireframes/<screen>.html;
+  one file per screen; list it in wireframes/README.md
+  (screen · stories it serves · states drawn).
+
+  Conventions: a box per region; a label in every box saying what it
+  is; [action] for a button or link with where it leads; {value} for
+  data with its source in parentheses; one column per state at the
+  bottom (empty · loading · error · no permission), each a small box
+  saying what the person sees.
+-->
+<title>Wireframe — <screen></title>
+<style>
+  body { font: 14px/1.4 system-ui, sans-serif; color: #222; background: #fafafa; margin: 0; padding: 20px; }
+  .frame { max-width: 960px; margin: 0 auto; }
+  h1 { font-size: 16px; margin: 0 0 4px; }
+  .meta { color: #666; font-size: 12.5px; margin-bottom: 14px; }
+  .box { border: 2px solid #999; border-radius: 6px; padding: 10px 12px; margin: 8px 0; background: #fff; }
+  .box .lbl { font-size: 11px; text-transform: uppercase; letter-spacing: .04em; color: #888; margin-bottom: 4px; }
+  .row { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 8px; }
+  .act { display: inline-block; border: 2px dashed #777; border-radius: 6px; padding: 4px 10px; margin: 4px 6px 4px 0; background: #f4f4f4; }
+  .val { background: #eee; border-radius: 4px; padding: 0 5px; }
+  .states { margin-top: 18px; }
+  .states .box { min-height: 70px; }
+</style>
+<div class="frame">
+  <h1><screen name></h1>
+  <div class="meta">Stories: S-00N · S-00M · Arrives from: <screen or entry> · Actor: <persona></div>
+
+  <div class="box"><div class="lbl">header</div><span class="val">{workstream name}</span> · [back → <screen>]</div>
+
+  <div class="row">
+    <div class="box"><div class="lbl">region: <what it is></div>
+      <span class="val">{value} (source: <story/AC or vocabulary>)</span><br>
+      <span class="act">[action → <where it leads>]</span>
+    </div>
+    <div class="box"><div class="lbl">region: <what it is></div>
+      <span class="val">{list item} (source: …)</span>
+    </div>
+  </div>
+
+  <div class="states">
+    <div class="lbl" style="font-size:11px;color:#888;text-transform:uppercase">states</div>
+    <div class="row">
+      <div class="box"><div class="lbl">empty</div><what the person sees on first use></div>
+      <div class="box"><div class="lbl">loading</div><what is shown while data loads></div>
+      <div class="box"><div class="lbl">error</div><the message and what they can do></div>
+      <div class="box"><div class="lbl">no permission</div><what an actor outside the scope sees></div>
+    </div>
+  </div>
+</div>

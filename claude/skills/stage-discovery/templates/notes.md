@@ -8,8 +8,8 @@
   user's language; keep the user's own words where they carry a
   decision or a taste.
 
-  Working file: deleted when the stage closes. The record lives in
-  the two documents.
+  Kept when the stage closes: the record of how the two documents
+  came to be, next to them.
 -->
 
 ## Starting point
@@ -19,6 +19,7 @@
 - **What the user knows well / does not know:** <domains where the blindspot pass ran, and what it taught>
 - **References:** <product, site, repo, folder — what to look at in each, and what the user liked>
 - **Prototypes:** <path or URL of each throwaway prototype · what the user reacted to · what that settled>
+- **Wireframes:** <none — no front> | <one line per screen: `wireframes/<screen>.html` · the stories it serves · the states drawn · what the user changed on seeing it>
 
 ## Coverage map
 

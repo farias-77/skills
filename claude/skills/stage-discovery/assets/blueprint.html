@@ -308,8 +308,7 @@
   .inf .num { font-family:var(--f-mono); font-size:12.5px; color:var(--ink-3); }
   .inf .ttl { font-size:16.5px; font-weight:600; }
 
-  /* ---------- design: glossary ---------- */
-  .gcard { display:grid; grid-template-columns:200px 1fr; padding:0; overflow:hidden; }
+    .gcard { display:grid; grid-template-columns:200px 1fr; padding:0; overflow:hidden; }
   .gcard .rail { border-right:1px solid var(--line); padding:16px 16px 16px 20px;
                   display:grid; gap:8px; align-content:start; background:var(--surface-2); }
   .gcard.hero .rail { background:var(--band); }
@@ -579,6 +578,16 @@ const BLUEPRINT = {
   },
 
   discovery: {
+    /* wireframes: one per screen when the demand has a front; html is the
+       wireframe file's markup, embedded as-is (srcdoc). Empty array when none. */
+    wireframes: [ /* { screen, file, stories: ['S-001'], states: ['empty','error'], note, html } */ ],
+    /* review: the rounds as the conductor judged them (from 00-discovery/reviews.md):
+       rounds: [{ n, findings, sustained: {author, user}, deferred, design, dismissed, changed }],
+       decisions: [{ id, t, ruling, why }]  (what the user ruled),
+       design: [{ from, t }]                 (for the design stage),
+       dismissed: [{ id, lens, t, why }]     (readable here, reopen any at the approval),
+       residue: [{ id, t, why }]             (still sustained when the user closed) */
+    review: null,
     prfaq: {
       release: {
         date: '<city>, <date>',
@@ -688,7 +697,9 @@ const STAGES = [
   { key:'discovery', label:'Discovery', sections: [
     { key:'prfaq', label:'PR-FAQ' },
     { key:'stories', label:'User Stories' },
-    { key:'inferred', label:'What was inferred' }
+    { key:'inferred', label:'What was inferred' },
+    { key:'wireframes', label:'Wireframes' },
+    { key:'review', label:'The review' }
   ]},
   { key:'design', label:'Design', sections: [
     { key:'glossary', label:'Glossary' },
@@ -818,6 +829,36 @@ function renderInferred() {
       <div class="kv"><b>because</b><span>${i.why}</span></div>
       <div class="kv"><b>if wrong</b><span style="color:var(--bad)">${i.ifWrong}</span></div>
     </div>`).join('')}</div></section>`;
+}
+
+/* ---------- design: glossary ---------- */
+/* ---------- discovery: wireframes and the review ---------- */
+function renderWireframes() {
+  const W = BLUEPRINT.discovery.wireframes || [];
+  if (!W.length) return `<section class="sec">${secT('Wireframes', 'none')}<p class="lede">This demand has no front; nothing to draw at this stage.</p></section>`;
+  return `<section class="sec">${secT('Wireframes', `${W.length} screen${W.length === 1 ? '' : 's'} · what is on each screen, what it does, where the user goes next — the look is the design stage's`)}
+    <div class="list">${W.map(w => `<article class="card icard">
+      <h3>${w.screen}</h3>${w.note ? `<p>${w.note}</p>` : ''}
+      <div class="ichips">${(w.stories||[]).map(s => `<span class="ichip">${s}</span>`).join('')}${(w.states||[]).map(s => `<span class="ichip prod">${s}</span>`).join('')}</div>
+      ${w.html ? `<iframe title="${esc(w.screen)}" srcdoc="${esc(w.html).replace(/"/g, '&quot;')}" style="width:100%;height:520px;border:1px solid var(--line);border-radius:12px;background:#fff;margin-top:10px"></iframe>` : ''}
+      ${w.file ? `<p class="xnote">${w.file}</p>` : ''}</article>`).join('')}</div></section>`;
+}
+
+function renderDiscoveryReview() {
+  const R = BLUEPRINT.discovery.review;
+  if (!R) return `<section class="sec">${secT('The review', 'not run yet')}</section>`;
+  const rounds = `<div class="scroll"><table class="table">
+    <tr><th>Round</th><th class="num">Findings</th><th class="num">To the authors</th><th class="num">To you</th><th class="num">Deferred</th><th class="num">For the design</th><th class="num">Dismissed</th><th>What changed</th></tr>
+    ${(R.rounds||[]).map(r => `<tr><td class="num">${r.n}</td><td class="num">${r.findings}</td><td class="num">${r.sustained?.author ?? 0}</td><td class="num">${r.sustained?.user ?? 0}</td><td class="num">${r.deferred ?? 0}</td><td class="num">${r.design ?? 0}</td><td class="num">${r.dismissed ?? 0}</td><td>${r.changed || ''}</td></tr>`).join('')}</table></div>`;
+  const list = (title, items, sub, fmt) => items?.length ? `<section class="sec">${secT(title, sub ?? items.length)}
+    <div class="list">${items.map((x, i) => `<article class="card step"><span class="pnum">${i + 1}</span>
+      <div class="pbody"><p class="pt">${fmt ? fmt(x) : x.t}</p><p class="pd">${x.why || ''}</p></div></article>`).join('')}</div></section>` : '';
+  return `
+  <section class="sec">${secT('The rounds', `${(R.rounds||[]).length} · the conductor judged, you decided`)}${rounds}</section>
+  ${list('What you decided', R.decisions, undefined, x => `${x.id ? `<code>${x.id}</code> ` : ''}${x.t} — <b>${x.ruling}</b>`)}
+  ${list('For the design', R.design, `${R.design?.length || 0} · mechanics the design stage decides`, x => `${x.from ? `<code>${x.from}</code> ` : ''}${x.t}`)}
+  ${list('Dismissed', R.dismissed, `${R.dismissed?.length || 0} · with the sentence that forecloses each; reopen any at the approval`, x => `${x.id ? `<code>${x.id}</code> ` : ''}${x.t}`)}
+  ${list('Still open', R.residue, `${R.residue?.length || 0} · sustained when you closed the rounds`)}`;
 }
 
 /* ---------- design: glossary ---------- */
@@ -1308,6 +1349,8 @@ const RENDER = {
   'discovery/prfaq': renderPrfaq,
   'discovery/stories': renderStories,
   'discovery/inferred': renderInferred,
+  'discovery/wireframes': renderWireframes,
+  'discovery/review': renderDiscoveryReview,
   'design/glossary': renderGlossary,
   'design/flows': renderFlows,
   'design/ui': renderUI,

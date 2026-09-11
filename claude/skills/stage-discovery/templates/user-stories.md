@@ -39,6 +39,8 @@ Vocabulary:
 
 **As a** <persona>, **I want** <capability>, **so that** <outcome>.
 
+**Screens:** <none> | `wireframes/<screen>.html` (states this story owns: <empty · loading · error · no permission>)
+
 ### Acceptance criteria
 
 - **`<SLUG>-S-001-AC-1`** — WHEN <condition>, the system SHALL <observable behavior, concrete values>.

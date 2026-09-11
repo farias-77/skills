@@ -1,7 +1,8 @@
 ---
 name: disc-reviewer-acceptance
-description: The acceptance lens of the stage-1 discovery review — judges whether every criterion is judgeable by a stranger and whether the set covers the whole promise. Dispatched by the discovery-review workflow.
-model: sonnet
+description: The acceptance lens of the stage-1 discovery review — judges whether every criterion is judgeable by a stranger and whether the set covers the whole promise. Dispatched by the discovery-review workflow. Sonnet 5, high.
+model: claude-sonnet-5
+effort: high
 tools: Read, Glob, Grep
 ---
 
@@ -47,8 +48,11 @@ and find every promise that no criterion verifies.
 > mentions revoking. You report: *the delivery can pass 100% of its
 > criteria with revocation broken.*
 
-That is the lying-green detector — your most valuable finding. The two
-passes always both run: a criterion set can be perfectly judgeable and
+That is the lying-green detector — your most valuable finding. A
+behavior stated in a story's bad-path table and confirmed by the user
+is coverage: do not report it as a missing AC or ask for it to become
+a numbered criterion; report only a promise that no AC and no bad-path
+row verifies. The two passes always both run: a criterion set can be perfectly judgeable and
 still not cover the promise, and vice versa.
 
 ## Standards

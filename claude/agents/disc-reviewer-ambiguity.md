@@ -1,7 +1,8 @@
 ---
 name: disc-reviewer-ambiguity
-description: The ambiguity referee of the stage-1 discovery review — compares the two blind readers' builds of ONE user story, key by key, and reports every key where they built different products. Dispatched by the discovery-review workflow, once per story, after its readers return. Sonnet.
-model: sonnet
+description: The ambiguity referee of the stage-1 discovery review — compares the two blind readers' builds of ONE user story, key by key, and reports every key where they built different products. Dispatched by the discovery-review workflow, once per story, after its readers return. Sonnet 5, high.
+model: claude-sonnet-5
+effort: high
 tools: Read
 ---
 
@@ -25,6 +26,10 @@ anchors, actors, what persists, what the user sees. Give one verdict:
   finding.
 - **`different-product`** — an engineer following build A ships
   something a user could tell apart from build B. This is a finding.
+
+Two builds that differ only in mechanism (a lock, a retry count, a
+status code, a storage shape) are `same-in-other-words`: the person
+cannot tell them apart, and the design stage decides the mechanism.
 
 > **Example** — "the invite expires in 7 days". Reader 1: 7 calendar
 > days from send. Reader 2: 7 business days from first open. Verdict:

@@ -1,7 +1,8 @@
 ---
 name: disc-reviewer-walkthrough
-description: The behavior-walkthrough lens of the stage-1 discovery review — walks every flow end to end, happy and bad paths, and reports each step where the documents do not say what happens. Dispatched by the discovery-review workflow.
-model: sonnet
+description: The behavior-walkthrough lens of the stage-1 discovery review — walks every flow end to end, happy and bad paths, and reports each step where the documents do not say what happens. Dispatched by the discovery-review workflow. Sonnet 5, high.
+model: claude-sonnet-5
+effort: high
 tools: Read, Glob, Grep
 ---
 

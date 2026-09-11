@@ -60,19 +60,26 @@ Underneath, four mechanics carry everything:
 
 **1 · Discovery** — the engineering team interviewing the demand's
 owner, one fluid conversation with notes written as it happens, until
-the unknowns that would change what gets built are gone. One author
-then writes the PR-FAQ and the user stories from the notes: what gets
-built, what stays out, every acceptance criterion with an ID. **The
-owner validates every story by hand**, one question each, and closes
-the scope story by story: confirm, reduce, adjust, or cut; what
-leaves discovery is only what gets built. A whole review
-round runs, cheap by design (Sonnet and Haiku): three lenses read the
-documents while, per story, two **blind readers** describe what each
-would build and a referee reports where they built different products;
-a **judge** rules every finding by the discovery razor — a wrong guess
-would change what gets built — and marks who decides the fix: the
-author alone when it is wording, the owner when it is product, scope,
-cost or a confirmed fact. The round runs again, whole, once. In the
+the unknowns that would change what gets built are gone. When the
+demand has a front, the conductor (Opus 5, high) draws a wireframe
+per screen during the interview: grey boxes, real labels, the states;
+it stays as a deliverable the design starts from. Two authors
+(Sonnet 5, high) then write the PR-FAQ and the user stories from the
+notes, in parallel: what gets built, what stays out, every acceptance
+criterion with an ID. **The owner validates every story by hand**, one
+question each, and closes the scope story by story: confirm, reduce,
+adjust, or cut; what leaves discovery is only what gets built. A
+whole review round runs, cheap by design (Sonnet and Haiku): four
+lenses read the documents and the wireframes while, per story, two
+**blind readers** describe what each would build and a referee reports
+where they built different products. The **conductor judges** every
+finding by the discovery razor — a wrong guess would change what gets
+built — with a closed list of classes that are never dismissed
+(personal data, money, legal, security, a contradiction) and a
+"for the design" list for the mechanics that are stage 2's; wording
+goes to the authors without a question, decisions go to the owner
+grouped by decision. Up to three rounds, the owner choosing after each
+whether to run another. In the
 ideal world, this stage isn't run *for* the business team but *by*
 it — the skill interviews whoever owns the demand, and engineering
 only enters at stage 2 with the ambiguity already wrung out.
@@ -226,7 +233,7 @@ What the pipeline expects from its surroundings:
 | **blueprint** | the workstream's single review artifact — one URL, tabs per stage, pills per wave |
 | **conductor** | whoever dispatches and audits without doing the work — the stage's session |
 | **lens** | a reviewer scoped to one failure mode |
-| **judge** | the agent that rules every finding — sustained/deferred/dismissed, with the reason; reviewers report at the maximum bar. At discovery, design and plan the judge also names who owns the fix (author, human, or at design the implementer and at plan the worker) and the human rules what is his; at execution the conductor rules alone inside the story's review budget, and the residue rides as PR notes the human rules at the audit that closes stage 4 |
+| **judge** | whoever rules every finding — sustained/deferred/dismissed, with the reason; reviewers report at the maximum bar. At discovery it is the conductor itself; at design and plan a judge agent proposes. The ruling names who owns the fix (author, human, or at design the implementer and at plan the worker) and the human rules what is his; at execution the conductor rules alone inside the story's review budget, and the residue rides as PR notes the human rules at the audit that closes stage 4 |
 | **blind reader** | an agent that reads alone, so divergence from its sibling exposes ambiguity |
 | **andon** | stop before building on a broken premise — a cheap halt beats wrong work |
 | **dreaming** | the closing session where frictions become edits to the pipeline itself — the session suggests, the human rules every lesson |

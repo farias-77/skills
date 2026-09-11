@@ -27,10 +27,31 @@ dreaming session confirms the edit instead of debating the class.
 This is separate from the standing rule that every stage notes its
 own frictions as they happen — both feed the same file.
 
+## Every agent is named with its model and effort
+
+In every skill, agent table, README paragraph and message that names
+an agent, the name carries the model and the effort in parentheses:
+`disc-author-stories (Sonnet 5, high)`, `the conductor (Opus 5,
+high)`, `disc-blind-reader (Haiku 4.5, low)`. Model and effort live
+in the agent's frontmatter (`model:`, `effort:`); the parentheses are
+how the reader sees the cost of a step without opening the file.
+
+## How a question is asked
+
+Every question through the question tool has one shape. The question
+text carries the context (what this is about, the quote, the gap, why
+it matters) and asks one clear thing. Each option's label is the
+answer itself, in the words the user would say; its description is
+why that answer is an option: what it costs, what it buys, when it is
+the right one. The recommended option comes first and says so. Four
+questions to a call, at most. Never a board he answers in prose.
+
 ## The user's rulings are the record
 
-At discovery, design and plan the judge agent proposes (ruling +
-reason) and names the owner of each sustained finding: wording goes
+At discovery the conductor judges every finding by the stage's
+`references/judging.md`; at design and plan the judge agent proposes
+(ruling + reason). Either way the ruling names the owner of each
+sustained finding: wording goes
 to the author without a question; product, scope, cost, data format,
 contract shape, security posture, the sequence and confirmed
 decisions go to him; at design a real observation that is declared
@@ -45,11 +66,15 @@ Plus one veto question over what the author fixed alone. The budget
 at discovery, design and plan is two whole rounds; a third only on
 his explicit call. His validation of every story (confirm / reduce /
 adjust / cut) is a ruling too, recorded the same way.
-**The rulings are asked through the question tool, always**: one
-question per finding, the context in the question itself (source,
-severity, quote, gap, fix, the judge's reason), the three rulings as
-the answers with the judge's pick first and marked as his, four to a
-call. Never a board he answers in prose. At execution the conductor
+**The rulings are asked through the question tool, always**, in the
+house shape: one question per finding at design and plan, one
+question per **decision** at discovery (findings that resolve by the
+same choice are one question); the context in the question itself
+(source, severity, quote, gap, fix, the judge's reason), the rulings
+as the answers with the judge's pick first and marked as his, four to
+a call. Wording fixes are applied without a question and without a
+veto: the user reads the blueprint at the approval and reports there
+whatever he wants changed. At execution the conductor
 rules alone inside the story's review budget; the residue
 rides as PR notes and in the wave report, and the user rules it at
 the audit that closes stage 4; a note he rules on there is a ruling
