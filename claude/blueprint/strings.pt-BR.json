@@ -151,5 +151,163 @@
    "light": "○",
    "dark": "●"
   }
- }
+ },
+ "design": {
+  "sec": {
+   "what": "O que estamos construindo",
+   "architecture": "Arquitetura",
+   "data": "Modelo de dados",
+   "contracts": "Contratos",
+   "ui": "Telas",
+   "security": "Segurança",
+   "infra": "Infraestrutura",
+   "observability": "Alarmes e painéis",
+   "rollout": "Como chega em produção",
+   "code": "Código",
+   "acceptance": "O que prova que funciona",
+   "review": "A revisão"
+  },
+  "cells": {
+   "flows": "fluxos",
+   "components": "componentes",
+   "alarms": "alarmes que acordam alguém",
+   "alarmsTail": "de {n} alarmes no total",
+   "cards": "decisões registradas",
+   "against": "contra a recomendação",
+   "cost": "por mês, hoje",
+   "costTail": "teto aceito: {e}",
+   "cases": "casos de aceitação",
+   "groups": "grupos",
+   "latitude": "pontos que o implementador decide"
+  },
+  "happens": "O que acontece",
+  "goesWrong": "Quando dá errado",
+  "look": "Vale um olhar",
+  "mechanisms": "Os mecanismos que guardam uma regra",
+  "mech": {
+   "name": "Mecanismo",
+   "rule": "A regra que ele guarda",
+   "ifFails": "Se ele falhar"
+  },
+  "components": "Os componentes",
+  "comp": {
+   "name": "Componente",
+   "runsWhere": "Roda onde",
+   "does": "O que faz"
+  },
+  "extensions": "Pontos de extensão",
+  "ext": {
+   "when": "Quando",
+   "what": "O que muda",
+   "unchanged": "O que não muda"
+  },
+  "latitude": "O implementador decide",
+  "docFull": "O documento inteiro · {f}",
+  "ent": {
+   "name": "Entidade",
+   "key": "Chave",
+   "holds": "O que guarda",
+   "retention": "Retenção"
+  },
+  "access": "O que cada tela ou job precisa ler",
+  "acc": {
+   "need": "Precisa de",
+   "how": "Como lê"
+  },
+  "ct": {
+   "kind": "Tipo",
+   "name": "Contrato",
+   "caller": "Quem chama",
+   "returns": "Devolve",
+   "errors": "Erros"
+  },
+  "kinds": {
+   "route": "rota",
+   "event": "evento",
+   "table": "tabela"
+  },
+  "artboard": "Ver a prancheta",
+  "reused": "O que já existe e é reaproveitado",
+  "noArtboard": "sem prancheta própria",
+  "sweep": {
+   "cls": "Classe",
+   "verdict": "Veredito",
+   "how": "Como"
+  },
+  "verdicts": {
+   "covered": "coberto",
+   "accepted": "risco aceito",
+   "n/a": "não se aplica"
+  },
+  "abuse": "Caminhos de abuso",
+  "ab": {
+   "stops": "O que barra"
+  },
+  "resources": "Recurso",
+  "res": {
+   "why": "Para quê",
+   "rule": "A config que codifica uma regra ou um custo"
+  },
+  "bill": "A conta mensal",
+  "billLine": "Linha",
+  "fixed": "Fixo",
+  "variable": "Variável",
+  "total": "Total",
+  "envelope": "Teto aceito",
+  "wayIn": "Como entra em produção",
+  "al": {
+   "fires": "Toca quando",
+   "wakes": "Acorda",
+   "do": "O que fazer"
+  },
+  "quiet": "não acorda ninguém",
+  "watched": "O que é olhado e nunca acorda ninguém",
+  "gate": "Antes do próximo passo",
+  "wayBack": "O caminho de volta",
+  "firstRun": "A primeira execução",
+  "isNew": "repo novo",
+  "existing": "repo existente",
+  "changes": "O que muda",
+  "unchanged": "O que não muda",
+  "seams": "As costuras",
+  "groups": {
+   "group": "Grupo",
+   "count": "Casos",
+   "how": "Como roda",
+   "proves": "O que prova"
+  },
+  "decLede": "Cada decisão em três linhas: a pergunta, a escolha, o porquê. As outras opções ficam atrás do clique. As marcadas na borda foram contra a recomendação do condutor.",
+  "docNames": {
+   "macro": "A forma macro",
+   "architecture": "Arquitetura",
+   "data-model": "Modelo de dados",
+   "contracts": "Contratos",
+   "ui": "Telas",
+   "security": "Segurança",
+   "infra": "Infraestrutura",
+   "observability": "Alarmes e painéis",
+   "rollout": "Rollout",
+   "code": "Código",
+   "acceptance": "Aceitação"
+  },
+  "when": {
+   "session": "sessão",
+   "author": "pergunta do autor",
+   "round 1": "round 1",
+   "round 2": "round 2",
+   "approval": "aprovação",
+   "plan": "no plano",
+   "execution": "na execução"
+  },
+  "againstPill": "contra a recomendação",
+  "options": "As opções",
+  "recommended": "recomendada",
+  "rev": {
+   "conductor": "decididos pelo condutor",
+   "forPlan": "Vai para o plano"
+  },
+  "decisionsOf": "As decisões deste documento",
+  "picked": "escolhida"
+ },
+ "close": "Fechar"
 }

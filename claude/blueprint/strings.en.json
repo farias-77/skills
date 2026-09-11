@@ -151,5 +151,163 @@
    "light": "○",
    "dark": "●"
   }
- }
+ },
+ "design": {
+  "sec": {
+   "what": "What we are building",
+   "architecture": "Architecture",
+   "data": "Data model",
+   "contracts": "Contracts",
+   "ui": "Screens",
+   "security": "Security",
+   "infra": "Infrastructure",
+   "observability": "Alarms and dashboards",
+   "rollout": "How it reaches production",
+   "code": "Code",
+   "acceptance": "What proves it works",
+   "review": "The review"
+  },
+  "cells": {
+   "flows": "flows",
+   "components": "components",
+   "alarms": "alarms that wake someone",
+   "alarmsTail": "of {n} alarms in total",
+   "cards": "decisions recorded",
+   "against": "against the recommendation",
+   "cost": "per month, today",
+   "costTail": "accepted ceiling: {e}",
+   "cases": "acceptance cases",
+   "groups": "groups",
+   "latitude": "points the implementer decides"
+  },
+  "happens": "What happens",
+  "goesWrong": "When it goes wrong",
+  "look": "Worth a look",
+  "mechanisms": "The mechanisms that guard a rule",
+  "mech": {
+   "name": "Mechanism",
+   "rule": "The rule it guards",
+   "ifFails": "If it fails"
+  },
+  "components": "The components",
+  "comp": {
+   "name": "Component",
+   "runsWhere": "Runs where",
+   "does": "What it does"
+  },
+  "extensions": "Extension points",
+  "ext": {
+   "when": "When",
+   "what": "What changes",
+   "unchanged": "What does not"
+  },
+  "latitude": "The implementer decides",
+  "docFull": "The whole document · {f}",
+  "ent": {
+   "name": "Entity",
+   "key": "Key",
+   "holds": "What it holds",
+   "retention": "Retention"
+  },
+  "access": "What each screen or job needs to read",
+  "acc": {
+   "need": "Needs",
+   "how": "How it reads"
+  },
+  "ct": {
+   "kind": "Kind",
+   "name": "Contract",
+   "caller": "Who calls",
+   "returns": "Returns",
+   "errors": "Errors"
+  },
+  "kinds": {
+   "route": "route",
+   "event": "event",
+   "table": "table"
+  },
+  "artboard": "See the artboard",
+  "reused": "What already exists and is reused",
+  "noArtboard": "no artboard of its own",
+  "sweep": {
+   "cls": "Class",
+   "verdict": "Verdict",
+   "how": "How"
+  },
+  "verdicts": {
+   "covered": "covered",
+   "accepted": "risk accepted",
+   "n/a": "not applicable"
+  },
+  "abuse": "Abuse paths",
+  "ab": {
+   "stops": "What stops it"
+  },
+  "resources": "Resource",
+  "res": {
+   "why": "What for",
+   "rule": "The config that encodes a rule or a cost"
+  },
+  "bill": "The monthly bill",
+  "billLine": "Line",
+  "fixed": "Fixed",
+  "variable": "Variable",
+  "total": "Total",
+  "envelope": "Accepted ceiling",
+  "wayIn": "How it reaches production",
+  "al": {
+   "fires": "Fires when",
+   "wakes": "Wakes",
+   "do": "What to do"
+  },
+  "quiet": "wakes nobody",
+  "watched": "What is watched and never wakes anyone",
+  "gate": "Before the next step",
+  "wayBack": "The way back",
+  "firstRun": "The first run",
+  "isNew": "new repo",
+  "existing": "existing repo",
+  "changes": "What changes",
+  "unchanged": "What does not change",
+  "seams": "The seams",
+  "groups": {
+   "group": "Group",
+   "count": "Cases",
+   "how": "Runs as",
+   "proves": "What it proves"
+  },
+  "decLede": "Every decision in three lines: the question, the pick, the why. The other options sit behind the click. The ones marked on the edge went against the conductor's recommendation.",
+  "docNames": {
+   "macro": "The macro shape",
+   "architecture": "Architecture",
+   "data-model": "Data model",
+   "contracts": "Contracts",
+   "ui": "Screens",
+   "security": "Security",
+   "infra": "Infrastructure",
+   "observability": "Alarms and dashboards",
+   "rollout": "Rollout",
+   "code": "Code",
+   "acceptance": "Acceptance"
+  },
+  "when": {
+   "session": "session",
+   "author": "author's question",
+   "round 1": "round 1",
+   "round 2": "round 2",
+   "approval": "approval",
+   "plan": "at plan",
+   "execution": "at execution"
+  },
+  "againstPill": "against the recommendation",
+  "options": "The options",
+  "recommended": "recommended",
+  "rev": {
+   "conductor": "ruled by the conductor",
+   "forPlan": "Goes to the plan"
+  },
+  "decisionsOf": "The decisions of this document",
+  "picked": "chosen"
+ },
+ "close": "Close"
 }
