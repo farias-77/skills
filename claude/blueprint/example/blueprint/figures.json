@@ -1,0 +1,1 @@
+[ { "title": "An invite, end to end", "caption": "The admin sends, the person opens; the link dies after seven days or after one use.", "mermaid": "flowchart LR\n  A[Admin types e-mail] -- sends link --> E[E-mail]\n  E -- opens within 7 days --> P[Sets password]\n  P --> W[In the workspace]\n  E -. after 7 days .-> X[Expired]" } ]

@@ -61,9 +61,9 @@ work.
                 the authors and is applied; decisions go to the user, one question
                 per decision; "for the design" items are recorded, not asked.
 6. Iterate      up to three rounds; after each, ask the user whether to run another.
-7. Close        blueprint published (wireframes and the review inside), explicit
-                approval, adjustments noted and applied on "apply", state moved,
-                /clear.
+7. Close        report.json and review.json written, the blueprint built and
+                published, explicit approval, adjustments noted and applied on
+                "apply", state moved, /clear.
 ```
 
 The user is interrupted at four points: the playback (end of 1), the
@@ -103,7 +103,8 @@ On open:
 2. Derive the slug: `YYYY-MM-DD-<short-kebab-name>`.
 3. Create the workstream folder at the designs root (the consuming
    project's `CLAUDE.md` says where) with `.state.md` containing
-   `stage: discovery`.
+   `stage: discovery`, and `blueprint/workstream.json` (slug, title,
+   the user's language, `stage: discovery`).
 4. Create `00-discovery/notes.md` from
    [templates/notes.md](templates/notes.md) on the first turn, and
    write to it every turn. A dead session loses nothing; resuming is
@@ -112,7 +113,14 @@ On open:
 ```
 designs-root/2026-08-15-workspace-invites/
 ├── .state.md                # stage: discovery
-├── blueprint.html           # the workstream's blueprint — Overview + Discovery filled here
+├── blueprint.html           # built by node claude/blueprint/build.mjs; never edited by hand
+├── blueprint/               # the data the blueprint is built from (schema: claude/blueprint/schema/discovery.md)
+│   ├── workstream.json      # the conductor, at open
+│   ├── prfaq.json           # disc-author-prfaq, kept in step with pr-faq.md
+│   ├── stories.json         # disc-author-stories, kept in step with user-stories.md
+│   ├── wireframes.json · figures.json   # the conductor: the screens, the flow in one picture
+│   ├── review.json          # the conductor, after each round
+│   └── report.json          # the conductor, at the close: the plain-language layer
 ├── rulings.md               # created at the first ruling (house rule)
 └── 00-discovery/
     ├── notes.md             # the interview, written as it happens; kept
@@ -160,8 +168,10 @@ techniques:
   fixes what is on the screen, what each thing does, and where the
   user goes next. It is a deliverable: it stays in the folder, listed
   in `wireframes/README.md` (screen · stories it serves · states
-  drawn), and the design starts from it. For a demand with no front,
-  none.
+  drawn) and in `blueprint/wireframes.json` (the file's markup
+  embedded), and the design starts from it. For a demand with no
+  front, none. When the flow is clearer as a picture than as prose,
+  draw it once as mermaid in `blueprint/figures.json`.
 - **Prototype.** A throwaway HTML with fake data for a flow that
   needs to be felt rather than seen; an interview instrument only.
   Its path and what it settled go to the notes; the file lives outside
@@ -239,8 +249,12 @@ Write it into the notes.
 Two `Agent` dispatches in the same message, in parallel:
 **`disc-author-prfaq`** and **`disc-author-stories`**, each with the
 path to `notes.md`, its template, the wireframes folder when it
-exists, the slug, and the language of the documents (the user's). Each
-author writes from the notes only. Both briefs include, verbatim:
+exists, the slug, the language of the documents (the user's), and the
+blueprint schema (`claude/blueprint/schema/discovery.md`). Each author
+writes from the notes only, and writes its blueprint JSON
+(`blueprint/prfaq.json`, `blueprint/stories.json`) in the same pass:
+the same content, in the shape the shell reads, kept in step through
+every later fix. Both briefs include, verbatim:
 
 > Where the notes are ambiguous, write the reading their wording most
 > directly supports, list that assumption in the Inferred list, and do
@@ -375,16 +389,28 @@ reasons, and he decides at the approval.
 
 ## Step 7 — close
 
-Copy [assets/blueprint.html](assets/blueprint.html) to
-`<slug>/blueprint.html` (the shell's visible strings translated to the
-user's language, words only; house rule), fill the `BLUEPRINT` data:
-Overview (the frame, the direction) and the Discovery sections:
-PR-FAQ, User Stories, Wireframes (each screen embedded with the
-stories it serves), What was inferred (confirmed and rejected), and
-the review block (rounds run, findings per lens, what was ruled how,
-the "for the design" list, the dismissed with their reason, the
-residue). Publish, and keep the same file path at every later stage;
-record the owning account beside the URL in `.state.md`.
+The blueprint is built, never edited (house rule). Write the two
+files that are yours: `blueprint/review.json` (the rounds, your
+validation, the user's decisions, the author fixes, the for-the-design
+list, the dismissed with their sentence, the residue; from `reviews.md`
+and `rulings.md`) and `blueprint/report.json`, the plain-language
+layer the tab shows first: one sentence, three things to know, the
+flow in verbs, one sentence per story, one per decision the user took,
+and a short paragraph for what stays out, the bets, the inferred and
+the review. Write it for the newcomer on the team: technical but new,
+familiar words, a role for each thing, no code. Check the authors'
+`prfaq.json` and `stories.json` are in step with the final documents.
+Then:
+
+```
+node claude/blueprint/build.mjs <workstream-dir>
+```
+
+The build validates every file against
+[the schema](../../blueprint/schema/discovery.md) and refuses with the
+field named; fix the data, never the HTML. Publish `blueprint.html`,
+keep the same file path at every later stage, and record the owning
+account beside the URL in `.state.md`.
 
 Present the URL and ask for approval. Approval is explicit; silence or
 a loose "looks good" does not close the stage. The user reads the
@@ -416,7 +442,7 @@ named in a message carries its model and effort in parentheses.
 - **Working:** a prototype, outside the workstream folder.
 - **Permanent:** `notes.md`, `wireframes/`, `pr-faq.md`,
   `user-stories.md`, `reviews.md`, `rulings.md`, `taste-notes.md`,
-  `blueprint.html`, `.state.md`.
+  `blueprint/*.json`, `blueprint.html`, `.state.md`.
 
 ## Resuming
 

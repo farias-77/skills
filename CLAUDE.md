@@ -101,19 +101,32 @@ rule: the dreaming reads it next to `dreaming-notes.md` and decides,
 with him, what each note becomes — a standard, a skill line, an agent
 prompt — or whether it is dropped.
 
-## The blueprint speaks the user's language
+## The blueprint is built, never edited
 
-The blueprint is written in the language the user talks to you in —
-the `BLUEPRINT` data object, and the shell's own words too. The shell
-ships in English; when the conversation runs in another language,
-translate its visible strings (tab labels, section titles, subtitles,
-ledes, kickers, empty-state lines) to that language in the workstream's
-copy. That is the only edit the shell admits: translate the words,
-never touch structure, keys, CSS, or render logic — the identical shell
-across workstreams is what lets the reader find everything without
-searching. Discovery does the translation once, when it creates the
-file; every later stage writes its data in the same language. One
-language on the page, the reader's.
+No agent opens `blueprint.html`. Each stage writes JSON under
+`<workstream>/blueprint/` in the shapes `claude/blueprint/schema/`
+fixes, and `node claude/blueprint/build.mjs <workstream>` assembles
+the shell from the pipeline repo, the data and the strings of the
+workstream's language into one self-contained file, validating the
+data and refusing with the field named. The shell is the repo's: a
+fix there reaches every workstream at its next build, and no
+workstream carries its own copy to port. Only the stages that have
+data appear on the page; a stage that has not run is a step in the
+journey line, never a tab.
+
+The shell's invariants, kept in the repo and never negotiated per
+workstream: the page never scrolls sideways (only tables, figures and
+wireframes scroll inside their own box); light and dark themes, a
+monochrome palette, the theme button on the rail; body text 18 px on
+a wide column; every section opens with a plain-language layer
+written for the newcomer on the team, and the documents' detail sits
+behind a click. A stage that needs a picture writes mermaid in the
+data; the page renders it.
+
+The blueprint is written in the language the user talks to you in:
+`workstream.json` names it, and `claude/blueprint/strings.<lang>.json`
+carries the shell's own words. A new language is a new strings file in
+the repo, not a translated copy of the shell.
 
 ## The blueprint is the report; the files are the record
 
@@ -163,5 +176,6 @@ altitude.
   6–8 thousand words across its nine subtabs; a subtab in two or three.
   Plan and Execution tabs hold the same altitude.
 
-Discovery is the exception: the PR-FAQ and the stories are the demand
-itself, and the user approves them there — shown whole.
+Discovery keeps the PR-FAQ and the stories whole, because they are
+the demand itself and the user approves them there; whole behind the
+click, with the plain sentence in front.

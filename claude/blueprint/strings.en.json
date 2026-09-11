@@ -1,0 +1,155 @@
+{
+ "stageName": "Discovery",
+ "stages": {
+  "discovery": "Discovery",
+  "design": "Design",
+  "plan": "Plan",
+  "execution": "Execution",
+  "release": "Release",
+  "close": "Close"
+ },
+ "opened": "opened",
+ "approved": "approved",
+ "slug": "workstream",
+ "sec": {
+  "what": "What this is",
+  "how": "How it works",
+  "faq": "Questions and answers",
+  "stories": "The stories",
+  "out": "What stays out",
+  "bets": "The bets",
+  "inferred": "What was inferred",
+  "wireframes": "Wireframes",
+  "review": "The review"
+ },
+ "cells": {
+  "stories": "stories",
+  "personas": "personas",
+  "acs": "acceptance criteria",
+  "badPaths": "bad paths defined",
+  "screens": "screens in wireframe",
+  "screensTail": "in wireframe",
+  "noFront": "no front in this demand",
+  "out": "items out",
+  "direction": "are future direction",
+  "bets": "bets standing",
+  "betsOpen": "open"
+ },
+ "eye": {
+  "title": "What needs your eye",
+  "none": "Nothing open: everything here was confirmed or decided by you.",
+  "residue": "Review residue",
+  "bet": "Open bet",
+  "inferred": "Inference without a ruling",
+  "dismissed": "Dismissed in the review",
+  "dismissedTail": "findings dismissed by the conductor, each with the sentence that closes it;",
+  "seeReview": "read them in the review"
+ },
+ "problem": "The problem",
+ "solution": "The solution",
+ "howItWorks": "How it works, in four sentences",
+ "faqLede": "The questions that matter most, answered as the PR-FAQ answers them. The rest sit behind a click.",
+ "faqExternal": "For those who use it",
+ "faqInternal": "For those who build it",
+ "storiesLede": "{n} stories. Each in one sentence; the acceptance criteria, the bad paths and what stayed out are behind a click, for whoever wants to check.",
+ "story": {
+  "as": "As",
+  "want": "I want",
+  "so": "so that",
+  "acs": "criteria",
+  "bad": "bad paths",
+  "criteria": "Acceptance criteria",
+  "badPaths": "Bad paths",
+  "screens": "Screens",
+  "out": "Out of this story"
+ },
+ "badCat": {
+  "Boundary input": "boundary input",
+  "Repeat / concurrency": "repeat and concurrency",
+  "Dependency failure": "dependency down",
+  "Permission": "permission"
+ },
+ "tools": {
+  "collapse": "Collapse all",
+  "expand": "Expand all"
+ },
+ "personas": "Personas",
+ "vocabulary": "Vocabulary",
+ "outLede": "Two kinds, always named: what is not built, with the reason; and what is future direction, so the design knows where to leave room.",
+ "out": {
+  "outTitle": "Not built",
+  "dirTitle": "Future direction, not scheduled",
+  "outPill": "out",
+  "dirPill": "direction"
+ },
+ "betsLede": "What has to be true for this to work, and how each bet was checked.",
+ "bets": {
+  "holds": "holds",
+  "fails": "does not hold",
+  "unchecked": "unchecked",
+  "checkedBy": "checked by"
+ },
+ "infLede": "{n} things the conductor assumed and you confirmed or rejected. The {c} marked ones changed in the review rounds by your decision.",
+ "inf": {
+  "confirmed": "confirmed",
+  "rejected": "rejected",
+  "open": "no ruling",
+  "superseded": "superseded",
+  "landed": "in"
+ },
+ "wf": {
+  "none": "This demand has no front: no screen was drawn. When there is one, each screen appears here embedded, with the stories it serves and the states drawn (empty, loading, error, no permission).",
+  "lede": "One screen per wireframe: what is on it, what each thing does, where the user goes next. The look is the design stage's."
+ },
+ "revLede": "What the lenses found, what the conductor decided alone, what was asked of you, what goes to the design, and what died with the sentence that closes it.",
+ "rev": {
+  "round": "Round",
+  "findings": "Findings",
+  "toAuthor": "To the author",
+  "toUser": "To you",
+  "deferred": "Deferred",
+  "dismissed": "Dismissed",
+  "unread": "Unread",
+  "changed": "What changed",
+  "validation": "Your validation of the stories",
+  "decisions": "Your decisions, in plain words",
+  "forDesign": "For the design",
+  "authorFixes": "Fixed by the author without asking",
+  "dismissedList": "Dismissed, with the sentence that closes each",
+  "residue": "Still open",
+  "nothing": "Nothing here."
+ },
+ "val": {
+  "confirm": "confirmed",
+  "reduce": "reduced",
+  "adjust": "adjusted",
+  "cut": "cut"
+ },
+ "foot": {
+  "files": "Source",
+  "built": "built"
+ },
+ "inOneSentence": "In one sentence",
+ "threeThings": "Three things to know",
+ "howLede": "Four steps, in plain words. The drawing below is the same path.",
+ "howFull": "As the PR-FAQ describes it, in full",
+ "faqMore": "{n} more questions",
+ "storyOpen": "See the criteria and the bad paths",
+ "vocabularyFold": "This workstream's vocabulary",
+ "outFull": "The whole list, with the reason for each item",
+ "infChanged": "The ones that changed by your decision",
+ "infRest": "The other {n}, confirmed as they were",
+ "revNumbers": "In numbers",
+ "decisionPlain": "what you decided",
+ "theme": {
+  "label": "Theme",
+  "system": "system",
+  "light": "light",
+  "dark": "dark",
+  "icon": {
+   "system": "◐",
+   "light": "○",
+   "dark": "●"
+  }
+ }
+}

@@ -1,0 +1,12 @@
+{
+  "inOneSentence": "An admin types an e-mail and the person joins the workspace by a link, without anyone creating accounts or sharing passwords by hand.",
+  "threeThings": [ { "t": "Nobody creates accounts by hand anymore.", "p": "The admin types an e-mail. The person sets their own password when they open the link." }, { "t": "A link lives seven days, once.", "p": "After that it shows as expired; the admin sends a new one. Opened twice, the second open says it was already used." }, { "t": "Whoever opens the link first gets in.", "p": "A forwarded link is a risk you accepted for the first customers; a second factor may come later." } ],
+  "howSteps": [ { "t": "Type", "p": "The admin types the person's e-mail on the pending invites screen." }, { "t": "Send", "p": "The system e-mails a link that works for seven days." }, { "t": "Open", "p": "The person opens it, chooses a password and is in the workspace." }, { "t": "Expire", "p": "Unopened after seven days, the link says it expired; the admin can resend." } ],
+  "stories": { "S-001": "The admin invites by e-mail; a link goes out, and inviting a member again sends nothing.", "S-002": "The person opens the link, sets a password and is in; an expired link just says so." },
+  "keyFaq": { "external": [ 1 ], "internal": [ 0 ] },
+  "outPlain": "Two things stay out. Bulk invites from a spreadsheet are future direction. Roles at invite time are not built: everyone comes in as a member.",
+  "betsPlain": "One bet is unchecked: that seven days is enough for people to open the link. The e-mail provider's delivery time holds by its published SLA.",
+  "inferredPlain": "One assumption, confirmed: a week means seven calendar days.",
+  "reviewPlain": "One round, three findings. One decision was yours (the forwarded link); the author fixed one wording; one mechanism goes to the design; one finding was dismissed with the sentence that closes it.",
+  "decisions": { "1:disc-reviewer-boundary#1": "A forwarded link lets whoever opens it first in; you accepted the risk for now." }
+}

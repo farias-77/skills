@@ -1,0 +1,8 @@
+{ "opened": "2026-08-15", "approved": "2026-08-16",
+  "rounds": [ { "n": 1, "run": "wf_example", "findings": 3, "toAuthor": 1, "toUser": 1, "deferred": 0, "dismissed": 1, "unread": [], "changed": "AC-2 of S-001 gained the 'send nothing' clause" } ],
+  "validation": [ { "story": "S-001", "ruling": "confirm" }, { "story": "S-002", "ruling": "confirm" } ],
+  "decisions": [ { "id": "disc-reviewer-boundary#1", "round": 1, "lens": "boundary", "title": "Forwarded link: who gets the account?", "gap": "nothing says what happens when the link is forwarded", "ruling": "risk accepted: whoever opens first", "words": "not worth a second factor for the first customers" } ],
+  "authorFixes": [ { "id": "disc-reviewer-acceptance#1", "round": 1, "title": "AC-2 did not say that nothing is sent" } ],
+  "forDesign": [ { "id": "disc-reviewer-ambiguity#1", "story": "S-002", "title": "token format and where it is stored", "why": "a mechanism the design decides; both readers built the same behavior" } ],
+  "dismissed": [ { "id": "disc-reviewer-walkthrough#2", "round": 1, "lens": "walkthrough", "title": "no confirmation dialog on revoke", "why": "every reading builds the same thing at this altitude; 'the admin removes it from the pending list' is the whole behavior" } ],
+  "residue": [] }

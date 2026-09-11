@@ -1,0 +1,16 @@
+{
+  "personas": [ { "persona": "admin", "who": "runs a workspace" }, { "persona": "invitee", "who": "the person invited" } ],
+  "vocabulary": [ { "term": "invite", "def": "a link sent to an e-mail that lets one person join one workspace" } ],
+  "stories": [
+    { "id": "S-001", "name": "Send an invite", "as": "admin", "want": "to invite someone by e-mail", "so": "that they join without me creating the account",
+      "acs": [ { "id": "WSINV-S-001-AC-1", "kind": "WHEN", "text": "an admin submits an e-mail, the system SHALL send a link valid for 7 calendar days." }, { "id": "WSINV-S-001-AC-2", "kind": "IF", "text": "the e-mail is already a member, THEN the system SHALL refuse with a hint and send nothing." } ],
+      "badPaths": [ { "category": "Boundary input", "case": "e-mail empty or malformed", "behavior": "refused before sending" }, { "category": "Repeat / concurrency", "case": "same e-mail invited twice", "behavior": "the first pending invite is resent, no second one" }, { "category": "Dependency failure", "case": "e-mail provider down", "behavior": "the invite stays pending and the admin sees 'not sent yet'" }, { "category": "Permission", "case": "a member tries to invite", "behavior": "the action is not shown" } ],
+      "screens": [ "wireframes/pending-invites.html" ], "out": [ "choosing a role at invite time (S-003, later)" ] },
+    { "id": "S-002", "name": "Accept an invite", "as": "invitee", "want": "to open the link and set my password", "so": "that I am in the workspace",
+      "acs": [ { "id": "WSINV-S-002-AC-1", "kind": "WHEN", "text": "a person opens a valid link, the system SHALL ask for a password and log them in." }, { "id": "WSINV-S-002-AC-2", "kind": "IF", "text": "the link is expired, THEN the system SHALL say so and offer nothing else." } ],
+      "badPaths": [ { "category": "Boundary input", "case": "password too short", "behavior": "refused with the rule shown" }, { "category": "Repeat / concurrency", "case": "link opened twice", "behavior": "second open says the invite was already used" }, { "category": "Dependency failure", "case": "identity service down", "behavior": "an error page; the link stays valid" }, { "category": "Permission", "case": "link forwarded to someone else", "behavior": "whoever opens it first gets the account; risk accepted" } ],
+      "screens": [], "out": [] }
+  ],
+  "inferred": [ { "id": "I-1", "landed": "S-001 AC-1", "assumed": "seven calendar days, not business days", "why": "the user said 'a week'", "ruling": "confirmed", "changed": false, "note": "" } ],
+  "openQuestions": []
+}

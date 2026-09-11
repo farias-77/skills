@@ -1,0 +1,155 @@
+{
+ "stageName": "Discovery",
+ "stages": {
+  "discovery": "Discovery",
+  "design": "Design",
+  "plan": "Plano",
+  "execution": "Execução",
+  "release": "Release",
+  "close": "Fechamento"
+ },
+ "opened": "aberto em",
+ "approved": "aprovado em",
+ "slug": "frente",
+ "sec": {
+  "what": "O que é isto",
+  "how": "Como funciona",
+  "faq": "Perguntas e respostas",
+  "stories": "As histórias",
+  "out": "O que fica de fora",
+  "bets": "As apostas",
+  "inferred": "O que foi inferido",
+  "wireframes": "Wireframes",
+  "review": "A revisão"
+ },
+ "cells": {
+  "stories": "histórias",
+  "personas": "personas",
+  "acs": "critérios de aceitação",
+  "badPaths": "maus caminhos definidos",
+  "screens": "tela em wireframe",
+  "screensTail": "em wireframe",
+  "noFront": "sem front nesta demanda",
+  "out": "itens fora",
+  "direction": "são direção futura",
+  "bets": "apostas de pé",
+  "betsOpen": "em aberto"
+ },
+ "eye": {
+  "title": "O que precisa do seu olho",
+  "none": "Nada em aberto: tudo que está aqui foi confirmado ou decidido por você.",
+  "residue": "Resíduo da revisão",
+  "bet": "Aposta em aberto",
+  "inferred": "Inferência sem ruling",
+  "dismissed": "Descartados na revisão",
+  "dismissedTail": "achados descartados pelo condutor, cada um com a frase que o fecha;",
+  "seeReview": "leia-os na revisão"
+ },
+ "problem": "O problema",
+ "solution": "A solução",
+ "howItWorks": "Como funciona, em quatro frases",
+ "faqLede": "As perguntas que mais importam, respondidas como o PR-FAQ responde. As outras ficam atrás do clique.",
+ "faqExternal": "Para quem usa",
+ "faqInternal": "Para quem constrói",
+ "storiesLede": "{n} histórias. Cada uma em uma frase; os critérios de aceitação, os maus caminhos e o que ficou fora estão atrás do clique, para quem quiser conferir.",
+ "story": {
+  "as": "Como",
+  "want": "quero",
+  "so": "para que",
+  "acs": "critérios",
+  "bad": "maus caminhos",
+  "criteria": "Critérios de aceitação",
+  "badPaths": "Maus caminhos",
+  "screens": "Telas",
+  "out": "Fora desta história"
+ },
+ "badCat": {
+  "Boundary input": "entrada no limite",
+  "Repeat / concurrency": "repetição e concorrência",
+  "Dependency failure": "dependência fora",
+  "Permission": "permissão"
+ },
+ "tools": {
+  "collapse": "Recolher todas",
+  "expand": "Abrir todas"
+ },
+ "personas": "Personas",
+ "vocabulary": "Vocabulário",
+ "outLede": "Dois tipos, sempre nomeados: o que não se constrói, com a razão; e o que é direção futura, para o design saber onde deixar espaço.",
+ "out": {
+  "outTitle": "Não se constrói",
+  "dirTitle": "Direção futura, sem data",
+  "outPill": "fora",
+  "dirPill": "direção"
+ },
+ "betsLede": "O que precisa ser verdade para isto funcionar, e como cada aposta foi checada.",
+ "bets": {
+  "holds": "de pé",
+  "fails": "não se sustenta",
+  "unchecked": "não checada",
+  "checkedBy": "checada por"
+ },
+ "infLede": "{n} coisas que o condutor supôs e você confirmou ou rejeitou. As {c} marcadas mudaram nas rodadas de revisão por decisão sua.",
+ "inf": {
+  "confirmed": "confirmada",
+  "rejected": "rejeitada",
+  "open": "sem ruling",
+  "superseded": "superada",
+  "landed": "em"
+ },
+ "wf": {
+  "none": "Esta demanda não tem front: nenhuma tela foi desenhada. Quando há, cada tela aparece aqui embutida, com as histórias que ela serve e os estados desenhados (vazio, carregando, erro, sem permissão).",
+  "lede": "Uma tela por wireframe: o que está nela, o que cada coisa faz, para onde se vai. O visual é do design."
+ },
+ "revLede": "O que as lentes acharam, o que o condutor decidiu sozinho, o que foi perguntado a você, o que fica para o design, e o que morreu com a frase que o fecha.",
+ "rev": {
+  "round": "Rodada",
+  "findings": "Achados",
+  "toAuthor": "Ao autor",
+  "toUser": "A você",
+  "deferred": "Adiados",
+  "dismissed": "Descartados",
+  "unread": "Não lidas",
+  "changed": "O que mudou",
+  "validation": "Sua validação das histórias",
+  "decisions": "As suas decisões, em linguagem simples",
+  "forDesign": "Para o design",
+  "authorFixes": "Corrigido pelo autor sem perguntar",
+  "dismissedList": "Descartados, com a frase que fecha cada um",
+  "residue": "Ainda em aberto",
+  "nothing": "Nada aqui."
+ },
+ "val": {
+  "confirm": "confirmadas",
+  "reduce": "reduzidas",
+  "adjust": "ajustadas",
+  "cut": "cortadas"
+ },
+ "foot": {
+  "files": "Fonte",
+  "built": "montado em"
+ },
+ "inOneSentence": "Em uma frase",
+ "threeThings": "Três coisas para saber",
+ "howLede": "Quatro passos, em linguagem de gente. O desenho abaixo é o mesmo caminho.",
+ "howFull": "Como o PR-FAQ descreve, na íntegra",
+ "faqMore": "Mais {n} perguntas",
+ "storyOpen": "Ver os critérios e os maus caminhos",
+ "vocabularyFold": "Vocabulário desta frente",
+ "outFull": "A lista inteira, com a razão de cada item",
+ "infChanged": "As que mudaram por decisão sua",
+ "infRest": "As outras {n}, confirmadas como estavam",
+ "revNumbers": "Em números",
+ "decisionPlain": "o que você decidiu",
+ "theme": {
+  "label": "Tema",
+  "system": "sistema",
+  "light": "claro",
+  "dark": "escuro",
+  "icon": {
+   "system": "◐",
+   "light": "○",
+   "dark": "●"
+  }
+ }
+}

@@ -20,7 +20,10 @@ One of two briefs from the conductor:
   ([user-stories.md](../skills/stage-discovery/templates/user-stories.md)),
   the wireframes folder when it exists (its `README.md` maps screen →
   stories → states), the workstream slug, and the language the
-  document is written in. You produce `00-discovery/user-stories.md`.
+  document is written in, and the blueprint schema. You produce
+  `00-discovery/user-stories.md` and `blueprint/stories.json`: the
+  same content in the shape the schema fixes, written in the same pass
+  and kept in step through every fix, the validation included.
   Another author writes `pr-faq.md` from the same notes at the same
   time; you do not read it.
 - **apply** — the path to `user-stories.md` and a list of fixes, each
@@ -61,9 +64,10 @@ For every fix in the batch:
 
 1. Make the edit the fix asks for, in the sentence it names. Do not
    add a second sentence that qualifies the first; change the first.
-2. **Propagate.** The concept you changed appears in other stories:
-   search the file for the term, the value, the actor, the AC id, the
-   screen name, and change every mention the fix makes wrong. Report a
+2. **Propagate.** The concept you changed appears in other stories
+   and in `blueprint/stories.json`: search for the term, the value,
+   the actor, the AC id, the screen name, and change every mention the
+   fix makes wrong, in both. Report a
    mentions table: term · line · changed or left, with one line of
    reason for every "left". When the fix names a change the PR-FAQ
    must mirror (an Out item, a promise), say so in the report; the
@@ -99,7 +103,7 @@ ids are never renumbered.
 
 You do not judge findings, do not choose between readings, and do not
 add scope the notes do not carry. You do not touch `pr-faq.md`, the
-wireframes, `.state.md`, `reviews.md`, `rulings.md` or the blueprint.
+wireframes, `.state.md`, `reviews.md`, `rulings.md` or `blueprint.html`.
 You do not talk to the user; the conductor does.
 
 ## Response contract

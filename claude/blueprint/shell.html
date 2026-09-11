@@ -1,0 +1,386 @@
+<title>__TITLE__</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&family=Source+Sans+3:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+  :root {
+    --bg: #F7F7F7; --surface: #FFFFFF; --surface-2: #EFEFEF;
+    --ink: #111111; --ink-2: #444444; --ink-3: #767676;
+    --line: #E2E2E2; --line-2: #CFCFCF;
+    --accent: #111111; --accent-ink: #111111; --accent-bg: #EAEAEA;
+    --good: #1F1F1F; --good-bg: #E6E6E6; --warn: #3A3A3A; --warn-bg: #EDEDED; --bad: #111111; --bad-bg: #DADADA;
+    --mark: #E8E8E8;
+    --f-display: 'Newsreader', Georgia, 'Times New Roman', serif;
+    --f-body: 'Source Sans 3', 'Segoe UI', system-ui, sans-serif;
+    --f-mono: 'JetBrains Mono', ui-monospace, Menlo, monospace;
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #0E0E0E; --surface: #171717; --surface-2: #202020;
+      --ink: #F0F0F0; --ink-2: #B8B8B8; --ink-3: #8A8A8A;
+      --line: #2B2B2B; --line-2: #3A3A3A;
+      --accent: #F0F0F0; --accent-ink: #F0F0F0; --accent-bg: #262626;
+      --good: #E6E6E6; --good-bg: #262626; --warn: #CFCFCF; --warn-bg: #222222; --bad: #FFFFFF; --bad-bg: #333333;
+      --mark: #2E2E2E;
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #0E0E0E; --surface: #171717; --surface-2: #202020;
+    --ink: #F0F0F0; --ink-2: #B8B8B8; --ink-3: #8A8A8A;
+    --line: #2B2B2B; --line-2: #3A3A3A;
+    --accent: #F0F0F0; --accent-ink: #F0F0F0; --accent-bg: #262626;
+    --good: #E6E6E6; --good-bg: #262626; --warn: #CFCFCF; --warn-bg: #222222; --bad: #FFFFFF; --bad-bg: #333333;
+    --mark: #2E2E2E;
+    color-scheme: dark;
+  }
+
+  * { box-sizing: border-box; }
+  /* the page never scrolls sideways: the viewport clips, every grid/flex child may shrink,
+     long tokens wrap, and only tables, figures and wireframes scroll inside their own box */
+  html, body { overflow-x: clip; max-width: 100%; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font: 18px/1.6 var(--f-body); padding-inline: 16px; padding-block: 0 80px; }
+  :where(.top, .page, .col, .sec, .hero, .cells, .duo, .split, .list, .faq, .smap, .story, .story .body, .row, .inf, .qa, .cell, .wf, .rev, .tools, .chips, .bad, .acs li, .fnd, .eye, details.fold, details.fold .inner) > * { min-width: 0; }
+  p, li, td, th, code, .chip, .pill, .t, .d, .a, .q, .as, .wh, summary, h1, h2, h3, h4 { overflow-wrap: anywhere; }
+  .pill, .cnt { white-space: normal; }
+  pre.mermaid { white-space: pre-wrap; overflow-wrap: anywhere; }
+  img, svg, iframe, video { max-width: 100%; }
+  a { color: var(--accent-ink); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  code, .mono { font-family: var(--f-mono); font-size: .86em; }
+  code { background: var(--surface-2); border-radius: 4px; padding: 1px 5px; }
+  h1, h2, h3, h4 { font-family: var(--f-display); font-weight: 500; letter-spacing: -.01em; text-wrap: balance; margin: 0; }
+  h2 { font-size: 34px; line-height: 1.15; }
+  h3 { font-size: 24px; line-height: 1.25; }
+  h4 { font-size: 18px; font-family: var(--f-body); font-weight: 600; }
+  p { margin: 0; }
+  .kicker { font: 500 13px/1 var(--f-body); letter-spacing: .08em; text-transform: uppercase; color: var(--ink-3); }
+  :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; scroll-behavior: auto !important; } }
+  html { scroll-behavior: smooth; }
+
+  /* ---------- top bar: identity and journey ---------- */
+  .top { max-width: 1560px; margin: 0 auto; padding-block: 22px 14px; display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 12px 24px; border-bottom: 1px solid var(--line); }
+  .top .brand { display: flex; flex-direction: column; gap: 2px; }
+  .top .brand b { font-family: var(--f-display); font-weight: 600; font-size: 22px; letter-spacing: -.01em; }
+  .journey { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+  .journey .st { display: inline-flex; align-items: center; gap: 7px; padding: 5px 11px; border-radius: 999px; font-size: 14.5px; color: var(--ink-3); border: 1px solid transparent; }
+  .journey .st .dot { width: 8px; height: 8px; border-radius: 999px; background: var(--line-2); }
+  .journey .st.done { color: var(--ink-2); }
+  .journey .st.done .dot { background: var(--good); }
+  .journey .st.now { color: var(--accent-ink); background: var(--accent-bg); border-color: transparent; font-weight: 600; }
+  .journey .st.now .dot { background: var(--accent); }
+  .journey .sep { color: var(--line-2); }
+
+  /* ---------- layout: rail + column ---------- */
+  .page { max-width: 1560px; margin: 0 auto; display: grid; grid-template-columns: minmax(0, 240px) minmax(0, 1fr); gap: 56px; padding-top: 32px; }
+  .rail { position: sticky; top: 16px; align-self: start; display: flex; flex-direction: column; gap: 2px; }
+  .rail a { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; padding: 7px 10px; border-radius: 8px; color: var(--ink-2); font-size: 15.5px; border-left: 2px solid transparent; }
+  .rail a .n { font-family: var(--f-mono); font-size: 11px; color: var(--ink-3); }
+  .rail a:hover { background: var(--surface); text-decoration: none; }
+  .rail a.on { color: var(--ink); background: var(--surface); border-left-color: var(--accent); }
+  .rail .rl { margin: 14px 10px 6px; }
+  .rail .theme { margin-top: 18px; padding: 8px 10px; border-radius: 8px; border: 1px solid var(--line-2); background: var(--surface); color: var(--ink-2); font: 500 14px/1 var(--f-body); cursor: pointer; text-align: left; }
+  .rail .theme:hover { color: var(--ink); border-color: var(--ink-3); }
+  .col { min-width: 0; display: flex; flex-direction: column; gap: 72px; }
+  .sec { scroll-margin-top: 20px; display: flex; flex-direction: column; gap: 18px; }
+  .sec > header { display: flex; flex-direction: column; gap: 6px; max-width: 90ch; }
+  .sec > header .lede { font-size: 19px; color: var(--ink-2); line-height: 1.55; }
+  .prose { max-width: 90ch; display: flex; flex-direction: column; gap: 12px; }
+  .prose p { line-height: 1.62; }
+  @media (max-width: 860px) { .page { grid-template-columns: minmax(0, 1fr); gap: 24px; } .rail { position: static; flex-direction: row; flex-wrap: wrap; } .rail .rl { display: none; } h2 { font-size: 26px; } }
+
+  /* ---------- hero ---------- */
+  .hero { display: grid; grid-template-columns: minmax(0, 1fr); gap: 22px; }
+  .hero h1 { font-size: 34px; line-height: 1.12; font-weight: 500; max-width: 40ch; }
+  .hero .lead { font-size: 18.5px; color: var(--ink-2); max-width: 66ch; line-height: 1.55; }
+  .hero .meta { display: flex; flex-wrap: wrap; gap: 8px 18px; font-size: 15px; color: var(--ink-3); }
+  .cells { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; }
+  .cell { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px; display: flex; flex-direction: column; gap: 3px; }
+  .cell .v { font-family: var(--f-display); font-size: 34px; line-height: 1; font-variant-numeric: tabular-nums; }
+  .cell .l { font-size: 15px; color: var(--ink-2); }
+  .cell .s { font-size: 13.5px; color: var(--ink-3); }
+  @media (max-width: 860px) { .hero h1 { font-size: 27px; } }
+
+  /* ---------- "needs your eye" ---------- */
+  .eye { background: var(--surface); border: 1px solid var(--line); border-left: 3px solid var(--ink); border-radius: 12px; padding: 18px 22px; max-width: 110ch; display: flex; flex-direction: column; gap: 10px; }
+  .eye ul { margin: 0; padding-left: 18px; display: flex; flex-direction: column; gap: 6px; }
+  .eye li { line-height: 1.5; }
+  .eye .none { color: var(--ink-3); }
+
+  /* ---------- two-column problem / solution ---------- */
+  .duo { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 14px; }
+  .duo .card { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 18px 20px; display: flex; flex-direction: column; gap: 8px; }
+  .duo .card p { color: var(--ink-2); line-height: 1.6; }
+
+  /* ---------- figure ---------- */
+  figure { margin: 0; background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 18px; overflow-x: auto; }
+  figure svg { max-width: 100%; height: auto; display: block; }
+  figcaption { margin-top: 12px; font-size: 15px; color: var(--ink-3); }
+  pre.mermaid { background: transparent; margin: 0; }
+
+  /* ---------- FAQ ---------- */
+  .faq { display: grid; grid-template-columns: repeat(auto-fit, minmax(380px, 1fr)); gap: 14px; }
+  .qa { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px; display: flex; flex-direction: column; gap: 6px; }
+  .qa .q { font-weight: 600; line-height: 1.4; }
+  .qa .a { color: var(--ink-2); line-height: 1.55; font-size: 17px; }
+
+  /* ---------- story map + story cards ---------- */
+  .smap { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 10px; }
+  .smap .sm { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; display: flex; flex-direction: column; gap: 4px; font-size: 15px; }
+  .smap .sm .id { font-family: var(--f-mono); font-size: 11.5px; color: var(--ink-3); }
+  .smap .sm .who { color: var(--ink-3); font-size: 12px; }
+  .smap a.sm:hover { border-color: var(--accent); text-decoration: none; }
+  .tools { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+  .btn { font: 500 13px/1 var(--f-body); padding: 7px 12px; border-radius: 8px; border: 1px solid var(--line-2); background: var(--surface); color: var(--ink-2); cursor: pointer; }
+  .btn:hover { border-color: var(--accent); color: var(--accent-ink); }
+  .story { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; scroll-margin-top: 20px; }
+  .story > summary { list-style: none; cursor: pointer; padding: 18px 20px; display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: 6px 14px; align-items: baseline; }
+  .story > summary::-webkit-details-marker { display: none; }
+  .story > summary .id { font-family: var(--f-mono); font-size: 12px; color: var(--ink-3); }
+  .story > summary h3 { grid-column: 2; }
+  .story > summary .sent { grid-column: 2; color: var(--ink-2); line-height: 1.5; }
+  .story > summary .cnt { grid-column: 3; grid-row: 1 / span 2; font-size: 12.5px; color: var(--ink-3); text-align: right; }
+  .story > summary .chev { display: inline-block; transition: transform .15s; }
+  .story[open] > summary .chev { transform: rotate(90deg); }
+  .story .body { padding: 0 20px 20px; display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 18px 28px; border-top: 1px solid var(--line); padding-top: 16px; }
+  .story .body .full { grid-column: 1 / -1; }
+  .acs { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 8px; }
+  .acs li { display: grid; grid-template-columns: 56px minmax(0, 1fr); gap: 10px; align-items: baseline; font-size: 16.5px; line-height: 1.5; }
+  .acs li .n { font-family: var(--f-mono); font-size: 11.5px; color: var(--ink-3); }
+  .acs li .kw { font-family: var(--f-mono); font-size: 11.5px; color: var(--accent-ink); }
+  .bad { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; }
+  .bad .bp { background: var(--surface-2); border-radius: 10px; padding: 10px 12px; display: flex; flex-direction: column; gap: 4px; font-size: 15px; }
+  .bad .bp .cat { font-size: 11.5px; letter-spacing: .05em; text-transform: uppercase; color: var(--ink-3); }
+  .bad .bp .case { font-weight: 600; }
+  .bad .bp .beh { color: var(--ink-2); line-height: 1.45; }
+  .chips { display: flex; gap: 6px; flex-wrap: wrap; }
+  .chip { font-family: var(--f-mono); font-size: 13px; padding: 3px 8px; border-radius: 6px; background: var(--surface-2); color: var(--ink-2); border: 1px solid var(--line); }
+  .chip.acc { background: var(--accent-bg); color: var(--accent-ink); border-color: transparent; }
+  .out { margin: 0; padding-left: 18px; color: var(--ink-2); font-size: 16px; display: flex; flex-direction: column; gap: 4px; }
+
+  /* ---------- lists: not building, bets, inferred ---------- */
+  .split { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+  .list { display: flex; flex-direction: column; gap: 8px; max-width: 120ch; }
+  .row { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 4px 14px; align-items: start; }
+  .row .t { font-weight: 600; line-height: 1.4; }
+  .row .d { grid-column: 1; color: var(--ink-2); font-size: 16px; line-height: 1.5; }
+  .pill { display: inline-flex; align-items: center; gap: 6px; font-size: 13.5px; font-weight: 600; padding: 3px 9px; border-radius: 999px; }
+  .pill.good { background: var(--good-bg); color: var(--good); }
+  .pill.good::before { content: '✓'; }
+  .pill.warn { background: var(--warn-bg); color: var(--warn); border: 1px dashed var(--line-2); }
+  .pill.warn::before { content: '?'; }
+  .pill.bad { background: var(--bad-bg); color: var(--bad); }
+  .pill.bad::before { content: '✕'; }
+  .pill.mute { background: var(--surface-2); color: var(--ink-3); }
+  .pill.acc { background: var(--accent-bg); color: var(--accent-ink); }
+  .inf { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; display: grid; grid-template-columns: 44px minmax(0, 1fr) auto; gap: 4px 12px; }
+  .inf .id { font-family: var(--f-mono); font-size: 12px; color: var(--ink-3); grid-row: 1 / span 2; }
+  .inf .as { line-height: 1.5; }
+  .inf .wh { grid-column: 2; font-size: 15px; color: var(--ink-3); }
+  .inf.changed { border-left: 3px solid var(--accent); }
+
+  /* ---------- wireframes ---------- */
+  .wf { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 16px 18px; display: flex; flex-direction: column; gap: 10px; }
+  .wf iframe { width: 100%; height: 560px; border: 1px solid var(--line); border-radius: 10px; background: #fff; }
+  .empty { background: var(--surface); border: 1px dashed var(--line-2); border-radius: 12px; padding: 18px 20px; color: var(--ink-2); max-width: 72ch; line-height: 1.55; font-size: 17px; }
+
+  /* ---------- review ---------- */
+  .tbl-wrap { overflow-x: auto; background: var(--surface); border: 1px solid var(--line); border-radius: 12px; }
+  table { border-collapse: collapse; width: 100%; font-size: 15.5px; }
+  th, td { padding: 9px 12px; text-align: left; border-bottom: 1px solid var(--line); vertical-align: top; }
+  th { font-size: 11.5px; letter-spacing: .05em; text-transform: uppercase; color: var(--ink-3); font-weight: 600; }
+  tr:last-child td { border-bottom: 0; }
+  td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
+  .rev { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; }
+  details.fold { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; }
+  details.fold > summary { cursor: pointer; padding: 12px 16px; font-weight: 600; list-style: none; display: flex; justify-content: space-between; gap: 10px; }
+  details.fold > summary::-webkit-details-marker { display: none; }
+  details.fold > summary .n { color: var(--ink-3); font-weight: 400; }
+  details.fold .inner { padding: 0 16px 14px; display: flex; flex-direction: column; gap: 8px; }
+  .fnd { display: grid; grid-template-columns: minmax(0, 1fr); gap: 3px; padding: 10px 0; border-top: 1px solid var(--line); font-size: 16px; }
+  .fnd .h { display: flex; gap: 8px; flex-wrap: wrap; align-items: baseline; }
+  .fnd .h .id { font-family: var(--f-mono); font-size: 11.5px; color: var(--ink-3); }
+  .fnd .why { color: var(--ink-2); line-height: 1.5; }
+  .fnd .words { color: var(--ink); font-style: italic; }
+  .quote { border-left: 3px solid var(--line-2); padding-left: 12px; color: var(--ink-2); }
+
+
+  /* ---------- report layer ---------- */
+  .one { font-family: var(--f-display); font-size: 28px; line-height: 1.35; max-width: 56ch; color: var(--ink); }
+  .three { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 22px 40px; margin-top: 6px; }
+  .three .th { display: flex; flex-direction: column; gap: 6px; border-top: 2px solid var(--ink); padding-top: 12px; }
+  .three .th b { font-family: var(--f-display); font-weight: 500; font-size: 23px; line-height: 1.25; }
+  .three .th p { color: var(--ink-2); line-height: 1.55; font-size: 17px; }
+  .steps { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 18px 36px; }
+  .step { display: flex; flex-direction: column; gap: 6px; }
+  .step .k { font-family: var(--f-display); font-size: 34px; line-height: 1; color: var(--accent); }
+  .step b { font-size: 19px; }
+  .step p { color: var(--ink-2); font-size: 17px; line-height: 1.55; }
+  .plain { font-size: 19px; line-height: 1.6; color: var(--ink); max-width: 90ch; }
+  .story2 { border-top: 1px solid var(--line); padding: 20px 0 8px; display: grid; grid-template-columns: 64px minmax(0, 1fr); gap: 4px 16px; scroll-margin-top: 20px; }
+  .story2 .id { font-family: var(--f-mono); font-size: 12px; color: var(--ink-3); padding-top: 5px; }
+  .story2 h3 { font-size: 23px; }
+  .story2 .pl { grid-column: 2; font-size: 18px; line-height: 1.55; max-width: 100ch; }
+  .story2 .row2 { grid-column: 2; display: flex; flex-wrap: wrap; gap: 6px 10px; align-items: center; font-size: 14.5px; color: var(--ink-3); margin-top: 2px; }
+  .story2 details { grid-column: 2; }
+  .story2 details > summary { cursor: pointer; list-style: none; font-size: 15px; color: var(--accent-ink); font-weight: 600; padding: 4px 0; }
+  .story2 details > summary::-webkit-details-marker { display: none; }
+  .story2 details > summary::before { content: '+ '; }
+  .story2 details[open] > summary::before { content: '− '; }
+  .story2 .body { padding: 10px 0 8px; display: grid; grid-template-columns: repeat(auto-fit, minmax(420px, 1fr)); gap: 16px 36px; }
+  .story2 .body .full { grid-column: 1 / -1; }
+  .story2 .sent { grid-column: 1 / -1; color: var(--ink-2); font-size: 16px; line-height: 1.5; }
+  .dec { display: grid; grid-template-columns: 28px minmax(0, 1fr); gap: 4px 12px; padding: 12px 0; border-top: 1px solid var(--line); }
+  .dec .k { font-family: var(--f-display); font-size: 20px; color: var(--accent); line-height: 1.2; }
+  .dec .pl { font-size: 18px; line-height: 1.5; }
+  .dec .src { grid-column: 2; font-size: 14px; color: var(--ink-3); }
+  .chipline { display: flex; flex-wrap: wrap; gap: 6px; }
+  .chipline .chip { font-family: var(--f-body); font-size: 15px; }
+
+  .foot { max-width: 1560px; margin: 60px auto 0; padding-top: 16px; border-top: 1px solid var(--line); font-size: 14.5px; color: var(--ink-3); display: flex; flex-wrap: wrap; gap: 8px 20px; }
+  mark { background: var(--mark); color: inherit; border-radius: 3px; padding: 0 2px; }
+</style>
+
+<script id="data" type="application/json">__DATA__</script>
+
+<header class="top">
+  <div class="brand"><span class="kicker" id="kick"></span><b id="title"></b></div>
+  <nav class="journey" id="journey" aria-label="Estágios"></nav>
+</header>
+
+<div class="page">
+  <nav class="rail" id="rail" aria-label="Seções"></nav>
+  <main class="col" id="col"></main>
+</div>
+<footer class="foot" id="foot"></footer>
+
+<script>
+(() => {
+  const D = JSON.parse(document.getElementById('data').textContent);
+  const S = D.strings, RP = D.report;
+  const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+  const md = s => esc(s).replace(/`([^`]+)`/g, '<code>$1</code>').replace(/\*\*([^*]+)\*\*/g, '<b>$1</b>');
+
+  document.title = D.workstream.title;
+  document.getElementById('kick').textContent = `${D.workstream.slug} · ${S.stageName}`;
+  document.getElementById('title').textContent = D.workstream.title;
+  const stages = ['discovery','design','plan','execution','release','close'];
+  const at = stages.indexOf(D.workstream.stage);
+  document.getElementById('journey').innerHTML = stages.map((k, i) => `<span class="st ${i < at ? 'done' : i === at ? 'now' : ''}"><span class="dot"></span>${S.stages[k]}</span>`).join('<span class="sep">›</span>');
+
+  const st = D.stories, acCount = st.reduce((a, s) => a + s.acs.length, 0), badCount = st.reduce((a, s) => a + s.badPaths.length, 0);
+  const sections = [];
+  const sec = (id, title, lede, body) => sections.push({ id, title, html: `<section class="sec" id="${id}">
+    <header><span class="kicker">${String(sections.length + 1).padStart(2,'0')}</span><h2>${title}</h2>${lede ? `<p class="lede">${lede}</p>` : ''}</header>${body}</section>` });
+  const fold = (title, inner, open) => `<details class="fold" ${open ? 'open' : ''}><summary><span>${title}</span></summary><div class="inner">${inner}</div></details>`;
+
+  // ---- 1. what this is ----
+  const eye = [];
+  (D.review?.residue || []).forEach(r => eye.push(`<b>${S.eye.residue}</b> — ${md(r.title)}`));
+  D.bets.filter(b => b.status !== 'holds').forEach(b => eye.push(`<b>${S.eye.bet}</b> — ${md(b.claim)}${b.note ? `: ${md(b.note)}` : ''}`));
+  D.inferred.filter(i => i.ruling === 'open').forEach(i => eye.push(`<b>${S.eye.inferred}</b> ${i.id} — ${md(i.assumed)}`));
+  if (D.review?.dismissed?.length) eye.push(`<b>${S.eye.dismissed}</b> — ${D.review.dismissed.length} ${S.eye.dismissedTail} <a href="#review">${S.eye.seeReview}</a>`);
+  sec('what', S.sec.what, null, `
+    <div class="hero">
+      <h1>${md(D.headline)}</h1>
+      <div class="meta"><span>${S.opened} ${D.review?.opened || ''}</span><span>${S.approved} ${D.review?.approved || '—'}</span><span>${S.slug} <code>${D.workstream.slug}</code></span></div>
+      <div><span class="kicker">${S.inOneSentence}</span><p class="one">${md(RP.inOneSentence)}</p></div>
+      <div><span class="kicker">${S.threeThings}</span><div class="three">${RP.threeThings.map(t => `<div class="th"><b>${md(t.t)}</b><p>${md(t.p)}</p></div>`).join('')}</div></div>
+      <div class="cells">
+        <div class="cell"><span class="v">${st.length}</span><span class="l">${S.cells.stories}</span><span class="s">${acCount} ${S.cells.acs} · ${badCount} ${S.cells.badPaths}</span></div>
+        <div class="cell"><span class="v">${D.wireframes.length}</span><span class="l">${S.cells.screens}</span><span class="s">${D.wireframes.length ? S.cells.screensTail : S.cells.noFront}</span></div>
+        <div class="cell"><span class="v">${D.notBuilding.length}</span><span class="l">${S.cells.out}</span><span class="s">${D.notBuilding.filter(x => x.kind === 'direction').length} ${S.cells.direction}</span></div>
+        <div class="cell"><span class="v">${D.bets.filter(b => b.status === 'holds').length}/${D.bets.length}</span><span class="l">${S.cells.bets}</span><span class="s">${D.bets.filter(b => b.status !== 'holds').length} ${S.cells.betsOpen}</span></div>
+      </div>
+      <div class="eye"><span class="kicker">${S.eye.title}</span>${eye.length ? `<ul>${eye.map(e => `<li>${e}</li>`).join('')}</ul>` : `<p class="none">${S.eye.none}</p>`}</div>
+    </div>`);
+
+  // ---- 2. how it works ----
+  const figures = (D.figures || []).map(f => `<figure>${f.mermaid ? `<pre class="mermaid">${esc(f.mermaid)}</pre>` : f.svg || ''}<figcaption>${md(f.caption || f.title || '')}</figcaption></figure>`).join('');
+  sec('how', S.sec.how, S.howLede, `
+    <div class="steps">${RP.howSteps.map((s, i) => `<div class="step"><span class="k">${i + 1}</span><b>${md(s.t)}</b><p>${md(s.p)}</p></div>`).join('')}</div>
+    ${figures}
+    ${fold(S.howFull, `<div class="prose"><p><b>${S.problem}.</b> ${md(D.problem)}</p><p><b>${S.solution}.</b> ${md(D.solution)}</p><p><b>${S.howItWorks}.</b> ${md(D.how)}</p></div>`, false)}`);
+
+  // ---- 3. FAQ ----
+  const qa = list => `<div class="faq">${list.map(x => `<div class="qa"><p class="q">${md(x.q)}</p><p class="a">${md(x.a)}</p></div>`).join('')}</div>`;
+  const keyE = (RP.keyFaq?.external || []).map(i => D.faq.external[i]).filter(Boolean), keyI = (RP.keyFaq?.internal || []).map(i => D.faq.internal[i]).filter(Boolean);
+  const restE = D.faq.external.filter((_, i) => !(RP.keyFaq?.external || []).includes(i)), restI = D.faq.internal.filter((_, i) => !(RP.keyFaq?.internal || []).includes(i));
+  sec('faq', S.sec.faq, S.faqLede, `${qa([...keyE, ...keyI])}${(restE.length + restI.length) ? fold(S.faqMore.replace('{n}', restE.length + restI.length), `${qa(restE)}${restI.length ? `<div style="margin-top:10px"><span class="kicker">${S.faqInternal}</span></div>${qa(restI)}` : ''}`, false) : ''}`);
+
+  // ---- 4. stories ----
+  const kw = t => t.replace(/^(WHEN|IF|WHILE)\s/,'');
+  const smap = `<div class="smap">${st.map(s => `<a class="sm" href="#${s.id}"><span class="id">${s.id}</span><span>${md(s.name)}</span><span class="who">${esc(s.as)}</span></a>`).join('')}</div>`;
+  const stories = st.map(s => `<article class="story2" id="${s.id}">
+    <span class="id">${s.id}</span><h3>${md(s.name)}</h3>
+    <p class="pl">${md(RP.stories[s.id])}</p>
+    <div class="row2"><span>${s.acs.length} ${S.story.acs}</span><span>·</span><span>${s.badPaths.length} ${S.story.bad}</span>${(s.screens||[]).length ? `<span>·</span>${s.screens.map(x => `<a class="chip acc" href="#wireframes">${esc(x.replace(/^wireframes\//,''))}</a>`).join('')}` : ''}</div>
+    <details><summary>${S.storyOpen}</summary><div class="body">
+      <p class="sent"><b>${S.story.as}</b> ${md(s.as)}, <b>${S.story.want}</b> ${md(s.want)}, <b>${S.story.so}</b> ${md(s.so)}</p>
+      <div class="full"><h4>${S.story.criteria}</h4><ul class="acs">${s.acs.map(a => `<li><span class="n">${a.id.replace(/^.*-S-\d+-/, '')}</span><span><span class="kw">${esc(a.kind)}</span> ${md(kw(a.text))}</span></li>`).join('')}</ul></div>
+      <div class="full"><h4>${S.story.badPaths}</h4><div class="bad">${s.badPaths.map(b => `<div class="bp"><span class="cat">${esc(S.badCat[b.category] || b.category)}</span><span class="case">${md(b.case)}</span><span class="beh">${md(b.behavior)}</span></div>`).join('')}</div></div>
+      ${s.out.length ? `<div class="full"><h4>${S.story.out}</h4><ul class="out">${s.out.map(o => `<li>${md(o)}</li>`).join('')}</ul></div>` : ''}
+    </div></details></article>`).join('');
+  sec('stories', S.sec.stories, S.storiesLede.replace('{n}', st.length), `${smap}<div>${stories}</div>
+    ${fold(S.vocabularyFold, `<div class="list">${D.vocabulary.map(v => `<div class="row"><span class="t">${esc(v.term)}</span><span class="d">${md(v.def)}</span></div>`).join('')}</div>`, false)}`);
+
+  // ---- 5. out ----
+  const dir = D.notBuilding.filter(x => x.kind === 'direction'), outs = D.notBuilding.filter(x => x.kind === 'out');
+  sec('out', S.sec.out, null, `<p class="plain">${md(RP.outPlain)}</p>
+    <div><span class="kicker">${S.out.dirTitle}</span><div class="chipline" style="margin-top:8px">${dir.map(x => `<span class="chip acc" title="${esc(x.why)}">${esc(x.what)}</span>`).join('')}</div></div>
+    <div><span class="kicker">${S.out.outTitle}</span><div class="chipline" style="margin-top:8px">${outs.map(x => `<span class="chip" title="${esc(x.why)}">${esc(x.what)}</span>`).join('')}</div></div>
+    ${fold(S.outFull, `<div class="list">${D.notBuilding.map(x => `<div class="row"><span class="t">${md(x.what)}</span><span class="pill ${x.kind === 'out' ? 'mute' : 'acc'}">${x.kind === 'out' ? S.out.outPill : S.out.dirPill}</span><span class="d">${md(x.why)}</span></div>`).join('')}</div>`, false)}`);
+
+  // ---- 6. bets ----
+  const PILL = { holds: ['good', S.bets.holds], 'does-not-hold': ['bad', S.bets.fails], unchecked: ['warn', S.bets.unchecked] };
+  sec('bets', S.sec.bets, null, `<p class="plain">${md(RP.betsPlain)}</p><div class="list">${D.bets.map(b => { const [c, t] = PILL[b.status] || ['mute', b.status];
+    return `<div class="row"><span class="t">${md(b.claim)}</span><span class="pill ${c}">${t}</span><span class="d">${S.bets.checkedBy} ${md(b.checkedBy)}${b.note ? ` — ${md(b.note)}` : ''}</span></div>`; }).join('')}</div>`);
+
+  // ---- 7. inferred ----
+  const IR = { confirmed: ['good', S.inf.confirmed], rejected: ['bad', S.inf.rejected], open: ['warn', S.inf.open], superseded: ['mute', S.inf.superseded] };
+  const inf = i => { const [c, t] = IR[i.ruling] || ['mute', i.ruling]; return `<div class="inf ${i.changed ? 'changed' : ''}"><span class="id">${i.id}</span><span class="as">${md(i.assumed)}</span><span class="pill ${c}">${t}</span><span class="wh">${S.inf.landed} ${esc(i.landed)}${i.note ? ` · ${md(i.note)}` : ''}</span></div>`; };
+  const ch = D.inferred.filter(i => i.changed || i.ruling === 'open' || i.ruling === 'rejected'), rest = D.inferred.filter(i => !ch.includes(i));
+  sec('inferred', S.sec.inferred, null, `<p class="plain">${md(RP.inferredPlain)}</p>
+    ${ch.length ? `<div><span class="kicker">${S.infChanged}</span><div class="list" style="margin-top:8px">${ch.map(inf).join('')}</div></div>` : ''}
+    ${fold(S.infRest.replace('{n}', rest.length), `<div class="list">${rest.map(inf).join('')}</div>`, false)}`);
+
+  // ---- 8. wireframes ----
+  const wfs = D.wireframes.length ? D.wireframes.map(w => `<div class="wf"><div class="tools"><h3>${esc(w.screen)}</h3>${(w.stories||[]).map(s => `<a class="chip acc" href="#${s}">${s}</a>`).join('')}${(w.states||[]).map(s => `<span class="chip">${esc(s)}</span>`).join('')}</div>
+    ${w.note ? `<p style="color:var(--ink-2)">${md(w.note)}</p>` : ''}<iframe title="${esc(w.screen)}" sandbox="" srcdoc="${esc(w.html)}"></iframe>${w.file ? `<span class="kicker">${esc(w.file)}</span>` : ''}</div>`).join('') : `<div class="empty">${S.wf.none}</div>`;
+  sec('wireframes', S.sec.wireframes, D.wireframes.length ? S.wf.lede : null, wfs);
+
+  // ---- 9. review ----
+  const R = D.review;
+  const tot = k => R.rounds.reduce((a, r) => a + (r[k] || 0), 0);
+  const cells = [[R.rounds.length, S.rev.round], [tot('findings'), S.rev.findings], [(R.decisions||[]).length, S.rev.toUser], [(R.authorFixes||[]).length, S.rev.toAuthor], [(R.forDesign||[]).length, S.rev.forDesign], [(R.dismissed||[]).length, S.rev.dismissed]];
+  const dec = (R.decisions || []).map(x => { const pl = RP.decisions?.[`${x.round}:${x.id}`]; return `<div class="dec"><span class="k">${x.round}</span><p class="pl">${md(pl || x.ruling)}</p><span class="src">${esc(x.id)} · ${md(x.title)}</span></div>`; }).join('');
+  const fDes = x => `<div class="fnd"><div class="h"><span class="id">${esc(x.id)}</span><b>${md(x.title)}</b>${x.story ? `<a class="chip" href="#${x.story}">${x.story}</a>` : ''}</div><div class="why">${md(x.why)}</div></div>`;
+  const fDis = x => `<div class="fnd"><div class="h"><span class="id">${esc(x.id)}</span><b>${md(x.title)}</b><span class="pill mute">${esc(x.lens)}</span></div><div class="why">${md(x.why)}</div></div>`;
+  const fAut = x => `<div class="fnd"><div class="h"><span class="id">${esc(x.id)}</span><span>${md(x.title)}</span></div></div>`;
+  const rounds = `<div class="tbl-wrap"><table><thead><tr><th>${S.rev.round}</th><th class="num">${S.rev.findings}</th><th class="num">${S.rev.toAuthor}</th><th class="num">${S.rev.toUser}</th><th class="num">${S.rev.deferred}</th><th class="num">${S.rev.dismissed}</th><th>${S.rev.unread}</th><th>${S.rev.changed}</th></tr></thead>
+    <tbody>${R.rounds.map(r => `<tr><td class="num">${r.n}</td><td class="num">${r.findings}</td><td class="num">${r.toAuthor}</td><td class="num">${r.toUser}</td><td class="num">${r.deferred}</td><td class="num">${r.dismissed}</td><td>${(r.unread||[]).length ? `<span class="pill bad">${r.unread.length}</span> ${r.unread.join(', ')}` : '—'}</td><td>${md(r.changed)}</td></tr>`).join('')}</tbody></table></div>`;
+  sec('review', S.sec.review, null, `<p class="plain">${md(RP.reviewPlain)}</p>
+    <div class="cells">${cells.map(([v, l]) => `<div class="cell"><span class="v">${v}</span><span class="l">${l}</span></div>`).join('')}</div>
+    <div><span class="kicker">${S.rev.decisions}</span><div style="margin-top:6px">${dec}</div></div>
+    ${fold(S.rev.forDesign + ` · ${(R.forDesign||[]).length}`, (R.forDesign||[]).map(fDes).join('') || `<p style="color:var(--ink-3)">${S.rev.nothing}</p>`, false)}
+    ${fold(S.rev.authorFixes + ` · ${(R.authorFixes||[]).length}`, (R.authorFixes||[]).map(fAut).join('') || `<p style="color:var(--ink-3)">${S.rev.nothing}</p>`, false)}
+    ${fold(S.rev.dismissedList + ` · ${(R.dismissed||[]).length}`, (R.dismissed||[]).map(fDis).join('') || `<p style="color:var(--ink-3)">${S.rev.nothing}</p>`, false)}
+    ${fold(S.rev.round + 's', rounds, false)}`);
+
+  // ---- mount ----
+  document.getElementById('col').innerHTML = sections.map(s => s.html).join('');
+  document.getElementById('rail').innerHTML = `<div class="kicker rl">${S.stageName}</div>` + sections.map((s, i) => `<a href="#${s.id}" data-id="${s.id}"><span>${s.title}</span><span class="n">${String(i + 1).padStart(2,'0')}</span></a>`).join('') + `<button class="theme" id="theme" type="button"></button>`;
+  // theme: system → light → dark, remembered per viewer
+  const root = document.documentElement, order = ['system', 'light', 'dark'];
+  let theme = 'system'; try { theme = localStorage.getItem('bp-theme') || 'system'; } catch (e) {}
+  const applyTheme = () => { if (theme === 'system') root.removeAttribute('data-theme'); else root.setAttribute('data-theme', theme);
+    document.getElementById('theme').textContent = `${S.theme.icon[theme]} ${S.theme.label}: ${S.theme[theme]}`; };
+  applyTheme();
+  document.getElementById('theme').addEventListener('click', () => { theme = order[(order.indexOf(theme) + 1) % order.length]; try { localStorage.setItem('bp-theme', theme); } catch (e) {} applyTheme(); });
+  document.getElementById('foot').innerHTML = `<span>${S.foot.files}: ${D.files.map(f => `<code>${esc(f)}</code>`).join(' · ')}</span><span>${S.foot.built} ${esc(D.builtAt)}</span>`;
+  const links = [...document.querySelectorAll('.rail a')];
+  const io = new IntersectionObserver(es => { es.forEach(e => { if (e.isIntersecting) links.forEach(l => l.classList.toggle('on', l.dataset.id === e.target.id)); }); }, { rootMargin: '-10% 0px -75% 0px' });
+  document.querySelectorAll('.sec').forEach(s => io.observe(s));
+})();
+</script>

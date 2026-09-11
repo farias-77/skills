@@ -1,0 +1,13 @@
+{
+  "headline": "Admins invite people to a workspace by e-mail, and the invite stops working after seven days",
+  "lead": "Today an admin creates the account and sends the password by hand. From now on they type an e-mail, the person gets a link, sets their own password and lands in the workspace.",
+  "problem": "Accounts are created by hand and passwords travel over chat.",
+  "solution": "An invite link, valid for seven days, that the person opens to set a password.",
+  "how": "The admin types an e-mail; the system sends a link; the person opens it, sets a password and is in. After seven days the link shows as expired and the admin can send a new one.",
+  "faq": {
+    "external": [ { "q": "What if the e-mail is already a member?", "a": "The admin sees it on the spot and nothing is sent." }, { "q": "Can an invite be revoked?", "a": "Yes: the admin removes it from the pending list and the link stops working." } ],
+    "internal": [ { "q": "What is the riskiest part?", "a": "E-mail delivery: a link that never arrives looks like a broken invite." } ]
+  },
+  "notBuilding": [ { "what": "Bulk invites from a spreadsheet", "kind": "direction", "why": "future direction; one at a time is enough for the first customers" }, { "what": "Roles chosen at invite time", "kind": "out", "why": "every invited person is a member; roles are set later" } ],
+  "bets": [ { "claim": "The e-mail provider delivers within a minute", "checkedBy": "doc", "status": "holds", "note": "SLA published" }, { "claim": "Seven days is enough for people to open the link", "checkedBy": "user", "status": "unchecked", "note": "the user's guess; no data yet" } ]
+}

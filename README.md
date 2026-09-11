@@ -20,7 +20,8 @@ keep rewriting these files as reality pushes back.
 One demand becomes a **workstream**: one folder, one conducting Claude
 Code session, one **blueprint** (a single self-contained HTML artifact
 the human reviews on — same URL from discovery to done, growing a tab
-per stage). The demand travels through six stages; each stage is a
+per stage; built from JSON the stages write, never edited by an
+agent). The demand travels through six stages; each stage is a
 skill that conducts the session, and each ends at an **explicit human
 checkpoint** — the pipeline runs autonomously between gates, never
 through them.
@@ -189,6 +190,7 @@ claude/                 the pipeline — the six stages, Claude Code
   skills/               one folder per stage — SKILL.md + templates + references
   agents/               every agent, named <stage>-<role>[-<lens>], five fixed sections
   workflows/            the deterministic review rounds (plain JS, single-file)
+  blueprint/            the blueprint shell, its build, the strings per language, the JSON schemas, an example
 codex/                  placeholder — nothing runs in Codex today
 docs/
   standards/            the single-source rulers everything points at

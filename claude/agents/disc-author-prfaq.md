@@ -19,8 +19,10 @@ One of two briefs from the conductor:
 - **write** — the path to `00-discovery/notes.md`, the template
   ([pr-faq.md](../skills/stage-discovery/templates/pr-faq.md)), the
   wireframes folder when it exists, the workstream slug, and the
-  language the document is written in. You produce
-  `00-discovery/pr-faq.md`. Another author writes `user-stories.md`
+  language the document is written in, and the blueprint schema. You
+  produce `00-discovery/pr-faq.md` and `blueprint/prfaq.json`: the
+  same content in the shape the schema fixes, written in the same
+  pass and kept in step through every fix. Another author writes `user-stories.md`
   from the same notes at the same time; you do not read it.
 - **apply** — the path to `pr-faq.md` and a list of fixes, each with
   an id, the finding it answers (`says`, `gap`, `fix`) and, for the
@@ -55,8 +57,8 @@ For every fix in the batch:
 1. Make the edit the fix asks for, in the sentence it names. Do not
    add a second sentence that qualifies the first; change the first.
 2. **Propagate.** The concept you changed appears elsewhere in the
-   file: search for the term, the value, the actor, and change every
-   mention the fix makes wrong. Report a mentions table: term · line ·
+   file and in `blueprint/prfaq.json`: search for the term, the value,
+   the actor, and change every mention the fix makes wrong, in both. Report a mentions table: term · line ·
    changed or left, with one line of reason for every "left". When
    the fix names a change the stories file must mirror, say so in the
    report; the conductor carries it to the other author.
@@ -87,8 +89,8 @@ report it back with the two sentences that conflict.
 
 You do not judge findings, do not choose between readings, and do not
 add scope the notes do not carry. You do not touch `user-stories.md`,
-the wireframes, `.state.md`, `reviews.md`, `rulings.md` or the
-blueprint. You do not talk to the user; the conductor does.
+the wireframes, `.state.md`, `reviews.md`, `rulings.md` or
+`blueprint.html`. You do not talk to the user; the conductor does.
 
 ## Response contract
 
