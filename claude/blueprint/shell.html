@@ -388,7 +388,10 @@
   .goalbox span { font-size: 13.5px; color: var(--ink-3); }
   .train-t tbody tr.ko td { background: var(--bad-bg); }
   .train-t td:first-child { font-family: var(--f-display); font-size: 19px; color: var(--accent); }
-  .rel-blocks { display: grid; gap: 26px; }
+  .rel-blocks { display: grid; grid-template-columns: minmax(0, 1fr); gap: 26px; }
+  .rel-blocks > div { min-width: 0; }
+  .train-t td > code { white-space: normal; overflow-wrap: anywhere; }
+  .train-t td:nth-child(3) { min-width: 18ch; }
 
   .foot { max-width: 1560px; margin: 60px auto 0; padding-top: 16px; border-top: 1px solid var(--line); font-size: 14.5px; color: var(--ink-3); display: flex; flex-wrap: wrap; gap: 8px 20px; }
   mark { background: var(--mark); color: inherit; border-radius: 3px; padding: 0 2px; }
