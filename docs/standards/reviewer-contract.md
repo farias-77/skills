@@ -24,12 +24,12 @@ precision of its findings, not their count.
 Report at the highest bar, always — including what might be too strict
 for this system. Severity says how bad the finding is IF real; whether
 it proceeds is not the reviewer's call: the round's judge rules every
-finding: a judge agent at every stage. At stages 1, 2 and 3 the judge
-also names who decides the fix (the author for wording, the user for
-product, scope, cost, the sequence and confirmed decisions, at design
-the implementer for declared latitude and at plan the worker for
-execution latitude), and **the user gives the final ruling on what is
-his**; at stage 4 the
+finding: the conductor, by the stage's `references/judging.md`. At
+stages 1, 2 and 3 the ruling also names who decides the fix (the
+author or writer for wording, the user for product, scope, cost, the
+sequence and confirmed decisions, at design the implementer for
+declared latitude and at plan the worker for execution latitude), and
+**the user gives the final ruling on what is his**; at stage 4 the
 conductor of the execution chair rules alone inside two lens rounds
 per story, and what survives rides as a PR note. There is no scrutiny tier: the bar is the maximum
 everywhere, and the user is the filter. Never pre-soften a finding

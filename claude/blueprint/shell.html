@@ -43,7 +43,8 @@
   :where(.top, .page, .col, .sec, .hero, .cells, .duo, .split, .list, .faq, .smap, .story, .story .body, .row, .inf, .qa, .cell, .wf, .rev, .tools, .chips, .bad, .acs li, .fnd, .eye, details.fold, details.fold .inner) > * { min-width: 0; }
   p, li, td, th, code, .chip, .pill, .t, .d, .a, .q, .as, .wh, summary, h1, h2, h3, h4 { overflow-wrap: anywhere; }
   .pill, .cnt { white-space: normal; }
-  td .pill, td .chip, th { white-space: nowrap; overflow-wrap: normal; }
+  td .pill, td .chip, td > code, th { white-space: nowrap; overflow-wrap: normal; }
+  .proof code { white-space: normal; overflow-wrap: anywhere; }
   pre.mermaid { white-space: pre-wrap; overflow-wrap: anywhere; }
   img, svg, iframe, video { max-width: 100%; }
   a { color: var(--accent-ink); text-decoration: none; }
@@ -312,6 +313,47 @@
   .repo { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 16px 18px; display: flex; flex-direction: column; gap: 8px; }
   .repo .hd { display: flex; gap: 10px; align-items: baseline; flex-wrap: wrap; }
   .repo p { color: var(--ink-2); line-height: 1.55; }
+
+  /* ---------- plan tab ---------- */
+  /* the board: one row per lane, one column per wave; the rows of a lane sit in the column of the wave that accepts them */
+  .board { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 16px 18px; overflow-x: auto; }
+  .board .grid { display: grid; gap: 10px 14px; min-width: 640px; }
+  .board .wh { display: flex; flex-direction: column; gap: 4px; padding: 8px 10px 10px; border-bottom: 2px solid var(--ink); }
+  .board .wh b { font-family: var(--f-display); font-size: 20px; font-weight: 500; }
+  .board .wh span { font-size: 14px; color: var(--ink-2); line-height: 1.45; }
+  .board .ln { display: flex; flex-direction: column; gap: 3px; padding: 10px 10px 10px 0; border-top: 1px solid var(--line); }
+  .board .ln b { font-family: var(--f-mono); font-size: 13.5px; }
+  .board .ln span { font-size: 13px; color: var(--ink-3); }
+  .board .cellw { display: flex; flex-wrap: wrap; gap: 6px; align-content: flex-start; padding: 10px 6px; border-top: 1px solid var(--line); }
+  .board .rc { display: inline-flex; flex-direction: column; gap: 1px; border: 1px solid var(--line-2); border-radius: 8px; padding: 6px 9px; background: var(--bg); max-width: 220px; font-size: 13.5px; line-height: 1.35; }
+  .board .rc .k { font-family: var(--f-mono); font-size: 11.5px; color: var(--ink-3); }
+  .board .rc .k i { font-style: normal; color: var(--ink-2); margin-left: 6px; }
+  .board .rc.see { border-style: dashed; }
+  .board .none { color: var(--ink-3); font-size: 13px; padding: 12px 6px; }
+  .board .leg { display: flex; gap: 14px; flex-wrap: wrap; margin-top: 12px; font-size: 13.5px; color: var(--ink-3); }
+  .ab { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 14px; }
+  .ab .card { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 18px 20px; display: flex; flex-direction: column; gap: 8px; }
+  .ab .card p { color: var(--ink-2); line-height: 1.6; }
+  .ab .card.b { border-left: 3px solid var(--ink); }
+  .lane { border-top: 1px solid var(--line); padding: 18px 0 8px; display: flex; flex-direction: column; gap: 12px; scroll-margin-top: 20px; }
+  .lane .hd { display: flex; gap: 10px; flex-wrap: wrap; align-items: baseline; }
+  .lane .hd h3 { font-size: 23px; }
+  .lane .facts { display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: 15px; color: var(--ink-2); }
+  .lane .facts b { color: var(--ink-3); font-weight: 600; font-size: 12px; text-transform: uppercase; letter-spacing: .05em; margin-right: 4px; }
+  .proof { display: flex; flex-direction: column; gap: 2px; font-size: 14.5px; }
+  .proof .pk { font-size: 11px; letter-spacing: .05em; text-transform: uppercase; color: var(--ink-3); margin-right: 6px; }
+  .proof code { font-size: .84em; }
+  .wave { background: var(--surface); border: 1px solid var(--line); border-left: 3px solid var(--ink); border-radius: 14px; padding: 20px 22px; display: flex; flex-direction: column; gap: 14px; max-width: 120ch; scroll-margin-top: 20px; }
+  .wave .hd { display: flex; gap: 10px; flex-wrap: wrap; align-items: baseline; }
+  .wave .hd h3 { font-size: 23px; }
+  .wave .acc { font-size: 18.5px; line-height: 1.55; }
+  .wave .kv { display: grid; grid-template-columns: 170px minmax(0, 1fr); gap: 8px 12px; font-size: 16px; line-height: 1.6; }
+  .wave .kv > span:nth-child(odd) { color: var(--ink-3); font-size: 12px; text-transform: uppercase; letter-spacing: .05em; padding-top: 5px; }
+  .wave .walk { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 6px; }
+  .wave .walk li { display: grid; grid-template-columns: 30px minmax(0, 1fr); gap: 6px 10px; padding: 8px 0; border-top: 1px solid var(--line); }
+  .wave .walk li .k { font-family: var(--f-display); font-size: 20px; color: var(--accent); line-height: 1.2; }
+  @media (max-width: 860px) { .wave .kv { grid-template-columns: minmax(0, 1fr); } }
+  .rules { margin: 0; padding-left: 18px; color: var(--ink-2); display: flex; flex-direction: column; gap: 4px; font-size: 16.5px; }
 
   .foot { max-width: 1560px; margin: 60px auto 0; padding-top: 16px; border-top: 1px solid var(--line); font-size: 14.5px; color: var(--ink-3); display: flex; flex-wrap: wrap; gap: 8px 20px; }
   mark { background: var(--mark); color: inherit; border-radius: 3px; padding: 0 2px; }
@@ -614,6 +656,108 @@
       ${fold(`${SD.rev.forPlan} · ${(RV.forPlan || []).length}`, (RV.forPlan || []).map(fRes).join('') || `<p style="color:var(--ink-3)">${S.rev.nothing}</p>`, false)}
       ${fold(`${S.rev.dismissedList} · ${(RV.dismissed || []).length}`, (RV.dismissed || []).map(fDis2).join('') || `<p style="color:var(--ink-3)">${S.rev.nothing}</p>`, false)}
       ${fold(S.rev.round + 's', rounds2, false)}`);
+  }
+
+  // ================= plan tab (only when the stage left its data) =================
+  if (D.plan) {
+    TAB = 'plan';
+    const P = D.plan, SP = S.plan, Q = P.seq, RP3 = P.report, RV3 = P.review || { rounds: [] }, DEC3 = Q.decisions || [];
+    const tbl3 = (heads, rows) => `<div class="tbl-wrap"><table><thead><tr>${heads.map(h => `<th${h.startsWith('#') ? ' class="num"' : ''}>${h.replace(/^#/, '')}</th>`).join('')}</tr></thead><tbody>${rows.map(r => `<tr>${r.map(c => `<td${typeof c === 'number' ? ' class="num"' : ''}>${c}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`;
+    const kick3 = (t, inner) => `<div><span class="kicker">${t}</span><div style="margin-top:8px">${inner}</div></div>`;
+    const proof = p => p.run ? `<div class="proof"><span><span class="pk">${SP.row.run}</span><code>${esc(p.run)}</code></span><span><span class="pk">${SP.row.expect}</span>${md(p.expect)}</span></div>`
+      : `<div class="proof"><span><span class="pk">${SP.row.see}</span>${md(p.see)}</span><span><span class="pk">${SP.row.where}</span>${md(p.where)}</span></div>`;
+    const allRows = Q.lanes.flatMap(l => l.rows.map(r => ({ ...r, repo: l.repo })));
+    const rowsN = allRows.length, casesN = Q.waves.flatMap(w => w.suites || []).reduce((a, s) => a + (s.cases || 0), 0), handed = (Q.preflight || []).filter(p => p.status === 'handed').length;
+    const against3 = DEC3.filter(c => c.againstRecommendation);
+    // the design's decision card, reused (same shape)
+    const letter3 = o => (String(o.label || '').match(/^([A-Z])\s*[)\.—–:-]/) || [])[1] || null;
+    const strip3 = t => String(t || '').replace(/^[A-Z]\s*[)\.—–:-]\s*/, '');
+    const dcard3 = c => {
+      const opts = c.options || [], pick = c.pick || (opts.length === 1 ? letter3(opts[0]) : null);
+      let boxes = opts.map(o => { const L = letter3(o), isPick = pick && L === pick, isRec = c.recommended && L === c.recommended;
+        return `<div class="opt ${isPick ? 'pick' : ''}"><span class="k">${L ? L + ' · ' : ''}${isPick ? S.design.picked : ''}${isPick && isRec ? ' · ' : ''}${isRec ? S.design.recommended : ''}</span><span>${md(isPick ? strip3(c.chosen) : strip3(o.label))}</span>${o.cost && !isPick ? `<span class="cost">${md(o.cost)}</span>` : ''}</div>`; });
+      if (!pick || !opts.some(o => letter3(o) === pick)) boxes.push(`<div class="opt pick"><span class="k">${S.design.picked}</span><span>${md(strip3(c.chosen))}</span></div>`);
+      return `<div class="dcard" id="${esc(c.id)}"><div class="meta"><span class="chip">${esc(c.id)}</span><span class="chip">${esc(SP.when[c.when] || c.when)}</span>${c.againstRecommendation ? `<span class="pill acc">${S.design.againstPill}</span>` : ''}</div>
+        <p class="q">${md(c.question)}</p><div class="opts">${boxes.join('')}</div>${c.why ? `<p class="why">${md(c.why)}</p>` : ''}</div>`;
+    };
+    const decs3 = (k, title) => { const L = DEC3.filter(c => c.doc === k); return L.length ? kick3(`${title} · ${L.length}`, `<div class="cards">${L.map(dcard3).join('')}</div>`) : ''; };
+
+    // ---- 1. what we build: the board (lanes × waves) ----
+    const board = `<div class="board"><div class="grid" style="grid-template-columns: 200px repeat(${Q.waves.length}, minmax(200px, 1fr))">
+      <div class="wh"><b>${SP.board.lane}</b><span>→ ${SP.board.wave}</span></div>${Q.waves.map(w => `<div class="wh"><b>${esc(w.n)} · ${md(w.name)}</b><span>${SP.board.acceptsWhen}: ${md(w.accepts)}</span></div>`).join('')}
+      ${Q.lanes.map(l => `<div class="ln"><b>${esc(l.repo)}</b><span>${l.rows.length} ${SP.cells.rows} · ${esc(l.session)}</span></div>${Q.waves.map(w => { const rs = l.rows.filter(r => r.wave === w.n);
+        return `<div class="cellw">${rs.length ? rs.map(r => `<a class="rc ${r.proof.see ? 'see' : ''}" href="#row-${esc(r.num)}"><span class="k">${esc(r.num)} · ${esc(r.story)}${r.par ? `<i>∥ ${esc(r.par)}</i>` : ''}${r.after ? `<i>← ${esc(r.after)}</i>` : ''}</span><span>${md(r.what)}</span></a>`).join('') : `<span class="none">${SP.board.noRows}</span>`}</div>`; }).join('')}`).join('')}
+    </div><div class="leg"><span>← ${SP.lane.after}</span><span>∥ ${SP.board.par}</span><span>┅ ${SP.row.see}</span></div></div>`;
+    sec('plan-what', SP.sec.what, null, `
+      <div class="hero">
+        <h1>${md(RP3.inOneSentence)}</h1>
+        <div class="meta"><span>${S.opened} ${RV3.opened || ''}</span><span>${S.approved} ${RV3.approved || '—'}</span><span>${S.slug} <code>${D.workstream.slug}</code></span></div>
+        ${board}
+        <div><span class="kicker">${S.threeThings}</span><div class="three">${RP3.threeThings.map(t => `<div class="th"><b>${md(t.t)}</b><p>${md(t.p)}</p></div>`).join('')}</div></div>
+        <div class="cells">
+          <div class="cell"><span class="v">${Q.lanes.length}</span><span class="l">${SP.cells.lanes}</span><span class="s">${SP.cells.lanesTail}</span></div>
+          <div class="cell"><span class="v">${rowsN}</span><span class="l">${SP.cells.rows}</span><span class="s">${SP.cells.rowsTail.replace('{n}', Q.lanes.length)}</span></div>
+          <div class="cell"><span class="v">${Q.waves.length}</span><span class="l">${SP.cells.waves}</span><span class="s">${SP.cells.wavesTail}</span></div>
+          <div class="cell"><span class="v">${casesN}</span><span class="l">${SP.cells.suites}</span><span class="s">${SP.cells.suitesTail.replace('{n}', Q.waves.flatMap(w => w.suites || []).length)}</span></div>
+          <div class="cell"><span class="v">${DEC3.length}</span><span class="l">${SP.cells.cards}</span><span class="s">${against3.length} ${SP.cells.against}</span></div>
+          <div class="cell"><span class="v">${(Q.preflight || []).length}</span><span class="l">${SP.cells.preflight}</span><span class="s">${SP.cells.preflightTail.replace('{n}', handed)}</span></div>
+        </div>
+        <div class="eye"><span class="kicker">${S.eye.title}</span>${RP3.needsYourEye?.length ? `<ul>${RP3.needsYourEye.map(e => `<li><b>${md(e.t)}</b> — ${md(e.p)}</li>`).join('')}</ul>` : `<p class="none">${S.eye.none}</p>`}</div>
+      </div>${decs3('cut', SP.cutDecisions)}`);
+
+    // ---- 2. from A to B, the frozen contracts ----
+    sec('plan-ab', SP.sec.ab, null, `
+      <div class="ab"><div class="card"><h4>${SP.a}</h4><p>${md(Q.fromA)}</p></div><div class="card b"><h4>${SP.b}</h4><p>${md(Q.toB)}</p></div></div>
+      ${kick3(SP.contracts, `<p class="plain" style="margin-bottom:10px">${SP.contractsLede}</p>${tbl3([SP.ct.name, SP.ct.fixedIn, SP.ct.writtenBy, SP.ct.readBy], (Q.contracts || []).map(c => [`<b>${md(c.name)}</b>`, md(c.fixedIn), md(c.writtenBy), md(c.readBy)]))}`)}`);
+
+    // ---- 3. the lanes: rows as a table, then each goal behind a click ----
+    const goalBlock = (l, w) => { const g = P.goals[`${l.repo}/${w}`]; if (!g) return '';
+      return fold(SP.goal.title.replace('{w}', w), `<p class="plain">${md(g.intro)}</p>
+        ${tbl3([SP.row.num, SP.goal.builds, SP.goal.proof], g.rows.map(r => [`<code>${esc(r.num)}</code>`, md(r.builds), md(r.proof)]))}
+        ${g.worthALook?.length ? `<div class="look"><span class="kicker">${SP.goal.look}</span><ul>${g.worthALook.map(x => `<li>${md(x)}</li>`).join('')}</ul></div>` : ''}
+        ${g.workerDecides?.length ? kick3(`${SP.goal.worker} · ${g.workerDecides.length}`, `<ul class="lat">${g.workerDecides.map(x => `<li>${md(x)}</li>`).join('')}</ul>`) : ''}
+        ${P.mdGoals[`${l.repo}/${w}`] ? fold(SP.goal.file.replace('{f}', g.file), `<div class="doc">${mdDoc(P.mdGoals[`${l.repo}/${w}`])}</div>`, false) : ''}`, false); };
+    const lanes = Q.lanes.map(l => `<article class="lane" id="lane-${esc(l.repo)}"><div class="hd"><h3><code>${esc(l.repo)}</code></h3><span class="chip acc">${esc(l.session)}</span></div>
+      <div class="facts">${l.sharesWith ? `<span><b>${SP.lane.shares}</b>${md(l.sharesWith)}</span>` : ''}<span><b>${SP.lane.preflight}</b>${(l.preflight || []).length ? l.preflight.map(md).join(' · ') : SP.lane.noPreflight}</span></div>
+      ${tbl3([SP.row.num, SP.row.story, SP.row.what, SP.row.proof, SP.row.after, SP.row.wave], l.rows.map(r => [`<code id="row-${esc(r.num)}">${esc(r.num)}</code>`, `<a class="chip acc" href="#${esc(r.story)}">${esc(r.story)}</a>`, `${md(r.what)}${r.touches ? `<span class="rid">${SP.lane.touches}: ${md(r.touches)}${r.readBy ? ` · ${SP.lane.readBy}: ${md(r.readBy)}` : ''}</span>` : ''}`, proof(r.proof), r.after ? `<code>${esc(r.after)}</code>` : `<span class="pill mute">${SP.lane.seeds}</span>`, `<span class="pill acc">${esc(r.wave)}</span>${r.par ? `<span class="rid">∥ ${esc(r.par)}</span>` : ''}`]))}
+      ${[...new Set(l.rows.map(r => r.wave))].map(w => goalBlock(l, w)).join('')}</article>`).join('');
+    sec('plan-lanes', SP.sec.lanes, null, `<p class="plain">${md(RP3.lanesPlain)}</p><div>${lanes}</div>`);
+
+    // ---- 4. the waves: one card each, the walk as commands ----
+    const waves = Q.waves.map(w => `<article class="wave" id="${esc(w.n)}"><div class="hd"><h3>${esc(w.n)} · ${md(w.name)}</h3>${w.shadow ? `<span class="chip">${SP.wave.shadow}</span>` : ''}</div>
+      <p class="acc"><b>${SP.wave.accepts}.</b> ${md(w.accepts)}</p>
+      <div class="kv">
+        <span>${SP.wave.requires}</span><span class="chips">${w.requires.map(n => `<a class="chip" href="#row-${esc(n)}">${esc(n)}</a>`).join('')}</span>
+        <span>${SP.wave.folders}</span><span class="chips">${(w.folders || []).map(f => `<span class="chip">${esc(f)}</span>`).join('')}</span>
+        <span>${SP.wave.suites}</span><span>${(w.suites || []).map(s => `<code>${esc(s.repo)}</code> · ${s.cases} ${SP.wave.cases}${s.note ? ` · ${md(s.note)}` : ''}`).join('<br>')}</span>
+      </div>
+      ${kick3(SP.wave.walk, `<ol class="walk">${w.walk.map((st, i) => `<li><span class="k">${i + 1}</span>${proof(st)}</li>`).join('')}</ol>`)}
+      <div class="kv">${w.masterDecides ? `<span>${SP.wave.masterDecides}</span><span>${md(w.masterDecides)}</span>` : ''}${w.parks ? `<span>${SP.wave.parks}</span><span>${md(w.parks)}</span>` : ''}<span>${SP.wave.shadow}</span><span>${w.shadow ? SP.wave.shadowYes : SP.wave.shadowNo}</span></div>
+      ${decs3(w.n, SP.decisionsOf)}</article>`).join('');
+    sec('plan-waves', SP.sec.waves, null, `<p class="plain">${md(RP3.wavesPlain)}</p><div class="cards" style="max-width:none">${waves}</div>`);
+
+    // ---- 5. the sessions and the pre-flight ----
+    sec('plan-team', SP.sec.team, null, `<p class="plain">${md(RP3.teamPlain)}</p>
+      ${tbl3([SP.team.session, SP.team.name, SP.team.model, SP.team.owns, SP.team.first], Q.team.map(t => [`<span class="pill ${t.session === 'master' ? 'acc' : 'mute'}">${esc(t.session)}</span>`, `<code>${esc(t.name)}</code><span class="rid">${esc(t.folder)}</span>`, md(t.model), md(t.owns), `<code>${esc(t.first)}</code>`]))}
+      ${kick3(SP.team.rules, `<ul class="rules"><li>${SP.team.rule1}</li><li>${SP.team.rule2}</li><li>${SP.team.rule3}</li></ul>`)}
+      ${kick3(SP.preflight.title, (Q.preflight || []).length ? tbl3([SP.preflight.item, SP.preflight.row, SP.preflight.status], Q.preflight.map(p => [md(p.item), `<a class="chip" href="#row-${esc(p.row)}">${esc(p.row)}</a>`, `<span class="pill ${p.status === 'handed' ? 'good' : 'bad'}">${p.status === 'handed' ? SP.preflight.handed : SP.preflight.missing}</span>`])) : `<p class="plain" style="color:var(--ink-3)">${SP.lane.noPreflight}</p>`)}`);
+
+    // ---- 6. the review ----
+    const tot3 = k => RV3.rounds.reduce((a, r) => a + (r[k] || 0), 0);
+    const cells3 = [[RV3.rounds.length, S.rev.round], [tot3('findings'), S.rev.findings], [(RV3.decisions || []).length, S.rev.toUser], [(RV3.conductorRulings || []).length, SP.rev.conductor], [tot3('toAuthor'), SP.rev.toWriters], [(RV3.dismissed || []).length, S.rev.dismissed]];
+    const dec3 = (RV3.decisions || []).map(x => `<div class="dec"><span class="k">${x.round}</span><p class="pl">${md(x.plain || x.ruling)}</p><span class="src">${esc(x.id)} · ${md(x.title)}${x.words ? ` · <i>“${md(x.words)}”</i>` : ''}</span></div>`).join('');
+    const fCond3 = x => `<div class="fnd"><div class="h"><span class="id">${esc(x.id)}</span><b>${md(x.title)}</b></div><div class="why">${md(x.ruling)}</div></div>`;
+    const fDis3 = x => `<div class="fnd"><div class="h"><span class="id">${esc(x.id)}</span><b>${md(x.title)}</b><span class="pill mute">${esc(x.lens)}</span></div><div class="why">${md(x.why)}</div></div>`;
+    const fRes3 = x => `<div class="fnd"><div class="h"><b>${md(x.title)}</b></div><div class="why">${md(x.why)}</div></div>`;
+    const rounds3 = `<div class="tbl-wrap"><table><thead><tr><th>${S.rev.round}</th><th class="num">${S.rev.findings}</th><th class="num">${SP.rev.toWriters}</th><th class="num">${S.rev.toUser}</th><th class="num">${S.rev.deferred}</th><th class="num">${S.rev.dismissed}</th><th>${S.rev.unread}</th><th>${S.rev.changed}</th></tr></thead>
+      <tbody>${RV3.rounds.map(r => `<tr><td class="num">${r.n}</td><td class="num">${r.findings}</td><td class="num">${r.toAuthor}</td><td class="num">${r.toUser}</td><td class="num">${r.deferred}</td><td class="num">${r.dismissed}</td><td>${(r.unread || []).length ? `<span class="pill bad">${r.unread.length}</span> ${r.unread.join(', ')}` : '—'}</td><td>${md(r.changed)}</td></tr>`).join('')}</tbody></table></div>`;
+    sec('plan-review', SP.sec.review, null, `<p class="plain">${md(RP3.reviewPlain || '')}</p>
+      <div class="cells">${cells3.map(([v, l]) => `<div class="cell"><span class="v">${v}</span><span class="l">${l}</span></div>`).join('')}</div>
+      ${dec3 ? kick3(S.rev.decisions, dec3) : ''}
+      ${(RV3.residue || []).length ? kick3(S.eye.residue, `<div>${RV3.residue.map(fRes3).join('')}</div>`) : ''}
+      ${fold(`${SP.rev.conductor} · ${(RV3.conductorRulings || []).length}`, (RV3.conductorRulings || []).map(fCond3).join('') || `<p style="color:var(--ink-3)">${S.rev.nothing}</p>`, false)}
+      ${fold(`${S.rev.dismissedList} · ${(RV3.dismissed || []).length}`, (RV3.dismissed || []).map(fDis3).join('') || `<p style="color:var(--ink-3)">${S.rev.nothing}</p>`, false)}
+      ${fold(S.rev.round + 's', rounds3, false)}`);
   }
 
   // ---- mount: every tab is in the DOM (mermaid renders once); the inactive ones are hidden ----

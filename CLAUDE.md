@@ -58,33 +58,34 @@ conductor writes.
 
 ## The user's rulings are the record
 
-At discovery and at design the conductor judges every finding by the
-stage's `references/judging.md`; at plan the judge agent proposes
-(ruling + reason). Either way the ruling names the owner of each
-sustained finding: wording goes
-to the author (at design: the document's writer) without a question; product, scope, cost, data format,
+At discovery, at design and at plan the conductor judges every
+finding by the stage's `references/judging.md`; there is no judge
+agent. The ruling names the owner of each sustained finding: wording
+goes to the author (at design and plan: the document's or the goal's
+writer) without a question; product, scope, cost, data format,
 contract shape, security posture, the sequence and confirmed
 decisions go to him; at design a real observation that is declared
 latitude goes to the implementer, as one line in the document's "The
 implementer decides" section, and at plan to the worker, as one line
 in the goal's "The worker decides" section. He rules what is his,
 except at plan: there the conductor rules the user-owned findings
-against the cut he approved (marked `ruled: conductor` in
-`rulings.md`) and lists them at the close for veto; only a finding
-that would change what a wave delivers reaches him as a question.
-Plus one veto question over what the author fixed alone. The budget
-at discovery is three rounds at most, the user asked after each; at
+against the cut he approved when the wave's walk and required rows
+stay as they are (marked `ruled: conductor` in `rulings.md`) and
+lists them at the close for veto; only a finding that would change
+what a wave accepts reaches him as a question. The budget at
+discovery is three rounds at most, the user asked after each; at
 design, round 1 is whole and automatic and rounds 2 and 3 run only on
-his word and only over the delta, three at most; at plan it is two
-whole rounds, a third only on his explicit call. His validation of every story (confirm / reduce /
-adjust / cut) is a ruling too, recorded the same way.
+his word and only over the delta, three at most; at plan, round 1 is
+whole and automatic, round 2 runs automatically over the delta, and a
+third only on his explicit call. His validation of every story
+(confirm / reduce / adjust / cut) is a ruling too, recorded the same
+way.
 **The rulings are asked through the question tool, always**, in the
-house shape: one question per finding at plan, one question per
-**decision** at discovery and design (findings that resolve by the
-same choice are one question); the context in the question itself
-(source, severity, quote, gap, fix, the judge's reason), the rulings
-as the answers with the judge's pick first and marked as his, four to
-a call. Wording fixes are applied without a question and without a
+house shape: one question per **decision** at every stage (findings
+that resolve by the same choice are one question); the context in
+the question itself (source, severity, quote, gap, fix, the
+conductor's reason), the rulings as the answers with the conductor's
+pick first and marked as his, four to a call. Wording fixes are applied without a question and without a
 veto: the user reads the blueprint at the approval and reports there
 whatever he wants changed. At execution the conductor
 rules alone inside the story's review budget; the residue

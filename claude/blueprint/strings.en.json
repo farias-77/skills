@@ -309,5 +309,130 @@
   "decisionsOf": "The decisions of this document",
   "picked": "chosen"
  },
- "close": "Close"
+ "close": "Close",
+ "plan": {
+  "sec": {
+   "what": "What we build, and in what order",
+   "ab": "From A to B",
+   "lanes": "The lanes",
+   "waves": "The waves",
+   "team": "The sessions",
+   "review": "The review"
+  },
+  "cells": {
+   "lanes": "lanes in parallel",
+   "lanesTail": "one session each",
+   "rows": "rows",
+   "rowsTail": "across {n} repos",
+   "waves": "acceptance waves",
+   "wavesTail": "gates, not phases",
+   "cards": "cut decisions",
+   "against": "against the recommendation",
+   "preflight": "pre-flight items",
+   "preflightTail": "{n} handed over",
+   "suites": "smoke cases",
+   "suitesTail": "{n} whole suites"
+  },
+  "board": {
+   "lane": "lane",
+   "wave": "wave",
+   "acceptsWhen": "accepts when",
+   "noRows": "nothing in this wave",
+   "par": "in parallel with"
+  },
+  "a": "A · today",
+  "b": "B · when the last wave is green",
+  "contracts": "The frozen contracts",
+  "contractsLede": "What one lane writes and another reads, with the design section that fixes the shape. This is why no lane waits for another: the reader proves on seeded data in that shape, and the wave proves the real junction.",
+  "ct": {
+   "name": "Contract",
+   "fixedIn": "Fixed in",
+   "writtenBy": "Written by",
+   "readBy": "Read by"
+  },
+  "lane": {
+   "session": "session",
+   "shares": "shares the alpha stack with",
+   "preflight": "pre-flight",
+   "noPreflight": "nothing to hand over",
+   "touches": "touches",
+   "readBy": "read by",
+   "after": "after",
+   "seeds": "proves on seeded data"
+  },
+  "row": {
+   "num": "#",
+   "story": "Story",
+   "what": "What it builds",
+   "proof": "Proof",
+   "after": "After",
+   "wave": "Wave",
+   "run": "run",
+   "expect": "expect",
+   "see": "see",
+   "where": "where"
+  },
+  "goal": {
+   "title": "Goal {w} · the worker's brief",
+   "rows": "The rows, one line each",
+   "builds": "Builds",
+   "proof": "Proof",
+   "look": "Worth a look",
+   "worker": "The worker decides",
+   "file": "The whole goal · {f}"
+  },
+  "wave": {
+   "accepts": "Accepts when",
+   "requires": "Requires merged and deployed",
+   "folders": "Affected folders",
+   "suites": "Suites green before",
+   "walk": "The master's walk",
+   "step": "Step",
+   "run": "Run",
+   "expect": "Expect",
+   "masterDecides": "The master decides alone",
+   "parks": "Parks for you",
+   "shadow": "Shadow suite after the gate",
+   "shadowYes": "yes: everything runs in the background; red blocks the next gate, never a lane",
+   "shadowNo": "no",
+   "cases": "cases",
+   "screenshot": "screenshot"
+  },
+  "team": {
+   "session": "Session",
+   "name": "Name",
+   "model": "Model, effort",
+   "folder": "Folder",
+   "owns": "Owns",
+   "first": "First message",
+   "rules": "The rules the sessions share",
+   "rule1": "A worker never waits for the master to go on with its lane; only a wave waits.",
+   "rule2": "Every message between sessions is one line and points at a file.",
+   "rule3": "Lanes that share an alpha stack never run a smoke and a deploy at the same time there."
+  },
+  "preflight": {
+   "title": "The pre-flight: what you hand over before leaving",
+   "item": "Item",
+   "row": "Row",
+   "status": "Status",
+   "handed": "handed over",
+   "missing": "missing: the row is parked"
+  },
+  "decLede": "Every cut decision in three lines: the question, the choice, the why. The ones marked on the edge went against the recommendation.",
+  "decisionsOf": "The decisions of this wave",
+  "cutDecisions": "The decisions of the cut",
+  "when": {
+   "session": "session",
+   "writer": "writer's question",
+   "round 1": "round 1",
+   "round 2": "round 2",
+   "round 3": "round 3",
+   "approval": "approval"
+  },
+  "rev": {
+   "conductor": "ruled by the conductor in your place",
+   "toWriters": "To the writers",
+   "toWorker": "To the worker"
+  }
+ }
 }

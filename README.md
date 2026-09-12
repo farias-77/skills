@@ -118,23 +118,28 @@ blueprint's Design tab is built from the JSON and read by the human
 at the close, where his adjustments are noted and applied in a batch.
 The wave cut is stage 3's.
 
-**3 · Plan** — the design becomes a sequence. The conductor proposes
-the cut and the human approves or rejects it, wave by wave; the rest
-is mechanical: waves that are each a **verifiable checkpoint in alpha**
-(one feature branch per repo, the whole smoke suite green, merged
-into the workstream branch), rows inside each wave (one story in one repo, with a
-"ready when" a person can observe), the order and what runs in
-parallel. One Fable author writes the **goal** of every wave: the
-whole brief the execution chair receives, pointing at the design and
-never re-deciding it. A whole review round runs: three lenses
-(coverage, verifiability, order) beside two blind readers and a
-referee per goal (would two engineers build the same wave and prove
-it the same way?); a judge rules every finding and marks who owns the
-fix — the author for wording, the human for the sequence, the worker
-for execution latitude; what would be the human's is ruled by the
-conductor against the approved cut and listed at the close for veto.
-Two rounds at most. The goals are files: the brief the execution chair
-reads.
+**3 · Plan** — the design becomes a sequence: **from A to B, and
+the steps between**. One scout (Sonnet 5, high) per repo writes what
+exists today; the conductor (Fable 5.1, high) arrives with the cut
+and the human shapes it: **rows** (one story in one repo, proved by a
+command and its expected output, or a screen and its artboard),
+**lanes** (the rows of one repo in order; an edge only where a proof
+needs another row running in alpha, because a contract the design
+froze is proved on seeded data) and **waves** (acceptance gates, not
+phases: the rows that must be merged, the walk the master runs in
+alpha with commands, each repo's whole suite green before; lanes never
+stop for a wave). The human approves wave by wave. Then one writer
+(Sonnet 5, high) per lane × wave writes the worker's **goal** in
+parallel, deciding nothing. A review round runs: three lenses (Opus
+5, high: coverage, verifiability, order) beside two blind readers
+(Haiku 4.5, high) and a referee (Sonnet 5, low) per goal; **the
+conductor judges** by the plan razor and rules the sequence findings
+in the human's place when the wave's gate stays as approved, listing
+them at the close for veto. Round 2 runs automatically over the
+delta; a third only on his word. The Plan tab is built from JSON and
+read at the close; the pre-flight (everything the rows need from him)
+is handed over there, and `team.md` names the sessions of stage 4 so
+his absence blocks nothing.
 
 **4 · Execute** — the plan becomes proven branches. The session
 conducts, and the human is not in the loop until the last wave. Per
@@ -185,7 +190,7 @@ waits on production: what hurts later reopens the demand as a fix.
 
 This pipeline is expensive to run today, and that was a deliberate
 non-concern. Every story's diff is read whole by five reviewers, twice;
-discovery and design run up to three rounds, plan two; ambiguity is hunted by dispatching multiple readers at
+discovery and design run up to three rounds on the human's word, plan runs round 2 automatically and a third on his word; ambiguity is hunted by dispatching multiple readers at
 the same document. That redundancy is exactly
 where the quality comes from — and it is priced in tokens.
 
@@ -248,7 +253,7 @@ What the pipeline expects from its surroundings:
 | **blueprint** | the workstream's single review artifact — one URL, tabs per stage, pills per wave |
 | **conductor** | whoever dispatches and audits without doing the work — the stage's session |
 | **lens** | a reviewer scoped to one failure mode |
-| **judge** | whoever rules every finding — sustained/deferred/dismissed, with the reason; reviewers report at the maximum bar. At discovery and at design the conductor judges by the stage's `references/judging.md`; at plan a judge agent proposes and the conductor rules in the user's place against the approved cut; at execution the conductor rules alone inside the story's budget. |
+| **judge** | whoever rules every finding — sustained/deferred/dismissed, with the reason; reviewers report at the maximum bar. At discovery, design and plan the conductor judges by the stage's `references/judging.md` (at plan it also rules the sequence findings in the user's place against the approved cut); at execution the conductor rules alone inside the story's budget. |
 | **blind reader** | an agent that reads alone, so divergence from its sibling exposes ambiguity |
 | **andon** | stop before building on a broken premise — a cheap halt beats wrong work |
 | **dreaming** | the closing session where frictions become edits to the pipeline itself — the session suggests, the human rules every lesson |

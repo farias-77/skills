@@ -309,5 +309,130 @@
   "decisionsOf": "As decisões deste documento",
   "picked": "escolhida"
  },
- "close": "Fechar"
+ "close": "Fechar",
+ "plan": {
+  "sec": {
+   "what": "O que vamos construir, e em que ordem",
+   "ab": "De A para B",
+   "lanes": "As trilhas",
+   "waves": "As ondas",
+   "team": "As sessões",
+   "review": "A revisão"
+  },
+  "cells": {
+   "lanes": "trilhas em paralelo",
+   "lanesTail": "uma sessão cada",
+   "rows": "rows",
+   "rowsTail": "em {n} repos",
+   "waves": "ondas de aceitação",
+   "wavesTail": "portões, não fases",
+   "cards": "decisões do corte",
+   "against": "contra a recomendação",
+   "preflight": "itens do pré-voo",
+   "preflightTail": "{n} entregues",
+   "suites": "casos de smoke",
+   "suitesTail": "{n} suítes inteiras"
+  },
+  "board": {
+   "lane": "trilha",
+   "wave": "onda",
+   "acceptsWhen": "aceita quando",
+   "noRows": "nada nesta onda",
+   "par": "em paralelo com"
+  },
+  "a": "A · hoje",
+  "b": "B · quando a última onda fica verde",
+  "contracts": "Os contratos congelados",
+  "contractsLede": "O que uma trilha escreve e outra lê, com a seção do design que fixa o formato. É por isso que nenhuma trilha espera outra: quem lê prova com dado semeado nesse formato, e a onda prova a junção real.",
+  "ct": {
+   "name": "Contrato",
+   "fixedIn": "Fixado em",
+   "writtenBy": "Escreve",
+   "readBy": "Lê"
+  },
+  "lane": {
+   "session": "sessão",
+   "shares": "divide a stack do alpha com",
+   "preflight": "pré-voo",
+   "noPreflight": "nada a entregar",
+   "touches": "toca",
+   "readBy": "lido por",
+   "after": "depois de",
+   "seeds": "prova com dado semeado"
+  },
+  "row": {
+   "num": "#",
+   "story": "História",
+   "what": "O que constrói",
+   "proof": "Prova",
+   "after": "Depois de",
+   "wave": "Onda",
+   "run": "roda",
+   "expect": "espera",
+   "see": "vê",
+   "where": "onde"
+  },
+  "goal": {
+   "title": "Goal {w} · o brief do worker",
+   "rows": "As rows, uma linha cada",
+   "builds": "Constrói",
+   "proof": "Prova",
+   "look": "Vale um olhar",
+   "worker": "O worker decide",
+   "file": "O goal inteiro · {f}"
+  },
+  "wave": {
+   "accepts": "Aceita quando",
+   "requires": "Exige mergeado e deployado",
+   "folders": "Pastas afetadas",
+   "suites": "Suítes verdes antes",
+   "walk": "A caminhada da master",
+   "step": "Passo",
+   "run": "Roda",
+   "expect": "Espera",
+   "masterDecides": "A master decide sozinha",
+   "parks": "Estaciona para você",
+   "shadow": "Suíte em sombra depois do portão",
+   "shadowYes": "sim: roda tudo em background; vermelha bloqueia o próximo portão, nunca uma trilha",
+   "shadowNo": "não",
+   "cases": "casos",
+   "screenshot": "captura de tela"
+  },
+  "team": {
+   "session": "Sessão",
+   "name": "Nome",
+   "model": "Modelo, effort",
+   "folder": "Pasta",
+   "owns": "Cuida de",
+   "first": "Primeira mensagem",
+   "rules": "As regras que as sessões dividem",
+   "rule1": "Um worker nunca espera a master para seguir a trilha; só a onda espera.",
+   "rule2": "Toda mensagem entre sessões tem uma linha e aponta para um arquivo.",
+   "rule3": "Trilhas que dividem uma stack do alpha nunca rodam smoke e deploy ao mesmo tempo nela."
+  },
+  "preflight": {
+   "title": "O pré-voo: o que você entrega antes de sair",
+   "item": "Item",
+   "row": "Row",
+   "status": "Estado",
+   "handed": "entregue",
+   "missing": "faltando: a row fica estacionada"
+  },
+  "decLede": "Cada decisão do corte em três linhas: a pergunta, a escolha, o porquê. As marcadas na borda foram contra a recomendação.",
+  "decisionsOf": "As decisões desta onda",
+  "cutDecisions": "As decisões do corte",
+  "when": {
+   "session": "sessão",
+   "writer": "pergunta do escritor",
+   "round 1": "round 1",
+   "round 2": "round 2",
+   "round 3": "round 3",
+   "approval": "aprovação"
+  },
+  "rev": {
+   "conductor": "decididos pelo condutor no seu lugar",
+   "toWriters": "Aos escritores",
+   "toWorker": "Ao worker"
+  }
+ }
 }

@@ -5,6 +5,8 @@
 //   node claude/blueprint/build.mjs <workstream-dir>
 //
 // reads  <workstream-dir>/blueprint/*.json   (workstream, prfaq, stories, report, review; wireframes, figures optional)
+//        <workstream-dir>/blueprint/plan/*.json when stage 3 ran (sequence, plan-report, plan-review; goals/<repo>-<wave>.json per goal;
+//        the goal files are embedded from 02-plan/goals/)
 //        <workstream-dir>/blueprint/design/*.json when stage 2 ran (one per document + decisions, design-report, design-review;
 //        the documents themselves and the artboards are embedded from 01-design/)
 // writes <workstream-dir>/blueprint.html
@@ -122,12 +124,83 @@ if (existsSync(designDir)) {
   if (problems.length) { console.error('blueprint data problems:\n  ' + problems.join('\n  ')); process.exit(1); }
   design = { docs, mdDocs, artboards, report: dreport, review: dreview, decisions };
 }
-const tabs = ['discovery', ...(design ? ['design'] : [])];
+// ---- stage 3: the cut (sequence), one JSON per goal (lane × wave), the goals embedded whole ----
+const planDir = join(dataDir, 'plan');
+let plan = null;
+if (existsSync(planDir)) {
+  const pread = f => JSON.parse(readFileSync(join(planDir, f), 'utf8'));
+  const popt = f => existsSync(join(planDir, f)) ? pread(f) : null;
+  const seq = popt('sequence.json'), preport = popt('plan-report.json'), preview = popt('plan-review.json') || { rounds: [] };
+  if (!seq) problems.push('plan/sequence.json: missing');
+  if (!preport) problems.push('plan/plan-report.json: missing'); else {
+    need(preport, ['inOneSentence', 'threeThings', 'needsYourEye', 'lanesPlain', 'wavesPlain', 'teamPlain', 'reviewPlain'], 'plan-report.json');
+    if ((preport.threeThings || []).length !== 3) problems.push('plan-report.json: threeThings must have exactly three items');
+  }
+  const goals = {}, mdGoals = {};
+  if (seq) {
+    need(seq, ['fromA', 'toB', 'contracts', 'lanes', 'waves', 'team', 'preflight'], 'plan/sequence.json');
+    const rowNums = new Map(), waveIds = new Set((seq.waves || []).map(w => w.n));
+    const proofOk = p => p && ((p.run && p.expect) || (p.see && p.where));
+    (seq.lanes || []).forEach(l => {
+      need(l, ['repo', 'session', 'rows'], `lane ${l.repo}`);
+      (l.rows || []).forEach(r => {
+        need(r, ['num', 'story', 'what', 'wave', 'proof'], `row ${r.num}`);
+        if (rowNums.has(r.num)) problems.push(`row ${r.num}: duplicate number (also in lane ${rowNums.get(r.num)})`); rowNums.set(r.num, l.repo);
+        if (!proofOk(r.proof)) problems.push(`row ${r.num}: proof must be {run, expect} or {see, where}`);
+        if (!waveIds.has(r.wave)) problems.push(`row ${r.num}: wave ${r.wave} does not exist`);
+        if (!ids.has(r.story) && !/^(infra|seed|mesh|—|-)$/.test(r.story)) problems.push(`row ${r.num}: story ${r.story} does not exist`);
+      });
+      // every lane × wave that has rows has its goal JSON and its goal file
+      [...new Set((l.rows || []).map(r => r.wave))].forEach(w => {
+        const gf = join(planDir, 'goals', `${l.repo}-${w}.json`);
+        if (!existsSync(gf)) { problems.push(`plan/goals/${l.repo}-${w}.json: missing (lane ${l.repo} has rows in ${w})`); return; }
+        const g = JSON.parse(readFileSync(gf, 'utf8'));
+        need(g, ['goal', 'repo', 'wave', 'file', 'intro', 'rows', 'worthALook', 'workerDecides'], `plan/goals/${l.repo}-${w}.json`);
+        (g.rows || []).forEach(gr => { if (!rowNums.has(gr.num)) problems.push(`goal ${g.goal}: row ${gr.num} is not in sequence.json`); });
+        goals[`${l.repo}/${w}`] = g;
+        const mdPath = join(ws, g.file || '');
+        if (g.file && existsSync(mdPath)) mdGoals[`${l.repo}/${w}`] = readFileSync(mdPath, 'utf8'); else problems.push(`goal ${g.goal}: file ${g.file} not found (the tab embeds it whole)`);
+      });
+    });
+    (seq.waves || []).forEach(w => {
+      need(w, ['n', 'name', 'accepts', 'requires', 'folders', 'suites', 'walk'], `wave ${w.n}`);
+      (w.requires || []).forEach(n => { if (!rowNums.has(n)) problems.push(`wave ${w.n}: requires row ${n}, which does not exist`); });
+      (w.walk || []).forEach((st, i) => { if (!proofOk(st)) problems.push(`wave ${w.n}: walk step ${i + 1} must be {run, expect} or {see, where}`); });
+    });
+    (seq.team || []).forEach(t => need(t, ['session', 'name', 'model', 'folder', 'owns', 'first'], `team ${t.name}`));
+    (seq.preflight || []).forEach(p => { need(p, ['item', 'row', 'status'], `preflight ${p.item}`); if (!['handed', 'missing'].includes(p.status)) problems.push(`preflight ${p.item}: status must be handed or missing`); });
+    const seen = new Set();
+    (seq.decisions || []).forEach(c => { need(c, ['id', 'doc', 'when', 'question', 'chosen'], `decision ${c.id}`); if (seen.has(c.id)) problems.push(`decision ${c.id}: duplicate id`); seen.add(c.id);
+      if (c.doc !== 'cut' && !waveIds.has(c.doc)) problems.push(`decision ${c.id}: doc "${c.doc}" is neither "cut" nor a wave`); });
+  }
+  (preview.decisions || []).forEach(x => { if (!x.plain) problems.push(`plan-review.json: decision ${x.id} has no plain sentence`); });
+  // word caps (schema/plan.md)
+  const PCAPS = { fromA: 60, toB: 60, what: 18, touches: 14, readBy: 14, sharesWith: 20, accepts: 25, note: 12, masterDecides: 30, parks: 30, owns: 20, item: 16, question: 16, chosen: 30, why: 25, label: 18, cost: 14,
+    intro: 45, builds: 25, proof: 25, worthALook: 20, workerDecides: 18, preflight: 16, inOneSentence: 35, p: 35, lanesPlain: 45, wavesPlain: 45, teamPlain: 45, reviewPlain: 45, plain: 25, title: 12, ruling: 25, changed: 20 };
+  const PSKIP = new Set(['run', 'expect', 'see', 'where', 'first', 'id', 'num', 'story', 'wave', 'after', 'par', 'n', 'name', 'session', 'model', 'folder', 'fixedIn', 'writtenBy', 'file', 'goal', 'repo', 'doc', 'when', 'recommended', 'pick', 'status', 'row', 'requires', 'folders', 'lens', 'words', 'opened', 'approved', 'cases', 't']);
+  const pwords = t => String(t).trim().split(/\s+/).filter(Boolean).length;
+  const pwalk = (v, path, file) => {
+    if (Array.isArray(v)) { v.forEach(x => pwalk(x, path, file)); return; }
+    if (v && typeof v === 'object') { Object.entries(v).forEach(([k, x]) => pwalk(x, path ? `${path}.${k}` : k, file)); return; }
+    if (typeof v !== 'string') return;
+    const key = path.split('.').pop();
+    // proof.* inside sequence rows are commands (skipped); a goal's "proof" is prose (capped)
+    const cap = PSKIP.has(key) ? null : (key === 'proof' && file !== 'goal' ? null : PCAPS[key]);
+    if (cap && pwords(v) > cap) problems.push(`plan/${file}: ${path} has ${pwords(v)} words, cap ${cap} — "${v.slice(0, 60)}…"`);
+  };
+  if (seq) pwalk(seq, '', 'sequence.json');
+  if (preport) pwalk(preport, '', 'plan-report.json');
+  pwalk(preview, '', 'plan-review.json');
+  Object.values(goals).forEach(g => pwalk(g, '', 'goal'));
+  if (problems.length) { console.error('blueprint data problems:\n  ' + problems.join('\n  ')); process.exit(1); }
+  plan = { seq, goals, mdGoals, report: preport, review: preview };
+}
+const tabs = ['discovery', ...(design ? ['design'] : []), ...(plan ? ['plan'] : [])];
 
 const data = {
-  workstream, strings, figures, wireframes, review, report, design, tabs,
+  workstream, strings, figures, wireframes, review, report, design, plan, tabs,
   ...prfaq, ...stories,
-  files: ['00-discovery/pr-faq.md', '00-discovery/user-stories.md', '00-discovery/reviews.md', 'rulings.md', ...(wireframes.length ? ['00-discovery/wireframes/'] : []), ...(design ? ['01-design/*.md', '01-design/notes.md', '01-design/reviews.md', '01-design/ui/'] : [])],
+  files: ['00-discovery/pr-faq.md', '00-discovery/user-stories.md', '00-discovery/reviews.md', 'rulings.md', ...(wireframes.length ? ['00-discovery/wireframes/'] : []), ...(design ? ['01-design/*.md', '01-design/notes.md', '01-design/reviews.md', '01-design/ui/'] : []), ...(plan ? ['waves.md', '02-plan/goals/', '02-plan/recon/', '02-plan/team.md', '02-plan/reviews.md'] : [])],
   builtAt: new Date().toISOString().slice(0, 16).replace('T', ' ') + ' UTC',
 };
 // `</script` inside JSON would end the data block early; escape it.
@@ -135,4 +208,4 @@ const json = JSON.stringify(data).replace(/<\/script/gi, '<\\/script');
 const shell = readFileSync(join(here, 'shell.html'), 'utf8');
 // function replacements: a `$&` or `$'` inside the data would otherwise be read as a replacement pattern
 writeFileSync(out, shell.replace('__TITLE__', () => workstream.title.replace(/</g, '&lt;')).replace('__DATA__', () => json));
-console.log(`built ${out}: tabs ${tabs.join(' + ')} · ${stories.stories.length} stories, ${stories.stories.reduce((a, s) => a + s.acs.length, 0)} ACs, ${wireframes.length} wireframes, ${review.rounds.length} discovery rounds` + (design ? ` · design: ${design.docs.architecture.flows.length} flows, ${design.decisions.length} decisions, ${design.review.rounds.length} rounds` : ''));
+console.log(`built ${out}: tabs ${tabs.join(' + ')} · ${stories.stories.length} stories, ${stories.stories.reduce((a, s) => a + s.acs.length, 0)} ACs, ${wireframes.length} wireframes, ${review.rounds.length} discovery rounds` + (design ? ` · design: ${design.docs.architecture.flows.length} flows, ${design.decisions.length} decisions, ${design.review.rounds.length} rounds` : '') + (plan ? ` · plan: ${plan.seq.lanes.length} lanes, ${plan.seq.lanes.reduce((a, l) => a + l.rows.length, 0)} rows, ${plan.seq.waves.length} waves, ${Object.keys(plan.goals).length} goals` : ''));
