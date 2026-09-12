@@ -756,6 +756,20 @@
    "none": "— (no earlier workstream has a close)",
    "notMeasured": "not measured",
    "previousIs": "against {slug}, closed {at}",
+   "ratios": {
+    "title": "Per row",
+    "disclaimer": "The absolute counts above depend on the size of the demand: a three-row workstream beats a thirteen-row one on almost every line without being better. The ratios below divide by rows, the unit the plan fixes (one story × repo with its proof), so two workstreams read on the same scale. Rows are still not equal in size between workstreams: read the ratios as an order of magnitude, and the lines that moved as the explanation.",
+    "keys": {
+     "daysPerRow": "days per row",
+     "foundPerRow": "findings per row",
+     "sustainedRate": "sustained / found",
+     "dismissedRate": "dismissed / found",
+     "fixesPerRow": "fixes per row (passes + fix rows)",
+     "rulingsPerRow": "rulings per row",
+     "hotfixesPerRow": "hotfixes per row",
+     "entriesPerRow": "dreaming entries per row"
+    }
+   },
    "keys": {
     "days": "calendar days to prod",
     "waves": "waves",

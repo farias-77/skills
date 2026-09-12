@@ -89,6 +89,12 @@ capped: they are copied exactly. His words are never cut.
 - `numbers.this` carries every key of the list above, a number or
   `null` (not measured — never estimated); `numbers.previous` the same
   keys or `null`; `moved[].key` is one of them.
+- The page derives **ratios per row** from `numbers.this` and
+  `numbers.previous` (days, findings, fixes, rulings, hotfixes and
+  dreaming entries per row; sustained and dismissed over found), with
+  a disclaimer that rows are the plan's unit and still differ in size
+  between workstreams; nothing is written in the JSON for them, and a
+  `null` or a zero denominator shows "not measured".
 - `lenses[]` is the precision per lens the harvest read, in full: the
   page tints the off ones (more dismissed than sustained).
 - `sweep[].status` is `done`, `delegated` (the user runs it, from

@@ -756,6 +756,20 @@
    "none": "— (nenhuma frente anterior tem fechamento)",
    "notMeasured": "não apurado",
    "previousIs": "contra {slug}, fechada em {at}",
+   "ratios": {
+    "title": "Por row",
+    "disclaimer": "As contagens absolutas acima dependem do tamanho da frente: uma frente de três rows vence uma de treze em quase toda linha sem ser melhor. As proporções abaixo dividem por rows, a unidade que o plano fixa (uma história × repo com a sua prova), para duas frentes lerem na mesma escala. Rows ainda não têm o mesmo tamanho entre frentes: leia as proporções como ordem de grandeza, e as linhas que se moveram como a explicação.",
+    "keys": {
+     "daysPerRow": "dias por row",
+     "foundPerRow": "achados por row",
+     "sustainedRate": "sustentados / encontrados",
+     "dismissedRate": "descartados / encontrados",
+     "fixesPerRow": "correções por row (passes + rows de correção)",
+     "rulingsPerRow": "rulings por row",
+     "hotfixesPerRow": "hotfixes por row",
+     "entriesPerRow": "entradas do dreaming por row"
+    }
+   },
    "keys": {
     "days": "dias de calendário até a prod",
     "waves": "ondas",

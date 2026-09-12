@@ -1008,9 +1008,14 @@
     const NK = Object.keys(SC.numbers.keys);
     const numRows = NK.map(k => { const m = movedOf(k); return { cls: m ? 'q' : '', cells: [`${esc(SC.numbers.keys[k])}${m ? `<span class="moved">${md(m.why)}</span>` : ''}`, `<b>${numv(N.this[k])}</b>`, ...(N.previous ? [numv(N.previous[k])] : [])] }; });
     const numbers = tbl6([SC.numbers.key, SC.numbers.this, ...(N.previous ? [SC.numbers.previous] : [])], numRows, 'num-t board-t');
+    const RATIOS = { daysPerRow: o => o.days / o.rows, foundPerRow: o => o.found / o.rows, sustainedRate: o => o.sustained / o.found, dismissedRate: o => o.dismissed / o.found, fixesPerRow: o => (o.fixPasses + o.fixRows) / o.rows, rulingsPerRow: o => o.rulings / o.rows, hotfixesPerRow: o => o.hotfixes / o.rows, entriesPerRow: o => o.entries / o.rows };
+    const ratio = (o, fn) => { if (!o) return null; try { const v = fn(o); return Number.isFinite(v) ? v : null; } catch { return null; } };
+    const fmt = v => v === null ? numv(null) : (Math.round(v * 100) / 100).toLocaleString(D.workstream.language || 'en');
+    const ratioRows = Object.keys(SC.numbers.ratios.keys).map(k => [esc(SC.numbers.ratios.keys[k]), `<b>${fmt(ratio(N.this, RATIOS[k]))}</b>`, ...(N.previous ? [fmt(ratio(N.previous, RATIOS[k]))] : [])]);
+    const ratios = `<p style="color:var(--ink-3);max-width:90ch;margin-bottom:10px">${esc(SC.numbers.ratios.disclaimer)}</p>` + tbl6([SC.numbers.key, SC.numbers.this, ...(N.previous ? [SC.numbers.previous] : [])], ratioRows, 'num-t');
     const prevLine = C.previous ? `<p style="color:var(--ink-3);margin-top:6px">${SC.numbers.previousIs.replace('{slug}', `<code>${esc(C.previous.slug)}</code>`).replace('{at}', esc(C.previous.closedAt))}</p>` : `<p style="color:var(--ink-3);margin-top:6px">${SC.numbers.none}</p>`;
     const lenses = C.lenses.length ? tbl6([SC.lenses.stage, SC.lenses.lens, '#' + SC.lenses.found, '#' + SC.lenses.sustained, '#' + SC.lenses.deferred, '#' + SC.lenses.dismissed, ''], C.lenses.map(l => ({ cls: l.dismissed > l.sustained ? 'off' : '', cells: [esc(l.stage), esc(l.lens), l.found, l.sustained, l.deferred, l.dismissed, l.dismissed > l.sustained ? `<span class="pill bad">${SC.lenses.off}</span>` : ''] })), 'board-t') : `<p style="color:var(--ink-3)">${SC.lenses.none}</p>`;
-    sec('cl-numbers', SC.sec.numbers, null, `<p class="plain">${md(C.numbersPlain)}</p><div class="rel-blocks">${kick6(SC.sec.numbers, numbers + prevLine)}${kick6(SC.lenses.title, lenses)}</div>`);
+    sec('cl-numbers', SC.sec.numbers, null, `<p class="plain">${md(C.numbersPlain)}</p><div class="rel-blocks">${kick6(SC.sec.numbers, numbers + prevLine)}${kick6(SC.numbers.ratios.title, ratios)}${kick6(SC.lenses.title, lenses)}</div>`);
 
     // ---- 3. what did not ship, and the pendencies ----
     const cut = C.cut.length ? `<ul class="rules">${C.cut.map(x => `<li><b>${md(x.what)}</b> — ${md(x.by)}</li>`).join('')}</ul>` : `<p style="color:var(--ink-3)">${SC.cut.none}</p>`;
