@@ -93,6 +93,6 @@ Pass 2 (only what pass 1's walk found): <rows, or none>.
 - **Alpha:** at these shas — `<deploy output line per repo>`
 - **Suites:** `<repo>` <p>/<f>/<s> (<date>) · …
 - **Walk after the fixes:** steps <n…> green (<trace line>)
-- **Residue, with owners:** <one line each: what, who, when>
+- **Residue, with owners:** <one line each: what, who, when · a proof deferred to prod: owner `stage 5`, the hour it can be read (UTC), what it expects>
 - **Parked and left:** <one line each: what it waits for>
 - **State:** `.state.md` → `stage: release · chair: fable`

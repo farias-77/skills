@@ -92,7 +92,10 @@ session of the lane rules alone inside the row's two rounds (the
 master rules nothing a lens found); the residue rides as PR notes, in
 the row file and in the wave report, and the user rules it at the
 audit that closes stage 4; a note he rules on there is a ruling
-too.
+too. At release his one ruling is the goal on `04-release/plan.md`,
+recorded verbatim in the trace; the session rules alone inside a fix
+row's two rounds by the execute stage's `judging.md`, and what
+survives rides as a PR note into the report.
 Every ruling is appended, as it happens, to the workstream's
 **`rulings.md`** (workstream root; created on the first ruling), one
 line each:

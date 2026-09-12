@@ -36,8 +36,9 @@ nothing alone.
 ## Preconditions
 
 `.state.md` says `stage: close` and `chair: fable`; `04-release/trace.md`
-shows the prod train completed and verified. Missing ⇒ halt, back to
-stage 5.
+shows the prod train completed and verified and the watch read (or
+its pendencies given an owner); `blueprint/release/release.json` has
+its close. Missing ⇒ halt, back to stage 5.
 
 ```
 <workstream>/

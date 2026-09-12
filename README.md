@@ -170,16 +170,28 @@ passes at most) closes the stage on a consolidated, verified, audited
 branch per repo. The Execution tab is built from the lanes' and the
 master's JSON. `main` is stage 5's.
 
-**5 · Release** — the audited branch goes to production, in the
-Claude chair, behind two explicit human gates. The entry gate shows
-what ships and what the audit left; then one integration PR per repo
-into `main`, producer-first, fronts whose hosting auto-builds prod
-prepared and merged last; alpha redeployed from `main` and the whole
-suite green (a regression goes back to stage 4 as a fix, two
-cycles at most); the version derived from the conventional commits;
-the prod-go gate with a written rollback per repo; the cutover one
-repo at a time, the human confirming each step, verification
-read-only, tags never retroactive. The Release tab is the report.
+**5 · Release** — the audited branch goes to production on one
+goal. The session (Fable 5.1, high) writes the release plan: what
+ships, the pre-flight only the human can do (done or delegated before
+the goal), the train step by step with the command and the read-only
+check of each, the versions, the rollback per repo, the proofs the
+audit deferred to production with their hour, and where it stops.
+He reads it, adjusts in prose, gives the goal, and leaves. Then one
+integration PR per repo into `main` in the rollout's order (a front
+whose hosting builds prod from `main` merges in the train, after its
+producers); the confirmation from `main` reruns the whole suite only
+when the tree or the alpha diff changed; one release-scribe (Sonnet
+5, high) per repo derives the version from the conventional commits
+and writes the notes; the rollback is written before any tag; tags
+on the integrated shas; one repo at a time from the tag under the
+rollout's checks, read-only. A red step runs the documented rollback
+and builds the fix as a row `R.n` in the same session through the
+stage-4 row workflow (exec-builder Opus 5 high, five lenses Sonnet 5
+high); the third red stops and calls him. The watch reads every
+deferred proof at its hour and the stage does not close before; a
+regression there is a hotfix by the same row, a patch tag, the
+affected stack only. One notification at the end. The Release tab is
+built from the session's JSON.
 
 **6 · Close** — the demand is archived and the pipeline learns. The
 closure record says what shipped, what did not, who owns what is
@@ -259,7 +271,7 @@ What the pipeline expects from its surroundings:
 | **blueprint** | the workstream's single review artifact — one URL, tabs per stage, pills per wave |
 | **conductor** | whoever dispatches and audits without doing the work — the stage's session |
 | **lens** | a reviewer scoped to one failure mode |
-| **judge** | whoever rules every finding — sustained/deferred/dismissed, with the reason; reviewers report at the maximum bar. At discovery, design and plan the conductor judges by the stage's `references/judging.md` (at plan it also rules the sequence findings in the user's place against the approved cut); at execution the worker session of the lane rules alone inside the row's two rounds, and the user rules the residue at the audit. |
+| **judge** | whoever rules every finding — sustained/deferred/dismissed, with the reason; reviewers report at the maximum bar. At discovery, design and plan the conductor judges by the stage's `references/judging.md` (at plan it also rules the sequence findings in the user's place against the approved cut); at execution the worker session of the lane rules alone inside the row's two rounds, and the user rules the residue at the audit; at release the session rules alone inside a fix row's two rounds, and the user's one ruling is the goal on the plan. |
 | **blind reader** | an agent that reads alone, so divergence from its sibling exposes ambiguity |
 | **andon** | stop before building on a broken premise — a cheap halt beats wrong work |
 | **dreaming** | the closing session where frictions become edits to the pipeline itself — the session suggests, the human rules every lesson |

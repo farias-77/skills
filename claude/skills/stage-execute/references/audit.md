@@ -77,8 +77,11 @@ owner, never chased into a third.
 The Close section of `audit.md`: the date; the sha of each repo's
 `feat/<workstream>` after the last audit row, with the last tag;
 alpha at those shas, said with the deploy output; the whole suites'
-last results; the residue with owners; the parked items he chose to
-leave, each with what it waits for. Then `audit.json` complete (every
+last results; the residue with owners — a proof deferred to
+production is owned by `stage 5` and carries the hour at which it
+can be read (the first scheduled run, the first alarm evaluation),
+so the release's watch schedules it (ledger P-4); the parked items
+he chose to leave, each with what it waits for. Then `audit.json` complete (every
 item with its ruling and words; the fixes with status; the close
 block), `exec-report.json` refreshed, the build, publish; `.state.md`
 to `stage: release · chair: fable` with the shas; the close commit
