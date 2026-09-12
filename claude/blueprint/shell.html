@@ -382,6 +382,14 @@
   .aud .words { font-style: italic; color: var(--ink-2); }
   @media (max-width: 860px) { .aud .kv, .rowfold { grid-template-columns: minmax(0, 1fr); } }
 
+  /* ---------- release tab ---------- */
+  .goalbox { border-left: 3px solid var(--ink); padding: 10px 18px; max-width: 90ch; display: flex; flex-direction: column; gap: 4px; }
+  .goalbox q { font-size: 20px; line-height: 1.5; font-style: italic; quotes: '“' '”'; }
+  .goalbox span { font-size: 13.5px; color: var(--ink-3); }
+  .train-t tbody tr.ko td { background: var(--bad-bg); }
+  .train-t td:first-child { font-family: var(--f-display); font-size: 19px; color: var(--accent); }
+  .rel-blocks { display: grid; gap: 26px; }
+
   .foot { max-width: 1560px; margin: 60px auto 0; padding-top: 16px; border-top: 1px solid var(--line); font-size: 14.5px; color: var(--ink-3); display: flex; flex-wrap: wrap; gap: 8px 20px; }
   mark { background: var(--mark); color: inherit; border-radius: 3px; padding: 0 2px; }
 </style>
@@ -893,6 +901,69 @@
         <div class="cells"><div class="cell"><span class="v">${AU.items.length}</span><span class="l">${SX.audit.items}</span><span class="s">${SX.audit.itemsTail.replace('{n}', ruled)}</span></div><div class="cell"><span class="v">${(AU.fixes || []).length}</span><span class="l">${SX.audit.fixes}</span><span class="s">${SX.audit.fixesTail.replace('{n}', (AU.fixes || []).filter(f => f.status === 'merged').length)}</span></div></div>
         ${kinds}${fixes}${close}`);
     }
+  }
+
+  if (D.release && D.plan) {
+    TAB = 'release';
+    const R = D.release, SR = S.release;
+    const tbl5 = (heads, rows, cls) => `<div class="tbl-wrap ${cls || ''}"><table><thead><tr>${heads.map(h => `<th${h.startsWith('#') ? ' class="num"' : ''}>${h.replace(/^#/, '')}</th>`).join('')}</tr></thead><tbody>${rows.map(r => `<tr${r.cls ? ` class="${r.cls}"` : ''}>${(r.cells || r).map(c => `<td${typeof c === 'number' ? ' class="num"' : ''}>${c}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`;
+    const kick5 = (t, inner) => `<div><span class="kicker">${t}</span><div style="margin-top:8px">${inner}</div></div>`;
+    const okPill = (ok, yes, no, pend) => ok === true ? `<span class="pill good">${yes}</span>` : ok === false ? `<span class="pill bad">${no}</span>` : `<span class="pill mute">${pend}</span>`;
+    const link = (url, text) => url ? `<a class="chip" href="${esc(url)}" target="_blank" rel="noopener">${esc(text)}</a>` : '—';
+    const closed = !!R.closed;
+    const stepsOk = R.train.filter(t => t.ok).length, watched = R.watch.filter(w => w.readAt && w.ok).length, hotfixN = R.fixes.filter(f => f.kind === 'hotfix').length;
+    const prodN = R.close ? R.close.prod.length : 0;
+
+    // ---- 1. what is in production ----
+    const prod = R.close
+      ? tbl5([SR.prod.repo, SR.prod.version, SR.prod.sha, SR.prod.deployedAt], R.close.prod.map(p => [`<code>${esc(p.repo)}</code>`, `<b>${esc(p.version)}</b>`, `<code>${esc(p.sha)}</code>`, esc(p.deployedAt)]))
+      : `<p class="plain" style="color:var(--ink-3)">${SR.prod.notYet}</p>`;
+    sec('rel-what', SR.sec.what, null, `
+      <div class="hero">
+        <h1>${md(R.inOneSentence)}</h1>
+        <div class="meta"><span>${S.opened} ${esc(R.opened)}</span><span>${S.approved} ${R.closed ? esc(R.closed) : '—'}</span><span>${S.slug} <code>${D.workstream.slug}</code></span></div>
+        ${prod}
+        ${R.threeThings ? `<div><span class="kicker">${S.threeThings}</span><div class="three">${R.threeThings.map(t => `<div class="th"><b>${md(t.t)}</b><p>${md(t.p)}</p></div>`).join('')}</div></div>` : ''}
+        <div class="cells">
+          <div class="cell"><span class="v">${prodN}</span><span class="l">${SR.cells.repos}</span><span class="s">${SR.cells.reposTail.replace('{n}', R.ships.length)}</span></div>
+          <div class="cell"><span class="v">${stepsOk}</span><span class="l">${SR.cells.steps}</span><span class="s">${SR.cells.stepsTail.replace('{n}', R.train.length)}</span></div>
+          <div class="cell"><span class="v">${R.fixes.length}</span><span class="l">${SR.cells.fixes}</span><span class="s">${SR.cells.fixesTail.replace('{n}', hotfixN)}</span></div>
+          <div class="cell"><span class="v">${watched}</span><span class="l">${SR.cells.watch}</span><span class="s">${SR.cells.watchTail.replace('{n}', R.watch.length)}</span></div>
+          <div class="cell"><span class="v">${R.stops.length}</span><span class="l">${SR.cells.stops}</span><span class="s">${SR.cells.stopsTail}</span></div>
+        </div>
+        <div class="eye"><span class="kicker">${S.eye.title}</span>${R.needsYourEye?.length ? `<ul>${R.needsYourEye.map(e => `<li><b>${md(e.t)}</b> — ${md(e.p)}</li>`).join('')}</ul>` : `<p class="none">${S.eye.none}</p>`}</div>
+      </div>`);
+
+    // ---- 2. the train: the goal, the pre-flight, the integration, the steps ----
+    const goal = R.goal ? `<div class="goalbox"><q>${md(R.goal.words)}</q><span>${SR.goal.at} ${esc(R.goal.at)}</span></div>` : `<p class="plain" style="color:var(--ink-3)">${SR.goal.notYet}</p>`;
+    const pre = R.preflight.length ? tbl5([SR.preflight.what, SR.preflight.status, SR.preflight.how], R.preflight.map(p => [md(p.what), `<span class="pill ${p.status === 'open' ? 'bad' : p.status === 'done' ? 'good' : 'acc'}">${SR.preflight[p.status]}</span>${p.at ? `<span class="rid">${esc(p.at)}</span>` : ''}`, md(p.how || '')])) : `<p style="color:var(--ink-3)">${SR.preflight.none}</p>`;
+    const confOf = repo => R.confirmation.find(c => c.repo === repo);
+    const integ = tbl5([SR.integ.repo, SR.integ.pr, SR.integ.rebased, SR.integ.ci, SR.integ.merged, SR.integ.confirm], R.ships.map(sh => { const i = R.integration.find(x => x.repo === sh.repo), c = confOf(sh.repo);
+      const conf = !c ? `<span class="pill mute">${SR.integ.pending}</span>` : `<div class="proof"><span>${SR.integ.tree}: <b>${c.treeIdentical ? SR.integ.yes : SR.integ.no}</b> · ${SR.integ.alpha}: <b>${c.alphaDiffEmpty ? SR.integ.yes : SR.integ.no}</b></span>${c.suite ? `<span>${SR.integ.suite.replace('{p}', c.suite.passed).replace('{f}', c.suite.failed).replace('{s}', c.suite.skipped)} <span class="rid">${esc(c.suite.file)}</span></span>` : ''}${c.stood ? `<span><span class="pill good">${SR.integ.stood}</span> ${md(c.stood)}</span>` : ''}</div>`;
+      return [`<code>${esc(sh.repo)}</code><span class="rid">${esc(sh.sha)} · ${sh.waves.map(esc).join(', ')} · Lane ${esc(sh.lane)}</span>`, i ? link(i.pr.url, '#' + i.pr.n) : '—', i ? (i.rebased ? SR.integ.yes : SR.integ.no) : '—', i ? okPill(i.ci === 'green', SR.train.ok, SR.train.ko, SR.integ.pending) : '—', i ? (i.mergedAt ? `${esc(i.mergedAt)}<span class="rid">${esc(i.mainSha || '')}</span>` : sh.lane === 'B' ? `<span class="pill mute">${SR.integ.waiting}</span>` : `<span class="pill mute">${SR.integ.pending}</span>`) : '—', conf]; }));
+    const train = R.train.length ? tbl5([SR.train.step, SR.train.repo, SR.train.what, SR.train.run, SR.train.expect, SR.train.got, SR.train.at, ''], R.train.map(st => ({ cls: st.ok === false ? 'ko' : '', cells: [st.step, `<code>${esc(st.repo)}</code>`, md(st.what), st.run ? `<code>${esc(st.run)}</code>` : md(st.see), md(st.expect || st.where), st.got ? `<b>${md(st.got)}</b>${st.file ? `<span class="rid">${esc(st.file)}</span>` : ''}` : `<code>${esc(st.shot)}</code>`, esc(st.at), okPill(st.ok, SR.train.ok, SR.train.ko, SR.integ.pending)] })), 'train-t') : `<p style="color:var(--ink-3)">${SR.train.none}</p>`;
+    sec('rel-train', SR.sec.train, null, `<p class="plain">${md(R.trainPlain)}</p><div class="rel-blocks">
+      ${kick5(SR.goal.title, goal)}
+      ${kick5(SR.preflight.title, pre)}
+      ${kick5(SR.integ.title, integ)}
+      ${kick5(SR.train.title, train)}</div>`);
+
+    // ---- 3. versions and the way back ----
+    const vers = R.versions.length ? tbl5([SR.versions.repo, SR.versions.from, SR.versions.to, SR.versions.bump, SR.versions.sha, SR.versions.release], R.versions.map(v => [`<code>${esc(v.repo)}</code>`, v.from ? `<code>${esc(v.from)}</code>` : '—', `<b>${esc(v.to)}</b>`, `${SR.versions.bumps[v.bump] || esc(v.bump)}${v.unparsed ? `<span class="rid">${SR.versions.unparsed.replace('{n}', v.unparsed)}</span>` : ''}`, `<code>${esc(v.sha)}</code>`, `${link(v.url, v.to)}<span class="rid">${esc(v.notesFile)}</span>`])) : `<p style="color:var(--ink-3)">${SR.versions.none}</p>`;
+    const rb = R.rollback.length ? tbl5([SR.rollback.repo, SR.rollback.returnTo, SR.rollback.dataSafe, SR.rollback.note], R.rollback.map(x => [`<code>${esc(x.repo)}</code>`, `${md(x.returnTo)}<span class="rid">${esc(x.file)}</span>`, okPill(x.dataSafe, SR.rollback.yes, SR.rollback.no, '—'), md(x.note)])) : '';
+    sec('rel-versions', SR.sec.versions, null, `<p class="plain">${md(R.versionsPlain)}</p><div class="rel-blocks">${kick5(SR.sec.versions, vers)}${rb ? kick5(SR.rollback.title, rb) : ''}</div>`);
+
+    // ---- 4. the watch, the fixes, the stops, the close ----
+    const watch = R.watch.length ? tbl5([SR.watch.n, SR.watch.what, SR.watch.at, SR.watch.expect, SR.watch.got, SR.watch.readAt, ''], R.watch.map(w => ({ cls: w.ok === false ? 'ko' : '', cells: [w.n, md(w.what), esc(w.at), md(w.expect), w.got ? `<b>${md(w.got)}</b>${w.file ? `<span class="rid">${esc(w.file)}</span>` : ''}` : '—', w.readAt ? esc(w.readAt) : '—', w.owner ? `<span class="pill warn">${SR.watch.owner.replace('{o}', md(w.owner))}</span>` : okPill(w.ok, SR.watch.ok, SR.watch.ko, SR.watch.pending)] })), 'train-t') : `<p style="color:var(--ink-3)">${SR.watch.none}</p>`;
+    const fixPill = st => `<span class="pill ${st === 'deployed' || st === 'merged' ? 'good' : st === 'stopped' ? 'bad' : 'acc'}">${SR.fixes.status_[st] || esc(st)}</span>`;
+    const fixes = R.fixes.length ? tbl5([SR.fixes.id, SR.fixes.kind, SR.fixes.repo, SR.fixes.seen, SR.fixes.what, SR.fixes.pr, SR.fixes.tag, SR.fixes.status], R.fixes.map(f => [`<code>${esc(f.id)}</code>`, SR.fixes.kinds[f.kind] || esc(f.kind), `<code>${esc(f.repo)}</code>`, md(f.seen), md(f.what), f.pr ? link(f.pr.url, '#' + f.pr.n) : '—', f.tag ? `<code>${esc(f.tag)}</code>` : '—', fixPill(f.status)])) : `<p style="color:var(--ink-3)">${SR.fixes.none}</p>`;
+    const stops = R.stops.length ? `<ul class="rules">${R.stops.map(x => `<li><b>${esc(x.at)}</b> — ${md(x.what)} · ${md(x.how)}</li>`).join('')}</ul>` : `<p style="color:var(--ink-3)">${SR.stops.none}</p>`;
+    const close = R.close ? `<div class="kv" style="display:grid;grid-template-columns:150px minmax(0,1fr);gap:6px 12px"><span class="kicker">${SR.close.date}</span><span>${esc(R.close.date)}</span><span class="kicker">${SR.close.residue}</span><span>${R.close.residue.length ? `<ul class="rules">${R.close.residue.map(r => `<li>${md(r.what)} — <b>${md(r.owner)}</b></li>`).join('')}</ul>` : SR.close.none}</span></div>` : `<p style="color:var(--ink-3)">${SR.close.notYet}</p>`;
+    sec('rel-watch', SR.sec.watch, null, `<p class="plain">${md(R.watchPlain)}</p><div class="rel-blocks">
+      ${kick5(SR.watch.title, watch)}
+      ${kick5(`${SR.fixes.title} · ${R.fixes.length}`, fixes)}
+      ${kick5(SR.stops.title, stops)}
+      ${kick5(SR.close.title, close)}</div>`);
   }
 
   // ---- mount: every tab is in the DOM (mermaid renders once); the inactive ones are hidden ----

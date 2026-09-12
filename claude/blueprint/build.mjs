@@ -8,6 +8,7 @@
 //        <workstream-dir>/blueprint/plan/*.json when stage 3 ran (sequence, plan-report, plan-review; goals/<repo>-<wave>.json per goal;
 //        the goal files are embedded from 02-plan/goals/)
 //        <workstream-dir>/blueprint/execution/ when stage 4 ran (lanes/<repo>.json per worker; waves/<wNN>.json, exec-report.json, audit.json by the master)
+//        <workstream-dir>/blueprint/release/release.json when stage 5 ran (one file by the session: the plan, the train, the versions, the fixes, the watch, the close)
 //        <workstream-dir>/blueprint/design/*.json when stage 2 ran (one per document + decisions, design-report, design-review;
 //        the documents themselves and the artboards are embedded from 01-design/)
 // writes <workstream-dir>/blueprint.html
@@ -292,12 +293,74 @@ if (existsSync(execDir) && plan) {
   problems.push('blueprint/execution/ exists but blueprint/plan/ does not: the Execution tab is read against the plan');
   console.error('blueprint data problems:\n  ' + problems.join('\n  ')); process.exit(1);
 }
-const tabs = ['discovery', ...(design ? ['design'] : []), ...(plan ? ['plan'] : []), ...(execution ? ['execution'] : [])];
+// ---- stage 5: one JSON by the session (the plan, the train, the versions, the fixes, the watch, the close) ----
+const relPath = join(dataDir, 'release', 'release.json');
+let release = null;
+if (existsSync(relPath) && plan) {
+  const R = JSON.parse(readFileSync(relPath, 'utf8'));
+  need(R, ['opened', 'goal', 'inOneSentence', 'threeThings', 'needsYourEye', 'trainPlain', 'versionsPlain', 'watchPlain', 'ships', 'preflight', 'integration', 'confirmation', 'versions', 'rollback', 'train', 'fixes', 'watch', 'stops', 'close'], 'release.json');
+  const closed = !!R.closed;
+  if ((R.threeThings || []).length !== 3) problems.push('release.json: threeThings must have exactly three items');
+  if (R.goal) need(R.goal, ['words', 'at'], 'release.json goal');
+  const planLanes = new Set(plan.seq.lanes.map(l => l.repo)), planWaves = new Set(plan.seq.waves.map(w => w.n));
+  const ships = new Set();
+  (R.ships || []).forEach(sh => { need(sh, ['repo', 'sha', 'waves', 'lane'], `release ships ${sh.repo}`); ships.add(sh.repo);
+    if (!planLanes.has(sh.repo)) problems.push(`release.json: ships ${sh.repo} is not a lane of sequence.json`);
+    (sh.waves || []).forEach(w => { if (!planWaves.has(w)) problems.push(`release.json: ships ${sh.repo} names wave ${w}, not in sequence.json`); });
+    if (!['A', 'B'].includes(sh.lane)) problems.push(`release.json: ships ${sh.repo} lane must be A or B`); });
+  const inShips = (list, name, key = 'repo') => (list || []).forEach(x => { if (!ships.has(x[key])) problems.push(`release.json: ${name} names ${x[key]}, not in ships`); });
+  (R.preflight || []).forEach((p, i) => { need(p, ['what', 'status'], `release preflight ${i + 1}`); if (!['done', 'delegated', 'open'].includes(p.status)) problems.push(`release preflight ${i + 1}: status must be done, delegated or open`); if (closed && p.status === 'open') problems.push(`release preflight ${i + 1}: the stage is closed and this line is open`); });
+  inShips(R.integration, 'integration'); (R.integration || []).forEach(x => { need(x, ['repo', 'pr', 'rebased', 'ci'], `release integration ${x.repo}`); if (!x.pr?.n || !x.pr?.url) problems.push(`release integration ${x.repo}: pr needs n and url`); });
+  inShips(R.confirmation, 'confirmation'); (R.confirmation || []).forEach(c => { need(c, ['repo', 'treeIdentical', 'alphaDiffEmpty'], `release confirmation ${c.repo}`);
+    if (c.treeIdentical && c.alphaDiffEmpty) { if (!c.stood && !c.suite) problems.push(`release confirmation ${c.repo}: tree identical and alpha diff empty, but neither stood nor suite`); }
+    else if (!c.suite) problems.push(`release confirmation ${c.repo}: something changed and no suite ran`);
+    if (c.suite) need(c.suite, ['passed', 'failed', 'skipped', 'file'], `release confirmation ${c.repo} suite`); });
+  inShips(R.versions, 'versions'); (R.versions || []).forEach(v => { need(v, ['repo', 'from', 'to', 'bump', 'sha', 'url', 'notesFile', 'unparsed'], `release version ${v.repo}`);
+    if (!/^v\d+\.\d+\.\d+$/.test(v.to || '')) problems.push(`release version ${v.repo}: to must be vN.N.N`);
+    if (!['major', 'minor', 'patch', 'initial'].includes(v.bump)) problems.push(`release version ${v.repo}: bump must be major, minor, patch or initial`);
+    if (closed && (!v.url || !v.sha)) problems.push(`release version ${v.repo}: the stage is closed and the version has no url or sha`); });
+  if (closed) ships.forEach(r => { if (!(R.versions || []).some(v => v.repo === r)) problems.push(`release.json: closed and ${r} has no version`); });
+  inShips(R.rollback, 'rollback'); (R.rollback || []).forEach(x => need(x, ['repo', 'returnTo', 'dataSafe', 'note', 'file'], `release rollback ${x.repo}`));
+  (R.train || []).forEach(st => { need(st, ['step', 'repo', 'what', 'ok', 'at'], `release train step ${st.step}`);
+    if (!ships.has(st.repo)) problems.push(`release train step ${st.step}: repo ${st.repo} not in ships`);
+    if (!((st.run && st.expect && st.got) || (st.see && st.where && st.shot))) problems.push(`release train step ${st.step}: needs run/expect/got or see/where/shot`);
+    if (closed && st.ok !== true) problems.push(`release train step ${st.step}: the stage is closed and this step is red`); });
+  (R.fixes || []).forEach(x => { need(x, ['id', 'kind', 'repo', 'seen', 'what', 'status'], `release fix ${x.id}`);
+    if (!/^R\.\d+$/.test(x.id || '')) problems.push(`release fix ${x.id}: id must be R.<n>`);
+    if (!['fix', 'hotfix'].includes(x.kind)) problems.push(`release fix ${x.id}: kind must be fix or hotfix`);
+    if (!['building', 'merged', 'deployed', 'stopped'].includes(x.status)) problems.push(`release fix ${x.id}: status must be building, merged, deployed or stopped`);
+    if (closed && !(x.status === 'deployed' || (x.kind === 'fix' && x.status === 'merged'))) problems.push(`release fix ${x.id}: the stage is closed and this ${x.kind} is ${x.status}`); });
+  (R.watch || []).forEach(w => { need(w, ['n', 'what', 'at', 'expect'], `release watch ${w.n}`);
+    if (w.readAt && w.ok == null) problems.push(`release watch ${w.n}: read but ok is null`);
+    if (closed && !(w.readAt && w.ok === true) && !w.owner) problems.push(`release watch ${w.n}: the stage is closed and this proof is neither read green nor given an owner`); });
+  (R.stops || []).forEach((x, i) => need(x, ['at', 'what', 'how'], `release stop ${i + 1}`));
+  if (closed && !R.close) problems.push('release.json: closed without a close');
+  if (R.close) { need(R.close, ['date', 'prod', 'residue'], 'release.json close'); ships.forEach(r => { if (!(R.close.prod || []).some(p => p.repo === r)) problems.push(`release.json close: ${r} is not in prod`); });
+    (R.close.prod || []).forEach(p => need(p, ['repo', 'version', 'sha', 'deployedAt'], `release close prod ${p.repo}`)); (R.close.residue || []).forEach(x => need(x, ['what', 'owner'], 'release close residue')); }
+  // word caps (schema/release.md)
+  const RCAPS = { inOneSentence: 35, p: 35, trainPlain: 45, versionsPlain: 45, watchPlain: 45, how: 20, stood: 25, note: 35, seen: 20 };
+  const RSKIP = new Set(['run', 'expect', 'see', 'where', 'got', 'shot', 'file', 'sha', 'url', 'tag', 'words', 'returnTo', 'at', 'readAt', 'mergedAt', 'deployedAt', 'repo', 'id', 'kind', 'status', 'step', 'n', 'from', 'to', 'bump', 'version', 'notesFile', 'owner', 'lane', 'ci', 'date', 'opened', 'closed', 't', 'mainSha', 'waves', 'expect']);
+  const rwords = t => String(t).trim().split(/\s+/).filter(Boolean).length;
+  const rwalk = (v, path) => {
+    if (Array.isArray(v)) { v.forEach(x => rwalk(x, path)); return; }
+    if (v && typeof v === 'object') { Object.entries(v).forEach(([k, x]) => rwalk(x, path ? `${path}.${k}` : k)); return; }
+    if (typeof v !== 'string') return;
+    const key = path.split('.').pop();
+    const cap = RSKIP.has(key) ? null : /^preflight\.what$/.test(path) ? 20 : /^train\.what$/.test(path) ? 14 : /^(fixes|watch)\.what$/.test(path) ? 20 : /^stops\.(what|how)$/.test(path) ? 25 : /^close\.residue\.what$/.test(path) ? 20 : RCAPS[key];
+    if (cap && rwords(v) > cap) problems.push(`release.json: ${path} has ${rwords(v)} words, cap ${cap} — "${v.slice(0, 60)}…"`);
+  };
+  rwalk(R, '');
+  if (problems.length) { console.error('blueprint data problems:\n  ' + problems.join('\n  ')); process.exit(1); }
+  release = R;
+} else if (existsSync(relPath) && !plan) {
+  console.error('blueprint data problems:\n  blueprint/release/release.json exists but blueprint/plan/ does not: the Release tab is read against the plan'); process.exit(1);
+}
+const tabs = ['discovery', ...(design ? ['design'] : []), ...(plan ? ['plan'] : []), ...(execution ? ['execution'] : []), ...(release ? ['release'] : [])];
 
 const data = {
-  workstream, strings, figures, wireframes, review, report, design, plan, execution, tabs,
+  workstream, strings, figures, wireframes, review, report, design, plan, execution, release, tabs,
   ...prfaq, ...stories,
-  files: ['00-discovery/pr-faq.md', '00-discovery/user-stories.md', '00-discovery/reviews.md', 'rulings.md', ...(wireframes.length ? ['00-discovery/wireframes/'] : []), ...(design ? ['01-design/*.md', '01-design/notes.md', '01-design/reviews.md', '01-design/ui/'] : []), ...(plan ? ['waves.md', '02-plan/goals/', '02-plan/recon/', '02-plan/team.md', '02-plan/reviews.md'] : []), ...(execution ? ['03-execution/rows/', '03-execution/<wNN>/', '03-execution/audit.md', '03-execution/parked.md'] : [])],
+  files: ['00-discovery/pr-faq.md', '00-discovery/user-stories.md', '00-discovery/reviews.md', 'rulings.md', ...(wireframes.length ? ['00-discovery/wireframes/'] : []), ...(design ? ['01-design/*.md', '01-design/notes.md', '01-design/reviews.md', '01-design/ui/'] : []), ...(plan ? ['waves.md', '02-plan/goals/', '02-plan/recon/', '02-plan/team.md', '02-plan/reviews.md'] : []), ...(execution ? ['03-execution/rows/', '03-execution/<wNN>/', '03-execution/audit.md', '03-execution/parked.md'] : []), ...(release ? ['04-release/plan.md', '04-release/trace.md', '04-release/rows/', '04-release/proof/'] : [])],
   builtAt: new Date().toISOString().slice(0, 16).replace('T', ' ') + ' UTC',
 };
 // `</script` inside JSON would end the data block early; escape it.
@@ -305,4 +368,4 @@ const json = JSON.stringify(data).replace(/<\/script/gi, '<\\/script');
 const shell = readFileSync(join(here, 'shell.html'), 'utf8');
 // function replacements: a `$&` or `$'` inside the data would otherwise be read as a replacement pattern
 writeFileSync(out, shell.replace('__TITLE__', () => workstream.title.replace(/</g, '&lt;')).replace('__DATA__', () => json));
-console.log(`built ${out}: tabs ${tabs.join(' + ')} · ${stories.stories.length} stories, ${stories.stories.reduce((a, s) => a + s.acs.length, 0)} ACs, ${wireframes.length} wireframes, ${review.rounds.length} discovery rounds` + (design ? ` · design: ${design.docs.architecture.flows.length} flows, ${design.decisions.length} decisions, ${design.review.rounds.length} rounds` : '') + (plan ? ` · plan: ${plan.seq.lanes.length} lanes, ${plan.seq.lanes.reduce((a, l) => a + l.rows.length, 0)} rows, ${plan.seq.waves.length} waves, ${Object.keys(plan.goals).length} goals` : '') + (execution ? ` · execution: ${Object.keys(execution.lanes).length} lanes, ${Object.values(execution.lanes).reduce((a, l) => a + l.rows.filter(r => r.status === 'merged' && !r.fixOf).length, 0)} rows merged, ${Object.values(execution.waves).filter(w => w.gatedAt).length} gates green${execution.audit ? (execution.audit.close ? ', audit closed' : ', audit open') : ''}` : ''));
+console.log(`built ${out}: tabs ${tabs.join(' + ')} · ${stories.stories.length} stories, ${stories.stories.reduce((a, s) => a + s.acs.length, 0)} ACs, ${wireframes.length} wireframes, ${review.rounds.length} discovery rounds` + (design ? ` · design: ${design.docs.architecture.flows.length} flows, ${design.decisions.length} decisions, ${design.review.rounds.length} rounds` : '') + (plan ? ` · plan: ${plan.seq.lanes.length} lanes, ${plan.seq.lanes.reduce((a, l) => a + l.rows.length, 0)} rows, ${plan.seq.waves.length} waves, ${Object.keys(plan.goals).length} goals` : '') + (execution ? ` · execution: ${Object.keys(execution.lanes).length} lanes, ${Object.values(execution.lanes).reduce((a, l) => a + l.rows.filter(r => r.status === 'merged' && !r.fixOf).length, 0)} rows merged, ${Object.values(execution.waves).filter(w => w.gatedAt).length} gates green${execution.audit ? (execution.audit.close ? ', audit closed' : ', audit open') : ''}` : '') + (release ? ` · release: ${release.train.filter(t => t.ok).length}/${release.train.length} train steps green, ${release.versions.length} versions, ${release.fixes.length} fixes, ${release.watch.filter(w => w.readAt).length}/${release.watch.length} watched${release.closed ? ', closed' : ', open'}` : ''));

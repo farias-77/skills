@@ -577,5 +577,151 @@
    "residue": "residue, with owners",
    "notClosed": "The audit is open: the Close section has not been written."
   }
+ },
+ "release": {
+  "sec": {
+   "what": "What is in production",
+   "train": "The train",
+   "versions": "Versions and the way back",
+   "watch": "The watch and the close"
+  },
+  "cells": {
+   "repos": "repos in production",
+   "reposTail": "of {n} shipping",
+   "steps": "train steps green",
+   "stepsTail": "of {n}",
+   "fixes": "fix rows",
+   "fixesTail": "{n} hotfixes",
+   "watch": "proofs read at the watch",
+   "watchTail": "of {n}",
+   "stops": "stops",
+   "stopsTail": "where the session called you"
+  },
+  "prod": {
+   "repo": "Repo",
+   "version": "Version",
+   "sha": "Sha",
+   "deployedAt": "Deployed",
+   "notYet": "Nothing in production yet: the train has not closed."
+  },
+  "goal": {
+   "title": "The goal",
+   "notYet": "Not given yet: the session is waiting on the plan.",
+   "at": "given"
+  },
+  "preflight": {
+   "title": "Pre-flight — what only you could do",
+   "what": "What",
+   "status": "Status",
+   "how": "How",
+   "done": "done",
+   "delegated": "delegated",
+   "open": "open",
+   "none": "nothing needed you before the goal"
+  },
+  "integ": {
+   "title": "Integration and confirmation from main",
+   "repo": "Repo",
+   "pr": "PR",
+   "rebased": "Rebased",
+   "ci": "CI",
+   "merged": "Merged",
+   "confirm": "Confirmation",
+   "stood": "the audit's green stands",
+   "suite": "suite {p} passed · {f} failed · {s} skipped",
+   "tree": "tree identical",
+   "alpha": "alpha diff empty",
+   "yes": "yes",
+   "no": "no",
+   "waiting": "waits for the train (merge is deploy)",
+   "pending": "not yet"
+  },
+  "train": {
+   "title": "The train, step by step",
+   "step": "Step",
+   "repo": "Repo",
+   "what": "What",
+   "run": "Run / see",
+   "expect": "Expect / where",
+   "got": "Got",
+   "at": "At",
+   "ok": "green",
+   "ko": "red",
+   "none": "no step has run yet"
+  },
+  "versions": {
+   "repo": "Repo",
+   "from": "From",
+   "to": "To",
+   "bump": "Bump",
+   "sha": "Sha",
+   "release": "Release",
+   "notes": "notes",
+   "unparsed": "{n} commits outside the grammar",
+   "none": "no version derived yet",
+   "bumps": {
+    "major": "major",
+    "minor": "minor",
+    "patch": "patch",
+    "initial": "first version"
+   }
+  },
+  "rollback": {
+   "title": "The way back, per repo",
+   "repo": "Repo",
+   "returnTo": "Return to",
+   "dataSafe": "Safe for data",
+   "note": "Note",
+   "file": "File",
+   "yes": "yes",
+   "no": "NO — a stop"
+  },
+  "fixes": {
+   "title": "Fixed on the way",
+   "id": "Row",
+   "kind": "Kind",
+   "repo": "Repo",
+   "seen": "Seen",
+   "what": "What changed",
+   "pr": "PR",
+   "tag": "Tag",
+   "status": "Status",
+   "none": "nothing was fixed on the way",
+   "kinds": {
+    "fix": "fix",
+    "hotfix": "hotfix"
+   },
+   "status_": {
+    "building": "in progress",
+    "merged": "merged",
+    "deployed": "deployed",
+    "stopped": "stopped"
+   }
+  },
+  "watch": {
+   "title": "The watch — proofs the audit deferred to prod",
+   "n": "#",
+   "what": "What",
+   "at": "Readable at",
+   "expect": "Expect",
+   "got": "Got",
+   "readAt": "Read",
+   "ok": "green",
+   "ko": "red",
+   "pending": "not yet",
+   "owner": "pendency: {o}",
+   "none": "the audit deferred nothing to production"
+  },
+  "stops": {
+   "title": "Where the session stopped",
+   "none": "The session never stopped: no third red, no unsafe rollback."
+  },
+  "close": {
+   "title": "The close",
+   "date": "date",
+   "residue": "stays with an owner",
+   "none": "nothing",
+   "notYet": "The stage has not closed: the watch is still open."
+  }
  }
 }

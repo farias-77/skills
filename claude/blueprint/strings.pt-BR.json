@@ -577,5 +577,151 @@
    "residue": "resíduo, com donos",
    "notClosed": "A auditoria está aberta: a seção de fechamento não foi escrita."
   }
+ },
+ "release": {
+  "sec": {
+   "what": "O que está em produção",
+   "train": "O trem",
+   "versions": "Versões e o caminho de volta",
+   "watch": "A vigília e o fechamento"
+  },
+  "cells": {
+   "repos": "repos em produção",
+   "reposTail": "de {n} que sobem",
+   "steps": "passos do trem verdes",
+   "stepsTail": "de {n}",
+   "fixes": "rows de correção",
+   "fixesTail": "{n} hotfixes",
+   "watch": "provas lidas na vigília",
+   "watchTail": "de {n}",
+   "stops": "paradas",
+   "stopsTail": "onde a sessão chamou você"
+  },
+  "prod": {
+   "repo": "Repo",
+   "version": "Versão",
+   "sha": "Sha",
+   "deployedAt": "Subiu em",
+   "notYet": "Nada em produção ainda: o trem não fechou."
+  },
+  "goal": {
+   "title": "O goal",
+   "notYet": "Ainda não dado: a sessão espera pelo plano.",
+   "at": "dado em"
+  },
+  "preflight": {
+   "title": "Pré-voo — o que só você podia fazer",
+   "what": "O quê",
+   "status": "Status",
+   "how": "Como",
+   "done": "feito",
+   "delegated": "delegado",
+   "open": "aberto",
+   "none": "nada precisou de você antes do goal"
+  },
+  "integ": {
+   "title": "Integração e confirmação a partir da main",
+   "repo": "Repo",
+   "pr": "PR",
+   "rebased": "Rebase",
+   "ci": "CI",
+   "merged": "Mergeado",
+   "confirm": "Confirmação",
+   "stood": "o verde da auditoria vale",
+   "suite": "suíte {p} passaram · {f} falharam · {s} pulados",
+   "tree": "árvore idêntica",
+   "alpha": "diff do alpha vazio",
+   "yes": "sim",
+   "no": "não",
+   "waiting": "espera o trem (merge é deploy)",
+   "pending": "ainda não"
+  },
+  "train": {
+   "title": "O trem, passo a passo",
+   "step": "Passo",
+   "repo": "Repo",
+   "what": "O quê",
+   "run": "Roda / vê",
+   "expect": "Espera / onde",
+   "got": "Saiu",
+   "at": "Quando",
+   "ok": "verde",
+   "ko": "vermelho",
+   "none": "nenhum passo rodou ainda"
+  },
+  "versions": {
+   "repo": "Repo",
+   "from": "De",
+   "to": "Para",
+   "bump": "Salto",
+   "sha": "Sha",
+   "release": "Release",
+   "notes": "notas",
+   "unparsed": "{n} commits fora da gramática",
+   "none": "nenhuma versão derivada ainda",
+   "bumps": {
+    "major": "major",
+    "minor": "minor",
+    "patch": "patch",
+    "initial": "primeira versão"
+   }
+  },
+  "rollback": {
+   "title": "O caminho de volta, por repo",
+   "repo": "Repo",
+   "returnTo": "Volta para",
+   "dataSafe": "Seguro para os dados",
+   "note": "Nota",
+   "file": "Arquivo",
+   "yes": "sim",
+   "no": "NÃO — uma parada"
+  },
+  "fixes": {
+   "title": "Corrigido no caminho",
+   "id": "Row",
+   "kind": "Tipo",
+   "repo": "Repo",
+   "seen": "Visto",
+   "what": "O que mudou",
+   "pr": "PR",
+   "tag": "Tag",
+   "status": "Status",
+   "none": "nada foi corrigido no caminho",
+   "kinds": {
+    "fix": "correção",
+    "hotfix": "hotfix"
+   },
+   "status_": {
+    "building": "em andamento",
+    "merged": "mergeado",
+    "deployed": "em prod",
+    "stopped": "parado"
+   }
+  },
+  "watch": {
+   "title": "A vigília — provas que a auditoria adiou para prod",
+   "n": "#",
+   "what": "O quê",
+   "at": "Legível a partir de",
+   "expect": "Espera",
+   "got": "Saiu",
+   "readAt": "Lido em",
+   "ok": "verde",
+   "ko": "vermelho",
+   "pending": "ainda não",
+   "owner": "pendência: {o}",
+   "none": "a auditoria não adiou nada para produção"
+  },
+  "stops": {
+   "title": "Onde a sessão parou",
+   "none": "A sessão nunca parou: nenhum terceiro vermelho, nenhum rollback inseguro."
+  },
+  "close": {
+   "title": "O fechamento",
+   "date": "data",
+   "residue": "fica com um dono",
+   "none": "nada",
+   "notYet": "O stage não fechou: a vigília ainda está aberta."
+  }
  }
 }
