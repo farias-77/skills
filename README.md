@@ -193,16 +193,24 @@ regression there is a hotfix by the same row, a patch tag, the
 affected stack only. One notification at the end. The Release tab is
 built from the session's JSON.
 
-**6 · Close** — the demand is archived and the pipeline learns. The
-closure record says what shipped, what did not, who owns what is
-left, and the demand's numbers against the previous one; the repos
-and GitHub are swept so the next demand starts clean. Then the
-**dreaming**, a working session: every friction the stages noted on
-the spot, every ruling, every departure the human kept at the audit,
-becomes an entry on a board with evidence and a suggested edit to a
-standard, a skill or an agent; the human rules each entry, and only
-ruled lessons become one revertible `learn()` commit each. Nothing
-waits on production: what hurts later reopens the demand as a fix.
+**6 · Close** — the demand is archived and the pipeline is told
+what it taught, with one stop for the human. One harvester (Sonnet 5,
+high) per source of the record returns the numbers and every friction
+with its evidence; the session (Fable 5.1, high) writes the closure
+(what shipped, what did not, who owns what is left, the numbers
+against the previous workstream's close), sweeps the repos and GitHub
+so the next demand starts clean, and builds the **dreaming** board:
+every friction, ruling pattern, taste note and audit departure as an
+entry with the class it sees, the destination and the edit it would
+make, each pipeline candidate checked against the pipeline repo's
+issues by one checker (Sonnet 5, high). The human reads the Close tab
+once; the session's suggestion is the default ruling, he vetoes or
+changes in prose, is asked only about a rule that did not hold, a
+taste note and a class conflict, and says apply. Then one issue per
+ruled lesson on the pipeline repo, from its issue template and
+sanitized for a public repo; **the pipeline is never edited here** —
+it changes in its own session, issue by issue. Nothing waits on
+production: what hurts later is a new demand.
 
 ## On cost
 
@@ -271,10 +279,10 @@ What the pipeline expects from its surroundings:
 | **blueprint** | the workstream's single review artifact — one URL, tabs per stage, pills per wave |
 | **conductor** | whoever dispatches and audits without doing the work — the stage's session |
 | **lens** | a reviewer scoped to one failure mode |
-| **judge** | whoever rules every finding — sustained/deferred/dismissed, with the reason; reviewers report at the maximum bar. At discovery, design and plan the conductor judges by the stage's `references/judging.md` (at plan it also rules the sequence findings in the user's place against the approved cut); at execution the worker session of the lane rules alone inside the row's two rounds, and the user rules the residue at the audit; at release the session rules alone inside a fix row's two rounds, and the user's one ruling is the goal on the plan. |
+| **judge** | whoever rules every finding — sustained/deferred/dismissed, with the reason; reviewers report at the maximum bar. At discovery, design and plan the conductor judges by the stage's `references/judging.md` (at plan it also rules the sequence findings in the user's place against the approved cut); at execution the worker session of the lane rules alone inside the row's two rounds, and the user rules the residue at the audit; at release the session rules alone inside a fix row's two rounds, and the user's one ruling is the goal on the plan; at the close the session's suggestion on every board entry is the default and the user rules by reading, asked only about a rule that did not hold, a taste note and a class conflict. |
 | **blind reader** | an agent that reads alone, so divergence from its sibling exposes ambiguity |
 | **andon** | stop before building on a broken premise — a cheap halt beats wrong work |
-| **dreaming** | the closing session where frictions become edits to the pipeline itself — the session suggests, the human rules every lesson |
+| **dreaming** | the board at the close where every friction of the demand becomes an entry with a suggested edit to the pipeline; the session suggests, the human rules by reading, and each ruled lesson becomes an issue on the pipeline repo — never an edit made there |
 
 ## License
 

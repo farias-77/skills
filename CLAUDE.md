@@ -95,7 +95,15 @@ audit that closes stage 4; a note he rules on there is a ruling
 too. At release his one ruling is the goal on `04-release/plan.md`,
 recorded verbatim in the trace; the session rules alone inside a fix
 row's two rounds by the execute stage's `judging.md`, and what
-survives rides as a PR note into the report.
+survives rides as a PR note into the report. At the close the board
+is the question: the session's suggestion on every entry (issue, join,
+discard, park, pendency) is the default ruling, listed for veto; he
+vetoes or changes in prose and his "apply" rules every entry he did
+not change; only a rule that did not hold (a closed issue of the same
+class with the rule still in the text), a taste note and a class
+conflict reach him as questions. A ruled lesson becomes an issue on
+the pipeline repo, never an edit made there: the pipeline changes in
+its own session, issue by issue.
 Every ruling is appended, as it happens, to the workstream's
 **`rulings.md`** (workstream root; created on the first ruling), one
 line each:

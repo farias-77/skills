@@ -34,7 +34,9 @@ worker session of the lane rules alone inside two lens rounds per
 row, by `stage-execute/references/judging.md`, and what survives
 rides as a PR note to the audit; at stage 5 the release session rules
 the same way inside a fix row's two rounds, and the note rides into
-the release report. There is no scrutiny tier: the bar is the maximum
+the release report; at stage 6 there are no reviewers: the harvesters
+report every friction with its evidence, the session suggests, and
+the user rules the board by reading. There is no scrutiny tier: the bar is the maximum
 everywhere, and the user is the filter. Never pre-soften a finding
 because the target is "just an internal tool" — and never inflate one
 to survive the judge; both distort the only thing a reviewer is judged
