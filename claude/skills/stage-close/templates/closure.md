@@ -1,41 +1,66 @@
 # Closure — <workstream>
 
 <!--
-The workstream's final record — written once, at close, and never
-edited after: the frozen counterpart of the living docs. A reader a
-year from now should understand what this demand was without opening
-anything else.
+The workstream's final record — written once, at the close, from the
+harvest and release.json, and never edited after. A reader a year
+from now understands what this demand was without opening anything
+else. In the workstream's language. Every number from a file; a
+number nobody measured is "not measured", never a guess.
 -->
+
+<Two or three sentences: what the demand was, in plain words; opened
+on, in production on; how many stages, repos, waves.>
 
 ## What shipped
 
-<Per repo: the version tag and one line of what it now does that it
-didn't before. The waves and their stories, each with where it lives
-now.>
+| Repo | Version in prod | What it does now that it did not |
+|---|---|---|
+| `<repo>` | **vN.N.N** (<the tags on the way: v1.0.0 at the train · v1.0.1 …>) | <one line> |
+
+| Wave | Stories | Where it lives |
+|---|---|---|
+| wNN · <name> | <ids and titles> | `<repo>` `main` (PRs #a–#b); proof in `03-execution/<wNN>/` |
+| release | <fix rows R.n, hotfixes> | `<repo>` `main`; trace in `04-release/trace.md` |
+
+<The first day in prod in one paragraph: what the watch read, what
+ran on its own.>
+
+Record of the demand: blueprint at <URL> (closed and dated at this
+stage).
 
 ## What deliberately did not ship
 
-<Scope that was cut or deferred during the demand, each with the
-decision that cut it — never a silent absence.>
+<!-- every cut with the decision that cut it; never a silent absence -->
+
+- **<what>** — <cut at (stage, the id) · by (his words, or the ruling)>.
 
 ## Pendencies, each with an owner
 
-<What remains open, re-homed: the item, where it lives now (an issue,
-a next wave's README, the venture backlog), and who owns it. A
-workstream never ends with unowned loose ends.>
+| # | Pendency | Where it lives now | Owner |
+|---|---|---|---|
+| 1 | <what> | `<file>` · <an issue, a runbook, a memory> | <who> |
 
 ## The demand in numbers
 
-| | This workstream | Previous |
+<!-- from close.json → numbers; the previous column from the previous
+workstream's close.json, or "—" with the line below saying there is
+none -->
+
+| | This workstream | Previous (<slug>) |
 |---|---|---|
-| waves · stories | | |
-| review rounds · findings (f · s · d · x) | | |
+| calendar | <opened → prod, days> | |
+| waves · rows · fix rows | | |
+| review rounds (discovery · design · plan) | | |
+| findings found · sustained · deferred · dismissed | | |
 | fix passes · suite runs · stops | | |
 | departures kept · reverted | | |
 | choices where the documents were silent | | |
-| audit items · fix waves | | |
-| release fix cycles | | |
-| tokens per wave (approx.) | | |
+| audit items · fix rows | | |
+| release fix rows · hotfixes · watch read · owned | | |
+| the user's rulings | | |
+| dreaming entries · issues opened | | |
+| tokens (approx., where measured) | | |
 
-<one line per number that moved, saying why; numbers tell the retro's
-story without adjectives>
+What the numbers say, without adjectives:
+
+- **<the number that moved>** — <why, in one line>.
