@@ -30,8 +30,9 @@ author or writer for wording, the user for product, scope, cost, the
 sequence and confirmed decisions, at design the implementer for
 declared latitude and at plan the worker for execution latitude), and
 **the user gives the final ruling on what is his**; at stage 4 the
-conductor of the execution chair rules alone inside two lens rounds
-per story, and what survives rides as a PR note. There is no scrutiny tier: the bar is the maximum
+worker session of the lane rules alone inside two lens rounds per
+row, by `stage-execute/references/judging.md`, and what survives
+rides as a PR note to the audit. There is no scrutiny tier: the bar is the maximum
 everywhere, and the user is the filter. Never pre-soften a finding
 because the target is "just an internal tool" — and never inflate one
 to survive the judge; both distort the only thing a reviewer is judged

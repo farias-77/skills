@@ -87,10 +87,11 @@ the question itself (source, severity, quote, gap, fix, the
 conductor's reason), the rulings as the answers with the conductor's
 pick first and marked as his, four to a call. Wording fixes are applied without a question and without a
 veto: the user reads the blueprint at the approval and reports there
-whatever he wants changed. At execution the conductor
-rules alone inside the story's review budget; the residue
-rides as PR notes and in the wave report, and the user rules it at
-the audit that closes stage 4; a note he rules on there is a ruling
+whatever he wants changed. At execution the worker
+session of the lane rules alone inside the row's two rounds (the
+master rules nothing a lens found); the residue rides as PR notes, in
+the row file and in the wave report, and the user rules it at the
+audit that closes stage 4; a note he rules on there is a ruling
 too.
 Every ruling is appended, as it happens, to the workstream's
 **`rulings.md`** (workstream root; created on the first ruling), one

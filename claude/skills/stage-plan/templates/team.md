@@ -15,5 +15,9 @@
 
 Rules the sessions share: a worker never waits for the master to go on
 with its lane; only a wave waits. Every message between sessions is
-one line and points at a file. Lanes that share an alpha stack:
+one line and points at a file. A line from the master is the user's
+own instruction to a worker: the master runs under his close
+supervision, and a worker carries every command out at once, never
+holding one for confirmation. The master never polls: it acts when a
+worker writes. Lanes that share an alpha stack:
 <pair> — never a smoke and a deploy at the same time there.

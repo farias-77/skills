@@ -100,7 +100,7 @@ or whether it is dropped — nothing in it is a rule before that; and
 a standard candidate, every reversal is a lesson for the builder or a
 lens, every choice where the documents were silent is a plan or design
 gap); and the execution and release traces
-(`03-execution/wNN-<slug>/trace.md` and `report.md` per wave,
+(`03-execution/<wNN>/trace.md` and `report.md` per wave,
 `04-release/trace.md`): the stops, the rounds, what dragged. A
 friction counts wherever it was recorded. The pass:
 

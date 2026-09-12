@@ -141,28 +141,34 @@ read at the close; the pre-flight (everything the rows need from him)
 is handed over there, and `team.md` names the sessions of stage 4 so
 his absence blocks nothing.
 
-**4 · Execute** — the plan becomes proven branches. The session
-conducts, and the human is not in the loop until the last wave. Per
-story, a builder writes the tests first and the code on its own branch;
-five lenses (fidelity to the goal, the code standard, the proof, the
-attack, operations) read the diff in parallel, the conductor rules
-every finding, the builder fixes, the five read the delta, the
-conductor rules again, and what is left rides as a note. The story is
-deployed to alpha and its smoke folder proved before its PR is merged
-into the wave branch. When the wave's stories are in, the whole suite
-runs green against alpha, the walk the goal describes is done with
-evidence saved, the wave PR is merged into the workstream branch
-`feat/<workstream>`, the report is written, and the next wave starts
-from there. Improvements inside the standard are applied and listed;
-departures from the standard are applied only when the system gets
-simpler, and listed with the rule they leave. When the last wave is
-in, the same session runs the **audit** with the human: the
-departures, choices, open notes and stops asked one question each,
-ruled keep, fix or revert; what he sends back is built as a fix wave.
-Stage 4 ends with the workstream branch consolidated, verified in
-alpha and audited; `main` is stage 5's. *The stage-4 skill is being
-rebuilt after the first end-to-end run; this paragraph is its
-contract.*
+**4 · Execute** — the plan becomes proven branches, with no human in
+the loop until the end. The session that invokes the skill is the
+**master** (Fable 5.1, high): its first message prints the sessions to
+open, one **worker** (Opus 5, high) per lane, and the user gives the
+master one goal and leaves. Each worker builds its lane row by row
+from the first day and never waits for anyone: one `exec-builder`
+(Opus 5, high) writes the row on its branch, tests first; five lenses
+(Sonnet 5, high; fidelity, code, proof, security, operations), which
+never wrote the code, read the whole diff; the worker rules every
+finding by `references/judging.md`; the builder fixes and the five
+read the delta; what is left rides as a PR note. The PR merges into
+`feat/<workstream>` when a lock file says the stack is free, the
+merge deploys, and the row's proof from the plan is run in alpha. A
+second red is a new brief, a third parks the row and the lane goes
+on. After the last row a wave requires, the repo's whole suite runs
+once in the background and the worker tells the master in one line.
+The master never polls: woken by that line, when every lane the wave
+requires is ready it freezes the stacks, tags `wNN`, walks alpha with
+the plan's commands, saves the evidence, writes the report and the
+"for the intern" explanation, and sends a red step back as a fix row
+to the lane that owns it. What is the user's (a story's delivery, a
+contract, a stateful deletion, a missing pre-flight item) is parked,
+never asked. When the last wave is green the master calls him once;
+the **audit** in the same session (parked, departures, choices, open
+notes, stops; four questions per call; fixes as rows `A.n`, two
+passes at most) closes the stage on a consolidated, verified, audited
+branch per repo. The Execution tab is built from the lanes' and the
+master's JSON. `main` is stage 5's.
 
 **5 · Release** — the audited branch goes to production, in the
 Claude chair, behind two explicit human gates. The entry gate shows
@@ -189,7 +195,7 @@ waits on production: what hurts later reopens the demand as a fix.
 ## On cost
 
 This pipeline is expensive to run today, and that was a deliberate
-non-concern. Every story's diff is read whole by five reviewers, twice;
+non-concern. Every row's diff is read whole by five reviewers, then its delta once;
 discovery and design run up to three rounds on the human's word, plan runs round 2 automatically and a third on his word; ambiguity is hunted by dispatching multiple readers at
 the same document. That redundancy is exactly
 where the quality comes from — and it is priced in tokens.
@@ -253,7 +259,7 @@ What the pipeline expects from its surroundings:
 | **blueprint** | the workstream's single review artifact — one URL, tabs per stage, pills per wave |
 | **conductor** | whoever dispatches and audits without doing the work — the stage's session |
 | **lens** | a reviewer scoped to one failure mode |
-| **judge** | whoever rules every finding — sustained/deferred/dismissed, with the reason; reviewers report at the maximum bar. At discovery, design and plan the conductor judges by the stage's `references/judging.md` (at plan it also rules the sequence findings in the user's place against the approved cut); at execution the conductor rules alone inside the story's budget. |
+| **judge** | whoever rules every finding — sustained/deferred/dismissed, with the reason; reviewers report at the maximum bar. At discovery, design and plan the conductor judges by the stage's `references/judging.md` (at plan it also rules the sequence findings in the user's place against the approved cut); at execution the worker session of the lane rules alone inside the row's two rounds, and the user rules the residue at the audit. |
 | **blind reader** | an agent that reads alone, so divergence from its sibling exposes ambiguity |
 | **andon** | stop before building on a broken premise — a cheap halt beats wrong work |
 | **dreaming** | the closing session where frictions become edits to the pipeline itself — the session suggests, the human rules every lesson |
