@@ -1,214 +1,202 @@
 ---
 name: stage-release
-description: Conducts stage 5 (Release) — takes the audited workstream branch to production: one integration PR per repo into main in producer-first order, alpha redeployed from main and the whole suite green, semver derived from the conventional commits, the prod-go gate with a written rollback per repo, the supervised cutover step by step with read-only verification, the Release tab published. Two explicit human gates: the entry and prod-go. Runs in Claude Code with a Fable session. Use when a workstream's .state.md says stage release, or to resume a release in progress.
+description: Conducts stage 5 (Release) — takes the audited workstream branch to production end to end on one goal from the user. The session (Fable 5.1, high) writes the release plan (what ships, the pre-flight only he can do, the train step by step with the command and the read-only check of each, the versions, the rollback per repo, the proofs the audit deferred to prod with their hour, where it stops); he reads it, gives the goal, and leaves. Then the session integrates feat/<workstream> into main producer-first, confirms from main (the whole suite only when the tree or the alpha diff changed), derives the versions with one release-scribe (Sonnet 5, high) per repo, tags, deploys one repo at a time under the rollout's checks, executes the documented rollback on a red step and builds the fix as a row R.n in this session (exec-builder Opus 5 high, five lenses Sonnet 5 high, through exec-row), watches the deferred proofs at their hour, runs a hotfix the same way while the workstream is not closed, and calls him once at the end with everything in prod. Use when a workstream's .state.md says stage release, to resume a release in progress, or with `hotfix <repo>` for a regression found in prod.
 disable-model-invocation: false
-argument-hint: "<workstream-slug>"
-allowed-tools: Read, Write, Edit, Glob, Grep, Agent, Artifact, AskUserQuestion, ScheduleWakeup, Bash(mkdir *), Bash(date *), Bash(ls *), Bash(cat *), Bash(git *), Bash(gh *), Bash(npm *), Bash(rm *)
+argument-hint: "<workstream-slug> [hotfix <repo>]"
+allowed-tools: Read, Write, Edit, Glob, Grep, Agent, Workflow, AskUserQuestion, Artifact, PushNotification, ScheduleWakeup, Bash
 ---
 
 # Stage 5: Release
 
-Stage 4 built the demand into the workstream branch `feat/<workstream>`
-of every repo, proved it in alpha and audited it with the user. This
-stage puts it in the air: `main` receives the branch, a version that
-means something is cut, and production is reached step by step with a
-documented way back. **This is the only stage where production
-exists**, so nothing here moves on inferred approval: the stage opens
-on an explicit go, and prod opens on a second one.
+Stage 4 left every repo's `feat/<workstream>` audited, deployed in
+alpha at a named sha, with the residue the user accepted and the
+proofs he deferred to production written under the audit's Close.
+This stage puts it in the air and reports once: `main` receives the
+branch, a version that means something is cut, production is reached
+one repo at a time with a documented way back, the proofs the audit
+deferred are read at their hour, and the user gets one message with
+everything running.
 
-The session conducts directly. The work is sequential and human-gated
-by nature, so no workflow runs here; one mechanical agent,
-`release-scribe`, does the version and notes grind, and the session
-merges, deploys and verifies, step by confirmed step. Code is never
-written by this session: a regression found here goes back to stage
-4 as a fix, through the same story cycle as everything else.
+**One gate, at the entry.** The session writes the release plan; the
+user reads it, changes what he wants in prose, and gives the goal
+("conduct it end to end"). From then on nothing waits for him: the
+session integrates, confirms, versions, tags, deploys, verifies,
+fixes and watches on its own, and calls him at the end. It stops
+before the end only where the plan said it would: the third red on
+one step, or a rollback the plan marked as not safe for data.
 
-## Two modes
+| Word | What it is here |
+|---|---|
+| **the plan** | `04-release/plan.md`: everything the session will do, in order, with the command and the read-only check of each step; what only the user can do is the **pre-flight**, done before the goal |
+| **the train** | the prod steps in the rollout's order, one repo at a time; a red step stops it, the documented rollback runs, the fix is built, the step runs again |
+| **row `R.n`** | a fix built in this session through the stage-4 row loop: before the train (a red confirmation) or after it (a hotfix); never code written by this session |
+| **the watch** | the proofs the audit deferred to prod, each with an hour; the stage does not close before every one is read |
 
-**Session mode** (the two gates and the cutover). The user is in the
-room; every gate is his explicit go through the question tool, and
-every cutover step waits for his confirmation before the next. Never
-run ahead of him here.
-
-**Autonomous mode** (the integration, the confirmation, the scribe,
-the report). The user is waiting. Merge, deploy alpha, run the suite,
-dispatch the scribe, write the trace and the tab, without asking
-permission for any of it. Say in one line what you are about to do,
-and close with a recap that stands on its own.
+The session conducts directly. The train is sequential by nature, so
+one session, no workers; the agents it dispatches are the scribes
+(one per repo, Sonnet 5, high) and, for a fix, the stage-4 row
+workflow (one exec-builder Opus 5 high, five exec-lens Sonnet 5 high
+that never wrote the code). Every reply that dispatches or waits on
+an agent carries a status table (agent · task · state), the state
+read from the harness. Say in one line what you are about to do; end
+no turn on a plan or a promise; when a wait is external (CI, a
+deploy, a proof's hour) end the turn on the wakeup that resumes it.
 
 ## The pattern
 
 ```
-1. Entry gate    what ships, the audit's close, the open residue; his explicit go.
-2. Integrate     one PR per repo feat/<workstream> → main, producer-first; fronts
-                 whose hosting auto-builds prod are prepared, merged in the train.
-3. Confirm       alpha redeployed from main, the whole suite green; two fix cycles.
-4. Version       release-scribe derives the semver and drafts the notes; creates nothing.
-5. Prod-go gate  the train order, the versions, the rollback per repo written; his go
-                 creates the tags and the GitHub Releases.
-6. Cutover       one repo at a time, he confirms every step; read-only verification.
-7. Report        the Release tab, .state.md → close, /clear.
+0. Plan       preconditions → the blueprint built → 04-release/plan.md written → he reads, adjusts, gives the goal
+1. Integrate  one PR feat/<ws> → main per repo, the rollout's order; Lane A merges now, Lane B (merge = deploy) waits for the train
+2. Confirm    per repo from main: tree identical to the audited head and alpha diff empty → the audit's green stands;
+              otherwise alpha from main and the whole suite · red → row R.n → confirm again · third red stops
+3. Version    release-version workflow: one release-scribe per repo → semver and notes; creates nothing
+4. Tags       rollback/<repo>.md written · tags on the integrated shas · GitHub Releases with the notes
+5. Train      per repo in order: checkout the tag → deploy:prod → the rollout's read-only checks → next
+              Lane B: merge the prepared PR (= deploy) → tag the merge sha → checks
+              red → the documented rollback, executed and verified → row R.n → the step again
+6. Watch      every deferred proof at its hour (a wakeup) → read → traced · a regression → hotfix row R.n
+7. Close      release.json → build → .state.md → close · chair: fable → commit → one PushNotification
 ```
 
 ## Preconditions
 
-`.state.md` says `stage: release` and `chair: fable`;
-`03-execution/audit.md` has its Close section written (the audit
-ended with nothing left to send back); every repo's `feat/<workstream>`
-is at the sha the audit's branch check names, alpha at that sha.
-Missing ⇒ halt, back to stage 4.
+`.state.md` says `stage: release · chair: fable`; `03-execution/audit.md`
+has its Close section with the sha of each repo's `feat/<workstream>`
+and alpha at it; every proof the audit deferred to production is a
+line under "Residue, with owners" with `stage 5` as owner. Re-read
+the heads on the origin: a branch not at the audit's sha halts the
+stage back to stage 4 with the two shas named.
 
 ```
 <workstream>/
-├── .state.md                  # stage: release · chair: fable
-├── blueprint.html             # this stage fills BLUEPRINT.release
+├── .state.md                     # stage: release · chair: fable → close
+├── blueprint/release/release.json
 └── 04-release/
-    ├── trace.md               # every train step and verification, one line each
-    └── rollback/<repo>.md     # the documented way back, per repo, written BEFORE prod-go
+    ├── plan.md                   # what he reads before the goal: steps, pre-flight, versions, rollback, watch, stops
+    ├── trace.md                  # every step as it ran, one line each, date -u
+    ├── rollback/<repo>.md        # written before any tag
+    ├── notes/<repo>.md           # the release notes the GitHub Release received
+    ├── proof/                    # the output of every check and every deferred proof
+    ├── rows/R.<n>.md             # the fixes and hotfixes, the stage-4 row record
+    └── reviews/R.<n>/            # their review rounds
 ```
 
-Plus, outside the folder: the demand on `main` in every repo, a semver
-tag and a GitHub Release per repo, and production running it, verified.
+Plus, outside the folder: the demand on `main` in every repo, a
+semver tag and a GitHub Release per repo, production running it,
+verified read-only.
 
-## Step 1 — the entry gate
+## Step 0 — the plan, and the one gate
 
-Republish the blueprint at its URL first, with the execution and
-audit entries stage 4 wrote. Then present what is about to ship: the repos and their
-`feat/<workstream>` shas, the waves as `waves.md` lists them, the audit's Close section
-(what he kept as a departure, the residue he accepted), and anything
-in "Stays with the user" that has a placeholder in the code and no
-real value yet. Get the explicit go through the question tool. A
-front whose hosting auto-builds prod from `main` makes merge and
-deploy the same act, so even the integration sits behind this gate.
+[references/plan.md](references/plan.md). Build the blueprint first
+(`node claude/blueprint/build.mjs <workstream>`) so the Execution tab
+he approved is the one on the page. Then write `04-release/plan.md`
+from [templates/plan.md](templates/plan.md): what ships (repos, shas,
+waves, the residue he accepted at the audit); the **pre-flight**, one
+line per thing only he can do (a password at a vendor, a subscription
+to confirm, a parameter whose value only he has), each marked done or
+delegated with what the session needs to do it; the train as a table
+(step · repo · command · read-only check · rollback if red), the
+order from the design's `rollout.md`, fallback producer-first (APIs →
+agents → fronts); the versions expected per repo; the deferred proofs
+with their hour and what each expects; and **where the session
+stops**: the third red on one step, and any rollback `rollback.md`
+would mark as not safe for data.
 
-## Step 2 — integrate, two lanes
+Print the plan's summary as a table and end the turn. He reads the
+file, changes what he wants in prose (apply, re-print, end the turn),
+and gives the goal in his words. **His goal is the only approval the
+stage takes**: it covers the integration, the tags, every `deploy:prod`,
+every rollback and every fix the plan describes. A pre-flight line
+still open at the goal is done by him then, or delegated then; the
+session never asks for it again. A step that needs him after the goal
+is a plan failure: the session treats it as a red (a stop after three
+attempts), never as a question.
 
-The order comes from the design's `rollout.md`; fallback
-producer-first (APIs → agents → fronts). Repos split by the flag the
-venture declares in each front's `CLAUDE.md`:
+## Steps 1–5 — the train
 
-- **Lane A, merge ≠ deploy** (backends, agents): open the PR
-  `feat/<workstream>` → `main` (body: the waves, the wave PRs, the
-  audit and the blueprint URL) → CI green → rebase merge → **re-read
-  the state as `MERGED`** (the git standard's git.6). If `main` moved
-  since the branch was cut, rebase the branch onto `main` first,
-  conflicts by intention (git.7), CI again, then merge.
-- **Lane B, merge is deploy** (fronts with prod auto-build): the PR
-  is **prepared** here, opened and CI green, and merged only in the
-  train (step 6), after its producers are live.
+[references/train.md](references/train.md). In short: one PR per repo
+into `main` in the rollout's order, CI awaited in the background,
+rebase merge, the state re-read as `MERGED`; the confirmation from
+`main` under P-17 (the whole suite only when the tree or the alpha
+diff changed, the trace saying which); one scribe per repo through
+[`release-version`](../../workflows/release-version.js); the
+rollback per repo written before any tag; tags on the integrated
+shas and the Releases; then one repo at a time, `deploy:prod` from
+the tag, the rollout's checks read-only, the output to `proof/`. A
+red step stops the train at that repo: the documented rollback runs
+and is verified, the fix is built as row `R.n`
+([references/fix.md](references/fix.md)), the step runs again. A
+consumer never goes up ahead of a producer that did not make it.
 
-**Stop-the-train:** a red CI or a conflict stops the whole train at
-that repo; a consumer never integrates ahead of a producer that did
-not make it. CI waits are external waits: ScheduleWakeup and
-re-check, never a background watch.
+## Step 6 — the watch
 
-## Step 3 — confirm from main
+[references/watch.md](references/watch.md). Every proof the audit
+deferred to production is a step with an hour: the session schedules
+the wakeup, reads the proof when it arrives, saves the output to
+`proof/`, writes the trace line. A proof further than 48 h from the
+train's end is not waited for: it becomes a pendency with an owner in
+the report. A regression seen here (a proof red, an alarm, a
+verification that no longer holds) is a **hotfix**: row `R.n` from
+`origin/main` on a `hotfix/<slug>` branch, the same row loop, a patch
+tag on the integrated sha, `deploy:prod` of the affected stack only,
+the rollout's checks, a trace line. `/stage-release <slug> hotfix
+<repo>` enters here directly while `.state.md` is not `closed`; after
+the close a regression is a new demand.
 
-With Lane A integrated: redeploy alpha **from `main`**, the
-inheritance pre-check first (`diff:alpha` or what the repo names,
-every deletion read; a stateful deletion this integration does not
-explain is another workstream's inheritance: stop that repo and
-escalate, never deploy over it). Then the **whole smoke suite per
-repo**. This kills the one new risk integration creates: the branch
-proved it, the rebase changed it.
+## Step 7 — the close
 
-A red suite becomes a fix: `.state.md` → `stage: release · phase:
-fix`, the fix described in `04-release/trace.md` as a row in the
-goal's format (repo, what, ready when), and the user opens
-`/stage-execute <workstream-slug>`; it builds the fix on a branch from
-`main`, proves it in alpha, opens the PR to `main`, and this stage
-merges it and confirms again. **Two fix
-cycles are the budget:** a third red confirmation halts the stage to
-the user with the evidence.
+`blueprint/release/release.json` ([schema](../../blueprint/schema/release.md)):
+the plain layer (one sentence, three things, what needs his eye), what
+shipped, the pre-flight, the integration and the confirmation per
+repo, the versions with their URLs, the rollback per repo, the train
+as it printed, the fixes, the watch, the close. Build; refuse means a
+field is missing, never a text to soften. `.state.md` → `stage: close
+· chair: fable`. Commit the workstream folder (push only with his
+explicit approval). Then **one `PushNotification`** and the report
+from [templates/report.md](templates/report.md): what is in prod at
+which version, the train in numbers, what was fixed on the way, what
+was read at the watch, what stays with an owner, the blueprint URL.
+Suggest `/clear` before stage 6.
 
-## Step 4 — version
+## Rules
 
-Dispatch `release-scribe` (Sonnet) with the repos and their
-integrated `main` shas. Per repo it derives the semver bump from the
-conventional commits since the last tag (`BREAKING CHANGE` or `!` ⇒
-major · `feat` ⇒ minor · otherwise patch; no tag yet ⇒ `v1.0.0`) and
-drafts the notes grouped by type. It proposes; it creates nothing.
-
-## Step 5 — the prod-go gate
-
-One table, everything on it: the train order · the proposed version
-per repo · **the rollback plan per repo**, written now from
-[templates/rollback.md](templates/rollback.md) into
-`04-release/rollback/<repo>.md` (the previous tag, the exact way back,
-the data considerations, how to verify the way back worked) · any
-residue the audit accepted that touches production. Documented, not
-rehearsed. **His explicit go releases the train**, and only then are
-the tags created on the integrated shas (**a tag is what goes up,
-never retroactive: prod deploys from the tag**) and the GitHub
-Releases published with the scribe's notes.
-
-## Step 6 — the cutover
-
-One repo at a time, in order, **the user present, every step
-confirmed before the next**:
-
-- **Lane A:** checkout the tag → `deploy:prod` under the repo's guard
-  → verify the step before moving on, with the checks the design's
-  `rollout.md` wrote (health, the version live, the key read-only
-  flow).
-- **Lane B:** merge the prepared PR (that is the deploy) → verify the
-  live site: routes served, the version stamped.
-- A failed verification **stops the train**: the step's rollback is
-  the documented one, executed and verified; the failure goes to
-  stage 4 as a fix. The train never limps past a red step.
-
-**Prod stays clean.** Every prod verification is read-only: the
-rollout's checks, never the smoke suite; nothing here writes test
-data, test accounts or any residue into production. A check that
-would need to write to prove itself is an alpha check, already paid
-in step 3.
-
-Every step lands in `04-release/trace.md`: the command, the
-verification, the confirmation.
-
-## Step 7 — the report
-
-Fill `BLUEPRINT.release` (workstream-level, like the plan; the shape
-is in the shell's comment: `intro` · `timeline` with `tone` marking
-the reds · `versions` · `smoke` · `rollback` with `rollbackNote` ·
-`decisions` · `pending`) and republish at the same URL. Same altitude
-as every tab: the timeline tells the story, the exact commands live
-in `trace.md`. Then `.state.md` → `stage: close · chair: fable`,
-commit the workstream folder (push only with the user's explicit
-approval), suggest `/clear`.
-
-## Gates
-
-| Gate | Rule |
+| Rule | What it means |
 |---|---|
-| Two human gates | entry and prod-go are separate explicit goes; nothing moves on inferred approval |
-| Stop-the-train | red or conflict stops the whole train at that repo; consumers never pass producers |
-| Lane B sequencing | an auto-build front merges only with its producers already live in prod |
-| Pre-prod confirmation | the train opens only on the whole suite green over alpha-from-main |
-| Fix budget | two fix cycles in step 3, each built through stage 4; the third red halts to the user |
-| Prod stays clean | prod verification is read-only; no suite, no test data, no residue |
-| Tag never retroactive | tags on the integrated sha, after prod-go; prod deploys from the tag |
-| Rollback before prod | no `deploy:prod` without that repo's plan in `04-release/rollback/` |
-| Supervised steps | verification confirmed between repos; a red step means stop and rollback |
-| External waits | ScheduleWakeup and re-check, always; never a background watch |
-| Zero silent death | every train step is a trace line |
+| One gate | the goal on the plan is the only approval; no prod-go, no step-by-step confirmation, no question after it |
+| Pre-flight before the goal | what only he can do is done or delegated before the goal; a step that needs him later is a red, never a question |
+| Stop-the-train | a red step or a conflict stops at that repo; the documented rollback runs first; a consumer never passes a producer |
+| Confirmation (P-17) | the whole suite reruns only when the tree or the alpha diff changed; lint, build and unit tests always after a rebase (P-12); the trace says which |
+| Fix budget | two fix cycles on one step; the third red stops and calls him with prod verified in the rolled-back state |
+| Tag never retroactive | tags on the integrated sha before the deploy; prod deploys from the tag; Lane B tags the merge sha |
+| Rollback before any tag | no tag without `rollback/<repo>.md`; a rollback the file marks not safe for data is a stop, listed in the plan |
+| Prod stays clean | every prod check is read-only: the rollout's checks, never the suite, never test data or accounts |
+| The watch closes the stage (P-4) | a deferred proof is a step with an hour; not read means not closed; beyond 48 h it is a pendency with an owner |
+| Hotfix is a row (P-9) | same loop, same reviewers, patch tag, the affected stack only; in this session while not closed |
+| External waits | CI, a deploy and a proof's hour are wakeups (a background `gh pr checks --watch`, a scheduled wakeup); never a poll, never a turn held open |
+| No code in this chair | the session never edits product code; a fix is exec-builder's, read by the lenses; a one-line change it verifies on disk after round 2 is the only exception |
+| Zero silent death | every step is a trace line with `date -u`; a resumed session continues from the first line missing |
 
 ## Files
 
-- **Permanent:** everything under `04-release/`, `blueprint.html`,
+- **Permanent:** everything under `04-release/`, `blueprint/release/`,
   `.state.md`; the tags and Releases on GitHub.
-- **Working:** the scribe's drafts before the gate, gone at close.
+- **Nothing is deleted at the close.** The trace and the rows are what
+  the dreaming reads next to the ledger.
 
 ## Resuming
 
-Read `.state.md`, then `04-release/trace.md` and GitHub: which PRs
-are merged (re-read, never assumed), which tags exist, which repos
-are live at which version. Continue from the first step whose trace
-line is missing. `phase: fix` means stage 4 is working the fix: stop
-and say so. Never from memory.
+Read `.state.md`, `04-release/plan.md` and `trace.md`; then GitHub and
+the cloud, never memory: which PRs are `MERGED` (re-read), which tags
+exist, which stacks are at which version (the rollout's checks say
+how). Continue from the first plan step without a trace line. A
+scheduled wakeup that did not fire is scheduled again from the plan's
+hour. The goal, once given, stands: a resumed session does not ask
+for it again.
 
 ## Boundaries
 
-No new features, no code in this chair. The design and plan fences
-hold. Frictions worth learning from go to the workstream's
+No new features, no code in this chair, no change to what a story
+delivers. The design and plan fences hold. A regression the fix
+budget cannot close is a stop with the evidence, never a workaround
+in prod. Frictions worth learning from go to the workstream's
 `dreaming-notes.md` on the spot; judging them is the close stage's.

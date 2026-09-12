@@ -1,30 +1,25 @@
-# Rollback — <repo> · <vN.N.N → the version shipping>
+# Rollback — `<repo>` · `<vX.Y.Z | none>` → `<the version shipping>`
 
 <!--
-Written at prod-go, BEFORE any prod command — one file per repo in
-04-release/rollback/. Documented, not rehearsed: the point is that
-when a cutover step goes red, nobody designs the way back under
-pressure — they execute this page.
+  Written by the SESSION before any tag, one file per repo under
+  04-release/rollback/. Documented, not rehearsed: when a train step
+  goes red the session executes this page, then verifies it with the
+  same checks, then builds the fix. A way back that is not code-only
+  is a STOP the plan named before the goal — the session does not
+  deploy that repo; it calls the user.
 -->
 
 ## The way back
 
-- **Return to:** `<the previous tag, e.g. v2.4.1>` — the last version
-  proven in prod.
-- **The command path:** <exactly how the rollback runs — checkout the
-  previous tag + `deploy:prod`, or the hosting's redeploy of the
-  previous build. Concrete commands, not descriptions.>
+- **Return to:** `<the previous tag>` — the last version proven in prod | **absence** — this demand created the stacks; the way back is the schedule off and the service stacks destroyed, the data stacks kept (`RETAIN`)
+- **Commands:** <exactly, in order: `git checkout <tag>` + `npm run deploy:prod -- <stacks>`, or the hosting's redeploy of the previous build, or `aws scheduler update-schedule --state DISABLED` then `cdk destroy <stack>`>
+- **Stacks touched by the way back:** <names> · not touched: <names, why>
 
-## Data considerations
+## Data
 
-<What this release changed about stored data, and why rolling the
-code back is safe against it — the expand→migrate→contract chains
-that made it so. If any step is NOT code-rollback-safe (a contracted
-field, a migrated shape), say so HERE, before the go: that is a
-prod-go conversation, not a surprise.>
+- **What this release changed about stored data:** <tables, indexes, buckets, lifecycle rules, schemas — one line each, with the expand → migrate → contract step it is at>
+- **Code rollback is safe against it:** **yes** — <why: additive fields, readers tolerate both shapes> | **NO** — <the contracted field or migrated shape; this is a stop, written in plan.md §where the session stops>
 
 ## Verifying the way back
 
-<How to confirm the rollback worked — the same rollout checks, run
-against the restored version: health, the version stamp, the key
-read-only flow.>
+- <the rollout's checks for this repo, run against the restored version: health, the version stamp, the key read-only flow — the commands and the expected values>
