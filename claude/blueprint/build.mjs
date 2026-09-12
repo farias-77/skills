@@ -7,6 +7,7 @@
 // reads  <workstream-dir>/blueprint/*.json   (workstream, prfaq, stories, report, review; wireframes, figures optional)
 //        <workstream-dir>/blueprint/plan/*.json when stage 3 ran (sequence, plan-report, plan-review; goals/<repo>-<wave>.json per goal;
 //        the goal files are embedded from 02-plan/goals/)
+//        <workstream-dir>/blueprint/execution/ when stage 4 ran (lanes/<repo>.json per worker; waves/<wNN>.json, exec-report.json, audit.json by the master)
 //        <workstream-dir>/blueprint/design/*.json when stage 2 ran (one per document + decisions, design-report, design-review;
 //        the documents themselves and the artboards are embedded from 01-design/)
 // writes <workstream-dir>/blueprint.html
@@ -15,7 +16,7 @@
 // in schema/<stage>.md; this script validates the shapes and the cross
 // references and refuses to build with the problem named. A shell fix in
 // this folder reaches every workstream at its next build.
-import { readFileSync, writeFileSync, existsSync } from 'node:fs';
+import { readFileSync, writeFileSync, existsSync, readdirSync } from 'node:fs';
 import { join, dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -195,12 +196,108 @@ if (existsSync(planDir)) {
   if (problems.length) { console.error('blueprint data problems:\n  ' + problems.join('\n  ')); process.exit(1); }
   plan = { seq, goals, mdGoals, report: preport, review: preview };
 }
-const tabs = ['discovery', ...(design ? ['design'] : []), ...(plan ? ['plan'] : [])];
+// ---- stage 4: one JSON per lane (workers), one per gated wave, the report and the audit (master) ----
+const execDir = join(dataDir, 'execution');
+let execution = null;
+if (existsSync(execDir) && plan) {
+  const eread = f => JSON.parse(readFileSync(join(execDir, f), 'utf8'));
+  const eopt = f => existsSync(join(execDir, f)) ? eread(f) : null;
+  const ereport = eopt('exec-report.json'), eaudit = eopt('audit.json');
+  const laneFiles = existsSync(join(execDir, 'lanes')) ? readdirSync(join(execDir, 'lanes')).filter(f => f.endsWith('.json')) : [];
+  const waveFiles = existsSync(join(execDir, 'waves')) ? readdirSync(join(execDir, 'waves')).filter(f => f.endsWith('.json')) : [];
+  const planRows = new Map(); plan.seq.lanes.forEach(l => l.rows.forEach(r => planRows.set(r.num, { ...r, repo: l.repo })));
+  const planLanes = new Set(plan.seq.lanes.map(l => l.repo)), planWaves = new Set(plan.seq.waves.map(w => w.n));
+  const proofDone = p => p && ((p.run && p.expect && p.got) || (p.see && p.where && p.shot));
+  const fixNum = n => /^(\d+\.\d+|w\d+)\.f\d+$/.test(n) || /^A\.\d+$/.test(n);
+  const lanes = {};
+  laneFiles.forEach(f => {
+    const l = eread(`lanes/${f}`);
+    need(l, ['repo', 'session', 'intro', 'rows', 'suites', 'worthALook'], `execution/lanes/${f}`);
+    if (!planLanes.has(l.repo)) problems.push(`execution/lanes/${f}: lane ${l.repo} is not in sequence.json`);
+    const seen = new Set();
+    (l.rows || []).forEach(r => {
+      need(r, ['num', 'story', 'wave', 'what', 'status', 'rounds', 'proof', 'attempts', 'notes', 'departures', 'choices', 'stops'], `execution row ${r.num}`);
+      if (seen.has(r.num)) problems.push(`execution/lanes/${f}: row ${r.num} listed twice`); seen.add(r.num);
+      const pr = planRows.get(r.num);
+      if (!pr && !fixNum(r.num)) problems.push(`execution/lanes/${f}: row ${r.num} is neither a plan row nor a fix row (N.k.fn, wNN.fn, A.n)`);
+      if (pr && pr.repo !== l.repo) problems.push(`execution/lanes/${f}: row ${r.num} belongs to lane ${pr.repo}`);
+      if (pr && (pr.story !== r.story || pr.wave !== r.wave)) problems.push(`execution/lanes/${f}: row ${r.num} story/wave differ from sequence.json (${pr.story}/${pr.wave})`);
+      if (fixNum(r.num) && !r.fixOf) problems.push(`execution/lanes/${f}: fix row ${r.num} has no fixOf`);
+      if (!['merged', 'building', 'parked', 'open'].includes(r.status)) problems.push(`execution row ${r.num}: status must be merged, building, parked or open`);
+      if ((r.rounds || []).length > 2) problems.push(`execution row ${r.num}: more than two rounds`);
+      if (![1, 2, 3].includes(r.attempts)) problems.push(`execution row ${r.num}: attempts must be 1, 2 or 3`);
+      if (r.status === 'merged') {
+        if (!r.pr || !r.pr.n || !r.pr.url) problems.push(`execution row ${r.num}: merged without a PR`);
+        if (!r.mergedAt) problems.push(`execution row ${r.num}: merged without mergedAt`);
+        if (!proofDone(r.proof)) problems.push(`execution row ${r.num}: merged without a proof output (got, or shot)`);
+      }
+    });
+    (l.suites || []).forEach(s => need(s, ['wave', 'cases', 'passed', 'failed', 'skipped', 'file'], `execution/lanes/${f} suite ${s.wave}`));
+    lanes[l.repo] = l;
+  });
+  const waves = {};
+  waveFiles.forEach(f => {
+    const w = eread(`waves/${f}`);
+    need(w, ['n', 'name', 'inOneParagraph', 'shas', 'suitesBefore', 'walk', 'shadow', 'fixes', 'parked', 'forTheIntern'], `execution/waves/${f}`);
+    if (!planWaves.has(w.n)) problems.push(`execution/waves/${f}: wave ${w.n} is not in sequence.json`);
+    (w.walk || []).forEach(st => {
+      need(st, ['step', 'ok'], `execution wave ${w.n} walk step ${st.step}`);
+      if (!((st.run && st.expect && st.got) || (st.see && st.where && st.shot))) problems.push(`execution wave ${w.n}: walk step ${st.step} needs run/expect/got or see/where/shot`);
+      if (w.gatedAt && st.ok !== true) problems.push(`execution wave ${w.n}: gated with step ${st.step} red`);
+    });
+    (w.fixes || []).forEach(x => { need(x, ['id', 'lane', 'row', 'why', 'status'], `execution wave ${w.n} fix ${x.id}`); if (w.gatedAt && x.status !== 'merged') problems.push(`execution wave ${w.n}: gated with fix ${x.id} ${x.status}`); });
+    (w.parked || []).forEach(p => need(p, ['id', 'row', 'why'], `execution wave ${w.n} parked ${p.id}`));
+    need(w.forTheIntern, ['problem', 'roles', 'guards', 'alphaVsProd'], `execution wave ${w.n} forTheIntern`);
+    (w.forTheIntern.roles || []).forEach(r => need(r, ['component', 'role', 'analogy'], `execution wave ${w.n} role`));
+    (w.forTheIntern.guards || []).forEach(g => need(g, ['guard', 'stops', 'why'], `execution wave ${w.n} guard`));
+    waves[w.n] = w;
+  });
+  if (ereport) {
+    need(ereport, ['inOneSentence', 'threeThings', 'needsYourEye', 'lanesPlain', 'wavesPlain', 'auditPlain'], 'exec-report.json');
+    if ((ereport.threeThings || []).length !== 3) problems.push('exec-report.json: threeThings must have exactly three items');
+  }
+  if (eaudit) {
+    need(eaudit, ['opened', 'items', 'fixes'], 'audit.json');
+    (eaudit.items || []).forEach(it => {
+      need(it, ['id', 'kind', 'title', 'plain', 'where', 'recommendation'], `audit item ${it.id}`);
+      if (!['P', 'D', 'C', 'N', 'S'].includes(it.kind)) problems.push(`audit item ${it.id}: kind must be P, D, C, N or S`);
+      if (!['keep', 'fix', 'revert'].includes(it.recommendation)) problems.push(`audit item ${it.id}: recommendation must be keep, fix or revert`);
+      if (it.ruling != null && !['keep', 'fix', 'revert'].includes(it.ruling)) problems.push(`audit item ${it.id}: ruling must be keep, fix, revert or null`);
+      if (eaudit.close && it.ruling == null) problems.push(`audit item ${it.id}: the audit is closed and this item has no ruling`);
+    });
+    (eaudit.fixes || []).forEach(x => { need(x, ['id', 'lane', 'row', 'from', 'what', 'status'], `audit fix ${x.id}`); if (eaudit.close && x.status !== 'merged') problems.push(`audit fix ${x.id}: the audit is closed and this fix is ${x.status}`); });
+    if (eaudit.close) need(eaudit.close, ['date', 'shas', 'alphaAt', 'suites', 'residue'], 'audit.json close');
+  }
+  // word caps (schema/execution.md)
+  const ECAPS = { intro: 45, what: 18, notes: 25, departures: 25, choices: 25, stops: 25, worthALook: 20, inOneParagraph: 70, why: 20, problem: 45, role: 18, analogy: 18, alphaVsProd: 20,
+    inOneSentence: 35, p: 35, lanesPlain: 45, wavesPlain: 45, auditPlain: 45, title: 12, plain: 25, standardSays: 35, built: 35, reading: 35, alphaAt: 20 };
+  const ESKIP = new Set(['run', 'expect', 'see', 'where', 'got', 'shot', 'file', 'branch', 'sha', 'words', 'id', 'num', 'story', 'wave', 'n', 'name', 'session', 'repo', 'status', 'url', 'tag', 'gatedAt', 'mergedAt', 'fixOf', 'lane', 'row', 'from', 'component', 'guard', 'kind', 'recommendation', 'ruling', 'opened', 'closed', 'date', 'owner', 't', 'step']);
+  const ewords = t => String(t).trim().split(/\s+/).filter(Boolean).length;
+  const ewalk = (v, path, file) => {
+    if (Array.isArray(v)) { v.forEach(x => ewalk(x, path, file)); return; }
+    if (v && typeof v === 'object') { Object.entries(v).forEach(([k, x]) => ewalk(x, path ? `${path}.${k}` : k, file)); return; }
+    if (typeof v !== 'string') return;
+    const key = path.split('.').pop();
+    // guards[].stops (14) and audit fixes[].what / close residue[].what (20) share names with wider fields: resolved by path
+    const cap = ESKIP.has(key) ? null : /guards\.stops$/.test(path) ? 14 : /(fixes|residue)\.what$/.test(path) ? 20 : /audit.*\.why$/.test(path) || file === 'audit.json' && key === 'why' ? 25 : ECAPS[key];
+    if (cap && ewords(v) > cap) problems.push(`execution/${file}: ${path} has ${ewords(v)} words, cap ${cap} — "${v.slice(0, 60)}…"`);
+  };
+  Object.entries(lanes).forEach(([k, l]) => ewalk(l, '', `lanes/${k}.json`));
+  Object.entries(waves).forEach(([k, w]) => ewalk(w, '', `waves/${k}.json`));
+  if (ereport) ewalk(ereport, '', 'exec-report.json');
+  if (eaudit) ewalk(eaudit, '', 'audit.json');
+  if (problems.length) { console.error('blueprint data problems:\n  ' + problems.join('\n  ')); process.exit(1); }
+  if (Object.keys(lanes).length || ereport) execution = { lanes, waves, report: ereport, audit: eaudit };
+} else if (existsSync(execDir) && !plan) {
+  problems.push('blueprint/execution/ exists but blueprint/plan/ does not: the Execution tab is read against the plan');
+  console.error('blueprint data problems:\n  ' + problems.join('\n  ')); process.exit(1);
+}
+const tabs = ['discovery', ...(design ? ['design'] : []), ...(plan ? ['plan'] : []), ...(execution ? ['execution'] : [])];
 
 const data = {
-  workstream, strings, figures, wireframes, review, report, design, plan, tabs,
+  workstream, strings, figures, wireframes, review, report, design, plan, execution, tabs,
   ...prfaq, ...stories,
-  files: ['00-discovery/pr-faq.md', '00-discovery/user-stories.md', '00-discovery/reviews.md', 'rulings.md', ...(wireframes.length ? ['00-discovery/wireframes/'] : []), ...(design ? ['01-design/*.md', '01-design/notes.md', '01-design/reviews.md', '01-design/ui/'] : []), ...(plan ? ['waves.md', '02-plan/goals/', '02-plan/recon/', '02-plan/team.md', '02-plan/reviews.md'] : [])],
+  files: ['00-discovery/pr-faq.md', '00-discovery/user-stories.md', '00-discovery/reviews.md', 'rulings.md', ...(wireframes.length ? ['00-discovery/wireframes/'] : []), ...(design ? ['01-design/*.md', '01-design/notes.md', '01-design/reviews.md', '01-design/ui/'] : []), ...(plan ? ['waves.md', '02-plan/goals/', '02-plan/recon/', '02-plan/team.md', '02-plan/reviews.md'] : []), ...(execution ? ['03-execution/rows/', '03-execution/<wNN>/', '03-execution/audit.md', '03-execution/parked.md'] : [])],
   builtAt: new Date().toISOString().slice(0, 16).replace('T', ' ') + ' UTC',
 };
 // `</script` inside JSON would end the data block early; escape it.
@@ -208,4 +305,4 @@ const json = JSON.stringify(data).replace(/<\/script/gi, '<\\/script');
 const shell = readFileSync(join(here, 'shell.html'), 'utf8');
 // function replacements: a `$&` or `$'` inside the data would otherwise be read as a replacement pattern
 writeFileSync(out, shell.replace('__TITLE__', () => workstream.title.replace(/</g, '&lt;')).replace('__DATA__', () => json));
-console.log(`built ${out}: tabs ${tabs.join(' + ')} · ${stories.stories.length} stories, ${stories.stories.reduce((a, s) => a + s.acs.length, 0)} ACs, ${wireframes.length} wireframes, ${review.rounds.length} discovery rounds` + (design ? ` · design: ${design.docs.architecture.flows.length} flows, ${design.decisions.length} decisions, ${design.review.rounds.length} rounds` : '') + (plan ? ` · plan: ${plan.seq.lanes.length} lanes, ${plan.seq.lanes.reduce((a, l) => a + l.rows.length, 0)} rows, ${plan.seq.waves.length} waves, ${Object.keys(plan.goals).length} goals` : ''));
+console.log(`built ${out}: tabs ${tabs.join(' + ')} · ${stories.stories.length} stories, ${stories.stories.reduce((a, s) => a + s.acs.length, 0)} ACs, ${wireframes.length} wireframes, ${review.rounds.length} discovery rounds` + (design ? ` · design: ${design.docs.architecture.flows.length} flows, ${design.decisions.length} decisions, ${design.review.rounds.length} rounds` : '') + (plan ? ` · plan: ${plan.seq.lanes.length} lanes, ${plan.seq.lanes.reduce((a, l) => a + l.rows.length, 0)} rows, ${plan.seq.waves.length} waves, ${Object.keys(plan.goals).length} goals` : '') + (execution ? ` · execution: ${Object.keys(execution.lanes).length} lanes, ${Object.values(execution.lanes).reduce((a, l) => a + l.rows.filter(r => r.status === 'merged' && !r.fixOf).length, 0)} rows merged, ${Object.values(execution.waves).filter(w => w.gatedAt).length} gates green${execution.audit ? (execution.audit.close ? ', audit closed' : ', audit open') : ''}` : ''));

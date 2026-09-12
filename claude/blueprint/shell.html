@@ -355,6 +355,33 @@
   @media (max-width: 860px) { .wave .kv { grid-template-columns: minmax(0, 1fr); } }
   .rules { margin: 0; padding-left: 18px; color: var(--ink-2); display: flex; flex-direction: column; gap: 4px; font-size: 16.5px; }
 
+  /* ---------- execution tab ---------- */
+  /* the board again, the chips now carrying state: solid merged, outline in progress, dashed parked, + a fix row */
+  .board .rc.st-merged { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+  .board .rc.st-merged .k, .board .rc.st-merged .k i { color: var(--bg); opacity: .8; }
+  .board .rc.st-building { border-style: solid; border-width: 2px; }
+  .board .rc.st-parked { border-style: dashed; opacity: .75; }
+  .board .rc.st-open { opacity: .55; }
+  .board .rc.fixrow { border-radius: 999px; padding: 4px 10px; }
+  .board .wh .g { font-family: var(--f-mono); font-size: 11.5px; letter-spacing: .04em; text-transform: uppercase; }
+  .exl { display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: 14px; color: var(--ink-2); }
+  .exl b { color: var(--ink-3); font-weight: 600; font-size: 12px; text-transform: uppercase; letter-spacing: .05em; margin-right: 4px; }
+  .walk-t td:first-child { font-family: var(--f-display); font-size: 19px; color: var(--accent); }
+  .intern { display: grid; gap: 14px; }
+  .intern p { color: var(--ink-2); line-height: 1.6; max-width: 90ch; }
+  .rowfold { border-top: 1px solid var(--line); padding: 10px 0; display: grid; grid-template-columns: 90px minmax(0, 1fr); gap: 6px 12px; font-size: 15.5px; }
+  .rowfold .k { font-family: var(--f-mono); font-size: 13px; padding-top: 3px; }
+  .rowfold ul { margin: 0; padding-left: 18px; color: var(--ink-2); display: flex; flex-direction: column; gap: 3px; }
+  .rowfold ul li b { color: var(--ink-3); font-weight: 600; font-size: 11.5px; text-transform: uppercase; letter-spacing: .05em; margin-right: 6px; }
+  .aud { border-top: 1px solid var(--line); padding: 14px 0; display: flex; flex-direction: column; gap: 8px; }
+  .aud .h { display: flex; gap: 10px; align-items: baseline; flex-wrap: wrap; }
+  .aud .h b { font-size: 18px; }
+  .aud .pl { font-size: 17px; line-height: 1.6; max-width: 90ch; }
+  .aud .kv { display: grid; grid-template-columns: 150px minmax(0, 1fr); gap: 4px 12px; font-size: 15px; color: var(--ink-2); line-height: 1.55; }
+  .aud .kv > span:nth-child(odd) { color: var(--ink-3); font-size: 11.5px; text-transform: uppercase; letter-spacing: .05em; padding-top: 4px; }
+  .aud .words { font-style: italic; color: var(--ink-2); }
+  @media (max-width: 860px) { .aud .kv, .rowfold { grid-template-columns: minmax(0, 1fr); } }
+
   .foot { max-width: 1560px; margin: 60px auto 0; padding-top: 16px; border-top: 1px solid var(--line); font-size: 14.5px; color: var(--ink-3); display: flex; flex-wrap: wrap; gap: 8px 20px; }
   mark { background: var(--mark); color: inherit; border-radius: 3px; padding: 0 2px; }
 </style>
@@ -758,6 +785,114 @@
       ${fold(`${SP.rev.conductor} · ${(RV3.conductorRulings || []).length}`, (RV3.conductorRulings || []).map(fCond3).join('') || `<p style="color:var(--ink-3)">${S.rev.nothing}</p>`, false)}
       ${fold(`${S.rev.dismissedList} · ${(RV3.dismissed || []).length}`, (RV3.dismissed || []).map(fDis3).join('') || `<p style="color:var(--ink-3)">${S.rev.nothing}</p>`, false)}
       ${fold(S.rev.round + 's', rounds3, false)}`);
+  }
+
+  // ================= execution tab (only when stage 4 left its data; read against the plan) =================
+  if (D.execution && D.plan) {
+    TAB = 'execution';
+    const X = D.execution, SX = S.execution, Q4 = D.plan.seq, RP4 = X.report || {}, AU = X.audit || null;
+    const tbl4 = (heads, rows) => `<div class="tbl-wrap"><table><thead><tr>${heads.map(h => `<th${h.startsWith('#') ? ' class="num"' : ''}>${h.replace(/^#/, '')}</th>`).join('')}</tr></thead><tbody>${rows.map(r => `<tr>${r.map(c => `<td${typeof c === 'number' ? ' class="num"' : ''}>${c}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`;
+    const kick4 = (t, inner) => `<div><span class="kicker">${t}</span><div style="margin-top:8px">${inner}</div></div>`;
+    const stPill = st => `<span class="pill ${st === 'merged' ? 'good' : st === 'parked' ? 'bad' : st === 'building' ? 'acc' : 'mute'}">${SX.lane.status_[st] || st}</span>`;
+    const rnd = r => r ? `${r.findings} · ${r.sustained} · ${r.deferred} · ${r.dismissed}${r.lenses && r.lenses !== 5 ? ` <span class="rid">${r.lenses} lenses</span>` : ''}` : '—';
+    const proof4 = p => p.run
+      ? `<div class="proof"><span><span class="pk">${SX.lane.run}</span><code>${esc(p.run)}</code></span><span><span class="pk">${SX.lane.expect}</span>${md(p.expect)}</span>${p.got ? `<span><span class="pk">${SX.lane.got}</span><b>${md(p.got)}</b>${p.file ? ` <span class="rid">${esc(p.file)}</span>` : ''}</span>` : ''}</div>`
+      : `<div class="proof"><span><span class="pk">${SX.lane.see}</span>${md(p.see)}</span><span><span class="pk">${SX.lane.where}</span>${md(p.where)}</span>${p.shot ? `<span><span class="pk">${SX.lane.shot}</span><code>${esc(p.shot)}</code></span>` : ''}</div>`;
+    // every row the lanes reported, keyed; plan rows the lanes have not reported yet are "open"
+    const laneRows = {}; Object.values(X.lanes).forEach(l => l.rows.forEach(r => { laneRows[r.num] = { ...r, repo: l.repo }; }));
+    const planRowsAll = Q4.lanes.flatMap(l => l.rows.map(r => ({ ...r, repo: l.repo })));
+    const rowState = num => laneRows[num] ? laneRows[num].status : 'open';
+    const mergedN = Object.values(laneRows).filter(r => r.status === 'merged' && !r.fixOf).length;
+    const fixN = Object.values(laneRows).filter(r => r.fixOf).length;
+    const prN = Object.values(laneRows).filter(r => r.pr).length;
+    const roundsN = Object.values(laneRows).reduce((a, r) => a + (r.rounds || []).length, 0);
+    const findN = Object.values(laneRows).reduce((a, r) => a + (r.rounds || []).reduce((b, x) => b + (x.findings || 0), 0), 0);
+    const sustN = Object.values(laneRows).reduce((a, r) => a + (r.rounds || []).reduce((b, x) => b + (x.sustained || 0), 0), 0);
+    const gatesN = Object.values(X.waves).filter(w => w.gatedAt).length;
+    const parkedN = Object.values(X.waves).reduce((a, w) => a + (w.parked || []).length, 0) + Object.values(laneRows).filter(r => r.status === 'parked').length;
+
+    // ---- 1. what got built: the board with state ----
+    const chip = r => { const x = laneRows[r.num]; const st = x ? x.status : 'open';
+      return `<a class="rc st-${st} ${x && x.fixOf ? 'fixrow' : ''}" href="#xrow-${esc(r.num)}"><span class="k">${esc(r.num)} · ${esc(r.story)}${x && x.pr ? `<i>#${x.pr.n}</i>` : ''}</span><span>${md(x ? x.what : r.what)}</span></a>`; };
+    const board4 = `<div class="board"><div class="grid" style="grid-template-columns: 200px repeat(${Q4.waves.length}, minmax(200px, 1fr))">
+      <div class="wh"><b>${SX.board.lane}</b><span>→ ${SX.board.wave}</span></div>${Q4.waves.map(w => { const x = X.waves[w.n]; return `<div class="wh"><b>${esc(w.n)} · ${md(w.name)}</b><span class="g">${x && x.gatedAt ? `${SX.board.green} · ${esc(x.gatedAt)}` : SX.board.openGate}</span></div>`; }).join('')}
+      ${Q4.lanes.map(l => { const xl = X.lanes[l.repo]; return `<div class="ln"><b>${esc(l.repo)}</b><span>${l.rows.filter(r => rowState(r.num) === 'merged').length}/${l.rows.length} ${SX.cells.rows.split(' ')[0]}${xl ? ` · ${esc(xl.session)}` : ''}</span></div>${Q4.waves.map(w => {
+        const rs = l.rows.filter(r => r.wave === w.n);
+        const fixes = xl ? xl.rows.filter(r => r.fixOf && r.wave === w.n) : [];
+        return `<div class="cellw">${rs.length || fixes.length ? [...rs.map(chip), ...fixes.map(f => chip({ num: f.num, story: f.story, what: f.what }))].join('') : `<span class="none">${SX.board.noRows}</span>`}</div>`; }).join('')}`; }).join('')}
+    </div><div class="leg"><span>${SX.board.legend}</span></div></div>`;
+    sec('exec-what', SX.sec.what, null, `
+      <div class="hero">
+        <h1>${md(RP4.inOneSentence || '')}</h1>
+        <div class="meta"><span>${S.opened} ${AU?.opened || Object.values(X.waves)[0]?.gatedAt?.slice(0, 10) || ''}</span><span>${S.approved} ${AU?.close?.date || '—'}</span><span>${S.slug} <code>${D.workstream.slug}</code></span></div>
+        ${board4}
+        ${RP4.threeThings ? `<div><span class="kicker">${S.threeThings}</span><div class="three">${RP4.threeThings.map(t => `<div class="th"><b>${md(t.t)}</b><p>${md(t.p)}</p></div>`).join('')}</div></div>` : ''}
+        <div class="cells">
+          <div class="cell"><span class="v">${mergedN}</span><span class="l">${SX.cells.rows}</span><span class="s">${SX.cells.rowsTail.replace('{n}', planRowsAll.length)}</span></div>
+          <div class="cell"><span class="v">${gatesN}</span><span class="l">${SX.cells.waves}</span><span class="s">${SX.cells.wavesTail.replace('{n}', Q4.waves.length)}</span></div>
+          <div class="cell"><span class="v">${prN}</span><span class="l">${SX.cells.prs}</span><span class="s">${SX.cells.prsTail.replace('{n}', roundsN)}</span></div>
+          <div class="cell"><span class="v">${findN}</span><span class="l">${SX.cells.findings}</span><span class="s">${SX.cells.findingsTail.replace('{n}', sustN)}</span></div>
+          <div class="cell"><span class="v">${fixN}</span><span class="l">${SX.cells.fixRows}</span><span class="s">${SX.cells.fixRowsTail}</span></div>
+          <div class="cell"><span class="v">${parkedN}</span><span class="l">${SX.cells.parked}</span><span class="s">${SX.cells.parkedTail}</span></div>
+        </div>
+        <div class="eye"><span class="kicker">${S.eye.title}</span>${RP4.needsYourEye?.length ? `<ul>${RP4.needsYourEye.map(e => `<li><b>${md(e.t)}</b> — ${md(e.p)}</li>`).join('')}</ul>` : `<p class="none">${S.eye.none}</p>`}</div>
+      </div>`);
+
+    // ---- 2. the lanes: rows as built, what rides behind a click ----
+    const eyeOf = r => [['notes', r.notes], ['departures', r.departures], ['choices', r.choices], ['stops', r.stops]].filter(([, v]) => v && v.length);
+    const lanes4 = Q4.lanes.map(l => { const xl = X.lanes[l.repo];
+      if (!xl) return `<article class="lane" id="xlane-${esc(l.repo)}"><div class="hd"><h3><code>${esc(l.repo)}</code></h3><span class="pill mute">${SX.lane.status_.open}</span></div></article>`;
+      const rows = xl.rows.map(r => [`<code id="xrow-${esc(r.num)}">${esc(r.num)}</code>${r.fixOf ? `<span class="rid">${SX.lane.fixOf} ${esc(r.fixOf)}</span>` : ''}`, `<a class="chip acc" href="#${esc(r.story)}">${esc(r.story)}</a>`, md(r.what), r.pr ? `<a class="chip" href="${esc(r.pr.url)}" target="_blank" rel="noopener">#${r.pr.n}</a>` : '—', rnd(r.rounds?.[0]), rnd(r.rounds?.[1]), proof4(r.proof), r.attempts, `${stPill(r.status)}${r.mergedAt ? `<span class="rid">${esc(r.mergedAt)}</span>` : ''}`]);
+      const eye = xl.rows.filter(r => eyeOf(r).length).map(r => `<div class="rowfold"><span class="k">${esc(r.num)}</span><ul>${eyeOf(r).flatMap(([k, v]) => v.map(x => `<li><b>${SX.lane[k]}</b>${md(x)}</li>`)).join('')}</ul></div>`).join('');
+      const suites = (xl.suites || []).map(s => `<span>${SX.lane.suite.replace('{w}', esc(s.wave)).replace('{p}', s.passed).replace('{f}', s.failed).replace('{s}', s.skipped).replace('{m}', s.minutes ?? '?')} <span class="rid">${esc(s.file)}</span></span>`).join('<br>');
+      return `<article class="lane" id="xlane-${esc(l.repo)}"><div class="hd"><h3><code>${esc(l.repo)}</code></h3><span class="chip acc">${esc(xl.session)}</span></div>
+        <p class="plain">${md(xl.intro)}</p>
+        ${tbl4([SX.lane.row, SX.lane.story, SX.lane.what, SX.lane.pr, SX.lane.r1, SX.lane.r2, SX.lane.proof, '#' + SX.lane.attempts, SX.lane.status], rows)}
+        <div class="exl"><span>${SX.lane.rounds}</span></div>
+        ${suites ? `<div class="exl"><span><b>${SX.lane.suites}</b>${suites}</span></div>` : ''}
+        ${xl.worthALook?.length ? `<div class="look"><span class="kicker">${SX.lane.look}</span><ul>${xl.worthALook.map(x => `<li>${md(x)}</li>`).join('')}</ul></div>` : ''}
+        ${fold(`${SX.lane.eye} · ${xl.rows.reduce((a, r) => a + eyeOf(r).reduce((b, [, v]) => b + v.length, 0), 0)}`, eye || `<p style="color:var(--ink-3)">${SX.lane.noEye}</p>`, false)}</article>`; }).join('');
+    sec('exec-lanes', SX.sec.lanes, null, `<p class="plain">${md(RP4.lanesPlain || '')}</p><div>${lanes4}</div>`);
+
+    // ---- 3. the gates: the walk as it printed, the fixes, for the intern ----
+    const suiteLine = s => `<code>${esc(s.repo)}</code> ${s.passed}/${s.failed}/${s.skipped}${s.file ? ` <span class="rid">${esc(s.file)}</span>` : ''}`;
+    const waves4 = Q4.waves.map(w => { const x = X.waves[w.n];
+      if (!x) return `<article class="wave" id="x${esc(w.n)}"><div class="hd"><h3>${esc(w.n)} · ${md(w.name)}</h3><span class="pill mute">${SX.wave.openGate}</span></div><p class="acc">${md(w.accepts)}</p></article>`;
+      const walk = tbl4([SX.wave.step, SX.wave.run + ' / ' + SX.lane.see, SX.wave.expect + ' / ' + SX.lane.where, SX.wave.got, ''], x.walk.map(st => [st.step, st.run ? `<code>${esc(st.run)}</code>` : md(st.see), md(st.expect || st.where), st.got ? `<b>${md(st.got)}</b>${st.file ? `<span class="rid">${esc(st.file)}</span>` : ''}` : `<code>${esc(st.shot)}</code>`, `<span class="pill ${st.ok ? 'good' : 'bad'}">${st.ok ? SX.wave.ok : SX.wave.ko}</span>`]));
+      const it = x.forTheIntern;
+      const intern = `<div class="intern"><div><span class="kicker">${SX.wave.problem}</span><p>${md(it.problem)}</p></div>
+        ${it.roles?.length ? kick4(SX.wave.roles, tbl4([SX.wave.component, SX.wave.role, SX.wave.analogy], it.roles.map(r => [`<code>${esc(r.component)}</code>`, md(r.role), md(r.analogy)]))) : ''}
+        ${it.guards?.length ? kick4(SX.wave.guards, tbl4([SX.wave.guard, SX.wave.stops, SX.wave.why], it.guards.map(g => [md(g.guard), md(g.stops), md(g.why)]))) : ''}
+        ${it.alphaVsProd?.length ? kick4(SX.wave.alphaVsProd, `<ul class="rules">${it.alphaVsProd.map(a => `<li>${md(a)}</li>`).join('')}</ul>`) : ''}</div>`;
+      return `<article class="wave" id="x${esc(w.n)}"><div class="hd"><h3>${esc(w.n)} · ${md(w.name)}</h3>${x.gatedAt ? `<span class="pill good">${SX.wave.gated} · ${esc(x.gatedAt)}</span>` : `<span class="pill bad">${SX.wave.openGate}</span>`}${x.tag ? `<span class="chip">${SX.wave.tag} <code>${esc(x.tag)}</code></span>` : ''}</div>
+        <p class="acc">${md(x.inOneParagraph)}</p>
+        <div class="kv">
+          <span>${SX.wave.at}</span><span class="chips">${(x.shas || []).map(s => `<span class="chip"><code>${esc(s.repo)}@${esc(s.sha)}</code></span>`).join('')}</span>
+          <span>${SX.wave.before}</span><span>${(x.suitesBefore || []).map(suiteLine).join('<br>') || SX.wave.none}</span>
+          <span>${SX.wave.shadow}</span><span>${(x.shadow || []).map(suiteLine).join('<br>') || SX.wave.none}</span>
+        </div>
+        ${kick4(SX.wave.walk, `<div class="walk-t">${walk}</div>`)}
+        ${x.fixes?.length ? kick4(`${SX.wave.fixes} · ${x.fixes.length}`, `<ul class="rules">${x.fixes.map(f => `<li><code>${esc(f.id)}</code> → ${SX.wave.fixRow} <a href="#xrow-${esc(f.row)}"><code>${esc(f.row)}</code></a> (<code>${esc(f.lane)}</code>) — ${md(f.why)} ${stPill(f.status)}</li>`).join('')}</ul>`) : ''}
+        ${x.parked?.length ? kick4(`${SX.wave.parked} · ${x.parked.length}`, `<ul class="rules">${x.parked.map(p => `<li><code>${esc(p.id)}</code> · ${SX.wave.fixRow} <code>${esc(p.row)}</code> — ${md(p.why)}</li>`).join('')}</ul>`) : ''}
+        ${fold(SX.wave.intern, intern, false)}</article>`; }).join('');
+    sec('exec-waves', SX.sec.waves, null, `<p class="plain">${md(RP4.wavesPlain || '')}</p><div class="cards" style="max-width:none">${waves4}</div>`);
+
+    // ---- 4. the audit: the items by kind with the user's rulings, the fixes, the close ----
+    if (!AU) {
+      sec('exec-audit', SX.sec.audit, null, `<p class="plain">${md(RP4.auditPlain || '')}</p><p class="plain" style="color:var(--ink-3)">${SX.audit.notYet}</p>`);
+    } else {
+      const ruled = AU.items.filter(i => i.ruling != null).length;
+      const rPill = r => r == null ? `<span class="pill mute">${SX.audit.unruled}</span>` : `<span class="pill ${r === 'keep' ? 'good' : r === 'revert' ? 'bad' : 'acc'}">${SX.audit.rulings[r]}</span>`;
+      const item = i => `<div class="aud" id="${esc(i.id)}"><div class="h"><span class="chip">${esc(i.id)}</span><b>${md(i.title)}</b>${rPill(i.ruling)}${i.words ? `<span class="words">“${md(i.words)}”</span>` : ''}</div>
+        <p class="pl">${md(i.plain)}</p>
+        <div class="kv"><span>${SX.audit.where}</span><span>${md(i.where)}</span>${i.standardSays ? `<span>${SX.audit.standardSays}</span><span>${md(i.standardSays)}</span>` : ''}${i.built ? `<span>${SX.audit.built}</span><span>${md(i.built)}</span>` : ''}${i.reading ? `<span>${SX.audit.reading}</span><span>${md(i.reading)}</span>` : ''}<span>${SX.audit.recommendation}</span><span>${SX.audit.rulings[i.recommendation]}${i.why ? ` — ${md(i.why)}` : ''}</span></div></div>`;
+      const kinds = ['P', 'D', 'C', 'N', 'S'].map(k => { const L = AU.items.filter(i => i.kind === k); return L.length ? kick4(`${SX.audit.kinds[k]} · ${L.length}`, L.map(item).join('')) : ''; }).join('');
+      const fixes = AU.fixes?.length ? kick4(`${SX.audit.fixes} · ${AU.fixes.length}`, tbl4([SX.audit.fixTable.id, SX.audit.fixTable.from, SX.audit.fixTable.lane, SX.audit.fixTable.what, SX.audit.fixTable.pr, SX.audit.fixTable.status], AU.fixes.map(f => [`<a href="#xrow-${esc(f.row)}"><code>${esc(f.row)}</code></a>`, `<a href="#${esc(f.from)}"><code>${esc(f.from)}</code></a>`, `<code>${esc(f.lane)}</code>`, md(f.what), f.pr ? `<a class="chip" href="${esc(f.pr.url)}" target="_blank" rel="noopener">#${f.pr.n}</a>` : '—', stPill(f.status)]))) : '';
+      const close = AU.close ? kick4(SX.audit.close, `<div class="kv"><span>${SX.audit.date}</span><span>${esc(AU.close.date)}</span><span>${SX.audit.shas}</span><span class="chips">${AU.close.shas.map(s => `<span class="chip"><code>${esc(s.repo)}@${esc(s.sha)}</code>${s.tag ? ` · ${esc(s.tag)}` : ''}</span>`).join('')}</span><span>${SX.audit.alphaAt}</span><span>${md(AU.close.alphaAt)}</span><span>${SX.audit.suites}</span><span>${AU.close.suites.map(suiteLine).join('<br>')}</span><span>${SX.audit.residue}</span><span>${AU.close.residue.length ? `<ul class="rules">${AU.close.residue.map(r => `<li>${md(r.what)} — <b>${esc(r.owner)}</b></li>`).join('')}</ul>` : SX.wave.none}</span></div>`) : `<p class="plain" style="color:var(--ink-3)">${SX.audit.notClosed}</p>`;
+      sec('exec-audit', SX.sec.audit, null, `<p class="plain">${md(RP4.auditPlain || '')}</p>
+        <div class="cells"><div class="cell"><span class="v">${AU.items.length}</span><span class="l">${SX.audit.items}</span><span class="s">${SX.audit.itemsTail.replace('{n}', ruled)}</span></div><div class="cell"><span class="v">${(AU.fixes || []).length}</span><span class="l">${SX.audit.fixes}</span><span class="s">${SX.audit.fixesTail.replace('{n}', (AU.fixes || []).filter(f => f.status === 'merged').length)}</span></div></div>
+        ${kinds}${fixes}${close}`);
+    }
   }
 
   // ---- mount: every tab is in the DOM (mermaid renders once); the inactive ones are hidden ----
