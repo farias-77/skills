@@ -723,5 +723,152 @@
    "none": "nothing",
    "notYet": "The stage has not closed: the watch is still open."
   }
+ },
+ "close": {
+  "sec": {
+   "what": "What this demand left",
+   "numbers": "The demand in numbers",
+   "record": "What did not ship, and who owns what is left",
+   "sweep": "The sweep",
+   "board": "The dreaming board",
+   "close": "The close"
+  },
+  "cells": {
+   "days": "days from opening to prod",
+   "entries": "entries on the board",
+   "issues": "issues opened on the pipeline",
+   "issuesTail": "{n} joined",
+   "pendencies": "pendencies with an owner",
+   "sweep": "sweep lines done",
+   "sweepTail": "of {n}"
+  },
+  "prod": {
+   "title": "In production",
+   "repo": "Repo",
+   "version": "Version",
+   "sha": "Sha",
+   "deployedAt": "Since"
+  },
+  "numbers": {
+   "key": "What",
+   "this": "This workstream",
+   "previous": "Previous",
+   "none": "— (no earlier workstream has a close)",
+   "notMeasured": "not measured",
+   "previousIs": "against {slug}, closed {at}",
+   "keys": {
+    "days": "calendar days to prod",
+    "waves": "waves",
+    "rows": "rows",
+    "fixRows": "fix rows",
+    "roundsDiscovery": "discovery review rounds",
+    "roundsDesign": "design review rounds",
+    "roundsPlan": "plan review rounds",
+    "found": "findings found",
+    "sustained": "findings sustained",
+    "deferred": "findings deferred",
+    "dismissed": "findings dismissed",
+    "fixPasses": "fix passes",
+    "suiteRuns": "suite runs",
+    "stops": "stops",
+    "departuresKept": "departures kept at the audit",
+    "departuresReverted": "departures reverted",
+    "silentChoices": "choices where the documents were silent",
+    "auditItems": "audit items",
+    "auditFixRows": "audit fix rows",
+    "releaseFixRows": "release fix rows",
+    "hotfixes": "hotfixes",
+    "watchRead": "proofs read at the watch",
+    "watchOwned": "proofs given an owner",
+    "rulings": "the user's rulings",
+    "entries": "dreaming entries",
+    "issues": "issues opened",
+    "tokensM": "tokens (millions, where measured)"
+   }
+  },
+  "lenses": {
+   "title": "Precision per lens",
+   "stage": "Stage",
+   "lens": "Lens",
+   "found": "Found",
+   "sustained": "Sustained",
+   "deferred": "Deferred",
+   "dismissed": "Dismissed",
+   "off": "off",
+   "none": "no review audit in the record"
+  },
+  "cut": {
+   "title": "What deliberately did not ship",
+   "none": "nothing was cut"
+  },
+  "pendencies": {
+   "title": "Pendencies, each with an owner",
+   "what": "What",
+   "where": "Where it lives",
+   "owner": "Owner",
+   "none": "nothing stays open"
+  },
+  "sweep": {
+   "repo": "Repo",
+   "what": "What",
+   "status": "Status",
+   "how": "How",
+   "done": "done",
+   "delegated": "you run it",
+   "open": "open",
+   "none": "nothing to sweep"
+  },
+  "board": {
+   "section": "Section",
+   "entries": "Entries",
+   "issue": "Issue",
+   "join": "Join",
+   "discard": "Discard",
+   "park": "Park",
+   "pendency": "Pendency",
+   "question": "Question",
+   "id": "Id",
+   "title": "Title",
+   "seen": "Seen",
+   "edit": "The edit",
+   "destination": "Destination",
+   "recurrence": "Recurrence",
+   "suggested": "Suggested",
+   "ruled": "Ruled",
+   "number": "#",
+   "parkedFrom": "parked at {slug}",
+   "stage": "stage {s}",
+   "sections": {
+    "user": "What you asked for",
+    "pipeline": "Pipeline candidates",
+    "taste": "Taste",
+    "venture": "Venture",
+    "repo": "Product repos",
+    "discard": "Suggested discards"
+   },
+   "verdicts": {
+    "new": "new",
+    "open": "open #{n}",
+    "closed": "closed #{n}",
+    "held": "rule still in the text",
+    "gone": "rule not in the text"
+   },
+   "rulings": {
+    "issue": "issue",
+    "join": "join",
+    "discard": "discard",
+    "park": "park",
+    "pendency": "pendency",
+    "question": "question",
+    "pending": "waiting for you"
+   },
+   "none": "the board is empty: the harvest found no friction"
+  },
+  "close": {
+   "date": "closed",
+   "issues": "the issues",
+   "note": "in a line",
+   "notYet": "The stage has not closed: the board is waiting for your reading."
+  }
  }
 }

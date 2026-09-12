@@ -723,5 +723,152 @@
    "none": "nada",
    "notYet": "O stage não fechou: a vigília ainda está aberta."
   }
+ },
+ "close": {
+  "sec": {
+   "what": "O que esta frente deixou",
+   "numbers": "A frente em números",
+   "record": "O que não saiu, e quem fica com o que sobrou",
+   "sweep": "A varredura",
+   "board": "O board do dreaming",
+   "close": "O fechamento"
+  },
+  "cells": {
+   "days": "dias da abertura à prod",
+   "entries": "entradas no board",
+   "issues": "issues abertas no pipeline",
+   "issuesTail": "{n} juntadas",
+   "pendencies": "pendências com dono",
+   "sweep": "linhas da varredura feitas",
+   "sweepTail": "de {n}"
+  },
+  "prod": {
+   "title": "Em produção",
+   "repo": "Repo",
+   "version": "Versão",
+   "sha": "Sha",
+   "deployedAt": "Desde"
+  },
+  "numbers": {
+   "key": "O quê",
+   "this": "Esta frente",
+   "previous": "Anterior",
+   "none": "— (nenhuma frente anterior tem fechamento)",
+   "notMeasured": "não apurado",
+   "previousIs": "contra {slug}, fechada em {at}",
+   "keys": {
+    "days": "dias de calendário até a prod",
+    "waves": "ondas",
+    "rows": "rows",
+    "fixRows": "rows de correção",
+    "roundsDiscovery": "rounds de review do discovery",
+    "roundsDesign": "rounds de review do design",
+    "roundsPlan": "rounds de review do plano",
+    "found": "achados encontrados",
+    "sustained": "achados sustentados",
+    "deferred": "achados deferidos",
+    "dismissed": "achados descartados",
+    "fixPasses": "passes de correção",
+    "suiteRuns": "rodadas de suíte",
+    "stops": "paradas",
+    "departuresKept": "desvios mantidos na auditoria",
+    "departuresReverted": "desvios revertidos",
+    "silentChoices": "escolhas onde os documentos calavam",
+    "auditItems": "itens da auditoria",
+    "auditFixRows": "rows de correção da auditoria",
+    "releaseFixRows": "rows de correção do release",
+    "hotfixes": "hotfixes",
+    "watchRead": "provas lidas na vigília",
+    "watchOwned": "provas com dono",
+    "rulings": "rulings do usuário",
+    "entries": "entradas do dreaming",
+    "issues": "issues abertas",
+    "tokensM": "tokens (milhões, onde apurado)"
+   }
+  },
+  "lenses": {
+   "title": "Precisão por lente",
+   "stage": "Estágio",
+   "lens": "Lente",
+   "found": "Achou",
+   "sustained": "Sustentados",
+   "deferred": "Deferidos",
+   "dismissed": "Descartados",
+   "off": "descalibrada",
+   "none": "nenhuma auditoria de review no registro"
+  },
+  "cut": {
+   "title": "O que deliberadamente não saiu",
+   "none": "nada foi cortado"
+  },
+  "pendencies": {
+   "title": "Pendências, cada uma com dono",
+   "what": "O quê",
+   "where": "Onde vive",
+   "owner": "Dono",
+   "none": "nada fica aberto"
+  },
+  "sweep": {
+   "repo": "Repo",
+   "what": "O quê",
+   "status": "Estado",
+   "how": "Como",
+   "done": "feito",
+   "delegated": "você roda",
+   "open": "aberto",
+   "none": "nada a varrer"
+  },
+  "board": {
+   "section": "Seção",
+   "entries": "Entradas",
+   "issue": "Issue",
+   "join": "Juntar",
+   "discard": "Descartar",
+   "park": "Estacionar",
+   "pendency": "Pendência",
+   "question": "Pergunta",
+   "id": "Id",
+   "title": "Título",
+   "seen": "Visto",
+   "edit": "O edit",
+   "destination": "Destino",
+   "recurrence": "Recorrência",
+   "suggested": "Sugerido",
+   "ruled": "Regido",
+   "number": "#",
+   "parkedFrom": "estacionada em {slug}",
+   "stage": "estágio {s}",
+   "sections": {
+    "user": "O que você pediu",
+    "pipeline": "Candidatos do pipeline",
+    "taste": "Gosto",
+    "venture": "Venture",
+    "repo": "Repos de produto",
+    "discard": "Descartes sugeridos"
+   },
+   "verdicts": {
+    "new": "nova",
+    "open": "aberta #{n}",
+    "closed": "fechada #{n}",
+    "held": "regra ainda no texto",
+    "gone": "regra fora do texto"
+   },
+   "rulings": {
+    "issue": "issue",
+    "join": "juntar",
+    "discard": "descartar",
+    "park": "estacionar",
+    "pendency": "pendência",
+    "question": "pergunta",
+    "pending": "esperando você"
+   },
+   "none": "o board está vazio: a colheita não achou fricção"
+  },
+  "close": {
+   "date": "fechada em",
+   "issues": "as issues",
+   "note": "em uma linha",
+   "notYet": "O stage não fechou: o board espera a sua leitura."
+  }
  }
 }

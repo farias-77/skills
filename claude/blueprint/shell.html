@@ -392,6 +392,11 @@
   .rel-blocks > div { min-width: 0; }
   .train-t td > code { white-space: normal; overflow-wrap: anywhere; }
   .train-t td:nth-child(3) { min-width: 18ch; }
+  .board-t tbody tr.q td { background: var(--warn-bg); }
+  .board-t tbody tr.off td { background: var(--bad-bg); }
+  .board-t td:first-child { font-family: var(--f-mono); font-size: 13.5px; white-space: nowrap; }
+  .num-t td:nth-child(2), .num-t td:nth-child(3) { font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .num-t .moved { display: block; font-size: 13.5px; color: var(--ink-3); font-weight: 400; margin-top: 2px; }
 
   .foot { max-width: 1560px; margin: 60px auto 0; padding-top: 16px; border-top: 1px solid var(--line); font-size: 14.5px; color: var(--ink-3); display: flex; flex-wrap: wrap; gap: 8px 20px; }
   mark { background: var(--mark); color: inherit; border-radius: 3px; padding: 0 2px; }
@@ -422,7 +427,7 @@
   document.getElementById('kick').textContent = `${D.workstream.slug} · ${S.stageName}`;
   document.getElementById('title').textContent = D.workstream.title;
   const stages = ['discovery','design','plan','execution','release','close'];
-  const at = stages.indexOf(D.workstream.stage);
+  const at = D.workstream.stage === 'closed' ? stages.length : stages.indexOf(D.workstream.stage);
   const tabs = D.tabs || ['discovery'];
   document.getElementById('journey').innerHTML = stages.map((k, i) => tabs.includes(k)
     ? `<a class="st has ${i < at ? 'done' : i === at ? 'now' : ''}" href="#${k}" data-tab="${k}"><span class="dot"></span>${S.stages[k]}</a>`
@@ -967,6 +972,69 @@
       ${kick5(`${SR.fixes.title} · ${R.fixes.length}`, fixes)}
       ${kick5(SR.stops.title, stops)}
       ${kick5(SR.close.title, close)}</div>`);
+  }
+
+  if (D.close && D.release && D.release.close) {
+    TAB = 'close';
+    const C = D.close, SC = S.close, N = C.numbers;
+    const tbl6 = (heads, rows, cls) => `<div class="tbl-wrap ${cls || ''}"><table><thead><tr>${heads.map(h => `<th${h.startsWith('#') ? ' class="num"' : ''}>${h.replace(/^#/, '')}</th>`).join('')}</tr></thead><tbody>${rows.map(r => `<tr${r.cls ? ` class="${r.cls}"` : ''}>${(r.cells || r).map(c => `<td${typeof c === 'number' ? ' class="num"' : ''}>${c}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`;
+    const kick6 = (t, inner) => `<div><span class="kicker">${t}</span><div style="margin-top:8px">${inner}</div></div>`;
+    const link6 = (url, text) => url ? `<a class="chip" href="${esc(url)}" target="_blank" rel="noopener">${esc(text)}</a>` : '—';
+    const E = C.board.entries || [];
+    const issued = E.filter(e => e.ruled === 'issue').length, joined = E.filter(e => e.ruled === 'join').length;
+    const sweepDone = C.sweep.filter(x => x.status === 'done').length;
+    const numv = v => v === null || v === undefined ? `<span style="color:var(--ink-3)">${SC.numbers.notMeasured}</span>` : esc(v);
+
+    // ---- 1. what this demand left ----
+    const prod = tbl6([SC.prod.repo, SC.prod.version, SC.prod.sha, SC.prod.deployedAt], D.release.close.prod.map(p => [`<code>${esc(p.repo)}</code>`, `<b>${esc(p.version)}</b>`, `<code>${esc(p.sha)}</code>`, esc(p.deployedAt)]));
+    sec('cl-what', SC.sec.what, null, `
+      <div class="hero">
+        <h1>${md(C.inOneSentence)}</h1>
+        <div class="meta"><span>${S.opened} ${esc(C.opened)}</span><span>${SC.close.date} ${C.closed ? esc(C.closed) : '—'}</span><span>${S.slug} <code>${D.workstream.slug}</code></span></div>
+        ${kick6(SC.prod.title, prod)}
+        ${C.threeThings ? `<div><span class="kicker">${S.threeThings}</span><div class="three">${C.threeThings.map(t => `<div class="th"><b>${md(t.t)}</b><p>${md(t.p)}</p></div>`).join('')}</div></div>` : ''}
+        <div class="cells">
+          <div class="cell"><span class="v">${numv(N.this.days)}</span><span class="l">${SC.cells.days}</span></div>
+          <div class="cell"><span class="v">${E.length}</span><span class="l">${SC.cells.entries}</span></div>
+          <div class="cell"><span class="v">${issued}</span><span class="l">${SC.cells.issues}</span><span class="s">${SC.cells.issuesTail.replace('{n}', joined)}</span></div>
+          <div class="cell"><span class="v">${C.pendencies.length}</span><span class="l">${SC.cells.pendencies}</span></div>
+          <div class="cell"><span class="v">${sweepDone}</span><span class="l">${SC.cells.sweep}</span><span class="s">${SC.cells.sweepTail.replace('{n}', C.sweep.length)}</span></div>
+        </div>
+        <div class="eye"><span class="kicker">${S.eye.title}</span>${C.needsYourEye?.length ? `<ul>${C.needsYourEye.map(e => `<li><b>${md(e.t)}</b> — ${md(e.p)}</li>`).join('')}</ul>` : `<p class="none">${S.eye.none}</p>`}</div>
+      </div>`);
+
+    // ---- 2. the numbers, against the previous workstream ----
+    const movedOf = k => (N.moved || []).find(m => m.key === k);
+    const NK = Object.keys(SC.numbers.keys);
+    const numRows = NK.map(k => { const m = movedOf(k); return { cls: m ? 'q' : '', cells: [`${esc(SC.numbers.keys[k])}${m ? `<span class="moved">${md(m.why)}</span>` : ''}`, `<b>${numv(N.this[k])}</b>`, ...(N.previous ? [numv(N.previous[k])] : [])] }; });
+    const numbers = tbl6([SC.numbers.key, SC.numbers.this, ...(N.previous ? [SC.numbers.previous] : [])], numRows, 'num-t board-t');
+    const prevLine = C.previous ? `<p style="color:var(--ink-3);margin-top:6px">${SC.numbers.previousIs.replace('{slug}', `<code>${esc(C.previous.slug)}</code>`).replace('{at}', esc(C.previous.closedAt))}</p>` : `<p style="color:var(--ink-3);margin-top:6px">${SC.numbers.none}</p>`;
+    const lenses = C.lenses.length ? tbl6([SC.lenses.stage, SC.lenses.lens, '#' + SC.lenses.found, '#' + SC.lenses.sustained, '#' + SC.lenses.deferred, '#' + SC.lenses.dismissed, ''], C.lenses.map(l => ({ cls: l.dismissed > l.sustained ? 'off' : '', cells: [esc(l.stage), esc(l.lens), l.found, l.sustained, l.deferred, l.dismissed, l.dismissed > l.sustained ? `<span class="pill bad">${SC.lenses.off}</span>` : ''] })), 'board-t') : `<p style="color:var(--ink-3)">${SC.lenses.none}</p>`;
+    sec('cl-numbers', SC.sec.numbers, null, `<p class="plain">${md(C.numbersPlain)}</p><div class="rel-blocks">${kick6(SC.sec.numbers, numbers + prevLine)}${kick6(SC.lenses.title, lenses)}</div>`);
+
+    // ---- 3. what did not ship, and the pendencies ----
+    const cut = C.cut.length ? `<ul class="rules">${C.cut.map(x => `<li><b>${md(x.what)}</b> — ${md(x.by)}</li>`).join('')}</ul>` : `<p style="color:var(--ink-3)">${SC.cut.none}</p>`;
+    const pend = C.pendencies.length ? tbl6([SC.pendencies.what, SC.pendencies.where, SC.pendencies.owner], C.pendencies.map(x => [md(x.what), `<code>${esc(x.where)}</code>`, `<b>${md(x.owner)}</b>`])) : `<p style="color:var(--ink-3)">${SC.pendencies.none}</p>`;
+    sec('cl-record', SC.sec.record, null, `<div class="rel-blocks">${kick6(SC.cut.title, cut)}${kick6(`${SC.pendencies.title} · ${C.pendencies.length}`, pend)}</div>`);
+
+    // ---- 4. the sweep ----
+    const sweep = C.sweep.length ? tbl6([SC.sweep.repo, SC.sweep.what, SC.sweep.status, SC.sweep.how], C.sweep.map(x => ({ cls: x.status === 'open' ? 'q' : '', cells: [`<code>${esc(x.repo)}</code>`, md(x.what), `<span class="pill ${x.status === 'done' ? 'good' : x.status === 'open' ? 'bad' : 'acc'}">${SC.sweep[x.status]}</span>${x.at ? `<span class="rid">${esc(x.at)}</span>` : ''}`, md(x.how || '')] })), 'board-t') : `<p style="color:var(--ink-3)">${SC.sweep.none}</p>`;
+    sec('cl-sweep', SC.sec.sweep, null, `<p class="plain">${md(C.sweepPlain)}</p>${sweep}`);
+
+    // ---- 5. the board ----
+    const SEC = ['user', 'pipeline', 'taste', 'venture', 'repo', 'discard'];
+    const rulePill = r => r === null ? `<span class="pill warn">${SC.board.rulings.pending}</span>` : `<span class="pill ${r === 'issue' || r === 'join' ? 'good' : r === 'park' ? 'acc' : 'mute'}">${SC.board.rulings[r] || esc(r)}</span>`;
+    const suggPill = sg => `<span class="pill ${sg === 'question' ? 'warn' : 'mute'}">${SC.board.rulings[sg] || esc(sg)}</span>`;
+    const recur = e => { const r = e.recurrence; if (!r) return '—'; if (r.verdict === 'new') return r.inText ? `${SC.board.verdicts.new}<span class="rid">${SC.board.verdicts.held}</span>` : SC.board.verdicts.new; const base = SC.board.verdicts[r.verdict].replace('{n}', r.issue); return r.verdict === 'closed' ? `${base}<span class="rid">${r.inText ? SC.board.verdicts.held : SC.board.verdicts.gone}</span>` : base; };
+    const counts = tbl6([SC.board.section, '#' + SC.board.entries, '#' + SC.board.issue, '#' + SC.board.join, '#' + SC.board.discard, '#' + SC.board.park, '#' + SC.board.pendency, '#' + SC.board.question], SEC.filter(k => E.some(e => e.section === k)).map(k => { const es = E.filter(e => e.section === k); const n = r => es.filter(e => e.ruled === r).length; return [`<b>${SC.board.sections[k]}</b>`, es.length, n('issue'), n('join'), n('discard'), n('park'), n('pendency'), es.filter(e => e.ruled === null && e.suggested === 'question').length]; }));
+    const sections = SEC.filter(k => E.some(e => e.section === k)).map(k => { const es = E.filter(e => e.section === k);
+      const rows = es.map(e => ({ cls: e.ruled === null && e.suggested === 'question' ? 'q' : '', cells: [`${esc(e.id)}${e.parkedFrom ? `<span class="rid">${SC.board.parkedFrom.replace('{slug}', esc(e.parkedFrom))}</span>` : ''}`, `<b>${md(e.title)}</b><span class="rid">${SC.board.stage.replace('{s}', esc(e.stage))}</span>`, md(e.seen), `${e.edit ? md(e.edit) : '—'}${e.destination ? `<span class="rid">${esc(e.destination)}</span>` : ''}`, recur(e), `${suggPill(e.suggested)} → ${rulePill(e.ruled)}${e.words ? `<span class="rid"><i>“${md(e.words)}”</i></span>` : ''}`, e.issue ? link6(e.issue.url, '#' + e.issue.n) : '—'] }));
+      return kick6(`${SC.board.sections[k]} · ${es.length}`, tbl6([SC.board.id, SC.board.title, SC.board.seen, SC.board.edit, SC.board.recurrence, `${SC.board.suggested} → ${SC.board.ruled}`, SC.board.number], rows, 'board-t')); }).join('');
+    sec('cl-board', SC.sec.board, null, E.length ? `<p class="plain">${md(C.boardPlain)}</p><div class="rel-blocks">${kick6(SC.sec.board, counts)}${sections}</div>` : `<p class="plain" style="color:var(--ink-3)">${SC.board.none}</p>`);
+
+    // ---- 6. the close ----
+    const closeBox = C.close ? `<div class="kv" style="display:grid;grid-template-columns:150px minmax(0,1fr);gap:6px 12px"><span class="kicker">${SC.close.date}</span><span>${esc(C.close.date)}</span><span class="kicker">${SC.close.issues}</span><span>${link6(C.close.issuesUrl, `${issued} + ${joined}`)}</span><span class="kicker">${SC.close.note}</span><span>${md(C.close.note)}</span></div>` : `<p class="plain" style="color:var(--ink-3)">${SC.close.notYet}</p>`;
+    sec('cl-close', SC.sec.close, null, closeBox);
   }
 
   // ---- mount: every tab is in the DOM (mermaid renders once); the inactive ones are hidden ----
