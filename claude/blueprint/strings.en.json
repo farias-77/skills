@@ -309,7 +309,7 @@
   "decisionsOf": "The decisions of this document",
   "picked": "chosen"
  },
- "close": "Close",
+ "modalClose": "Close",
  "plan": {
   "sec": {
    "what": "What we build, and in what order",

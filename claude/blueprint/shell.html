@@ -416,6 +416,7 @@
 <footer class="foot" id="foot"></footer>
 <div class="modal" id="modal" hidden><div class="box"><div class="bar"><b id="modal-title"></b><button class="btn" id="modal-close" type="button"></button></div><iframe id="modal-frame" title="" sandbox=""></iframe></div></div>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mermaid/11.12.0/mermaid.min.js"></script>
 <script>
 (() => {
   const D = JSON.parse(document.getElementById('data').textContent);
@@ -1067,7 +1068,7 @@
   window.addEventListener('hashchange', route);
   // the artboard modal: the page dims, the screen opens large; Esc, the button or the backdrop close it
   const modal = document.getElementById('modal'), frame = document.getElementById('modal-frame');
-  document.getElementById('modal-close').textContent = S.close || 'Fechar';
+  document.getElementById('modal-close').textContent = S.modalClose || 'Fechar';
   const closeModal = () => { modal.hidden = true; frame.removeAttribute('srcdoc'); };
   document.addEventListener('click', e => { const b = e.target.closest('.artbtn'); if (b) { document.getElementById('modal-title').textContent = b.dataset.name; frame.title = b.dataset.name; frame.srcdoc = D.design.artboards[b.dataset.file]; modal.hidden = false; }
     else if (e.target === modal || e.target.closest('#modal-close')) closeModal(); });
@@ -1076,7 +1077,16 @@
   const root = document.documentElement, order = ['system', 'light', 'dark'];
   let theme = 'system'; try { theme = localStorage.getItem('bp-theme') || 'system'; } catch (e) {}
   const applyTheme = () => { if (theme === 'system') root.removeAttribute('data-theme'); else root.setAttribute('data-theme', theme);
-    document.getElementById('theme').textContent = `${S.theme.icon[theme]} ${S.theme.label}: ${S.theme[theme]}`; };
+    document.getElementById('theme').textContent = `${S.theme.icon[theme]} ${S.theme.label}: ${S.theme[theme]}`; renderMermaid(); };
+  // the host renders <pre class="mermaid"> only when it is in the static HTML; these are injected, so the page renders them itself, once per theme
+  const renderMermaid = () => {
+    if (!window.mermaid) return;
+    const dark = root.getAttribute('data-theme') === 'dark' || (!root.getAttribute('data-theme') && matchMedia('(prefers-color-scheme: dark)').matches);
+    const nodes = [...document.querySelectorAll('pre.mermaid')];
+    nodes.forEach(n => { if (!n.dataset.src) n.dataset.src = n.textContent; n.textContent = n.dataset.src; n.removeAttribute('data-processed'); });
+    mermaid.initialize({ startOnLoad: false, theme: dark ? 'dark' : 'neutral', securityLevel: 'loose' });
+    mermaid.run({ nodes }).catch(() => {});
+  };
   applyTheme();
   document.getElementById('theme').addEventListener('click', () => { theme = order[(order.indexOf(theme) + 1) % order.length]; try { localStorage.setItem('bp-theme', theme); } catch (e) {} applyTheme(); });
   document.getElementById('foot').innerHTML = `<span>${S.foot.files}: ${D.files.map(f => `<code>${esc(f)}</code>`).join(' · ')}</span><span>${S.foot.built} ${esc(D.builtAt)}</span>`;

@@ -62,6 +62,13 @@ wireframes.forEach(w => (w.stories || []).forEach(s => { if (!ids.has(s)) proble
 (review.decisions || []).forEach(x => { if (!report.decisions?.[`${x.round}:${x.id}`]) problems.push(`report.json: decision ${x.round}:${x.id} has no plain sentence`); });
 if (problems.length) { console.error('blueprint data problems:\n  ' + problems.join('\n  ')); process.exit(1); }
 
+// an artboard names its images by bare filename (`src="hero.jpg"`); shown by srcdoc there is no base to resolve them, so they travel as data URIs
+const MIME = { jpg: 'image/jpeg', jpeg: 'image/jpeg', png: 'image/png', gif: 'image/gif', webp: 'image/webp', avif: 'image/avif', svg: 'image/svg+xml' };
+const inlineImages = (html, dir) => html.replace(/(src=["'])(?:\.\/)?([\w.-]+\.(jpg|jpeg|png|gif|webp|avif|svg))(["'])/gi, (m, a, name, ext, z) => {
+  const p = join(dir, name); if (!existsSync(p)) return m;
+  return `${a}data:${MIME[ext.toLowerCase()]};base64,${readFileSync(p).toString('base64')}${z}`;
+});
+
 // ---- stage 2: one JSON per document, the documents embedded whole, the artboards embedded ----
 const DOCS = ['architecture', 'data-model', 'contracts', 'ui', 'security', 'infra', 'observability', 'rollout', 'code', 'acceptance'];
 const designDir = join(dataDir, 'design');
@@ -91,7 +98,7 @@ if (existsSync(designDir)) {
   if (docs.contracts) need(docs.contracts, ['endpoints'], 'design/contracts.json');
   if (docs.ui) { need(docs.ui, ['screens'], 'design/ui.json'); (docs.ui.screens || []).forEach(sc => {
     (sc.stories || []).forEach(sid => { if (!ids.has(sid)) problems.push(`screen ${sc.name}: story ${sid} does not exist`); });
-    if (sc.file) { const p = join(ws, '01-design', sc.file); if (existsSync(p)) artboards[sc.file] = readFileSync(p, 'utf8'); else problems.push(`screen ${sc.name}: artboard ${sc.file} not found under 01-design/`); } }); }
+    if (sc.file) { const p = join(ws, '01-design', sc.file); if (existsSync(p)) artboards[sc.file] = inlineImages(readFileSync(p, 'utf8'), dirname(p)); else problems.push(`screen ${sc.name}: artboard ${sc.file} not found under 01-design/`); } }); }
   if (docs.security) need(docs.security, ['sweep'], 'design/security.json');
   if (docs.infra) { need(docs.infra, ['resources', 'bill'], 'design/infra.json'); const b = docs.infra.bill || {};
     if (b.scales) { const n = b.scales.length; [...(b.fixed || []), ...(b.variable || [])].forEach(l => { if (!Array.isArray(l.v) || l.v.length !== n) problems.push(`infra bill line "${l.name}": v must have ${n} numbers`); });
