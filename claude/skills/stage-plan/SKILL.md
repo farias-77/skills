@@ -1,6 +1,6 @@
 ---
 name: stage-plan
-description: Conducts stage 3 (Plan) — takes an approved design and builds, with the user, the sequence in which the whole demand gets built: one scout (Sonnet 5, high) per repo writes what exists today, the conductor (Fable 5.1, high) arrives with the cut ("from A to B") as rows (one story in one repo, with a proof that is a command and its expected output), lanes (the rows of one repo, in order, an edge only where a proof needs another row running) and waves (the acceptance gates: which rows, the walk the master runs in alpha, the suites), the user approves wave by wave; then one writer (Sonnet 5, high) per lane × wave writes the worker's goal in parallel, deciding nothing; a review round of three lenses (Opus 5, high), two blind readers (Haiku 4.5, high) and a referee (Sonnet 5, low) per goal, judged by the conductor; round 2 automatic over the delta, a third only on the user's word; the blueprint's Plan tab built from JSON and read by the user at the close, the pre-flight handed over, the sessions of stage 4 named. Runs in Claude Code with a Fable session at high effort. Use after a design is approved, or to resume a plan in progress.
+description: Conducts stage 3 (Plan) — takes an approved design and builds, with the user, the sequence in which the whole demand gets built: one scout (Haiku 4.5, max) per repo writes what exists today, the conductor (Fable 5.1, high) arrives with the cut ("from A to B") as rows (one story in one repo, with a proof that is a command and its expected output), lanes (the rows of one repo, in order, an edge only where a proof needs another row running) and waves (the acceptance gates: which rows, the walk the master runs in alpha, the suites), the user approves wave by wave; then one writer (Sonnet 5, high) per lane × wave writes the worker's goal in parallel, deciding nothing; a review round of three lenses (Sonnet 5, high), two blind readers (Haiku 4.5, high) and a referee (Sonnet 5, low) per goal, judged by the conductor; round 2 automatic over the delta, a third only on the user's word; the blueprint's Plan tab built from JSON and read by the user at the close, the pre-flight handed over, the sessions of stage 4 named. Runs in Claude Code with a Fable session at high effort. Use after a design is approved, or to resume a plan in progress.
 disable-model-invocation: false
 argument-hint: "<workstream-slug>"
 allowed-tools: Read, Write, Edit, Glob, Grep, Agent, SendMessage, Workflow, AskUserQuestion, Artifact, Bash(mkdir *), Bash(date *), Bash(ls *), Bash(cat *), Bash(rm *), Bash(git *), Bash(node *)
@@ -57,7 +57,7 @@ end a turn on a plan or a promise; do the work.
 
 ```
 0. Open     first message: ask the user to switch to Fable, effort high; wait for his ok
-1. Recon    one plan-scout (Sonnet 5, high) per repo the design names, in parallel
+1. Recon    one plan-scout (Haiku 4.5, max) per repo the design names, in parallel
             → 02-plan/recon/<repo>.md: what exists today (smoke folders and counts, deploy
             commands, branch conventions, the tables, routes and screens the rows will extend)
 2. The cut  SESSION. from A to B in one line; the rows; the lanes with their edges; the waves
@@ -67,7 +67,7 @@ end a turn on a plan or a promise; do the work.
             (waves.md + the design + recon + the template): the worker's goal, every row with
             run/expect, plus blueprint/plan/goals/<repo>-wNN.json; zero decisions — questions
             come back in one batch, you answer them against the approved cut
-4. Round 1  whole and automatic: plan-review workflow (three lenses Opus 5 high; per goal two
+4. Round 1  whole and automatic: plan-review workflow (three lenses Sonnet 5 high; per goal two
             blind readers Haiku 4.5 high + a referee Sonnet 5 low); you judge every finding by
             references/judging.md; wording → writers; the cut → you, against what he approved
 5. Round 2  automatic, delta only (the goals that changed + the fixes); a third round only on
@@ -88,9 +88,9 @@ plan is mechanical and he is waiting, not answering.
 | Agent | Model, effort | Does |
 |---|---|---|
 | the conductor | Fable 5.1, high | the cut, the answers to the writers, the judging, the close |
-| `plan-scout` × 1 per repo | Sonnet 5, high | reads the repo and its docs, writes `recon/<repo>.md`: facts and where they are |
+| `plan-scout` × 1 per repo | Haiku 4.5, max | reads the repo and its docs, writes `recon/<repo>.md`: facts and where they are |
 | `plan-writer` × 1 per lane × wave | Sonnet 5, high | one goal each, in parallel, from the same source; asks, never decides |
-| `plan-reviewer-{coverage, verifiability, order}` | Opus 5, high | three lenses, each reads everything |
+| `plan-reviewer-{coverage, verifiability, order}` | Sonnet 5, high | three lenses, each reads everything |
 | `plan-blind-reader` × 2 per goal | Haiku 4.5, high | builds and proves one goal alone, reading only that file, in the goal's language |
 | `plan-reviewer-ambiguity` | Sonnet 5, low | compares the two builds key by key |
 
@@ -291,9 +291,9 @@ The workflow passes paths; the readers open only their goal.
 
 | Lens | Question |
 |---|---|
-| `plan-reviewer-coverage` (Opus 5, high) | every story AC and every acceptance case lands in exactly one row; every screen and every resource has its row; both ends of every contract are built by the last wave that consumes them; no row builds what nothing forces |
-| `plan-reviewer-verifiability` (Opus 5, high) | every `run` is a command that exists in that repo and every `expect` is an output it prints; every `see` names its artboard; every row proved on seeded data has its real producer in some wave's walk; the wave's walk crosses lanes; nothing needs a human eye or prod |
-| `plan-reviewer-order` (Opus 5, high) | every edge is real and every real edge is declared; a consume with no edge is provable on frozen data; `∥` rows and parallel lanes do not collide on a stack, a table's schema or a screen; lanes that share an alpha stack are listed; the affected folders of each wave are complete |
+| `plan-reviewer-coverage` (Sonnet 5, high) | every story AC and every acceptance case lands in exactly one row; every screen and every resource has its row; both ends of every contract are built by the last wave that consumes them; no row builds what nothing forces |
+| `plan-reviewer-verifiability` (Sonnet 5, high) | every `run` is a command that exists in that repo and every `expect` is an output it prints; every `see` names its artboard; every row proved on seeded data has its real producer in some wave's walk; the wave's walk crosses lanes; nothing needs a human eye or prod |
+| `plan-reviewer-order` (Sonnet 5, high) | every edge is real and every real edge is declared; a consume with no edge is provable on frozen data; `∥` rows and parallel lanes do not collide on a stack, a table's schema or a screen; lanes that share an alpha stack are listed; the affected folders of each wave are complete |
 | 2 × `plan-blind-reader` (Haiku 4.5, high) → `plan-reviewer-ambiguity` (Sonnet 5, low), per goal | would two engineers build the same rows from this goal alone, and call each one done on the same command and output? |
 
 Every reviewer answers under the

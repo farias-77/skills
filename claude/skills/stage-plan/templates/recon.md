@@ -1,7 +1,7 @@
 # Recon — `<repo>` — <date>
 
 <!--
-  Written by a plan-scout (Sonnet 5, high) from the repo and its docs
+  Written by a plan-scout (Haiku 4.5, max) from the repo and its docs
   only; nothing from the cloud, nothing from memory. Every line says
   where it was read (a path, a line). This is A: what exists before
   the demand. The conductor reads it before the cut; the writers copy

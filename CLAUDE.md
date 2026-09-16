@@ -36,6 +36,30 @@ high)`, `disc-blind-reader (Haiku 4.5, low)`. Model and effort live
 in the agent's frontmatter (`model:`, `effort:`); the parentheses are
 how the reader sees the cost of a step without opening the file.
 
+## The session never reads to look something up; it sends a scout
+
+Every session that conducts a stage is an expensive model in a long
+conversation — the conductor at discovery, design, plan and close, the
+master and the workers at execution, the session at release. A file
+such a session opens itself does not cost one read: it enters the
+context and is paid again on every turn that follows. So the rule is
+the same at every stage: **when the session needs something it has not
+read — what a document says, what a repo already has, what a standard
+requires, what a past workstream recorded — it dispatches
+`scout` (Haiku 4.5, max) and works from what comes back.**
+
+The scout locates and quotes; it never summarizes and never concludes.
+It returns the literal lines with their `path:line`, where it looked,
+and what it did not find — that last part is what lets the session
+tell "it is not there" from "the scout missed it". The session opens a
+file itself only when it is about to **rule** on that text: judging a
+finding, approving a document, writing a decision. Scout to find; the
+session to decide.
+
+What the rule does not cover: a file the session is writing or has
+just written, a file the user named and asked to be read now, and a
+stage's own template. Those the session reads.
+
 ## How a question is asked
 
 Every question through the question tool has one shape. The question

@@ -1,8 +1,8 @@
 ---
 name: plan-scout
-description: A scout of stage 3 (Plan) — reads ONE repo and its docs and writes 02-plan/recon/<repo>.md: what exists today (smoke folders and counts, the deploy and test commands, the branch conventions, the tables, routes, screens and stacks the design's rows will extend), every line with where it was read. One is dispatched per repo by the stage-plan conductor before the cut, all in parallel. Sonnet 5, high.
-model: claude-sonnet-5
-effort: high
+description: A scout of stage 3 (Plan) — reads ONE repo and its docs and writes 02-plan/recon/<repo>.md: what exists today (smoke folders and counts, the deploy and test commands, the branch conventions, the tables, routes, screens and stacks the design's rows will extend), every line with where it was read. One is dispatched per repo by the stage-plan conductor before the cut, all in parallel. Haiku 4.5, max.
+model: claude-haiku-4-5
+effort: max
 tools: Read, Write, Glob, Grep, Bash(ls *), Bash(cat *), Bash(git log *), Bash(git branch *), Bash(wc *)
 ---
 
