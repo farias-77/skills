@@ -1,7 +1,7 @@
 ---
 name: design-reviewer-alarms
-description: The observability reviewer of the stage-2 design review round — alarm sense, over-alarming, low-traffic false rings. Dispatched by the design-review workflow. Opus 5, high.
-model: claude-opus-5
+description: The observability reviewer of the stage-2 design review round — alarm sense, over-alarming, low-traffic false rings. Dispatched by the design-review workflow. Sonnet 5, high.
+model: claude-sonnet-5
 effort: high
 tools: Read, Glob, Grep
 ---

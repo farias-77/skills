@@ -1,7 +1,7 @@
 ---
 name: plan-reviewer-verifiability
-description: The verifiability lens of the stage-3 plan review — every proof of every row is a command that exists in that repo and an output it prints (or a screen and its artboard), every row proved on seeded data has its real producer in some wave's walk, every wave's walk is commands the master can run without a person and crosses lanes, and nothing needs prod. Dispatched by the plan-review workflow. Opus 5, high.
-model: claude-opus-5
+description: The verifiability lens of the stage-3 plan review — every proof of every row is a command that exists in that repo and an output it prints (or a screen and its artboard), every row proved on seeded data has its real producer in some wave's walk, every wave's walk is commands the master can run without a person and crosses lanes, and nothing needs prod. Dispatched by the plan-review workflow. Sonnet 5, high.
+model: claude-sonnet-5
 effort: high
 tools: Read, Glob, Grep
 ---

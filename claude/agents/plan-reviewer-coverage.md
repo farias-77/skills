@@ -1,7 +1,7 @@
 ---
 name: plan-reviewer-coverage
-description: The coverage lens of the stage-3 plan review — every story AC and every acceptance case of the design lands in exactly one row of the lanes, every screen and every resource has the row that creates it, every row builds something the design or a story forces, and both ends of every contract are built by the last wave that walks it. Dispatched by the plan-review workflow. Opus 5, high.
-model: claude-opus-5
+description: The coverage lens of the stage-3 plan review — every story AC and every acceptance case of the design lands in exactly one row of the lanes, every screen and every resource has the row that creates it, every row builds something the design or a story forces, and both ends of every contract are built by the last wave that walks it. Dispatched by the plan-review workflow. Sonnet 5, high.
+model: claude-sonnet-5
 effort: high
 tools: Read, Glob, Grep
 ---

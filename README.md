@@ -103,7 +103,7 @@ and the conductor plays every subject back with the research in it
 before a line is written. **Ten writers (Sonnet 5, high) write the ten
 documents in parallel** from the same notes and research, deciding
 nothing (a gap is a question back), each also writing its blueprint
-JSON. A whole review round runs: ten lenses (Opus 5, high) —
+JSON. A whole review round runs: ten lenses (Sonnet 5, high) —
 data, code, infra, security, contracts, alarms, coverage, facts, UI
 and consistency, the one that reads the ten documents as one system
 — beside, per flow, two **blind readers** (Haiku 4.5, high) and a
@@ -130,7 +130,7 @@ phases: the rows that must be merged, the walk the master runs in
 alpha with commands, each repo's whole suite green before; lanes never
 stop for a wave). The human approves wave by wave. Then one writer
 (Sonnet 5, high) per lane × wave writes the worker's **goal** in
-parallel, deciding nothing. A review round runs: three lenses (Opus
+parallel, deciding nothing. A review round runs: three lenses (Sonnet
 5, high: coverage, verifiability, order) beside two blind readers
 (Haiku 4.5, high) and a referee (Sonnet 5, low) per goal; **the
 conductor judges** by the plan razor and rules the sequence findings

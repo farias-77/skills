@@ -1,7 +1,7 @@
 ---
 name: design-reviewer-consistency
-description: The consistency reviewer of the stage-2 design review round — everything that appears in two documents says the same thing in both: names, values, keys, shapes, counts, cadences, retentions. Ten writers wrote the ten documents in parallel from one source; this lens is where their drift is caught. Dispatched by the design-review workflow. Opus 5, high.
-model: claude-opus-5
+description: The consistency reviewer of the stage-2 design review round — everything that appears in two documents says the same thing in both: names, values, keys, shapes, counts, cadences, retentions. Ten writers wrote the ten documents in parallel from one source; this lens is where their drift is caught. Dispatched by the design-review workflow. Sonnet 5, high.
+model: claude-sonnet-5
 effort: high
 tools: Read, Glob, Grep
 ---

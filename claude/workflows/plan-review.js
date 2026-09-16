@@ -70,9 +70,9 @@
 
 export const meta = {
   name: 'plan-review',
-  description: 'Stage-3 review round: three Opus lenses in parallel with two Haiku blind readers and a Sonnet referee per goal; whole in round 1, delta after; no judge agent — the conductor judges',
+  description: 'Stage-3 review round: three Sonnet lenses in parallel with two Haiku blind readers and a Sonnet referee per goal; whole in round 1, delta after; no judge agent — the conductor judges',
   phases: [
-    { title: 'Lenses', detail: 'coverage, verifiability and order in parallel, each reads everything (or the delta)', model: 'opus' },
+    { title: 'Lenses', detail: 'coverage, verifiability and order in parallel, each reads everything (or the delta)', model: 'sonnet' },
     { title: 'Blind reads', detail: 'per goal: two Haiku readers build it alone from the file, a Sonnet referee compares them key by key' },
   ],
 }

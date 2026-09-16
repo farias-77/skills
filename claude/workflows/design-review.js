@@ -62,9 +62,9 @@
 
 export const meta = {
   name: 'design-review',
-  description: 'Stage-2 review round: ten Opus lenses in parallel with two Haiku blind readers and a Sonnet referee per flow; whole in round 1, delta only after; no judge agent — the conductor judges',
+  description: 'Stage-2 review round: ten Sonnet lenses in parallel with two Haiku blind readers and a Sonnet referee per flow; whole in round 1, delta only after; no judge agent — the conductor judges',
   phases: [
-    { title: 'Lenses', detail: 'the ten lenses in parallel, each reads everything (or the delta), reports its lens', model: 'opus' },
+    { title: 'Lenses', detail: 'the ten lenses in parallel, each reads everything (or the delta), reports its lens', model: 'sonnet' },
     { title: 'Blind reads', detail: 'per flow: two Haiku readers build it alone, a Sonnet referee compares them key by key' },
   ],
 }

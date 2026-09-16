@@ -1,7 +1,7 @@
 ---
 name: plan-reviewer-order
-description: The order lens of the stage-3 plan review — the lanes as they will RUN, in parallel from day one: every edge is real (a proof needs it) and every real edge is declared, a consume with no edge is provable on a frozen shape, the ∥ rows and the parallel lanes do not collide on a stack, a schema or a screen, the lanes that share an alpha stack are listed with their rule, and every wave's affected folders are complete. Dispatched by the plan-review workflow. Opus 5, high.
-model: claude-opus-5
+description: The order lens of the stage-3 plan review — the lanes as they will RUN, in parallel from day one: every edge is real (a proof needs it) and every real edge is declared, a consume with no edge is provable on a frozen shape, the ∥ rows and the parallel lanes do not collide on a stack, a schema or a screen, the lanes that share an alpha stack are listed with their rule, and every wave's affected folders are complete. Dispatched by the plan-review workflow. Sonnet 5, high.
+model: claude-sonnet-5
 effort: high
 tools: Read, Glob, Grep
 ---
