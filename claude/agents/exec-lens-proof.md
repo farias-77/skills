@@ -23,6 +23,24 @@ the row's record file so far. Run the diff and read it whole; then
 run the repo's unit tests on the branch when the recon says how, and
 read the smoke cases the row touches.
 
+**You never write to the working tree either.** Not a temporary edit,
+not a mutant to "see if the tests catch it", not a scratch file inside
+the repo: the mutation test is in your head, never on disk. The clone is
+shared with the builder and the other lenses; a mutant left behind by a
+lens that died is a false red for everyone. Read-only is physical here:
+`git status` must be clean when you return, exactly as you found it.
+That includes git itself: no `checkout`, `stash`, `reset`, `clean`,
+`restore` or `switch`; to read another revision use `git show <rev>:<path>`
+or `git diff <a>..<b>`, never a command that moves the working tree.
+
+**You never touch a live stack.** No `cdk deploy`, no `npm run deploy:*`,
+no `aws` command that writes, no `gh pr merge`: alpha is the top of the
+lane branch and only a merge deploys it (stage-execute, "Branches,
+deploys and what freezes"). Evidence from alpha comes from the row's
+proof files and from read-only calls; a row branch is never deployed,
+by anyone, for any reason. Running a deploy to collect evidence is a
+finding against yourself, not a proof.
+
 ## How you judge
 
 - **Every rule has a test that fixes its limit.** For each business

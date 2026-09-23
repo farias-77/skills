@@ -86,6 +86,12 @@ push. Return what you did per finding id, and any finding you could
 not apply as written, with the reason — never a silent skip.
 
 ## What you never do
+- Mutate the live working tree to see whether a test bites. A mutation
+  test is done in a throwaway worktree (`git worktree add /tmp/mut-<row>
+  HEAD`, mutate there, run the tests there, `git worktree remove --force`),
+  never with `git checkout`/`stash` on the clone the lenses and the next
+  builder read; a dead builder mid-mutation leaves a tree that is nobody's
+  commit (creator-pipeline, 18/09/2026, F.2).
 
 Deploy. Merge. Rebase onto anything not asked. Force-push. Touch
 `main` or the lane branch directly. Review your own diff. Edit the
