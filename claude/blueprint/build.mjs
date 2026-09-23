@@ -11,7 +11,9 @@
 //        the precision per reviewer, the report, the audit)
 //        <workstream-dir>/blueprint/release/release.json when stage 5 ran (one file by the session: the staging runs, the fixes,
 //        the ask, production, the versions, what is in production, the watch), read against the plan and the execution record
-//        <workstream-dir>/blueprint/close/close.json when stage 6 ran, read only against a closed release
+//        <workstream-dir>/blueprint/close/retro.json when stage 6 ran (one file by the session: the numbers, the precision per
+//        reviewer, what worked, what went wrong, the ideas with their evidence, the user's notes, the sweep), read only against a
+//        closed release
 //        <workstream-dir>/blueprint/design/*.json when stage 2 ran (one per document + decisions, design-report, design-review;
 //        the documents themselves and the artboards are embedded from 01-design/)
 // writes <workstream-dir>/blueprint.html
@@ -456,72 +458,96 @@ if (existsSync(releasePath)) {
   const { ask: _ask, asks: _asks, ...rest } = L;
   release = { ...rest, asks };
 }
-// ---- stage 6: one JSON by the session (the numbers, the record, the sweep, the board, the close) ----
-const closePath = join(dataDir, 'close', 'close.json');
-let close = null;
-const NKEYS = ['days', 'waves', 'rows', 'fixRows', 'roundsDiscovery', 'roundsDesign', 'roundsPlan', 'found', 'sustained', 'deferred', 'dismissed', 'fixPasses', 'suiteRuns', 'stops', 'departuresKept', 'departuresReverted', 'silentChoices', 'auditItems', 'auditFixRows', 'releaseFixRows', 'hotfixes', 'watchRead', 'watchOwned', 'rulings', 'entries', 'issues', 'tokensM'];
-if (existsSync(closePath) && !(release && release.closed)) { problems.push(`close/close.json: the Close tab is read against a closed release; ${release ? 'release/release.json closed is null' : 'blueprint/release/release.json is missing'}`); console.error('blueprint data problems:\n  ' + problems.join('\n  ')); process.exit(1); }
-if (existsSync(closePath)) {
-  const C = JSON.parse(readFileSync(closePath, 'utf8'));
-  need(C, ['opened', 'closed', 'inOneSentence', 'threeThings', 'needsYourEye', 'numbersPlain', 'boardPlain', 'sweepPlain', 'previous', 'numbers', 'lenses', 'cut', 'pendencies', 'sweep', 'board', 'close'], 'close.json');
-  const cclosed = !!C.closed;
-  if ((C.threeThings || []).length !== 3) problems.push('close.json: threeThings must have exactly three items');
-  if (C.previous) need(C.previous, ['slug', 'closedAt'], 'close.json previous');
-  const N = C.numbers || {};
-  need(N, ['this', 'previous', 'moved'], 'close.json numbers');
-  const numOk = (o, name) => NKEYS.forEach(k => { if (!(k in (o || {}))) problems.push(`close.json numbers.${name}: key ${k} missing (a number or null)`); else if (o[k] !== null && typeof o[k] !== 'number') problems.push(`close.json numbers.${name}.${k}: must be a number or null`); });
-  numOk(N.this, 'this');
-  if (C.previous && !N.previous) problems.push('close.json: previous is named but numbers.previous is null');
-  if (N.previous) numOk(N.previous, 'previous');
-  (N.moved || []).forEach((m, i) => { need(m, ['key', 'why'], `close.json numbers.moved ${i + 1}`); if (!NKEYS.includes(m.key)) problems.push(`close.json numbers.moved ${i + 1}: unknown key ${m.key}`); });
-  (C.lenses || []).forEach((l, i) => need(l, ['stage', 'lens', 'found', 'sustained', 'deferred', 'dismissed'], `close.json lenses ${i + 1}`));
-  (C.cut || []).forEach((x, i) => need(x, ['what', 'by'], `close.json cut ${i + 1}`));
-  (C.pendencies || []).forEach((x, i) => need(x, ['what', 'where', 'owner'], `close.json pendencies ${i + 1}`));
-  (C.sweep || []).forEach((x, i) => { need(x, ['repo', 'what', 'status', 'how'], `close.json sweep ${i + 1}`); if (!['done', 'delegated', 'open'].includes(x.status)) problems.push(`close.json sweep ${i + 1}: status must be done, delegated or open`); if (cclosed && x.status === 'open') problems.push(`close.json sweep ${i + 1}: the stage is closed and this line is open`); });
-  const entries = C.board?.entries || [];
-  if (!C.board || !Array.isArray(entries)) problems.push('close.json: board.entries must be an array');
-  const SECTIONS = ['user', 'pipeline', 'taste', 'venture', 'repo', 'discard'], SUGG = ['issue', 'join', 'discard', 'park', 'pendency', 'question'], RULED = ['issue', 'join', 'discard', 'park', 'pendency'];
-  const ids = new Set();
-  entries.forEach(e => { need(e, ['id', 'section', 'stage', 'title', 'seen', 'edit', 'destination', 'parkedFrom', 'recurrence', 'suggested', 'ruled', 'words', 'issue'], `close.json entry ${e.id}`);
-    if (ids.has(e.id)) problems.push(`close.json entry ${e.id}: duplicate id`); ids.add(e.id);
-    if (!SECTIONS.includes(e.section)) problems.push(`close.json entry ${e.id}: section must be one of ${SECTIONS.join(', ')}`);
-    if (!SUGG.includes(e.suggested)) problems.push(`close.json entry ${e.id}: suggested must be one of ${SUGG.join(', ')}`);
-    if (e.ruled !== null && !RULED.includes(e.ruled)) problems.push(`close.json entry ${e.id}: ruled must be null or one of ${RULED.join(', ')}`);
-    if (e.recurrence) { need(e.recurrence, ['verdict', 'issue', 'inText'], `close.json entry ${e.id} recurrence`); if (!['new', 'open', 'closed'].includes(e.recurrence.verdict)) problems.push(`close.json entry ${e.id}: recurrence verdict must be new, open or closed`); if (e.recurrence.verdict !== 'new' && !e.recurrence.issue) problems.push(`close.json entry ${e.id}: recurrence ${e.recurrence.verdict} without an issue number`); }
-    if (['user', 'pipeline'].includes(e.section) && !e.recurrence) problems.push(`close.json entry ${e.id}: a pipeline candidate has no recurrence verdict`);
-    if (['user', 'pipeline'].includes(e.section) && e.suggested !== 'question' && !e.edit) problems.push(`close.json entry ${e.id}: a pipeline candidate has no edit`);
-    if (['venture', 'repo'].includes(e.section) && e.suggested !== 'pendency') problems.push(`close.json entry ${e.id}: a ${e.section} entry is suggested as a pendency, never an issue`);
-    if ((e.ruled === 'issue' || e.ruled === 'join') && !(e.issue && e.issue.n && e.issue.url)) problems.push(`close.json entry ${e.id}: ruled ${e.ruled} without its issue (n and url)`);
-    if (cclosed && e.ruled === null) problems.push(`close.json entry ${e.id}: the stage is closed and this entry is not ruled`); });
-  if (cclosed) {
-    const issued = entries.filter(e => e.ruled === 'issue').length;
-    if (N.this && N.this.entries !== entries.length) problems.push(`close.json numbers.this.entries is ${N.this.entries}, the board has ${entries.length}`);
-    if (N.this && N.this.issues !== issued) problems.push(`close.json numbers.this.issues is ${N.this.issues}, the board rules ${issued} issues`);
-    if (!C.close) problems.push('close.json: closed without a close');
+// ---- stage 6 (schema/close.md): the retro, one file by the session, read only against a closed release ----
+const closeDir = join(dataDir, 'close');
+const retroPath = join(closeDir, 'retro.json');
+let retro = null;
+const RETRO_NUMBERS = ['days', 'stories', 'entries', 'amendments', 'roundsDiscovery', 'roundsDesign', 'roundsPlan', 'roundsExecute', 'found', 'sustained', 'deferred', 'latitude', 'dismissed',
+  'parked', 'stagingRuns', 'stagingReds', 'fixes', 'rollbacks', 'hotfixes', 'watchRead', 'watchOwned', 'rulings', 'tokensM'];
+if (existsSync(join(closeDir, 'close.json'))) { console.error('blueprint data problems:\n  close/close.json: the retired close (the dreaming board, issues, recurrence); stage 6 writes only close/retro.json — remove close.json'); process.exit(1); }
+if (existsSync(retroPath)) {
+  const W = 'close/retro.json';
+  const fail = () => { console.error('blueprint data problems:\n  ' + problems.join('\n  ')); process.exit(1); };
+  if (!release || !release.closed) { problems.push(`${W}: the retro is read against a closed release; ${release ? 'release/release.json closed is null' : 'blueprint/release/release.json is missing'}`); fail(); }
+  const C = JSON.parse(readFileSync(retroPath, 'utf8'));
+  need(C, ['workstream', 'report', 'numbers', 'lenses', 'worked', 'wrong', 'ideas', 'userNotes', 'sweep'], W);
+  if (!('closed' in C)) problems.push(`${W}: missing closed (null until the user says it is closed)`);
+  if (C.workstream !== undefined && C.workstream !== workstream.slug) problems.push(`${W}: workstream "${C.workstream}" is not this workstream's slug "${workstream.slug}"`);
+  const list = (v, name) => { if (v === undefined) return []; if (!Array.isArray(v)) { problems.push(`${W}: ${name} must be a list`); return []; } return v; };
+  const nat = v => Number.isInteger(v) && v >= 0;
+  const R = C.report && typeof C.report === 'object' ? C.report : {};
+  if (C.report !== undefined) {
+    need(R, ['inOneSentence', 'threeThings'], `${W} report`);
+    if (!Array.isArray(R.threeThings) || R.threeThings.length !== 3) problems.push(`${W}: report.threeThings must have exactly three items`);
+    (Array.isArray(R.threeThings) ? R.threeThings : []).forEach((t, i) => need(t, ['t', 'p'], `${W} report.threeThings[${i + 1}]`));
   }
-  if (C.close) need(C.close, ['date', 'issuesUrl', 'note'], 'close.json close');
-  // word caps (schema/close.md)
-  const CCAPS = { inOneSentence: 35, p: 35, numbersPlain: 45, boardPlain: 45, sweepPlain: 45, why: 25, by: 25, title: 14, seen: 25, edit: 30, note: 35 };
-  const CSKIP = new Set(['where', 'owner', 'destination', 'slug', 'url', 'words', 'quote', 'at', 'closedAt', 'date', 'opened', 'closed', 'id', 'section', 'stage', 'lens', 'repo', 'status', 'key', 'verdict', 'suggested', 'ruled', 'parkedFrom', 'issuesUrl', 't', 'n']);
+  const N = C.numbers && typeof C.numbers === 'object' && !Array.isArray(C.numbers) ? C.numbers : null;
+  if (C.numbers !== undefined && !N) problems.push(`${W}: numbers must be an object`);
+  if (N) {
+    RETRO_NUMBERS.forEach(k => { if (!(k in N)) problems.push(`${W}: numbers.${k} missing (a number, or null when the record does not carry it)`); else if (N[k] !== null && !(typeof N[k] === 'number' && Number.isFinite(N[k]))) problems.push(`${W}: numbers.${k} must be a number or null`); });
+    Object.keys(N).filter(k => !RETRO_NUMBERS.includes(k)).forEach(k => problems.push(`${W}: numbers.${k} is not a key of the schema`));
+  }
+  const STAGES = ['discovery', 'design', 'plan', 'execute', 'release'];
+  const stageOk = (v, w) => { if (v !== undefined && !STAGES.includes(v)) problems.push(`${w}: stage "${v}" must be one of ${STAGES.join(', ')}`); };
+  const LK = ['found', 'sustained', 'deferred', 'latitude', 'dismissed'];
+  list(C.lenses, 'lenses').forEach((l, i) => {
+    const w = `${W} lenses[${i + 1}]${l.lens ? ` (${l.lens})` : ''}`;
+    need(l, ['stage', 'lens', ...LK], w); stageOk(l.stage, w);
+    LK.forEach(k => { if (l[k] !== undefined && !nat(l[k])) problems.push(`${w}: ${k} must be a whole number`); });
+  });
+  list(C.worked, 'worked').forEach((x, i) => need(x, ['what', 'evidence'], `${W} worked[${i + 1}]`));
+  const wrongIds = new Set(), ideaIds = new Set();
+  list(C.wrong, 'wrong').forEach((x, i) => {
+    const w = `${W} wrong[${i + 1}]${x.id ? ` (${x.id})` : ''}`;
+    need(x, ['id', 'stage', 'what', 'where', 'quote', 'cost'], w); stageOk(x.stage, w);
+    if (x.id !== undefined && !/^W-\d+$/.test(x.id)) problems.push(`${w}: id "${x.id}" must be W-<n>`);
+    if (wrongIds.has(x.id)) problems.push(`${w}: duplicate id`); wrongIds.add(x.id);
+  });
+  const LANDS = ['pipeline', 'doctrine', 'venture', 'incident'];
+  list(C.ideas, 'ideas').forEach((x, i) => {
+    const w = `${W} ideas[${i + 1}]${x.id ? ` (${x.id})` : ''}`;
+    need(x, ['id', 'stage', 'lands', 'change', 'why'], w); stageOk(x.stage, w);
+    if (x.id !== undefined && !/^I-\d+$/.test(x.id)) problems.push(`${w}: id "${x.id}" must be I-<n>`);
+    if (ideaIds.has(x.id)) problems.push(`${w}: duplicate id`); ideaIds.add(x.id);
+    if (x.lands !== undefined && !LANDS.includes(x.lands)) problems.push(`${w}: lands "${x.lands}" must be one of ${LANDS.join(', ')}`);
+    if (x.lands === 'pipeline' && !x.target) problems.push(`${w}: a pipeline idea names its target (the file it would touch)`);
+    if (!Array.isArray(x.evidence) || !x.evidence.length) problems.push(`${w}: evidence must be a non-empty list of W- ids`);
+    (Array.isArray(x.evidence) ? x.evidence : []).forEach(e => { if (!wrongIds.has(e)) problems.push(`${w}: evidence names "${e}", which is not a W- id in wrong`); });
+  });
+  list(C.userNotes, 'userNotes').forEach((x, i) => {
+    const w = `${W} userNotes[${i + 1}]`;
+    need(x, ['on', 'words'], w);
+    if (x.on !== undefined && x.on !== 'general' && !wrongIds.has(x.on) && !ideaIds.has(x.on)) problems.push(`${w}: on "${x.on}" is neither an I-/W- id of this retro nor "general"`);
+  });
+  list(C.sweep, 'sweep').forEach((x, i) => {
+    const w = `${W} sweep[${i + 1}]`;
+    need(x, ['what'], w);
+    if (typeof x.done !== 'boolean') problems.push(`${w}: done must be true or false`);
+    if ('left' in x && typeof x.left !== 'boolean') problems.push(`${w}: left must be true or false`);
+    if (x.left === true && x.done === true) problems.push(`${w}: a line is done or left, not both`);
+    if (x.left === true && !x.command) problems.push(`${w}: a line left for the user names the command he runs`);
+    if (C.closed && x.done !== true && x.left !== true) problems.push(`${w}: the retro is closed and this sweep line is open (done, or left with the command)`);
+  });
+  // word caps (schema/close.md): by exact path; ids, paths, quotes, numbers and words are never capped
+  const CCAPS = { 'report.inOneSentence': 35, 'report.threeThings.p': 35, 'worked.what': 25, 'wrong.what': 25, 'sweep.what': 25, 'wrong.cost': 15, 'ideas.change': 35, 'ideas.why': 20 };
   const cwords = t => String(t).trim().split(/\s+/).filter(Boolean).length;
   const cwalk = (v, path) => {
     if (Array.isArray(v)) { v.forEach(x => cwalk(x, path)); return; }
     if (v && typeof v === 'object') { Object.entries(v).forEach(([k, x]) => cwalk(x, path ? `${path}.${k}` : k)); return; }
     if (typeof v !== 'string') return;
-    const key = path.split('.').pop();
-    const cap = CSKIP.has(key) ? null : /^(cut|pendencies|sweep)\.what$/.test(path) ? 20 : /^sweep\.how$/.test(path) ? 20 : CCAPS[key];
-    if (cap && cwords(v) > cap) problems.push(`close.json: ${path} has ${cwords(v)} words, cap ${cap} — "${v.slice(0, 60)}…"`);
+    const cap = CCAPS[path];
+    if (cap && cwords(v) > cap) problems.push(`${W}: ${path} has ${cwords(v)} words, cap ${cap} — "${v.slice(0, 60)}…"`);
   };
   cwalk(C, '');
-  if (problems.length) { console.error('blueprint data problems:\n  ' + problems.join('\n  ')); process.exit(1); }
-  close = C;
+  if (problems.length) fail();
+  retro = C;
 }
-const tabs = ['discovery', ...(design ? ['design'] : []), ...(plan ? ['plan'] : []), ...(execution ? ['execution'] : []), ...(release ? ['release'] : []), ...(close ? ['close'] : [])];
+const tabs = ['discovery', ...(design ? ['design'] : []), ...(plan ? ['plan'] : []), ...(execution ? ['execution'] : []), ...(release ? ['release'] : []), ...(retro ? ['close'] : [])];
 
 const data = {
-  workstream, strings, figures, review, report, design, plan, execution, release, close, tabs,
+  workstream, strings, figures, review, report, design, plan, execution, release, retro, tabs,
   ...prfaq, ...stories,
-  files: ['00-discovery/pr-faq.md', '00-discovery/user-stories.md', '00-discovery/reviews.md', 'rulings.md', ...(design ? ['01-design/*.md', '01-design/notes.md', '01-design/reviews.md', '01-design/ui/'] : []), ...(plan ? ['02-plan/plan.md', '02-plan/briefs/', '02-plan/recon/', '02-plan/reviews.md'] : []), ...(execution ? ['03-execution/board.md', '03-execution/parked.md', '03-execution/entries/', '03-execution/audit.md', '03-execution/explain.md'] : []), ...(release ? ['04-release/plan.md', '04-release/trace.md', '04-release/notes/', '04-release/entries/', '04-release/proof/'] : []), ...(close ? ['05-close/closure.md', '05-close/dreaming/ledger.md', '05-close/harvest/'] : [])],
+  files: ['00-discovery/pr-faq.md', '00-discovery/user-stories.md', '00-discovery/reviews.md', 'rulings.md', ...(design ? ['01-design/*.md', '01-design/notes.md', '01-design/reviews.md', '01-design/ui/'] : []), ...(plan ? ['02-plan/plan.md', '02-plan/briefs/', '02-plan/recon/', '02-plan/reviews.md'] : []), ...(execution ? ['03-execution/board.md', '03-execution/parked.md', '03-execution/entries/', '03-execution/audit.md', '03-execution/explain.md'] : []), ...(release ? ['04-release/plan.md', '04-release/trace.md', '04-release/notes/', '04-release/entries/', '04-release/proof/'] : []), ...(retro ? ['05-close/retro.md', '05-close/harvest/', '05-close/trace.md'] : [])],
   builtAt: new Date().toISOString().slice(0, 16).replace('T', ' ') + ' UTC',
 };
 // `</script` inside JSON would end the data block early; escape it.
@@ -529,4 +555,4 @@ const json = JSON.stringify(data).replace(/<\/script/gi, '<\\/script');
 const shell = readFileSync(join(here, 'shell.html'), 'utf8');
 // function replacements: a `$&` or `$'` inside the data would otherwise be read as a replacement pattern
 writeFileSync(out, shell.replace('__TITLE__', () => workstream.title.replace(/</g, '&lt;')).replace('__DATA__', () => json));
-console.log(`built ${out}: tabs ${tabs.join(' + ')} · ${stories.stories.length} stories, ${stories.stories.reduce((a, s) => a + s.acs.length, 0)} ACs, ${review.rounds.length} discovery rounds` + (design ? ` · design: ${design.docs.architecture.flows.length} flows, ${design.decisions.length} decisions, ${design.review.rounds.length} rounds` : '') + (plan ? ` · plan: ${plan.plan.entries.length} entries, ${plan.plan.entries.reduce((a, e) => a + e.stories.length, 0)} stories, concurrency ${plan.plan.concurrency}, ${Object.keys(plan.briefs).length} briefs` : '') + (execution ? (x => { const planned = new Set(['F', ...plan.plan.entries.map(e => e.id)]), req = x.entries.filter(e => planned.has(e.id)); return ` · execution: ${req.filter(e => e.status === 'merged').length}/${req.length} merged, ${x.entries.filter(e => e.status === 'parked').length} parked, ${x.amendments.length} amendments, audit ${x.closed ? 'closed' : 'open'}`; })(execution) : '') + (release ? ` · release: in production ${release.inProduction.length} artifact(s), ${release.staging.length} staging runs, ${release.fixes.length} fixes, ${release.watch.filter(r => r.readAt != null && r.got != null && r.ok != null).length}/${release.watch.length} watched, ${release.closed ? 'closed' : 'open'}` : '') + (close ? ` · close: ${close.board.entries.length} entries, ${close.board.entries.filter(e => e.ruled === 'issue').length} issues, ${close.board.entries.filter(e => e.ruled === null).length} unruled${close.closed ? ', closed' : ', open'}` : ''));
+console.log(`built ${out}: tabs ${tabs.join(' + ')} · ${stories.stories.length} stories, ${stories.stories.reduce((a, s) => a + s.acs.length, 0)} ACs, ${review.rounds.length} discovery rounds` + (design ? ` · design: ${design.docs.architecture.flows.length} flows, ${design.decisions.length} decisions, ${design.review.rounds.length} rounds` : '') + (plan ? ` · plan: ${plan.plan.entries.length} entries, ${plan.plan.entries.reduce((a, e) => a + e.stories.length, 0)} stories, concurrency ${plan.plan.concurrency}, ${Object.keys(plan.briefs).length} briefs` : '') + (execution ? (x => { const planned = new Set(['F', ...plan.plan.entries.map(e => e.id)]), req = x.entries.filter(e => planned.has(e.id)); return ` · execution: ${req.filter(e => e.status === 'merged').length}/${req.length} merged, ${x.entries.filter(e => e.status === 'parked').length} parked, ${x.amendments.length} amendments, audit ${x.closed ? 'closed' : 'open'}`; })(execution) : '') + (release ? ` · release: in production ${release.inProduction.length} artifact(s), ${release.staging.length} staging runs, ${release.fixes.length} fixes, ${release.watch.filter(r => r.readAt != null && r.got != null && r.ok != null).length}/${release.watch.length} watched, ${release.closed ? 'closed' : 'open'}` : '') + (retro ? ` · close: ${retro.wrong.length} wrong, ${retro.ideas.length} ideas (${retro.ideas.filter(i => i.lands === 'pipeline').length} pipeline), ${retro.userNotes.length} user notes, ${retro.closed ? 'closed' : 'open'}` : ''));

@@ -1,6 +1,6 @@
 ---
 name: stage-plan
-description: Conducts stage 3 (Plan) — takes an approved design and cuts, with the user, how the whole demand gets built as fast as the machine allows. One scout (Haiku 4.5, max) per area of the codebase the design touches writes what exists today; the conductor (Opus 5.5, high) arrives with the cut: the foundation (every migration, the whole contract with its generated code, the modules registered, the shared pieces and factories, laid down once so no entry ever touches a shared file) and the graph of entries (a story or a small group, built vertically, back and front; an edge only where an entry's proof needs another entry's behavior), each proved by commands; the user shapes and approves it; then one writer (Sonnet 5, high) per entry writes the brief its builder will receive, deciding nothing; a review round of three lenses (Sonnet 5, high), two blind readers (Haiku 4.5, high) and a referee (Sonnet 5, low) per brief, judged by the conductor; round 2 automatic over the delta, a third only on the user's word; the blueprint's Plan tab read by the user at the close, the pre-flight handed over. Runs in Claude Code with an Opus 5.5 session at high effort. Use after a design is approved, or to resume a plan in progress.
+description: Conducts stage 3 (Plan) — takes an approved design and cuts, with the user, how the whole demand gets built as fast as the machine allows. One scout (Haiku 4.5, max) per area of the codebase the design touches writes what exists today; the conductor (Opus 5.5, medium) arrives with the cut: the foundation (every migration, the whole contract with its generated code, the modules registered, the shared pieces and factories, laid down once so no entry ever touches a shared file) and the graph of entries (a story or a small group, built vertically, back and front; an edge only where an entry's proof needs another entry's behavior), each proved by commands; the user shapes and approves it; then one writer (Sonnet 5, high) per entry writes the brief its builder will receive, deciding nothing; a review round of three lenses (Sonnet 5, high), two blind readers (Haiku 4.5, high) and a referee (Sonnet 5, low) per brief, judged by the conductor; round 2 automatic over the delta, a third only on the user's word; the blueprint's Plan tab read by the user at the close, the pre-flight handed over. Runs in Claude Code with an Opus 5.5 session at medium effort. Use after a design is approved, or to resume a plan in progress.
 disable-model-invocation: false
 argument-hint: "<workstream-slug>"
 allowed-tools: Read, Write, Edit, Glob, Grep, Agent, SendMessage, Workflow, AskUserQuestion, Artifact, Bash(mkdir *), Bash(date *), Bash(ls *), Bash(cat *), Bash(git status *), Bash(git diff *), Bash(git add *), Bash(git commit *), Bash(nproc), Bash(free *), Bash(node *)
@@ -31,7 +31,7 @@ An entry that finds the contract must change stops; the change is a
 foundation amendment at stage 4, small and serial, and the entries in
 flight rebase on it.
 
-The session is the conductor, **Opus 5.5 at high effort**. It runs
+The session is the conductor, **Opus 5.5 at medium effort**. It runs
 the cut with the user, writes `02-plan/plan.md` as the session closes,
 dispatches scouts and writers, runs the review, judges every finding,
 builds the blueprint, and hands over the pre-flight. It writes
@@ -63,7 +63,7 @@ end a turn on a plan or a promise; do the work.
 ## The pattern
 
 ```
-0. Open     Opus 5.5, effort high; read the design whole and the discovery's stories
+0. Open     Opus 5.5, effort medium; read the design whole and the discovery's stories
 1. Recon    one plan-scout (Haiku 4.5, max) per area of the codebase the design touches, in
             parallel → 02-plan/recon/<area>.md: what exists today (modules, routes, tables, screens,
             factories, the commands and the suites with their size)
@@ -94,7 +94,7 @@ not answering.
 
 | Agent | Model, effort | Does |
 |---|---|---|
-| the conductor | Opus 5.5, high | the cut, the answers to the writers, the judging, the close |
+| the conductor | Opus 5.5, medium | the cut, the answers to the writers, the judging, the close |
 | `plan-scout` × 1 per area | Haiku 4.5, max | reads one area of the codebase and its docs, writes `recon/<area>.md`: facts and where they are |
 | `plan-writer` × 1 per entry, + 1 for the foundation | Sonnet 5, high | one brief each, in parallel, from the same source; asks, never decides |
 | `plan-reviewer-{coverage, verifiability, order}` | Sonnet 5, high | three lenses, each reads everything |
@@ -126,7 +126,7 @@ designs-root/2026-08-15-workspace-invites/
 
 ## Step 0 — open
 
-If the session is not on **Opus 5.5 at high effort**, ask the user to
+If the session is not on **Opus 5.5 at medium effort**, ask the user to
 switch (`/model`) and wait. Then read, before speaking again: the
 design whole (`notes.md`, `architecture.md`, `contracts.md`,
 `data-model.md`, `ui.md`, `acceptance.md` above all), the discovery's

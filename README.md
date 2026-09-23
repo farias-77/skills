@@ -33,7 +33,8 @@ flowchart LR
   D3 --> D4["4 · Execute"]
   D4 --> D5["5 · Release"]
   D5 --> D6["6 · Close"]
-  D6 -. "next wave" .-> D2
+  D6 -. "retro" .-> W["Weekly retro"]
+  W -. "changes the pipeline" .-> D1
 ```
 
 Underneath, four mechanics carry everything:
@@ -117,11 +118,11 @@ human one question per decision, latitude to the implementer. The
 human then says whether a second or a third round runs, each over the
 delta only. The blueprint's Design tab is read by the human at the
 close, where his adjustments are noted and applied in a batch. The
-wave cut is stage 3's.
+order of construction is stage 3's.
 
 **3 · Plan** — the design becomes a cut built **as parallel as the
 machine allows**. One scout (Haiku 4.5, max) per area of the codebase
-writes what exists today; the conductor (Opus 5.5, high) arrives with
+writes what exists today; the conductor (Opus 5.5, medium) arrives with
 the cut and the human shapes it. First the **foundation**: everything
 two builders would fight over — every migration of the demand, the
 whole contract with its generated code, the new modules registered,
@@ -183,29 +184,28 @@ deferred to production at its hour, runs a hotfix the same way while
 the workstream is open, and calls him once at the end with everything
 in production.
 
-**6 · Close** — the demand is archived and the pipeline is told
-what it taught, with one stop for the human. One harvester (Sonnet 5,
-high) per source of the record returns the numbers and every friction
-with its evidence; the session (Fable 5.1, high) writes the closure
-(what shipped, what did not, who owns what is left, the numbers
-against the previous workstream's close), sweeps the repos and GitHub
-so the next demand starts clean, and builds the **dreaming** board:
-every friction, ruling pattern, taste note and audit departure as an
-entry with the class it sees, the destination and the edit it would
-make, each pipeline candidate checked against the pipeline repo's
-issues by one checker (Sonnet 5, high). The human reads the Close tab
-once; the session's suggestion is the default ruling, he vetoes or
-changes in prose, is asked only about a rule that did not hold, a
-taste note and a class conflict, and says apply. Then one issue per
-ruled lesson on the pipeline repo, from its issue template and
-sanitized for a public repo; **the pipeline is never edited here** —
-it changes in its own session, issue by issue. Nothing waits on
-production: what hurts later is a new demand.
+**6 · Close** — the retro of the workstream, with nothing changed in
+the pipeline. One harvester (Sonnet 5, high) per source of the record
+returns the numbers, the precision of every reviewer and every
+friction with its evidence; the session (Opus 5.5, medium) sums the
+numbers, cleans what the workstream left behind, and writes the retro:
+what worked, what went wrong, and the ideas for the pipeline, each
+with the file it would touch and the frictions behind it. The human
+reads it and comments; his words go in verbatim; nothing is decided,
+no issue is opened, no pipeline file is edited.
+
+**Weekly · the retro of the week** — the only place the pipeline
+changes. `weekly-retro` (Opus 5.5, medium) gathers the retro of every
+workstream closed in the week, merges the ideas that repeat, sums the
+reviewers' precision, and brings the human a board ranked by his own
+notes and by how many workstreams saw each thing. He rules each group
+— apply, park, drop — and the session applies what he approved to the
+pipeline, verifies it, and commits with his word.
 
 ## On cost
 
 This pipeline is expensive to run today, and that was a deliberate
-non-concern. Every row's diff is read whole by five reviewers, then its delta once;
+non-concern. Every entry's diff is read whole by seven lenses and two QA, then its delta, up to three rounds;
 discovery and design run up to three rounds on the human's word, plan runs round 2 automatically and a third on his word; ambiguity is hunted by dispatching multiple readers at
 the same document. That redundancy is exactly
 where the quality comes from — and it is priced in tokens.
@@ -265,14 +265,16 @@ What the pipeline expects from its surroundings:
 | Term | Meaning |
 |---|---|
 | **workstream** | one demand, end to end — one folder, one blueprint, one conducting session |
-| **wave** | a shippable slice of the demand; wave 1 is the smallest thing useful end to end |
-| **blueprint** | the workstream's single review artifact — one URL, tabs per stage, pills per wave |
+| **foundation** | what every entry would otherwise fight over (migrations, the contract, the module registry, factories), laid down once at the start of stage 4 |
+| **entry** | one story, or a small group that proves only together, built vertically in its own worktree; an edge only where its proof needs another entry's behavior |
+| **blueprint** | the workstream's single review artifact — one URL, tabs per stage |
 | **conductor** | whoever dispatches and audits without doing the work — the stage's session |
 | **lens** | a reviewer scoped to one failure mode |
-| **judge** | whoever rules every finding — sustained/deferred/dismissed, with the reason; reviewers report at the maximum bar. At discovery, design and plan the conductor judges by the stage's `references/judging.md` (at plan it also rules the sequence findings in the user's place against the approved cut); at execution the worker session of the lane rules alone inside the row's two rounds, and the user rules the residue at the audit; at release the session rules alone inside a fix row's two rounds, and the user's one ruling is the goal on the plan; at the close the session's suggestion on every board entry is the default and the user rules by reading, asked only about a rule that did not hold, a taste note and a class conflict. |
+| **judge** | whoever rules every finding — sustained/deferred/dismissed, with the reason; reviewers report at the maximum bar. At discovery, design and plan the conductor judges by the stage's `references/judging.md` (at plan it also rules the sequence findings in the user's place against the approved cut); at execution `exec-judge` rules every round of every entry, and the user rules what parked at the audit; at release a fix is judged the same way, and the user's one ruling is his "vai?"; at the close nothing is ruled; at the weekly retro the user rules each group of ideas. |
 | **blind reader** | an agent that reads alone, so divergence from its sibling exposes ambiguity |
 | **andon** | stop before building on a broken premise — a cheap halt beats wrong work |
-| **dreaming** | the board at the close where every friction of the demand becomes an entry with a suggested edit to the pipeline; the session suggests, the human rules by reading, and each ruled lesson becomes an issue on the pipeline repo — never an edit made there |
+| **retro** | the close of a workstream: what worked, what went wrong, the ideas for the pipeline with their evidence; nothing is decided there |
+| **weekly retro** | the only place the pipeline changes: the week's retros gathered, the repeated ideas grouped, the user rules each group |
 
 ## License
 

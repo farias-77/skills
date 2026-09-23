@@ -22,8 +22,8 @@ At any stage, when the user says to note something for the dreaming
 workstream's `dreaming-notes.md` on the spot, marked **`[user]`** —
 his words as close to verbatim as the entry allows, plus what he
 already wants changed when he says it. These entries are first-class
-input to stage 6: he wrote them knowing what he wants, so the
-dreaming session confirms the edit instead of debating the class.
+input to the retro of stage 6 and to the weekly retro, which weighs
+them first: he wrote them knowing what he wants.
 This is separate from the standing rule that every stage notes its
 own frictions as they happen — both feed the same file.
 
@@ -119,15 +119,11 @@ rules it with the builders' choices at the audit that closes stage 4;
 a ruling he gives there is a ruling too. At release his one ruling is his answer to "vai?" on the release PR,
 recorded verbatim in the trace and in `rulings.md`; a fix built during
 the release is an entry through the stage-4 pipeline, judged there by
-`exec-judge`. At the close the board
-is the question: the session's suggestion on every entry (issue, join,
-discard, park, pendency) is the default ruling, listed for veto; he
-vetoes or changes in prose and his "apply" rules every entry he did
-not change; only a rule that did not hold (a closed issue of the same
-class with the rule still in the text), a taste note and a class
-conflict reach him as questions. A ruled lesson becomes an issue on
-the pipeline repo, never an edit made there: the pipeline changes in
-its own session, issue by issue.
+`exec-judge`. At the close nothing is ruled: the retro records what
+went wrong and the ideas it suggests, and his comments go in verbatim.
+The pipeline changes only at the weekly retro, where he rules each
+group of ideas gathered across the week's workstreams (apply, park,
+drop).
 Every ruling is appended, as it happens, to the workstream's
 **`rulings.md`** (workstream root; created on the first ruling), one
 line each:
@@ -140,14 +136,14 @@ Date · stage and round (or the PR at stage 4) · the finding id · what
 the judge proposed · what he ruled · his reason, verbatim where he
 gave one.
 The stage's own audit (`reviews.md`, the lane trace) keeps the detail;
-`rulings.md` is the index the dreaming reads first, next to
+`rulings.md` is the index the retro reads first, next to
 `dreaming-notes.md`. A pattern in it — a ruling he keeps overruling, a
 class he keeps dismissing, a design card where he chose against the
 recommendation — is noted on the spot in the workstream's
 **`taste-notes.md`** (workstream root; created on the first note), one
 line each, as the pattern rather than the instance. Nothing there is a
-rule: the dreaming reads it next to `dreaming-notes.md` and decides,
-with him, what each note becomes — a standard, a skill line, an agent
+rule: the retro carries it, and the weekly retro decides, with him,
+what each note becomes — a doctrine line, a skill line, an agent
 prompt — or whether it is dropped.
 
 ## The blueprint is built, never edited

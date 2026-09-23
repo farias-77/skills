@@ -1,10 +1,10 @@
 /*
  * close-harvest.js — step 1 of stage 6 as deterministic code: one
  * close-harvester per source of the workstream's record, in parallel,
- * each returning the numbers, the precision per lens and every
- * friction with its evidence; the session judges what they brought.
+ * each returning the numbers, the precision per reviewer and every
+ * friction with its evidence; the session writes the retro.
  *
- * Why a workflow: five sources, five independent readings, one
+ * Why a workflow: four sources, four independent readings, one
  * structured answer each (no parsing of prose), and the guarantee
  * that the session sums numbers a reader counted, never numbers it
  * remembered.
@@ -15,13 +15,12 @@
  *   Workflow({ scriptPath: '<...>/workflows/close-harvest.js', args: {
  *     workstream: '<slug>',
  *     language: 'pt-BR',
- *     keys: ['days', 'waves', 'rows', ...],            // the numbers close.json sums (schema/close.md)
+ *     keys: ['days', 'entries', 'found', ...],          // the numbers retro.json sums (schema/close.md)
  *     sources: [
  *       { key: 'documents', paths: ['/abs/.../00-discovery/reviews.md', '/abs/.../01-design/reviews.md', '/abs/.../02-plan/reviews.md', '/abs/.../rulings.md'] },
- *       { key: 'execution', paths: ['/abs/.../03-execution/w01/trace.md', ..., '/abs/.../03-execution/audit.md'] },
- *       { key: 'release',   paths: ['/abs/.../04-release/plan.md', '/abs/.../04-release/trace.md', '/abs/.../04-release/rows', '/abs/.../blueprint/release/release.json'] },
+ *       { key: 'execution', paths: ['/abs/.../03-execution/board.md', '/abs/.../03-execution/parked.md', '/abs/.../03-execution/audit.md', '/abs/.../03-execution/entries', '/abs/.../blueprint/execution/execution.json'] },
+ *       { key: 'release',   paths: ['/abs/.../04-release/plan.md', '/abs/.../04-release/trace.md', '/abs/.../04-release/entries', '/abs/.../blueprint/release/release.json'] },
  *       { key: 'notes',     paths: ['/abs/.../dreaming-notes.md', '/abs/.../taste-notes.md'] },
- *       { key: 'previous',  paths: ['/abs/<previous>/05-close/dreaming/ledger.md'] },   // [] when there is no previous
  *     ],
  *   }})
  *
@@ -33,7 +32,7 @@
 
 export const meta = {
   name: 'close-harvest',
-  description: 'Stage 6 · one close-harvester per source of the record returns numbers, lens precision and every friction with evidence; decides nothing',
+  description: 'Stage 6 · one close-harvester per source of the record returns numbers, reviewer precision and every friction with evidence; decides nothing',
   phases: [{ title: 'Harvest', detail: 'one harvester (Sonnet 5, high) per source, in parallel' }],
 }
 
@@ -45,9 +44,9 @@ const HARVEST = {
   properties: {
     key: { type: 'string' },
     numbers: { type: 'object', additionalProperties: { type: ['number', 'null'] }, description: 'only the keys this source carries; null where the file does not say' },
-    lenses: { type: 'array', items: { type: 'object', additionalProperties: false, required: ['stage', 'lens', 'found', 'sustained', 'deferred', 'dismissed'], properties: {
-      stage: { type: 'string' }, lens: { type: 'string' }, found: { type: 'integer' }, sustained: { type: 'integer' }, deferred: { type: 'integer' }, dismissed: { type: 'integer' } } } },
-    frictions: { type: 'array', items: { type: 'object', additionalProperties: false, required: ['id', 'stage', 'where', 'quote', 'what', 'user', 'taste', 'parked', 'parkedId', 'classHint', 'destinationHint'], properties: {
+    lenses: { type: 'array', items: { type: 'object', additionalProperties: false, required: ['stage', 'lens', 'found', 'sustained', 'deferred', 'latitude', 'dismissed'], properties: {
+      stage: { type: 'string' }, lens: { type: 'string' }, found: { type: 'integer' }, sustained: { type: 'integer' }, deferred: { type: 'integer' }, latitude: { type: 'integer' }, dismissed: { type: 'integer' } } } },
+    frictions: { type: 'array', items: { type: 'object', additionalProperties: false, required: ['id', 'stage', 'where', 'quote', 'what', 'user', 'taste', 'landsHint', 'destinationHint'], properties: {
       id: { type: 'string', description: '<key>-<n>' },
       stage: { type: 'string', enum: ['discovery', 'design', 'plan', 'execute', 'release', 'close', 'house'] },
       where: { type: 'string', description: 'file:line' },
@@ -55,9 +54,7 @@ const HARVEST = {
       what: { type: 'string', description: 'the pattern in one or two sentences' },
       user: { type: 'boolean', description: 'a [user] entry — he dictated it' },
       taste: { type: 'boolean', description: 'a taste-notes line' },
-      parked: { type: 'boolean', description: 'a parked entry of the previous ledger' },
-      parkedId: { type: ['string', 'null'], description: 'its original id when parked' },
-      classHint: { type: 'string', enum: ['pipeline', 'venture', 'repo', 'incident'] },
+      landsHint: { type: 'string', enum: ['pipeline', 'doctrine', 'venture', 'incident'] },
       destinationHint: { type: ['string', 'null'], description: 'the pipeline file it would point at, if known' } } } },
     unread: { type: 'array', items: { type: 'string' } },
   },
@@ -86,7 +83,7 @@ const results = await parallel(sources.map(s => async () => {
   if (!valid(v, s.key)) { log(`${s.key}: no valid answer — re-dispatching once`); v = await dispatch() }
   if (!valid(v, s.key)) { log(`${s.key}: harvester failed twice — the session reads this source itself`); return { key: s.key, failed: true } }
   if (v.unread.length) log(`${s.key}: ${v.unread.length} path(s) unread: ${v.unread.join(', ')}`)
-  log(`${s.key}: ${v.frictions.length} frictions (${v.frictions.filter(f => f.user).length} [user], ${v.frictions.filter(f => f.taste).length} taste, ${v.frictions.filter(f => f.parked).length} parked) · ${v.lenses.length} lens rows`)
+  log(`${s.key}: ${v.frictions.length} frictions (${v.frictions.filter(f => f.user).length} [user], ${v.frictions.filter(f => f.taste).length} taste) · ${v.lenses.length} lens rows`)
   return v
 }))
 
