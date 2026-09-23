@@ -2,34 +2,28 @@
 
 <!--
   The executable acceptance SPEC — frozen with contracts.md, one line
-  per case. The exec transcribes each line into <repo>/smoke/ (the
-  testing standard §3 owns the file shape); transcription is mechanical
-  by construction, so every column must be exact. The assert never
-  diverges: implementation proving it wrong is a declared design
+  per case. Stage 4 turns each line into a test in the layer the
+  doctrine's testing standard assigns (unit, integration, browser
+  journey, a case against a deployed environment); transcription is
+  mechanical by construction, so every column must be exact. The assert
+  never diverges: implementation proving it wrong is a declared design
   amendment, never a silent test edit. MUST have: per endpoint, the
   success case plus one per declared error (the contracts lens audits
-  the mirror against contracts.md); every mutation's side effect
-  checked DIRECTLY in the store (lib/db.sh), never via a read endpoint;
-  every case cleans up what it created. Case names follow smoke.1:
-  <method>-<behavior>[-<expected-result>].
+  the mirror against contracts.md); every mutation's side effect checked
+  directly in the store, never via a read endpoint; every screen state
+  the stories imply; every case cleans up what it created.
 -->
 
-## <repo> — <resource>
+## <area> — <resource or screen>
 
-| Case | Request | Expect | Side effect (store) | Cleanup |
-|---|---|---|---|---|
-| `post-create-<x>-201` | `POST /<x>` <valid payload, the fixture fields> | 201 + <envelope fields> | <item exists, the fields that must match> | delete created item |
-| `post-create-<x>-no-auth-401` | no token | 401 `UNAUTHORIZED` envelope | none | — |
-| `post-create-<x>-invalid-422` | <the invalid shape> | 422 `<CODE>` envelope | nothing written | — |
+| Case | Layer | Given / request | Expect | Side effect (store) | Cleanup |
+|---|---|---|---|---|---|
+| `create-<x>-ok` | integration | <valid payload, the fixture fields> | <status + body fields> | <item exists, the fields that must match> | delete created item |
+| `create-<x>-no-auth` | integration | no token | <the doctrine's unauthenticated response> | none | — |
+| `create-<x>-invalid` | integration | <the invalid shape> | <status + error code> | nothing written | — |
 
 ## The implementer decides
 
 <!-- The latitude the user granted for this document (notes.md)
      plus what transcription left open on purpose. One line each.
      Never a hard class. -->
-
-- <item>
-
-## References
-
-- `contracts.md` — the bridge every assert derives from

@@ -204,7 +204,7 @@ final version. The eleven subjects, one block of `notes.md` each:
 | 8 | Observability | the alarms that wake someone and whom; what is only watched; a window is not a clock | `observability.md` |
 | 9 | Rollout | order, gates, the way back, the first run | `rollout.md` |
 | 10 | Code | repos, where the tree departs from the house, the seams | `code.md` |
-| 11 | Acceptance | the case groups and how each runs; infra is proved by synth, never by a test under `infra/` | `acceptance.md` |
+| 11 | Acceptance | the case groups and the test layer each runs in, as the doctrine's testing standard assigns them | `acceptance.md` |
 
 Every subject is thought, even when nothing changes in it: a small
 feature may need no alarm and no infra, but the notes say so and why
@@ -258,7 +258,8 @@ its writer in one message before the review starts.
 
 Autonomous mode, right after the writers' questions are answered.
 Run [`design-review`](../../workflows/design-review.js) by `scriptPath`
-with `designDir`, `discoveryDir`, `round: 1`, `language`, the glossary
+with `designDir`, `discoveryDir`, `doctrineDir` (the engineering
+doctrine the project's `CLAUDE.md` names), `round: 1`, `language`, the glossary
 block, and `flows`: one `{id, text}` per flow of `architecture.md`,
 split at every `### ` heading under `## Flows`.
 
@@ -266,7 +267,7 @@ split at every `### ` heading under `## Flows`.
 |---|---|
 | `design-reviewer-data` (Sonnet 5, high) | every read has a key path; growth is bounded; writes that must land together do |
 | `design-reviewer-code` (Sonnet 5, high) | the construction razor and the doctrine hold; blocks every workaround, temporary step or speculation; coupling, seams, extension points with their "does not change" line |
-| `design-reviewer-infra` (Sonnet 5, high) | configs on purpose, IAM by the verb, cost at three scales against real prices; infra proved by synth, never by a test under `infra/` |
+| `design-reviewer-infra` (Sonnet 5, high) | configs on purpose, IAM by the verb, cost at three scales against real prices; infra proved the way the doctrine's testing standard says |
 | `design-reviewer-security` (Sonnet 5, high) | the abuse paths; the class sweep answered with mechanisms |
 | `design-reviewer-contracts` (Sonnet 5, high) | every contract whole, success and error; the data each side needs arrives |
 | `design-reviewer-alarms` (Sonnet 5, high) | every alarm has its four fields, would not ring on a quiet day, and does not depend on where a window sits on the clock |

@@ -104,9 +104,8 @@ the bound the design sets.
   session and cannot ask; the reader of the JSON is the intern.
 - Write in the language the brief names. IDs, headings and the
   decision-block keywords stay as the template has them.
-- Never an acceptance case that runs a test under `infra/`: infra is
-  proved by `synth`, the diff protocol and smoke against the deployed
-  stage (testing standard §2).
+- Never an acceptance case that proves infra a way the doctrine's
+  testing standard does not name for infra.
 - Never a real credential, key or invite code in a document or a
   JSON; describe it.
 - Edit in place. Do not rewrite a file to change three lines.

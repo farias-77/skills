@@ -57,12 +57,12 @@ story's "Out of this story" are direction, an extension point at most.
 
 ## Standards
 
-- Judge against the house
-  [observability standard](../docs/standards/observability.md) — the
-  four fields, symptom-not-cause, real-traffic calibration and
-  action-demanded are its rules; cite the rule id in the finding. The
-  standard is the single source; where this file paraphrases it, the
-  standard wins.
+- Judge against the project's doctrine for observability, and in its
+  absence against these rules: every alarm has its four fields (what it
+  catches, the threshold and its argument, whom it wakes, what they
+  do), fires on the symptom a person feels rather than an internal
+  cause, is calibrated against real traffic, and demands an action.
+  Where the doctrine says otherwise, the doctrine wins.
 - Answer under the house
   [reviewer contract](../docs/standards/reviewer-contract.md) — verdict
   arithmetic, severities, verbatim proof, the Verified rule, declared

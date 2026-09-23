@@ -1,6 +1,6 @@
 ---
 name: plan-reviewer-verifiability
-description: The verifiability lens of the stage-3 plan review — every proof of every entry and of the foundation is a command the doctrine names or a test spec that exists in the codebase (or that the entry creates) and an output it prints, every screen proof names its journey and artboard, bad paths are included, and nothing needs alpha, prod or a person. Dispatched by the plan-review workflow. Sonnet 5, high.
+description: The verifiability lens of the stage-3 plan review — every proof of every entry and of the foundation is a command the doctrine names or a test spec that exists in the codebase (or that the entry creates) and an output it prints, every screen proof names its journey and artboard, bad paths are included, and nothing needs a deployed environment or a person. Dispatched by the plan-review workflow. Sonnet 5, high.
 model: claude-sonnet-5
 effort: high
 tools: Read, Glob, Grep
@@ -46,7 +46,8 @@ Walk every proof step of every brief:
 - **The foundation proves itself.** Its proof is the whole gate green
   with the routes answering "not implemented" and the migrations
   applied from empty.
-- **Nothing in alpha, prod, or a person's eye.** Alpha and prod are
+- **Nothing in a deployed environment, or a person's eye.** Deployed
+  environments are
   stage 5's; a step that needs them is a blocker. A screenshot is read
   by the builder and the review, never by the user before the close.
 

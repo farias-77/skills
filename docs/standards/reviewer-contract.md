@@ -28,11 +28,11 @@ finding: the conductor, by the stage's `references/judging.md`. At
 stages 1, 2 and 3 the ruling also names who decides the fix (the
 author or writer for wording, the user for product, scope, cost, the
 sequence and confirmed decisions, at design the implementer for
-declared latitude and at plan the worker for execution latitude), and
+declared latitude and at plan the builder for execution latitude), and
 **the user gives the final ruling on what is his**; at stage 4 the
-worker session of the lane rules alone inside two lens rounds per
-row, by `stage-execute/references/judging.md`, and what survives
-rides as a PR note to the audit; at stage 5 the release session rules
+judge agent of each entry (`exec-judge`) rules every round, by
+`stage-execute/references/judging.md`, up to three rounds, and what is
+the user's parks for the audit; at stage 5 the release session rules
 the same way inside a fix row's two rounds, and the note rides into
 the release report; at stage 6 there are no reviewers: the harvesters
 report every friction with its evidence, the session suggests, and

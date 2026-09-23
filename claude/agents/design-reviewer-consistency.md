@@ -22,7 +22,7 @@ agree with.
 ## How you judge
 
 Build the cross-reference as you read: every named thing (a table, a
-key, a route, an event, a Lambda, an alarm, a parameter, a stage, a
+key, a route, an event, a function, an alarm, a parameter, a stage, a
 role), every value (a timeout, a retention, a cadence, a limit, a
 memory size, a price, a count), every shape (a request, a response,
 an item, an error class), every "who calls whom". Then report:

@@ -16,7 +16,7 @@ document, each carrying its own must-haves as comments:
 | `observability.md` | alarms with the four fields |
 | `rollout.md` | deploy order, cutover, rollback |
 | `code.md` | the file-tree preview per repo, a guide, never a build contract |
-| `acceptance.md` | the executable acceptance spec, frozen with `contracts.md`; the exec transcribes it into each repo's `smoke/` |
+| `acceptance.md` | the executable acceptance spec, frozen with `contracts.md`; stage 4 turns each case into a test in the layer the doctrine assigns |
 | `notes.md` | the design session's record, the CONDUCTOR's file; the writers transcribe it and never edit it |
 | `reviews.md` | the round audit with the rulings, the conductor's file |
 | `blueprint/design/<doc>.json` | the document's report layer, written by its writer with the document, in the shapes and word caps of `claude/blueprint/schema/design.md` |
@@ -61,7 +61,7 @@ invented.
 implementer decides`, before `## References`. "Latitude" is the word
 for what goes there: a choice left to whoever builds it, with the
 bound the design sets ("retries on the Cognito calls, within the
-Lambda's 10 s budget"). The section holds the items the user left
+call's 10 s budget"). The section holds the items the user left
 open at the session (the Latitude list of that document's section in
 `notes.md`) plus what the writer's transcription left open on
 purpose, one concrete line each. Reviewers do not report an item
@@ -81,7 +81,7 @@ the **execution** inside that shape, and the design says the bound.
 | infra | resources, every config that encodes a rule or a cost (timeout, memory, PITR, region), IAM by the verb, cost at three scales | resource names within the convention; tags; stack organization |
 | observability | which alarms exist, what each catches, whom it wakes, the threshold and its argument | log format beyond the required fields; dashboard metrics without an alarm |
 | rollout | deploy order, gates, rollback per step | the exact script of each step, as long as it meets its "confirmed when" |
-| code | where the layout departs from the house structure | everything else in the layout: the house standard is the rule, `code.md` a guide |
+| code | where the layout departs from the doctrine's structure | everything else in the layout: the doctrine is the rule, `code.md` a guide |
 | acceptance | the case list and what each one proves | request bodies, fixtures, execution order |
 
 The hard classes, the left column condensed, never sit in the
@@ -111,11 +111,9 @@ and says where the exact form lives when it is another document's
 ("the whole shape is in `contracts.md`"). The consistency lens reads
 the ten together and reports every drift.
 
-**Infra is proved by synth.** No acceptance case runs a test under
-`infra/`; an alarm expression, a schedule, an IAM statement or a
-resource config is proved by a check over the synthesized template,
-the diff protocol and smoke against the deployed stage (testing
-standard §2).
+**Infra is proved the doctrine's way.** An acceptance case proves an
+alarm expression, a schedule, a permission or a resource config the way
+the doctrine's testing standard says infra is proved, and no other way.
 
 **The reference rule.** Every claim about an external tool or an
 existing internal service points at its research file:

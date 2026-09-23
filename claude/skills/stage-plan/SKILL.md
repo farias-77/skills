@@ -209,8 +209,8 @@ Four rules inside the proposal:
   entry itself creates, and then it says so); `expect` is what it
   prints, with the cases named. `see` is a screenshot of the local
   stack from a journey spec, both themes, 390 px; `where` is the
-  artboard in `ui.md`. "Works" is not a proof. Nothing needs alpha or
-  prod: alpha is stage 5's.
+  artboard in `ui.md`. "Works" is not a proof. Nothing needs a deployed
+  environment: deploying is stage 5's.
 - **After the foundation, no entry touches a shared file.** Migrations,
   the contract, the generated code and the module registry are the
   foundation's. An entry that needs one of them changed is a
@@ -268,7 +268,7 @@ open only their brief.
 | Lens | Question |
 |---|---|
 | `plan-reviewer-coverage` (Sonnet 5, high) | every story AC and every acceptance case lands in exactly one entry; every table, route, module and factory the design names is in the foundation; every screen has its entry; nothing is built that nothing forces |
-| `plan-reviewer-verifiability` (Sonnet 5, high) | every `run` is a command the doctrine names or a spec that exists or that the entry creates, and every `expect` is what it prints; every `see` names its journey and artboard; bad paths included; nothing needs alpha, prod or a person |
+| `plan-reviewer-verifiability` (Sonnet 5, high) | every `run` is a command the doctrine names or a spec that exists or that the entry creates, and every `expect` is what it prints; every `see` names its journey and artboard; bad paths included; nothing needs a deployed environment or a person |
 | `plan-reviewer-order` (Sonnet 5, high) | every edge is a behavior the proof needs, every such need has its edge, the graph has no cycle; after the foundation no entry touches a shared file; entries that run at once do not collide on the same file; the foundation is complete |
 | 2 × `plan-blind-reader` (Haiku 4.5, high) → `plan-reviewer-ambiguity` (Sonnet 5, low), per brief | would two builders build the same entry from this brief alone, and call it done on the same command and output? |
 

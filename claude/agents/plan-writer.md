@@ -58,7 +58,7 @@ writing a line. Then fill the template:
    `acceptance.md`, the bad paths among them. A screen is the journey
    spec's screenshots, both themes, 390 px, against the artboard in
    `ui.md`. The last step is always the doctrine's gate command → exit 0. A proof
-   the builder cannot type, or that needs alpha, prod or a person, is
+   the builder cannot type, or that needs a deployed environment or a person, is
    a question back, never a softer sentence.
 3. **Seeds and touches.** Which factories the tests call, in the shape
    of which design section; which files and folders the entry touches.

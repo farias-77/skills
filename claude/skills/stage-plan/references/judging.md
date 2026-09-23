@@ -31,7 +31,7 @@ gap.
 
 Some defects always proceed: a story AC or an acceptance case no
 entry carries · a `run` that is not a target or spec in the codebase,
-or an `expect` it cannot print · a proof that needs alpha, prod or a
+or an `expect` it cannot print · a proof that needs a deployed environment or a
 person · a proof that needs another entry's behavior with no edge · a
 cycle · an entry that edits a migration, the contract, the generated
 code or the module registry · two entries that run at once and touch
@@ -63,7 +63,7 @@ These classes proceed whether or not the build changes. Rule
 `sustained` or at most `deferred`, never `dismissed`:
 
 - a story AC or an acceptance case with no entry;
-- a proof that is not a command, or needs alpha, prod or a person;
+- a proof that is not a command, or needs a deployed environment or a person;
 - a pre-flight item (a credential, a text, an account) an entry needs
   and the list does not carry: the user leaves nothing behind;
 - an entry touching a shared file, or two parallel entries touching

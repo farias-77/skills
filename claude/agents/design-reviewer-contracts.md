@@ -65,9 +65,9 @@ story's "Out of this story" are direction, an extension point at most.
 
 ## Standards
 
-- Every error crosses the bridge in the house
-  [error envelope](../docs/standards/error-envelope.md) — one shape
-  across the whole API; the standard is the single source, cite it.
+- Every error crosses the bridge in the error shape the project's
+  doctrine fixes — one shape across the whole API; the doctrine is the
+  single source, cite it.
 - Answer under the house
   [reviewer contract](../docs/standards/reviewer-contract.md) — verdict
   arithmetic, severities, verbatim proof, the Verified rule, declared

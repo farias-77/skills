@@ -166,6 +166,7 @@ const docInputs = `Round ${round}, ${mode}.
 The design: ${args.designDir} — everything under it, research/ and ui/ included.
 The session's notes (the design as the user decided it; a card is contested only by defect): ${args.designDir}/notes.md
 The demand it must satisfy: ${args.discoveryDir}/pr-faq.md and ${args.discoveryDir}/user-stories.md
+The project's engineering doctrine (the bar the design applies; never reopened): ${args.doctrineDir ?? '(not given)'}
 The round audit so far: ${args.designDir}/reviews.md
 Language of the documents: ${language}${delta ? `
 

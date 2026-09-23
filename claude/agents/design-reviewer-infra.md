@@ -40,13 +40,11 @@ story's "Out of this story" are direction, an extension point at most.
   against the provider's published pricing (the research file's pricing
   source, or fetch the current price page yourself). A cost table built
   on guessed unit prices is a finding even when the arithmetic is right.
-- **Infra is proved by synth, never by a test under `infra/`.** An
-  acceptance case that proves an alarm expression, a schedule, an IAM
-  statement or any resource config by a unit test in `infra/tests/` is
-  a finding (testing standard §2): infra is proved by `synth` (a check
-  over the synthesized template), the diff protocol and smoke against
-  the deployed stage. The first end-to-end run shipped one such test
-  past nine lenses; it is the reason this bullet exists.
+- **Infra is proved the doctrine's way.** An acceptance case that
+  proves an alarm expression, a schedule, a permission or a resource
+  config in a way the doctrine's testing standard does not name for
+  infra is a finding. An earlier run shipped an infra unit test past
+  nine lenses; it is the reason this bullet exists.
 - **The way in and out.** `rollout.md` is yours: deploy order that
   respects who produces and who consumes, cutover steps with a
   confirmation each, rollback with the time it takes written — a
