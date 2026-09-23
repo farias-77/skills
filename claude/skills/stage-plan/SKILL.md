@@ -1,6 +1,6 @@
 ---
 name: stage-plan
-description: Conducts stage 3 (Plan) — takes an approved design and builds, with the user, the sequence in which the whole demand gets built: one scout (Haiku 4.5, max) per repo writes what exists today, the conductor (Fable 5.1, high) arrives with the cut ("from A to B") as rows (one story in one repo, with a proof that is a command and its expected output), lanes (the rows of one repo, in order, an edge only where a proof needs another row running) and waves (the acceptance gates: which rows, the walk the master runs in alpha, the suites), the user approves wave by wave; then one writer (Sonnet 5, high) per lane × wave writes the worker's goal in parallel, deciding nothing; a review round of three lenses (Sonnet 5, high), two blind readers (Haiku 4.5, high) and a referee (Sonnet 5, low) per goal, judged by the conductor; round 2 automatic over the delta, a third only on the user's word; the blueprint's Plan tab built from JSON and read by the user at the close, the pre-flight handed over, the sessions of stage 4 named. Runs in Claude Code with a Fable session at high effort. Use after a design is approved, or to resume a plan in progress.
+description: Conducts stage 3 (Plan) — takes an approved design and builds, with the user, the sequence in which the whole demand gets built: one scout (Haiku 4.5, max) per repo writes what exists today, the conductor (Opus 5, high) arrives with the cut ("from A to B") as rows (one story in one repo, with a proof that is a command and its expected output), lanes (the rows of one repo, in order, an edge only where a proof needs another row running) and waves (the acceptance gates: which rows, the walk the master runs in alpha, the suites), the user approves wave by wave; then one writer (Sonnet 5, high) per lane × wave writes the worker's goal in parallel, deciding nothing; a review round of three lenses (Sonnet 5, high), two blind readers (Haiku 4.5, high) and a referee (Sonnet 5, low) per goal, judged by the conductor; round 2 automatic over the delta, a third only on the user's word; the blueprint's Plan tab built from JSON and read by the user at the close, the pre-flight handed over, the sessions of stage 4 named. Runs in Claude Code with an Opus session at high effort. Use after a design is approved, or to resume a plan in progress.
 disable-model-invocation: false
 argument-hint: "<workstream-slug>"
 allowed-tools: Read, Write, Edit, Glob, Grep, Agent, SendMessage, Workflow, AskUserQuestion, Artifact, Bash(mkdir *), Bash(date *), Bash(ls *), Bash(cat *), Bash(rm *), Bash(git *), Bash(node *)
@@ -24,7 +24,7 @@ Three words, from the smallest up:
 | **lane** | the rows of one repo, in order. An edge between two rows exists only when one row's **proof** needs the other running in alpha; a contract the design froze is not an edge, the consumer proves on seeded data. Lanes run in parallel from day one | one worker session per lane |
 | **wave** | an acceptance gate, not a phase: the rows that must be merged and deployed, the walk the master runs in alpha end to end (commands with expected outputs, screenshots for what is visual), each repo's whole suite green before. Nothing is accepted for the demand until its wave is green; no lane stops for a wave | the master session |
 
-The session is the conductor, **Fable 5.1 at high effort**. It runs
+The session is the conductor, **Opus 5 at high effort**. It runs
 the cut with the user, writes `waves.md` as the session closes,
 dispatches scouts and writers, runs the review, judges every finding,
 builds the blueprint, and hands over the pre-flight and the team.
@@ -56,7 +56,7 @@ end a turn on a plan or a promise; do the work.
 ## The pattern
 
 ```
-0. Open     first message: ask the user to switch to Fable, effort high; wait for his ok
+0. Open     first message: ask the user to switch to Opus, effort high; wait for his ok
 1. Recon    one plan-scout (Haiku 4.5, max) per repo the design names, in parallel
             → 02-plan/recon/<repo>.md: what exists today (smoke folders and counts, deploy
             commands, branch conventions, the tables, routes and screens the rows will extend)
@@ -87,14 +87,14 @@ plan is mechanical and he is waiting, not answering.
 
 | Agent | Model, effort | Does |
 |---|---|---|
-| the conductor | Fable 5.1, high | the cut, the answers to the writers, the judging, the close |
+| the conductor | Opus 5, high | the cut, the answers to the writers, the judging, the close |
 | `plan-scout` × 1 per repo | Haiku 4.5, max | reads the repo and its docs, writes `recon/<repo>.md`: facts and where they are |
 | `plan-writer` × 1 per lane × wave | Sonnet 5, high | one goal each, in parallel, from the same source; asks, never decides |
 | `plan-reviewer-{coverage, verifiability, order}` | Sonnet 5, high | three lenses, each reads everything |
 | `plan-blind-reader` × 2 per goal | Haiku 4.5, high | builds and proves one goal alone, reading only that file, in the goal's language |
 | `plan-reviewer-ambiguity` | Sonnet 5, low | compares the two builds key by key |
 
-Where the Fable tokens go: the cut and the judging. What left Fable
+Where the Opus tokens go: the cut and the judging. What left Opus
 since the first run: writing the goals (writers), reading the repos
 (scouts), the judge agent (you already hold the goals). No script
 checks a goal; the writers, the lenses and you do.
@@ -126,7 +126,7 @@ designs-root/2026-08-15-workspace-invites/
 ## Step 0 — open
 
 The first message after the skill is invoked asks the user to switch
-the session to **Fable, effort high**, and says why in one line: the
+the session to **Opus, effort high**, and says why in one line: the
 cut is the one act of thought in this stage, and the judging is his
 to trust. Nothing else happens until he says he switched. Then read,
 before speaking again: the design whole (`notes.md`,

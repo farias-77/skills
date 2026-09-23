@@ -119,7 +119,7 @@ The wave cut is stage 3's.
 
 **3 · Plan** — the design becomes a sequence: **from A to B, and
 the steps between**. One scout (Sonnet 5, high) per repo writes what
-exists today; the conductor (Fable 5.1, high) arrives with the cut
+exists today; the conductor (Opus 5, high) arrives with the cut
 and the human shapes it: **rows** (one story in one repo, proved by a
 command and its expected output, or a screen and its artboard),
 **lanes** (the rows of one repo in order; an edge only where a proof

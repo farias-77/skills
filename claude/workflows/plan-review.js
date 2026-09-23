@@ -196,7 +196,7 @@ const readingProblems = (reading, expected) => {
   if (!reading) return ['no output']
   const problems = []
   const got = new Map(reading.builds.map(b => [normalizeKey(b.key), b]))
-  for (const k of expected) if (!got.has(k)) problems.push(`missing key ${k}`)
+  for (const k of expected) if (!got.has(normalizeKey(k))) problems.push(`missing key ${k}`)
   for (const [k, b] of got) {
     if (!b.build || !b.build.trim()) problems.push(`empty build at ${k}`)
     else if (HEDGE.test(b.build)) problems.push(`hedged build at ${k}`)

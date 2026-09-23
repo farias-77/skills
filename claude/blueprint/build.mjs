@@ -217,7 +217,9 @@ if (existsSync(execDir) && plan) {
   const planRows = new Map(); plan.seq.lanes.forEach(l => l.rows.forEach(r => planRows.set(r.num, { ...r, repo: l.repo })));
   const planLanes = new Set(plan.seq.lanes.map(l => l.repo)), planWaves = new Set(plan.seq.waves.map(w => w.n));
   const proofDone = p => p && ((p.run && p.expect && p.got) || (p.see && p.where && p.shot));
-  const fixNum = n => /^(\d+\.\d+|w\d+)\.f\d+$/.test(n) || /^A\.\d+$/.test(n);
+  // A lane row may be lettered (`A.1`, `F.3`): a num the plan knows is never a
+  // fix row, whatever its shape; `A.n` is an audit row only when the plan has no such row.
+  const fixNum = n => /^([A-Za-z]\.\d+|\d+\.\d+|w\d+)\.f\d+$/.test(n) || (/^A\.\d+$/.test(n) && !planRows.has(n));
   const lanes = {};
   laneFiles.forEach(f => {
     const l = eread(`lanes/${f}`);
