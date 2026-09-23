@@ -119,28 +119,27 @@ delta only. The blueprint's Design tab is read by the human at the
 close, where his adjustments are noted and applied in a batch. The
 wave cut is stage 3's.
 
-**3 · Plan** — the design becomes a sequence: **from A to B, and
-the steps between**. One scout (Sonnet 5, high) per repo writes what
-exists today; the conductor (Opus 5, high) arrives with the cut
-and the human shapes it: **rows** (one story in one repo, proved by a
-command and its expected output, or a screen and its artboard),
-**lanes** (the rows of one repo in order; an edge only where a proof
-needs another row running in alpha, because a contract the design
-froze is proved on seeded data) and **waves** (acceptance gates, not
-phases: the rows that must be merged, the walk the master runs in
-alpha with commands, each repo's whole suite green before; lanes never
-stop for a wave). The human approves wave by wave. Then one writer
-(Sonnet 5, high) per lane × wave writes the worker's **goal** in
-parallel, deciding nothing. A review round runs: three lenses (Sonnet
-5, high: coverage, verifiability, order) beside two blind readers
-(Haiku 4.5, high) and a referee (Sonnet 5, low) per goal; **the
-conductor judges** by the plan razor and rules the sequence findings
-in the human's place when the wave's gate stays as approved, listing
-them at the close for veto. Round 2 runs automatically over the
-delta; a third only on his word. The Plan tab is built from JSON and
-read at the close; the pre-flight (everything the rows need from him)
-is handed over there, and `team.md` names the sessions of stage 4 so
-his absence blocks nothing.
+**3 · Plan** — the design becomes a cut built **as parallel as the
+machine allows**. One scout (Haiku 4.5, max) per area of the codebase
+writes what exists today; the conductor (Opus 5.5, high) arrives with
+the cut and the human shapes it. First the **foundation**: everything
+two builders would fight over — every migration of the demand, the
+whole contract with its generated code, the new modules registered,
+the shared pieces, the factories — laid down once, so no later piece
+ever touches a shared file. Then the **graph of entries**: one story,
+or a small group that proves only together, built vertically (back,
+front, tests) in its own worktree with its own local stack; an **edge**
+only where an entry's proof needs another entry's behavior (data is
+seeded by the factories, never an edge); everything free runs at once,
+up to a **concurrency cap** measured on the machine. Every entry is
+proved by commands on the local stack (`run`/`expect`, and a
+screenshot against its artboard for a screen); nothing needs alpha or
+prod. One writer (Sonnet 5, high) per entry writes the **brief** its
+builder will receive, deciding nothing; three lenses (Sonnet 5, high)
+— coverage, verifiability, order — and, per brief, two blind readers
+(Haiku 4.5, high) with a referee (Sonnet 5, low) review it; round 2
+runs automatically over the delta, a third only on the human's word.
+The pre-flight (what only he can hand over) is handed at the close.
 
 **4 · Execute** — the plan becomes proven branches, with no human in
 the loop until the end. The session that invokes the skill is the

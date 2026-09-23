@@ -3,36 +3,35 @@
  *
  * Why a workflow: the guarantee that no lens is skipped must be
  * physical, not discipline. Round 1 is whole: the three lenses in
- * parallel with, per goal, two blind readers and a referee. Round 2
- * runs automatically over the delta: the lenses receive the goals
+ * parallel with, per brief, two blind readers and a referee. Round 2
+ * runs automatically over the delta: the lenses receive the briefs
  * that changed and the fixes that were applied, and check that each
  * fix landed and did not break its surroundings; the blind readers
- * reopen only the goals whose text changed. A third round runs only
+ * reopen only the briefs whose text changed. A third round runs only
  * on the user's word, delta again; the conductor enforces the count.
  *
- * THE BLIND READS are per goal (one lane × one wave): two Haiku
- * readers (4.5, high) build it alone, reading only that file (and the
- * design sections it points at), in the goal's language, one build
- * per key (`goal`, `owes`, `row:<N.k>` per row heading). A Sonnet
- * referee (5, low) compares the two readings key by key; only a
- * `different-product` verdict becomes a finding. A reading that
- * misses a key, hedges, or is empty is invalid and re-dispatched
- * once; a goal whose two readings do not both survive is reported as
- * unread. A round in which no goal was read is INVALID
- * (`valid: false`): the conductor fixes the cause and runs it again.
+ * THE BLIND READS are per brief (one entry of the plan, or F for the
+ * foundation): two Haiku readers (4.5, high) build it alone, reading
+ * only that file (and the design sections it points at), in the
+ * brief's language, one build per key (`brief`, `back`, `front`,
+ * `proof`). A Sonnet referee (5, low) compares the two readings key
+ * by key; only a `different-product` verdict becomes a finding; an
+ * open build ("maybe X") is judged by the referee as two possible
+ * builds. A reading that misses a key or is empty is invalid and
+ * re-dispatched once; a brief whose two readings do not both survive
+ * is reported as unread. A round in which no brief was read is
+ * INVALID (`valid: false`): the conductor fixes the cause and runs it
+ * again.
  *
- * THE ARGS CARRY PATHS, NOT TEXT. The agents read the files; the
- * script only needs the row numbers of each goal to know which keys
- * a reading must have. (The first run embedded 140 KB of goals in
- * args through a generated script; this shape removes the need.)
+ * THE ARGS CARRY PATHS, NOT TEXT. The agents read the files.
  *
  * THERE IS NO JUDGE AGENT. The conductor judges every finding by
  * stage-plan/references/judging.md, with the cut in its head: merge
  * by fix, sustained / deferred / dismissed, owner writer / user /
- * worker. The workflow returns the findings as the lenses gave them,
+ * builder. The workflow returns the findings as the lenses gave them,
  * ids assigned.
  *
- * The briefs below carry INPUTS only. Every instruction lives in the
+ * The prompts below carry INPUTS only. Every instruction lives in the
  * agent definitions under agents/ and in the shared reviewer contract
  * (docs/standards/reviewer-contract.md).
  *
@@ -40,40 +39,35 @@
  *   Workflow({ scriptPath: '<...>/workflows/plan-review.js', args: {
  *                 // by scriptPath, never by name
  *     planDir:      'absolute path to <slug>/02-plan',
- *     wavesPath:    'absolute path to <slug>/waves.md',
  *     designDir:    'absolute path to <slug>/01-design',
  *     discoveryDir: 'absolute path to <slug>/00-discovery',
  *     reconDir:     'absolute path to <slug>/02-plan/recon',
- *     repos:        [{ name: 'labs-api-tracking', path: '/abs/path' }, ...],
+ *     root:         'absolute path to the codebase',
  *     round:        1,            // 1, 2 or 3; shown in labels and ids
- *     language:     'pt-BR',      // the goals' language; the readers build in it
- *     goals: [                    // one entry per goal file (lane × wave)
- *       { id: 'labs-api-tracking/w02', repo: 'labs-api-tracking', wave: 'w02',
- *         path: '/abs/.../02-plan/goals/labs-api-tracking/w02.md',
- *         rows: ['2.1', '2.2'] }, // the row numbers of that goal, from waves.md
+ *     language:     'pt-BR',      // the briefs' language; the readers build in it
+ *     briefs: [                   // one entry per brief file
+ *       { id: 'E-03', path: '/abs/.../02-plan/briefs/E-03.md' },
  *     ],
  *     // rounds 2 and 3 only — the delta:
- *     changed: { goals: ['labs-api-tracking/w02'] },
- *     fixes:   [ { id: 'plan-reviewer-order#1', goal: 'labs-api-tracking/w02', fix: 'what was applied, one line' } ],
+ *     changed: { briefs: ['E-03'] },
+ *     fixes:   [ { id: 'plan-reviewer-order#1', brief: 'E-03', fix: 'what was applied, one line' } ],
  *   }})
  *
  * Returns { round, mode, valid, findings, lenses, unread } — findings
- * is every finding with its id, lens, goal (for referee findings),
+ * is every finding with its id, lens, brief (for referee findings),
  * severity, title, says, gap, fix; lenses is [{ lens, verdict,
  * verified, quote, findings, invalid }] with the referees merged as
- * one `plan-reviewer-ambiguity` entry; unread lists the goal ids
+ * one `plan-reviewer-ambiguity` entry; unread lists the brief ids
  * whose readings did not survive; valid is false when the round read
- * no goal it was asked to read. The conductor writes reviews.md,
- * judges, sends the writer fixes, rules or asks the rest, and runs
- * round 2 over the delta without asking.
+ * no brief it was asked to read.
  */
 
 export const meta = {
   name: 'plan-review',
-  description: 'Stage-3 review round: three Sonnet lenses in parallel with two Haiku blind readers and a Sonnet referee per goal; whole in round 1, delta after; no judge agent — the conductor judges',
+  description: 'Stage-3 review round: three Sonnet lenses in parallel with two Haiku blind readers and a Sonnet referee per brief; whole in round 1, delta after; no judge agent — the conductor judges',
   phases: [
     { title: 'Lenses', detail: 'coverage, verifiability and order in parallel, each reads everything (or the delta)', model: 'sonnet' },
-    { title: 'Blind reads', detail: 'per goal: two Haiku readers build it alone from the file, a Sonnet referee compares them key by key' },
+    { title: 'Blind reads', detail: 'per brief: two Haiku readers build it alone from the file, a Sonnet referee compares them key by key' },
   ],
 }
 
@@ -110,18 +104,18 @@ const REVIEW = {
 
 const READING = {
   type: 'object', additionalProperties: false,
-  required: ['goal', 'builds'],
+  required: ['brief', 'builds'],
   properties: {
-    goal: { type: 'string' },
+    brief: { type: 'string' },
     builds: {
       type: 'array', minItems: 1,
       items: {
         type: 'object', additionalProperties: false,
         required: ['key', 'sentence', 'build'],
         properties: {
-          key: { type: 'string', description: 'goal, owes, or row:<N.k>' },
-          sentence: { type: 'string', description: 'the row\'s first line, verbatim' },
-          build: { type: 'string', description: 'what this reader would build and the command and output that prove it; at most sixty words; in the goal\'s language' },
+          key: { type: 'string', description: 'brief, back, front, or proof' },
+          sentence: { type: 'string', description: 'the brief\'s line that drives this key, verbatim' },
+          build: { type: 'string', description: 'what this reader would build and the command and output that prove it; at most sixty words; in the brief\'s language' },
         },
       },
     },
@@ -130,9 +124,9 @@ const READING = {
 
 const REFEREE_REVIEW = {
   type: 'object', additionalProperties: false,
-  required: ['goal', 'keys', 'verdict', 'verified', 'quote', 'findings'],
+  required: ['brief', 'keys', 'verdict', 'verified', 'quote', 'findings'],
   properties: {
-    goal: { type: 'string' },
+    brief: { type: 'string' },
     keys: {
       type: 'array',
       items: {
@@ -153,54 +147,40 @@ const REFEREE_REVIEW = {
 
 const round = args?.round ?? 1
 const language = args?.language ?? 'en'
-const allGoals = Array.isArray(args?.goals) ? args.goals.filter(g => g && g.id && g.path) : []
-const delta = round > 1 && args?.changed ? { goals: args.changed.goals ?? [] } : null
+const allBriefs = Array.isArray(args?.briefs) ? args.briefs.filter(b => b && b.id && b.path) : []
+const delta = round > 1 && args?.changed ? { briefs: args.changed.briefs ?? [] } : null
 const fixes = Array.isArray(args?.fixes) ? args.fixes : []
 const mode = delta ? 'delta' : 'whole'
-// whole round: every goal; delta round: only the goals whose text changed
-const goals = delta ? allGoals.filter(g => delta.goals.includes(g.id)) : allGoals
-if (!allGoals.length) log('no goals passed in args — the blind reads are skipped this round; pass goals: [{id, repo, wave, path, rows}] to run them')
-if (delta) log(`delta round: goals ${delta.goals.join(', ') || '(none)'} · ${fixes.length} fix(es) applied`)
-
-const repoList = (args?.repos ?? []).map(r => `${r.name}: ${r.path}`).join('\n') || '(none)'
+const briefs = delta ? allBriefs.filter(b => delta.briefs.includes(b.id)) : allBriefs
+if (!allBriefs.length) log('no briefs passed in args — the blind reads are skipped this round; pass briefs: [{id, path}] to run them')
+if (delta) log(`delta round: briefs ${delta.briefs.join(', ') || '(none)'} · ${fixes.length} fix(es) applied`)
 
 const docInputs = `Round ${round}, ${mode}.
-The cut, as the user approved it (lanes, rows, waves, frozen contracts): ${args.wavesPath}
-The goals, one per lane × wave: ${args.planDir}/goals/<repo>/wNN.md
-${allGoals.map(g => `  - ${g.id}: ${g.path} (rows ${(g.rows ?? []).join(', ') || '?'})`).join('\n')}
-The recon, what exists in each repo today: ${args.reconDir}
+The cut, as the user approved it (the foundation, the entries, the edges, the cap): ${args.planDir}/plan.md
+The briefs, one per entry and F for the foundation:
+${allBriefs.map(b => `  - ${b.id}: ${b.path}`).join('\n')}
+The recon, what exists in each area today: ${args.reconDir}
 The design (the law; notes.md inside): ${args.designDir}
 The demand it must satisfy: ${args.discoveryDir}/pr-faq.md and ${args.discoveryDir}/user-stories.md
-The repos:
-${repoList}
+The codebase: ${args.root ?? '(not given)'}
 The round audit so far: ${args.planDir}/reviews.md
-Language of the goals: ${language}${delta ? `
+Language of the briefs: ${language}${delta ? `
 
-THIS IS A DELTA ROUND. The goals that changed since the last round: ${delta.goals.join(', ') || '(none)'}. The fixes that were applied, each with the finding it answers:
-${fixes.map(f => `- ${f.id} (${f.goal}): ${f.fix}`).join('\n') || '(none listed)'}
-Read the changed goals whole and every other goal for what the fixes touched (a consuming lane, a wave's list). Report: a fix that did not land as described, a fix that broke its surroundings or another goal, and anything new in the changed text. Text no fix touched was read and passed last round; a finding on it needs the razor at full strength.` : ''}`
+THIS IS A DELTA ROUND. The briefs that changed since the last round: ${delta.briefs.join(', ') || '(none)'}. The fixes that were applied, each with the finding it answers:
+${fixes.map(f => `- ${f.id} (${f.brief}): ${f.fix}`).join('\n') || '(none listed)'}
+Read the changed briefs whole and plan.md and every other brief for what the fixes touched. Report: a fix that did not land as described, a fix that broke its surroundings or another brief, and anything new in the changed text. Text no fix touched was read and passed last round; a finding on it needs the razor at full strength.` : ''}`
 
 // ---------- mechanical checks on a reading ----------
 
-// The keys a goal defines: `goal`, `owes`, one `row:<N.k>` per row
-// number the conductor listed for it (from waves.md).
-const expectedKeys = (g) => new Set(['goal', 'owes', ...(g.rows ?? []).map(r => `row:${String(r).trim()}`)])
-
-// Doubt words only — never a plain "or"/"ou": an enumeration is not a
-// hedge. The list is the reviewer contract's; English and pt-BR,
-// because the readers build in the goal's language.
-const HEDGE = /\b(either|depends|could be|probably|maybe|possibly|talvez|provavelmente|possivelmente|depende|poderia ser|pode ser que)\b/i
+const KEYS = ['brief', 'back', 'front', 'proof']
 const normalizeKey = (k) => String(k).trim().replace(/^`|`$/g, '').replace(/\s+/g, '').toLowerCase()
 
-const readingProblems = (reading, expected) => {
+const readingProblems = (reading) => {
   if (!reading) return ['no output']
   const problems = []
   const got = new Map(reading.builds.map(b => [normalizeKey(b.key), b]))
-  for (const k of expected) if (!got.has(normalizeKey(k))) problems.push(`missing key ${k}`)
-  for (const [k, b] of got) {
-    if (!b.build || !b.build.trim()) problems.push(`empty build at ${k}`)
-    else if (HEDGE.test(b.build)) problems.push(`hedged build at ${k}`)
-  }
+  for (const k of KEYS) if (!got.has(k)) problems.push(`missing key ${k}`)
+  for (const [k, b] of got) if (!b.build || !b.build.trim()) problems.push(`empty build at ${k}`)
   return problems
 }
 
@@ -219,82 +199,81 @@ const reviewed = async (dispatch, name) => {
     : { verdict: 'fail', verified: [], quote: '', findings: [], invalid: true }
 }
 
-const goalInputs = (g) => `Round ${round}. Goal ${g.id} (lane ${g.repo ?? '?'}, wave ${g.wave ?? '?'}).
-Language of the goal (write every build in it): ${language}
-The goal file — read it whole, and only it: ${g.path}
-The design folder, for looking up a route, a field, a table or a screen the goal points at: ${args.designDir}
-The keys your reading must carry: ${[...expectedKeys(g)].join(', ')}`
+const briefInputs = (b) => `Round ${round}. Brief ${b.id}.
+Language of the brief (write every build in it): ${language}
+The brief file — read it whole, and only it: ${b.path}
+The design folder, for looking up a route, a field, a table or a screen the brief points at: ${args.designDir}
+The keys your reading must carry: ${KEYS.join(', ')}`
 
-const readBlind = async (g, n) => {
-  const expected = expectedKeys(g)
-  const dispatch = () => agent(goalInputs(g), {
-    label: `${g.id}·read${n}·r${round}`, phase: 'Blind reads',
+const readBlind = async (b, n) => {
+  const dispatch = () => agent(briefInputs(b), {
+    label: `${b.id}·read${n}·r${round}`, phase: 'Blind reads',
     agentType: READER, schema: READING,
   })
   let r = await dispatch()
-  let problems = readingProblems(r, expected)
+  let problems = readingProblems(r)
   if (problems.length) {
-    log(`${g.id} reader ${n}: ${problems.join(', ')} — re-dispatching`)
+    log(`${b.id} reader ${n}: ${problems.join(', ')} — re-dispatching`)
     r = await dispatch()
-    problems = readingProblems(r, expected)
+    problems = readingProblems(r)
   }
-  if (problems.length) { log(`${g.id} reader ${n}: still invalid (${problems.join(', ')}) — dropped`); return null }
-  return { reader: n, builds: r.builds.map(b => ({ ...b, key: normalizeKey(b.key) })) }
+  if (problems.length) { log(`${b.id} reader ${n}: still invalid (${problems.join(', ')}) — dropped`); return null }
+  return { reader: n, builds: r.builds.map(x => ({ ...x, key: normalizeKey(x.key) })) }
 }
 
-const referee = async (g, readings) => {
-  const r = await reviewed(() => agent(`${goalInputs(g)}
+const referee = async (b, readings) => {
+  const r = await reviewed(() => agent(`${briefInputs(b)}
 
 READING 1:
 ${JSON.stringify(readings[0].builds, null, 2)}
 
 READING 2:
 ${JSON.stringify(readings[1].builds, null, 2)}`, {
-    label: `${g.id}·referee·r${round}`, phase: 'Blind reads',
+    label: `${b.id}·referee·r${round}`, phase: 'Blind reads',
     agentType: REFEREE, schema: REFEREE_REVIEW,
-  }), `${g.id} referee`)
-  return { goal: g.id, ...r }
+  }), `${b.id} referee`)
+  return { brief: b.id, ...r }
 }
 
-// ---------- the round: lenses and per-goal reads, concurrently ----------
+// ---------- the round: lenses and per-brief reads, concurrently ----------
 
 phase('Lenses')
-log(`round ${round} (${mode}): ${LENSES.length} lenses · ${goals.length} goals × (2 readers + referee) · the conductor judges`)
+log(`round ${round} (${mode}): ${LENSES.length} lenses · ${briefs.length} briefs × (2 readers + referee) · the conductor judges`)
 
-const [lensResults, goalResults] = await parallel([
+const [lensResults, briefResults] = await parallel([
   () => parallel(LENSES.map(name => () =>
     reviewed(() =>
       agent(docInputs, { label: `${name}·r${round}`, phase: 'Lenses', agentType: name, schema: REVIEW }),
       name).then(r => ({ lens: name, ...r }))
   )),
   () => pipeline(
-    goals,
-    (g) => parallel([() => readBlind(g, 1), () => readBlind(g, 2)]).then(rs => rs.filter(Boolean)),
-    (readings, g) => readings.length === 2
-      ? referee(g, readings)
-      : Promise.resolve({ goal: g.id, unread: true }),
+    briefs,
+    (b) => parallel([() => readBlind(b, 1), () => readBlind(b, 2)]).then(rs => rs.filter(Boolean)),
+    (readings, b) => readings.length === 2
+      ? referee(b, readings)
+      : Promise.resolve({ brief: b.id, unread: true }),
   ),
 ])
 
 // The referees merge into one ambiguity lens entry: the conductor and
-// the audit see one lens with per-goal findings.
-const refereed = (goalResults ?? []).filter(Boolean)
-const unread = refereed.filter(r => r.unread).map(r => r.goal)
-const perGoal = refereed.filter(r => !r.unread)
+// the audit see one lens with per-brief findings.
+const refereed = (briefResults ?? []).filter(Boolean)
+const unread = refereed.filter(r => r.unread).map(r => r.brief)
+const perBrief = refereed.filter(r => !r.unread)
 if (unread.length) log(`unread this round (readings did not survive): ${unread.join(', ')}`)
 
 const ambiguity = {
   lens: REFEREE,
-  verdict: perGoal.some(r => r.verdict === 'fail') ? 'fail'
-    : perGoal.some(r => r.verdict === 'pass with fixes') ? 'pass with fixes' : 'pass',
-  verified: perGoal.flatMap(r => r.verified.map(v => `${r.goal}: ${v}`)),
-  quote: perGoal[0]?.quote ?? '',
-  findings: perGoal.flatMap(r => r.findings.map(f => ({ ...f, goal: r.goal }))),
-  invalid: perGoal.some(r => r.invalid) || (goals.length > 0 && perGoal.length === 0),
-  keys: perGoal.map(r => ({ goal: r.goal, keys: r.keys })),
+  verdict: perBrief.some(r => r.verdict === 'fail') ? 'fail'
+    : perBrief.some(r => r.verdict === 'pass with fixes') ? 'pass with fixes' : 'pass',
+  verified: perBrief.flatMap(r => r.verified.map(v => `${r.brief}: ${v}`)),
+  quote: perBrief[0]?.quote ?? '',
+  findings: perBrief.flatMap(r => r.findings.map(f => ({ ...f, brief: r.brief }))),
+  invalid: perBrief.some(r => r.invalid) || (briefs.length > 0 && perBrief.length === 0),
+  keys: perBrief.map(r => ({ brief: r.brief, keys: r.keys })),
 }
 
-const lenses = [...(lensResults ?? []).filter(Boolean), ...(goals.length ? [ambiguity] : [])]
+const lenses = [...(lensResults ?? []).filter(Boolean), ...(briefs.length ? [ambiguity] : [])]
 
 // ---------- ids; the conductor judges from here ----------
 
@@ -304,9 +283,9 @@ for (const r of lenses) r.findings.forEach((f, i) => {
   findings.push({ lens: r.lens, ...f })
 })
 
-// A round that was asked to read goals and read none is not a round.
-const valid = !(goals.length > 0 && perGoal.length === 0)
-if (!valid) log(`round ${round} is INVALID: ${goals.length} goal(s) to read, none survived — fix the cause (language, keys, hedge) and run the round again`)
+// A round that was asked to read briefs and read none is not a round.
+const valid = !(briefs.length > 0 && perBrief.length === 0)
+if (!valid) log(`round ${round} is INVALID: ${briefs.length} brief(s) to read, none survived — fix the cause (language, keys) and run the round again`)
 
 const bySeverity = (s) => findings.filter(f => f.severity === s).length
 log(`round ${round}: ${findings.length} finding(s) — ${bySeverity('blocker')} blocker · ${bySeverity('fix')} fix · ${bySeverity('detail')} detail${lenses.some(l => l.invalid) ? ' · INVALID lens: ' + lenses.filter(l => l.invalid).map(l => l.lens).join(', ') : ''} → the conductor judges by references/judging.md`)

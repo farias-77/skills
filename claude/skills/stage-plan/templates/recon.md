@@ -1,54 +1,52 @@
-# Recon — `<repo>` — <date>
+# Recon — `<area>` — <date>
 
 <!--
-  Written by a plan-scout (Haiku 4.5, max) from the repo and its docs
-  only; nothing from the cloud, nothing from memory. Every line says
-  where it was read (a path, a line). This is A: what exists before
-  the demand. The conductor reads it before the cut; the writers copy
-  its commands and counts into the goals.
+  Written by a plan-scout (Haiku 4.5, max) from one area of the
+  codebase and its docs only; nothing from the cloud, nothing from
+  memory. Every line says where it was read (a path, a line). This is
+  A: what exists before the demand. The conductor reads it before the
+  cut; the writers copy its commands, targets and paths into the briefs.
 -->
 
 ## In one paragraph
 
-<what the repo is, how it deploys, what is in alpha today>
+<what this area is (a backend module, a frontend app, the ingestion, the infra) and how it is built and tested>
 
 ## Commands
 
 | What | Command | Read at |
 |---|---|---|
-| deploy alpha | `npm run deploy:alpha` | `package.json:12` |
-| one smoke folder | `bash smoke/run.sh <folder>` | `docs/testing.md:40` |
-| whole suite | `bash smoke/run.sh` | `docs/testing.md:44` |
-| unit tests · build | | |
-| dev server (front) | | |
+| the whole gate | `make verify` | `Makefile:12` |
+| fast loop | `make check` | |
+| unit / integration of one module | `make test-integration pkg=<module>` | |
+| journeys | `pnpm --filter <app> test:e2e <spec>` | |
+| the local stack | `make up` · `make env` · `make down` | |
 
-## Smoke layout
+## Tests today
 
-| Folder | Cases | What it proves | Read at |
-|---|---|---|---|
-| `smoke/users/` | 14 | | |
+| Suite | Where | Cases | Duration when stated | Read at |
+|---|---|---|---|---|
+| unit | `internal/<module>/…_test.go` | | | |
+| integration | `tests/integration/<module>/` | | | |
+| journeys | `frontend/<app>/e2e/journeys/` | | | |
 
-Whole suite: <N> cases, about <t> when the docs say; the folders that write fixtures: <list>.
+Factories and fixtures that exist: <one line each, with the path>
 
-## Branches and PRs
-
-<the convention the docs fix: branch names, where PRs go, what CI runs>
-
-## What the design's rows will extend
+## What the design's entries will extend
 
 | Design names | Exists as | Read at |
 |---|---|---|
-| table `recordings` | `infra/lib/data-stack.ts:88`, keys `person_id` / `recording_key` | |
-| route `GET /tracking/accounts` | `app/routes/accounts.ts` | |
-| screen `Person` | `src/features/production/PersonLevel.tsx` | |
+| table `orders` | `database/migrations/0007_orders.sql`, keys … | |
+| route `GET /orders` | `internal/orders/http/list.go` | |
+| screen `Orders` | `frontend/tracking/src/features/orders/pages/…` | |
 
 ## What does not exist yet
 
-<what the design names that has no file here: the rows that create it start from nothing>
+<what the design names that has no file here: the foundation or an entry creates it>
 
-## Stacks in alpha
+## Shared files this area writes to
 
-<the CDK stacks and what shares them; another repo that reads this alpha (the front reading this API)>
+<the migrations folder, openapi.yaml, the generated code, the composition root: the paths an entry must not edit after the foundation>
 
 ## Not verified
 

@@ -8,7 +8,7 @@
   happened and the record of the rulings; plan-review.json is filled
   from it at the close. MUST have, per round: every lens that ran with
   verdict, run id (from the workflow journal, not prose) and verified
-  list; the goals read blind, with the keys where the two readers
+  list; the briefs read blind, with the keys where the two readers
   built or proved different things; every finding with the conductor's
   ruling, owner and reason (the foreclosing sentence quoted on every
   dismissal), and, for the user's, his ruling and words, or the
@@ -17,7 +17,7 @@
   third only on the user's word, recorded here with his words.
 -->
 
-## Round <N> — <date> · run <id> · whole | delta over <goals>
+## Round <N> — <date> · run <id> · whole | delta over <briefs>
 
 | Lens | Verdict | Run id | Findings |
 |---|---|---|---|
@@ -28,9 +28,9 @@
 
 ### Blind reads
 
-| Goal | Keys compared | Different product | Unread |
+| Brief | Keys compared | Different product | Unread |
 |---|---|---|---|
-| <repo>/wNN | <n> | <keys, or none> | <yes when a reader was dropped> |
+| <E-nn> | <n> | <keys, or none> | <yes when a reader was dropped> |
 
 ### Findings and rulings
 
@@ -38,20 +38,20 @@
 
 - **Finding:** <gap>
 - **Merged with:** <ids, or —>
-- **Ruling:** <sustained / deferred / dismissed> · owner <writer / user / worker / —> — <reason; the sentence quoted on a dismissal>
+- **Ruling:** <sustained / deferred / dismissed> · owner <writer / user / builder / —> — <reason; the sentence quoted on a dismissal>
 - **User:** <his ruling and words when the owner was him; "ruled: conductor — <reason>" when you ruled in his place; "—" otherwise>
 
 ### The lists
 
-- **To the writers** (by goal): …
+- **To the writers** (by brief): …
 - **To the user** (by decision): …
 - **Ruled in his place** (by decision, listed at the close for veto): …
-- **To the worker** (by goal): …
+- **To the builder** (by brief): …
 - **Dismissed**: …
 
 ### Round close
 
-<sustained N (writer N · user N · worker N) · deferred N · dismissed N · round 2 automatic | the user's word on a third>
+<sustained N (writer N · user N · builder N) · deferred N · dismissed N · round 2 automatic | the user's word on a third>
 
 ## Close
 

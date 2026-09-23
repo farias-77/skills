@@ -433,6 +433,87 @@
    "conductor": "decididos pelo condutor no seu lugar",
    "toWriters": "Aos escritores",
    "toWorker": "Ao worker"
+  },
+  "graph": {
+   "sec": {
+    "what": "O que vamos construir, e em que ordem",
+    "graph": "O grafo",
+    "foundation": "A fundação",
+    "entries": "As entradas",
+    "decisions": "As decisões e o pré-voo",
+    "review": "A revisão"
+   },
+   "cells": {
+    "entries": "entradas",
+    "entriesTail": "{n} começam logo depois da fundação",
+    "stories": "histórias",
+    "storiesTail": "cada uma em exatamente uma entrada",
+    "concurrency": "construídas ao mesmo tempo, no máximo",
+    "concurrencyTail": "o teto, pela máquina",
+    "steps": "passos",
+    "stepsTail": "a cadeia mais longa depois da fundação",
+    "cards": "decisões do corte",
+    "against": "contra a recomendação",
+    "preflight": "itens do pré-voo",
+    "preflightTail": "{n} entregues"
+   },
+   "a": "A · hoje",
+   "b": "B · quando a última entrada é mergeada",
+   "foundationNode": "F · Fundação",
+   "caption": "F é a fundação. Uma seta quer dizer que a entrada na ponta precisa do comportamento da entrada na origem para se provar; todo o resto roda em paralelo, até {c} ao mesmo tempo.",
+   "byStep": "As entradas, passo a passo",
+   "step": "Passo",
+   "stepEntries": "Entradas",
+   "stepZero": "a fundação",
+   "items": "O que ela assenta",
+   "item": {
+    "kind": "Tipo",
+    "what": "O quê"
+   },
+   "kinds": {
+    "migration": "migração",
+    "contract": "contrato",
+    "module": "módulo",
+    "shared": "compartilhado",
+    "factory": "factory",
+    "other": "outro"
+   },
+   "proof": "A prova",
+   "briefFile": "O brief inteiro · {f}",
+   "table": {
+    "id": "#",
+    "name": "Entrada",
+    "stories": "Histórias",
+    "after": "Depois de",
+    "back": "Back",
+    "front": "Front",
+    "proof": "Prova"
+   },
+   "noAfter": "só a fundação",
+   "noSide": "—",
+   "touches": "toca",
+   "seeStep": "vê",
+   "briefs": "Os briefs, um por entrada",
+   "brief": {
+    "back": "Back",
+    "front": "Front",
+    "proof": "Como se prova",
+    "look": "Vale um olhar",
+    "builder": "O builder decide"
+   },
+   "cutDecisions": "As decisões do corte",
+   "decisionsOf": "As decisões desta entrada",
+   "decisionsOfF": "As decisões da fundação",
+   "noDecisions": "nenhuma decisão do corte registrada",
+   "preflight": {
+    "title": "O pré-voo: o que você entrega antes de sair",
+    "item": "Item",
+    "entry": "Entrada",
+    "status": "Estado",
+    "handed": "entregue",
+    "missing": "faltando: a entrada fica estacionada"
+   },
+   "noPreflight": "nada a entregar"
   }
  },
  "execution": {

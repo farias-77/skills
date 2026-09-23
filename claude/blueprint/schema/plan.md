@@ -1,142 +1,147 @@
 # The plan blueprint — what each writer and the conductor leave in JSON
 
 Stage 3 writes under `<workstream>/blueprint/plan/`: the conductor
-writes `sequence.json` (the cut: from A to B, the frozen contracts,
-the lanes with their rows, the waves with their walks, the cut's
-cards, the team, the pre-flight), `plan-report.json` (the plain layer
-the tab opens with) and `plan-review.json` (the rounds and the
-rulings); each `plan-writer` (Sonnet 5, high) writes
-`goals/<repo>-<wNN>.json` in the same pass as its goal.
+writes `plan.json` (the cut: from A to B, the foundation, the entries
+with their edges and proofs, the concurrency cap, the cut's cards, the
+pre-flight), `plan-report.json` (the plain layer the tab opens with)
+and `plan-review.json` (the rounds and the rulings); each
+`plan-writer` (Sonnet 5, high) writes `briefs/<id>.json` in the same
+pass as its brief (`02-plan/briefs/<id>.md`).
 `node claude/blueprint/build.mjs <workstream>` validates them, embeds
-the goal `.md` files whole, and assembles the Plan tab. The build
-refuses with the field named: a row with no proof, a wave requiring
-a row that does not exist, a lane × wave with rows and no goal JSON
-or no goal file, a duplicate row number, **a text over its word
-cap**. Text fields accept two inline marks: `` `code` `` and
-`**bold**`. No HTML. Everything in the workstream's language.
+the brief `.md` files whole, and assembles the Plan tab. The build
+refuses with the field named: an entry with no proof, an edge to an
+entry that does not exist, a cycle in the edges, a story that no entry
+carries, an entry or the foundation with no brief JSON or no brief
+file, a duplicate id, **a text over its word cap**. Text fields accept
+two inline marks: `` `code` `` and `**bold**`. No HTML. Everything in
+the workstream's language.
+
+A workstream planned before this shape keeps its `sequence.json`
+(lanes and waves); the builder still reads it and renders the legacy
+tab. A workstream has one or the other, never both.
 
 ## The voice: technical, and an intern reads it to the end
 
 Same rules as the design ([schema/design.md](design.md)): short
 sentences, one idea each; the real name of a thing once, then what it
 does; a number only when it changes what the reader would decide;
-lists curated, never complete; the text invites reading. The Plan
-tab's reader wants to know, in ten minutes: where we start, where we
-land, what each session builds, where the master stops to accept,
-and what is his to hand over before he leaves.
+lists curated, never complete. The Plan tab's reader wants to know, in
+ten minutes: where we start, where we land, what the foundation lays
+down, what gets built in parallel and what waits for what, how each
+entry is proved, and what is his to hand over before he leaves.
 
 ## Word caps (the build refuses a field over its cap)
 
 | Field | Cap | Field | Cap |
 |---|---|---|---|
-| `fromA` / `toB` | 60 | `contracts[].name` | 10 |
-| `rows[].what` | 18 | `rows[].touches` / `.readBy` | 14 |
-| `lanes[].sharesWith` | 20 | `lanes[].preflight[]` | 16 |
-| `waves[].accepts` | 25 | `waves[].suites[].note` | 12 |
-| `waves[].masterDecides` / `.parks` | 30 | `team[].owns` | 20 |
-| `preflight[].item` | 16 | decisions `question` | 16 |
-| decisions `chosen` | 30 | decisions `why` | 25 |
-| decisions `options[].label` | 18 | decisions `options[].cost` | 14 |
-| goal `intro` | 45 | goal `rows[].builds` | 25 |
-| goal `rows[].proof` | 25 | goal `worthALook[]` | 20 |
-| goal `workerDecides[]` | 18 | report `inOneSentence` | 35 |
-| report `threeThings[].p` / `needsYourEye[].p` | 35 | report `lanesPlain` / `wavesPlain` / `teamPlain` | 45 |
-| report `reviewPlain` | 45 | review `decisions[].plain` | 25 |
+| `fromA` / `toB` | 60 | `foundation.intro` | 45 |
+| `foundation.items[].what` | 18 | `entries[].name` | 8 |
+| `entries[].what` | 25 | `entries[].back` / `.front` | 25 |
+| `entries[].touches` | 14 | `preflight[].item` | 16 |
+| decisions `question` | 16 | decisions `chosen` | 30 |
+| decisions `why` | 25 | decisions `options[].label` | 18 |
+| decisions `options[].cost` | 14 | brief `intro` | 45 |
+| brief `back[]` / `front[]` | 25 | brief `proof[]` | 25 |
+| brief `worthALook[]` | 20 | brief `builderDecides[]` | 18 |
+| report `inOneSentence` | 35 | report `threeThings[].p` / `needsYourEye[].p` | 35 |
+| report `foundationPlain` / `graphPlain` / `reviewPlain` | 45 | review `decisions[].plain` | 25 |
 | review `title` | 12 | review `ruling` | 25 |
 | review `why` | 30 | review `rounds[].changed` | 20 |
 
-`run`, `expect`, `see`, `where`, `first` and every id, number, name,
-path and command are not capped: they are copied exactly.
+`run`, `expect`, `see`, `where` and every id, number, path and command
+are not capped: they are copied exactly.
 
-## `sequence.json` (the conductor)
+## `plan.json` (the conductor)
 
 ```json
 {
-  "fromA": "Today the ingestion repo does not exist; the tracking API and the panel are in alpha and prod with the war-room data.",
-  "toB": "Every night the pipeline reads the Minute panel, writes the recordings and the panel shows where each number came from.",
-  "contracts": [
-    { "name": "`recordings` item", "fixedIn": "data-model.md §recordings", "writtenBy": "ingestion 1.4", "readBy": "tracking 2.1 · front 2.4" }
-  ],
-  "lanes": [
-    { "repo": "labs-api-ingestion", "session": "minute-ingestion-ingestion",
-      "sharesWith": null, "preflight": ["the Minute password, in SSM (1.0)"],
-      "rows": [
-        { "num": "1.0", "story": "S-001", "what": "capture the real panel responses with curl", "wave": "w01",
-          "proof": { "run": "ls smoke/fixtures/panel/*.json | wc -l", "expect": "5" },
-          "after": null, "par": null, "touches": "`smoke/fixtures/panel/`", "readBy": "1.2 (the stub serves these)" },
-        { "num": "1.2", "story": "S-002", "what": "the alpha stub serves the captured responses", "wave": "w01",
-          "proof": { "run": "bash smoke/run.sh stub", "expect": "`0 failed` of 6 cases" },
-          "after": "1.1", "par": null, "touches": "`smoke/stub/`", "readBy": "1.3" },
-        { "num": "2.4", "story": "S-006", "what": "the Person screen shows the quality cards", "wave": "w02",
-          "proof": { "see": "`localhost:5173/pessoas/<id>` against the alpha API, both themes, 390 px", "where": "ui.md §Person · `ui/Person.dc.html`" },
-          "after": "2.1", "par": "2.3", "touches": "`PersonLevel.tsx`", "readBy": null }
-      ] }
-  ],
-  "waves": [
-    { "n": "w01", "name": "the pipeline runs",
-      "accepts": "The tech team starts a run by hand and it ends Succeeded with the orphans in the tables.",
-      "requires": ["1.0", "1.1", "1.2", "1.3", "1.4", "1.5", "1.6", "1.7"],
-      "folders": ["smoke/stub/", "smoke/run/", "smoke/status/"],
-      "suites": [{ "repo": "labs-api-ingestion", "cases": 34, "note": "minutes" }],
-      "walk": [
-        { "run": "aws stepfunctions start-execution --state-machine-arn … --input '{}'", "expect": "status `SUCCEEDED` within 10 min" },
-        { "see": "the panel still opens", "where": "screenshot to `03-execution/w01/proof/`" }
+  "fromA": "Today the bakery has no system: orders arrive by phone and live in a notebook.",
+  "toB": "Customers order online, the baker sees the day's list and marks each order ready, and the customer gets an e-mail.",
+  "foundation": {
+    "intro": "Lays every table, every route of the contract and the three modules down at once, so the entries never touch a shared file.",
+    "items": [
+      { "kind": "migration", "what": "tables `clients`, `breads`, `orders`" },
+      { "kind": "contract", "what": "every route of `openapi.yaml` and the generated code" },
+      { "kind": "module", "what": "modules `clients`, `menu`, `orders` registered" },
+      { "kind": "factory", "what": "`factory.Client`, `factory.Bread`, `factory.Order`" }
+    ],
+    "proof": [ { "run": "make verify", "expect": "exit 0; every new route answers 501" } ],
+    "brief": "02-plan/briefs/F.md"
+  },
+  "entries": [
+    { "id": "E-03", "name": "Place an order", "stories": ["S-003"],
+      "what": "A customer picks breads, quantities and a day; the order is stored and shown back.",
+      "back": "the create-order use case in `orders`; `POST /orders`",
+      "front": "the New order screen",
+      "after": [],
+      "proof": [
+        { "run": "make test-integration pkg=orders", "expect": "`valid order`, `day in the past refused`, `unknown bread refused` pass" },
+        { "see": "`e2e/journeys/new-order.spec.ts` screenshots, both themes, 390 px", "where": "ui.md §New order" }
       ],
-      "masterDecides": "counts, pointers, the order of two independent rows",
-      "parks": "a change to what a story delivers; a contract; a stateful deletion the goal does not explain",
-      "shadow": true }
+      "touches": "module `orders`, screen New order",
+      "brief": "02-plan/briefs/E-03.md" },
+    { "id": "E-05", "name": "Ready e-mail", "stories": ["S-005"],
+      "what": "Marking an order ready sends the customer an e-mail.",
+      "back": "a job enqueued by mark-ready; the e-mail template",
+      "front": null,
+      "after": ["E-04"],
+      "proof": [ { "run": "make test-integration pkg=orders run=Ready", "expect": "the e-mail sink holds one message per ready order" } ],
+      "touches": "module `orders`, `communications`",
+      "brief": "02-plan/briefs/E-05.md" }
   ],
+  "concurrency": 4,
   "decisions": [
-    { "id": "P-cut-1", "doc": "cut", "when": "session", "question": "One wave or two?",
-      "options": [ { "label": "A) one wave, three lanes in parallel", "cost": "first look later" }, { "label": "B) two waves", "cost": "the front waits for the pipeline" } ],
-      "recommended": "A", "pick": "B", "chosen": "B) two waves — look at the pipeline alone first", "why": "\"quero ver a pipeline rodando antes\"", "againstRecommendation": true }
+    { "id": "P-cut-1", "doc": "cut", "when": "session", "question": "One entry for orders and the panel, or two?",
+      "options": [ { "label": "A) two entries", "cost": "one more merge" }, { "label": "B) one entry", "cost": "a bigger diff to review" } ],
+      "recommended": "A", "pick": "A", "chosen": "A) two entries", "why": "each proves alone", "againstRecommendation": false }
   ],
-  "team": [
-    { "session": "master", "name": "minute-ingestion-master", "model": "Fable 5.1, high", "folder": "~/clonex/labs", "owns": "the waves: accepts, routes fixes, the walk", "first": "/stage-execute 2026-09-08-minute-ingestion" },
-    { "session": "worker", "name": "minute-ingestion-ingestion", "model": "Opus 5, high", "folder": "~/clonex/labs", "owns": "lane labs-api-ingestion", "first": "/stage-execute 2026-09-08-minute-ingestion worker labs-api-ingestion" }
-  ],
-  "preflight": [ { "item": "the Minute password in SSM `/labs/ingestion/minute/password`", "row": "1.0", "status": "handed" } ]
+  "preflight": [ { "item": "the e-mail provider key in SSM `/labs/alpha/communications/key`", "entry": "E-05", "status": "handed" } ]
 }
 ```
 
-- A row's `proof` is `{run, expect}` or `{see, where}`; nothing else.
-  `after` is a row number or `null`; `par` a row number or `null`.
-- `waves[].requires` lists row numbers that exist in some lane;
-  `folders` is the affected folders; `suites` names each repo's
-  whole suite with its size; `walk` steps are `{run, expect}` or
-  `{see, where}`; `shadow` says whether the whole suites run after
-  the gate closes.
-- `decisions` uses the design's card shape; `doc` is `"cut"` for the
-  session's cards or a wave id (`"w01"`) for a card about one wave.
+- `foundation.items[].kind` is one of `migration`, `contract`,
+  `module`, `shared`, `factory`, `other`.
+- An entry carries one or more `stories`; together the entries carry
+  every story of the discovery, each exactly once.
+- `after` lists entry ids whose **behavior** the entry's proof needs;
+  it is empty when the foundation and the factories are enough. The
+  foundation precedes every entry and is never listed. The edges form
+  no cycle.
+- `back` or `front` is `null` when the entry has no such side.
+- A proof step is `{run, expect}` or `{see, where}`; nothing else.
+- `concurrency` is the cap on entries built at once, from the machine.
+- `decisions` uses the design's card shape; `doc` is `"cut"` or an
+  entry id (`"E-03"`, `"F"`).
 - `preflight[].status` is `handed` or `missing`; a missing item names
-  the row it blocks, and stage 4 parks that row.
+  the entry it blocks (`"F"` for the foundation), and stage 4 parks it.
 
-## `goals/<repo>-<wNN>.json` (the writer)
+## `briefs/<id>.json` (the writer)
+
+One per entry and one for the foundation (`briefs/F.json`).
 
 ```json
 {
-  "goal": "labs-api-tracking/w02", "repo": "labs-api-tracking", "wave": "w02",
-  "file": "02-plan/goals/labs-api-tracking/w02.md",
-  "intro": "Two rows: the accounts route learns where each account came from, and a new admin route lists the orphans. Both prove on seeded items; the real pipeline is walked at w02.",
-  "rows": [
-    { "num": "2.1", "builds": "the recording schema with the new optional fields; the production model excludes removed recordings", "proof": "`bash smoke/run.sh accounts` prints `0 failed` of 15, the 403 among them" }
-  ],
-  "worthALook": ["the orphans route caps at 200 and says `truncated`"],
-  "workerDecides": ["the helper's home for the two bounded queries"]
+  "id": "E-03", "file": "02-plan/briefs/E-03.md",
+  "intro": "One vertical slice: the customer places an order and sees it after a reload. It proves on factory data, so it waits for nobody.",
+  "back": ["the create-order use case with the day and bread rules", "`POST /orders` returning the stored order"],
+  "front": ["the New order screen with its empty, error and conflict states"],
+  "proof": ["`make test-integration pkg=orders`: the three order cases pass", "the journey creates, reloads and still shows the order"],
+  "worthALook": ["a day in the past is refused by the use case, not only by the form"],
+  "builderDecides": ["the order of the form fields"]
 }
 ```
 
-The build embeds `file` whole behind a click and refuses a goal
-whose file is missing.
+The build embeds `file` whole behind a click and refuses a brief whose
+file is missing.
 
 ## `plan-report.json` (the conductor)
 
 ```json
 {
-  "inOneSentence": "Three sessions build three repos at once; two gates, the second is the demand.",
+  "inOneSentence": "One foundation, then four entries at once and one that waits; the whole demand in two steps.",
   "threeThings": [ { "t": "…", "p": "…" }, { "t": "…", "p": "…" }, { "t": "…", "p": "…" } ],
   "needsYourEye": [ { "t": "…", "p": "…" } ],
-  "lanesPlain": "…", "wavesPlain": "…", "teamPlain": "…", "reviewPlain": "…"
+  "foundationPlain": "…", "graphPlain": "…", "reviewPlain": "…"
 }
 ```
 

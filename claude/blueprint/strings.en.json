@@ -433,6 +433,87 @@
    "conductor": "ruled by the conductor in your place",
    "toWriters": "To the writers",
    "toWorker": "To the worker"
+  },
+  "graph": {
+   "sec": {
+    "what": "What we build, and in what order",
+    "graph": "The graph",
+    "foundation": "The foundation",
+    "entries": "The entries",
+    "decisions": "The decisions and the pre-flight",
+    "review": "The review"
+   },
+   "cells": {
+    "entries": "entries",
+    "entriesTail": "{n} start right after the foundation",
+    "stories": "stories",
+    "storiesTail": "each carried by exactly one entry",
+    "concurrency": "built at once, at most",
+    "concurrencyTail": "the cap, from the machine",
+    "steps": "steps",
+    "stepsTail": "the longest chain after the foundation",
+    "cards": "cut decisions",
+    "against": "against the recommendation",
+    "preflight": "pre-flight items",
+    "preflightTail": "{n} handed over"
+   },
+   "a": "A · today",
+   "b": "B · when the last entry is merged",
+   "foundationNode": "F · Foundation",
+   "caption": "F is the foundation. An arrow means the entry at its tip needs the behavior of the entry at its tail to prove itself; everything else runs in parallel, up to {c} at once.",
+   "byStep": "The entries, step by step",
+   "step": "Step",
+   "stepEntries": "Entries",
+   "stepZero": "the foundation",
+   "items": "What it lays down",
+   "item": {
+    "kind": "Kind",
+    "what": "What"
+   },
+   "kinds": {
+    "migration": "migration",
+    "contract": "contract",
+    "module": "module",
+    "shared": "shared",
+    "factory": "factory",
+    "other": "other"
+   },
+   "proof": "The proof",
+   "briefFile": "The whole brief · {f}",
+   "table": {
+    "id": "#",
+    "name": "Entry",
+    "stories": "Stories",
+    "after": "After",
+    "back": "Back",
+    "front": "Front",
+    "proof": "Proof"
+   },
+   "noAfter": "foundation only",
+   "noSide": "—",
+   "touches": "touches",
+   "seeStep": "see",
+   "briefs": "The briefs, one per entry",
+   "brief": {
+    "back": "Back",
+    "front": "Front",
+    "proof": "How it is proved",
+    "look": "Worth a look",
+    "builder": "The builder decides"
+   },
+   "cutDecisions": "The decisions of the cut",
+   "decisionsOf": "The decisions of this entry",
+   "decisionsOfF": "The decisions of the foundation",
+   "noDecisions": "no cut decision recorded",
+   "preflight": {
+    "title": "The pre-flight: what you hand over before leaving",
+    "item": "Item",
+    "entry": "Entry",
+    "status": "Status",
+    "handed": "handed over",
+    "missing": "missing: the entry is parked"
+   },
+   "noPreflight": "nothing to hand over"
   }
  },
  "execution": {

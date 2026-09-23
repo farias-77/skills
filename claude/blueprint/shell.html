@@ -349,9 +349,9 @@
   .wave .acc { font-size: 18.5px; line-height: 1.55; }
   .wave .kv { display: grid; grid-template-columns: 170px minmax(0, 1fr); gap: 8px 12px; font-size: 16px; line-height: 1.6; }
   .wave .kv > span:nth-child(odd) { color: var(--ink-3); font-size: 12px; text-transform: uppercase; letter-spacing: .05em; padding-top: 5px; }
-  .wave .walk { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 6px; }
-  .wave .walk li { display: grid; grid-template-columns: 30px minmax(0, 1fr); gap: 6px 10px; padding: 8px 0; border-top: 1px solid var(--line); }
-  .wave .walk li .k { font-family: var(--f-display); font-size: 20px; color: var(--accent); line-height: 1.2; }
+  .wave .walk, .walk.g { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 6px; }
+  .wave .walk li, .walk.g li { display: grid; grid-template-columns: 30px minmax(0, 1fr); gap: 6px 10px; padding: 8px 0; border-top: 1px solid var(--line); }
+  .wave .walk li .k, .walk.g li .k { font-family: var(--f-display); font-size: 20px; color: var(--accent); line-height: 1.2; }
   @media (max-width: 860px) { .wave .kv { grid-template-columns: minmax(0, 1fr); } }
   .rules { margin: 0; padding-left: 18px; color: var(--ink-2); display: flex; flex-direction: column; gap: 4px; font-size: 16.5px; }
 
@@ -703,7 +703,7 @@
   }
 
   // ================= plan tab (only when the stage left its data) =================
-  if (D.plan) {
+  if (D.plan && D.plan.shape !== 'graph') {
     TAB = 'plan';
     const P = D.plan, SP = S.plan, Q = P.seq, RP3 = P.report, RV3 = P.review || { rounds: [] }, DEC3 = Q.decisions || [];
     const tbl3 = (heads, rows) => `<div class="tbl-wrap"><table><thead><tr>${heads.map(h => `<th${h.startsWith('#') ? ' class="num"' : ''}>${h.replace(/^#/, '')}</th>`).join('')}</tr></thead><tbody>${rows.map(r => `<tr>${r.map(c => `<td${typeof c === 'number' ? ' class="num"' : ''}>${c}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`;
@@ -802,6 +802,119 @@
       ${fold(`${SP.rev.conductor} · ${(RV3.conductorRulings || []).length}`, (RV3.conductorRulings || []).map(fCond3).join('') || `<p style="color:var(--ink-3)">${S.rev.nothing}</p>`, false)}
       ${fold(`${S.rev.dismissedList} · ${(RV3.dismissed || []).length}`, (RV3.dismissed || []).map(fDis3).join('') || `<p style="color:var(--ink-3)">${S.rev.nothing}</p>`, false)}
       ${fold(S.rev.round + 's', rounds3, false)}`);
+  }
+
+  // ================= plan tab, graph shape: the foundation, the entries and their edges =================
+  if (D.plan && D.plan.shape === 'graph') {
+    TAB = 'plan';
+    const P = D.plan, SP = S.plan, SG = S.plan.graph, G = P.plan, E = G.entries, F = G.foundation, RPG = P.report, RVG = P.review || { rounds: [] }, DECG = G.decisions || [];
+    const tblG = (heads, rows) => `<div class="tbl-wrap"><table><thead><tr>${heads.map(h => `<th${h.startsWith('#') && h.length > 1 ? ' class="num"' : ''}>${h.length > 1 ? h.replace(/^#/, '') : h}</th>`).join('')}</tr></thead><tbody>${rows.map(r => `<tr>${r.map(c => `<td${typeof c === 'number' ? ' class="num"' : ''}>${c}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`;
+    const kickG = (t, inner) => `<div><span class="kicker">${t}</span><div style="margin-top:8px">${inner}</div></div>`;
+    const stepG = p => p.run ? `<div class="proof"><span><span class="pk">${SP.row.run}</span><code>${esc(p.run)}</code></span><span><span class="pk">${SP.row.expect}</span>${md(p.expect)}</span></div>`
+      : `<div class="proof"><span><span class="pk">${SP.row.see}</span>${md(p.see)}</span><span><span class="pk">${SP.row.where}</span>${md(p.where)}</span></div>`;
+    const walkG = list => `<ol class="walk g">${list.map((st, i) => `<li><span class="k">${i + 1}</span>${stepG(st)}</li>`).join('')}</ol>`;
+    const listG = (t, xs) => xs?.length ? kickG(t, `<ul class="lat">${xs.map(x => `<li>${md(x)}</li>`).join('')}</ul>`) : '';
+    const briefFold = id => P.mdBriefs?.[id] ? fold(SG.briefFile.replace('{f}', esc(P.briefs[id].file)), `<div class="doc">${mdDoc(P.mdBriefs[id])}</div>`, false) : '';
+    const letterG = o => (String(o.label || '').match(/^([A-Z])\s*[)\.—–:-]/) || [])[1] || null;
+    const stripG = t => String(t || '').replace(/^[A-Z]\s*[)\.—–:-]\s*/, '');
+    const dcardG = c => {
+      const opts = c.options || [], pick = c.pick || (opts.length === 1 ? letterG(opts[0]) : null);
+      const boxes = opts.map(o => { const L = letterG(o), isPick = pick && L === pick, isRec = c.recommended && L === c.recommended;
+        return `<div class="opt ${isPick ? 'pick' : ''}"><span class="k">${L ? L + ' · ' : ''}${isPick ? S.design.picked : ''}${isPick && isRec ? ' · ' : ''}${isRec ? S.design.recommended : ''}</span><span>${md(isPick ? stripG(c.chosen) : stripG(o.label))}</span>${o.cost && !isPick ? `<span class="cost">${md(o.cost)}</span>` : ''}</div>`; });
+      if (!pick || !opts.some(o => letterG(o) === pick)) boxes.push(`<div class="opt pick"><span class="k">${S.design.picked}</span><span>${md(stripG(c.chosen))}</span></div>`);
+      return `<div class="dcard" id="${esc(c.id)}"><div class="meta"><span class="chip">${esc(c.id)}</span><span class="chip">${esc(SP.when[c.when] || c.when)}</span>${c.againstRecommendation ? `<span class="pill acc">${S.design.againstPill}</span>` : ''}</div>
+        <p class="q">${md(c.question)}</p><div class="opts">${boxes.join('')}</div>${c.why ? `<p class="why">${md(c.why)}</p>` : ''}</div>`;
+    };
+    const decsG = (k, title) => { const L = DECG.filter(c => c.doc === k); return L.length ? kickG(`${title} · ${L.length}`, `<div class="cards">${L.map(dcardG).join('')}</div>`) : ''; };
+    const entryLink = id => id === 'F' ? `<a class="chip" href="#plan-foundation">F</a>` : `<a class="chip" href="#entry-${esc(id)}">${esc(id)}</a>`;
+    // the step of an entry: the foundation is 0, an entry with no edge is 1, else one past its deepest predecessor (the build refused cycles)
+    const byId = Object.fromEntries(E.map(e => [e.id, e])), stepOf = {};
+    const step = id => stepOf[id] ?? (stepOf[id] = byId[id].after.length ? 1 + Math.max(...byId[id].after.map(step)) : 1);
+    E.forEach(e => step(e.id));
+    const depth = Math.max(0, ...Object.values(stepOf));
+    const storiesN = E.reduce((a, e) => a + e.stories.length, 0), roots = E.filter(e => !e.after.length), handedG = (G.preflight || []).filter(p => p.status === 'handed').length, againstG = DECG.filter(c => c.againstRecommendation);
+
+    // ---- 1. what we build ----
+    sec('plan-what', SG.sec.what, null, `
+      <div class="hero">
+        <h1>${md(RPG.inOneSentence)}</h1>
+        <div class="meta"><span>${S.opened} ${RVG.opened || ''}</span><span>${S.approved} ${RVG.approved || '—'}</span><span>${S.slug} <code>${D.workstream.slug}</code></span></div>
+        <div class="ab"><div class="card"><h4>${SG.a}</h4><p>${md(G.fromA)}</p></div><div class="card b"><h4>${SG.b}</h4><p>${md(G.toB)}</p></div></div>
+        <div><span class="kicker">${S.threeThings}</span><div class="three">${RPG.threeThings.map(t => `<div class="th"><b>${md(t.t)}</b><p>${md(t.p)}</p></div>`).join('')}</div></div>
+        <div class="cells">
+          <div class="cell"><span class="v">${E.length}</span><span class="l">${SG.cells.entries}</span><span class="s">${SG.cells.entriesTail.replace('{n}', roots.length)}</span></div>
+          <div class="cell"><span class="v">${storiesN}</span><span class="l">${SG.cells.stories}</span><span class="s">${SG.cells.storiesTail}</span></div>
+          <div class="cell"><span class="v">${G.concurrency}</span><span class="l">${SG.cells.concurrency}</span><span class="s">${SG.cells.concurrencyTail}</span></div>
+          <div class="cell"><span class="v">${depth}</span><span class="l">${SG.cells.steps}</span><span class="s">${SG.cells.stepsTail}</span></div>
+          <div class="cell"><span class="v">${DECG.length}</span><span class="l">${SG.cells.cards}</span><span class="s">${againstG.length} ${SG.cells.against}</span></div>
+          <div class="cell"><span class="v">${(G.preflight || []).length}</span><span class="l">${SG.cells.preflight}</span><span class="s">${SG.cells.preflightTail.replace('{n}', handedG)}</span></div>
+        </div>
+        <div class="eye"><span class="kicker">${S.eye.title}</span>${RPG.needsYourEye?.length ? `<ul>${RPG.needsYourEye.map(e => `<li><b>${md(e.t)}</b> — ${md(e.p)}</li>`).join('')}</ul>` : `<p class="none">${S.eye.none}</p>`}</div>
+      </div>`);
+
+    // ---- 2. the graph: generated from the entries and their edges ----
+    const nid = id => 'n_' + String(id).replace(/[^A-Za-z0-9]/g, '_');
+    const lbl = t => String(t).replace(/[`*]/g, '').replace(/"/g, '#quot;');
+    const mer = ['flowchart LR', `  F0["${lbl(SG.foundationNode)}"]`, ...E.map(e => `  ${nid(e.id)}["${lbl(`${e.id} · ${e.name}`)}"]`),
+      ...roots.map(e => `  F0 --> ${nid(e.id)}`), ...E.flatMap(e => e.after.map(a => `  ${nid(a)} --> ${nid(e.id)}`))].join('\n');
+    const bySteps = Array.from({ length: depth }, (_, i) => [i + 1, E.filter(e => stepOf[e.id] === i + 1)]);
+    sec('plan-graph', SG.sec.graph, null, `<p class="plain">${md(RPG.graphPlain)}</p>
+      <figure><pre class="mermaid">${esc(mer)}</pre><figcaption>${SG.caption.replace('{c}', G.concurrency)}</figcaption></figure>
+      ${kickG(SG.byStep, tblG([SG.step, SG.stepEntries], [[0, `<a class="chip" href="#plan-foundation">F</a> ${SG.stepZero}`], ...bySteps.map(([n, es]) => [n, `<span class="chips">${es.map(e => entryLink(e.id)).join('')}</span>`])]))}`);
+
+    // ---- 3. the foundation ----
+    const FB = P.briefs.F;
+    sec('plan-foundation', SG.sec.foundation, null, `<p class="plain">${md(RPG.foundationPlain)}</p>
+      <p class="plain">${md(F.intro)}</p>
+      ${kickG(SG.items, tblG([SG.item.kind, SG.item.what], F.items.map(it => [`<span class="pill mute">${esc(SG.kinds[it.kind] || it.kind)}</span>`, md(it.what)])))}
+      ${kickG(SG.proof, walkG(F.proof))}
+      ${decsG('F', SG.decisionsOfF)}
+      ${FB ? `<article class="lane"><p class="plain">${md(FB.intro)}</p>${listG(SG.brief.back, FB.back)}${listG(SG.brief.front, FB.front)}${listG(SG.brief.proof, FB.proof)}
+        ${FB.worthALook?.length ? `<div class="look"><span class="kicker">${SG.brief.look}</span><ul>${FB.worthALook.map(x => `<li>${md(x)}</li>`).join('')}</ul></div>` : ''}
+        ${listG(`${SG.brief.builder} · ${(FB.builderDecides || []).length}`, FB.builderDecides)}${briefFold('F')}</article>` : ''}`);
+
+    // ---- 4. the entries: the table, then each entry's brief ----
+    const proofSum = list => `<div class="proof">${list.map(p => p.run ? `<span><code>${esc(p.run)}</code></span>` : `<span><span class="pk">${SG.seeStep}</span>${md(p.where)}</span>`).join('')}</div>`;
+    const table = tblG([SG.table.id, SG.table.name, SG.table.stories, SG.table.after, SG.table.back, SG.table.front, SG.table.proof], E.map(e => [
+      `<a href="#entry-${esc(e.id)}" style="white-space:nowrap"><code>${esc(e.id)}</code></a>`,
+      `<b>${md(e.name)}</b>`,
+      `<span class="chips">${e.stories.map(s => `<a class="chip acc" href="#${esc(s)}">${esc(s)}</a>`).join('')}</span>`,
+      e.after.length ? `<span class="chips">${e.after.map(entryLink).join('')}</span>` : `<span class="pill mute">${SG.noAfter}</span>`,
+      e.back == null ? SG.noSide : md(e.back), e.front == null ? SG.noSide : md(e.front), proofSum(e.proof)]));
+    const cards = E.map(e => { const b = P.briefs[e.id] || {};
+      return `<article class="lane" id="entry-${esc(e.id)}"><div class="hd"><h3><code>${esc(e.id)}</code> · ${md(e.name)}</h3>${e.stories.map(s => `<a class="chip acc" href="#${esc(s)}">${esc(s)}</a>`).join('')}<span class="chip">${SG.step} ${stepOf[e.id]}</span></div>
+        <p class="plain">${md(e.what)}</p>
+        <div class="facts"><span><b>${SG.table.after}</b>${e.after.length ? e.after.map(esc).join(' · ') : SG.noAfter}</span>${e.touches ? `<span><b>${SG.touches}</b>${md(e.touches)}</span>` : ''}</div>
+        ${b.intro ? `<p class="plain">${md(b.intro)}</p>` : ''}
+        ${listG(SG.brief.back, b.back)}${listG(SG.brief.front, b.front)}
+        ${kickG(SG.proof, walkG(e.proof))}${listG(SG.brief.proof, b.proof)}
+        ${b.worthALook?.length ? `<div class="look"><span class="kicker">${SG.brief.look}</span><ul>${b.worthALook.map(x => `<li>${md(x)}</li>`).join('')}</ul></div>` : ''}
+        ${listG(`${SG.brief.builder} · ${(b.builderDecides || []).length}`, b.builderDecides)}
+        ${decsG(e.id, SG.decisionsOf)}${briefFold(e.id)}</article>`; }).join('');
+    sec('plan-entries', SG.sec.entries, null, `${table}${kickG(SG.briefs, `<div>${cards}</div>`)}`);
+
+    // ---- 5. the cut's decisions and the pre-flight ----
+    const cutCards = DECG.filter(c => c.doc === 'cut');
+    sec('plan-decisions', SG.sec.decisions, SP.decLede, `
+      ${cutCards.length ? decsG('cut', SG.cutDecisions) : `<p class="plain" style="color:var(--ink-3)">${SG.noDecisions}</p>`}
+      ${kickG(SG.preflight.title, (G.preflight || []).length ? tblG([SG.preflight.item, SG.preflight.entry, SG.preflight.status], G.preflight.map(p => [md(p.item), entryLink(p.entry), `<span class="pill ${p.status === 'handed' ? 'good' : 'bad'}">${p.status === 'handed' ? SG.preflight.handed : SG.preflight.missing}</span>`])) : `<p class="plain" style="color:var(--ink-3)">${SG.noPreflight}</p>`)}`);
+
+    // ---- 6. the review ----
+    const totG = k => RVG.rounds.reduce((a, r) => a + (r[k] || 0), 0);
+    const cellsG = [[RVG.rounds.length, S.rev.round], [totG('findings'), S.rev.findings], [(RVG.decisions || []).length, S.rev.toUser], [(RVG.conductorRulings || []).length, SP.rev.conductor], [totG('toAuthor'), SP.rev.toWriters], [(RVG.dismissed || []).length, S.rev.dismissed]];
+    const decG = (RVG.decisions || []).map(x => `<div class="dec"><span class="k">${x.round}</span><p class="pl">${md(x.plain || x.ruling)}</p><span class="src">${esc(x.id)} · ${md(x.title)}${x.words ? ` · <i>“${md(x.words)}”</i>` : ''}</span></div>`).join('');
+    const fCondG = x => `<div class="fnd"><div class="h"><span class="id">${esc(x.id)}</span><b>${md(x.title)}</b></div><div class="why">${md(x.ruling)}</div></div>`;
+    const fDisG = x => `<div class="fnd"><div class="h"><span class="id">${esc(x.id)}</span><b>${md(x.title)}</b><span class="pill mute">${esc(x.lens)}</span></div><div class="why">${md(x.why)}</div></div>`;
+    const fResG = x => `<div class="fnd"><div class="h"><b>${md(x.title)}</b></div><div class="why">${md(x.why)}</div></div>`;
+    const roundsG = `<div class="tbl-wrap"><table><thead><tr><th>${S.rev.round}</th><th class="num">${S.rev.findings}</th><th class="num">${SP.rev.toWriters}</th><th class="num">${S.rev.toUser}</th><th class="num">${S.rev.deferred}</th><th class="num">${S.rev.dismissed}</th><th>${S.rev.unread}</th><th>${S.rev.changed}</th></tr></thead>
+      <tbody>${RVG.rounds.map(r => `<tr><td class="num">${r.n}</td><td class="num">${r.findings}</td><td class="num">${r.toAuthor}</td><td class="num">${r.toUser}</td><td class="num">${r.deferred}</td><td class="num">${r.dismissed}</td><td>${(r.unread || []).length ? `<span class="pill bad">${r.unread.length}</span> ${r.unread.map(esc).join(', ')}` : '—'}</td><td>${md(r.changed)}</td></tr>`).join('')}</tbody></table></div>`;
+    sec('plan-review', SP.sec.review, null, `<p class="plain">${md(RPG.reviewPlain || '')}</p>
+      <div class="cells">${cellsG.map(([v, l]) => `<div class="cell"><span class="v">${v}</span><span class="l">${l}</span></div>`).join('')}</div>
+      ${decG ? kickG(S.rev.decisions, decG) : ''}
+      ${(RVG.residue || []).length ? kickG(S.eye.residue, `<div>${RVG.residue.map(fResG).join('')}</div>`) : ''}
+      ${fold(`${SP.rev.conductor} · ${(RVG.conductorRulings || []).length}`, (RVG.conductorRulings || []).map(fCondG).join('') || `<p style="color:var(--ink-3)">${S.rev.nothing}</p>`, false)}
+      ${fold(`${S.rev.dismissedList} · ${(RVG.dismissed || []).length}`, (RVG.dismissed || []).map(fDisG).join('') || `<p style="color:var(--ink-3)">${S.rev.nothing}</p>`, false)}
+      ${fold(S.rev.round + 's', roundsG, false)}`);
   }
 
   // ================= execution tab (only when stage 4 left its data; read against the plan) =================
