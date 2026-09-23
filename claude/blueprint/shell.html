@@ -362,6 +362,21 @@
   .xent td:nth-child(6) { min-width: 24ch; }
   .xprec tbody tr.tot td { font-weight: 700; border-top: 2px solid var(--line-2); }
 
+  /* ---------- release tab ---------- */
+  .askbox { background: var(--surface); border: 1px solid var(--line); border-left: 3px solid var(--ink); border-radius: 12px; padding: 16px 20px; max-width: 110ch; display: flex; flex-direction: column; gap: 8px; }
+  .askbox .ask { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 14px; }
+  .askbox .words { font-family: var(--f-display); font-size: 28px; line-height: 1.2; }
+  .askbox .when { font-size: 15px; color: var(--ink-3); }
+  .rsteps td:first-child, .rsteps td:nth-child(2) { white-space: nowrap; }
+  .rsteps td:nth-child(5) { min-width: 26ch; }
+  .rsteps tbody tr.red td { background: var(--bad-bg); }
+  .rsteps tbody tr.askrow td { background: var(--accent-bg); }
+  .rwatch td:nth-child(2), .rwatch td:nth-child(4) { min-width: 20ch; }
+  .rfix td:nth-child(3) { min-width: 24ch; }
+  .rvers td { white-space: nowrap; }
+  /* the path reads left to right: on a phone the figure scrolls inside its box instead of shrinking the labels away */
+  .rflow pre.mermaid svg { min-width: 640px; }
+
   /* ---------- close tab ---------- */
   .rel-blocks { display: grid; grid-template-columns: minmax(0, 1fr); gap: 26px; }
   .rel-blocks > div { min-width: 0; }
@@ -867,7 +882,97 @@
       ${kick4(`${SA.latitude} · ${AU.latitude.length}`, lat)}`);
   }
 
-  if (D.close && D.release && D.release.close) {
+  // ================= release tab (only when stage 5 left its data; read against the plan and the execution record) =================
+  if (D.release && D.execution) {
+    TAB = 'release';
+    const L = D.release, SL = S.release, RP5 = L.report, X5 = D.execution;
+    const tbl5 = (heads, rows, cls) => `<div class="tbl-wrap ${cls || ''}"><table><thead><tr>${heads.map(h => `<th${h.startsWith('#') && h.length > 1 ? ' class="num"' : ''}>${h.length > 1 ? h.replace(/^#/, '') : h}</th>`).join('')}</tr></thead><tbody>${rows.map(r => `<tr${r.cls ? ` class="${r.cls}"` : ''}>${(r.cells || r).map(c => `<td${typeof c === 'number' ? ' class="num"' : ''}>${c}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`;
+    const kick5 = (t, inner) => `<div><span class="kicker">${t}</span><div style="margin-top:8px">${inner}</div></div>`;
+    const none5 = t => `<p class="plain" style="color:var(--ink-3)">${t}</p>`;
+    const code5 = v => v == null || v === '' ? '—' : `<code>${esc(v)}</code>`;
+    const okPill = ok => `<span class="pill ${ok ? 'good' : 'bad'}">${ok ? SL.ok : SL.red}</span>`;
+    const isRead = r => r.readAt != null && r.got != null && r.ok != null;
+    const green = L.staging.filter(s => s.ok).length, red = L.staging.length - green;
+    const openFixes = L.fixes.filter(f => !f.sha).length, rollbacks = L.production.filter(p => p.rolledBack).length;
+    const readN = L.watch.filter(isRead).length, ownedN = L.watch.filter(r => !isRead(r) && r.owner != null).length;
+    const fixLink = id => id ? `<a class="chip" href="#rfix-${esc(id)}">${esc(id)}</a>` : '—';
+    const ansPill = a => `<span class="pill ${a === 'go' ? 'good' : 'warn'}">${SL.answers[a] || esc(a)}</span>`;
+
+    // ---- 1. what went to production ----
+    const askBox = L.asks.length ? L.asks.map(a => `<div class="ask"><span class="words">“${esc(a.words)}”</span>${ansPill(a.answer)}<span class="when">${esc(a.at)}${a.pr ? ` · ${SL.pr} #${esc(a.pr)}` : ''}</span></div>`).join('') : `<p style="color:var(--ink-3)">${SL.noAsk}</p>`;
+    sec('rel-what', SL.sec.what, null, `
+      <div class="hero">
+        <h1>${md(RP5.inOneSentence)}</h1>
+        <div class="meta"><span>${SL.started} ${esc(L.started)}</span><span>${SL.closed} ${L.closed ? esc(L.closed) : '—'}</span><span>${S.slug} <code>${D.workstream.slug}</code></span></div>
+        <div><span class="kicker">${S.threeThings}</span><div class="three">${RP5.threeThings.map(t => `<div class="th"><b>${md(t.t)}</b><p>${md(t.p)}</p></div>`).join('')}</div></div>
+        <div class="cells">
+          <div class="cell"><span class="v">${L.inProduction.length}</span><span class="l">${SL.cells.inProd}</span><span class="s">${L.inProduction.map(p => `${esc(p.artifact)} ${esc(p.version)}`).join(' · ') || SL.cells.inProdNone}</span></div>
+          <div class="cell"><span class="v">${L.staging.length}</span><span class="l">${SL.cells.staging}</span><span class="s">${SL.cells.stagingTail.replace('{g}', green).replace('{r}', red)}</span></div>
+          <div class="cell"><span class="v">${L.fixes.length}</span><span class="l">${SL.cells.fixes}</span><span class="s">${SL.cells.fixesTail.replace('{n}', openFixes)}</span></div>
+          <div class="cell"><span class="v">${rollbacks}</span><span class="l">${SL.cells.rollbacks}</span><span class="s">${SL.cells.rollbacksTail.replace('{n}', L.production.length)}</span></div>
+          <div class="cell"><span class="v">${readN}/${L.watch.length}</span><span class="l">${SL.cells.watch}</span><span class="s">${SL.cells.watchTail.replace('{n}', ownedN)}</span></div>
+        </div>
+        <div class="askbox"><span class="kicker">${SL.askTitle}</span>${askBox}</div>
+        <div class="eye"><span class="kicker">${S.eye.title}</span>${RP5.needsYourEye.length ? `<ul>${RP5.needsYourEye.map(e => `<li><b>${md(e.t)}</b> — ${md(e.p)}</li>`).join('')}</ul>` : `<p class="none">${S.eye.none}</p>`}</div>
+      </div>`);
+
+    // ---- 2. the path: feature branch → staging → the ask → production ----
+    const events = [...L.staging.map(s => ({ k: 'staging', at: s.at, s })), ...L.asks.map(a => ({ k: 'ask', at: a.at, s: a })), ...L.production.map(p => ({ k: 'production', at: p.at, s: p }))]
+      .sort((a, b) => a.at < b.at ? -1 : a.at > b.at ? 1 : ['staging', 'ask', 'production'].indexOf(a.k) - ['staging', 'ask', 'production'].indexOf(b.k));
+    const lbl5 = t => String(t).replace(/[`*]/g, '').replace(/"/g, '#quot;');
+    const nodes = ['flowchart LR', `  feat["${lbl5(`${SL.path.feat} · ${X5.branch}`)}"]`], klass = [];
+    let prev = 'feat';
+    events.forEach((e, i) => {
+      const id = `e${i}`;
+      if (e.k === 'ask') { nodes.push(`  ${id}{{"${lbl5(`${SL.path.ask} · “${e.s.words}”`)}"}}`); klass.push(`  class ${id} ${e.s.answer === 'go' ? 'xbuilding' : 'xwaiting'}`); }
+      else { const ok = e.s.ok && !e.s.rolledBack; nodes.push(`  ${id}["${lbl5(`${ok ? '✓' : '✕'} ${SL.path[e.k].replace('{n}', e.s.n)}`)}"]`); klass.push(`  class ${id} ${ok ? 'xmerged' : 'xparked'}`); }
+      nodes.push(`  ${prev} --> ${id}`); prev = id;
+      if (e.s.fix && e.k !== 'ask') { const f = `f${i}`; nodes.push(`  ${f}["${lbl5(`${SL.path.fix} ${e.s.fix}`)}"]`, `  ${id} -.-> ${f}`); klass.push(`  class ${f} xwaiting`); }
+    });
+    const mer5 = [...nodes, '  classDef xmerged stroke-width:2px', '  classDef xparked stroke-width:3px', '  classDef xbuilding stroke-width:2px,stroke-dasharray:6 4', '  classDef xwaiting stroke-width:1px', ...klass].join('\n');
+    const leg5 = `<div class="xleg"><span><i class="merged"></i>${SL.ok}</span><span><i class="parked">✕</i>${SL.red}</span><span><i class="building"></i>${SL.path.ask}</span><span><i class="waiting"></i>${SL.path.fix}</span></div>`;
+    const stepRows = events.map(e => {
+      const x = e.s;
+      if (e.k === 'ask') return { cls: 'askrow', cells: [`<b>${SL.path.ask}</b>`, esc(x.at), x.pr ? `${SL.pr} #${esc(x.pr)}` : '—', ansPill(x.answer), `<i>“${esc(x.words)}”</i>`, '—', '—'] };
+      const red = !x.ok || x.rolledBack;
+      const result = `${okPill(x.ok)}${x.rolledBack ? `<span class="rid">${SL.rolledBack}</span>` : ''}${x.cause ? `<span class="rid">${SL.cause[x.cause] || esc(x.cause)}</span>` : ''}`;
+      const what = `${md(e.k === 'staging' ? x.summary : x.checks)}${x.proof ? `<span class="rid">${esc(x.proof)}</span>` : ''}`;
+      return { cls: red ? 'red' : '', cells: [`<b>${SL.path[e.k].replace('{n}', esc(x.n))}</b>${x.pr ? `<span class="rid">${SL.pr} #${esc(x.pr)}</span>` : ''}`, esc(x.at), code5(x.run), result, what, e.k === 'production' ? md(x.verified) : '—', fixLink(x.fix)] };
+    });
+    const T = SL.path.table;
+    const pre = (L.preflight || []).length ? tbl5([SL.preflight.item, SL.preflight.status], L.preflight.map(p => [md(p.item), `<span class="pill ${p.status === 'done' ? 'good' : 'warn'}">${SL.preflight.statuses[p.status] || esc(p.status)}</span>`])) : none5(SL.preflight.none);
+    sec('rel-path', SL.sec.path, SL.path.lede, `
+      <figure class="xgraph rflow"><pre class="mermaid">${esc(mer5)}</pre>${leg5}<figcaption>${SL.path.caption}</figcaption></figure>
+      ${events.length ? tbl5([T.step, T.at, T.run, T.result, T.what, T.verified, T.fix], stepRows, 'rsteps') : none5(SL.path.none)}
+      ${kick5(`${SL.preflight.title} · ${(L.preflight || []).length}`, pre)}`);
+
+    // ---- 3. versions, what shipped, what is in production ----
+    const V = SL.versions;
+    const vers = L.versions.length ? tbl5([V.artifact, V.from, V.to, V.bump, '#' + V.commits, '#' + V.unparsed, V.notes], L.versions.map(v => [`<code>${esc(v.artifact)}</code>`, v.from ? esc(v.from) : '—', `<b>${esc(v.to)}</b>`, `<span class="pill mute">${V.bumps[v.bump] || esc(v.bump)}</span>`, v.commits, v.unparsed, `<code>${esc(v.notes)}</code>`]), 'rvers') : none5(V.none);
+    const inProd = L.inProduction.length ? tbl5([V.artifact, V.version, V.sha, V.at], L.inProduction.map(p => [`<code>${esc(p.artifact)}</code>`, `<b>${esc(p.version)}</b>`, code5(p.sha), esc(p.at)])) : none5(V.noneInProd);
+    const chips5 = ids => ids.length ? `<div class="chipline">${ids.map(id => `<span class="chip">${esc(id)}</span>`).join('')}</div>` : `<span style="color:var(--ink-3)">—</span>`;
+    const shipped = `<div class="rel-blocks"><div>${kick5(`${V.entries} · ${L.ships.entries.length}`, chips5(L.ships.entries))}</div><div>${kick5(`${V.amendments} · ${L.ships.amendments.length}`, chips5(L.ships.amendments))}</div>
+      <div>${kick5(`${V.residue} · ${L.ships.residue.length}`, L.ships.residue.length ? `<ul class="rules">${L.ships.residue.map(r => `<li>${md(r)}</li>`).join('')}</ul>` : `<span style="color:var(--ink-3)">${V.noResidue}</span>`)}</div></div>`;
+    sec('rel-versions', SL.sec.versions, null, `<div class="rel-blocks">${kick5(V.inProdTitle, inProd)}${kick5(V.title, vers)}${kick5(V.shipsTitle, shipped)}</div>`);
+
+    // ---- 4. the fixes ----
+    const FX = SL.fixes;
+    const fixRows = L.fixes.map(f => ({ cls: f.sha ? '' : 'red', cells: [`<code id="rfix-${esc(f.id)}">${esc(f.id)}</code>`, `<span class="pill mute">${FX.kinds[f.kind] || esc(f.kind)}</span>`, md(f.what), f.rounds, f.sha ? code5(f.sha) : `<span class="pill warn">${FX.open}</span>`, `<code>${esc(f.run)}</code>`] }));
+    sec('rel-fixes', SL.sec.fixes, null, L.fixes.length ? tbl5([FX.id, FX.kind, FX.what, '#' + FX.rounds, FX.sha, FX.run], fixRows, 'rsteps rfix') : none5(FX.none));
+
+    // ---- 5. the watch and the pendencies ----
+    const WT = SL.watch;
+    const wState = r => isRead(r) ? `<span class="pill ${r.ok ? 'good' : 'bad'}">${r.ok ? WT.readOk : WT.readBad}</span><span class="rid">${WT.readAt.replace('{at}', esc(r.readAt))}</span>`
+      : r.owner != null ? `<span class="pill acc">${WT.owned}</span><span class="rid">${esc(r.owner)}</span>` : `<span class="pill warn">${WT.waiting}</span><span class="rid">${WT.until.replace('{at}', esc(r.readableAt))}</span>`;
+    const wRows = L.watch.map(r => ({ cls: isRead(r) && !r.ok ? 'red' : '', cells: [r.n, md(r.what), esc(r.readableAt), md(r.expects), wState(r), r.got != null ? md(r.got) : '—'] }));
+    const pend5 = L.pendencies.length ? tbl5([SL.pendencies.what, SL.pendencies.owner], L.pendencies.map(p => [md(p.what), `<b>${md(p.owner)}</b>`])) : none5(SL.pendencies.none);
+    sec('rel-watch', SL.sec.watch, null, `
+      <p class="plain" style="color:var(--ink-3)">${L.closed ? SL.closedOn.replace('{d}', esc(L.closed)) : SL.openNote}</p>
+      ${L.watch.length ? tbl5(['#' + WT.n, WT.what, WT.readableAt, WT.expects, WT.state, WT.got], wRows, 'rwatch') : none5(WT.none)}
+      ${kick5(`${SL.pendencies.title} · ${L.pendencies.length}`, pend5)}`);
+  }
+
+  if (D.close && D.release && D.release.closed) {
     TAB = 'close';
     const C = D.close, SC = S.close, N = C.numbers;
     const tbl6 = (heads, rows, cls) => `<div class="tbl-wrap ${cls || ''}"><table><thead><tr>${heads.map(h => `<th${h.startsWith('#') ? ' class="num"' : ''}>${h.replace(/^#/, '')}</th>`).join('')}</tr></thead><tbody>${rows.map(r => `<tr${r.cls ? ` class="${r.cls}"` : ''}>${(r.cells || r).map(c => `<td${typeof c === 'number' ? ' class="num"' : ''}>${c}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`;
@@ -879,7 +984,7 @@
     const numv = v => v === null || v === undefined ? `<span style="color:var(--ink-3)">${SC.numbers.notMeasured}</span>` : esc(v);
 
     // ---- 1. what this demand left ----
-    const prod = tbl6([SC.prod.repo, SC.prod.version, SC.prod.sha, SC.prod.deployedAt], D.release.close.prod.map(p => [`<code>${esc(p.repo)}</code>`, `<b>${esc(p.version)}</b>`, `<code>${esc(p.sha)}</code>`, esc(p.deployedAt)]));
+    const prod = tbl6([SC.prod.artifact, SC.prod.version, SC.prod.sha, SC.prod.deployedAt], D.release.inProduction.map(p => [`<code>${esc(p.artifact)}</code>`, `<b>${esc(p.version)}</b>`, `<code>${esc(p.sha)}</code>`, esc(p.at)]));
     sec('cl-what', SC.sec.what, null, `
       <div class="hero">
         <h1>${md(C.inOneSentence)}</h1>
@@ -983,6 +1088,8 @@
   const applyTheme = () => { if (theme === 'system') root.removeAttribute('data-theme'); else root.setAttribute('data-theme', theme);
     document.getElementById('theme').textContent = `${S.theme.icon[theme]} ${S.theme.label}: ${S.theme[theme]}`; document.body.dataset.themed = '1'; renderMermaid(); };
   // the host renders <pre class="mermaid"> only when it is in the static HTML; these are injected, so the page renders them itself, once per theme
+  // mermaid's own startOnLoad would lay out the hidden tabs' diagrams at zero size; a tab with no diagram never reaches the initialize in renderMermaid
+  if (window.mermaid) mermaid.initialize({ startOnLoad: false });
   applyTheme();
   document.getElementById('theme').addEventListener('click', () => { theme = order[(order.indexOf(theme) + 1) % order.length]; try { localStorage.setItem('bp-theme', theme); } catch (e) {} applyTheme(); });
   document.getElementById('foot').innerHTML = `<span>${S.foot.files}: ${D.files.map(f => `<code>${esc(f)}</code>`).join(' · ')}</span><span>${S.foot.built} ${esc(D.builtAt)}</span>`;

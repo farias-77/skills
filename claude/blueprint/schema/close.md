@@ -79,8 +79,9 @@ capped: they are copied exactly. His words are never cut.
 }
 ```
 
-- The build requires `blueprint/release/release.json` with its
-  `close`: the tab's "what is in production" is the release's.
+- The build requires `blueprint/release/release.json` with `closed`
+  set, and refuses `close.json` otherwise: the tab's "what is in
+  production" is the release's `inProduction`.
 - `closed` is `null` while the stage runs; `close` is `null` until
   the close.
 - `previous` is `null` when no earlier workstream has a

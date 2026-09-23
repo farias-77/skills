@@ -116,10 +116,10 @@ whatever he wants changed. At execution the judge agent of each entry
 `judging.md`; what is his (a question the judge raised, an entry still
 sustained after three rounds) is parked, never asked, and the user
 rules it with the builders' choices at the audit that closes stage 4;
-a ruling he gives there is a ruling too. At release his one ruling is the goal on `04-release/plan.md`,
-recorded verbatim in the trace; the session rules alone inside a fix
-row's two rounds by the execute stage's `judging.md`, and what
-survives rides as a PR note into the report. At the close the board
+a ruling he gives there is a ruling too. At release his one ruling is his answer to "vai?" on the release PR,
+recorded verbatim in the trace and in `rulings.md`; a fix built during
+the release is an entry through the stage-4 pipeline, judged there by
+`exec-judge`. At the close the board
 is the question: the session's suggestion on every entry (issue, join,
 discard, park, pendency) is the default ruling, listed for veto; he
 vetoes or changes in prose and his "apply" rules every entry he did

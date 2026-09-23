@@ -516,7 +516,7 @@
   },
   "prod": {
    "title": "Em produção",
-   "repo": "Repo",
+   "artifact": "Artefato",
    "version": "Versão",
    "sha": "Sha",
    "deployedAt": "Desde"
@@ -656,5 +656,136 @@
    "note": "em uma linha",
    "notYet": "O stage não fechou: o board espera a sua leitura."
   }
+ },
+ "release": {
+  "sec": {
+   "what": "O que foi para produção",
+   "path": "O caminho",
+   "versions": "Versões, e o que está em produção",
+   "fixes": "As correções",
+   "watch": "A vigília, e o que espera"
+  },
+  "started": "início",
+  "closed": "fechado",
+  "pr": "PR",
+  "ok": "verde",
+  "red": "vermelho",
+  "rolledBack": "revertido",
+  "cause": {
+   "code": "causa: código",
+   "environment": "causa: ambiente"
+  },
+  "answers": {
+   "go": "vai",
+   "not-now": "agora não"
+  },
+  "askTitle": "A pergunta, nas palavras dele",
+  "noAsk": "Ainda não perguntado: o PR de release espera o staging ficar verde.",
+  "cells": {
+   "inProd": "em produção",
+   "inProdNone": "nada ainda",
+   "staging": "rodadas de staging",
+   "stagingTail": "{g} verdes · {r} vermelhas",
+   "fixes": "correções",
+   "fixesTail": "{n} ainda abertas",
+   "rollbacks": "rollbacks",
+   "rollbacksTail": "em {n} passos de produção",
+   "watch": "linhas da vigília lidas",
+   "watchTail": "{n} deixadas com um dono"
+  },
+  "path": {
+   "lede": "A branch da feature vai para staging, um vermelho vira correção e o staging roda de novo, ele responde a pergunta, e só então produção.",
+   "feat": "branch da feature",
+   "staging": "staging {n}",
+   "production": "produção {n}",
+   "ask": "a pergunta",
+   "fix": "correção",
+   "caption": "Cada passo na ordem em que aconteceu. Uma seta pontilhada liga um vermelho à correção que ele abriu.",
+   "none": "Nenhum passo ainda.",
+   "table": {
+    "step": "Passo",
+    "at": "Quando",
+    "run": "Run",
+    "result": "Resultado",
+    "what": "O que mostrou",
+    "verified": "Verificado",
+    "fix": "Correção"
+   }
+  },
+  "preflight": {
+   "title": "Pré-voo",
+   "item": "Item",
+   "status": "Estado",
+   "statuses": {
+    "done": "feito",
+    "delegated": "delegado",
+    "missing": "faltando"
+   },
+   "none": "Nada a preparar antes do staging."
+  },
+  "versions": {
+   "title": "Versões",
+   "artifact": "Artefato",
+   "from": "De",
+   "to": "Para",
+   "bump": "Salto",
+   "bumps": {
+    "major": "major",
+    "minor": "minor",
+    "patch": "patch"
+   },
+   "commits": "Commits",
+   "unparsed": "Fora da convenção",
+   "notes": "Notas",
+   "none": "Nenhuma versão derivada ainda.",
+   "inProdTitle": "Em produção agora",
+   "version": "Versão",
+   "sha": "Sha",
+   "at": "Desde",
+   "noneInProd": "Nada em produção ainda.",
+   "shipsTitle": "O que este release leva",
+   "entries": "Entradas",
+   "amendments": "Emendas à fundação",
+   "residue": "O que fica para trás",
+   "noResidue": "Nada fica para trás."
+  },
+  "fixes": {
+   "id": "#",
+   "kind": "Tipo",
+   "what": "O quê",
+   "rounds": "Rodadas",
+   "sha": "Sha",
+   "run": "Run",
+   "open": "aberta",
+   "kinds": {
+    "staging": "staging",
+    "production": "produção",
+    "hotfix": "hotfix"
+   },
+   "none": "Nenhuma correção: o staging ficou verde na primeira rodada."
+  },
+  "watch": {
+   "n": "#",
+   "what": "O quê",
+   "readableAt": "Legível em",
+   "expects": "Espera",
+   "state": "Estado",
+   "got": "Obtido",
+   "readOk": "lida",
+   "readBad": "lida",
+   "readAt": "lida em {at}",
+   "owned": "com dono",
+   "waiting": "esperando",
+   "until": "até {at}",
+   "none": "Nenhuma prova espera a sua hora."
+  },
+  "pendencies": {
+   "title": "Pendências",
+   "what": "O quê",
+   "owner": "Dono",
+   "none": "Nenhuma pendência."
+  },
+  "closedOn": "Fechado em {d}: toda linha da vigília lida ou com dono, nenhuma correção aberta.",
+  "openNote": "O release está aberto: uma linha da vigília ainda espera a sua hora ou um dono."
  }
 }

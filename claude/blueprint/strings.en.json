@@ -516,7 +516,7 @@
   },
   "prod": {
    "title": "In production",
-   "repo": "Repo",
+   "artifact": "Artifact",
    "version": "Version",
    "sha": "Sha",
    "deployedAt": "Since"
@@ -656,5 +656,136 @@
    "note": "in a line",
    "notYet": "The stage has not closed: the board is waiting for your reading."
   }
+ },
+ "release": {
+  "sec": {
+   "what": "What went to production",
+   "path": "The path",
+   "versions": "Versions, and what is in production",
+   "fixes": "The fixes",
+   "watch": "The watch, and what waits"
+  },
+  "started": "started",
+  "closed": "closed",
+  "pr": "PR",
+  "ok": "green",
+  "red": "red",
+  "rolledBack": "rolled back",
+  "cause": {
+   "code": "cause: code",
+   "environment": "cause: environment"
+  },
+  "answers": {
+   "go": "go",
+   "not-now": "not now"
+  },
+  "askTitle": "The ask, in his words",
+  "noAsk": "Not asked yet: the release PR waits for staging to be green.",
+  "cells": {
+   "inProd": "in production",
+   "inProdNone": "nothing yet",
+   "staging": "staging runs",
+   "stagingTail": "{g} green · {r} red",
+   "fixes": "fixes",
+   "fixesTail": "{n} still open",
+   "rollbacks": "rollbacks",
+   "rollbacksTail": "across {n} production steps",
+   "watch": "watch rows read",
+   "watchTail": "{n} left with an owner"
+  },
+  "path": {
+   "lede": "The feature branch goes to staging, a red becomes a fix and staging runs again, he answers the ask, and only then production.",
+   "feat": "feature branch",
+   "staging": "staging {n}",
+   "production": "production {n}",
+   "ask": "the ask",
+   "fix": "fix",
+   "caption": "Each step in the order it happened. A dotted arrow leads from a red to the fix it opened.",
+   "none": "No step yet.",
+   "table": {
+    "step": "Step",
+    "at": "At",
+    "run": "Run",
+    "result": "Result",
+    "what": "What it showed",
+    "verified": "Verified",
+    "fix": "Fix"
+   }
+  },
+  "preflight": {
+   "title": "Pre-flight",
+   "item": "Item",
+   "status": "Status",
+   "statuses": {
+    "done": "done",
+    "delegated": "delegated",
+    "missing": "missing"
+   },
+   "none": "Nothing to prepare before staging."
+  },
+  "versions": {
+   "title": "Versions",
+   "artifact": "Artifact",
+   "from": "From",
+   "to": "To",
+   "bump": "Bump",
+   "bumps": {
+    "major": "major",
+    "minor": "minor",
+    "patch": "patch"
+   },
+   "commits": "Commits",
+   "unparsed": "Outside the convention",
+   "notes": "Notes",
+   "none": "No version derived yet.",
+   "inProdTitle": "In production now",
+   "version": "Version",
+   "sha": "Sha",
+   "at": "Since",
+   "noneInProd": "Nothing in production yet.",
+   "shipsTitle": "What this release carries",
+   "entries": "Entries",
+   "amendments": "Amendments to the foundation",
+   "residue": "What stays behind",
+   "noResidue": "Nothing stays behind."
+  },
+  "fixes": {
+   "id": "#",
+   "kind": "Kind",
+   "what": "What",
+   "rounds": "Rounds",
+   "sha": "Sha",
+   "run": "Run",
+   "open": "open",
+   "kinds": {
+    "staging": "staging",
+    "production": "production",
+    "hotfix": "hotfix"
+   },
+   "none": "No fix: staging was green on the first run."
+  },
+  "watch": {
+   "n": "#",
+   "what": "What",
+   "readableAt": "Readable at",
+   "expects": "Expects",
+   "state": "State",
+   "got": "Got",
+   "readOk": "read",
+   "readBad": "read",
+   "readAt": "read at {at}",
+   "owned": "owned",
+   "waiting": "waiting",
+   "until": "until {at}",
+   "none": "No proof waits for its hour."
+  },
+  "pendencies": {
+   "title": "Pendencies",
+   "what": "What",
+   "owner": "Owner",
+   "none": "No pendency."
+  },
+  "closedOn": "Closed on {d}: every watch row read or owned, no fix open.",
+  "openNote": "The release is open: a watch row still waits for its hour or an owner."
  }
 }

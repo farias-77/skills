@@ -166,28 +166,22 @@ him once for the **audit**: the parked, the choices the builders made
 where the documents were silent, the latitude the judge granted, the
 precision of every reviewer. `main` is stage 5's.
 
-**5 · Release** — the audited branch goes to production on one
-goal. The session (Fable 5.1, high) writes the release plan: what
-ships, the pre-flight only the human can do (done or delegated before
-the goal), the train step by step with the command and the read-only
-check of each, the versions, the rollback per repo, the proofs the
-audit deferred to production with their hour, and where it stops.
-He reads it, adjusts in prose, gives the goal, and leaves. Then one
-integration PR per repo into `main` in the rollout's order (a front
-whose hosting builds prod from `main` merges in the train, after its
-producers); the confirmation from `main` reruns the whole suite only
-when the tree or the alpha diff changed; one release-scribe (Sonnet
-5, high) per repo derives the version from the conventional commits
-and writes the notes; the rollback is written before any tag; tags
-on the integrated shas; one repo at a time from the tag under the
-rollout's checks, read-only. A red step runs the documented rollback
-and builds the fix as a row `R.n` in the same session through the
-stage-4 row workflow (exec-builder Opus 5 high, five lenses Sonnet 5
-high); the third red stops and calls him. The watch reads every
-deferred proof at its hour and the stage does not close before; a
-regression there is a hotfix by the same row, a patch tag, the
-affected stack only. One notification at the end. The Release tab is
-built from the session's JSON.
+**5 · Release** — the audited feature branch reaches production
+through the project's own delivery pipeline, with one question to the
+human. The session (Opus 5.5, medium) writes the release plan from the
+audit and the doctrine's delivery standard, merges the feature branch
+into staging on its own (the audit authorized it) and follows the CI
+while it deploys staging and runs the real suite; a red in the code is
+fixed as an entry `R.n` through the stage-4 pipeline — builders, gate,
+panel, judge — so no fix ships unreviewed. One `release-scribe`
+(Sonnet 5, high) per versioned artifact derives the version and the
+notes. Then the session opens the release PR and asks the human once:
+**"vai?"**. On his word it merges; the CI deploys to production the
+same artifact staging proved, runs its read-only checks and rolls back
+on its own when they fail. The session reads every proof the audit
+deferred to production at its hour, runs a hotfix the same way while
+the workstream is open, and calls him once at the end with everything
+in production.
 
 **6 · Close** — the demand is archived and the pipeline is told
 what it taught, with one stop for the human. One harvester (Sonnet 5,

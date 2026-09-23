@@ -1,202 +1,189 @@
 ---
 name: stage-release
-description: Conducts stage 5 (Release) — takes the audited workstream branch to production end to end on one goal from the user. The session (Fable 5.1, high) writes the release plan (what ships, the pre-flight only he can do, the train step by step with the command and the read-only check of each, the versions, the rollback per repo, the proofs the audit deferred to prod with their hour, where it stops); he reads it, gives the goal, and leaves. Then the session integrates feat/<workstream> into main producer-first, confirms from main (the whole suite only when the tree or the alpha diff changed), derives the versions with one release-scribe (Sonnet 5, high) per repo, tags, deploys one repo at a time under the rollout's checks, executes the documented rollback on a red step and builds the fix as a row R.n in this session (exec-builder Opus 5 high, five lenses Sonnet 5 high, through exec-row), watches the deferred proofs at their hour, runs a hotfix the same way while the workstream is not closed, and calls him once at the end with everything in prod. Use when a workstream's .state.md says stage release, to resume a release in progress, or with `hotfix <repo>` for a regression found in prod.
+description: Conducts stage 5 (Release) — takes the audited feature branch to production through the project's own delivery pipeline, with one question to the user. The session (Opus 5.5, medium) writes the release plan from the audit and the doctrine's delivery standard; merges the feature branch into staging on its own; follows the CI while it deploys staging and runs the real suite; a red is fixed as an entry R.n through the stage-4 pipeline (builders, gate, panel, judge) and staging runs again; the versions and notes come from one release-scribe (Sonnet 5, high) per versioned artifact; then the session opens the release PR and asks the user once, "vai?"; on his word it merges, follows production through the CI (same artifact, read-only checks, the doctrine's automatic rollback), reads every proof the audit deferred at its hour, and calls him once at the end with everything in prod. Also runs a hotfix the same way while the workstream is not closed. Use when a workstream's .state.md says stage release, to resume a release in progress, or with `hotfix` for a regression found in production.
 disable-model-invocation: false
-argument-hint: "<workstream-slug> [hotfix <repo>]"
+argument-hint: "<workstream-slug> [hotfix]"
 allowed-tools: Read, Write, Edit, Glob, Grep, Agent, Workflow, AskUserQuestion, Artifact, PushNotification, ScheduleWakeup, Bash
 ---
 
 # Stage 5: Release
 
-Stage 4 left every repo's `feat/<workstream>` audited, deployed in
-alpha at a named sha, with the residue the user accepted and the
-proofs he deferred to production written under the audit's Close.
-This stage puts it in the air and reports once: `main` receives the
-branch, a version that means something is cut, production is reached
-one repo at a time with a documented way back, the proofs the audit
-deferred are read at their hour, and the user gets one message with
-everything running.
+Stage 4 left `feat/<workstream>` merged, gated, reviewed and audited.
+This stage puts it in production and reports once. **How** code
+reaches each environment is the project's: the engineering doctrine
+the project's `CLAUDE.md` names has a delivery standard (the branches,
+what the CI does on each, the staging suite, the production checks,
+the automatic rollback, the command that shows the production diff).
+The session follows it; it never deploys by hand what the doctrine
+says the CI deploys.
 
-**One gate, at the entry.** The session writes the release plan; the
-user reads it, changes what he wants in prose, and gives the goal
-("conduct it end to end"). From then on nothing waits for him: the
-session integrates, confirms, versions, tags, deploys, verifies,
-fixes and watches on its own, and calls him at the end. It stops
-before the end only where the plan said it would: the third red on
-one step, or a rollback the plan marked as not safe for data.
+**One question, at the end of staging.** Everything before it runs on
+its own: the audit's approval already authorized staging. When staging
+is green, the session opens the release PR and asks the user one
+thing: "vai?". Production waits for his word and for nothing else.
 
 | Word | What it is here |
 |---|---|
-| **the plan** | `04-release/plan.md`: everything the session will do, in order, with the command and the read-only check of each step; what only the user can do is the **pre-flight**, done before the goal |
-| **the train** | the prod steps in the rollout's order, one repo at a time; a red step stops it, the documented rollback runs, the fix is built, the step runs again |
-| **row `R.n`** | a fix built in this session through the stage-4 row loop: before the train (a red confirmation) or after it (a hotfix); never code written by this session |
-| **the watch** | the proofs the audit deferred to prod, each with an hour; the stage does not close before every one is read |
+| **the plan** | `04-release/plan.md`: what ships, the versions, the pre-flight only the user can do, the staging and production steps as the doctrine defines them with the read-only check of each, the rollback, the proofs deferred to production with their hour |
+| **staging** | the environment the doctrine promotes to before production (a project may call it alpha) |
+| **entry `R.n`** | a fix built through the stage-4 pipeline (`exec-entry`): builders, gate, panel, judge. The session never writes or reviews code |
+| **the watch** | the proofs the audit deferred to production, each with an hour; the stage does not close before every one is read |
 
-The session conducts directly. The train is sequential by nature, so
-one session, no workers; the agents it dispatches are the scribes
-(one per repo, Sonnet 5, high) and, for a fix, the stage-4 row
-workflow (one exec-builder Opus 5 high, five exec-lens Sonnet 5 high
-that never wrote the code). Every reply that dispatches or waits on
-an agent carries a status table (agent · task · state), the state
-read from the harness. Say in one line what you are about to do; end
-no turn on a plan or a promise; when a wait is external (CI, a
-deploy, a proof's hour) end the turn on the wakeup that resumes it.
+The session is **Opus 5.5 at medium effort**. It conducts directly:
+the steps are sequential, so there are no workers. Every reply that
+dispatches or waits on an agent or a run carries a status table (what
+· state), read from the harness. A wait on something outside (the CI,
+a deploy, a proof's hour) ends the turn on a wakeup sized to what it
+waits for; never a loop that checks early.
 
 ## The pattern
 
 ```
-0. Plan       preconditions → the blueprint built → 04-release/plan.md written → he reads, adjusts, gives the goal
-1. Integrate  one PR feat/<ws> → main per repo, the rollout's order; Lane A merges now, Lane B (merge = deploy) waits for the train
-2. Confirm    per repo from main: tree identical to the audited head and alpha diff empty → the audit's green stands;
-              otherwise alpha from main and the whole suite · red → row R.n → confirm again · third red stops
-3. Version    release-version workflow: one release-scribe per repo → semver and notes; creates nothing
-4. Tags       rollback/<repo>.md written · tags on the integrated shas · GitHub Releases with the notes
-5. Train      per repo in order: checkout the tag → deploy:prod → the rollout's read-only checks → next
-              Lane B: merge the prepared PR (= deploy) → tag the merge sha → checks
-              red → the documented rollback, executed and verified → row R.n → the step again
-6. Watch      every deferred proof at its hour (a wakeup) → read → traced · a regression → hotfix row R.n
-7. Close      release.json → build → .state.md → close · chair: fable → commit → one PushNotification
+0. Plan       preconditions → 04-release/plan.md from the audit and the doctrine's delivery standard
+1. Staging    PR feat/<ws> → staging branch, CI green → merge (the session's) → the CI deploys and runs
+              the staging suite → the session follows it
+              red → entry R.n through exec-entry → merge into feat/<ws> → staging again · third red stops
+2. Version    one release-scribe (Sonnet 5, high) per versioned artifact, dispatched in parallel
+3. The ask    the release PR staging → main (notes, versions, the production diff, the watch)
+              → ONE question to the user: "vai?"
+4. Production merge → the CI deploys the same artifact → the doctrine's read-only checks → the session follows
+              red → the doctrine's rollback → entry R.n → staging → the ask again
+5. Watch      every deferred proof at its hour → read → traced · a regression → hotfix
+6. Close      release.json → the blueprint's Release tab → tags → .state.md → one PushNotification
 ```
 
 ## Preconditions
 
-`.state.md` says `stage: release · chair: fable`; `03-execution/audit.md`
-has its Close section with the sha of each repo's `feat/<workstream>`
-and alpha at it; every proof the audit deferred to production is a
-line under "Residue, with owners" with `stage 5` as owner. Re-read
-the heads on the origin: a branch not at the audit's sha halts the
-stage back to stage 4 with the two shas named.
+`.state.md` says `stage: release`; `03-execution/audit.md` is approved
+and `blueprint/execution/execution.json` has `closed` set; every entry
+is merged or ruled at the audit. Missing: halt, back to stage 4.
 
 ```
-<workstream>/
-├── .state.md                     # stage: release · chair: fable → close
-├── blueprint/release/release.json
-└── 04-release/
-    ├── plan.md                   # what he reads before the goal: steps, pre-flight, versions, rollback, watch, stops
-    ├── trace.md                  # every step as it ran, one line each, date -u
-    ├── rollback/<repo>.md        # written before any tag
-    ├── notes/<repo>.md           # the release notes the GitHub Release received
-    ├── proof/                    # the output of every check and every deferred proof
-    ├── rows/R.<n>.md             # the fixes and hotfixes, the stage-4 row record
-    └── reviews/R.<n>/            # their review rounds
+designs-root/<workstream>/04-release/
+├── plan.md        # the plan: what the session will do, in order
+├── trace.md       # one line per step as it ends, `date -u`
+├── notes/         # the release notes, one file per versioned artifact (the scribes)
+├── entries/R.<n>/ # the fix entries' run.json and evidence
+└── proof/         # the CI summaries, the checks' output, the watch readings
 ```
 
-Plus, outside the folder: the demand on `main` in every repo, a
-semver tag and a GitHub Release per repo, production running it,
-verified read-only.
+## Step 0 — the plan
 
-## Step 0 — the plan, and the one gate
+Read the audit, the execution record, the design's rollout and
+observability documents, and the doctrine's delivery standard. Write
+`04-release/plan.md` from [templates/plan.md](templates/plan.md) by
+[references/plan.md](references/plan.md): what ships (the entries and
+amendments), the versioned artifacts, the pre-flight (what only the
+user can do: a secret, a DNS record, an account), each staging and
+production step as the doctrine defines it with the command the
+session runs and the read-only check of its result, the rollback, the
+watch with absolute hours, and where the session stops. A pre-flight
+item still missing parks the release before step 1; the session says
+so in one line.
 
-[references/plan.md](references/plan.md). Build the blueprint first
-(`node claude/blueprint/build.mjs <workstream>`) so the Execution tab
-he approved is the one on the page. Then write `04-release/plan.md`
-from [templates/plan.md](templates/plan.md): what ships (repos, shas,
-waves, the residue he accepted at the audit); the **pre-flight**, one
-line per thing only he can do (a password at a vendor, a subscription
-to confirm, a parameter whose value only he has), each marked done or
-delegated with what the session needs to do it; the train as a table
-(step · repo · command · read-only check · rollback if red), the
-order from the design's `rollout.md`, fallback producer-first (APIs →
-agents → fronts); the versions expected per repo; the deferred proofs
-with their hour and what each expects; and **where the session
-stops**: the third red on one step, and any rollback `rollback.md`
-would mark as not safe for data.
+## Step 1 — staging
 
-Print the plan's summary as a table and end the turn. He reads the
-file, changes what he wants in prose (apply, re-print, end the turn),
-and gives the goal in his words. **His goal is the only approval the
-stage takes**: it covers the integration, the tags, every `deploy:prod`,
-every rollback and every fix the plan describes. A pre-flight line
-still open at the goal is done by him then, or delegated then; the
-session never asks for it again. A step that needs him after the goal
-is a plan failure: the session treats it as a red (a stop after three
-attempts), never as a question.
+Open the PR from `feat/<workstream>` to the staging branch the
+doctrine names; when its CI is green, merge it (the audit authorized
+this). The CI deploys staging and runs the staging suite; follow it
+(`gh run watch`, or a wakeup sized to the run's usual duration) and
+save its summary to `proof/`.
 
-## Steps 1–5 — the train
+A red is read before anything: the failing case, its log, the
+environment. A red caused by the environment and not the code (a
+missing pre-flight item, a flaky provider) is traced and, when it is
+the user's, parked. A red in the code becomes **entry `R.n`**: the
+session writes its brief (the failure, the evidence, the design
+section it breaks), runs it through
+`${CLAUDE_SKILL_DIR}/../../workflows/exec-entry.js` exactly as stage 4
+does, merges it into `feat/<workstream>` through the queue, and
+promotes to staging again. The third red on the same step stops the
+release and calls the user with the three traces.
 
-[references/train.md](references/train.md). In short: one PR per repo
-into `main` in the rollout's order, CI awaited in the background,
-rebase merge, the state re-read as `MERGED`; the confirmation from
-`main` under P-17 (the whole suite only when the tree or the alpha
-diff changed, the trace saying which); one scribe per repo through
-[`release-version`](../../workflows/release-version.js); the
-rollback per repo written before any tag; tags on the integrated
-shas and the Releases; then one repo at a time, `deploy:prod` from
-the tag, the rollout's checks read-only, the output to `proof/`. A
-red step stops the train at that repo: the documented rollback runs
-and is verified, the fix is built as row `R.n`
-([references/fix.md](references/fix.md)), the step runs again. A
-consumer never goes up ahead of a producer that did not make it.
+## Step 2 — the versions
 
-## Step 6 — the watch
+Dispatch one `release-scribe` (Sonnet 5, high) per versioned artifact
+the doctrine names (one repo, or several deployables in one repo), all
+in one message, each with: the artifact's name, repo, paths and tag
+prefix; its sha on the staging branch; the plan's path; the doctrine
+folder (its commit convention); and its notes file under
+`04-release/notes/`. Each derives the version from the commits and
+writes the notes; nothing is created. A scribe that returns no valid
+version is dispatched once more; a second failure is derived by the
+session by the same rules, never guessed. A commit outside the
+convention is traced.
 
-[references/watch.md](references/watch.md). Every proof the audit
-deferred to production is a step with an hour: the session schedules
-the wakeup, reads the proof when it arrives, saves the output to
-`proof/`, writes the trace line. A proof further than 48 h from the
-train's end is not waited for: it becomes a pendency with an owner in
-the report. A regression seen here (a proof red, an alarm, a
-verification that no longer holds) is a **hotfix**: row `R.n` from
-`origin/main` on a `hotfix/<slug>` branch, the same row loop, a patch
-tag on the integrated sha, `deploy:prod` of the affected stack only,
-the rollout's checks, a trace line. `/stage-release <slug> hotfix
-<repo>` enters here directly while `.state.md` is not `closed`; after
-the close a regression is a new demand.
+## Step 3 — the ask
 
-## Step 7 — the close
+Open the release PR from the staging branch to `main` with the notes,
+the versions, the production diff (the command the doctrine names for
+it, its output attached) and the watch list. Then ask the user **one
+question** through the question tool: what goes, the staging proof
+line, the production diff in one line, the rollback, and "vai?" —
+answers "vai" (recommended when staging is green) and "não agora" with
+what he wants first. His words go to the trace and to `rulings.md`.
+"Não agora" stops here; his reasons become entries or a new ask.
 
-`blueprint/release/release.json` ([schema](../../blueprint/schema/release.md)):
-the plain layer (one sentence, three things, what needs his eye), what
-shipped, the pre-flight, the integration and the confirmation per
-repo, the versions with their URLs, the rollback per repo, the train
-as it printed, the fixes, the watch, the close. Build; refuse means a
-field is missing, never a text to soften. `.state.md` → `stage: close
-· chair: fable`. Commit the workstream folder (push only with his
-explicit approval). Then **one `PushNotification`** and the report
-from [templates/report.md](templates/report.md): what is in prod at
-which version, the train in numbers, what was fixed on the way, what
-was read at the watch, what stays with an owner, the blueprint URL.
-Suggest `/clear` before stage 6.
+## Step 4 — production
 
-## Rules
+On "vai": merge the release PR. The CI deploys to production the same
+artifact staging proved, runs the doctrine's read-only checks and, on
+a red, its automatic rollback. Follow it, save the summary to
+`proof/`, and verify with a read-only call of your own that production
+answers what the checks say. Tag each versioned artifact on the merge
+sha with its version and create the release with its notes, as the
+doctrine says.
 
-| Rule | What it means |
-|---|---|
-| One gate | the goal on the plan is the only approval; no prod-go, no step-by-step confirmation, no question after it |
-| Pre-flight before the goal | what only he can do is done or delegated before the goal; a step that needs him later is a red, never a question |
-| Stop-the-train | a red step or a conflict stops at that repo; the documented rollback runs first; a consumer never passes a producer |
-| Confirmation (P-17) | the whole suite reruns only when the tree or the alpha diff changed; lint, build and unit tests always after a rebase (P-12); the trace says which |
-| Fix budget | two fix cycles on one step; the third red stops and calls him with prod verified in the rolled-back state |
-| Tag never retroactive | tags on the integrated sha before the deploy; prod deploys from the tag; Lane B tags the merge sha |
-| Rollback before any tag | no tag without `rollback/<repo>.md`; a rollback the file marks not safe for data is a stop, listed in the plan |
-| Prod stays clean | every prod check is read-only: the rollout's checks, never the suite, never test data or accounts |
-| The watch closes the stage (P-4) | a deferred proof is a step with an hour; not read means not closed; beyond 48 h it is a pendency with an owner |
-| Hotfix is a row (P-9) | same loop, same reviewers, patch tag, the affected stack only; in this session while not closed |
-| External waits | CI, a deploy and a proof's hour are wakeups (a background `gh pr checks --watch`, a scheduled wakeup); never a poll, never a turn held open |
-| No code in this chair | the session never edits product code; a fix is exec-builder's, read by the lenses; a one-line change it verifies on disk after round 2 is the only exception |
-| Zero silent death | every step is a trace line with `date -u`; a resumed session continues from the first line missing |
+A red in production: confirm the rollback ran and production is back
+on the previous version (read-only), trace it, build the fix as entry
+`R.n`, and go back to step 1. The user is asked again at step 3: a
+new artifact is a new "vai".
 
-## Files
+## Step 5 — the watch
 
-- **Permanent:** everything under `04-release/`, `blueprint/release/`,
-  `.state.md`; the tags and Releases on GitHub.
-- **Nothing is deleted at the close.** The trace and the rows are what
-  the dreaming reads next to the ledger.
+By [references/watch.md](references/watch.md): every proof the audit
+deferred to production is read at its hour, with a wakeup; a
+regression is a hotfix.
+
+## Step 6 — close
+
+When every watch row is read (or listed as a pendency with an owner)
+and no fix is open: `blueprint/release/release.json` (schema:
+`${CLAUDE_SKILL_DIR}/../../blueprint/schema/release.md`), the build
+(`node "${CLAUDE_SKILL_DIR}/../../blueprint/build.mjs" <workstream>`)
+and publish, `.state.md` → `stage: close`, the commit of the
+workstream folder, and one **PushNotification**: everything in
+production, the versions, the pendencies with their owners.
+
+## Hotfix
+
+`/stage-release <slug> hotfix`, while `.state.md` is not `closed`: a
+regression found in production. The trace line with what was seen and
+where; `hotfix/<slug>` from `main`; the fix as entry `R.n` through
+exec-entry with that branch as its base; the PR into `main` with its
+notes; the ask ("vai?"); production as in step 4; then `main` merged
+back into the staging branch and into `feat/<workstream>` if it is
+still open. After `closed`, a regression is a new demand: say so and
+stop.
+
+## How to write
+
+Say what you mean. Literal sentences, concrete values. A trace line
+carries the command's summary and the file under `proof/`, never the
+whole output. Every agent named carries its model and effort.
 
 ## Resuming
 
-Read `.state.md`, `04-release/plan.md` and `trace.md`; then GitHub and
-the cloud, never memory: which PRs are `MERGED` (re-read), which tags
-exist, which stacks are at which version (the rollout's checks say
-how). Continue from the first plan step without a trace line. A
-scheduled wakeup that did not fire is scheduled again from the plan's
-hour. The goal, once given, stands: a resumed session does not ask
-for it again.
+Everything is in files. Read `.state.md`, `plan.md`, `trace.md` (the
+first plan step with no trace line is where to resume), `proof/` and
+`entries/`. A CI run in flight is followed from where it is; never
+redone.
 
 ## Boundaries
 
-No new features, no code in this chair, no change to what a story
-delivers. The design and plan fences hold. A regression the fix
-budget cannot close is a stop with the evidence, never a workaround
-in prod. Frictions worth learning from go to the workstream's
-`dreaming-notes.md` on the spot; judging them is the close stage's.
+The session writes no product code and reviews none: a fix is an
+entry through the stage-4 pipeline. It deploys only the way the
+doctrine says, and nothing to production before the user's "vai".
+No force-push to `main` or the staging branch; no rewriting of a
+published tag. Frictions worth learning from go to the workstream's
+`dreaming-notes.md` on the spot.

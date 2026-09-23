@@ -1,100 +1,74 @@
-# The release blueprint — what the session leaves in JSON
+# The release blueprint — `blueprint/release/release.json`
 
-Stage 5 writes one file, `<workstream>/blueprint/release/release.json`,
-rewritten whole at every trace line that changes it (the goal, a
-merge, a confirmation, the versions, a train step, a fix, a watch
-row, the close). `node claude/blueprint/build.mjs <workstream>`
-validates it against the plan and assembles the Release tab. The
-build refuses with the field named: a repo the plan does not know, a
-train step with no output, a version without its URL when the stage
-is closed, a fix not merged when closed, a watch row neither read nor
-given an owner when closed, a pre-flight line still open when closed,
-**a text over its word cap**. Text fields accept two inline marks:
-`` `code` `` and `**bold**`. No HTML. Everything in the workstream's
+Stage 5 writes one file, by the session, rewritten whole after every
+step: `release.json`. `node claude/blueprint/build.mjs <workstream>`
+validates it against the plan and the execution record and assembles
+the Release tab. The build refuses with the field named: an entry the
+plan does not know, a production step before the ask was answered
+"vai", a closed release with a watch row neither read nor owned, a
+fix entry without its run, **a text over its word cap**. Text fields
+accept `` `code` `` and `**bold**`. Everything in the workstream's
 language.
 
 ## The voice
 
-Same as the plan and the execution ([schema/plan.md](plan.md),
-[schema/execution.md](execution.md)): short sentences, one idea each;
-the real name of a thing once, then what it does; a number only when
-it changes what the reader decides. The Release tab's reader wants to
-know, in five minutes: what is in production and since when, what the
-train did and where it stopped, what was fixed on the way, what the
-watch read, and what stays with an owner. The record (`trace.md`, the
-rows, `proof/`) is named as the authority, never copied.
-
-## Word caps (the build refuses a field over its cap)
-
-| Field | Cap | Field | Cap |
-|---|---|---|---|
-| `inOneSentence` | 35 | `threeThings[].p` / `needsYourEye[].p` | 35 |
-| `trainPlain` / `versionsPlain` / `watchPlain` | 45 | `preflight[].what` / `.how` | 20 |
-| `confirmation[].stood` | 25 | `rollback[].note` | 35 |
-| `train[].what` | 14 | `fixes[].seen` / `.what` | 20 |
-| `watch[].what` | 20 | `stops[].what` / `.how` | 25 |
-| `close.residue[].what` | 20 | | |
-
-`run`, `expect`, `see`, `where`, `got`, `shot`, `file`, `sha`, `url`,
-`tag`, `words`, `returnTo`, every hour, id, number, name, path and
-command are not capped: they are copied exactly.
+Same as the other tabs: short sentences, one idea each; the reader
+wants to know, in five minutes, what is in production, how it got
+there, what broke on the way and what still waits for someone.
 
 ## `release.json`
 
 ```json
 {
-  "opened": "2026-09-11 02:40 UTC", "closed": "2026-09-11 16:20 UTC",
-  "goal": { "words": "conduz de ponta a ponta, inclusive o go de prod", "at": "2026-09-11 03:20 UTC" },
-  "inOneSentence": "Three repos in production since the morning of 11/09; the first scheduled runs finished on their own; one alarm was fixed by a hotfix.",
-  "threeThings": [ { "t": "…", "p": "…" }, { "t": "…", "p": "…" }, { "t": "…", "p": "…" } ],
-  "needsYourEye": [ { "t": "…", "p": "…" } ],
-  "trainPlain": "…", "versionsPlain": "…", "watchPlain": "…",
-  "ships": [ { "repo": "labs-api-ingestion", "sha": "884d790", "waves": ["w01", "w02"], "lane": "A" } ],
-  "preflight": [ { "what": "the three SSM parameters of prod", "status": "delegated", "how": "by CLI, values from the vendor's doc, never printed", "at": "2026-09-11 03:42 UTC" } ],
-  "integration": [ { "repo": "labs-api-ingestion", "pr": { "n": 14, "url": "…" }, "rebased": false, "ci": "green", "mergedAt": "2026-09-11 03:22 UTC", "mainSha": "9902327" } ],
-  "confirmation": [ { "repo": "labs-api-tracking", "treeIdentical": true, "alphaDiffEmpty": true, "suite": null, "stood": "the whole suite green on the branch at the audit's close" },
-                    { "repo": "labs-api-ingestion", "treeIdentical": true, "alphaDiffEmpty": true, "suite": { "passed": 34, "failed": 0, "skipped": 0, "file": "04-release/proof/suite-labs-api-ingestion.txt" }, "stood": null } ],
-  "versions": [ { "repo": "labs-api-ingestion", "from": null, "to": "v1.0.0", "bump": "initial", "sha": "9902327", "url": "https://github.com/…/releases/tag/v1.0.0", "notesFile": "04-release/notes/labs-api-ingestion.md", "unparsed": 0 } ],
-  "rollback": [ { "repo": "labs-api-ingestion", "returnTo": "absence: schedule off, service and monitoring destroyed, data kept", "dataSafe": true, "note": "the tables are RETAIN; nothing the tracking reads changes shape", "file": "04-release/rollback/labs-api-ingestion.md" } ],
-  "train": [
-    { "step": 7, "repo": "labs-api-ingestion", "what": "data and service stacks, schedule off", "run": "git checkout v1.0.0 && npm run deploy:prod -- labs-ingestion-data-prod labs-ingestion-service-prod", "expect": "runs ACTIVE with PITR; scheduler DISABLED; 4 lambdas nodejs22.x arm64; no stub", "got": "all as expected; 0 alarms yet", "ok": true, "at": "2026-09-11 04:12 UTC", "file": "04-release/proof/train-7.txt" },
-    { "step": 11, "repo": "labs-front-tracking", "what": "merge = deploy, then the live site", "see": "the site serves the new bundle with the ingestion strings", "where": "https://tracking.clonexlabs.com", "shot": "04-release/proof/train-11.png", "ok": true, "at": "2026-09-11 04:40 UTC" }
+  "started": "2026-10-03", "closed": null,
+  "report": {
+    "inOneSentence": "…",
+    "threeThings": [ { "t": "…", "p": "…" }, { "t": "…", "p": "…" }, { "t": "…", "p": "…" } ],
+    "needsYourEye": [ { "t": "…", "p": "…" } ]
+  },
+  "ships": { "entries": ["F", "E-01", "E-02", "E-03"], "amendments": ["F.1"], "residue": [ "the cost line is read after a week" ] },
+  "preflight": [ { "item": "the e-mail provider key for production", "status": "done" } ],
+  "staging": [
+    { "n": 1, "at": "2026-10-03 14:10", "pr": 41, "run": "123456789", "ok": false,
+      "summary": "suite 212 passed, 1 failed: `ready-email-sent`", "cause": "code", "fix": "R.1", "proof": "proof/staging-1.txt" },
+    { "n": 2, "at": "2026-10-03 16:02", "pr": 43, "run": "123456901", "ok": true,
+      "summary": "suite 213 passed", "cause": null, "fix": null, "proof": "proof/staging-2.txt" }
   ],
-  "fixes": [ { "id": "R.1", "kind": "hotfix", "repo": "labs-api-ingestion", "seen": "sync-stale alarm ALARM with the ingestion healthy", "what": "2 h period with the night forced by the schedule", "pr": { "n": 17, "url": "…" }, "tag": "v1.0.2", "status": "deployed" } ],
-  "watch": [ { "n": 1, "what": "the first scheduled run ends Succeeded", "at": "2026-09-11 12:01 UTC", "expect": "SUCCEEDED, sync_success 1, alarm OK", "got": "SUCCEEDED in 20 s, sync_success 1", "ok": true, "readAt": "2026-09-11 12:05 UTC", "file": "04-release/proof/watch-1.txt", "owner": null },
-             { "n": 3, "what": "the monthly bill after a week", "at": "2026-09-18 00:00 UTC", "expect": "under the budget", "got": null, "ok": null, "readAt": null, "file": null, "owner": "operations, next demand" } ],
-  "stops": [],
-  "close": { "date": "2026-09-11 16:20 UTC", "prod": [ { "repo": "labs-api-ingestion", "version": "v1.0.2", "sha": "48f25ac", "deployedAt": "2026-09-11 16:11 UTC" } ],
-             "residue": [ { "what": "the night derivation assumes the schedule never crosses midnight UTC", "owner": "observability demand" } ] }
+  "fixes": [ { "id": "R.1", "kind": "staging", "what": "the ready e-mail job retried on an unknown result", "rounds": 2, "sha": "7c6b5a4", "run": "04-release/entries/R.1/run.json" } ],
+  "versions": [ { "artifact": "api", "from": "v1.4.0", "to": "v1.5.0", "bump": "minor", "commits": 23, "unparsed": 0, "notes": "04-release/notes/api.md" } ],
+  "ask": { "at": "2026-10-03 16:20", "pr": 44, "words": "vai", "answer": "go" },
+  "production": [
+    { "n": 1, "at": "2026-10-03 16:31", "run": "123457002", "ok": true, "rolledBack": false,
+      "checks": "4/4 green", "verified": "GET /health → 200, version v1.5.0", "proof": "proof/prod-1.txt" }
+  ],
+  "inProduction": [ { "artifact": "api", "version": "v1.5.0", "sha": "9f8e7d6", "at": "2026-10-03 16:36" } ],
+  "watch": [
+    { "n": 1, "what": "the first nightly ingestion ends Succeeded", "readableAt": "2026-10-04 06:15",
+      "expects": "status SUCCEEDED, stale alarm OK", "readAt": null, "got": null, "ok": null, "owner": null }
+  ],
+  "pendencies": [ { "what": "the cost line after a week", "owner": "the CTO" } ]
 }
 ```
 
-- `goal` is `null` until he gives it; when set, `words` are his,
-  verbatim. `closed` is `null` while the stage runs.
-- `ships[].repo` is a lane of `sequence.json` and `waves` are its
-  waves; `integration`, `confirmation`, `versions`, `rollback` and
-  `close.prod` name only repos in `ships`.
-- `preflight[].status` is `done`, `delegated` or `open`; a closed
-  stage has no `open` line.
-- `confirmation`: `treeIdentical` and `alphaDiffEmpty` both true ⇒
-  `stood` says why the audit's green stands (P-17) and `suite` may be
-  null; either false ⇒ `suite` with the four fields.
-- `versions[].to` is `vN.N.N`; `bump` is `major`, `minor`, `patch` or
-  `initial`; a closed stage has a version with `url` and `sha` for
-  every repo in `ships`.
-- `train[]` is a step of the plan's train table in order: `{step,
-  repo, what, run, expect, got, ok, at, file}` or `{step, repo, what,
-  see, where, shot, ok, at}`; a red step keeps `ok: false` and its
-  `got` until the fix's deploy, then the step is rewritten green with
-  the new `at`. A closed stage has every step `ok: true`.
-- `fixes[].id` is `R.<n>`; `kind` is `fix` (before or in the train)
-  or `hotfix` (at the watch); `status` is `building`, `merged`,
-  `deployed` or `stopped`. A closed stage has every fix `merged`
-  (kind fix) or `deployed` (kind hotfix).
-- `watch[]`: `ok` is `null` until read; a closed stage has every row
-  read (`readAt`, `ok: true`) or given an `owner` (a pendency the
-  plan announced: beyond 48 h).
-- `stops[]`: `{at, what, how}` — the third red, a rollback not safe
-  for data; how it ended.
-- `close` is `null` until the close; when set, `prod` has one line per
-  repo in `ships` and `residue` carries what stays with an owner.
+- `ships.entries` names ids of `execution.json` that are merged;
+  `amendments` names its `F.<n>`.
+- `staging[].cause` is `code` (then `fix` names an `R.<n>` in
+  `fixes`), `environment`, or `null` on a green run.
+- `fixes[].kind` is `staging`, `production` or `hotfix`; each has its
+  `run` file.
+- `ask.answer` is `go` or `not-now`; `words` is his, verbatim. No
+  `production` step exists before an `ask` answered `go`; a new
+  artifact after a production red needs a new ask (`asks` may be an
+  array when there were several; the last one is the one that
+  shipped).
+- A `production[]` step with `rolledBack: true` names the `fix` that
+  followed.
+- `watch[]`: `readAt`, `got` and `ok` are filled when read; `owner`
+  when it is left as a pendency.
+- `closed` is set when every watch row is read or owned and no fix is
+  open.
+
+Word caps: `summary` 25 · `what` 18 · `item` 16 · `verified` 25 ·
+`expects` 20 · `inOneSentence` 35 · `threeThings[].p` and
+`needsYourEye[].p` 35 · `residue[]` 20. Ids, shas, runs, paths,
+dates, versions and `words` are not capped.

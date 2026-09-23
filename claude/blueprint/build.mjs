@@ -9,8 +9,9 @@
 //        entry and briefs/F.json, the brief files embedded from 02-plan/briefs/
 //        <workstream-dir>/blueprint/execution/execution.json when stage 4 ran (one file by the session: the entries, the amendments,
 //        the precision per reviewer, the report, the audit)
-//        <workstream-dir>/blueprint/close/close.json when stage 6 ran, read only against a closed release (the Release tab is not
-//        built yet, so blueprint/release/ is not read and neither tab renders)
+//        <workstream-dir>/blueprint/release/release.json when stage 5 ran (one file by the session: the staging runs, the fixes,
+//        the ask, production, the versions, what is in production, the watch), read against the plan and the execution record
+//        <workstream-dir>/blueprint/close/close.json when stage 6 ran, read only against a closed release
 //        <workstream-dir>/blueprint/design/*.json when stage 2 ran (one per document + decisions, design-report, design-review;
 //        the documents themselves and the artboards are embedded from 01-design/)
 // writes <workstream-dir>/blueprint.html
@@ -334,12 +335,133 @@ if (existsSync(execDir) && plan) {
   problems.push('blueprint/execution/ exists but blueprint/plan/ does not: the Execution tab is read against the plan');
   console.error('blueprint data problems:\n  ' + problems.join('\n  ')); process.exit(1);
 }
-const release = null;
+// ---- stage 5 (schema/release.md): one file by the session, read against the plan and the execution record ----
+const releasePath = join(dataDir, 'release', 'release.json');
+let release = null;
+if (existsSync(releasePath)) {
+  const W = 'release/release.json';
+  const fail = () => { console.error('blueprint data problems:\n  ' + problems.join('\n  ')); process.exit(1); };
+  if (!plan || !execution) { problems.push(`${W}: the Release tab is read against the plan and the execution record; blueprint/${!plan ? 'plan/plan.json' : 'execution/execution.json'} is missing`); fail(); }
+  if (!execution.closed) problems.push(`${W}: the release starts from an approved audit; execution.json closed is null`);
+  const L = JSON.parse(readFileSync(releasePath, 'utf8'));
+  need(L, ['started', 'report', 'ships', 'staging', 'fixes', 'versions', 'production', 'inProduction', 'watch', 'pendencies'], W);
+  ['closed', 'preflight'].forEach(k => { if (!(k in L)) problems.push(`${W}: missing ${k}${k === 'closed' ? ' (null until every watch row is read or owned)' : ''}`); });
+  if (!('ask' in L) && !('asks' in L)) problems.push(`${W}: missing ask (null until the release PR is asked)`);
+  if ('ask' in L && 'asks' in L) problems.push(`${W}: ask and asks both present; write one (an array when there were several)`);
+  const list = (v, name) => { if (v === undefined || v === null) return []; if (!Array.isArray(v)) { problems.push(`${W}: ${name} must be a list`); return []; } return v; };
+  const nat = v => Number.isInteger(v) && v >= 0;
+  const stamp = v => typeof v === 'string' && /^\d{4}-\d{2}-\d{2}( \d{2}:\d{2}( UTC)?)?$/.test(v);
+  const bool = (o, k, w) => { if (typeof o[k] !== 'boolean') problems.push(`${w}: ${k} must be true or false`); };
+  const R = L.report && typeof L.report === 'object' ? L.report : {};
+  if (L.report !== undefined) {
+    need(R, ['inOneSentence', 'threeThings', 'needsYourEye'], `${W} report`);
+    if (!Array.isArray(R.threeThings) || R.threeThings.length !== 3) problems.push(`${W}: report.threeThings must have exactly three items`);
+    (Array.isArray(R.threeThings) ? R.threeThings : []).forEach((t, i) => need(t, ['t', 'p'], `${W} report.threeThings[${i + 1}]`));
+    list(R.needsYourEye, 'report.needsYourEye').forEach((t, i) => need(t, ['t', 'p'], `${W} report.needsYourEye[${i + 1}]`));
+  }
+  const SH = L.ships && typeof L.ships === 'object' ? L.ships : {};
+  if (L.ships !== undefined) ['entries', 'amendments', 'residue'].forEach(k => { if (!Array.isArray(SH[k])) problems.push(`${W}: ships.${k} must be a list`); });
+  const mergedIds = new Set(execution.entries.filter(e => e.status === 'merged').map(e => e.id));
+  const amendIds = new Set(execution.amendments.map(a => a.id));
+  list(SH.entries, 'ships.entries').forEach(id => { if (!mergedIds.has(id)) problems.push(`${W}: ships.entries names "${id}", which is not a merged entry of execution.json`); });
+  list(SH.amendments, 'ships.amendments').forEach(id => { if (!amendIds.has(id)) problems.push(`${W}: ships.amendments names "${id}", which is not an amendment F.<n> of execution.json`); });
+  list(L.preflight, 'preflight').forEach((p, i) => need(p, ['item', 'status'], `${W} preflight[${i + 1}]`));
+  const FKINDS = ['staging', 'production', 'hotfix'];
+  const fixes = list(L.fixes, 'fixes'), fixIds = new Set();
+  fixes.forEach((f, i) => {
+    const w = `${W} fixes[${i + 1}]${f.id ? ` (${f.id})` : ''}`;
+    need(f, ['id', 'kind', 'what', 'rounds', 'run'], w);
+    if (!('sha' in f)) problems.push(`${w}: missing sha (null until merged)`);
+    if (fixIds.has(f.id)) problems.push(`${w}: duplicate id`); fixIds.add(f.id);
+    if (f.kind !== undefined && !FKINDS.includes(f.kind)) problems.push(`${w}: kind "${f.kind}" must be one of ${FKINDS.join(', ')}`);
+    if (f.rounds !== undefined && !nat(f.rounds)) problems.push(`${w}: rounds must be a whole number`);
+  });
+  const fixOk = (id, w) => { if (!fixIds.has(id)) problems.push(`${w}: fix ${id == null ? 'is null' : `"${id}" is not an id in fixes`}`); };
+  const staging = list(L.staging, 'staging');
+  staging.forEach((s, i) => {
+    const w = `${W} staging[${i + 1}]`;
+    need(s, ['n', 'at', 'run', 'summary', 'proof'], w); bool(s, 'ok', w);
+    ['pr', 'cause', 'fix'].forEach(k => { if (!(k in s)) problems.push(`${w}: missing ${k} (null when none)`); });
+    if (s.at !== undefined && !stamp(s.at)) problems.push(`${w}: at "${s.at}" must be YYYY-MM-DD HH:MM`);
+    if (s.cause !== undefined && ![null, 'code', 'environment'].includes(s.cause)) problems.push(`${w}: cause "${s.cause}" must be code, environment or null`);
+    if (s.ok === true && s.cause != null) problems.push(`${w}: a green run has cause null`);
+    if (s.ok === false && s.cause == null) problems.push(`${w}: a red run names its cause (code or environment)`);
+    if (s.cause === 'code') fixOk(s.fix, `${w}: cause code`);
+    else if (s.fix != null) fixOk(s.fix, w);
+  });
+  const asks = ('asks' in L ? list(L.asks, 'asks') : Array.isArray(L.ask) ? L.ask : L.ask == null ? [] : [L.ask]);
+  asks.forEach((a, i) => {
+    const w = `${W} ask${asks.length > 1 ? `[${i + 1}]` : ''}`;
+    if (!a || typeof a !== 'object') { problems.push(`${w}: must be an object`); return; }
+    need(a, ['at', 'words', 'answer'], w);
+    if (a.at !== undefined && !stamp(a.at)) problems.push(`${w}: at "${a.at}" must be YYYY-MM-DD HH:MM`);
+    if (a.answer !== undefined && !['go', 'not-now'].includes(a.answer)) problems.push(`${w}: answer "${a.answer}" must be go or not-now`);
+  });
+  const goes = asks.filter(a => a && a.answer === 'go' && stamp(a.at)).map(a => a.at);
+  const production = list(L.production, 'production');
+  let lastRed = null;
+  production.forEach((p, i) => {
+    const w = `${W} production[${i + 1}]`;
+    need(p, ['n', 'at', 'run', 'checks', 'verified', 'proof'], w); bool(p, 'ok', w); bool(p, 'rolledBack', w);
+    if (p.at !== undefined && !stamp(p.at)) problems.push(`${w}: at "${p.at}" must be YYYY-MM-DD HH:MM`);
+    else if (stamp(p.at)) {
+      if (!goes.some(g => g <= p.at)) problems.push(`${w}: a production step at ${p.at} before any ask answered go`);
+      else if (lastRed && !goes.some(g => g > lastRed && g <= p.at)) problems.push(`${w}: a production step after the red at ${lastRed} needs a new ask answered go`);
+    }
+    if (p.rolledBack === true) fixOk(p.fix, `${w}: rolled back`);
+    else if (p.fix != null) fixOk(p.fix, w);
+    if ((p.ok === false || p.rolledBack === true) && stamp(p.at)) lastRed = p.at;
+  });
+  const versions = list(L.versions, 'versions'), artifacts = new Set();
+  versions.forEach((v, i) => {
+    const w = `${W} versions[${i + 1}]${v.artifact ? ` (${v.artifact})` : ''}`;
+    need(v, ['artifact', 'to', 'bump', 'commits', 'unparsed', 'notes'], w);
+    if (!('from' in v)) problems.push(`${w}: missing from (null on a first version)`);
+    if (v.bump !== undefined && !['major', 'minor', 'patch'].includes(v.bump)) problems.push(`${w}: bump "${v.bump}" must be major, minor or patch`);
+    ['commits', 'unparsed'].forEach(k => { if (v[k] !== undefined && !nat(v[k])) problems.push(`${w}: ${k} must be a whole number`); });
+    artifacts.add(v.artifact);
+  });
+  list(L.inProduction, 'inProduction').forEach((p, i) => {
+    const w = `${W} inProduction[${i + 1}]${p.artifact ? ` (${p.artifact})` : ''}`;
+    need(p, ['artifact', 'version', 'sha', 'at'], w);
+    if (p.artifact !== undefined && !artifacts.has(p.artifact)) problems.push(`${w}: artifact "${p.artifact}" has no line in versions`);
+    if (p.at !== undefined && !stamp(p.at)) problems.push(`${w}: at "${p.at}" must be YYYY-MM-DD HH:MM`);
+  });
+  const watch = list(L.watch, 'watch');
+  watch.forEach((r, i) => {
+    const w = `${W} watch[${i + 1}]`;
+    need(r, ['n', 'what', 'readableAt', 'expects'], w);
+    ['readAt', 'got', 'ok', 'owner'].forEach(k => { if (!(k in r)) problems.push(`${w}: missing ${k} (null until ${k === 'owner' ? 'left as a pendency' : 'read'})`); });
+    const filled = ['readAt', 'got', 'ok'].filter(k => r[k] != null);
+    if (filled.length && filled.length < 3) problems.push(`${w}: readAt, got and ok are filled together when read (${filled.join(', ')} set alone)`);
+    if (r.ok != null && typeof r.ok !== 'boolean') problems.push(`${w}: ok must be true, false or null`);
+    if (r.readableAt !== undefined && !stamp(r.readableAt)) problems.push(`${w}: readableAt "${r.readableAt}" must be YYYY-MM-DD HH:MM`);
+    if (L.closed && filled.length < 3 && r.owner == null) problems.push(`${w}: the release is closed and this watch row is neither read (readAt, got, ok) nor owned (owner)`);
+  });
+  if (L.closed) fixes.forEach(f => { if (!f.sha) problems.push(`${W} fixes ${f.id}: the release is closed and this fix has no sha (open)`); });
+  list(L.pendencies, 'pendencies').forEach((p, i) => need(p, ['what', 'owner'], `${W} pendencies[${i + 1}]`));
+  // word caps (schema/release.md): by exact path; ids, shas, runs, paths, dates, versions and words are never capped
+  const LCAPS = { 'staging.summary': 25, 'fixes.what': 18, 'watch.what': 18, 'pendencies.what': 18, 'preflight.item': 16, 'production.verified': 25, 'watch.expects': 20,
+    'report.inOneSentence': 35, 'report.threeThings.p': 35, 'report.needsYourEye.p': 35, 'ships.residue': 20 };
+  const lwords = t => String(t).trim().split(/\s+/).filter(Boolean).length;
+  const lwalk = (v, path) => {
+    if (Array.isArray(v)) { v.forEach(x => lwalk(x, path)); return; }
+    if (v && typeof v === 'object') { Object.entries(v).forEach(([k, x]) => lwalk(x, path ? `${path}.${k}` : k)); return; }
+    if (typeof v !== 'string') return;
+    const cap = LCAPS[path];
+    if (cap && lwords(v) > cap) problems.push(`${W}: ${path} has ${lwords(v)} words, cap ${cap} — "${v.slice(0, 60)}…"`);
+  };
+  lwalk(L, '');
+  if (problems.length) fail();
+  const { ask: _ask, asks: _asks, ...rest } = L;
+  release = { ...rest, asks };
+}
 // ---- stage 6: one JSON by the session (the numbers, the record, the sweep, the board, the close) ----
 const closePath = join(dataDir, 'close', 'close.json');
 let close = null;
 const NKEYS = ['days', 'waves', 'rows', 'fixRows', 'roundsDiscovery', 'roundsDesign', 'roundsPlan', 'found', 'sustained', 'deferred', 'dismissed', 'fixPasses', 'suiteRuns', 'stops', 'departuresKept', 'departuresReverted', 'silentChoices', 'auditItems', 'auditFixRows', 'releaseFixRows', 'hotfixes', 'watchRead', 'watchOwned', 'rulings', 'entries', 'issues', 'tokensM'];
-if (existsSync(closePath) && release && release.close) {
+if (existsSync(closePath) && !(release && release.closed)) { problems.push(`close/close.json: the Close tab is read against a closed release; ${release ? 'release/release.json closed is null' : 'blueprint/release/release.json is missing'}`); console.error('blueprint data problems:\n  ' + problems.join('\n  ')); process.exit(1); }
+if (existsSync(closePath)) {
   const C = JSON.parse(readFileSync(closePath, 'utf8'));
   need(C, ['opened', 'closed', 'inOneSentence', 'threeThings', 'needsYourEye', 'numbersPlain', 'boardPlain', 'sweepPlain', 'previous', 'numbers', 'lenses', 'cut', 'pendencies', 'sweep', 'board', 'close'], 'close.json');
   const cclosed = !!C.closed;
@@ -394,12 +516,12 @@ if (existsSync(closePath) && release && release.close) {
   if (problems.length) { console.error('blueprint data problems:\n  ' + problems.join('\n  ')); process.exit(1); }
   close = C;
 }
-const tabs = ['discovery', ...(design ? ['design'] : []), ...(plan ? ['plan'] : []), ...(execution ? ['execution'] : []), ...(close ? ['close'] : [])];
+const tabs = ['discovery', ...(design ? ['design'] : []), ...(plan ? ['plan'] : []), ...(execution ? ['execution'] : []), ...(release ? ['release'] : []), ...(close ? ['close'] : [])];
 
 const data = {
-  workstream, strings, figures, review, report, design, plan, execution, close, tabs,
+  workstream, strings, figures, review, report, design, plan, execution, release, close, tabs,
   ...prfaq, ...stories,
-  files: ['00-discovery/pr-faq.md', '00-discovery/user-stories.md', '00-discovery/reviews.md', 'rulings.md', ...(design ? ['01-design/*.md', '01-design/notes.md', '01-design/reviews.md', '01-design/ui/'] : []), ...(plan ? ['02-plan/plan.md', '02-plan/briefs/', '02-plan/recon/', '02-plan/reviews.md'] : []), ...(execution ? ['03-execution/board.md', '03-execution/parked.md', '03-execution/entries/', '03-execution/audit.md', '03-execution/explain.md'] : []), ...(close ? ['05-close/closure.md', '05-close/dreaming/ledger.md', '05-close/harvest/'] : [])],
+  files: ['00-discovery/pr-faq.md', '00-discovery/user-stories.md', '00-discovery/reviews.md', 'rulings.md', ...(design ? ['01-design/*.md', '01-design/notes.md', '01-design/reviews.md', '01-design/ui/'] : []), ...(plan ? ['02-plan/plan.md', '02-plan/briefs/', '02-plan/recon/', '02-plan/reviews.md'] : []), ...(execution ? ['03-execution/board.md', '03-execution/parked.md', '03-execution/entries/', '03-execution/audit.md', '03-execution/explain.md'] : []), ...(release ? ['04-release/plan.md', '04-release/trace.md', '04-release/notes/', '04-release/entries/', '04-release/proof/'] : []), ...(close ? ['05-close/closure.md', '05-close/dreaming/ledger.md', '05-close/harvest/'] : [])],
   builtAt: new Date().toISOString().slice(0, 16).replace('T', ' ') + ' UTC',
 };
 // `</script` inside JSON would end the data block early; escape it.
@@ -407,4 +529,4 @@ const json = JSON.stringify(data).replace(/<\/script/gi, '<\\/script');
 const shell = readFileSync(join(here, 'shell.html'), 'utf8');
 // function replacements: a `$&` or `$'` inside the data would otherwise be read as a replacement pattern
 writeFileSync(out, shell.replace('__TITLE__', () => workstream.title.replace(/</g, '&lt;')).replace('__DATA__', () => json));
-console.log(`built ${out}: tabs ${tabs.join(' + ')} · ${stories.stories.length} stories, ${stories.stories.reduce((a, s) => a + s.acs.length, 0)} ACs, ${review.rounds.length} discovery rounds` + (design ? ` · design: ${design.docs.architecture.flows.length} flows, ${design.decisions.length} decisions, ${design.review.rounds.length} rounds` : '') + (plan ? ` · plan: ${plan.plan.entries.length} entries, ${plan.plan.entries.reduce((a, e) => a + e.stories.length, 0)} stories, concurrency ${plan.plan.concurrency}, ${Object.keys(plan.briefs).length} briefs` : '') + (execution ? (x => { const planned = new Set(['F', ...plan.plan.entries.map(e => e.id)]), req = x.entries.filter(e => planned.has(e.id)); return ` · execution: ${req.filter(e => e.status === 'merged').length}/${req.length} merged, ${x.entries.filter(e => e.status === 'parked').length} parked, ${x.amendments.length} amendments, audit ${x.closed ? 'closed' : 'open'}`; })(execution) : '') + (close ? ` · close: ${close.board.entries.length} entries, ${close.board.entries.filter(e => e.ruled === 'issue').length} issues, ${close.board.entries.filter(e => e.ruled === null).length} unruled${close.closed ? ', closed' : ', open'}` : ''));
+console.log(`built ${out}: tabs ${tabs.join(' + ')} · ${stories.stories.length} stories, ${stories.stories.reduce((a, s) => a + s.acs.length, 0)} ACs, ${review.rounds.length} discovery rounds` + (design ? ` · design: ${design.docs.architecture.flows.length} flows, ${design.decisions.length} decisions, ${design.review.rounds.length} rounds` : '') + (plan ? ` · plan: ${plan.plan.entries.length} entries, ${plan.plan.entries.reduce((a, e) => a + e.stories.length, 0)} stories, concurrency ${plan.plan.concurrency}, ${Object.keys(plan.briefs).length} briefs` : '') + (execution ? (x => { const planned = new Set(['F', ...plan.plan.entries.map(e => e.id)]), req = x.entries.filter(e => planned.has(e.id)); return ` · execution: ${req.filter(e => e.status === 'merged').length}/${req.length} merged, ${x.entries.filter(e => e.status === 'parked').length} parked, ${x.amendments.length} amendments, audit ${x.closed ? 'closed' : 'open'}`; })(execution) : '') + (release ? ` · release: in production ${release.inProduction.length} artifact(s), ${release.staging.length} staging runs, ${release.fixes.length} fixes, ${release.watch.filter(r => r.readAt != null && r.got != null && r.ok != null).length}/${release.watch.length} watched, ${release.closed ? 'closed' : 'open'}` : '') + (close ? ` · close: ${close.board.entries.length} entries, ${close.board.entries.filter(e => e.ruled === 'issue').length} issues, ${close.board.entries.filter(e => e.ruled === null).length} unruled${close.closed ? ', closed' : ', open'}` : ''));
