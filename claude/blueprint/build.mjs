@@ -312,14 +312,10 @@ if (graphPlan) {
   if (problems.length) { console.error('blueprint data problems:\n  ' + problems.join('\n  ')); process.exit(1); }
   plan = { shape: 'lanes', seq, goals, mdGoals, report: preport, review: preview };
 }
-if (plan?.shape === 'graph') {
-  const later = [['execution', 'Execution'], ['release', 'Release']].filter(([d]) => existsSync(join(dataDir, d)));
-  if (later.length) { console.error(`blueprint data problems:\n  ${later.map(([d, t]) => `blueprint/${d}/ exists, but the ${t} tab for graph plans is not built yet`).join('\n  ')}`); process.exit(1); }
-}
 // ---- stage 4: one JSON per lane (workers), one per gated wave, the report and the audit (master) ----
 const execDir = join(dataDir, 'execution');
 let execution = null;
-if (existsSync(execDir) && plan) {
+if (existsSync(execDir) && plan?.shape === 'lanes') {
   const eread = f => JSON.parse(readFileSync(join(execDir, f), 'utf8'));
   const eopt = f => existsSync(join(execDir, f)) ? eread(f) : null;
   const ereport = eopt('exec-report.json'), eaudit = eopt('audit.json');
@@ -417,7 +413,7 @@ if (existsSync(execDir) && plan) {
 // ---- stage 5: one JSON by the session (the plan, the train, the versions, the fixes, the watch, the close) ----
 const relPath = join(dataDir, 'release', 'release.json');
 let release = null;
-if (existsSync(relPath) && plan) {
+if (existsSync(relPath) && plan?.shape === 'lanes') {
   const R = JSON.parse(readFileSync(relPath, 'utf8'));
   need(R, ['opened', 'goal', 'inOneSentence', 'threeThings', 'needsYourEye', 'trainPlain', 'versionsPlain', 'watchPlain', 'ships', 'preflight', 'integration', 'confirmation', 'versions', 'rollback', 'train', 'fixes', 'watch', 'stops', 'close'], 'release.json');
   const closed = !!R.closed;
