@@ -52,7 +52,14 @@ New capability plugs into what exists: a new consumer of existing
 events, a new endpoint beside the old ones — and when the producer needs
 to emit a **new event** for it, add the event: that is extension, not
 coupling. What is forbidden is the patch-through: reaching into another
-service's internals, sharing its tables, hijacking its flow. And never
+service's internals, writing to its tables, hijacking its flow. Reading
+another service's table is not a patch-through: **every table has one
+writer and N readers** — the writer owns the schema (additive evolution,
+documented in its `docs/data.md`); a reader imports the table by name with
+read-only IAM and never writes, locks, or leans on an undocumented
+attribute. Reads by name are the pattern for *knowing* a neighbour's state;
+events remain the pattern for *reacting* to it; a local projection of a
+neighbour's table is a declared exception. And never
 build speculatively — extensibility is a **named seam** ("a third
 provider enters by implementing this interface; nothing else changes"),
 not scaffolding for imagined futures.
