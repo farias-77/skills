@@ -15,7 +15,7 @@
  * one build per key (`flow`, `step:<n>` per numbered step,
  * `failure:<n>` per failure-table row). A Sonnet referee (5, low)
  * compares the two readings key by key; only a `different-product`
- * verdict becomes a finding. A reading that misses a key, hedges, or
+ * verdict becomes a finding. A reading that misses a key, or
  * is written in another language is invalid and re-dispatched once; a
  * flow whose two readings do not both survive is reported as unread.
  * A round in which no flow was read is INVALID (`valid: false`): the
@@ -179,25 +179,24 @@ Read the changed documents whole and every other document for what the fixes tou
 // one `failure:<n>` per body row of the failure table (a line starting
 // with "|" that is neither the header nor the separator), numbered in
 // order of appearance.
+const isSeparator = (line) => {
+  const cells = line.split('|').map(c => c.trim()).filter(Boolean)
+  return cells.length > 0 && cells.every(c => /^:?-+:?$/.test(c))
+}
 const expectedKeys = (text) => {
   const keys = new Set(['flow'])
+  const lines = text.split('\n').map(l => l.trim())
   let failures = 0
-  for (const raw of text.split('\n')) {
-    const line = raw.trim()
+  lines.forEach((line, i) => {
     const step = line.match(/^(\d+)\.\s+\S/)
-    if (step) { keys.add(`step:${step[1]}`); continue }
-    if (!line.startsWith('|')) continue
-    const cells = line.split('|').map(c => c.trim()).filter(Boolean)
-    if (!cells.length || cells.every(c => /^:?-+:?$/.test(c)) || /^(fails when|falha quando)$/i.test(cells[0])) continue
+    if (step) { keys.add(`step:${step[1]}`); return }
+    if (!line.startsWith('|') || isSeparator(line)) return
+    if (lines[i + 1] && isSeparator(lines[i + 1])) return
     keys.add(`failure:${++failures}`)
-  }
+  })
   return keys
 }
 
-// Doubt words only — never a plain "or"/"ou": an enumeration is not a
-// hedge. English and pt-BR, because the readers build in the
-// documents' language.
-const HEDGE = /\b(either|depends|could be|probably|maybe|possibly|talvez|provavelmente|possivelmente|depende|poderia ser|pode ser que)\b/i
 const normalizeKey = (k) => String(k).trim().replace(/^`|`$/g, '').replace(/\s+/g, '').toLowerCase()
 
 const readingProblems = (reading, expected) => {
@@ -211,7 +210,6 @@ const readingProblems = (reading, expected) => {
   for (const k of expected) if (!got.has(k)) problems.push(`missing key ${k}`)
   for (const [k, b] of got) {
     if (!b.build || !b.build.trim()) problems.push(`empty build at ${k}`)
-    else if (HEDGE.test(b.build)) problems.push(`hedged build at ${k}`)
   }
   return problems
 }
@@ -322,7 +320,7 @@ for (const r of lenses) r.findings.forEach((f, i) => {
 
 // A round that was asked to read flows and read none is not a round.
 const valid = !(flows.length > 0 && perFlow.length === 0)
-if (!valid) log(`round ${round} is INVALID: ${flows.length} flow(s) to read, none survived — fix the cause (language, keys, hedge) and run the round again`)
+if (!valid) log(`round ${round} is INVALID: ${flows.length} flow(s) to read, none survived — fix the cause (language, keys) and run the round again`)
 
 const bySeverity = (s) => findings.filter(f => f.severity === s).length
 log(`round ${round}: ${findings.length} finding(s) — ${bySeverity('blocker')} blocker · ${bySeverity('fix')} fix · ${bySeverity('detail')} detail${lenses.some(l => l.invalid) ? ' · INVALID lens: ' + lenses.filter(l => l.invalid).map(l => l.lens).join(', ') : ''} → the conductor judges by references/judging.md`)

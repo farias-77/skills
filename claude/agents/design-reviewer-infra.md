@@ -52,6 +52,10 @@ story's "Out of this story" are direction, an extension point at most.
   confirmation each, rollback with the time it takes written — a
   rollback that is a paragraph of hope instead of steps is a blocker.
 
+- **A document that says nothing changes** is judged too: check its
+  reason against the flows and the other documents; a reason they
+  contradict is a finding.
+
 ## Standards
 
 - Answer under the house

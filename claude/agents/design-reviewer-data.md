@@ -34,6 +34,10 @@ where the product is heading.
 - **Modeling that will be re-modeled.** A shape that works for the demand
   and demonstrably breaks on the recorded direction; cite the line. This design knows where the product is heading.
 
+- **A document that says nothing changes** is judged too: check its
+  reason against the flows and the other documents; a reason they
+  contradict is a finding.
+
 ## Standards
 
 - Answer under the house

@@ -42,6 +42,10 @@ an item, an error class), every "who calls whom". Then report:
 - **A claim about another document that is false.** "The exact shapes
   live in `contracts.md`" when they do not; "proved by the case
   `x-y-z`" when no such case exists.
+- **Prose against a list.** A query, an access or a call described in
+  prose in one document and a list in another that must allow it (a
+  role's grants, a route table, a job list): check every item of the
+  prose against the list, one by one.
 - **A decision applied in one document and not in another.** A card
   in the notes that `architecture.md` follows and `rollout.md` still
   contradicts.

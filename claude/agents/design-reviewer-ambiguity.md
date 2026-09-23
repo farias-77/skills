@@ -40,6 +40,14 @@ the time anchors, what happens on failure. Give one verdict:
 > 409 on failure". Reader 2: "ConditionExpression attribute_not_exists
 > on leader_sub, returns 409". Verdict: `same-in-other-words`.
 
+A build that keeps two options open ("maybe X", "X or Y, not
+decided") means the reader could not settle the line. Treat each
+option as a possible build: when the options are different products,
+or one of them differs from the other reader's build, the verdict is
+`different-product`. "Or" and "depends" that state the rule itself
+("accepted or rejected", "depends on the person's UF") are a
+committed build, not an open one.
+
 A `different-product` key becomes one finding: `says` = the line
 verbatim, `gap` = the two builds, one line each, `fix` = the line
 rewritten so that only one build is possible. Severity: `blocker` when

@@ -39,6 +39,24 @@ renders as a card in that tab's context). Fixed, greppable format:
 > Chosen: <letter> — <why, one or two sentences; the tradeoff said out loud>
 ```
 
+**Every document is written, even when nothing changes.** The design
+thinks every subject. When the demand changes nothing in a document's
+subject, the document still exists and says so: a `## Nothing changes`
+section with the reason tied to the demand ("no alarm: the new route
+is synchronous and its errors fall under the existing 5xx alarm") and
+what was checked to reach it. The lens of that subject checks the
+reason against the flows; a reason the flows contradict is a finding.
+
+**No workaround, no temporary step.** Nothing in a design document is
+a flag, a special case, a copy of existing logic or a step meant to be
+removed later, unless the user asked for the temporary explicitly; then
+the document quotes his words and names when it goes away.
+
+**Every gate cites its source.** A threshold, a coverage bar or a
+test layer written in `acceptance.md` (or anywhere) cites the line of
+the doctrine or the repo that sustains it. A gate with no source is
+invented.
+
 **The implementer decides.** Every document ends with `## The
 implementer decides`, before `## References`. "Latitude" is the word
 for what goes there: a choice left to whoever builds it, with the

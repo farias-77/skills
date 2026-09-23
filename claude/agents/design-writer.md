@@ -43,7 +43,11 @@ and the schema before writing a line. Then write the document from the
 template, with its must-haves: every card of your subject as a
 decision block where it applies, every claim about the outside world
 pointing at its research file, the latitude list under "The
-implementer decides", the references at the end. The document is
+implementer decides", the references at the end. When your subject
+has nothing to change for this demand, the notes say so and why: write
+the `## Nothing changes` section with that reason and what was checked
+(the shared rules). Every gate you write cites the doctrine or repo
+line that sustains it. The document is
 written for the machine: as complete and exact as the next stage
 needs. Write the document first, to disk, as soon as it is complete;
 then the JSON.

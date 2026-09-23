@@ -42,6 +42,10 @@ story's "Out of this story" are direction, an extension point at most.
   the why. A bare "n/a", a missing class, or a mitigation that is a verb
   without a mechanism ("we validate input") is a finding.
 
+- **A document that says nothing changes** is judged too: check its
+  reason against the flows and the other documents; a reason they
+  contradict is a finding.
+
 ## Standards
 
 - Answer under the house

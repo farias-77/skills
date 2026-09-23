@@ -10,7 +10,9 @@
   recommendation kept beside the choice (a divergence becomes a line
   in taste-notes.md). Each subject ends with its Latitude list. A
   decision the session skipped is a writer's question back to the
-  conductor, never the writer's to take.
+  conductor, never the writer's to take. One version of each decision:
+  a revised decision replaces the old text in place (the change is
+  dated in Amendments), so the writers never read two.
 -->
 
 Session opened <date>. Language of the documents: <language>.
@@ -23,12 +25,23 @@ cannot reopen are in `../rulings.md`.
 
 Stories to cover: <S-001 … S-0NN>
 
-## 1 · The macro shape
+Shape in mind before the proposal: <none> | <what the user brought, in his words>
 
-<!-- boundary and repos · data · compute · how the blocks talk ·
-     identity and credentials · build vs buy · the cost envelope at
-     three scales · the alarm philosophy · environment and rollout
-     macro · extension points. One card per item that applies. -->
+## What exists today
+
+<!-- The recon: one line per fact the scouts and the research brought,
+     with its source (path:line, or research/<topic>.md). The proposal
+     extends what is here. -->
+
+- <fact> — <source>
+
+## 1 · The shape
+
+<!-- what this demand changes in the system's shape against the
+     doctrine (a module, a repo, where something runs, how blocks
+     talk, a store) — usually "nothing, because"; build vs buy; the
+     cost envelope at three scales; extension points. A change to the
+     doctrine is a card marked "changes the doctrine". -->
 
 > **Decision — <title>**
 > Context: <the question that had to be answered>
@@ -79,19 +92,12 @@ Latitude:
 
 Latitude:
 
+<!-- Every subject is thought: when the demand changes nothing in it,
+     the block says "Nothing changes: <why>" in one line. -->
+
 ## Facts looked up during the session
 
-<!-- one line each: the fact, where it was found, the card it weighed on -->
-
-## Research topics
-
-<!-- listed at the end of the session; one design-research workflow each -->
-
-- <topic> — <the questions the notes need answered>
-
-## Playback per subject (after research)
-
-<!-- per subject: confirmed as is, or the amendment, dated -->
+<!-- one line each: the fact, the scout or research that brought it, the card it weighed on -->
 
 ## Questions answered after the session
 

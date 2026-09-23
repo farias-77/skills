@@ -59,6 +59,10 @@ story's "Out of this story" are direction, an extension point at most.
   the design writes the spec, the worker transcribes it, and what the
   spec does not name never gets proven in alpha.
 
+- **A document that says nothing changes** is judged too: check its
+  reason against the flows and the other documents; a reason they
+  contradict is a finding.
+
 ## Standards
 
 - Every error crosses the bridge in the house

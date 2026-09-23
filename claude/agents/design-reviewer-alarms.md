@@ -51,6 +51,10 @@ story's "Out of this story" are direction, an extension point at most.
 - **Thresholds without an argument.** A number with no line explaining
   why that number — five minutes of what, relative to what baseline.
 
+- **A document that says nothing changes** is judged too: check its
+  reason against the flows and the other documents; a reason they
+  contradict is a finding.
+
 ## Standards
 
 - Judge against the house

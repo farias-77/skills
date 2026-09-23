@@ -64,7 +64,12 @@ most `deferred`, never `dismissed`:
 - **a card contested with a contradiction** shown in the documents or
   the research;
 - **a contradiction between two documents** (it may be the writer's
-  to fix, but it is never dismissed).
+  to fix, but it is never dismissed);
+- **a workaround, a temporary step or a speculative abstraction** the
+  code lens reports: sustained, owner `user` when removing it changes
+  the design, `writer` otherwise; never latitude. The only exception
+  is a temporary step the user asked for explicitly, quoted in the
+  notes.
 
 > In the first end-to-end run, a jest test under `infra/tests/` passed
 > nine lenses and two rounds, and the `HOUR()` in an alarm's metric

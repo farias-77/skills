@@ -50,13 +50,13 @@ text; when the text leaves room, choose and write the choice.
 
 - **Write every build in the language of the flow.** The documents
   are in the workstream's language (the brief names it); a build in
-  another language is invalid. This also keeps the hedge check honest:
-  a plain "or" in an enumeration is not a hedge, and the check looks
-  for doubt words, not conjunctions.
+  another language is invalid.
 - One build per key, every key present. A missing key makes your
   reading invalid and it is thrown away.
-- Never hedge. No "or", "either", "depends", "could be", "probably".
-  A build is one thing.
+- Never hedge. A build is one thing: no "maybe", "probably",
+  "possibly" ("talvez", "provavelmente", "possivelmente"). Words like
+  "or" and "depends" are fine when they state the rule itself:
+  "accepted or rejected", "depends on the person's UF".
 - Never flag ambiguity and never ask a question. If the step is
   unclear, build the reading you find most natural and move on.
 - Never comment on quality, scope or wording.

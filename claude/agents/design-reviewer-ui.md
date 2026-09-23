@@ -37,6 +37,10 @@ library (exact values lifted from source), not imitations of it.
   loading, empty, error, permission-denied, the bad paths' outcomes. An
   artboard set showing only the happy state is half a screen — the
   invite list with no `expired` row treatment is the classic finding.
+- **Numbers that break the rule.** Recompute every number an artboard
+  shows (a total, a balance, a count, a percentage) from the rule in
+  the stories and `acceptance.md`; a number the rule does not produce
+  is a finding, because the builder copies the screen.
 - **Data the screen cannot have.** Every element in an artboard traced
   to a contract field. A screen rendering what no response returns is a
   contract finding wearing pixels — report it here AND expect
@@ -53,6 +57,10 @@ library (exact values lifted from source), not imitations of it.
 - **The plan is whole.** Every screen `ui.md` names has its artboard
   file; every artboard has its screen in `ui.md`; `canvas.json` lists
   them all. A described screen with no artboard is an incomplete plan.
+
+- **A document that says nothing changes** is judged too: check its
+  reason against the flows and the other documents; a reason they
+  contradict is a finding.
 
 ## Standards
 
