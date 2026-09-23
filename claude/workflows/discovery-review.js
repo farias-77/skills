@@ -2,9 +2,9 @@
  * discovery-review.js — the stage-1 review round as deterministic code.
  *
  * Why a workflow: the guarantee that no lens is skipped must be
- * physical, not discipline. Every round is whole: the document lenses
- * (walkthrough, acceptance, boundary, and wireframe when wireframes
- * exist) and, per story, two blind readers and a referee, all in
+ * physical, not discipline. Every round is whole: the three document
+ * lenses (walkthrough, acceptance, boundary) and, per story, two blind
+ * readers and a referee, all in
  * parallel. There are no delta rounds — the round is cheap (Sonnet and
  * Haiku only) and running it whole after every fix is what catches the
  * loose wire a scoped re-read misses.
@@ -21,7 +21,7 @@
  * cause and runs it again before judging anything.
  *
  * THERE IS NO JUDGE HERE. The workflow returns the findings with the
- * referees' verdicts; the conductor (Opus 5, high) rules every one of
+ * referees' verdicts; the conductor (Opus 5.5, medium) rules every one of
  * them by the stage's references/judging.md — it has the interview and
  * the user's words, which no agent has.
  *
@@ -35,7 +35,6 @@
  *     discoveryDir:  'absolute path to <slug>/00-discovery',
  *     round:         1,          // 1-based; shown in labels and ids
  *     language:      'pt-BR',    // the documents' language; the readers build in it
- *     wireframesDir: 'absolute path to <slug>/00-discovery/wireframes', // optional
  *     vocabulary:    '<the stories file's vocabulary block, verbatim>',
  *     stories: [                 // one entry per story block, verbatim —
  *       { id: 'S-001', text: '## S-001 — ...\n...' },   // scripts cannot
@@ -57,15 +56,14 @@
 
 export const meta = {
   name: 'discovery-review',
-  description: 'Stage-1 review round, always whole: the document lenses (walkthrough, acceptance, boundary, wireframe when present) in parallel with two Haiku blind readers and a Sonnet referee per story; returns every finding for the conductor to judge',
+  description: 'Stage-1 review round, always whole: three document lenses (walkthrough, acceptance, boundary) in parallel with two Haiku blind readers and a Sonnet referee per story; returns every finding for the conductor to judge',
   phases: [
-    { title: 'Lenses', detail: 'walkthrough, acceptance, boundary — and wireframe when wireframes exist' },
+    { title: 'Lenses', detail: 'walkthrough, acceptance, boundary' },
     { title: 'Blind reads', detail: 'per story: two Haiku readers build it alone, a Sonnet referee compares them key by key' },
   ],
 }
 
 const DOC_LENSES = ['disc-reviewer-walkthrough', 'disc-reviewer-acceptance', 'disc-reviewer-boundary']
-const WIREFRAME_LENS = 'disc-reviewer-wireframe'
 const REFEREE = 'disc-reviewer-ambiguity'
 const READER = 'disc-blind-reader'
 
@@ -139,12 +137,11 @@ const round = args?.round ?? 1
 const language = args?.language ?? 'the language of the documents'
 const stories = Array.isArray(args?.stories) ? args.stories.filter(s => s && s.id && s.text) : []
 const vocabulary = args?.vocabulary ?? ''
-const wireframesDir = args?.wireframesDir ?? null
 if (!stories.length) log('no stories passed in args — the blind reads are skipped this round; pass stories: [{id, text}] to run them')
 
 const docInputs = `Round ${round}.
 The documents: ${args.discoveryDir}/pr-faq.md and ${args.discoveryDir}/user-stories.md
-${wireframesDir ? `The wireframes: ${wireframesDir} (README.md maps screen → stories → states)\n` : ''}The round audit so far: ${args.discoveryDir}/reviews.md`
+The round audit so far: ${args.discoveryDir}/reviews.md`
 
 // ---------- mechanical checks on a reading ----------
 
@@ -168,12 +165,6 @@ const expectedKeys = (text) => {
   return keys
 }
 
-// Hedge words that make a build not one thing. A plain "or" is not a
-// hedge: it appears in legitimate enumerations ("approved or rejected").
-// The list is the reviewer contract's; every review workflow copies it
-// literally. Portuguese equivalents included because readers build in
-// the documents' language.
-const HEDGE = /\b(either|depends|could be|probably|maybe|possibly|talvez|provavelmente|possivelmente|depende|poderia ser)\b/i
 const normalizeKey = (k) => {
   const s = String(k).trim().replace(/^`|`$/g, '')
   const bp = s.match(/^bad-path:\s*(.+)$/i)
@@ -193,7 +184,6 @@ const readingProblems = (reading, expected) => {
   for (const k of expected) if (!got.has(k)) problems.push(`missing key ${k}`)
   for (const [k, b] of got) {
     if (!b.build || !b.build.trim()) problems.push(`empty build at ${k}`)
-    else if (HEDGE.test(b.build)) problems.push(`hedged build at ${k}`)
   }
   return problems
 }
@@ -254,7 +244,7 @@ ${JSON.stringify(readings[1].builds, null, 2)}`, {
 
 // ---------- the round: lenses and per-story reads, concurrently ----------
 
-const lensNames = wireframesDir ? [...DOC_LENSES, WIREFRAME_LENS] : DOC_LENSES
+const lensNames = DOC_LENSES
 
 phase('Lenses')
 log(`round ${round}: ${lensNames.length} lenses · ${stories.length} stories × (2 readers + referee)`)

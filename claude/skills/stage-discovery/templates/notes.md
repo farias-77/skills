@@ -18,8 +18,7 @@
 - **How formed it is:** <idea · sketch · spec> — <what the user has already covered alone>
 - **What the user knows well / does not know:** <domains where the blindspot pass ran, and what it taught>
 - **References:** <product, site, repo, folder — what to look at in each, and what the user liked>
-- **Prototypes:** <path or URL of each throwaway prototype · what the user reacted to · what that settled>
-- **Wireframes:** <none — no front> | <one line per screen: `wireframes/<screen>.html` · the stories it serves · the states drawn · what the user changed on seeing it>
+- **Prior decisions:** <none> | <document · what it decided · imported as Confirmed with its source>
 
 ## Coverage map
 
@@ -58,7 +57,7 @@
 
 - WHEN <condition>, the system does <behavior>.
 
-**Inferred** — what the conductor proposed and the user did not discuss. Marked as a guess; each one is confirmed or rejected at validation.
+**Inferred** — what the conductor proposed and the user did not discuss. Marked as a guess; each one is confirmed or rejected at the playback.
 
 - <guess> — because <why it seemed right>
 
@@ -66,6 +65,15 @@
 
 - <capability> — not building: <reason>
 - <capability> — future direction (from the evolution question), not scheduled
+
+## Stories
+
+<!-- Written at the playback: the scope the user closed, one line per
+     story. The authors write these stories and no other. -->
+
+| Story | What it does | Ruling | The user's words |
+|---|---|---|---|
+| S-001 | <one line> | confirm · reduce · adjust · cut | "<quote>" |
 
 ## Bets
 

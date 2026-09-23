@@ -9,10 +9,10 @@ alone: open the sentence it quotes.
 
 ## Merge first
 
-Four lenses and a referee per story read the same documents, so one
+Three lenses and a referee per story read the same documents, so one
 defect arrives as several findings. Before ruling, group the findings
 whose fix is the same edit (the same sentence, value, AC or Out item,
-seen by walkthrough, acceptance, boundary, wireframe and ambiguity) and
+seen by walkthrough, acceptance, boundary and ambiguity) and
 rule the group once: one ruling, one owner, the ids of the merged
 findings listed in the reason. The user answers one question per
 decision, never one per lens.
@@ -27,8 +27,7 @@ preference.
 Some defects always proceed: a contradiction between the two
 documents · an acceptance criterion a stranger could not judge · an
 item neither In nor Out · two blind readers who would ship different
-products from one sentence · a screen with no story or a story with a
-screen no wireframe shows · money, legal, or a stated constraint
+products from one sentence · money, legal, or a stated constraint
 violated.
 
 ## The four rulings
@@ -91,8 +90,8 @@ most `deferred`, never `dismissed`:
   nothing: splitting an AC in two, adding the missing value the
   documents already imply elsewhere, naming an Out item the interview
   already settled, aligning two sentences that say the same thing
-  differently, a wireframe label that names the wrong thing. The
-  author of that file applies it; the user is not asked.
+  differently. The author of that file applies it; the user is not
+  asked.
 - **`user`** — the fix changes the product's behavior, adds or removes
   scope, changes cost, touches personal data, contests a fact the user
   confirmed, or chooses between two readings the text admits and the

@@ -19,7 +19,6 @@
 | disc-reviewer-walkthrough | | | |
 | disc-reviewer-acceptance | | | |
 | disc-reviewer-boundary | | | |
-| disc-reviewer-wireframe | | | <— when wireframes exist> |
 | disc-reviewer-ambiguity (referees) | | | |
 
 ### Blind reads

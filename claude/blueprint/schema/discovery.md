@@ -11,7 +11,7 @@ the workstream's language. See `../example/` for a filled set.
 | `workstream.json` | the conductor | at open |
 | `prfaq.json` | `disc-author-prfaq` | with `pr-faq.md`, kept in step through every fix |
 | `stories.json` | `disc-author-stories` | with `user-stories.md`, kept in step through every fix |
-| `wireframes.json` | the conductor | when the wireframes exist; one entry per file in `00-discovery/wireframes/` |
+| `wireframes.json` | — | legacy: read for workstreams opened before discovery stopped drawing screens; never written now |
 | `figures.json` | the conductor | optional: the flow in one picture (mermaid) |
 | `review.json` | the conductor | after each round, from `reviews.md` and `rulings.md` |
 | `report.json` | the conductor | at the close: the plain-language layer |
@@ -56,8 +56,8 @@ the workstream's language. See `../example/` for a filled set.
 ```
 
 `changed: true` marks an inference the user's rulings altered after
-validation; the tab shows those first. `screens` must name files that
-exist in `wireframes.json`.
+validation; the tab shows those first. `screens` is legacy (older
+workstreams); new stories leave it out.
 
 ## wireframes.json
 

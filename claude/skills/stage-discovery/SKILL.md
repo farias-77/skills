@@ -1,6 +1,6 @@
 ---
 name: stage-discovery
-description: Conducts stage 1 (Discovery) — helps the user find out what to build and put it into words. One fluid interview with notes written as it happens and, when the demand has a front, a wireframe per screen; then two authors (Sonnet 5, high) write the PR-FAQ and the User Stories in parallel; the user validates every story and closes the scope story by story; a review round runs (four lenses, two blind readers and a referee per story), the conductor judges every finding, fixes wording through the authors and asks the user one question per decision; up to three rounds, the user choosing whether to run the next; the blueprint is published for approval. Runs in Claude Code; the conductor is Opus 5 (high). Use when the user brings a new demand, asks to open a discovery, or resumes one.
+description: Conducts stage 1 (Discovery) — a natural interview that defines what gets built. The conductor interviews with notes written as it happens, plays the understanding back as stories the user confirms one by one, then two authors (Sonnet 5, high) write the PR-FAQ and the User Stories with their blueprint JSON; a review round runs (three lenses, and per story two blind readers and a referee), the conductor judges every finding, fixes wording through the authors and asks the user one question per decision; up to three rounds; the user reads the blueprint and approves. Runs in Claude Code; the conductor is Opus 5.5 (medium). Use when the user brings a new demand, asks to open a discovery, or resumes one.
 disable-model-invocation: false
 argument-hint: "[slug]"
 allowed-tools: Read, Write, Edit, Glob, Grep, Agent, Workflow, AskUserQuestion, Artifact, WebSearch, WebFetch, Bash(mkdir *), Bash(date *), Bash(ls *), Bash(cat *), Bash(rm *), Bash(git *), Bash(node *)
@@ -11,33 +11,31 @@ allowed-tools: Read, Write, Edit, Glob, Grep, Agent, Workflow, AskUserQuestion, 
 You help the user discover what they are going to build and put it
 into words. The output is two documents, `pr-faq.md` and
 `user-stories.md`, that an engineer who was not in the room can build
-from, with the scope closed story by story by the user, and, when the
-demand has a front, one wireframe per screen that the design stage
-starts from. Nothing here is design: no architecture, no data model,
-no technology, no build order. Discovery answers what and why; stage 2
-answers how.
+from, with the scope closed story by story by the user. Nothing here
+is design: no architecture, no data model, no technology, no build
+order, no screen layout. Discovery answers what and why; stage 2
+answers how, and draws the screens.
 
-This stage runs in Claude Code. The conductor is **Opus 5 (high)**:
-the interview is the expensive part of the stage and it is where the
-judgment lives. When the user says they want to start, before the
-first question, tell them to switch the session to Opus 5 at high
-effort if it is not already there (`/model`), and wait for it.
+This stage runs in Claude Code. The conductor is **Opus 5.5
+(medium)**: the interview is where the judgment lives. If the session
+is on another model, ask the user to switch (`/model`) before the
+first question, and wait for it.
 
-The session is the conductor. It interviews, writes the notes and the
-wireframes, dispatches the two authors, runs the review workflow,
+The session is the conductor. It interviews, writes the notes,
+dispatches the two authors, runs the review workflow,
 judges every finding itself, asks the user what is his, publishes the
 blueprint. It never writes the two documents: the authors are their
 only writers, first draft to last fix.
 
 ## Two modes
 
-**Interview mode** (steps 1, 3 and 5). The user is in the room and
+**Interview mode** (steps 1, 2 and 5). The user is in the room and
 questions are the work. One theme per turn. Never run ahead of the
 user, never write the documents from a conversation that is not
 finished, never decide in the user's place. Closed choices go through
 the question tool; open questions go in prose, one at a time.
 
-**Autonomous mode** (steps 2, 4, the judging half of 5, 6 and the
+**Autonomous mode** (steps 3, 4, the judging half of 5, 6 and the
 file work of 7). The user is waiting, not answering. Dispatch the
 authors, run the workflow, judge, write the files, publish the
 blueprint, update the state, without asking permission for any of it.
@@ -48,14 +46,13 @@ work.
 ## The pattern
 
 ```
-1. Interview    you talk with the user and write notes.md as you go; a wireframe per
-                screen when there is a front. No agent runs. Ends with the playback
-                and an explicit "that's it".
-2. Write        two dispatches in parallel: disc-author-prfaq (Sonnet 5, high) →
-                pr-faq.md · disc-author-stories (Sonnet 5, high) → user-stories.md.
-3. Validate     every story, with the user, through the question tool: confirm,
-                reduce, adjust, or cut. One batch to the authors applies it.
-4. Review       the discovery-review workflow, whole: four lenses in parallel with
+1. Interview    you talk with the user and write notes.md as you go. No agent runs.
+2. Playback     the whole understanding back, as stories; the user confirms every
+                story through the question tool: confirm, reduce, adjust, or cut.
+3. Write        two dispatches in parallel: disc-author-prfaq (Sonnet 5, high) →
+                pr-faq.md + prfaq.json · disc-author-stories (Sonnet 5, high) →
+                user-stories.md + stories.json, from the confirmed stories only.
+4. Review       the discovery-review workflow, whole: three lenses in parallel with
                 two blind readers and a referee per story. No judge agent.
 5. Judge        you rule every finding by references/judging.md. Wording goes to
                 the authors and is applied; decisions go to the user, one question
@@ -66,30 +63,30 @@ work.
                 "apply", state moved, /clear.
 ```
 
-The user is interrupted at four points: the playback (end of 1), the
-validation (3), the decisions (5) and the round question (6).
+The user is interrupted at four points: the playback (2), the
+decisions (5), the round question (6) and the approval (7).
 Everything else runs without them.
 
 ## The team
 
 | Agent | Model, effort | Does |
 |---|---|---|
-| the conductor (this session) | Opus 5, high | interviews, draws the wireframes, judges, asks |
+| the conductor (this session) | Opus 5.5, medium | interviews, plays back, judges, asks |
 | `disc-author-prfaq` | Sonnet 5, high | writes and fixes `pr-faq.md` from the notes |
 | `disc-author-stories` | Sonnet 5, high | writes and fixes `user-stories.md` from the notes |
 | `disc-reviewer-boundary` | Sonnet 5, high | is it clear what gets built and what does not? |
 | `disc-reviewer-walkthrough` | Sonnet 5, high | does every flow reach its end, every value with a source? |
 | `disc-reviewer-acceptance` | Sonnet 5, high | can a stranger judge each AC; does the set cover the promise? |
-| `disc-reviewer-wireframe` | Sonnet 5, high | does every screen have a story and every story its screen; the states; the flow between screens? Runs only when wireframes exist |
-| 2× `disc-blind-reader` | Haiku 4.5, low | builds one story alone, in the documents' language |
+| 2× `disc-blind-reader` | Haiku 4.5, high | builds one story alone, in the documents' language |
 | `disc-reviewer-ambiguity` | Sonnet 5, high | compares the two builds key by key |
 
 ## The front door
 
-A demand arrives in conversation. Ask one closed question first: open
-a discovery, or just talk? Talking is welcome: thinking out loud,
-weighing whether to build at all, breaking a theme into pieces. Only an
-explicit "open it" creates state.
+A demand arrives in conversation. An explicit request to open or
+start a discovery opens it. When the intent is not clear, ask one
+closed question: open a discovery, or just talk? Talking is welcome:
+thinking out loud, weighing whether to build at all, breaking a theme
+into pieces. Only an explicit "open it" creates state.
 
 In the same breath, locate the user's starting point: how formed is
 the demand, what have they already covered alone, what do they know
@@ -97,9 +94,16 @@ well and what not. Write it into the notes. A vague idea earns a
 brainstorm before any fence closes around it; a formed spec goes
 straight to the interview.
 
+When decisions already exist in a document the user points to (an
+inventory, an earlier workstream, a spec), read it before the first
+question and write its decisions into the notes as **Confirmed**,
+each with its source. Then interview only the gaps and the
+contradictions. The document is the user's earlier word; code that
+behaves otherwise is evidence of what exists today, never a decision.
+
 On open:
 
-1. Ask for Opus 5 at high effort if the session is not on it.
+1. Ask for Opus 5.5 at medium effort if the session is not on it.
 2. Derive the slug: `YYYY-MM-DD-<short-kebab-name>`.
 3. Create the workstream folder at the designs root (the consuming
    project's `CLAUDE.md` says where) with `.state.md` containing
@@ -113,18 +117,17 @@ On open:
 ```
 designs-root/2026-08-15-workspace-invites/
 ├── .state.md                # stage: discovery
-├── blueprint.html           # built by node claude/blueprint/build.mjs; never edited by hand
+├── blueprint.html           # built by the blueprint builder (step 7); never edited by hand
 ├── blueprint/               # the data the blueprint is built from (schema: claude/blueprint/schema/discovery.md)
 │   ├── workstream.json      # the conductor, at open
 │   ├── prfaq.json           # disc-author-prfaq, kept in step with pr-faq.md
 │   ├── stories.json         # disc-author-stories, kept in step with user-stories.md
-│   ├── wireframes.json · figures.json   # the conductor: the screens, the flow in one picture
+│   ├── figures.json         # the conductor, optional: the flow in one picture
 │   ├── review.json          # the conductor, after each round
 │   └── report.json          # the conductor, at the close: the plain-language layer
 ├── rulings.md               # created at the first ruling (house rule)
 └── 00-discovery/
     ├── notes.md             # the interview, written as it happens; kept
-    ├── wireframes/          # when there is a front: one <screen>.html per screen + README.md
     ├── reviews.md           # the review-round audit: findings, rulings, for-the-design, dismissed
     ├── pr-faq.md            # the whole demand, narrated
     └── user-stories.md      # every story and AC that gets built
@@ -151,31 +154,16 @@ stop; chasing further branches widens the scope this interview exists
 to close.
 
 **Unknown knowns** are what the user will recognize when they see it
-and cannot describe first. Do not force them into prose. Two
-techniques:
+and cannot describe first. Do not force them into prose: **brainstorm**.
+Lay out approaches from cheapest to most ambitious, adjacent problems,
+scope shapes; the user says which resonate. When the flow is clearer
+as a picture than as prose, draw it once as mermaid in
+`blueprint/figures.json`.
 
-- **Brainstorm.** Lay out approaches from cheapest to most ambitious,
-  adjacent problems, scope shapes; the user says which resonate.
-- **Wireframe.** When the demand has a front, draw the screen: boxes,
-  labels, the data on it, the actions, the states (empty, loading,
-  error, no permission), as `00-discovery/wireframes/<screen>.html`
-  from [templates/wireframe.html](templates/wireframe.html), grey
-  boxes and real labels, no styling. Publish the set as one artifact
-  and let the user react; what they say goes into the notes as
-  confirmed behavior or as taste in their words, and the wireframe is
-  corrected on the spot. Low fidelity on purpose: the design stage
-  owns the look, the components, the exact layout; the wireframe
-  fixes what is on the screen, what each thing does, and where the
-  user goes next. It is a deliverable: it stays in the folder, listed
-  in `wireframes/README.md` (screen · stories it serves · states
-  drawn) and in `blueprint/wireframes.json` (the file's markup
-  embedded), and the design starts from it. For a demand with no
-  front, none. When the flow is clearer as a picture than as prose,
-  draw it once as mermaid in `blueprint/figures.json`.
-- **Prototype.** A throwaway HTML with fake data for a flow that
-  needs to be felt rather than seen; an interview instrument only.
-  Its path and what it settled go to the notes; the file lives outside
-  the workstream folder.
+Screens are the design stage's. When the demand has a front, record
+what the user sees (the data, where each value comes from), what they
+can do, and where they go next, in words. Never the layout, the
+components or the look.
 
 **Unknown unknowns** are what the user has not considered. When the
 demand enters territory the user does not command, run a **blindspot
@@ -238,19 +226,55 @@ answered in the notes; ladders "why" past the business goal.
 > screen show a confirmation dialog?" Every answer builds the same
 > thing at this altitude; the implementer decides it.
 
-**The playback.** When no question passes the razor, present the
-whole understanding back in one structured pass: what it is, every
-flow's behavior, the screens (the wireframes, by name), the fence,
-the direction, the bets, the inferences. Get an explicit "that's it".
-Write it into the notes.
+## Step 2 — the playback, story by story
 
-## Step 2 — write
+When no question passes the razor, present the whole understanding
+back in one structured pass: what it is, the flows, the fence, the
+direction, the bets, the inferences. Then cut it into stories and
+close the scope with the user, one question per story, four stories
+per call of the question tool, in the shape the house rules fix for
+every question: the question text carries the context and asks one
+clear thing; each option's label is the answer itself, and its
+description is why that answer is an option. For a story, the
+question text says what the story does, its behavior and bad paths in
+one line each, the inferences that landed in it, and the minimum you
+propose. The options, the recommended one first and marked as
+recommended:
+
+- **Confirm** — as played back.
+- **Reduce** — the story shrinks to the proposed minimum; what came
+  out goes to its "Out of this story" list as direction.
+- **Adjust** — the user says what changes.
+- **Cut** — nothing of it gets built; it goes to "What we are NOT
+  building", as direction.
+
+> **Example** — header `S-005`, question: "S-005 Lifecycle: a person
+> is active or inactive. Whoever has the person in scope marks
+> inactive (date automatic, reason optional) and can reactivate;
+> creating with an existing CPF is refused with a hint to reactivate.
+> Proposed minimum: exactly that. Out of the minimum: cancel/renew as
+> a cycle, transfer between subleaders. Inferred here: inactive
+> people stay in the tree, greyed. What do you want built?"
+> Options: label "Reduce to the minimum" / description "the cycle and
+> the transfer have no story asking for them yet; they stay as
+> direction" (recommended) · "Confirm the whole story" / "the cycle
+> and the transfer get built now, as written" · "Adjust" / "you say
+> what changes" · "Cut" / "nothing of this gets built; it goes to
+> What we are NOT building".
+
+An adjusted story is asked again once the change is written. Each
+inference is confirmed (it becomes a fact) or rejected in the same
+pass. Write the result into the notes' **Stories** block (id, name,
+the ruling, the user's words) and each ruling into `rulings.md`
+(house rule). What leaves this step is only what gets built.
+
+## Step 3 — write
 
 Two `Agent` dispatches in the same message, in parallel:
 **`disc-author-prfaq`** and **`disc-author-stories`**, each with the
-path to `notes.md`, its template, the wireframes folder when it
-exists, the slug, the language of the documents (the user's), and the
-blueprint schema (`claude/blueprint/schema/discovery.md`). Each author
+path to `notes.md`, its template, the slug, the language of the
+documents (the user's), and the blueprint schema
+(`${CLAUDE_SKILL_DIR}/../../blueprint/schema/discovery.md`). Each author
 writes from the notes only, and writes its blueprint JSON
 (`blueprint/prfaq.json`, `blueprint/stories.json`) in the same pass:
 the same content, in the shape the shell reads, kept in step through
@@ -260,74 +284,29 @@ every later fix. Both briefs include, verbatim:
 > directly supports, list that assumption in the Inferred list, and do
 > not write for the other readings as well.
 
-When both return, read the two files together. Check that every theme
-in the notes produced a story, that every Confirmed fact is an AC,
-that every wireframe is named by the story it serves, that the
-Inferred list is present in the stories file, and that the PR-FAQ's
-"What we are NOT building" matches the notes' Out blocks. Anything
-missing goes back to the author of that file in one message before
-validation starts.
-
-## Step 3 — validate every story
-
-Interview mode. This is the contract: the user validates every story
-by hand and closes the scope, one question per story, four stories per
-call of the question tool, in the shape the house rules fix for every
-question: the question text carries the context and asks one clear
-thing; each option's label is the answer itself, and its description
-is why that answer is an option. For a story, the question text says
-what the story does, its ACs in one line each, its bad paths, the
-inferences that landed in it, and the minimum you propose. The
-options, the recommended one first and marked as recommended:
-
-- **Confirm** — as written.
-- **Reduce** — the author rewrites the story in the proposed minimum;
-  what came out goes to its "Out of this story" list as direction.
-- **Adjust** — the user says what changes; the author applies it.
-- **Cut** — the author removes the story from `user-stories.md`, and
-  the PR-FAQ author lists it under "What we are NOT building", as
-  direction. AC ids of the removed story are never reused.
-
-The documents leave this step holding only what gets built. No
-status field: a story in the file is a story to build.
-
-> **Example** — header `S-005`, question: "S-005 Lifecycle: a person
-> is active or inactive. Whoever has the person in scope marks
-> inactive (date automatic, reason optional) and can reactivate;
-> creating with an existing CPF is refused with a hint to reactivate.
-> Proposed minimum: exactly that. Out of the minimum: cancel/renew as
-> a cycle, transfer between subleaders. Inferred here: I-4 (inactive
-> people stay in the tree, greyed). What do you want built?"
-> Options: label "Reduce to the minimum" / description "the cycle and
-> the transfer have no story asking for them yet; they stay as
-> direction" (recommended) · "Confirm the whole story" / "the cycle
-> and the transfer get built now, as written" · "Adjust" / "you say
-> what changes and the author applies it" · "Cut" / "nothing of this
-> gets built; it goes to What we are NOT building".
-
-Ask about the Inferred list in the same pass: each inference is
-confirmed (rewritten as fact) or rejected (the author rewrites the
-sentence). A story the user adjusts is re-asked once the author has
-applied the change.
-
-Send everything to the authors in one apply batch each: reductions,
-cuts, adjustments, inference rulings, the PR-FAQ's Out list. Read the
-result before moving on. Record every ruling in `rulings.md` (house
-rule).
+When both return, read the two files together. Check that every
+confirmed story is written and no other, that every Confirmed fact is
+an AC, that the PR-FAQ's "What we are NOT building" matches the notes'
+Out blocks and the cut stories, and that the two JSON files match
+their documents. Anything missing goes back to the author of that
+file in one message before the review starts. What an author had to
+guess sits in its Inferred list; you ask the user about each one with
+the decisions of step 5.
 
 ## Step 4 — the review round
 
-Autonomous mode. Run
-[`discovery-review`](../../workflows/discovery-review.js) by
-`scriptPath` (never by name), with `discoveryDir`, `round`,
-`language` (the documents'), `wireframesDir` when the folder exists,
-the stories file's vocabulary block, and `stories`: one `{id, text}`
+Autonomous mode. Run the `discovery-review` workflow by
+`scriptPath` (never by name):
+`${CLAUDE_SKILL_DIR}/../../workflows/discovery-review.js`, with
+`discoveryDir`, `round`, `language` (the documents'), the stories
+file's vocabulary block, and `stories`: one `{id, text}`
 per story block, split at every `## S-` heading. Scripts cannot read
 files; you pass the text.
 
 The round runs whole every time: the document lenses in parallel with
 the per-story blind reads. Every reviewer answers under the
-[reviewer contract](../../docs/standards/reviewer-contract.md). The
+reviewer contract (`docs/standards/reviewer-contract.md` in the
+pipeline repo). The
 workflow returns the findings with the referees' verdicts and the
 lens results; it rules nothing. A round in which every story came
 back unread is **invalid**: the workflow says so, and you fix the
@@ -355,7 +334,9 @@ reports there whatever he wants changed.
 
 **Owner `user`.** Product behavior, scope, cost, personal data, a
 confirmed fact contested, a sentence that admits two readings that
-are two products. Group them **by decision**: several findings that
+are two products, and every entry of the authors' Inferred lists
+(confirm, and the author rewrites it as fact; or reject, and the
+author rewrites the sentence). Group them **by decision**: several findings that
 resolve by the same choice are one question. Ask through the question
 tool, one question per decision, four per call, in the house shape:
 the question text carries the context (the lens, the quote, the gap,
@@ -373,8 +354,8 @@ list of `reviews.md`, which stage 2 reads at its macro shape.
 **Dismissed** findings die with the sentence that forecloses them, in
 `reviews.md`. They are visible in the blueprint's review block.
 
-A user ruling that changes a story materially sends that story back
-through step 3's question once, after the author applied it.
+A user ruling that changes a story materially is confirmed once more
+in step 2's shape, after the author applied it.
 
 ## Step 6 — iterate
 
@@ -403,12 +384,12 @@ familiar words, a role for each thing, no code. Check the authors'
 Then:
 
 ```
-node claude/blueprint/build.mjs <workstream-dir>
+node "${CLAUDE_SKILL_DIR}/../../blueprint/build.mjs" <workstream-dir>
 ```
 
-The build validates every file against
-[the schema](../../blueprint/schema/discovery.md) and refuses with the
-field named; fix the data, never the HTML. Publish `blueprint.html`,
+The build validates every file against the schema
+(`${CLAUDE_SKILL_DIR}/../../blueprint/schema/discovery.md`) and
+refuses with the field named; fix the data, never the HTML. Publish `blueprint.html`,
 keep the same file path at every later stage, and record the owning
 account beside the URL in `.state.md`.
 
@@ -439,8 +420,7 @@ named in a message carries its model and effort in parentheses.
 
 ## Files
 
-- **Working:** a prototype, outside the workstream folder.
-- **Permanent:** `notes.md`, `wireframes/`, `pr-faq.md`,
+- **Permanent:** `notes.md`, `pr-faq.md`,
   `user-stories.md`, `reviews.md`, `rulings.md`, `taste-notes.md`,
   `blueprint/*.json`, `blueprint.html`, `.state.md`.
 

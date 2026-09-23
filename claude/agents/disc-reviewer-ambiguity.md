@@ -31,6 +31,14 @@ Two builds that differ only in mechanism (a lock, a retry count, a
 status code, a storage shape) are `same-in-other-words`: the person
 cannot tell them apart, and the design stage decides the mechanism.
 
+A build that keeps two options open ("maybe X", "X or Y, not
+decided") means the reader could not settle the sentence. Treat each
+option as a possible build: when the options are different products,
+or one of them differs from the other reader's build, the verdict is
+`different-product`. "Or" and "depends" that state the rule itself
+("approved or rejected", "depends on the person's UF") are a
+committed build, not an open one.
+
 > **Example** — "the invite expires in 7 days". Reader 1: 7 calendar
 > days from send. Reader 2: 7 business days from first open. Verdict:
 > `different-product`, the expiry date differs by days and the

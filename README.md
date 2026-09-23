@@ -61,17 +61,16 @@ Underneath, four mechanics carry everything:
 
 **1 · Discovery** — the engineering team interviewing the demand's
 owner, one fluid conversation with notes written as it happens, until
-the unknowns that would change what gets built are gone. When the
-demand has a front, the conductor (Opus 5, high) draws a wireframe
-per screen during the interview: grey boxes, real labels, the states;
-it stays as a deliverable the design starts from. Two authors
-(Sonnet 5, high) then write the PR-FAQ and the user stories from the
-notes, in parallel: what gets built, what stays out, every acceptance
-criterion with an ID. **The owner validates every story by hand**, one
-question each, and closes the scope story by story: confirm, reduce,
-adjust, or cut; what leaves discovery is only what gets built. A
-whole review round runs, cheap by design (Sonnet and Haiku): four
-lenses read the documents and the wireframes while, per story, two
+the unknowns that would change what gets built are gone; the
+conductor is Opus 5.5 (medium). Screens are not drawn here: they are
+the design's. The conductor plays the understanding back as stories
+and **the owner confirms every story by hand**, one question each:
+confirm, reduce, adjust, or cut; what leaves the playback is only what
+gets built. Two authors (Sonnet 5, high) then write the PR-FAQ and the
+user stories from the notes, in parallel: what gets built, what stays
+out, every acceptance criterion with an ID. A whole review round runs,
+cheap by design (Sonnet and Haiku): three lenses read the documents
+while, per story, two
 **blind readers** describe what each would build and a referee reports
 where they built different products. The **conductor judges** every
 finding by the discovery razor — a wrong guess would change what gets

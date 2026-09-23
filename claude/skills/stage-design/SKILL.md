@@ -134,7 +134,7 @@ order, one block of `notes.md` per subject:
 | 2 | Architecture | one flow per story or group, end to end; the mechanisms that guard a rule (lock, idempotency, retry, cutoff); what happens when the other side fails | `architecture.md` |
 | 3 | Data model | entities and keys; access patterns; retention | `data-model.md` |
 | 4 | Contracts | routes, events, shared tables; who calls; error classes | `contracts.md` |
-| 5 | Screens | the screens and their states; what is reused; artboards from the discovery's wireframes | `ui.md` + `ui/` |
+| 5 | Screens | the screens and their states, drawn here from the stories (discovery draws none); what is reused | `ui.md` + `ui/` |
 | 6 | Security | the class sweep: covered how, or risk accepted and why | `security.md` |
 | 7 | Infra | resources; every config that encodes a rule or a cost; the bill at three scales | `infra.md` |
 | 8 | Observability | the alarms that wake someone and whom; what is only watched; a window is not a clock | `observability.md` |

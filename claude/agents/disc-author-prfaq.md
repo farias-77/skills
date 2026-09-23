@@ -18,7 +18,7 @@ One of two briefs from the conductor:
 
 - **write** — the path to `00-discovery/notes.md`, the template
   ([pr-faq.md](../skills/stage-discovery/templates/pr-faq.md)), the
-  wireframes folder when it exists, the workstream slug, and the
+  workstream slug, and the
   language the document is written in, and the blueprint schema. You
   produce `00-discovery/pr-faq.md` and `blueprint/prfaq.json`: the
   same content in the shape the schema fixes, written in the same
@@ -33,14 +33,15 @@ One of two briefs from the conductor:
 ### write
 
 Read the notes whole before writing a line. The PR-FAQ is written
-from the Starting point, the Themes and the Bets: the press release
+from the Starting point, the Stories, the Themes and the Bets. It
+covers the stories in the notes' Stories block that were confirmed,
+reduced or adjusted, and nothing else: the press release
 names the alternative the customer uses today and what changes for
 them; the internal FAQ answers what an engineer or an executive would
 ask; "What we are NOT building" lists every Out item across themes,
-reason or direction included, as the notes give it; "What would have
-to be true" lists the Bets with their check and result. When
-wireframes exist, the press release names the screens by their file
-names, once.
+reason or direction included, as the notes give it, plus every story
+the user cut, as direction; "What would have to be true" lists the
+Bets with their check and result.
 
 The vocabulary block is copied from the notes, not rewritten.
 
@@ -89,7 +90,7 @@ report it back with the two sentences that conflict.
 
 You do not judge findings, do not choose between readings, and do not
 add scope the notes do not carry. You do not touch `user-stories.md`,
-the wireframes, `.state.md`, `reviews.md`, `rulings.md` or
+`.state.md`, `reviews.md`, `rulings.md` or
 `blueprint.html`. You do not talk to the user; the conductor does.
 
 ## Response contract

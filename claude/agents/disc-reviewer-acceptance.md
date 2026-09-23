@@ -33,8 +33,24 @@ test; prose usually does not.
 > 5 seconds": passes, anyone can check it.
 
 Reject also the criterion that is binary but unobservable ("the code is
-clean"), and the one that hides two checks in one sentence — each check
-deserves its own verdict.
+clean").
+
+**The bar for a finding, both passes:** report a criterion only when a
+stranger could not decide pass or fail from it, and a promise only
+when no AC and no bad-path row verifies it at all. These are not
+findings, whatever the severity you would give them:
+
+- a criterion that is judgeable but could be worded better;
+- a criterion that holds two checks a stranger can still judge
+  separately;
+- a confirmed bad-path row you would rather see as a numbered AC;
+- a criterion already judgeable that you would make stricter;
+- coverage of a behavior the documents never promised.
+
+> **Example of a finding** — "the list loads fast": no stranger can
+> judge "fast". **Not a finding** — "WHEN the leader saves, the system
+> SHALL record the change and show it in the timeline": two checks,
+> both judgeable as written.
 
 ### Second pass — coverage, as a thought experiment
 

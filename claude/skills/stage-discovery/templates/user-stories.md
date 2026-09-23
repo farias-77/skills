@@ -6,11 +6,12 @@
   (planning issues, tests, the e2e round), so they never change after
   approval.
 
-  The document leaves discovery holding only what gets built. The
-  user validates every story: a story he reduces is rewritten in its
-  minimum and what came out goes to its "Out of this story" list; a
-  story he cuts is removed from this file and listed in the PR-FAQ
-  under "What we are NOT building". No status field anywhere.
+  The document holds only what gets built: the stories the user
+  confirmed at the playback (the notes' Stories block). A story he
+  reduced is written in its minimum and what came out goes to its "Out
+  of this story" list; a story he cut is not written here and is
+  listed in the PR-FAQ under "What we are NOT building". No status
+  field anywhere.
 
   ACs are written in EARS form: "WHEN <condition>, the system SHALL
   <behavior>" (state-driven: "WHILE <state>..."; unwanted behavior:
@@ -39,8 +40,6 @@ Vocabulary:
 
 **As a** <persona>, **I want** <capability>, **so that** <outcome>.
 
-**Screens:** <none> | `wireframes/<screen>.html` (states this story owns: <empty · loading · error · no permission>)
-
 ### Acceptance criteria
 
 - **`<SLUG>-S-001-AC-1`** — WHEN <condition>, the system SHALL <observable behavior, concrete values>.
@@ -67,7 +66,7 @@ Vocabulary:
 ## Inferred
 
 <!-- Every fact the author assumed while writing, with the guess marked
-     as a guess. The user confirms or rejects each one at validation;
+     as a guess. The user confirms or rejects each one with the review's decisions;
      a confirmed inference is rewritten as fact and removed from here.
      MUST be empty to approve. -->
 
