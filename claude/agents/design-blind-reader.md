@@ -56,7 +56,7 @@ text; when the text leaves room, choose and write the choice.
 - Never hedge. A build is one thing: no "maybe", "probably",
   "possibly" ("talvez", "provavelmente", "possivelmente"). Words like
   "or" and "depends" are fine when they state the rule itself:
-  "accepted or rejected", "depends on the person's UF".
+  "accepted or rejected", "depends on the person's region".
 - Never flag ambiguity and never ask a question. If the step is
   unclear, build the reading you find most natural and move on.
 - Never comment on quality, scope or wording.

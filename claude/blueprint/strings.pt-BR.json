@@ -19,7 +19,6 @@
   "out": "O que fica de fora",
   "bets": "As apostas",
   "inferred": "O que foi inferido",
-  "wireframes": "Wireframes",
   "review": "A revisão"
  },
  "cells": {
@@ -27,9 +26,6 @@
   "personas": "personas",
   "acs": "critérios de aceitação",
   "badPaths": "maus caminhos definidos",
-  "screens": "tela em wireframe",
-  "screensTail": "em wireframe",
-  "noFront": "sem front nesta demanda",
   "out": "itens fora",
   "direction": "são direção futura",
   "bets": "apostas de pé",
@@ -60,7 +56,6 @@
   "bad": "maus caminhos",
   "criteria": "Critérios de aceitação",
   "badPaths": "Maus caminhos",
-  "screens": "Telas",
   "out": "Fora desta história"
  },
  "badCat": {
@@ -96,10 +91,6 @@
   "open": "sem ruling",
   "superseded": "superada",
   "landed": "em"
- },
- "wf": {
-  "none": "Esta demanda não tem front: nenhuma tela foi desenhada. Quando há, cada tela aparece aqui embutida, com as histórias que ela serve e os estados desenhados (vazio, carregando, erro, sem permissão).",
-  "lede": "Uma tela por wireframe: o que está nela, o que cada coisa faz, para onde se vai. O visual é do design."
  },
  "revLede": "O que as lentes acharam, o que o condutor decidiu sozinho, o que foi perguntado a você, o que fica para o design, e o que morreu com a frase que o fecha.",
  "rev": {
@@ -313,114 +304,89 @@
  "plan": {
   "sec": {
    "what": "O que vamos construir, e em que ordem",
-   "ab": "De A para B",
-   "lanes": "As trilhas",
-   "waves": "As ondas",
-   "team": "As sessões",
+   "graph": "O grafo",
+   "foundation": "A fundação",
+   "entries": "As entradas",
+   "decisions": "As decisões e o pré-voo",
    "review": "A revisão"
   },
   "cells": {
-   "lanes": "trilhas em paralelo",
-   "lanesTail": "uma sessão cada",
-   "rows": "rows",
-   "rowsTail": "em {n} repos",
-   "waves": "ondas de aceitação",
-   "wavesTail": "portões, não fases",
+   "entries": "entradas",
+   "entriesTail": "{n} começam logo depois da fundação",
+   "stories": "histórias",
+   "storiesTail": "cada uma em exatamente uma entrada",
+   "concurrency": "construídas ao mesmo tempo, no máximo",
+   "concurrencyTail": "o teto, pela máquina",
+   "steps": "passos",
+   "stepsTail": "a cadeia mais longa depois da fundação",
    "cards": "decisões do corte",
    "against": "contra a recomendação",
    "preflight": "itens do pré-voo",
-   "preflightTail": "{n} entregues",
-   "suites": "casos de smoke",
-   "suitesTail": "{n} suítes inteiras"
-  },
-  "board": {
-   "lane": "trilha",
-   "wave": "onda",
-   "acceptsWhen": "aceita quando",
-   "noRows": "nada nesta onda",
-   "par": "em paralelo com"
+   "preflightTail": "{n} entregues"
   },
   "a": "A · hoje",
-  "b": "B · quando a última onda fica verde",
-  "contracts": "Os contratos congelados",
-  "contractsLede": "O que uma trilha escreve e outra lê, com a seção do design que fixa o formato. É por isso que nenhuma trilha espera outra: quem lê prova com dado semeado nesse formato, e a onda prova a junção real.",
-  "ct": {
-   "name": "Contrato",
-   "fixedIn": "Fixado em",
-   "writtenBy": "Escreve",
-   "readBy": "Lê"
+  "b": "B · quando a última entrada é mergeada",
+  "foundationNode": "F · Fundação",
+  "caption": "F é a fundação. Uma seta quer dizer que a entrada na ponta precisa do comportamento da entrada na origem para se provar; todo o resto roda em paralelo, até {c} ao mesmo tempo.",
+  "byStep": "As entradas, passo a passo",
+  "step": "Passo",
+  "stepEntries": "Entradas",
+  "stepZero": "a fundação",
+  "items": "O que ela assenta",
+  "item": {
+   "kind": "Tipo",
+   "what": "O quê"
   },
-  "lane": {
-   "session": "sessão",
-   "shares": "divide a stack do alpha com",
-   "preflight": "pré-voo",
-   "noPreflight": "nada a entregar",
-   "touches": "toca",
-   "readBy": "lido por",
-   "after": "depois de",
-   "seeds": "prova com dado semeado"
+  "kinds": {
+   "migration": "migração",
+   "contract": "contrato",
+   "module": "módulo",
+   "shared": "compartilhado",
+   "factory": "factory",
+   "other": "outro"
   },
-  "row": {
-   "num": "#",
-   "story": "História",
-   "what": "O que constrói",
-   "proof": "Prova",
+  "proof": "A prova",
+  "briefFile": "O brief inteiro · {f}",
+  "table": {
+   "id": "#",
+   "name": "Entrada",
+   "stories": "Histórias",
    "after": "Depois de",
-   "wave": "Onda",
+   "back": "Back",
+   "front": "Front",
+   "proof": "Prova"
+  },
+  "noAfter": "só a fundação",
+  "noSide": "—",
+  "touches": "toca",
+  "seeStep": "vê",
+  "briefs": "Os briefs, um por entrada",
+  "brief": {
+   "back": "Back",
+   "front": "Front",
+   "proof": "Como se prova",
+   "look": "Vale um olhar",
+   "builder": "O builder decide"
+  },
+  "cutDecisions": "As decisões do corte",
+  "decisionsOf": "As decisões desta entrada",
+  "decisionsOfF": "As decisões da fundação",
+  "noDecisions": "nenhuma decisão do corte registrada",
+  "preflight": {
+   "title": "O pré-voo: o que você entrega antes de sair",
+   "item": "Item",
+   "entry": "Entrada",
+   "status": "Estado",
+   "handed": "entregue",
+   "missing": "faltando: a entrada fica estacionada"
+  },
+  "noPreflight": "nada a entregar",
+  "row": {
    "run": "roda",
    "expect": "espera",
    "see": "vê",
    "where": "onde"
   },
-  "goal": {
-   "title": "Goal {w} · o brief do worker",
-   "rows": "As rows, uma linha cada",
-   "builds": "Constrói",
-   "proof": "Prova",
-   "look": "Vale um olhar",
-   "worker": "O worker decide",
-   "file": "O goal inteiro · {f}"
-  },
-  "wave": {
-   "accepts": "Aceita quando",
-   "requires": "Exige mergeado e deployado",
-   "folders": "Pastas afetadas",
-   "suites": "Suítes verdes antes",
-   "walk": "A caminhada da master",
-   "step": "Passo",
-   "run": "Roda",
-   "expect": "Espera",
-   "masterDecides": "A master decide sozinha",
-   "parks": "Estaciona para você",
-   "shadow": "Suíte em sombra depois do portão",
-   "shadowYes": "sim: roda tudo em background; vermelha bloqueia o próximo portão, nunca uma trilha",
-   "shadowNo": "não",
-   "cases": "casos",
-   "screenshot": "captura de tela"
-  },
-  "team": {
-   "session": "Sessão",
-   "name": "Nome",
-   "model": "Modelo, effort",
-   "folder": "Pasta",
-   "owns": "Cuida de",
-   "first": "Primeira mensagem",
-   "rules": "As regras que as sessões dividem",
-   "rule1": "Um worker nunca espera a master para seguir a trilha; só a onda espera.",
-   "rule2": "Toda mensagem entre sessões tem uma linha e aponta para um arquivo.",
-   "rule3": "Trilhas que dividem uma stack do alpha nunca rodam smoke e deploy ao mesmo tempo nela."
-  },
-  "preflight": {
-   "title": "O pré-voo: o que você entrega antes de sair",
-   "item": "Item",
-   "row": "Row",
-   "status": "Estado",
-   "handed": "entregue",
-   "missing": "faltando: a row fica estacionada"
-  },
-  "decLede": "Cada decisão do corte em três linhas: a pergunta, a escolha, o porquê. As marcadas na borda foram contra a recomendação.",
-  "decisionsOf": "As decisões desta onda",
-  "cutDecisions": "As decisões do corte",
   "when": {
    "session": "sessão",
    "writer": "pergunta do escritor",
@@ -431,378 +397,103 @@
   },
   "rev": {
    "conductor": "decididos pelo condutor no seu lugar",
-   "toWriters": "Aos escritores",
-   "toWorker": "Ao worker"
+   "toWriters": "Aos escritores"
   },
-  "graph": {
-   "sec": {
-    "what": "O que vamos construir, e em que ordem",
-    "graph": "O grafo",
-    "foundation": "A fundação",
-    "entries": "As entradas",
-    "decisions": "As decisões e o pré-voo",
-    "review": "A revisão"
-   },
-   "cells": {
-    "entries": "entradas",
-    "entriesTail": "{n} começam logo depois da fundação",
-    "stories": "histórias",
-    "storiesTail": "cada uma em exatamente uma entrada",
-    "concurrency": "construídas ao mesmo tempo, no máximo",
-    "concurrencyTail": "o teto, pela máquina",
-    "steps": "passos",
-    "stepsTail": "a cadeia mais longa depois da fundação",
-    "cards": "decisões do corte",
-    "against": "contra a recomendação",
-    "preflight": "itens do pré-voo",
-    "preflightTail": "{n} entregues"
-   },
-   "a": "A · hoje",
-   "b": "B · quando a última entrada é mergeada",
-   "foundationNode": "F · Fundação",
-   "caption": "F é a fundação. Uma seta quer dizer que a entrada na ponta precisa do comportamento da entrada na origem para se provar; todo o resto roda em paralelo, até {c} ao mesmo tempo.",
-   "byStep": "As entradas, passo a passo",
-   "step": "Passo",
-   "stepEntries": "Entradas",
-   "stepZero": "a fundação",
-   "items": "O que ela assenta",
-   "item": {
-    "kind": "Tipo",
-    "what": "O quê"
-   },
-   "kinds": {
-    "migration": "migração",
-    "contract": "contrato",
-    "module": "módulo",
-    "shared": "compartilhado",
-    "factory": "factory",
-    "other": "outro"
-   },
-   "proof": "A prova",
-   "briefFile": "O brief inteiro · {f}",
-   "table": {
-    "id": "#",
-    "name": "Entrada",
-    "stories": "Histórias",
-    "after": "Depois de",
-    "back": "Back",
-    "front": "Front",
-    "proof": "Prova"
-   },
-   "noAfter": "só a fundação",
-   "noSide": "—",
-   "touches": "toca",
-   "seeStep": "vê",
-   "briefs": "Os briefs, um por entrada",
-   "brief": {
-    "back": "Back",
-    "front": "Front",
-    "proof": "Como se prova",
-    "look": "Vale um olhar",
-    "builder": "O builder decide"
-   },
-   "cutDecisions": "As decisões do corte",
-   "decisionsOf": "As decisões desta entrada",
-   "decisionsOfF": "As decisões da fundação",
-   "noDecisions": "nenhuma decisão do corte registrada",
-   "preflight": {
-    "title": "O pré-voo: o que você entrega antes de sair",
-    "item": "Item",
-    "entry": "Entrada",
-    "status": "Estado",
-    "handed": "entregue",
-    "missing": "faltando: a entrada fica estacionada"
-   },
-   "noPreflight": "nada a entregar"
-  }
+  "decLede": "Cada decisão do corte em três linhas: a pergunta, a escolha, o porquê. As marcadas na borda foram contra a recomendação."
  },
  "execution": {
   "sec": {
-   "what": "O que foi construído, e o que foi provado",
-   "lanes": "As trilhas",
-   "waves": "Os portões",
+   "what": "O que foi construído, e o que espera",
+   "graph": "O grafo, como ficou",
+   "entries": "As entradas",
+   "review": "A revisão",
    "audit": "A auditoria"
   },
+  "started": "início",
+  "closed": "fechamento",
+  "branch": "branch",
+  "head": "head",
+  "gate": "portão",
   "cells": {
-   "rows": "rows mergeadas",
-   "rowsTail": "de {n} planejadas",
-   "fixRows": "rows de correção",
-   "fixRowsTail": "caminhadas e auditoria",
-   "prs": "pull requests",
-   "prsTail": "{n} rounds de revisão",
+   "merged": "mergeadas",
+   "mergedTail": "a fundação e as entradas do plano",
+   "parked": "estacionadas",
+   "parkedTail": "esperando a sua decisão",
+   "amendments": "emendas",
+   "amendmentsTail": "à fundação, cada uma para uma entrada",
+   "rounds": "rodadas de revisão",
+   "roundsTail": "somando todas as entradas",
    "findings": "achados",
-   "findingsTail": "{n} sustentados",
-   "waves": "portões verdes",
-   "wavesTail": "de {n}",
-   "parked": "esperando você",
-   "parkedTail": "rows que as trilhas pularam"
+   "findingsTail": "{n} mantidos"
   },
-  "board": {
-   "lane": "trilha",
-   "wave": "portão",
+  "status": {
    "merged": "mergeada",
-   "building": "em andamento",
-   "parked": "estacionada",
-   "open": "não iniciada",
-   "fix": "correção",
-   "noRows": "nada neste portão",
-   "green": "verde",
-   "openGate": "aberto",
-   "legend": "cheio: mergeada · contorno: em andamento · tracejado: estacionada · +: row de correção"
+   "building": "em construção",
+   "waiting": "na fila",
+   "parked": "estacionada"
   },
-  "lane": {
-   "session": "sessão",
-   "row": "#",
-   "story": "História",
-   "what": "O que construiu",
-   "pr": "PR",
-   "r1": "Round 1",
-   "r2": "Round 2",
-   "proof": "Prova no alpha",
-   "attempts": "Builders",
+  "caption": "O grafo do plano com o estado de cada entrada agora. F é a fundação; uma seta quer dizer que a entrada na ponta precisou da entrada na origem mergeada antes.",
+  "kinds": {
+   "F": "a fundação",
+   "amendment": "emenda à fundação",
+   "fix": "entrada de correção"
+  },
+  "table": {
+   "id": "#",
    "status": "Estado",
-   "rounds": "f · s · d · x = achados · sustentados · adiados · descartados",
-   "eye": "O que precisa do seu olho nesta trilha",
-   "notes": "notas que seguem",
-   "departures": "desvios do padrão",
-   "choices": "escolhas onde os documentos eram silenciosos",
-   "stops": "paradas",
-   "suites": "A suíte inteira",
-   "suite": "{w}: {p} passaram · {f} falharam · {s} pulados · {m} min",
-   "look": "Vale um olhar",
-   "noEye": "Nada segue desta trilha.",
-   "fixOf": "correção de",
-   "run": "roda",
-   "expect": "espera",
-   "got": "imprimiu",
-   "see": "vê",
-   "where": "onde",
-   "shot": "captura",
-   "openRow": "o registro",
-   "status_": {
-    "merged": "mergeada",
-    "building": "em andamento",
-    "parked": "estacionada",
-    "open": "não iniciada"
-   }
+   "sha": "Commit",
+   "rounds": "Rodadas",
+   "findings": "Achados → mantidos",
+   "summary": "O que construiu"
   },
-  "wave": {
-   "tag": "tag",
-   "at": "alpha em",
-   "gated": "aceito",
-   "openGate": "aberto: a caminhada não fechou",
-   "before": "Suítes verdes antes da caminhada",
-   "shadow": "Suíte em sombra depois do portão",
-   "walk": "A caminhada da master",
-   "step": "Passo",
-   "run": "Roda",
-   "expect": "Espera",
-   "got": "Imprimiu",
-   "ok": "verde",
-   "ko": "vermelho",
-   "fixes": "Rows de correção que este portão mandou",
-   "parked": "Estacionado neste portão",
-   "intern": "Para o estagiário",
-   "problem": "O problema que este portão resolve",
-   "roles": "Quem faz o quê",
-   "component": "Componente",
-   "role": "O trabalho dele",
-   "analogy": "Pense como",
-   "guards": "As guardas",
-   "guard": "Guarda",
-   "stops": "O que impede",
-   "why": "Por quê",
-   "alphaVsProd": "Alpha e prod",
-   "none": "nenhuma",
-   "fixRow": "row",
-   "of": "de"
+  "parkedOn": "estacionada em",
+  "amendments": "Emendas à fundação",
+  "amendTable": {
+   "id": "#",
+   "what": "O quê",
+   "for": "Para",
+   "sha": "Commit"
   },
+  "noAmendments": "Nenhuma emenda: a fundação bastou.",
+  "precTitle": "Precisão por revisor",
+  "prec": {
+   "lens": "Revisor",
+   "found": "Achados",
+   "sustained": "Mantidos",
+   "deferred": "Adiados",
+   "latitude": "Latitude",
+   "dismissed": "Descartados",
+   "user": "Para você",
+   "ratio": "Mantidos / achados",
+   "total": "todos os revisores"
+  },
+  "noPrecision": "Nenhum revisor reportou ainda.",
   "audit": {
-   "notYet": "A auditoria não rodou: a master te chama quando todos os portões estiverem verdes.",
-   "items": "itens",
-   "itemsTail": "{n} regidos",
-   "fixes": "rows de correção",
-   "fixesTail": "{n} mergeadas",
-   "kinds": {
-    "P": "Estacionados — o que esperou você",
-    "D": "Desvios do padrão",
-    "C": "Escolhas onde os documentos eram silenciosos",
-    "N": "Notas ainda abertas",
-    "S": "Paradas e como terminaram"
-   },
+   "items": "itens para a sua decisão",
+   "itemsTail": "{n} decididos",
+   "latitudeCell": "latitude",
+   "latitudeTail": "decidido pelos builders, listado para veto",
+   "parked": "Estacionados — o que esperou você",
+   "choices": "Escolhas onde os documentos eram silenciosos",
+   "latitude": "Latitude — o que os builders decidiram no seu lugar",
+   "entry": "entrada",
    "where": "onde",
-   "standardSays": "o padrão diz",
-   "built": "o que foi construído",
-   "reading": "lendo o código",
    "recommendation": "recomendação",
-   "ruling": "sua ruling",
-   "unruled": "ainda não perguntado",
+   "ruling": "sua decisão",
+   "awaiting": "aguardando a sua decisão",
+   "ruled": "decidido",
    "rulings": {
     "keep": "manter",
     "fix": "corrigir",
     "revert": "reverter"
    },
-   "fixTable": {
-    "id": "Row",
-    "from": "De",
-    "lane": "Trilha",
-    "what": "O quê",
-    "status": "Estado",
-    "pr": "PR"
-   },
-   "close": "O fechamento",
-   "date": "data",
-   "shas": "branches",
-   "alphaAt": "alpha",
-   "suites": "suítes",
-   "residue": "resíduo, com donos",
-   "notClosed": "A auditoria está aberta: a seção de fechamento não foi escrita."
-  }
- },
- "release": {
-  "sec": {
-   "what": "O que está em produção",
-   "train": "O trem",
-   "versions": "Versões e o caminho de volta",
-   "watch": "A vigília e o fechamento"
-  },
-  "cells": {
-   "repos": "repos em produção",
-   "reposTail": "de {n} que sobem",
-   "steps": "passos do trem verdes",
-   "stepsTail": "de {n}",
-   "fixes": "rows de correção",
-   "fixesTail": "{n} hotfixes",
-   "watch": "provas lidas na vigília",
-   "watchTail": "de {n}",
-   "stops": "paradas",
-   "stopsTail": "onde a sessão chamou você"
-  },
-  "prod": {
-   "repo": "Repo",
-   "version": "Versão",
-   "sha": "Sha",
-   "deployedAt": "Subiu em",
-   "notYet": "Nada em produção ainda: o trem não fechou."
-  },
-  "goal": {
-   "title": "O goal",
-   "notYet": "Ainda não dado: a sessão espera pelo plano.",
-   "at": "dado em"
-  },
-  "preflight": {
-   "title": "Pré-voo — o que só você podia fazer",
-   "what": "O quê",
-   "status": "Status",
-   "how": "Como",
-   "done": "feito",
-   "delegated": "delegado",
-   "open": "aberto",
-   "none": "nada precisou de você antes do goal"
-  },
-  "integ": {
-   "title": "Integração e confirmação a partir da main",
-   "repo": "Repo",
-   "pr": "PR",
-   "rebased": "Rebase",
-   "ci": "CI",
-   "merged": "Mergeado",
-   "confirm": "Confirmação",
-   "stood": "o verde da auditoria vale",
-   "suite": "suíte {p} passaram · {f} falharam · {s} pulados",
-   "tree": "árvore idêntica",
-   "alpha": "diff do alpha vazio",
-   "yes": "sim",
-   "no": "não",
-   "waiting": "espera o trem (merge é deploy)",
-   "pending": "ainda não"
-  },
-  "train": {
-   "title": "O trem, passo a passo",
-   "step": "Passo",
-   "repo": "Repo",
-   "what": "O quê",
-   "run": "Roda / vê",
-   "expect": "Espera / onde",
-   "got": "Saiu",
-   "at": "Quando",
-   "ok": "verde",
-   "ko": "vermelho",
-   "none": "nenhum passo rodou ainda"
-  },
-  "versions": {
-   "repo": "Repo",
-   "from": "De",
-   "to": "Para",
-   "bump": "Salto",
-   "sha": "Sha",
-   "release": "Release",
-   "notes": "notas",
-   "unparsed": "{n} commits fora da gramática",
-   "none": "nenhuma versão derivada ainda",
-   "bumps": {
-    "major": "major",
-    "minor": "minor",
-    "patch": "patch",
-    "initial": "primeira versão"
+   "closedOn": "A auditoria fechou em {d}: todo item tem a sua decisão.",
+   "openNote": "A auditoria está aberta: ela fecha quando você tiver decidido todos os itens.",
+   "none": "Nada aqui.",
+   "latTable": {
+    "entry": "Entrada",
+    "what": "O quê"
    }
-  },
-  "rollback": {
-   "title": "O caminho de volta, por repo",
-   "repo": "Repo",
-   "returnTo": "Volta para",
-   "dataSafe": "Seguro para os dados",
-   "note": "Nota",
-   "file": "Arquivo",
-   "yes": "sim",
-   "no": "NÃO — uma parada"
-  },
-  "fixes": {
-   "title": "Corrigido no caminho",
-   "id": "Row",
-   "kind": "Tipo",
-   "repo": "Repo",
-   "seen": "Visto",
-   "what": "O que mudou",
-   "pr": "PR",
-   "tag": "Tag",
-   "status": "Status",
-   "none": "nada foi corrigido no caminho",
-   "kinds": {
-    "fix": "correção",
-    "hotfix": "hotfix"
-   },
-   "status_": {
-    "building": "em andamento",
-    "merged": "mergeado",
-    "deployed": "em prod",
-    "stopped": "parado"
-   }
-  },
-  "watch": {
-   "title": "A vigília — provas que a auditoria adiou para prod",
-   "n": "#",
-   "what": "O quê",
-   "at": "Legível a partir de",
-   "expect": "Espera",
-   "got": "Saiu",
-   "readAt": "Lido em",
-   "ok": "verde",
-   "ko": "vermelho",
-   "pending": "ainda não",
-   "owner": "pendência: {o}",
-   "none": "a auditoria não adiou nada para produção"
-  },
-  "stops": {
-   "title": "Onde a sessão parou",
-   "none": "A sessão nunca parou: nenhum terceiro vermelho, nenhum rollback inseguro."
-  },
-  "close": {
-   "title": "O fechamento",
-   "date": "data",
-   "residue": "fica com um dono",
-   "none": "nada",
-   "notYet": "O stage não fechou: a vigília ainda está aberta."
   }
  },
  "close": {

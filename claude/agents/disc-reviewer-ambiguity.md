@@ -36,7 +36,7 @@ decided") means the reader could not settle the sentence. Treat each
 option as a possible build: when the options are different products,
 or one of them differs from the other reader's build, the verdict is
 `different-product`. "Or" and "depends" that state the rule itself
-("approved or rejected", "depends on the person's UF") are a
+("approved or rejected", "depends on the person's region") are a
 committed build, not an open one.
 
 > **Example** — "the invite expires in 7 days". Reader 1: 7 calendar

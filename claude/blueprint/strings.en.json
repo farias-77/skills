@@ -19,7 +19,6 @@
   "out": "What stays out",
   "bets": "The bets",
   "inferred": "What was inferred",
-  "wireframes": "Wireframes",
   "review": "The review"
  },
  "cells": {
@@ -27,9 +26,6 @@
   "personas": "personas",
   "acs": "acceptance criteria",
   "badPaths": "bad paths defined",
-  "screens": "screens in wireframe",
-  "screensTail": "in wireframe",
-  "noFront": "no front in this demand",
   "out": "items out",
   "direction": "are future direction",
   "bets": "bets standing",
@@ -60,7 +56,6 @@
   "bad": "bad paths",
   "criteria": "Acceptance criteria",
   "badPaths": "Bad paths",
-  "screens": "Screens",
   "out": "Out of this story"
  },
  "badCat": {
@@ -96,10 +91,6 @@
   "open": "no ruling",
   "superseded": "superseded",
   "landed": "in"
- },
- "wf": {
-  "none": "This demand has no front: no screen was drawn. When there is one, each screen appears here embedded, with the stories it serves and the states drawn (empty, loading, error, no permission).",
-  "lede": "One screen per wireframe: what is on it, what each thing does, where the user goes next. The look is the design stage's."
  },
  "revLede": "What the lenses found, what the conductor decided alone, what was asked of you, what goes to the design, and what died with the sentence that closes it.",
  "rev": {
@@ -313,114 +304,89 @@
  "plan": {
   "sec": {
    "what": "What we build, and in what order",
-   "ab": "From A to B",
-   "lanes": "The lanes",
-   "waves": "The waves",
-   "team": "The sessions",
+   "graph": "The graph",
+   "foundation": "The foundation",
+   "entries": "The entries",
+   "decisions": "The decisions and the pre-flight",
    "review": "The review"
   },
   "cells": {
-   "lanes": "lanes in parallel",
-   "lanesTail": "one session each",
-   "rows": "rows",
-   "rowsTail": "across {n} repos",
-   "waves": "acceptance waves",
-   "wavesTail": "gates, not phases",
+   "entries": "entries",
+   "entriesTail": "{n} start right after the foundation",
+   "stories": "stories",
+   "storiesTail": "each carried by exactly one entry",
+   "concurrency": "built at once, at most",
+   "concurrencyTail": "the cap, from the machine",
+   "steps": "steps",
+   "stepsTail": "the longest chain after the foundation",
    "cards": "cut decisions",
    "against": "against the recommendation",
    "preflight": "pre-flight items",
-   "preflightTail": "{n} handed over",
-   "suites": "smoke cases",
-   "suitesTail": "{n} whole suites"
-  },
-  "board": {
-   "lane": "lane",
-   "wave": "wave",
-   "acceptsWhen": "accepts when",
-   "noRows": "nothing in this wave",
-   "par": "in parallel with"
+   "preflightTail": "{n} handed over"
   },
   "a": "A · today",
-  "b": "B · when the last wave is green",
-  "contracts": "The frozen contracts",
-  "contractsLede": "What one lane writes and another reads, with the design section that fixes the shape. This is why no lane waits for another: the reader proves on seeded data in that shape, and the wave proves the real junction.",
-  "ct": {
-   "name": "Contract",
-   "fixedIn": "Fixed in",
-   "writtenBy": "Written by",
-   "readBy": "Read by"
+  "b": "B · when the last entry is merged",
+  "foundationNode": "F · Foundation",
+  "caption": "F is the foundation. An arrow means the entry at its tip needs the behavior of the entry at its tail to prove itself; everything else runs in parallel, up to {c} at once.",
+  "byStep": "The entries, step by step",
+  "step": "Step",
+  "stepEntries": "Entries",
+  "stepZero": "the foundation",
+  "items": "What it lays down",
+  "item": {
+   "kind": "Kind",
+   "what": "What"
   },
-  "lane": {
-   "session": "session",
-   "shares": "shares the alpha stack with",
-   "preflight": "pre-flight",
-   "noPreflight": "nothing to hand over",
-   "touches": "touches",
-   "readBy": "read by",
-   "after": "after",
-   "seeds": "proves on seeded data"
+  "kinds": {
+   "migration": "migration",
+   "contract": "contract",
+   "module": "module",
+   "shared": "shared",
+   "factory": "factory",
+   "other": "other"
   },
-  "row": {
-   "num": "#",
-   "story": "Story",
-   "what": "What it builds",
-   "proof": "Proof",
+  "proof": "The proof",
+  "briefFile": "The whole brief · {f}",
+  "table": {
+   "id": "#",
+   "name": "Entry",
+   "stories": "Stories",
    "after": "After",
-   "wave": "Wave",
+   "back": "Back",
+   "front": "Front",
+   "proof": "Proof"
+  },
+  "noAfter": "foundation only",
+  "noSide": "—",
+  "touches": "touches",
+  "seeStep": "see",
+  "briefs": "The briefs, one per entry",
+  "brief": {
+   "back": "Back",
+   "front": "Front",
+   "proof": "How it is proved",
+   "look": "Worth a look",
+   "builder": "The builder decides"
+  },
+  "cutDecisions": "The decisions of the cut",
+  "decisionsOf": "The decisions of this entry",
+  "decisionsOfF": "The decisions of the foundation",
+  "noDecisions": "no cut decision recorded",
+  "preflight": {
+   "title": "The pre-flight: what you hand over before leaving",
+   "item": "Item",
+   "entry": "Entry",
+   "status": "Status",
+   "handed": "handed over",
+   "missing": "missing: the entry is parked"
+  },
+  "noPreflight": "nothing to hand over",
+  "row": {
    "run": "run",
    "expect": "expect",
    "see": "see",
    "where": "where"
   },
-  "goal": {
-   "title": "Goal {w} · the worker's brief",
-   "rows": "The rows, one line each",
-   "builds": "Builds",
-   "proof": "Proof",
-   "look": "Worth a look",
-   "worker": "The worker decides",
-   "file": "The whole goal · {f}"
-  },
-  "wave": {
-   "accepts": "Accepts when",
-   "requires": "Requires merged and deployed",
-   "folders": "Affected folders",
-   "suites": "Suites green before",
-   "walk": "The master's walk",
-   "step": "Step",
-   "run": "Run",
-   "expect": "Expect",
-   "masterDecides": "The master decides alone",
-   "parks": "Parks for you",
-   "shadow": "Shadow suite after the gate",
-   "shadowYes": "yes: everything runs in the background; red blocks the next gate, never a lane",
-   "shadowNo": "no",
-   "cases": "cases",
-   "screenshot": "screenshot"
-  },
-  "team": {
-   "session": "Session",
-   "name": "Name",
-   "model": "Model, effort",
-   "folder": "Folder",
-   "owns": "Owns",
-   "first": "First message",
-   "rules": "The rules the sessions share",
-   "rule1": "A worker never waits for the master to go on with its lane; only a wave waits.",
-   "rule2": "Every message between sessions is one line and points at a file.",
-   "rule3": "Lanes that share an alpha stack never run a smoke and a deploy at the same time there."
-  },
-  "preflight": {
-   "title": "The pre-flight: what you hand over before leaving",
-   "item": "Item",
-   "row": "Row",
-   "status": "Status",
-   "handed": "handed over",
-   "missing": "missing: the row is parked"
-  },
-  "decLede": "Every cut decision in three lines: the question, the choice, the why. The ones marked on the edge went against the recommendation.",
-  "decisionsOf": "The decisions of this wave",
-  "cutDecisions": "The decisions of the cut",
   "when": {
    "session": "session",
    "writer": "writer's question",
@@ -431,378 +397,103 @@
   },
   "rev": {
    "conductor": "ruled by the conductor in your place",
-   "toWriters": "To the writers",
-   "toWorker": "To the worker"
+   "toWriters": "To the writers"
   },
-  "graph": {
-   "sec": {
-    "what": "What we build, and in what order",
-    "graph": "The graph",
-    "foundation": "The foundation",
-    "entries": "The entries",
-    "decisions": "The decisions and the pre-flight",
-    "review": "The review"
-   },
-   "cells": {
-    "entries": "entries",
-    "entriesTail": "{n} start right after the foundation",
-    "stories": "stories",
-    "storiesTail": "each carried by exactly one entry",
-    "concurrency": "built at once, at most",
-    "concurrencyTail": "the cap, from the machine",
-    "steps": "steps",
-    "stepsTail": "the longest chain after the foundation",
-    "cards": "cut decisions",
-    "against": "against the recommendation",
-    "preflight": "pre-flight items",
-    "preflightTail": "{n} handed over"
-   },
-   "a": "A · today",
-   "b": "B · when the last entry is merged",
-   "foundationNode": "F · Foundation",
-   "caption": "F is the foundation. An arrow means the entry at its tip needs the behavior of the entry at its tail to prove itself; everything else runs in parallel, up to {c} at once.",
-   "byStep": "The entries, step by step",
-   "step": "Step",
-   "stepEntries": "Entries",
-   "stepZero": "the foundation",
-   "items": "What it lays down",
-   "item": {
-    "kind": "Kind",
-    "what": "What"
-   },
-   "kinds": {
-    "migration": "migration",
-    "contract": "contract",
-    "module": "module",
-    "shared": "shared",
-    "factory": "factory",
-    "other": "other"
-   },
-   "proof": "The proof",
-   "briefFile": "The whole brief · {f}",
-   "table": {
-    "id": "#",
-    "name": "Entry",
-    "stories": "Stories",
-    "after": "After",
-    "back": "Back",
-    "front": "Front",
-    "proof": "Proof"
-   },
-   "noAfter": "foundation only",
-   "noSide": "—",
-   "touches": "touches",
-   "seeStep": "see",
-   "briefs": "The briefs, one per entry",
-   "brief": {
-    "back": "Back",
-    "front": "Front",
-    "proof": "How it is proved",
-    "look": "Worth a look",
-    "builder": "The builder decides"
-   },
-   "cutDecisions": "The decisions of the cut",
-   "decisionsOf": "The decisions of this entry",
-   "decisionsOfF": "The decisions of the foundation",
-   "noDecisions": "no cut decision recorded",
-   "preflight": {
-    "title": "The pre-flight: what you hand over before leaving",
-    "item": "Item",
-    "entry": "Entry",
-    "status": "Status",
-    "handed": "handed over",
-    "missing": "missing: the entry is parked"
-   },
-   "noPreflight": "nothing to hand over"
-  }
+  "decLede": "Every cut decision in three lines: the question, the choice, the why. The ones marked on the edge went against the recommendation."
  },
  "execution": {
   "sec": {
-   "what": "What got built, and what was proved",
-   "lanes": "The lanes",
-   "waves": "The gates",
+   "what": "What got built, and what waits",
+   "graph": "The graph, as built",
+   "entries": "The entries",
+   "review": "The review",
    "audit": "The audit"
   },
+  "started": "started",
+  "closed": "closed",
+  "branch": "branch",
+  "head": "head",
+  "gate": "gate",
   "cells": {
-   "rows": "rows merged",
-   "rowsTail": "of {n} planned",
-   "fixRows": "fix rows",
-   "fixRowsTail": "walks and audit",
-   "prs": "pull requests",
-   "prsTail": "{n} review rounds",
-   "findings": "findings",
-   "findingsTail": "{n} sustained",
-   "waves": "gates green",
-   "wavesTail": "of {n}",
-   "parked": "waiting for you",
-   "parkedTail": "rows the lanes went past"
-  },
-  "board": {
-   "lane": "lane",
-   "wave": "gate",
    "merged": "merged",
-   "building": "in progress",
+   "mergedTail": "the foundation and the plan's entries",
    "parked": "parked",
-   "open": "not started",
-   "fix": "fix",
-   "noRows": "nothing in this gate",
-   "green": "green",
-   "openGate": "open",
-   "legend": "solid: merged · outline: in progress · dashed: parked · +: a fix row"
+   "parkedTail": "waiting for your ruling",
+   "amendments": "amendments",
+   "amendmentsTail": "to the foundation, each for one entry",
+   "rounds": "review rounds",
+   "roundsTail": "across every entry",
+   "findings": "findings",
+   "findingsTail": "{n} sustained"
   },
-  "lane": {
-   "session": "session",
-   "row": "#",
-   "story": "Story",
-   "what": "What it built",
-   "pr": "PR",
-   "r1": "Round 1",
-   "r2": "Round 2",
-   "proof": "Proof in alpha",
-   "attempts": "Builders",
+  "status": {
+   "merged": "merged",
+   "building": "building",
+   "waiting": "waiting",
+   "parked": "parked"
+  },
+  "caption": "The plan's graph with the state of each entry now. F is the foundation; an arrow means the entry at the tip needed the one at the origin merged first.",
+  "kinds": {
+   "F": "the foundation",
+   "amendment": "amendment to the foundation",
+   "fix": "fix entry"
+  },
+  "table": {
+   "id": "#",
    "status": "Status",
-   "rounds": "f · s · d · x = findings · sustained · deferred · dismissed",
-   "eye": "What needs your eye in this lane",
-   "notes": "notes that ride",
-   "departures": "departures from the standard",
-   "choices": "choices where the documents were silent",
-   "stops": "stops",
-   "suites": "The whole suite",
-   "suite": "{w}: {p} passed · {f} failed · {s} skipped · {m} min",
-   "look": "Worth a look",
-   "noEye": "Nothing rides from this lane.",
-   "fixOf": "fix of",
-   "run": "run",
-   "expect": "expect",
-   "got": "got",
-   "see": "see",
-   "where": "where",
-   "shot": "screenshot",
-   "openRow": "the record",
-   "status_": {
-    "merged": "merged",
-    "building": "in progress",
-    "parked": "parked",
-    "open": "not started"
-   }
+   "sha": "Commit",
+   "rounds": "Rounds",
+   "findings": "Found → sustained",
+   "summary": "What it built"
   },
-  "wave": {
-   "tag": "tag",
-   "at": "alpha at",
-   "gated": "accepted",
-   "openGate": "open: the walk has not closed",
-   "before": "Suites green before the walk",
-   "shadow": "Shadow suite after the gate",
-   "walk": "The master's walk",
-   "step": "Step",
-   "run": "Run",
-   "expect": "Expect",
-   "got": "Got",
-   "ok": "green",
-   "ko": "red",
-   "fixes": "Fix rows this gate sent",
-   "parked": "Parked at this gate",
-   "intern": "For the intern",
-   "problem": "The problem this gate solves",
-   "roles": "Who does what",
-   "component": "Component",
-   "role": "Its job",
-   "analogy": "Think of it as",
-   "guards": "The guards",
-   "guard": "Guard",
-   "stops": "What it stops",
-   "why": "Why",
-   "alphaVsProd": "Alpha and prod",
-   "none": "none",
-   "fixRow": "row",
-   "of": "of"
+  "parkedOn": "parked on",
+  "amendments": "Amendments to the foundation",
+  "amendTable": {
+   "id": "#",
+   "what": "What",
+   "for": "For",
+   "sha": "Commit"
   },
+  "noAmendments": "No amendment: the foundation was enough.",
+  "precTitle": "Precision per reviewer",
+  "prec": {
+   "lens": "Reviewer",
+   "found": "Found",
+   "sustained": "Sustained",
+   "deferred": "Deferred",
+   "latitude": "Latitude",
+   "dismissed": "Dismissed",
+   "user": "To you",
+   "ratio": "Sustained / found",
+   "total": "every reviewer"
+  },
+  "noPrecision": "No reviewer has reported yet.",
   "audit": {
-   "notYet": "The audit has not run: the master calls you when every gate is green.",
-   "items": "items",
+   "items": "items for your ruling",
    "itemsTail": "{n} ruled",
-   "fixes": "fix rows",
-   "fixesTail": "{n} merged",
-   "kinds": {
-    "P": "Parked — what waited for you",
-    "D": "Departures from the standard",
-    "C": "Choices where the documents were silent",
-    "N": "Notes still open",
-    "S": "Stops and how they ended"
-   },
+   "latitudeCell": "latitude",
+   "latitudeTail": "decided by the builders, listed for veto",
+   "parked": "Parked — what waited for you",
+   "choices": "Choices where the documents were silent",
+   "latitude": "Latitude — what the builders decided in your place",
+   "entry": "entry",
    "where": "where",
-   "standardSays": "the standard says",
-   "built": "what was built",
-   "reading": "reading the code",
    "recommendation": "recommendation",
    "ruling": "your ruling",
-   "unruled": "not yet asked",
+   "awaiting": "awaiting your ruling",
+   "ruled": "ruled",
    "rulings": {
     "keep": "keep",
     "fix": "fix",
     "revert": "revert"
    },
-   "fixTable": {
-    "id": "Row",
-    "from": "From",
-    "lane": "Lane",
-    "what": "What",
-    "status": "Status",
-    "pr": "PR"
-   },
-   "close": "The close",
-   "date": "date",
-   "shas": "branches",
-   "alphaAt": "alpha",
-   "suites": "suites",
-   "residue": "residue, with owners",
-   "notClosed": "The audit is open: the Close section has not been written."
-  }
- },
- "release": {
-  "sec": {
-   "what": "What is in production",
-   "train": "The train",
-   "versions": "Versions and the way back",
-   "watch": "The watch and the close"
-  },
-  "cells": {
-   "repos": "repos in production",
-   "reposTail": "of {n} shipping",
-   "steps": "train steps green",
-   "stepsTail": "of {n}",
-   "fixes": "fix rows",
-   "fixesTail": "{n} hotfixes",
-   "watch": "proofs read at the watch",
-   "watchTail": "of {n}",
-   "stops": "stops",
-   "stopsTail": "where the session called you"
-  },
-  "prod": {
-   "repo": "Repo",
-   "version": "Version",
-   "sha": "Sha",
-   "deployedAt": "Deployed",
-   "notYet": "Nothing in production yet: the train has not closed."
-  },
-  "goal": {
-   "title": "The goal",
-   "notYet": "Not given yet: the session is waiting on the plan.",
-   "at": "given"
-  },
-  "preflight": {
-   "title": "Pre-flight — what only you could do",
-   "what": "What",
-   "status": "Status",
-   "how": "How",
-   "done": "done",
-   "delegated": "delegated",
-   "open": "open",
-   "none": "nothing needed you before the goal"
-  },
-  "integ": {
-   "title": "Integration and confirmation from main",
-   "repo": "Repo",
-   "pr": "PR",
-   "rebased": "Rebased",
-   "ci": "CI",
-   "merged": "Merged",
-   "confirm": "Confirmation",
-   "stood": "the audit's green stands",
-   "suite": "suite {p} passed · {f} failed · {s} skipped",
-   "tree": "tree identical",
-   "alpha": "alpha diff empty",
-   "yes": "yes",
-   "no": "no",
-   "waiting": "waits for the train (merge is deploy)",
-   "pending": "not yet"
-  },
-  "train": {
-   "title": "The train, step by step",
-   "step": "Step",
-   "repo": "Repo",
-   "what": "What",
-   "run": "Run / see",
-   "expect": "Expect / where",
-   "got": "Got",
-   "at": "At",
-   "ok": "green",
-   "ko": "red",
-   "none": "no step has run yet"
-  },
-  "versions": {
-   "repo": "Repo",
-   "from": "From",
-   "to": "To",
-   "bump": "Bump",
-   "sha": "Sha",
-   "release": "Release",
-   "notes": "notes",
-   "unparsed": "{n} commits outside the grammar",
-   "none": "no version derived yet",
-   "bumps": {
-    "major": "major",
-    "minor": "minor",
-    "patch": "patch",
-    "initial": "first version"
+   "closedOn": "The audit closed on {d}: every item has your ruling.",
+   "openNote": "The audit is open: it closes when you have ruled every item.",
+   "none": "Nothing here.",
+   "latTable": {
+    "entry": "Entry",
+    "what": "What"
    }
-  },
-  "rollback": {
-   "title": "The way back, per repo",
-   "repo": "Repo",
-   "returnTo": "Return to",
-   "dataSafe": "Safe for data",
-   "note": "Note",
-   "file": "File",
-   "yes": "yes",
-   "no": "NO — a stop"
-  },
-  "fixes": {
-   "title": "Fixed on the way",
-   "id": "Row",
-   "kind": "Kind",
-   "repo": "Repo",
-   "seen": "Seen",
-   "what": "What changed",
-   "pr": "PR",
-   "tag": "Tag",
-   "status": "Status",
-   "none": "nothing was fixed on the way",
-   "kinds": {
-    "fix": "fix",
-    "hotfix": "hotfix"
-   },
-   "status_": {
-    "building": "in progress",
-    "merged": "merged",
-    "deployed": "deployed",
-    "stopped": "stopped"
-   }
-  },
-  "watch": {
-   "title": "The watch — proofs the audit deferred to prod",
-   "n": "#",
-   "what": "What",
-   "at": "Readable at",
-   "expect": "Expect",
-   "got": "Got",
-   "readAt": "Read",
-   "ok": "green",
-   "ko": "red",
-   "pending": "not yet",
-   "owner": "pendency: {o}",
-   "none": "the audit deferred nothing to production"
-  },
-  "stops": {
-   "title": "Where the session stopped",
-   "none": "The session never stopped: no third red, no unsafe rollback."
-  },
-  "close": {
-   "title": "The close",
-   "date": "date",
-   "residue": "stays with an owner",
-   "none": "nothing",
-   "notYet": "The stage has not closed: the watch is still open."
   }
  },
  "close": {

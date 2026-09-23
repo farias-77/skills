@@ -141,34 +141,30 @@ builder will receive, deciding nothing; three lenses (Sonnet 5, high)
 runs automatically over the delta, a third only on the human's word.
 The pre-flight (what only he can hand over) is handed at the close.
 
-**4 · Execute** — the plan becomes proven branches, with no human in
-the loop until the end. The session that invokes the skill is the
-**master** (Fable 5.1, high): its first message prints the sessions to
-open, one **worker** (Opus 5, high) per lane, and the user gives the
-master one goal and leaves. Each worker builds its lane row by row
-from the first day and never waits for anyone: one `exec-builder`
-(Opus 5, high) writes the row on its branch, tests first; five lenses
-(Sonnet 5, high; fidelity, code, proof, security, operations), which
-never wrote the code, read the whole diff; the worker rules every
-finding by `references/judging.md`; the builder fixes and the five
-read the delta; what is left rides as a PR note. The PR merges into
-`feat/<workstream>` when a lock file says the stack is free, the
-merge deploys, and the row's proof from the plan is run in alpha. A
-second red is a new brief, a third parks the row and the lane goes
-on. After the last row a wave requires, the repo's whole suite runs
-once in the background and the worker tells the master in one line.
-The master never polls: woken by that line, when every lane the wave
-requires is ready it freezes the stacks, tags `wNN`, walks alpha with
-the plan's commands, saves the evidence, writes the report and the
-"for the intern" explanation, and sends a red step back as a fix row
-to the lane that owns it. What is the user's (a story's delivery, a
-contract, a stateful deletion, a missing pre-flight item) is parked,
-never asked. When the last wave is green the master calls him once;
-the **audit** in the same session (parked, departures, choices, open
-notes, stops; four questions per call; fixes as rows `A.n`, two
-passes at most) closes the stage on a consolidated, verified, audited
-branch per repo. The Execution tab is built from the lanes' and the
-master's JSON. `main` is stage 5's.
+**4 · Execute** — the plan becomes merged, reviewed code, with no
+human in the loop until the end. **One session** (Opus 5.5, high)
+receives one goal, "build the whole plan", and orchestrates without
+writing or reviewing code: the foundation first, then every entry whose
+edges are merged, in parallel up to the plan's cap, each in its own
+worktree and local stack, through the **exec-entry** workflow.
+`builder-backend` and `builder-frontend` (Opus 5.5, high) build the two
+sides at once in their own worktrees, tests and journeys first; the
+**gate** (`exec-gate`, Sonnet 5, high) merges them and runs `make
+verify`, sending every red back to the side that owns it; a **panel
+that never wrote the code** reads the diff — seven lenses (fidelity,
+workaround, craft, proof, security, operations, and visual when there
+is a screen) and two QA that use the running stack and try to break it,
+all Opus 5.5, medium — and a **judge** (`exec-judge`, Opus 5.5, medium)
+rules every finding; the builders fix, the gate runs, the panel reads
+only the delta, three rounds at most. **No code enters without
+review**: every build, fix, conflict resolution and foundation
+amendment passes the gate and the panel. The session merges what comes
+back ready through a serial queue (rebase, gate, merge), writes
+foundation amendments when an entry needs a shared file changed, and
+parks what is the user's. When everything is merged and green it calls
+him once for the **audit**: the parked, the choices the builders made
+where the documents were silent, the latitude the judge granted, the
+precision of every reviewer. `main` is stage 5's.
 
 **5 · Release** — the audited branch goes to production on one
 goal. The session (Fable 5.1, high) writes the release plan: what

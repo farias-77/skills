@@ -14,21 +14,24 @@
 
 ## Commands
 
-| What | Command | Read at |
+<!-- the commands the doctrine names for each role of the pipeline's
+     project contract, as this codebase has them -->
+
+| Role | Command | Read at |
 |---|---|---|
-| the whole gate | `make verify` | `Makefile:12` |
-| fast loop | `make check` | |
-| unit / integration of one module | `make test-integration pkg=<module>` | |
-| journeys | `pnpm --filter <app> test:e2e <spec>` | |
-| the local stack | `make up` · `make env` · `make down` | |
+| the gate | `<command>` | `<file:line>` |
+| the fast check | | |
+| focused tests (one module, one spec) | | |
+| journeys | | |
+| stack up · env · down | | |
 
 ## Tests today
 
 | Suite | Where | Cases | Duration when stated | Read at |
 |---|---|---|---|---|
-| unit | `internal/<module>/…_test.go` | | | |
-| integration | `tests/integration/<module>/` | | | |
-| journeys | `frontend/<app>/e2e/journeys/` | | | |
+| unit | | | | |
+| integration | | | | |
+| journeys | | | | |
 
 Factories and fixtures that exist: <one line each, with the path>
 
@@ -36,9 +39,9 @@ Factories and fixtures that exist: <one line each, with the path>
 
 | Design names | Exists as | Read at |
 |---|---|---|
-| table `orders` | `database/migrations/0007_orders.sql`, keys … | |
-| route `GET /orders` | `internal/orders/http/list.go` | |
-| screen `Orders` | `frontend/tracking/src/features/orders/pages/…` | |
+| table `<name>` | `<path>`, keys … | |
+| route `<METHOD /path>` | `<path>` | |
+| screen `<name>` | `<path>` | |
 
 ## What does not exist yet
 
@@ -46,7 +49,7 @@ Factories and fixtures that exist: <one line each, with the path>
 
 ## Shared files this area writes to
 
-<the migrations folder, openapi.yaml, the generated code, the composition root: the paths an entry must not edit after the foundation>
+<the files the doctrine marks as shared (migrations, the API contract, the generated code, the module registry): the paths an entry must not edit after the foundation>
 
 ## Not verified
 

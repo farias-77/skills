@@ -30,19 +30,19 @@
 | Kind | What |
 |---|---|
 | migration | <tables and columns, expansion only, with the data-model.md section> |
-| contract | <every new or changed route in openapi.yaml; the generated code; routes answer 501 until their entry lands> |
+| contract | <every new or changed route in the API contract; the generated code; routes answer 501 until their entry lands> |
 | module | <new modules registered in the composition> |
 | shared | <a component or helper two entries use, as the design names it> |
 | factory | <one per entity the proofs seed> |
 
-**Proof:** run `make verify` → expect `<exit 0; the new routes answer 501>`
+**Proof:** run `<the gate command>` → expect `<exit 0; the new routes answer 501>`
 **Brief:** `02-plan/briefs/F.md`
 
 ## The entries
 
 | Id | Name | Stories | Builds (back · front) | After | Proof | Touches |
 |---|---|---|---|---|---|---|
-| E-01 | <name> | S-001 | <use case, route> · <screen> | — | run `<make target or spec>` → expect `<cases named>` | <module, screen> |
+| E-01 | <name> | S-001 | <use case, route> · <screen> | — | run `<command or spec>` → expect `<cases named>` | <module, screen> |
 | E-05 | <name> | S-005 | <…> · — | E-04 (its test clicks <the button E-04 builds>) | <…> | <…> |
 
 ## The graph

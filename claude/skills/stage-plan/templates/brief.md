@@ -24,7 +24,7 @@
 
 - Read: `<designs-root>/<workstream>/01-design/` (the design; `notes.md` is the law), the recon of the areas below, the consuming project's `CLAUDE.md` and its engineering doctrine.
 - Starts from: the top of `feat/<workstream>` with the foundation merged<, and E-nn merged>.
-- Never edit a shared file (migrations, `openapi.yaml`, generated code, the module registry): a change there is a foundation amendment; stop and report it.
+- Never edit a shared file (the files the doctrine marks as shared: migrations, the API contract, generated code, the module registry): a change there is a foundation amendment; stop and report it.
 
 ## Builds
 
@@ -40,9 +40,9 @@
 
 | Step | Run / See | Expect / Where |
 |---|---|---|
-| 1 | run `<make target or spec>` | `<the cases named, the bad paths among them>` |
+| 1 | run `<command or spec>` | `<the cases named, the bad paths among them>` |
 | 2 | see `<journey spec>` screenshots, both themes, 390 px | where `ui.md` §<screen> |
-| 3 | run `make verify` | exit 0 |
+| 3 | run `<the gate command>` | exit 0 |
 
 **Seeds:** <factory calls the tests use, in the shape of which design section; "none">
 **Touches:** <module files, screen folder, spec files>

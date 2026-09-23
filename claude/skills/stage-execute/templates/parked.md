@@ -1,15 +1,13 @@
 # Parked — <workstream>
 
 <!--
-  Written by the MASTER, one entry per thing that waits for the user:
-  a change to what a story delivers, a contract's shape, a stateful
-  deletion no goal explains, a pre-flight item missing, a row's third
-  red, a red walk step no row explains. The lane goes on with the rows
-  that do not depend on it. This list is the first thing the user
-  reads at the audit (audit.md, "Parked"). Nothing here is asked
-  before then.
+  Written by the SESSION, one entry per thing that waits for the user:
+  a question the judge raised, a gate that stayed red, findings still
+  sustained after three rounds, an amendment the design does not
+  decide, a pre-flight item missing. Everything that does not depend on
+  it goes on. This list is the first thing the user reads at the audit.
 -->
 
-| # | Row | Lane | Why (the evidence quoted) | What waits on it | Since (UTC) | File |
-|---|---|---|---|---|---|---|
-| P.1 | <N.k> | `<repo>` | <one line, the quote> | <rows, a wave's step> | | `rows/<repo>/<N.k>.md` |
+| # | Entry | Why (the evidence quoted) | What waits on it | Since (UTC) | Run |
+|---|---|---|---|---|---|
+| P.1 | <E-nn> | <one line, the quote> | <entries> | | `entries/<E-nn>/run.json` |

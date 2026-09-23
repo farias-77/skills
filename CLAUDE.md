@@ -40,7 +40,7 @@ how the reader sees the cost of a step without opening the file.
 
 Every session that conducts a stage is an expensive model in a long
 conversation — the conductor at discovery, design, plan and close, the
-master and the workers at execution, the session at release. A file
+session at execution and at release. A file
 such a session opens itself does not cost one read: it enters the
 context and is paid again on every turn that follows. So the rule is
 the same at every stage: **when the session needs something it has not
@@ -111,12 +111,12 @@ the question itself (source, severity, quote, gap, fix, the
 conductor's reason), the rulings as the answers with the conductor's
 pick first and marked as his, four to a call. Wording fixes are applied without a question and without a
 veto: the user reads the blueprint at the approval and reports there
-whatever he wants changed. At execution the worker
-session of the lane rules alone inside the row's two rounds (the
-master rules nothing a lens found); the residue rides as PR notes, in
-the row file and in the wave report, and the user rules it at the
-audit that closes stage 4; a note he rules on there is a ruling
-too. At release his one ruling is the goal on `04-release/plan.md`,
+whatever he wants changed. At execution the judge agent of each entry
+(`exec-judge`) rules every finding of its rounds by the execute stage's
+`judging.md`; what is his (a question the judge raised, an entry still
+sustained after three rounds) is parked, never asked, and the user
+rules it with the builders' choices at the audit that closes stage 4;
+a ruling he gives there is a ruling too. At release his one ruling is the goal on `04-release/plan.md`,
 recorded verbatim in the trace; the session rules alone inside a fix
 row's two rounds by the execute stage's `judging.md`, and what
 survives rides as a PR note into the report. At the close the board

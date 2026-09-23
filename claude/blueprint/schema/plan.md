@@ -16,10 +16,6 @@ file, a duplicate id, **a text over its word cap**. Text fields accept
 two inline marks: `` `code` `` and `**bold**`. No HTML. Everything in
 the workstream's language.
 
-A workstream planned before this shape keeps its `sequence.json`
-(lanes and waves); the builder still reads it and renders the legacy
-tab. A workstream has one or the other, never both.
-
 ## The voice: technical, and an intern reads it to the end
 
 Same rules as the design ([schema/design.md](design.md)): short

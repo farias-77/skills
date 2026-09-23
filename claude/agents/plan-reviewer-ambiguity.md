@@ -39,14 +39,14 @@ or one of them differs from the other reader's build, the verdict is
 `different-product`.
 
 > **Example** — key `back`, brief: "the list route returns the day's
-> orders". Reader 1: orders whose delivery day is today, in São Paulo
-> time. Reader 2: orders created today. Verdict: `different-product`:
+> orders". Reader 1: orders whose delivery day is today, in the business
+> time zone. Reader 2: orders created today. Verdict: `different-product`:
 > an order placed yesterday for today appears in one list and not in
 > the other.
 >
-> **Example** — key `proof`: Reader 1 runs `make test-integration
-> pkg=orders` then `make verify`; Reader 2 runs `make verify` alone.
-> Verdict: `same-in-other-words`: `make verify` runs the same cases.
+> **Example** — key `proof`: Reader 1 runs the focused tests of
+> `orders` then the gate command; Reader 2 runs the gate command alone.
+> Verdict: `same-in-other-words`: the gate runs the same cases.
 
 A `different-product` key becomes one finding: `says` = the brief's
 line verbatim, `gap` = the two builds, one line each, `fix` = the

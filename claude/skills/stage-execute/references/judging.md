@@ -1,142 +1,104 @@
-# Judging the row's review rounds
+# Judging a review round of an entry
 
-The worker judges. The lenses report at the maximum bar: told to find
-problems, they find problems, and that is by design. The round closes
-on the worker's ruling, not on their word. The worker has what the
-lenses do not: the goal whole, the design, the recon, the repo's
-history, the branch. Never rule on a finding's text alone: open the
-lines it quotes, run the command it doubts, read the design section
-it invokes.
+Read by `exec-judge` (Opus 5.5, medium) before the first ruling of every
+round. The lenses and the QA report at the maximum bar: told to find
+problems, they find problems, and that is by design. The round closes on
+the judge's ruling, not on their word. Never rule on a finding's text
+alone: open the lines it quotes, run the command it doubts, read the
+design section and the doctrine line it invokes.
 
 ## Merge first
 
-Five lenses read the same diff, so one defect arrives as several
-findings (the same missing check seen by code, proof and operations).
-Group the findings whose fix is the same edit and rule the group
-once: one ruling, one owner, the merged ids in the reason. The
-builder gets one list, never five.
+Seven lenses and two QA read the same entry, so one defect arrives as
+several findings (the same missing scope check seen by security, proof
+and qa-backend). Group the findings whose fix is the same edit and rule
+the group once: one ruling, one side, the merged ids listed. The
+builder gets one list, never nine.
 
 ## The ruler
 
-The execution razor: **a finding is sustained when the diff, merged
-as it is, would put in alpha a behavior the goal and the design do
-not say, leave a contract or a rule unproved by a test, loosen a
-proof to fit the product, expose a credential or a person, or fail
-in a way nobody would see.** The goal is the brief and the design is
-the law; the standards are the bar. What the builder chose where the
-documents were silent is a choice, listed, not a finding — unless
-the choice changes what a consumer receives.
+**A finding is sustained when the entry, merged as it is, would put in
+the codebase a behavior the brief and the design do not say, leave a
+rule or a contract unproved by a test that goes red when it breaks,
+route around a cause instead of fixing it, expose a person's data or a
+credential, fail in a way nobody would see, or show a screen that is
+not the one the design drew.** The brief is the instruction, the design
+is the law, the doctrine is the bar. What a builder chose where the
+documents are silent is a choice, not a finding — unless it changes
+what a caller or a person receives.
 
-Some defects always proceed: a behavior the goal does not name ·
-a contract field, route or event that differs from `contracts.md` ·
-a business rule with no test fixing its limit · a test expectation
-or a smoke assertion changed to fit the output · a `run` that does
-not print its `expect` · a real credential, a real person's data, an
-account id in code, logs, fixtures or docs · a deletion of stored
-data the goal does not name · an external call with no timeout · an
-error swallowed without a log or an alarm · config that branches on
-the stage in code · a dependency added that the runtime cannot load.
+Some defects always proceed: a behavior the brief does not name · a
+route, field, status or error that differs from `contracts.md` · a rule
+with no test fixing its limit · a test or assert changed to fit the
+output · a workaround of any kind · a person's data or a credential in
+anything committed · a deletion of stored data the brief does not name
+· an external call with no timeout · an error swallowed · a shared file
+edited by an entry · a number on screen the rule does not produce.
 
-## The three rulings
+## The rulings
 
-- **sustained** — a real defect under the razor. The builder fixes
-  it in this round's fix pass, or it parks.
-- **deferred** — a right observation below the razor that costs one
-  edit: a name, a log field, a dead import, a tighter assert. Applied
-  with the sustained ones at its simplest form; the label records
-  that it did not bite.
-- **dismissed** — preference wearing severity, a mechanism nothing
-  forces (an abstraction for the next story, a flag for later, a
-  retry the design did not ask for), rigor the demand has not asked
-  for, a departure the row file already records with its reason, a
-  finding that misread the goal, or plain wrong. It dies **with the
-  sentence that forecloses it quoted** in the reason (from the goal,
-  the design, the standard or the code); "already fine" without the
-  quote is not a dismissal.
+- **sustained** — a real defect under the ruler. The side's builder
+  fixes it this round.
+- **deferred** — right, below the ruler, one edit: a name, a log field,
+  a tighter assert. Fixed with the sustained ones, labeled as not
+  biting.
+- **latitude** — real, but the builder's to choose ("The builder
+  decides", the design's latitude): recorded for the audit, not fixed.
+- **dismissed** — preference wearing severity, an abstraction nothing
+  asks for, rigor the demand does not ask for, a misread of the brief,
+  plain wrong. It dies **with the sentence that forecloses it quoted**
+  (the brief, the design, the doctrine or the code).
+- **user** — the fix would change what the entry delivers, a contract,
+  the security posture, or delete stored data; or the brief and the
+  design contradict each other. One question with its context, the
+  options and your pick. The entry parks until he answers.
 
-## Never dismissed
+## Never dismissed, never latitude
 
-Rule `sustained` or at most `deferred`, never `dismissed`:
-
-- a test expectation or a smoke assertion changed in the diff, in
-  any direction, without the row's reason written next to it;
-- a credential, a token, a person's e-mail or name, an account id,
-  in anything committed (a fixture included) — an identifier of an
-  external source is a `detail` only when the lens shows nothing it
-  grants, and a ruling already in `rulings.md` is not reopened;
-- a stateful deletion (a table, a bucket, an index, rows) the goal
-  does not name;
-- a departure from a frozen contract, however small;
-- a proof that does not print what the goal's `expect` says;
-- a change to a file outside the row's `touches` that the row file
-  does not explain.
-
-> In the first end-to-end run four smoke fixes entered without a lens
-> and one of them loosened an assert; a fix at the top of a PR stack
-> hid that the PR below was red; a rebase resolved "without
-> conflicts" left a duplicated import; a dependency the runtime could
-> not load took down three lambdas and was only seen at the wave. The
-> lists above carry each of those.
+- a workaround, a temporary step, a special case, a copy, a parallel
+  path, a swallowed error, a loosened test — the only exception is a
+  temporary step the user asked for explicitly, quoted in `notes.md` or
+  `rulings.md`;
+- a person's data or a credential in code, test, fixture, log or
+  screenshot;
+- a stateful deletion the brief does not name;
+- a departure from a contract, however small;
+- an edit to a shared file (migrations, the contract, generated code,
+  the module registry).
 
 ## Three tests, in order
 
-1. **Is it true?** Open the quoted lines; the gap follows from them.
-   A lens that claims a repo fact is checked in the repo; a lens that
-   claims a design fact is checked in the design.
-2. **Does it bite?** Name what would be wrong in alpha, in the
-   contract, in the proof or in the record if this stands. No named
-   consequence, no sustain — unless the class is in the list above.
-3. **Is it already decided?** A choice the goal leaves to the worker
-   ("The worker decides") is not a gap; a departure the design
-   records as latitude is not a finding; a ruling in `rulings.md`
-   is not reopened.
+1. **Is it true?** Open the quoted lines or run the quoted request; the
+   gap follows from them. A claim about the codebase is checked in the
+   codebase; a claim about the design, in the design.
+2. **Does it bite?** Name what would be wrong in the product, the
+   contract, the proof or the record if it stands. No named
+   consequence, no sustain — unless the class is in the lists above.
+3. **Is it already decided?** "The builder decides" is not a gap; a
+   ruling in `rulings.md` is not reopened; a finding already ruled in
+   an earlier round of this entry is not ruled again unless the code
+   changed under it.
 
-## The owner of a sustained finding
+## The side of a fix
 
-- **`builder`** — the fix changes code, tests or docs on this branch
-  and decides nothing the plan owes: the builder applies it in the
-  fix pass; round 2 checks it landed.
-- **`note`** — real, but not this row's to fix now: a rule the
-  standard leaves open, a cost the design accepted, a debt with a
-  named owner. One line in the PR body under "Notes" and in the row
-  file; the audit rules it with the user.
-- **`master`** — the fix would change what the row builds, a
-  contract, a wave's proof, or delete stored data; the goal
-  contradicts the repo or the design. One `parked` line to the
-  master with the finding quoted; the row is parked or the master
-  answers in one line from the plan.
-
-In doubt between `builder` and `note`, `builder`. In doubt between
-`note` and `master`, `master`.
+`back` when the change is in the server side's folders, `front` when
+it is in the screen side's (the doctrine names them). A finding that needs both is two fixes, one per side, each
+saying what the other side does.
 
 ## Calibrations
 
-- **A lens's "the standard says" is checked against the standard
-  file**, not believed; a rule quoted wrong is dismissed with the
-  right sentence.
-- **A departure from the standard the builder recorded** (with the
-  rule it leaves and why the system got simpler) is a `note`, never
-  a `builder` fix by a lens's taste; the audit rules it.
-- **Coverage is the rule's, not the file's:** a business rule without
-  a test fixing its limit is sustained; a percentage below a number
-  on a file with no rule is a `detail`.
-- **In round 2, a finding on text no fix touched gets the razor at
-  full strength.** Round 1 read it and passed it.
-- **A lens that fails or returns nothing** is re-dispatched once by
-  the workflow; a round with a lens still invalid is recorded so and
-  judged on the four that ran, and the row file says which lens was
-  missing.
-- **A recurrence** — the same class sustained on a previous row of
-  this lane — is named in the ruling and goes to the row file's notes
-  so the audit sees the pattern.
+- **A reviewer's quote of the doctrine is checked against the
+  doctrine**; a rule quoted wrong is dismissed with the right sentence.
+- **A QA finding is a behavior**: reproduce it from the request or the
+  steps before ruling; one you cannot reproduce is dismissed with what
+  you ran.
+- **In a delta round**, a finding on code no fix touched needs to be
+  serious: the previous round read it.
+- **A recurrence** — the same class sustained in an earlier round of
+  this entry — goes to the user when the fix did not move the code.
 
-## What you write
+## Precision
 
-`reviews/<repo>/<N.k>/r<n>.md`, before any fix is sent: per finding
-(or merged group) the id, lens, severity, title, ruling, owner, reason
-with the quote; then the lists: to the builder (the fix pass), notes,
-to the master, dismissed. The row file carries the numbers per round
-and the notes; the PR body carries the numbers and the notes;
-`lanes/<repo>.json` carries the numbers. Nothing here goes to
-`rulings.md`: at execution the worker rules alone inside the two
-rounds, and the user rules the residue at the audit.
+Count, per lens and QA, what it found and how each was ruled. The
+session sums them across entries; the close compares them across
+workstreams to learn which angle pays for itself.

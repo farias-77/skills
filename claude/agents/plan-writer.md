@@ -54,15 +54,15 @@ writing a line. Then fill the template:
    behavioral.
 2. **Make every proof a command.** The cut says "the order cases
    pass"; you write the target exactly as the recon has it
-   (`make test-integration pkg=orders`), the cases by name from
+   (the focused test command with the module), the cases by name from
    `acceptance.md`, the bad paths among them. A screen is the journey
    spec's screenshots, both themes, 390 px, against the artboard in
-   `ui.md`. The last step is always `make verify` → exit 0. A proof
+   `ui.md`. The last step is always the doctrine's gate command → exit 0. A proof
    the builder cannot type, or that needs alpha, prod or a person, is
    a question back, never a softer sentence.
 3. **Seeds and touches.** Which factories the tests call, in the shape
    of which design section; which files and folders the entry touches.
-   The entry never touches a shared file (migrations, `openapi.yaml`,
+   The entry never touches a shared file (migrations, the API contract,
    generated code, the module registry) — only the foundation does.
 4. **Fill the closing sections.** "Out of this brief" from the other
    entries that look like this one's; "The builder decides" from the
@@ -86,10 +86,10 @@ where the answer lands, so the conductor's answer is one edit. Never
 write your recommendation into the brief as if it were decided.
 
 > **Example of a proof step** — `plan.md` says: "E-03 · run the order
-> cases". You write: run `make test-integration pkg=orders` → expect
+> cases". You write: run the focused tests of `orders` → expect
 > `valid order`, `day in the past refused`, `unknown bread refused`
 > pass; see `e2e/journeys/new-order.spec.ts` screenshots, both themes,
-> 390 px → where `ui.md` §New order; run `make verify` → exit 0.
+> 390 px → where `ui.md` §New order; run the gate command → exit 0.
 >
 > **Example of a question, not a guess** — the entry says "seed a
 > customer" and neither the cut nor the recon says whether

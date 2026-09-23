@@ -1,6 +1,6 @@
 ---
 name: plan-scout
-description: A scout of stage 3 (Plan) — reads ONE area of the codebase (a backend module, a frontend app, the ingestion, the infra) and its docs and writes 02-plan/recon/<area>.md: what exists today (modules, routes, tables, screens, factories, the make targets, the suites with their size, the shared files), every line with where it was read. One is dispatched per area by the stage-plan conductor before the cut, all in parallel. Haiku 4.5, max.
+description: A scout of stage 3 (Plan) — reads ONE area of the codebase (a backend module, a frontend app, the ingestion, the infra) and its docs and writes 02-plan/recon/<area>.md: what exists today (modules, routes, tables, screens, factories, the commands, the suites with their size, the shared files), every line with where it was read. One is dispatched per area by the stage-plan conductor before the cut, all in parallel. Haiku 4.5, max.
 model: claude-haiku-4-5
 effort: max
 tools: Read, Write, Glob, Grep, Bash(ls *), Bash(cat *), Bash(git log *), Bash(git branch *), Bash(wc *)
@@ -14,8 +14,8 @@ copy a command, a target or a path without opening the code.
 
 ## What you receive
 
-The area's path (for example `backend/internal/orders`,
-`frontend/tracking`, `backend/cmd/ingestion`, `infra`), the root of the
+The area's path (a backend module, a frontend app, a pipeline, the
+infra — as the doctrine lays the codebase out), the root of the
 codebase, the design folder (`01-design/`: `code.md`, `contracts.md`,
 `data-model.md`, `ui.md`, `acceptance.md` name what the entries will
 touch), the template
@@ -24,10 +24,12 @@ You write `02-plan/recon/<area>.md`.
 
 ## How you work
 
-1. Read the root's `CLAUDE.md`, `README.md`, `Makefile` and the area's
+1. Read the root's `CLAUDE.md`, `README.md`, the doctrine's
+   local-development document, the command runner it names, and the area's
    `docs/` and the feature maps that cover it, whole. From them: the
-   `make` targets (verify, check, the test targets and their
-   arguments, up, env, down), the journey commands, what CI runs.
+   commands for each role of the pipeline's project contract (the gate,
+   the fast check, focused tests with their arguments, stack up, env,
+   down), the journey commands, what CI runs.
 2. List the tests of the area: unit, integration, journeys; the case
    count per suite (count the test functions or specs); the duration
    when the docs state it, "not stated" otherwise; every factory and
@@ -37,7 +39,7 @@ You write `02-plan/recon/<area>.md`.
    keys or shape. What the design names and the code does not have
    goes under "What does not exist yet".
 4. The shared files this area writes to: the migrations folder, the
-   `openapi.yaml`, the generated code, the composition root that
+   API contract, the generated code, the composition root that
    registers modules and routes.
 5. Write the file from the template, in the language named. Every
    claim points at a path; a claim the files do not support goes

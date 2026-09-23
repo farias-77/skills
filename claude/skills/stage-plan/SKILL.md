@@ -20,7 +20,7 @@ Three words:
 
 | Word | What it is | At stage 4 |
 |---|---|---|
-| **foundation** | everything the entries would otherwise fight over, laid down once: every migration of the demand (expansion only), the whole contract (`openapi.yaml` and its generated code), the new modules registered, the shared pieces the design names, the factories the proofs seed with. One entry, built and merged first | built alone, before any entry |
+| **foundation** | everything the entries would otherwise fight over, laid down once: every migration of the demand (expansion only), the whole API contract and its generated code, the new modules registered, the shared pieces the design names, the factories the proofs seed with. One entry, built and merged first | built alone, before any entry |
 | **entry** | one story, or a small group of stories that share a screen or a flow and only prove together. Built **vertically**: back and front and tests, in its own worktree with its own stack. Proved by commands: `run` / `expect`, or a screen and its artboard (`see` / `where`) | one builder, one branch, one merge |
 | **edge** | entry B waits for entry A only when B's **proof** needs A's behavior (a button A builds, a state A's action produces). Data is not an edge: the foundation's factories seed it. Everything with no edge runs at once, up to the concurrency cap | the session starts an entry the moment its edges are merged |
 
@@ -66,7 +66,7 @@ end a turn on a plan or a promise; do the work.
 0. Open     Opus 5.5, effort high; read the design whole and the discovery's stories
 1. Recon    one plan-scout (Haiku 4.5, max) per area of the codebase the design touches, in
             parallel → 02-plan/recon/<area>.md: what exists today (modules, routes, tables, screens,
-            factories, the make targets and the suites with their size)
+            factories, the commands and the suites with their size)
 2. The cut  SESSION. from A to B in one line; the foundation; the entries and their edges, drawn
             as a graph; the concurrency cap; the pre-flight; approval through the question tool;
             adjustments in a visible list, applied on "apply" → 02-plan/plan.md
@@ -142,7 +142,8 @@ infra), all in one message, each with the area's path, the design
 folder and the template ([templates/recon.md](templates/recon.md)).
 A scout writes `02-plan/recon/<area>.md`: the modules, routes,
 tables, screens and jobs that exist, the factories and fixtures, the
-`make` targets that build, test and verify, the suites with their
+commands the doctrine names for the gate, the fast check and the
+focused tests, the suites with their
 size and duration when the docs say, and what the design names that
 does not exist yet. Facts only, each with where it was read.
 
@@ -167,7 +168,7 @@ approves it. The order of the conversation:
 **How the foundation is found.** Everything two entries would both
 edit: every new or changed table and column of `data-model.md` as
 migrations (expansion only); every new or changed route of
-`contracts.md` in `openapi.yaml`, with the generated code (the route
+`contracts.md` in the API contract, with the generated code (the route
 exists and answers "not implemented" until its entry lands); every new
 module registered in the composition; every shared piece the design
 names (a component two screens use, a helper two use cases use); one
@@ -204,7 +205,7 @@ the spot, as the pattern.
 Four rules inside the proposal:
 
 - **Every proof is a command or a screen, on the local stack.** `run`
-  is a `make` target or a test spec the worktree runs (or that the
+  is a command the doctrine names or a test spec the worktree runs (or that the
   entry itself creates, and then it says so); `expect` is what it
   prints, with the cases named. `see` is a screenshot of the local
   stack from a journey spec, both themes, 390 px; `where` is the
@@ -267,7 +268,7 @@ open only their brief.
 | Lens | Question |
 |---|---|
 | `plan-reviewer-coverage` (Sonnet 5, high) | every story AC and every acceptance case lands in exactly one entry; every table, route, module and factory the design names is in the foundation; every screen has its entry; nothing is built that nothing forces |
-| `plan-reviewer-verifiability` (Sonnet 5, high) | every `run` is a make target or spec that exists or that the entry creates, and every `expect` is what it prints; every `see` names its journey and artboard; bad paths included; nothing needs alpha, prod or a person |
+| `plan-reviewer-verifiability` (Sonnet 5, high) | every `run` is a command the doctrine names or a spec that exists or that the entry creates, and every `expect` is what it prints; every `see` names its journey and artboard; bad paths included; nothing needs alpha, prod or a person |
 | `plan-reviewer-order` (Sonnet 5, high) | every edge is a behavior the proof needs, every such need has its edge, the graph has no cycle; after the foundation no entry touches a shared file; entries that run at once do not collide on the same file; the foundation is complete |
 | 2 × `plan-blind-reader` (Haiku 4.5, high) → `plan-reviewer-ambiguity` (Sonnet 5, low), per brief | would two builders build the same entry from this brief alone, and call it done on the same command and output? |
 

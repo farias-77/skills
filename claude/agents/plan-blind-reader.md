@@ -42,10 +42,10 @@ build in the language of the brief.
 
 > **Example** — key `proof`, line: "run the order cases; the journey
 > shows the order after a reload".
-> Build: "`make test-integration pkg=orders` with `valid order`, `day
+> Build: "the focused tests of `orders` with `valid order`, `day
 > in the past refused`, `unknown bread refused` passing; then
 > `new-order.spec.ts` creates an order, reloads, and the order is in
-> the list; `make verify` exits 0."
+> the list; the gate command exits 0."
 
 ## Standards
 

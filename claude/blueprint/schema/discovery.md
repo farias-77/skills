@@ -11,7 +11,6 @@ the workstream's language. See `../example/` for a filled set.
 | `workstream.json` | the conductor | at open |
 | `prfaq.json` | `disc-author-prfaq` | with `pr-faq.md`, kept in step through every fix |
 | `stories.json` | `disc-author-stories` | with `user-stories.md`, kept in step through every fix |
-| `wireframes.json` | — | legacy: read for workstreams opened before discovery stopped drawing screens; never written now |
 | `figures.json` | the conductor | optional: the flow in one picture (mermaid) |
 | `review.json` | the conductor | after each round, from `reviews.md` and `rulings.md` |
 | `report.json` | the conductor | at the close: the plain-language layer |
@@ -47,7 +46,6 @@ the workstream's language. See `../example/` for a filled set.
     "id": "S-001", "name": "…", "as": "…", "want": "…", "so": "…",
     "acs": [ { "id": "<SLUG>-S-001-AC-1", "kind": "WHEN | IF | WHILE", "text": "the sentence after the keyword" } ],
     "badPaths": [ { "category": "Boundary input | Repeat / concurrency | Dependency failure | Permission", "case": "…", "behavior": "…" } ],
-    "screens": [ "wireframes/<screen>.html" ],
     "out": [ "…" ]
   } ],
   "inferred": [ { "id": "I-1", "landed": "S-001 AC-6", "assumed": "…", "why": "…", "ruling": "confirmed | rejected | open | superseded", "changed": false, "note": "…" } ],
@@ -56,18 +54,7 @@ the workstream's language. See `../example/` for a filled set.
 ```
 
 `changed: true` marks an inference the user's rulings altered after
-validation; the tab shows those first. `screens` is legacy (older
-workstreams); new stories leave it out.
-
-## wireframes.json
-
-```json
-[ { "screen": "Produção da região", "file": "wireframes/producao-regiao.html",
-    "stories": [ "S-003", "S-010" ], "states": [ "empty", "loading", "error", "no permission" ],
-    "note": "one line, optional", "html": "the wireframe file's markup, verbatim" } ]
-```
-
-`html` is embedded in a sandboxed frame; the file stays the source.
+validation; the tab shows those first.
 
 ## figures.json
 

@@ -4,13 +4,13 @@
 //
 //   node claude/blueprint/build.mjs <workstream-dir>
 //
-// reads  <workstream-dir>/blueprint/*.json   (workstream, prfaq, stories, report, review; wireframes, figures optional)
-//        <workstream-dir>/blueprint/plan/*.json when stage 3 ran: plan.json (graph shape: plan-report, plan-review; briefs/<id>.json per
-//        entry and briefs/F.json, the brief files embedded from 02-plan/briefs/) or, for a workstream planned before it, sequence.json
-//        (legacy lanes shape: plan-report, plan-review; goals/<repo>-<wave>.json per goal, the goal files embedded from 02-plan/goals/)
-//        <workstream-dir>/blueprint/execution/ when stage 4 ran (lanes/<repo>.json per worker; waves/<wNN>.json, exec-report.json, audit.json by the master)
-//        <workstream-dir>/blueprint/release/release.json when stage 5 ran (one file by the session: the plan, the train, the versions, the fixes, the watch, the close)
-//        <workstream-dir>/blueprint/close/close.json when stage 6 ran (one file by the session: the numbers, the record, the sweep, the board, the close)
+// reads  <workstream-dir>/blueprint/*.json   (workstream, prfaq, stories, report, review; figures optional)
+//        <workstream-dir>/blueprint/plan/*.json when stage 3 ran: plan.json, plan-report, plan-review; briefs/<id>.json per
+//        entry and briefs/F.json, the brief files embedded from 02-plan/briefs/
+//        <workstream-dir>/blueprint/execution/execution.json when stage 4 ran (one file by the session: the entries, the amendments,
+//        the precision per reviewer, the report, the audit)
+//        <workstream-dir>/blueprint/close/close.json when stage 6 ran, read only against a closed release (the Release tab is not
+//        built yet, so blueprint/release/ is not read and neither tab renders)
 //        <workstream-dir>/blueprint/design/*.json when stage 2 ran (one per document + decisions, design-report, design-review;
 //        the documents themselves and the artboards are embedded from 01-design/)
 // writes <workstream-dir>/blueprint.html
@@ -36,7 +36,6 @@ const prfaq = read('prfaq.json');
 const stories = read('stories.json');
 const report = read('report.json');
 const review = read('review.json');
-const wireframes = opt('wireframes.json') || [];
 const figures = opt('figures.json') || [];
 const stringsFile = join(here, `strings.${workstream.language || 'en'}.json`);
 const strings = JSON.parse(readFileSync(existsSync(stringsFile) ? stringsFile : join(here, 'strings.en.json'), 'utf8'));
@@ -54,11 +53,9 @@ stories.stories.forEach(s => {
   need(s, ['id', 'name', 'as', 'want', 'so', 'acs', 'badPaths', 'out'], `story ${s.id}`);
   if (!s.acs.length) problems.push(`story ${s.id}: no ACs`);
   s.acs.forEach(a => { if (!/-S-\d{3}-AC-\d+$/.test(a.id)) problems.push(`story ${s.id}: AC id ${a.id} is not <SLUG>-S-NNN-AC-n`); });
-  (s.screens || []).forEach(sc => { if (!wireframes.some(w => w.file === sc || w.screen === sc)) problems.push(`story ${s.id}: screen "${sc}" has no wireframe`); });
   if (!report.stories[s.id]) problems.push(`report.json: story ${s.id} has no plain sentence`);
 });
 if (report.threeThings.length !== 3) problems.push('report.json: threeThings must have exactly three items');
-wireframes.forEach(w => (w.stories || []).forEach(s => { if (!ids.has(s)) problems.push(`wireframe ${w.screen}: story ${s} does not exist`); }));
 (review.forDesign || []).forEach(x => { if (x.story && !ids.has(x.story)) problems.push(`forDesign ${x.id}: story ${x.story} does not exist`); });
 (review.decisions || []).forEach(x => { if (!report.decisions?.[`${x.round}:${x.id}`]) problems.push(`report.json: decision ${x.round}:${x.id} has no plain sentence`); });
 if (problems.length) { console.error('blueprint data problems:\n  ' + problems.join('\n  ')); process.exit(1); }
@@ -135,15 +132,11 @@ if (existsSync(designDir)) {
   if (problems.length) { console.error('blueprint data problems:\n  ' + problems.join('\n  ')); process.exit(1); }
   design = { docs, mdDocs, artboards, report: dreport, review: dreview, decisions };
 }
-// ---- stage 3: the cut (sequence), one JSON per goal (lane × wave), the goals embedded whole ----
+// ---- stage 3 (schema/plan.md): the foundation, the entries and their edges, one brief per entry, embedded whole ----
 const planDir = join(dataDir, 'plan');
 let plan = null;
-const graphPlan = existsSync(join(planDir, 'plan.json'));
-if (graphPlan && existsSync(join(planDir, 'sequence.json'))) {
-  console.error('blueprint data problems:\n  plan/plan.json and plan/sequence.json both exist: a workstream has one plan shape or the other, never both'); process.exit(1);
-}
-if (graphPlan) {
-  // ---- stage 3, graph shape (schema/plan.md): the foundation, the entries and their edges, one brief per entry, embedded whole ----
+if (existsSync(planDir)) {
+  if (!existsSync(join(planDir, 'plan.json'))) { console.error('blueprint data problems:\n  plan/plan.json: missing (blueprint/plan/ exists; the Plan tab is read from plan.json)'); process.exit(1); }
   const pread = f => JSON.parse(readFileSync(join(planDir, f), 'utf8'));
   const popt = f => existsSync(join(planDir, f)) ? pread(f) : null;
   const G = pread('plan.json'), preport = popt('plan-report.json'), preview = popt('plan-review.json') || { rounds: [] };
@@ -243,235 +236,105 @@ if (graphPlan) {
   gwalk(preview, '', 'plan-review.json', 'plan-review.json');
   Object.entries(briefs).forEach(([id, b]) => gwalk(b, '', 'brief', `briefs/${id}.json`));
   if (problems.length) { console.error('blueprint data problems:\n  ' + problems.join('\n  ')); process.exit(1); }
-  plan = { shape: 'graph', plan: G, briefs, mdBriefs, report: preport, review: preview };
-} else if (existsSync(planDir)) {
-  const pread = f => JSON.parse(readFileSync(join(planDir, f), 'utf8'));
-  const popt = f => existsSync(join(planDir, f)) ? pread(f) : null;
-  const seq = popt('sequence.json'), preport = popt('plan-report.json'), preview = popt('plan-review.json') || { rounds: [] };
-  if (!seq) problems.push('plan/sequence.json: missing');
-  if (!preport) problems.push('plan/plan-report.json: missing'); else {
-    need(preport, ['inOneSentence', 'threeThings', 'needsYourEye', 'lanesPlain', 'wavesPlain', 'teamPlain', 'reviewPlain'], 'plan-report.json');
-    if ((preport.threeThings || []).length !== 3) problems.push('plan-report.json: threeThings must have exactly three items');
-  }
-  const goals = {}, mdGoals = {};
-  if (seq) {
-    need(seq, ['fromA', 'toB', 'contracts', 'lanes', 'waves', 'team', 'preflight'], 'plan/sequence.json');
-    const rowNums = new Map(), waveIds = new Set((seq.waves || []).map(w => w.n));
-    const proofOk = p => p && ((p.run && p.expect) || (p.see && p.where));
-    (seq.lanes || []).forEach(l => {
-      need(l, ['repo', 'session', 'rows'], `lane ${l.repo}`);
-      (l.rows || []).forEach(r => {
-        need(r, ['num', 'story', 'what', 'wave', 'proof'], `row ${r.num}`);
-        if (rowNums.has(r.num)) problems.push(`row ${r.num}: duplicate number (also in lane ${rowNums.get(r.num)})`); rowNums.set(r.num, l.repo);
-        if (!proofOk(r.proof)) problems.push(`row ${r.num}: proof must be {run, expect} or {see, where}`);
-        if (!waveIds.has(r.wave)) problems.push(`row ${r.num}: wave ${r.wave} does not exist`);
-        if (!ids.has(r.story) && !/^(infra|seed|mesh|—|-)$/.test(r.story)) problems.push(`row ${r.num}: story ${r.story} does not exist`);
-      });
-      // every lane × wave that has rows has its goal JSON and its goal file
-      [...new Set((l.rows || []).map(r => r.wave))].forEach(w => {
-        const gf = join(planDir, 'goals', `${l.repo}-${w}.json`);
-        if (!existsSync(gf)) { problems.push(`plan/goals/${l.repo}-${w}.json: missing (lane ${l.repo} has rows in ${w})`); return; }
-        const g = JSON.parse(readFileSync(gf, 'utf8'));
-        need(g, ['goal', 'repo', 'wave', 'file', 'intro', 'rows', 'worthALook', 'workerDecides'], `plan/goals/${l.repo}-${w}.json`);
-        (g.rows || []).forEach(gr => { if (!rowNums.has(gr.num)) problems.push(`goal ${g.goal}: row ${gr.num} is not in sequence.json`); });
-        goals[`${l.repo}/${w}`] = g;
-        const mdPath = join(ws, g.file || '');
-        if (g.file && existsSync(mdPath)) mdGoals[`${l.repo}/${w}`] = readFileSync(mdPath, 'utf8'); else problems.push(`goal ${g.goal}: file ${g.file} not found (the tab embeds it whole)`);
-      });
-    });
-    (seq.waves || []).forEach(w => {
-      need(w, ['n', 'name', 'accepts', 'requires', 'folders', 'suites', 'walk'], `wave ${w.n}`);
-      (w.requires || []).forEach(n => { if (!rowNums.has(n)) problems.push(`wave ${w.n}: requires row ${n}, which does not exist`); });
-      (w.walk || []).forEach((st, i) => { if (!proofOk(st)) problems.push(`wave ${w.n}: walk step ${i + 1} must be {run, expect} or {see, where}`); });
-    });
-    (seq.team || []).forEach(t => need(t, ['session', 'name', 'model', 'folder', 'owns', 'first'], `team ${t.name}`));
-    (seq.preflight || []).forEach(p => { need(p, ['item', 'row', 'status'], `preflight ${p.item}`); if (!['handed', 'missing'].includes(p.status)) problems.push(`preflight ${p.item}: status must be handed or missing`); });
-    const seen = new Set();
-    (seq.decisions || []).forEach(c => { need(c, ['id', 'doc', 'when', 'question', 'chosen'], `decision ${c.id}`); if (seen.has(c.id)) problems.push(`decision ${c.id}: duplicate id`); seen.add(c.id);
-      if (c.doc !== 'cut' && !waveIds.has(c.doc)) problems.push(`decision ${c.id}: doc "${c.doc}" is neither "cut" nor a wave`); });
-  }
-  (preview.decisions || []).forEach(x => { if (!x.plain) problems.push(`plan-review.json: decision ${x.id} has no plain sentence`); });
-  // word caps (schema/plan.md)
-  const PCAPS = { fromA: 60, toB: 60, what: 18, touches: 14, readBy: 14, sharesWith: 20, accepts: 25, note: 12, masterDecides: 30, parks: 30, owns: 20, item: 16, question: 16, chosen: 30, why: 25, label: 18, cost: 14,
-    intro: 45, builds: 25, proof: 25, worthALook: 20, workerDecides: 18, preflight: 16, inOneSentence: 35, p: 35, lanesPlain: 45, wavesPlain: 45, teamPlain: 45, reviewPlain: 45, plain: 25, title: 12, ruling: 25, changed: 20 };
-  const PSKIP = new Set(['run', 'expect', 'see', 'where', 'first', 'id', 'num', 'story', 'wave', 'after', 'par', 'n', 'name', 'session', 'model', 'folder', 'fixedIn', 'writtenBy', 'file', 'goal', 'repo', 'doc', 'when', 'recommended', 'pick', 'status', 'row', 'requires', 'folders', 'lens', 'words', 'opened', 'approved', 'cases', 't']);
-  const pwords = t => String(t).trim().split(/\s+/).filter(Boolean).length;
-  const pwalk = (v, path, file) => {
-    if (Array.isArray(v)) { v.forEach(x => pwalk(x, path, file)); return; }
-    if (v && typeof v === 'object') { Object.entries(v).forEach(([k, x]) => pwalk(x, path ? `${path}.${k}` : k, file)); return; }
-    if (typeof v !== 'string') return;
-    const key = path.split('.').pop();
-    // proof.* inside sequence rows are commands (skipped); a goal's "proof" is prose (capped)
-    const cap = PSKIP.has(key) ? null : (key === 'proof' && file !== 'goal' ? null : PCAPS[key]);
-    if (cap && pwords(v) > cap) problems.push(`plan/${file}: ${path} has ${pwords(v)} words, cap ${cap} — "${v.slice(0, 60)}…"`);
-  };
-  if (seq) pwalk(seq, '', 'sequence.json');
-  if (preport) pwalk(preport, '', 'plan-report.json');
-  pwalk(preview, '', 'plan-review.json');
-  Object.values(goals).forEach(g => pwalk(g, '', 'goal'));
-  if (problems.length) { console.error('blueprint data problems:\n  ' + problems.join('\n  ')); process.exit(1); }
-  plan = { shape: 'lanes', seq, goals, mdGoals, report: preport, review: preview };
+  plan = { plan: G, briefs, mdBriefs, report: preport, review: preview };
 }
-// ---- stage 4: one JSON per lane (workers), one per gated wave, the report and the audit (master) ----
+// ---- stage 4 (schema/execution.md): one file by the session ----
 const execDir = join(dataDir, 'execution');
+const execGraphPath = join(execDir, 'execution.json');
 let execution = null;
-if (existsSync(execDir) && plan?.shape === 'lanes') {
-  const eread = f => JSON.parse(readFileSync(join(execDir, f), 'utf8'));
-  const eopt = f => existsSync(join(execDir, f)) ? eread(f) : null;
-  const ereport = eopt('exec-report.json'), eaudit = eopt('audit.json');
-  const laneFiles = existsSync(join(execDir, 'lanes')) ? readdirSync(join(execDir, 'lanes')).filter(f => f.endsWith('.json')) : [];
-  const waveFiles = existsSync(join(execDir, 'waves')) ? readdirSync(join(execDir, 'waves')).filter(f => f.endsWith('.json')) : [];
-  const planRows = new Map(); plan.seq.lanes.forEach(l => l.rows.forEach(r => planRows.set(r.num, { ...r, repo: l.repo })));
-  const planLanes = new Set(plan.seq.lanes.map(l => l.repo)), planWaves = new Set(plan.seq.waves.map(w => w.n));
-  const proofDone = p => p && ((p.run && p.expect && p.got) || (p.see && p.where && p.shot));
-  // A lane row may be lettered (`A.1`, `F.3`): a num the plan knows is never a
-  // fix row, whatever its shape; `A.n` is an audit row only when the plan has no such row.
-  const fixNum = n => /^([A-Za-z]\.\d+|\d+\.\d+|w\d+)\.f\d+$/.test(n) || (/^A\.\d+$/.test(n) && !planRows.has(n));
-  const lanes = {};
-  laneFiles.forEach(f => {
-    const l = eread(`lanes/${f}`);
-    need(l, ['repo', 'session', 'intro', 'rows', 'suites', 'worthALook'], `execution/lanes/${f}`);
-    if (!planLanes.has(l.repo)) problems.push(`execution/lanes/${f}: lane ${l.repo} is not in sequence.json`);
-    const seen = new Set();
-    (l.rows || []).forEach(r => {
-      need(r, ['num', 'story', 'wave', 'what', 'status', 'rounds', 'proof', 'attempts', 'notes', 'departures', 'choices', 'stops'], `execution row ${r.num}`);
-      if (seen.has(r.num)) problems.push(`execution/lanes/${f}: row ${r.num} listed twice`); seen.add(r.num);
-      const pr = planRows.get(r.num);
-      if (!pr && !fixNum(r.num)) problems.push(`execution/lanes/${f}: row ${r.num} is neither a plan row nor a fix row (N.k.fn, wNN.fn, A.n)`);
-      if (pr && pr.repo !== l.repo) problems.push(`execution/lanes/${f}: row ${r.num} belongs to lane ${pr.repo}`);
-      if (pr && (pr.story !== r.story || pr.wave !== r.wave)) problems.push(`execution/lanes/${f}: row ${r.num} story/wave differ from sequence.json (${pr.story}/${pr.wave})`);
-      if (fixNum(r.num) && !r.fixOf) problems.push(`execution/lanes/${f}: fix row ${r.num} has no fixOf`);
-      if (!['merged', 'building', 'parked', 'open'].includes(r.status)) problems.push(`execution row ${r.num}: status must be merged, building, parked or open`);
-      if ((r.rounds || []).length > 2) problems.push(`execution row ${r.num}: more than two rounds`);
-      if (![1, 2, 3].includes(r.attempts)) problems.push(`execution row ${r.num}: attempts must be 1, 2 or 3`);
-      if (r.status === 'merged') {
-        if (!r.pr || !r.pr.n || !r.pr.url) problems.push(`execution row ${r.num}: merged without a PR`);
-        if (!r.mergedAt) problems.push(`execution row ${r.num}: merged without mergedAt`);
-        if (!proofDone(r.proof)) problems.push(`execution row ${r.num}: merged without a proof output (got, or shot)`);
-      }
+if (existsSync(execDir) && plan) {
+  const stray = ['lanes/', 'waves/', 'exec-report.json', 'audit.json'].filter(f => existsSync(join(execDir, f)));
+  if (stray.length) { console.error(`blueprint data problems:\n  execution/${stray.join(', execution/')}: files of the retired lanes-and-waves execution; stage 4 writes only execution/execution.json`); process.exit(1); }
+  if (existsSync(execGraphPath)) {
+    const X = JSON.parse(readFileSync(execGraphPath, 'utf8'));
+    const W = 'execution/execution.json';
+    need(X, ['started', 'branch', 'head', 'gate', 'entries', 'amendments', 'precision', 'report', 'audit'], W);
+    if (!('closed' in X)) problems.push(`${W}: missing closed (null until you approve the audit)`);
+    const list = (v, name) => { if (v === undefined) return []; if (!Array.isArray(v)) { problems.push(`${W}: ${name} must be a list`); return []; } return v; };
+    const entries = list(X.entries, 'entries'), amendments = list(X.amendments, 'amendments'), precision = list(X.precision, 'precision');
+    const A = X.audit && typeof X.audit === 'object' ? X.audit : {};
+    if (X.audit !== undefined) need(A, ['parked', 'choices', 'latitude'], `${W} audit`);
+    const aParked = list(A.parked, 'audit.parked'), aChoices = list(A.choices, 'audit.choices'), aLat = list(A.latitude, 'audit.latitude');
+    const planIds = new Set(plan.plan.entries.map(e => e.id));
+    const idOk = id => id === 'F' || planIds.has(id) || /^[FX]\.\d+$/.test(String(id));
+    const count = new Map();
+    const STATUS = ['waiting', 'building', 'merged', 'parked'];
+    const parkedIds = new Set(aParked.map(p => p.id));
+    const nat = v => Number.isInteger(v) && v >= 0;
+    entries.forEach((e, i) => {
+      const w = `${W} entries[${i + 1}]${e.id ? ` (${e.id})` : ''}`;
+      need(e, ['id', 'status', 'rounds', 'found', 'sustained', 'summary'], w);
+      if (!('sha' in e)) problems.push(`${w}: missing sha (null until merged)`);
+      if (e.id !== undefined && !idOk(e.id)) problems.push(`${w}: id "${e.id}" is neither F, an entry of plan.json, an amendment F.<n> nor a fix entry X.<n>`);
+      count.set(e.id, (count.get(e.id) || 0) + 1);
+      if (e.status !== undefined && !STATUS.includes(e.status)) problems.push(`${w}: status "${e.status}" must be one of ${STATUS.join(', ')}`);
+      if (e.status === 'merged' && !e.sha) problems.push(`${w}: merged without a sha`);
+      if (e.status === 'parked' && !parkedIds.has(e.parked)) problems.push(`${w}: parked names ${e.parked === undefined ? 'no audit item' : `"${e.parked}"`}, which is not in audit.parked`);
+      ['rounds', 'found', 'sustained'].forEach(k => { if (e[k] !== undefined && !nat(e[k])) problems.push(`${w}: ${k} must be a whole number`); });
     });
-    (l.suites || []).forEach(s => need(s, ['wave', 'cases', 'passed', 'failed', 'skipped', 'file'], `execution/lanes/${f} suite ${s.wave}`));
-    lanes[l.repo] = l;
-  });
-  const waves = {};
-  waveFiles.forEach(f => {
-    const w = eread(`waves/${f}`);
-    need(w, ['n', 'name', 'inOneParagraph', 'shas', 'suitesBefore', 'walk', 'shadow', 'fixes', 'parked', 'forTheIntern'], `execution/waves/${f}`);
-    if (!planWaves.has(w.n)) problems.push(`execution/waves/${f}: wave ${w.n} is not in sequence.json`);
-    (w.walk || []).forEach(st => {
-      need(st, ['step', 'ok'], `execution wave ${w.n} walk step ${st.step}`);
-      if (!((st.run && st.expect && st.got) || (st.see && st.where && st.shot))) problems.push(`execution wave ${w.n}: walk step ${st.step} needs run/expect/got or see/where/shot`);
-      if (w.gatedAt && st.ok !== true) problems.push(`execution wave ${w.n}: gated with step ${st.step} red`);
+    count.forEach((n, id) => { if (n > 1 && id !== undefined) problems.push(`${W} entries: ${id} appears ${n} times (each entry exactly once)`); });
+    ['F', ...planIds].forEach(id => { if (!count.has(id)) problems.push(`${W} entries: ${id === 'F' ? 'the foundation F' : `plan entry ${id}`} is missing (every plan entry and F appear exactly once)`); });
+    const known = new Set(['F', ...planIds, ...entries.map(e => e.id).filter(Boolean)]);
+    amendments.forEach((a, i) => {
+      const w = `${W} amendments[${i + 1}]${a.id ? ` (${a.id})` : ''}`;
+      need(a, ['id', 'what', 'for'], w);
+      if (!('sha' in a)) problems.push(`${w}: missing sha (null until merged)`);
+      if (a.id !== undefined && !/^F\.\d+$/.test(a.id)) problems.push(`${w}: id "${a.id}" must be F.<n>`);
+      if (a.for !== undefined && !known.has(a.for)) problems.push(`${w}: for names "${a.for}", which is not a known entry id`);
     });
-    (w.fixes || []).forEach(x => { need(x, ['id', 'lane', 'row', 'why', 'status'], `execution wave ${w.n} fix ${x.id}`); if (w.gatedAt && x.status !== 'merged') problems.push(`execution wave ${w.n}: gated with fix ${x.id} ${x.status}`); });
-    (w.parked || []).forEach(p => need(p, ['id', 'row', 'why'], `execution wave ${w.n} parked ${p.id}`));
-    need(w.forTheIntern, ['problem', 'roles', 'guards', 'alphaVsProd'], `execution wave ${w.n} forTheIntern`);
-    (w.forTheIntern.roles || []).forEach(r => need(r, ['component', 'role', 'analogy'], `execution wave ${w.n} role`));
-    (w.forTheIntern.guards || []).forEach(g => need(g, ['guard', 'stops', 'why'], `execution wave ${w.n} guard`));
-    waves[w.n] = w;
-  });
-  if (ereport) {
-    need(ereport, ['inOneSentence', 'threeThings', 'needsYourEye', 'lanesPlain', 'wavesPlain', 'auditPlain'], 'exec-report.json');
-    if ((ereport.threeThings || []).length !== 3) problems.push('exec-report.json: threeThings must have exactly three items');
+    const PREC = ['found', 'sustained', 'deferred', 'latitude', 'dismissed', 'user'];
+    precision.forEach((p, i) => {
+      const w = `${W} precision[${i + 1}]${p.lens ? ` (${p.lens})` : ''}`;
+      need(p, ['lens', ...PREC], w);
+      if (p.lens !== undefined && !/^exec-(lens|qa)-[a-z]+$/.test(p.lens)) problems.push(`${w}: lens "${p.lens}" must be exec-lens-<name> or exec-qa-<name>`);
+      PREC.forEach(k => { if (p[k] !== undefined && !nat(p[k])) problems.push(`${w}: ${k} must be a whole number`); });
+    });
+    const R = X.report && typeof X.report === 'object' ? X.report : {};
+    if (X.report !== undefined) {
+      need(R, ['inOneSentence', 'threeThings', 'needsYourEye', 'entriesPlain', 'reviewPlain'], `${W} report`);
+      if (!Array.isArray(R.threeThings) || R.threeThings.length !== 3) problems.push(`${W}: report.threeThings must have exactly three items`);
+      (Array.isArray(R.threeThings) ? R.threeThings : []).forEach((t, i) => need(t, ['t', 'p'], `${W} report.threeThings[${i + 1}]`));
+      if (R.needsYourEye !== undefined && !Array.isArray(R.needsYourEye)) problems.push(`${W}: report.needsYourEye must be a list`);
+      (Array.isArray(R.needsYourEye) ? R.needsYourEye : []).forEach((t, i) => need(t, ['t', 'p'], `${W} report.needsYourEye[${i + 1}]`));
+    }
+    const seenAudit = new Set();
+    const auditItem = (it, i, kind, keys) => {
+      const w = `${W} audit.${kind}[${i + 1}]${it.id ? ` (${it.id})` : ''}`;
+      need(it, keys, w);
+      ['ruling', 'words'].forEach(k => { if (!(k in it)) problems.push(`${w}: missing ${k} (null until you rule)`); });
+      if (it.id !== undefined) { if (seenAudit.has(it.id)) problems.push(`${w}: duplicate id`); seenAudit.add(it.id); }
+      if (it.entry !== undefined && !known.has(it.entry)) problems.push(`${w}: entry "${it.entry}" is not a known entry id`);
+      if (X.closed && it.ruling == null) problems.push(`${w}: the audit is closed and this item has no ruling`);
+      return w;
+    };
+    aParked.forEach((p, i) => auditItem(p, i, 'parked', ['id', 'entry', 'title', 'why', 'recommendation']));
+    aChoices.forEach((c, i) => {
+      const w = auditItem(c, i, 'choices', ['id', 'entry', 'title', 'where', 'chosen', 'recommendation']);
+      if (c.recommendation !== undefined && !['keep', 'fix'].includes(c.recommendation)) problems.push(`${w}: recommendation "${c.recommendation}" must be keep or fix`);
+      if (c.ruling != null && !['keep', 'fix', 'revert'].includes(c.ruling)) problems.push(`${w}: ruling "${c.ruling}" must be keep, fix, revert or null`);
+    });
+    aLat.forEach((l, i) => { const w = `${W} audit.latitude[${i + 1}]`; need(l, ['entry', 'what'], w); if (l.entry !== undefined && !known.has(l.entry)) problems.push(`${w}: entry "${l.entry}" is not a known entry id`); });
+    // word caps (schema/execution.md, "Graph plans"): by exact path; ids, shas, paths, gate and words are never capped
+    const XCAPS = { 'entries.summary': 25, 'amendments.what': 18, 'audit.latitude.what': 18, 'audit.parked.title': 12, 'audit.choices.title': 12, 'audit.parked.why': 30,
+      'audit.parked.recommendation': 25, 'audit.choices.recommendation': 25, 'audit.choices.chosen': 25, 'report.inOneSentence': 35, 'report.threeThings.p': 35, 'report.needsYourEye.p': 35,
+      'report.entriesPlain': 45, 'report.reviewPlain': 45 };
+    const xwords = t => String(t).trim().split(/\s+/).filter(Boolean).length;
+    const xwalk = (v, path) => {
+      if (Array.isArray(v)) { v.forEach(x => xwalk(x, path)); return; }
+      if (v && typeof v === 'object') { Object.entries(v).forEach(([k, x]) => xwalk(x, path ? `${path}.${k}` : k)); return; }
+      if (typeof v !== 'string') return;
+      const cap = XCAPS[path];
+      if (cap && xwords(v) > cap) problems.push(`${W}: ${path} has ${xwords(v)} words, cap ${cap} — "${v.slice(0, 60)}…"`);
+    };
+    xwalk(X, '');
+    if (problems.length) { console.error('blueprint data problems:\n  ' + problems.join('\n  ')); process.exit(1); }
+    execution = X;
   }
-  if (eaudit) {
-    need(eaudit, ['opened', 'items', 'fixes'], 'audit.json');
-    (eaudit.items || []).forEach(it => {
-      need(it, ['id', 'kind', 'title', 'plain', 'where', 'recommendation'], `audit item ${it.id}`);
-      if (!['P', 'D', 'C', 'N', 'S'].includes(it.kind)) problems.push(`audit item ${it.id}: kind must be P, D, C, N or S`);
-      if (!['keep', 'fix', 'revert'].includes(it.recommendation)) problems.push(`audit item ${it.id}: recommendation must be keep, fix or revert`);
-      if (it.ruling != null && !['keep', 'fix', 'revert'].includes(it.ruling)) problems.push(`audit item ${it.id}: ruling must be keep, fix, revert or null`);
-      if (eaudit.close && it.ruling == null) problems.push(`audit item ${it.id}: the audit is closed and this item has no ruling`);
-    });
-    (eaudit.fixes || []).forEach(x => { need(x, ['id', 'lane', 'row', 'from', 'what', 'status'], `audit fix ${x.id}`); if (eaudit.close && x.status !== 'merged') problems.push(`audit fix ${x.id}: the audit is closed and this fix is ${x.status}`); });
-    if (eaudit.close) need(eaudit.close, ['date', 'shas', 'alphaAt', 'suites', 'residue'], 'audit.json close');
-  }
-  // word caps (schema/execution.md)
-  const ECAPS = { intro: 45, what: 18, notes: 25, departures: 25, choices: 25, stops: 25, worthALook: 20, inOneParagraph: 70, why: 20, problem: 45, role: 18, analogy: 18, alphaVsProd: 20,
-    inOneSentence: 35, p: 35, lanesPlain: 45, wavesPlain: 45, auditPlain: 45, title: 12, plain: 25, standardSays: 35, built: 35, reading: 35, alphaAt: 20 };
-  const ESKIP = new Set(['run', 'expect', 'see', 'where', 'got', 'shot', 'file', 'branch', 'sha', 'words', 'id', 'num', 'story', 'wave', 'n', 'name', 'session', 'repo', 'status', 'url', 'tag', 'gatedAt', 'mergedAt', 'fixOf', 'lane', 'row', 'from', 'component', 'guard', 'kind', 'recommendation', 'ruling', 'opened', 'closed', 'date', 'owner', 't', 'step']);
-  const ewords = t => String(t).trim().split(/\s+/).filter(Boolean).length;
-  const ewalk = (v, path, file) => {
-    if (Array.isArray(v)) { v.forEach(x => ewalk(x, path, file)); return; }
-    if (v && typeof v === 'object') { Object.entries(v).forEach(([k, x]) => ewalk(x, path ? `${path}.${k}` : k, file)); return; }
-    if (typeof v !== 'string') return;
-    const key = path.split('.').pop();
-    // guards[].stops (14) and audit fixes[].what / close residue[].what (20) share names with wider fields: resolved by path
-    const cap = ESKIP.has(key) ? null : /guards\.stops$/.test(path) ? 14 : /(fixes|residue)\.what$/.test(path) ? 20 : /audit.*\.why$/.test(path) || file === 'audit.json' && key === 'why' ? 25 : ECAPS[key];
-    if (cap && ewords(v) > cap) problems.push(`execution/${file}: ${path} has ${ewords(v)} words, cap ${cap} — "${v.slice(0, 60)}…"`);
-  };
-  Object.entries(lanes).forEach(([k, l]) => ewalk(l, '', `lanes/${k}.json`));
-  Object.entries(waves).forEach(([k, w]) => ewalk(w, '', `waves/${k}.json`));
-  if (ereport) ewalk(ereport, '', 'exec-report.json');
-  if (eaudit) ewalk(eaudit, '', 'audit.json');
-  if (problems.length) { console.error('blueprint data problems:\n  ' + problems.join('\n  ')); process.exit(1); }
-  if (Object.keys(lanes).length || ereport) execution = { lanes, waves, report: ereport, audit: eaudit };
 } else if (existsSync(execDir) && !plan) {
   problems.push('blueprint/execution/ exists but blueprint/plan/ does not: the Execution tab is read against the plan');
   console.error('blueprint data problems:\n  ' + problems.join('\n  ')); process.exit(1);
 }
-// ---- stage 5: one JSON by the session (the plan, the train, the versions, the fixes, the watch, the close) ----
-const relPath = join(dataDir, 'release', 'release.json');
-let release = null;
-if (existsSync(relPath) && plan?.shape === 'lanes') {
-  const R = JSON.parse(readFileSync(relPath, 'utf8'));
-  need(R, ['opened', 'goal', 'inOneSentence', 'threeThings', 'needsYourEye', 'trainPlain', 'versionsPlain', 'watchPlain', 'ships', 'preflight', 'integration', 'confirmation', 'versions', 'rollback', 'train', 'fixes', 'watch', 'stops', 'close'], 'release.json');
-  const closed = !!R.closed;
-  if ((R.threeThings || []).length !== 3) problems.push('release.json: threeThings must have exactly three items');
-  if (R.goal) need(R.goal, ['words', 'at'], 'release.json goal');
-  const planLanes = new Set(plan.seq.lanes.map(l => l.repo)), planWaves = new Set(plan.seq.waves.map(w => w.n));
-  const ships = new Set();
-  (R.ships || []).forEach(sh => { need(sh, ['repo', 'sha', 'waves', 'lane'], `release ships ${sh.repo}`); ships.add(sh.repo);
-    if (!planLanes.has(sh.repo)) problems.push(`release.json: ships ${sh.repo} is not a lane of sequence.json`);
-    (sh.waves || []).forEach(w => { if (!planWaves.has(w)) problems.push(`release.json: ships ${sh.repo} names wave ${w}, not in sequence.json`); });
-    if (!['A', 'B'].includes(sh.lane)) problems.push(`release.json: ships ${sh.repo} lane must be A or B`); });
-  const inShips = (list, name, key = 'repo') => (list || []).forEach(x => { if (!ships.has(x[key])) problems.push(`release.json: ${name} names ${x[key]}, not in ships`); });
-  (R.preflight || []).forEach((p, i) => { need(p, ['what', 'status'], `release preflight ${i + 1}`); if (!['done', 'delegated', 'open'].includes(p.status)) problems.push(`release preflight ${i + 1}: status must be done, delegated or open`); if (closed && p.status === 'open') problems.push(`release preflight ${i + 1}: the stage is closed and this line is open`); });
-  inShips(R.integration, 'integration'); (R.integration || []).forEach(x => { need(x, ['repo', 'pr', 'rebased', 'ci'], `release integration ${x.repo}`); if (!x.pr?.n || !x.pr?.url) problems.push(`release integration ${x.repo}: pr needs n and url`); });
-  inShips(R.confirmation, 'confirmation'); (R.confirmation || []).forEach(c => { need(c, ['repo', 'treeIdentical', 'alphaDiffEmpty'], `release confirmation ${c.repo}`);
-    if (c.treeIdentical && c.alphaDiffEmpty) { if (!c.stood && !c.suite) problems.push(`release confirmation ${c.repo}: tree identical and alpha diff empty, but neither stood nor suite`); }
-    else if (!c.suite) problems.push(`release confirmation ${c.repo}: something changed and no suite ran`);
-    if (c.suite) need(c.suite, ['passed', 'failed', 'skipped', 'file'], `release confirmation ${c.repo} suite`); });
-  inShips(R.versions, 'versions'); (R.versions || []).forEach(v => { need(v, ['repo', 'from', 'to', 'bump', 'sha', 'url', 'notesFile', 'unparsed'], `release version ${v.repo}`);
-    if (!/^v\d+\.\d+\.\d+$/.test(v.to || '')) problems.push(`release version ${v.repo}: to must be vN.N.N`);
-    if (!['major', 'minor', 'patch', 'initial'].includes(v.bump)) problems.push(`release version ${v.repo}: bump must be major, minor, patch or initial`);
-    if (closed && (!v.url || !v.sha)) problems.push(`release version ${v.repo}: the stage is closed and the version has no url or sha`); });
-  if (closed) ships.forEach(r => { if (!(R.versions || []).some(v => v.repo === r)) problems.push(`release.json: closed and ${r} has no version`); });
-  inShips(R.rollback, 'rollback'); (R.rollback || []).forEach(x => need(x, ['repo', 'returnTo', 'dataSafe', 'note', 'file'], `release rollback ${x.repo}`));
-  (R.train || []).forEach(st => { need(st, ['step', 'repo', 'what', 'ok', 'at'], `release train step ${st.step}`);
-    if (!ships.has(st.repo)) problems.push(`release train step ${st.step}: repo ${st.repo} not in ships`);
-    if (!((st.run && st.expect && st.got) || (st.see && st.where && st.shot))) problems.push(`release train step ${st.step}: needs run/expect/got or see/where/shot`);
-    if (closed && st.ok !== true) problems.push(`release train step ${st.step}: the stage is closed and this step is red`); });
-  (R.fixes || []).forEach(x => { need(x, ['id', 'kind', 'repo', 'seen', 'what', 'status'], `release fix ${x.id}`);
-    if (!/^R\.\d+$/.test(x.id || '')) problems.push(`release fix ${x.id}: id must be R.<n>`);
-    if (!['fix', 'hotfix'].includes(x.kind)) problems.push(`release fix ${x.id}: kind must be fix or hotfix`);
-    if (!['building', 'merged', 'deployed', 'stopped'].includes(x.status)) problems.push(`release fix ${x.id}: status must be building, merged, deployed or stopped`);
-    if (closed && !(x.status === 'deployed' || (x.kind === 'fix' && x.status === 'merged'))) problems.push(`release fix ${x.id}: the stage is closed and this ${x.kind} is ${x.status}`); });
-  (R.watch || []).forEach(w => { need(w, ['n', 'what', 'at', 'expect'], `release watch ${w.n}`);
-    if (w.readAt && w.ok == null) problems.push(`release watch ${w.n}: read but ok is null`);
-    if (closed && !(w.readAt && w.ok === true) && !w.owner) problems.push(`release watch ${w.n}: the stage is closed and this proof is neither read green nor given an owner`); });
-  (R.stops || []).forEach((x, i) => need(x, ['at', 'what', 'how'], `release stop ${i + 1}`));
-  if (closed && !R.close) problems.push('release.json: closed without a close');
-  if (R.close) { need(R.close, ['date', 'prod', 'residue'], 'release.json close'); ships.forEach(r => { if (!(R.close.prod || []).some(p => p.repo === r)) problems.push(`release.json close: ${r} is not in prod`); });
-    (R.close.prod || []).forEach(p => need(p, ['repo', 'version', 'sha', 'deployedAt'], `release close prod ${p.repo}`)); (R.close.residue || []).forEach(x => need(x, ['what', 'owner'], 'release close residue')); }
-  // word caps (schema/release.md)
-  const RCAPS = { inOneSentence: 35, p: 35, trainPlain: 45, versionsPlain: 45, watchPlain: 45, how: 20, stood: 25, note: 35, seen: 20 };
-  const RSKIP = new Set(['run', 'expect', 'see', 'where', 'got', 'shot', 'file', 'sha', 'url', 'tag', 'words', 'returnTo', 'at', 'readAt', 'mergedAt', 'deployedAt', 'repo', 'id', 'kind', 'status', 'step', 'n', 'from', 'to', 'bump', 'version', 'notesFile', 'owner', 'lane', 'ci', 'date', 'opened', 'closed', 't', 'mainSha', 'waves', 'expect']);
-  const rwords = t => String(t).trim().split(/\s+/).filter(Boolean).length;
-  const rwalk = (v, path) => {
-    if (Array.isArray(v)) { v.forEach(x => rwalk(x, path)); return; }
-    if (v && typeof v === 'object') { Object.entries(v).forEach(([k, x]) => rwalk(x, path ? `${path}.${k}` : k)); return; }
-    if (typeof v !== 'string') return;
-    const key = path.split('.').pop();
-    const cap = RSKIP.has(key) ? null : /^preflight\.what$/.test(path) ? 20 : /^train\.what$/.test(path) ? 14 : /^(fixes|watch)\.what$/.test(path) ? 20 : /^stops\.(what|how)$/.test(path) ? 25 : /^close\.residue\.what$/.test(path) ? 20 : RCAPS[key];
-    if (cap && rwords(v) > cap) problems.push(`release.json: ${path} has ${rwords(v)} words, cap ${cap} — "${v.slice(0, 60)}…"`);
-  };
-  rwalk(R, '');
-  if (problems.length) { console.error('blueprint data problems:\n  ' + problems.join('\n  ')); process.exit(1); }
-  release = R;
-} else if (existsSync(relPath) && !plan) {
-  console.error('blueprint data problems:\n  blueprint/release/release.json exists but blueprint/plan/ does not: the Release tab is read against the plan'); process.exit(1);
-}
+const release = null;
 // ---- stage 6: one JSON by the session (the numbers, the record, the sweep, the board, the close) ----
 const closePath = join(dataDir, 'close', 'close.json');
 let close = null;
@@ -530,15 +393,13 @@ if (existsSync(closePath) && release && release.close) {
   cwalk(C, '');
   if (problems.length) { console.error('blueprint data problems:\n  ' + problems.join('\n  ')); process.exit(1); }
   close = C;
-} else if (existsSync(closePath)) {
-  console.error('blueprint data problems:\n  blueprint/close/close.json exists but the release has no close: the Close tab is read against a closed release'); process.exit(1);
 }
-const tabs = ['discovery', ...(design ? ['design'] : []), ...(plan ? ['plan'] : []), ...(execution ? ['execution'] : []), ...(release ? ['release'] : []), ...(close ? ['close'] : [])];
+const tabs = ['discovery', ...(design ? ['design'] : []), ...(plan ? ['plan'] : []), ...(execution ? ['execution'] : []), ...(close ? ['close'] : [])];
 
 const data = {
-  workstream, strings, figures, wireframes, review, report, design, plan, execution, release, close, tabs,
+  workstream, strings, figures, review, report, design, plan, execution, close, tabs,
   ...prfaq, ...stories,
-  files: ['00-discovery/pr-faq.md', '00-discovery/user-stories.md', '00-discovery/reviews.md', 'rulings.md', ...(wireframes.length ? ['00-discovery/wireframes/'] : []), ...(design ? ['01-design/*.md', '01-design/notes.md', '01-design/reviews.md', '01-design/ui/'] : []), ...(plan?.shape === 'graph' ? ['02-plan/plan.md', '02-plan/briefs/', '02-plan/recon/', '02-plan/reviews.md'] : plan ? ['waves.md', '02-plan/goals/', '02-plan/recon/', '02-plan/team.md', '02-plan/reviews.md'] : []), ...(execution ? ['03-execution/rows/', '03-execution/<wNN>/', '03-execution/audit.md', '03-execution/parked.md'] : []), ...(release ? ['04-release/plan.md', '04-release/trace.md', '04-release/rows/', '04-release/proof/'] : []), ...(close ? ['05-close/closure.md', '05-close/dreaming/ledger.md', '05-close/harvest/'] : [])],
+  files: ['00-discovery/pr-faq.md', '00-discovery/user-stories.md', '00-discovery/reviews.md', 'rulings.md', ...(design ? ['01-design/*.md', '01-design/notes.md', '01-design/reviews.md', '01-design/ui/'] : []), ...(plan ? ['02-plan/plan.md', '02-plan/briefs/', '02-plan/recon/', '02-plan/reviews.md'] : []), ...(execution ? ['03-execution/board.md', '03-execution/parked.md', '03-execution/entries/', '03-execution/audit.md', '03-execution/explain.md'] : []), ...(close ? ['05-close/closure.md', '05-close/dreaming/ledger.md', '05-close/harvest/'] : [])],
   builtAt: new Date().toISOString().slice(0, 16).replace('T', ' ') + ' UTC',
 };
 // `</script` inside JSON would end the data block early; escape it.
@@ -546,4 +407,4 @@ const json = JSON.stringify(data).replace(/<\/script/gi, '<\\/script');
 const shell = readFileSync(join(here, 'shell.html'), 'utf8');
 // function replacements: a `$&` or `$'` inside the data would otherwise be read as a replacement pattern
 writeFileSync(out, shell.replace('__TITLE__', () => workstream.title.replace(/</g, '&lt;')).replace('__DATA__', () => json));
-console.log(`built ${out}: tabs ${tabs.join(' + ')} · ${stories.stories.length} stories, ${stories.stories.reduce((a, s) => a + s.acs.length, 0)} ACs, ${wireframes.length} wireframes, ${review.rounds.length} discovery rounds` + (design ? ` · design: ${design.docs.architecture.flows.length} flows, ${design.decisions.length} decisions, ${design.review.rounds.length} rounds` : '') + (plan?.shape === 'graph' ? ` · plan: ${plan.plan.entries.length} entries, ${plan.plan.entries.reduce((a, e) => a + e.stories.length, 0)} stories, concurrency ${plan.plan.concurrency}, ${Object.keys(plan.briefs).length} briefs` : plan ? ` · plan: ${plan.seq.lanes.length} lanes, ${plan.seq.lanes.reduce((a, l) => a + l.rows.length, 0)} rows, ${plan.seq.waves.length} waves, ${Object.keys(plan.goals).length} goals` : '') + (execution ? ` · execution: ${Object.keys(execution.lanes).length} lanes, ${Object.values(execution.lanes).reduce((a, l) => a + l.rows.filter(r => r.status === 'merged' && !r.fixOf).length, 0)} rows merged, ${Object.values(execution.waves).filter(w => w.gatedAt).length} gates green${execution.audit ? (execution.audit.close ? ', audit closed' : ', audit open') : ''}` : '') + (release ? ` · release: ${release.train.filter(t => t.ok).length}/${release.train.length} train steps green, ${release.versions.length} versions, ${release.fixes.length} fixes, ${release.watch.filter(w => w.readAt).length}/${release.watch.length} watched${release.closed ? ', closed' : ', open'}` : '') + (close ? ` · close: ${close.board.entries.length} entries, ${close.board.entries.filter(e => e.ruled === 'issue').length} issues, ${close.board.entries.filter(e => e.ruled === null).length} unruled${close.closed ? ', closed' : ', open'}` : ''));
+console.log(`built ${out}: tabs ${tabs.join(' + ')} · ${stories.stories.length} stories, ${stories.stories.reduce((a, s) => a + s.acs.length, 0)} ACs, ${review.rounds.length} discovery rounds` + (design ? ` · design: ${design.docs.architecture.flows.length} flows, ${design.decisions.length} decisions, ${design.review.rounds.length} rounds` : '') + (plan ? ` · plan: ${plan.plan.entries.length} entries, ${plan.plan.entries.reduce((a, e) => a + e.stories.length, 0)} stories, concurrency ${plan.plan.concurrency}, ${Object.keys(plan.briefs).length} briefs` : '') + (execution ? (x => { const planned = new Set(['F', ...plan.plan.entries.map(e => e.id)]), req = x.entries.filter(e => planned.has(e.id)); return ` · execution: ${req.filter(e => e.status === 'merged').length}/${req.length} merged, ${x.entries.filter(e => e.status === 'parked').length} parked, ${x.amendments.length} amendments, audit ${x.closed ? 'closed' : 'open'}`; })(execution) : '') + (close ? ` · close: ${close.board.entries.length} entries, ${close.board.entries.filter(e => e.ruled === 'issue').length} issues, ${close.board.entries.filter(e => e.ruled === null).length} unruled${close.closed ? ', closed' : ', open'}` : ''));

@@ -32,7 +32,7 @@ The paths: `02-plan/plan.md`, `02-plan/briefs/<id>.md`,
   the behavior and the entry that builds it.
 - **No cycle.** Two entries that wait for each other never start.
 - **After the foundation, no shared file.** An entry that adds a
-  migration, edits `openapi.yaml` or the generated code, or registers
+  migration, edits the API contract or the generated code, or registers
   a module is a blocker: that belongs to the foundation, or it is a
   foundation amendment.
 - **Entries that run at once do not collide.** Two entries with no
