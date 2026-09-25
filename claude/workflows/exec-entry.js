@@ -21,7 +21,11 @@
  *              gate again, up to maxGateFixes; still red → 'parked'.
  *   3. panel   the lenses (Opus 5.5, medium; visual only with a front)
  *              and the QA (Opus 5.5, medium; per side) in parallel over
- *              the diff — whole in round 1, the delta after.
+ *              the diff — whole in round 1, the delta after. A delta
+ *              round seats only the lenses that had a finding sustained
+ *              in the round before, the QA of the sides the fixes
+ *              touched, and the visual lens when the front changed: an
+ *              angle that found nothing does not reread the fixes.
  *   4. judge   exec-judge (Opus 5.5, medium) rules every finding. A
  *              question for the user → 'parked' with the questions.
  *              Nothing sustained → 'ready'. Deferred rulings do not
@@ -284,6 +288,7 @@ if (!g0 || !g0.green) { log(`${entry}: the gate is still red — parked`); retur
 // ---------- the review rounds ----------
 
 let head = g0.head
+let focus = null
 for (let round = 1; round <= maxRounds; round++) {
   const whole = round === 1 && !resume
   const diffCmd = whole ? `git diff ${args?.base}...${args?.branch}` : `git diff ${since}..${args?.branch}`
@@ -299,7 +304,9 @@ THIS IS A DELTA ROUND. The fixes applied since the last round:
 ${lastFixes.map(f => `- ${f.id} (${f.side}): ${f.fix}`).join('\n') || '(none listed)'}` : ''}`
 
   phase('Panel')
-  const names = [...CODE_LENSES, ...(sides.includes('front') ? [VISUAL_LENS] : []), ...sides.map(s => QA[s])]
+  const panel = [...CODE_LENSES, ...(sides.includes('front') ? [VISUAL_LENS] : []), ...sides.map(s => QA[s])]
+  const focused = focus && panel.filter(n => focus.lenses.has(n) || (n === VISUAL_LENS && focus.sides.has('front')) || sides.some(s => QA[s] === n && focus.sides.has(s)))
+  const names = focused?.length ? focused : panel
   log(`${entry} round ${round}: ${names.length} reviewers over \`${diffCmd}\``)
   const reviews = (await parallel(names.map(name => () =>
     agent(panelInputs(name), { label: `${name}·${entry}·r${round}`, phase: 'Panel', agentType: name, schema: REVIEW }).then(r => ({ lens: name, ...(r ?? { verdict: 'fail', verified: [], quote: '', findings: [] }), invalid: !r }))
@@ -338,6 +345,10 @@ ${JSON.stringify(findings, null, 1)}`, { label: `${JUDGE}·${entry}·r${round}`,
   }
   if (round === maxRounds) { result.head = head; log(`${entry}: still ${fixes.length} to fix after ${maxRounds} rounds — parked`); return result }
 
+  focus = {
+    lenses: new Set(j.rulings.filter(r => r.ruling === 'sustained').flatMap(r => r.ids.map(id => id.split('#')[0]))),
+    sides: new Set(fixes.map(f => f.side)),
+  }
   phase('Fix')
   since = head
   for (const side of ['back', 'front']) {
