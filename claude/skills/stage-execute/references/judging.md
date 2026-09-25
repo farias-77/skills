@@ -40,8 +40,9 @@ edited by an entry · a number on screen the rule does not produce.
 - **sustained** — a real defect under the ruler. The side's builder
   fixes it this round.
 - **deferred** — right, below the ruler, one edit: a name, a log field,
-  a tighter assert. Fixed with the sustained ones, labeled as not
-  biting.
+  a tighter assert. It does not hold the entry: the entry is ready when
+  nothing is sustained, and every deferred ruling goes to the stage's
+  finishing entry, built and reviewed at the end like any other code.
 - **latitude** — real, but the builder's to choose ("The builder
   decides", the design's latitude): recorded for the audit, not fixed.
 - **dismissed** — preference wearing severity, an abstraction nothing
@@ -66,7 +67,7 @@ edited by an entry · a number on screen the rule does not produce.
 - an edit to a shared file (migrations, the contract, generated code,
   the module registry).
 
-## Three tests, in order
+## Four tests, in order
 
 1. **Is it true?** Open the quoted lines or run the quoted request; the
    gap follows from them. A claim about the codebase is checked in the
@@ -76,8 +77,17 @@ edited by an entry · a number on screen the rule does not produce.
    consequence, no sustain — unless the class is in the lists above.
 3. **Is it already decided?** "The builder decides" is not a gap; a
    ruling in `rulings.md` is not reopened; a finding already ruled in
-   an earlier round of this entry is not ruled again unless the code
-   changed under it.
+   an earlier round or an earlier run of this entry is not ruled again
+   unless the code changed under it.
+4. **Is the fix proportional?** Weigh what the fix adds against what
+   the defect costs. A fix that brings in mechanism the design does not
+   ask for — a new component, a new timing or lifecycle scheme, a new
+   failure path to handle a failure the design already answers (its
+   alarm, its retry, its runbook) — is not sustained: the design's
+   answer stands, and the finding is dismissed with the design's
+   sentence quoted, or goes to the user when the design has no answer
+   and the risk is real. The fix of a sustained finding is the smallest
+   change that closes it.
 
 ## The side of a fix
 
@@ -93,7 +103,10 @@ saying what the other side does.
   steps before ruling; one you cannot reproduce is dismissed with what
   you ran.
 - **In a delta round**, a finding on code no fix touched needs to be
-  serious: the previous round read it.
+  serious: the previous round read it. A finding on what the fixes
+  touched is sustained only in the classes of "Some defects always
+  proceed" and "Never dismissed, never latitude"; anything else there
+  is deferred.
 - **A recurrence** — the same class sustained in an earlier round of
   this entry — goes to the user when the fix did not move the code.
 

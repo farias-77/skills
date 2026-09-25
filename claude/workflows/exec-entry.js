@@ -24,8 +24,11 @@
  *              the diff — whole in round 1, the delta after.
  *   4. judge   exec-judge (Opus 5.5, medium) rules every finding. A
  *              question for the user → 'parked' with the questions.
- *              Nothing sustained or deferred → 'ready'.
- *   5. fix     the builders apply the fixes, side by side in series in
+ *              Nothing sustained → 'ready'. Deferred rulings do not
+ *              hold the entry: they are returned in `deferred`, and
+ *              the session gathers them into one finishing entry at the
+ *              end of the stage, built and reviewed like any other.
+ *   5. fix     the builders apply the sustained fixes, side by side in series in
  *              the entry worktree → gate → the next round's panel reads
  *              the delta. After maxRounds panel rounds with something
  *              still sustained → 'parked'.
@@ -36,12 +39,19 @@
  * sides it touches, and the resolution is code: gate, then the panel
  * over the whole entry diff, then the judge, as in build mode.
  *
+ * THE FLOW (mode 'resume'): a run that parked (a question answered in
+ * the rulings, or the round cap reached) continues without a new build
+ * and without a whole review: the builders apply the parked run's last
+ * sustained rulings, the gate runs, and the review rounds
+ * read only the delta from the parked head, with the parked run's
+ * rulings in front of the judge. maxRounds fresh rounds.
+ *
  * THE ARGS CARRY PATHS, NOT TEXT. The prompts below carry inputs only;
  * every instruction lives in the agent definitions.
  *
  * Invoked by the stage-execute session:
  *   Workflow({ scriptPath: '<...>/workflows/exec-entry.js', args: {
- *     mode:          'build' | 'rebase',
+ *     mode:          'build' | 'rebase' | 'resume',
  *     entry:         'E-03',
  *     briefPath:     '/abs/.../02-plan/briefs/E-03.md',
  *     designDir:     '/abs/.../01-design',
@@ -57,10 +67,11 @@
  *     trailer:       'the attribution trailer for commits, verbatim',
  *     maxRounds:     3,
  *     maxGateFixes:  3,
+ *     resume:        { rulingsFile: '/abs/.../<parked run return>.json', round: 3, head: '<parked head sha>' },  // 'resume' only
  *   }})
  *
  * Returns { entry, mode, status, head, rounds, precision, questions,
- * amendment, gate } — status is 'ready' | 'parked' | 'needs-amendment';
+ * amendment, gate, deferred } — status is 'ready' | 'parked' | 'needs-amendment';
  * rounds lists each panel round with its findings and rulings;
  * precision sums, per lens and QA, found · sustained · deferred ·
  * latitude · dismissed · user.
@@ -74,7 +85,7 @@ export const meta = {
     { title: 'Gate', detail: 'exec-gate (Sonnet 5, high): merge the sides, the gate command, attribute every red', model: 'sonnet' },
     { title: 'Panel', detail: 'seven lenses and the QA (Opus 5.5, medium) over the diff', model: 'opus' },
     { title: 'Judge', detail: 'exec-judge (Opus 5.5, medium) rules every finding', model: 'opus' },
-    { title: 'Fix', detail: 'the builders apply what was sustained, then the gate, then the panel over the delta', model: 'opus' },
+    { title: 'Fix', detail: 'the builders apply what was sustained (deferred go to the finishing entry), then the gate, then the panel over the delta', model: 'opus' },
   ],
 }
 
@@ -157,7 +168,8 @@ const RULINGS = {
   },
 }
 
-const mode = args?.mode === 'rebase' ? 'rebase' : 'build'
+const mode = ['rebase', 'resume'].includes(args?.mode) ? args.mode : 'build'
+const resume = mode === 'resume' ? args?.resume ?? {} : null
 const entry = args?.entry ?? '?'
 const sides = Object.entries(args?.sides ?? {}).filter(([, v]) => v).map(([k]) => k)
 const maxRounds = args?.maxRounds ?? 3
@@ -171,7 +183,7 @@ Engineering doctrine of the project: ${args?.doctrineDir}
 Rulings of the workstream (not reopened): ${args?.rulingsPath}
 Evidence folder of this entry: ${args?.evidenceDir}`
 
-const result = { entry, mode, status: 'parked', head: null, rounds: [], precision: {}, questions: [], amendment: null, gate: null }
+const result = { entry, mode, status: 'parked', head: null, rounds: [], precision: {}, questions: [], amendment: null, gate: null, deferred: [] }
 const addPrecision = (rows) => rows.forEach(p => {
   const t = result.precision[p.lens] ?? (result.precision[p.lens] = { found: 0, sustained: 0, deferred: 0, latitude: 0, dismissed: 0, user: 0 })
   for (const k of Object.keys(t)) t[k] += p[k] ?? 0
@@ -244,10 +256,28 @@ ${args?.trailer ?? '(none given)'}`, 'build').then(b => ({ side, b }))))
   }
 }
 
+// ---------- mode: resume — a parked run's last rulings, applied, then delta rounds ----------
+
+if (resume) {
+  since = resume.head
+  log(`${entry}: resuming from ${resume.head} — applying the rulings of round ${resume.round} in ${resume.rulingsFile}`)
+  phase('Fix')
+  for (const side of ['back', 'front']) {
+    if (!sides.includes(side)) continue
+    await builder(side, `Mode: fix. Entry ${entry}, ${side} side. Work in the entry worktree ${args?.worktree} on ${args?.branch}.
+${docs}
+Attribution trailer for every commit, verbatim:
+${args?.trailer ?? '(none given)'}
+The rulings to apply are in ${resume.rulingsFile} (the return of the parked run: \`result.rounds\`, round ${resume.round}). Apply every ruling there whose \`ruling\` is "sustained" and whose \`side\` is "${side}"; its id is its \`ids\` joined with "+". Return one \`applied\` entry per id. If nothing there is for your side, change nothing.`, `fix-resume`)
+  }
+}
+
 phase('Gate')
 const g0 = await gateUntilGreen(mode === 'build'
   ? `Merge the side branches into ${args?.branch}: ${sides.map(s => args?.sides[s].branch).join(', ')}. Bring the stack up, run the gate command, leave the stack up.`
-  : 'Run the gate on the entry branch after the conflict resolution. Leave the stack up.', 'r0')
+  : resume
+    ? 'Run the gate on the entry branch after the fixes (no merge). Bring the stack up if it is down, and leave it up.'
+    : 'Run the gate on the entry branch after the conflict resolution. Leave the stack up.', 'r0')
 result.gate = g0
 if (!g0 || !g0.green) { log(`${entry}: the gate is still red — parked`); return result }
 
@@ -255,14 +285,15 @@ if (!g0 || !g0.green) { log(`${entry}: the gate is still red — parked`); retur
 
 let head = g0.head
 for (let round = 1; round <= maxRounds; round++) {
-  const diffCmd = round === 1 ? `git diff ${args?.base}...${args?.branch}` : `git diff ${since}..${args?.branch}`
-  const lastFixes = result.rounds.at(-1)?.fixes ?? []
-  const panelInputs = (name) => `Round ${round} (${round === 1 ? 'whole' : 'delta'}). Entry ${entry}. You are ${name}.
+  const whole = round === 1 && !resume
+  const diffCmd = whole ? `git diff ${args?.base}...${args?.branch}` : `git diff ${since}..${args?.branch}`
+  const lastFixes = result.rounds.at(-1)?.fixes ?? (resume ? [{ id: `round ${resume.round} of the parked run`, side: 'back+front', fix: `the sustained rulings in ${resume.rulingsFile}` }] : [])
+  const panelInputs = (name) => `Round ${round} (${whole ? 'whole' : 'delta'}). Entry ${entry}. You are ${name}.
 ${docs}
 Worktree: ${args?.worktree} · branch ${args?.branch} · base ${args?.base}
 The diff to read first: run \`${diffCmd}\` in the worktree.
 The gate's evidence: ${args?.evidenceDir} (the gate output; screenshots)
-The running stack: ${g0.stack}${round > 1 ? `
+The running stack: ${g0.stack}${!whole ? `
 
 THIS IS A DELTA ROUND. The fixes applied since the last round:
 ${lastFixes.map(f => `- ${f.id} (${f.side}): ${f.fix}`).join('\n') || '(none listed)'}` : ''}`
@@ -285,16 +316,18 @@ ${docs}
 The ruler (read it whole first): ${args?.judgingPath}
 Worktree: ${args?.worktree} · the diff: \`${diffCmd}\`
 Reviewers that returned nothing this round: ${invalid.join(', ') || 'none'}
-${result.rounds.length ? `Previous rounds' rulings:\n${JSON.stringify(result.rounds.map(r => ({ round: r.round, rulings: r.rulings })), null, 1)}\n` : ''}
+${resume ? `The parked run this one resumes, with its rounds' rulings (a finding ruled there is not ruled again unless the code changed under it): ${resume.rulingsFile}\n` : ''}${result.rounds.length ? `Previous rounds' rulings:\n${JSON.stringify(result.rounds.map(r => ({ round: r.round, rulings: r.rulings })), null, 1)}\n` : ''}
 The findings of this round:
 ${JSON.stringify(findings, null, 1)}`, { label: `${JUDGE}·${entry}·r${round}`, phase: 'Judge', agentType: JUDGE, schema: RULINGS })
   if (!j) { log(`${entry} round ${round}: the judge returned nothing — parked`); return result }
   addPrecision(j.precision)
 
-  const fixes = j.rulings.filter(r => (r.ruling === 'sustained' || r.ruling === 'deferred') && r.side !== 'none')
+  const fixes = j.rulings.filter(r => r.ruling === 'sustained' && r.side !== 'none')
     .map((r, i) => ({ id: r.ids.join('+') || `j#${i + 1}`, side: r.side, fix: r.fix }))
+  j.rulings.filter(r => r.ruling === 'deferred' && r.side !== 'none')
+    .forEach((r, i) => result.deferred.push({ round, id: r.ids.join('+') || `d#${round}.${i + 1}`, side: r.side, fix: r.fix }))
   result.rounds.push({ round, findings: findings.length, invalid, rulings: j.rulings, fixes, seen: j.seen })
-  log(`${entry} round ${round}: ${findings.length} finding(s) → ${fixes.length} to fix, ${j.toUser.length} for the user`)
+  log(`${entry} round ${round}: ${findings.length} finding(s) → ${fixes.length} to fix, ${result.deferred.filter(d => d.round === round).length} deferred, ${j.toUser.length} for the user`)
 
   if (j.toUser.length) { result.questions = j.toUser; result.head = head; log(`${entry}: parked for the user`); return result }
   if (!fixes.length) {

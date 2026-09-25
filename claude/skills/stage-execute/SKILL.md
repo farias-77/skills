@@ -70,6 +70,7 @@ designs-root/<workstream>/
 └── 03-execution/
     ├── board.md               # one line per entry: state, sha, rounds, the run id — the session's file
     ├── parked.md              # what waits for the user, with the evidence
+    ├── deferred.md            # every deferred ruling, by entry — the finishing entry's list
     ├── amendments/F.<n>.md    # the brief of each foundation amendment
     ├── entries/<id>/          # per entry: run.json (the workflow's return), gate output, screenshots
     ├── explain.md             # at the end: what was built, for the intern
@@ -121,7 +122,9 @@ board as a table (entry · state · round · run), read from the harness.
 
 ## Step 3 — what comes back
 
-Save the return as `entries/<id>/run.json`, then act on `status`:
+Save the return as `entries/<id>/run.json` and append its `deferred`
+rulings to `deferred.md` (entry · round · side · fix), then act on
+`status`:
 
 - **`ready`** → the merge queue.
 - **`needs-amendment`** → step 5; the entry waits for it and restarts
@@ -129,7 +132,12 @@ Save the return as `entries/<id>/run.json`, then act on `status`:
 - **`parked`** → one line in `parked.md` with the evidence (the
   question the judge raised with its options, the gate that stayed
   red, the findings still sustained after three rounds); the entries
-  that depend on it wait; everything else goes on.
+  that depend on it wait; everything else goes on. Once the question is
+  answered in `rulings.md`, or for the round cap, the entry continues
+  with exec-entry `mode: 'resume'` (`resume: { rulingsFile, round,
+  head }`, the parked run's saved return): the builders apply its
+  sustained rulings and the panel reads only the delta — never a new
+  build and a whole review for an entry that was already reviewed.
 
 ## Step 4 — the merge queue
 
@@ -159,6 +167,12 @@ entries in flight pick it up at their rebase.
 
 When every entry is merged or parked:
 
+0. **The finishing entry `X.0`.** Everything in `deferred.md` — the
+   rulings that were right but did not bite — becomes one entry: the
+   session writes its brief from the list (each item with its entry,
+   its round and its fix), runs it through exec-entry from the top of
+   `feat/<workstream>` like any other code, and merges it. Its own
+   deferred rulings go to the audit, not to another finishing entry.
 1. The gate on the top of `feat/<workstream>`: exec-gate runs the gate
    command once more, whole, and the visual lens reads every screenshot
    of the run together, for the coherence of the screens as one
