@@ -107,6 +107,12 @@ saying what the other side does.
   touched is sustained only in the classes of "Some defects always
   proceed" and "Never dismissed, never latitude"; anything else there
   is deferred.
+- **Evidence is not the product.** A stale or missing record of a proof
+  — a screenshot taken before the last fix, a SHA in the evidence that is
+  not the head, a green run filed from an earlier commit — is deferred,
+  never sustained, when the gate is green on the head and the rule has a
+  test that goes red: the finishing entry refreshes the evidence. Only a
+  rule with no test at all is sustained.
 - **A recurrence** — the same class sustained in an earlier round of
   this entry — goes to the user when the fix did not move the code.
 

@@ -25,7 +25,10 @@
  *              round seats only the lenses that had a finding sustained
  *              in the round before, the QA of the sides the fixes
  *              touched, and the visual lens when the front changed: an
- *              angle that found nothing does not reread the fixes.
+ *              angle that found nothing does not reread the fixes. A
+ *              small entry runs with panel 'lean': four lenses
+ *              (fidelity, workaround, proof, security), and the visual
+ *              lens and the front QA only when it has a screen.
  *   4. judge   exec-judge (Opus 5.5, medium) rules every finding. A
  *              question for the user → 'parked' with the questions.
  *              Nothing sustained → 'ready'. Deferred rulings do not
@@ -71,6 +74,7 @@
  *     trailer:       'the attribution trailer for commits, verbatim',
  *     maxRounds:     3,
  *     maxGateFixes:  3,
+ *     panel:         'full' | 'lean',  // lean: fidelity, workaround, proof, security; visual and the front QA only with a front
  *     resume:        { rulingsFile: '/abs/.../<parked run return>.json', round: 3, head: '<parked head sha>' },  // 'resume' only
  *   }})
  *
@@ -99,6 +103,7 @@ const JUDGE = 'exec-judge'
 const CODE_LENSES = ['exec-lens-fidelity', 'exec-lens-workaround', 'exec-lens-craft', 'exec-lens-proof', 'exec-lens-security', 'exec-lens-operations']
 const VISUAL_LENS = 'exec-lens-visual'
 const QA = { back: 'exec-qa-backend', front: 'exec-qa-frontend' }
+const LEAN_LENSES = ['exec-lens-fidelity', 'exec-lens-workaround', 'exec-lens-proof', 'exec-lens-security']
 
 const BUILD = {
   type: 'object', additionalProperties: false,
@@ -178,6 +183,7 @@ const entry = args?.entry ?? '?'
 const sides = Object.entries(args?.sides ?? {}).filter(([, v]) => v).map(([k]) => k)
 const maxRounds = args?.maxRounds ?? 3
 const maxGateFixes = args?.maxGateFixes ?? 3
+const lean = args?.panel === 'lean'
 if (!sides.length) log(`${entry}: no sides given — pass sides: { back: {worktree, branch}, front: {worktree, branch} }`)
 
 const docs = `Brief: ${args?.briefPath}
@@ -304,7 +310,9 @@ THIS IS A DELTA ROUND. The fixes applied since the last round:
 ${lastFixes.map(f => `- ${f.id} (${f.side}): ${f.fix}`).join('\n') || '(none listed)'}` : ''}`
 
   phase('Panel')
-  const panel = [...CODE_LENSES, ...(sides.includes('front') ? [VISUAL_LENS] : []), ...sides.map(s => QA[s])]
+  const panel = lean
+    ? [...LEAN_LENSES, ...(sides.includes('front') ? [VISUAL_LENS, QA.front] : [])]
+    : [...CODE_LENSES, ...(sides.includes('front') ? [VISUAL_LENS] : []), ...sides.map(s => QA[s])]
   const focused = focus && panel.filter(n => focus.lenses.has(n) || (n === VISUAL_LENS && focus.sides.has('front')) || sides.some(s => QA[s] === n && focus.sides.has(s)))
   const names = focused?.length ? focused : panel
   log(`${entry} round ${round}: ${names.length} reviewers over \`${diffCmd}\``)

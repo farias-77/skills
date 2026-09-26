@@ -107,14 +107,18 @@ are merged, up to the cap. For each:
    worktree on `story/<workstream>/<id>`, and one side worktree per
    side the brief builds (`story/<workstream>/<id>-back`,
    `…-front`), all under the codebase's `.worktrees/`.
-2. **Run** the workflow by `scriptPath`, in the background:
+2. **The panel's size.** `panel: 'full'` for the foundation and for an
+   entry that opens a new area of the product (a new page, a new
+   module); `panel: 'lean'` for a slice on top of what exists (a route
+   or two and their dialogs or commands), and for every amendment.
+3. **Run** the workflow by `scriptPath`, in the background:
    `${CLAUDE_SKILL_DIR}/../../workflows/exec-entry.js` with `mode:
    'build'`, the entry id, the brief, the design, recon and doctrine
    folders, `rulings.md`, the ruler
    (`${CLAUDE_SKILL_DIR}/references/judging.md`), the evidence folder
    `03-execution/entries/<id>/`, the worktrees and branches, the base
    `feat/<workstream>`, and the commit trailer.
-3. **Record** the run id and `building` in `board.md`.
+4. **Record** the run id and `building` in `board.md`.
 
 The session does not wait on a run and does not poll: the workflow's
 completion wakes it. Every reply while runs are in flight carries the
