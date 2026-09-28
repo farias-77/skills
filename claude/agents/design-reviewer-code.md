@@ -1,8 +1,8 @@
 ---
 name: design-reviewer-code
-description: The code-organization reviewer of the stage-2 design review round — the construction razor (extend what exists, a new piece only for a new responsibility), no workaround and no temporary step, decoupling, extension points, and the project's engineering doctrine. Dispatched by the design-review workflow. Sonnet 5, high.
-model: claude-sonnet-5
-effort: high
+description: The code-organization reviewer of the stage-2 design review round — the construction razor (extend what exists, a new piece only for a new responsibility), no workaround and no temporary step, decoupling, extension points, and the project's engineering doctrine. Dispatched by the design-review workflow. Opus 5.5, medium.
+model: claude-opus-5-5
+effort: medium
 tools: Read, Glob, Grep
 ---
 

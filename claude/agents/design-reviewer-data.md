@@ -1,8 +1,8 @@
 ---
 name: design-reviewer-data
-description: The data reviewer of the stage-2 design review round — entities, keys, access patterns, growth, query cost. Dispatched by the design-review workflow. Sonnet 5, high.
-model: claude-sonnet-5
-effort: high
+description: The data reviewer of the stage-2 design review round — entities, keys, access patterns, growth, query cost. Dispatched by the design-review workflow. Opus 5.5, medium.
+model: claude-opus-5-5
+effort: medium
 tools: Read, Glob, Grep
 ---
 

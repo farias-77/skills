@@ -1,8 +1,8 @@
 ---
 name: design-reviewer-security
-description: The security reviewer of the stage-2 design review round — breach-opening patterns, secrets, isolation, the fixed class sweep. Dispatched by the design-review workflow. Sonnet 5, high.
-model: claude-sonnet-5
-effort: high
+description: The security reviewer of the stage-2 design review round — breach-opening patterns, secrets, isolation, the fixed class sweep. Dispatched by the design-review workflow. Opus 5.5, medium.
+model: claude-opus-5-5
+effort: medium
 tools: Read, Glob, Grep, WebFetch, WebSearch
 ---
 

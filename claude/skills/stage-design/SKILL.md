@@ -1,6 +1,6 @@
 ---
 name: stage-design
-description: Conducts stage 2 (Design) — takes an approved discovery and designs, with the user, how the whole demand gets built on the system as it is. Recon first (scouts, Haiku 4.5 max, read the current system; a deep-research workflow, Sonnet 5 high, reads the docs of every external tool); then the conductor asks whether the user already has a shape in mind, builds on it or arrives with its own proposal across the eleven subjects under the construction razor (extend what exists, a new piece only for a new responsibility, never a workaround, never speculation), and iterates with him to a final version; then ten writers (Sonnet 5, high) write the ten documents in parallel, deciding nothing, and review round 1 runs at once: ten lenses (Sonnet 5, high), two blind readers (Haiku 4.5, high) and a referee (Sonnet 5, low) per flow, judged by the conductor; delta rounds on the user's call, three at most; the blueprint's Design tab read by the user at the close. Runs in Claude Code with an Opus 5.5 session at high effort. Use after a discovery is approved, or to resume a design in progress.
+description: Conducts stage 2 (Design) — takes an approved discovery and designs, with the user, how the whole demand gets built on the system as it is. Recon first (scouts, Haiku 4.5 max, read the current system; a deep-research workflow, Sonnet 5 high, reads the docs of every external tool); then the conductor asks whether the user already has a shape in mind, builds on it or arrives with its own proposal across the eleven subjects under the construction razor (extend what exists, a new piece only for a new responsibility, never a workaround, never speculation), and iterates with him to a final version; then ten writers (Sonnet 5, high) write the ten documents in parallel, deciding nothing, and review round 1 runs at once: ten lenses (Opus 5.5, medium), two blind readers (Haiku 4.5, high) and a referee (Sonnet 5, low) per flow, judged by the conductor; delta rounds on the user's call, three at most; the blueprint's Design tab read by the user at the close. Runs in Claude Code with an Opus 5.5 session at high effort. Use after a discovery is approved, or to resume a design in progress.
 disable-model-invocation: false
 argument-hint: "<workstream-slug>"
 allowed-tools: Read, Write, Edit, Glob, Grep, Agent, SendMessage, Workflow, AskUserQuestion, Artifact, WebSearch, WebFetch, Bash(mkdir *), Bash(date *), Bash(ls *), Bash(cat *), Bash(rm *), Bash(git *), Bash(node *)
@@ -68,7 +68,7 @@ plan or a promise; do the work.
 4. Write     ten design-writer (Sonnet 5, high) in parallel, one per document, same source:
              your brief + notes.md + research/ + the template; zero decisions — questions come
              back to you, you answer or ask the user; each also writes blueprint/design/<doc>.json
-5. Review    round 1 whole and automatic, right after the writers: design-review workflow (ten lenses Sonnet 5 high;
+5. Review    round 1 whole and automatic, right after the writers: design-review workflow (ten lenses Opus 5.5 medium;
              per flow two blind readers Haiku 4.5 high + a referee Sonnet 5 low); you judge
              every finding by references/judging.md; wording → writers, decisions → user,
              one question per decision
@@ -92,7 +92,7 @@ him.
 | `scout` × N | Haiku 4.5, max | one question each about the system as it is: quotes with path:line, never conclusions |
 | `design-researcher` | Sonnet 5, high | one deep-research workflow per external tool: planner, searchers, synthesizer, critic, citer |
 | `design-writer` × 10 | Sonnet 5, high | one document each, in parallel, from the same source; asks, never decides |
-| `design-reviewer-{data, code, infra, security, contracts, alarms, coverage, facts, ui, consistency}` | Sonnet 5, high | ten lenses, each reads everything |
+| `design-reviewer-{data, code, infra, security, contracts, alarms, coverage, facts, ui, consistency}` | Opus 5.5, medium | ten lenses, each reads everything |
 | `design-blind-reader` × 2 per flow | Haiku 4.5, high | builds one flow alone, in the documents' language |
 | `design-reviewer-ambiguity` | Sonnet 5, low | compares the two builds key by key |
 
@@ -265,16 +265,16 @@ split at every `### ` heading under `## Flows`.
 
 | Lens | Question |
 |---|---|
-| `design-reviewer-data` (Sonnet 5, high) | every read has a key path; growth is bounded; writes that must land together do |
-| `design-reviewer-code` (Sonnet 5, high) | the construction razor and the doctrine hold; blocks every workaround, temporary step or speculation; coupling, seams, extension points with their "does not change" line |
-| `design-reviewer-infra` (Sonnet 5, high) | configs on purpose, IAM by the verb, cost at three scales against real prices; infra proved the way the doctrine's testing standard says |
-| `design-reviewer-security` (Sonnet 5, high) | the abuse paths; the class sweep answered with mechanisms |
-| `design-reviewer-contracts` (Sonnet 5, high) | every contract whole, success and error; the data each side needs arrives |
-| `design-reviewer-alarms` (Sonnet 5, high) | every alarm has its four fields, would not ring on a quiet day, and does not depend on where a window sits on the clock |
-| `design-reviewer-coverage` (Sonnet 5, high) | every story has its home; nothing in the design is unforced |
-| `design-reviewer-facts` (Sonnet 5, high) | every claim about the outside world traces to research |
-| `design-reviewer-ui` (Sonnet 5, high) | the screens fit the product as it is; every story state has a home |
-| `design-reviewer-consistency` (Sonnet 5, high) | everything that appears in two documents says the same thing in both: names, values, keys, shapes, counts |
+| `design-reviewer-data` (Opus 5.5, medium) | every read has a key path; growth is bounded; writes that must land together do |
+| `design-reviewer-code` (Opus 5.5, medium) | the construction razor and the doctrine hold; blocks every workaround, temporary step or speculation; coupling, seams, extension points with their "does not change" line |
+| `design-reviewer-infra` (Opus 5.5, medium) | configs on purpose, IAM by the verb, cost at three scales against real prices; infra proved the way the doctrine's testing standard says |
+| `design-reviewer-security` (Opus 5.5, medium) | the abuse paths; the class sweep answered with mechanisms |
+| `design-reviewer-contracts` (Opus 5.5, medium) | every contract whole, success and error; the data each side needs arrives |
+| `design-reviewer-alarms` (Opus 5.5, medium) | every alarm has its four fields, would not ring on a quiet day, and does not depend on where a window sits on the clock |
+| `design-reviewer-coverage` (Opus 5.5, medium) | every story has its home; nothing in the design is unforced |
+| `design-reviewer-facts` (Opus 5.5, medium) | every claim about the outside world traces to research |
+| `design-reviewer-ui` (Opus 5.5, medium) | the screens fit the product as it is; every story state has a home |
+| `design-reviewer-consistency` (Opus 5.5, medium) | everything that appears in two documents says the same thing in both: names, values, keys, shapes, counts |
 | 2 × `design-blind-reader` (Haiku 4.5, high) → `design-reviewer-ambiguity` (Sonnet 5, low), per flow | would two engineers implement the same flow from these steps? |
 
 Every reviewer answers under the

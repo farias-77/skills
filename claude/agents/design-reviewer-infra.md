@@ -1,8 +1,8 @@
 ---
 name: design-reviewer-infra
-description: The infrastructure reviewer of the stage-2 design review round — service configs, exposure, IAM, cost vs real prices, rollout. Dispatched by the design-review workflow. Sonnet 5, high.
-model: claude-sonnet-5
-effort: high
+description: The infrastructure reviewer of the stage-2 design review round — service configs, exposure, IAM, cost vs real prices, rollout. Dispatched by the design-review workflow. Opus 5.5, medium.
+model: claude-opus-5-5
+effort: medium
 tools: Read, Glob, Grep, WebFetch, WebSearch
 ---
 

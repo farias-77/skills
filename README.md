@@ -107,7 +107,7 @@ one card per real fork, `notes.md` holding one version of every
 decision. **Ten writers (Sonnet 5, high) write the ten documents in
 parallel** from the same notes and research, deciding nothing (a gap
 is a question back), each also writing its blueprint JSON, and round 1
-runs at once: ten lenses (Sonnet 5, high) — data, code (which blocks
+runs at once: ten lenses (Opus 5.5, medium) — data, code (which blocks
 every workaround), infra, security, contracts, alarms, coverage,
 facts, UI and consistency — beside, per flow, two **blind readers**
 (Haiku 4.5, high) and a referee (Sonnet 5, low) reporting where they

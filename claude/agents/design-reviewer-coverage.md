@@ -1,8 +1,8 @@
 ---
 name: design-reviewer-coverage
-description: The bidirectional coverage reviewer of the stage-2 design review round — every story has its home in the design, every AC is satisfiable, and nothing in the design exists unforced. Dispatched by the design-review workflow. Sonnet 5, high.
-model: claude-sonnet-5
-effort: high
+description: The bidirectional coverage reviewer of the stage-2 design review round — every story has its home in the design, every AC is satisfiable, and nothing in the design exists unforced. Dispatched by the design-review workflow. Opus 5.5, medium.
+model: claude-opus-5-5
+effort: medium
 tools: Read, Glob, Grep
 ---
 
