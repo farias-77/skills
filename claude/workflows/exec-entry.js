@@ -468,7 +468,8 @@ let head = g0.head
 let stack = g0.stack
 let focus = null
 const recordItems = []
-for (let round = 1; round <= maxRounds; round++) {
+let lastRound = maxRounds
+for (let round = 1; round <= lastRound; round++) {
   const whole = round === 1 && !resume
   const diffCmd = whole ? `git diff ${args?.base}...${args?.branch}` : `git diff ${since}..${args?.branch}`
   const lastFixes = result.rounds.at(-1)?.fixes ?? (resume ? [{ id: `round ${resume.round} of the parked run`, side: 'back+front', fix: `the sustained rulings in ${resume.rulingsFile}` }] : [])
@@ -563,13 +564,14 @@ ${JSON.stringify(unsettled, null, 1)}`, { label: `${JUDGE}·${entry}·r${round}`
       log(`${entry}: ready at ${fin.head}`)
       return result
     }
-    if (round === maxRounds) { result.head = fin.head; log(`${entry}: the whole gate needed fixes after ${maxRounds} rounds — parked for their review`); return result }
+    if (round === lastRound && lastRound > maxRounds) { result.head = fin.head; log(`${entry}: the whole gate needed fixes again after the extra round — parked for their review`); return result }
+    if (round === lastRound) { lastRound++; log(`${entry}: the whole gate needed fixes in the last round — one extra round reviews only them`) }
     result.rounds.at(-1).fixes = fin.fixed
     focus = { lenses: new Set(), sides: new Set(fin.fixed.map(f => f.side)), touches: new Set(fin.fixed.some(f => f.side === 'front') ? ['screen'] : []) }
     since = head; head = fin.head; stack = fin.stack
     continue
   }
-  if (round === maxRounds) { result.head = head; log(`${entry}: still ${fixes.length} to fix after ${maxRounds} rounds — parked`); return result }
+  if (round >= maxRounds) { result.head = head; log(`${entry}: still ${fixes.length} to fix after ${maxRounds} rounds — parked`); return result }
 
   focus = {
     lenses: new Set(j.rulings.filter(r => r.ruling === 'sustained').flatMap(r => r.ids.map(id => id.split('#')[0]))),
