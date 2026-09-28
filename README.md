@@ -67,10 +67,10 @@ conductor is Opus 5.5 (medium). Screens are not drawn here: they are
 the design's. The conductor plays the understanding back as stories
 and **the owner confirms every story by hand**, one question each:
 confirm, reduce, adjust, or cut; what leaves the playback is only what
-gets built. Two authors (Sonnet 5, high) then write the PR-FAQ and the
+gets built. Two authors (Sonnet 5.5, high) then write the PR-FAQ and the
 user stories from the notes, in parallel: what gets built, what stays
 out, every acceptance criterion with an ID. A whole review round runs,
-cheap by design (Sonnet and Haiku): three lenses read the documents
+cheap by design (Sonnet 5.5, medium and low): three lenses read the documents
 while, per story, two
 **blind readers** describe what each would build and a referee reports
 where they built different products. The **conductor judges** every

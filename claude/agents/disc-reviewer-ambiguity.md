@@ -1,8 +1,8 @@
 ---
 name: disc-reviewer-ambiguity
-description: The ambiguity referee of the stage-1 discovery review — compares the two blind readers' builds of ONE user story, key by key, and reports every key where they built different products. Dispatched by the discovery-review workflow, once per story, after its readers return. Sonnet 5, high.
-model: claude-sonnet-5
-effort: high
+description: The ambiguity referee of the stage-1 discovery review — compares the two blind readers' builds of ONE user story, key by key, and reports every key where they built different products. Dispatched by the discovery-review workflow, once per story, after its readers return. Sonnet 5.5, low.
+model: claude-sonnet-5-5
+effort: low
 tools: Read
 ---
 

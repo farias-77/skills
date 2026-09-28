@@ -1,8 +1,8 @@
 ---
 name: disc-reviewer-boundary
-description: The boundary lens of the stage-1 discovery review — audits the In/Out fence and reports everything left in limbo. Dispatched by the discovery-review workflow. Sonnet 5, high.
-model: claude-sonnet-5
-effort: high
+description: The boundary lens of the stage-1 discovery review — audits the In/Out fence and reports everything left in limbo. Dispatched by the discovery-review workflow. Sonnet 5.5, medium.
+model: claude-sonnet-5-5
+effort: medium
 tools: Read, Glob, Grep
 ---
 

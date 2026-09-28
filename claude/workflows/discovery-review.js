@@ -5,14 +5,14 @@
  * physical, not discipline. Every round is whole: the three document
  * lenses (walkthrough, acceptance, boundary) and, per story, two blind
  * readers and a referee, all in
- * parallel. There are no delta rounds — the round is cheap (Sonnet and
- * Haiku only) and running it whole after every fix is what catches the
+ * parallel. There are no delta rounds — the round is cheap (Sonnet 5.5
+ * at medium and low) and running it whole after every fix is what catches the
  * loose wire a scoped re-read misses.
  *
- * THE BLIND READS are per story: two Haiku readers build one story
+ * THE BLIND READS are per story: two Sonnet readers (low) build one story
  * each, alone, one build per key (the story's AC ids, its bad-path
  * rows, the story sentence), in the documents' language. A Sonnet
- * referee compares the two readings key by key; only a
+ * referee (low) compares the two readings key by key; only a
  * `different-product` verdict becomes a finding. The keys make the
  * comparison mechanical: a reading that misses a key is invalid and
  * re-dispatched once; a story whose two readings do not both survive
@@ -56,10 +56,10 @@
 
 export const meta = {
   name: 'discovery-review',
-  description: 'Stage-1 review round, always whole: three document lenses (walkthrough, acceptance, boundary) in parallel with two Haiku blind readers and a Sonnet referee per story; returns every finding for the conductor to judge',
+  description: 'Stage-1 review round, always whole: three document lenses (walkthrough, acceptance, boundary) in parallel with two Sonnet blind readers and a Sonnet referee per story; returns every finding for the conductor to judge',
   phases: [
     { title: 'Lenses', detail: 'walkthrough, acceptance, boundary' },
-    { title: 'Blind reads', detail: 'per story: two Haiku readers build it alone, a Sonnet referee compares them key by key' },
+    { title: 'Blind reads', detail: 'per story: two Sonnet readers build it alone, a Sonnet referee compares them key by key' },
   ],
 }
 

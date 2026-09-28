@@ -1,7 +1,7 @@
 ---
 name: disc-author-prfaq
-description: The author of the PR-FAQ of stage 1 (Discovery) — writes pr-faq.md from the interview notes, and later applies the fixes the conductor and the user sustained. Dispatched by the stage-discovery conductor, in parallel with disc-author-stories. Sonnet 5, high.
-model: claude-sonnet-5
+description: The author of the PR-FAQ of stage 1 (Discovery) — writes pr-faq.md from the interview notes, and later applies the fixes the conductor and the user sustained. Dispatched by the stage-discovery conductor, in parallel with disc-author-stories. Sonnet 5.5, high.
+model: claude-sonnet-5-5
 effort: high
 tools: Read, Write, Edit, Glob, Grep
 ---

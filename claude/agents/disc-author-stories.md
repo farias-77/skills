@@ -1,7 +1,7 @@
 ---
 name: disc-author-stories
-description: The author of the User Stories of stage 1 (Discovery) — writes user-stories.md from the interview notes and the stories the user confirmed at the playback, and later applies the fixes the conductor and the user sustained. Dispatched by the stage-discovery conductor, in parallel with disc-author-prfaq. Sonnet 5, high.
-model: claude-sonnet-5
+description: The author of the User Stories of stage 1 (Discovery) — writes user-stories.md from the interview notes and the stories the user confirmed at the playback, and later applies the fixes the conductor and the user sustained. Dispatched by the stage-discovery conductor, in parallel with disc-author-prfaq. Sonnet 5.5, high.
+model: claude-sonnet-5-5
 effort: high
 tools: Read, Write, Edit, Glob, Grep
 ---

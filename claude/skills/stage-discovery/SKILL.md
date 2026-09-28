@@ -1,6 +1,6 @@
 ---
 name: stage-discovery
-description: Conducts stage 1 (Discovery) — a natural interview that defines what gets built. The conductor interviews with notes written as it happens, plays the understanding back as stories the user confirms one by one, then two authors (Sonnet 5, high) write the PR-FAQ and the User Stories with their blueprint JSON; a review round runs (three lenses, and per story two blind readers and a referee), the conductor judges every finding, fixes wording through the authors and asks the user one question per decision; up to three rounds; the user reads the blueprint and approves. Runs in Claude Code; the conductor is Opus 5.5 (medium). Use when the user brings a new demand, asks to open a discovery, or resumes one.
+description: Conducts stage 1 (Discovery) — a natural interview that defines what gets built. The conductor interviews with notes written as it happens, plays the understanding back as stories the user confirms one by one, then two authors (Sonnet 5.5, high) write the PR-FAQ and the User Stories with their blueprint JSON; a review round runs (three lenses, and per story two blind readers and a referee), the conductor judges every finding, fixes wording through the authors and asks the user one question per decision; up to three rounds; the user reads the blueprint and approves. Runs in Claude Code; the conductor is Opus 5.5 (medium). Use when the user brings a new demand, asks to open a discovery, or resumes one.
 disable-model-invocation: false
 argument-hint: "[slug]"
 allowed-tools: Read, Write, Edit, Glob, Grep, Agent, Workflow, AskUserQuestion, Artifact, WebSearch, WebFetch, Bash(mkdir *), Bash(date *), Bash(ls *), Bash(cat *), Bash(rm *), Bash(git *), Bash(node *)
@@ -49,8 +49,8 @@ work.
 1. Interview    you talk with the user and write notes.md as you go. No agent runs.
 2. Playback     the whole understanding back, as stories; the user confirms every
                 story through the question tool: confirm, reduce, adjust, or cut.
-3. Write        two dispatches in parallel: disc-author-prfaq (Sonnet 5, high) →
-                pr-faq.md + prfaq.json · disc-author-stories (Sonnet 5, high) →
+3. Write        two dispatches in parallel: disc-author-prfaq (Sonnet 5.5, high) →
+                pr-faq.md + prfaq.json · disc-author-stories (Sonnet 5.5, high) →
                 user-stories.md + stories.json, from the confirmed stories only.
 4. Review       the discovery-review workflow, whole: three lenses in parallel with
                 two blind readers and a referee per story. No judge agent.
@@ -72,13 +72,13 @@ Everything else runs without them.
 | Agent | Model, effort | Does |
 |---|---|---|
 | the conductor (this session) | Opus 5.5, medium | interviews, plays back, judges, asks |
-| `disc-author-prfaq` | Sonnet 5, high | writes and fixes `pr-faq.md` from the notes |
-| `disc-author-stories` | Sonnet 5, high | writes and fixes `user-stories.md` from the notes |
-| `disc-reviewer-boundary` | Sonnet 5, high | is it clear what gets built and what does not? |
-| `disc-reviewer-walkthrough` | Sonnet 5, high | does every flow reach its end, every value with a source? |
-| `disc-reviewer-acceptance` | Sonnet 5, high | can a stranger judge each AC; does the set cover the promise? |
-| 2× `disc-blind-reader` | Haiku 4.5, high | builds one story alone, in the documents' language |
-| `disc-reviewer-ambiguity` | Sonnet 5, high | compares the two builds key by key |
+| `disc-author-prfaq` | Sonnet 5.5, high | writes and fixes `pr-faq.md` from the notes |
+| `disc-author-stories` | Sonnet 5.5, high | writes and fixes `user-stories.md` from the notes |
+| `disc-reviewer-boundary` | Sonnet 5.5, medium | is it clear what gets built and what does not? |
+| `disc-reviewer-walkthrough` | Sonnet 5.5, medium | does every flow reach its end, every value with a source? |
+| `disc-reviewer-acceptance` | Sonnet 5.5, medium | can a stranger judge each AC; does the set cover the promise? |
+| 2× `disc-blind-reader` | Sonnet 5.5, low | builds one story alone, in the documents' language |
+| `disc-reviewer-ambiguity` | Sonnet 5.5, low | compares the two builds key by key |
 
 ## The front door
 
@@ -359,8 +359,8 @@ in step 2's shape, after the author applied it.
 
 ## Step 6 — iterate
 
-The round is cheap (Sonnet and Haiku), so it runs again after every
-round that changed text, whole. Three rounds are the ceiling. After
+The round is cheap (Sonnet 5.5 at medium and low), so it runs again
+after every round that changed text, whole. Three rounds are the ceiling. After
 each round's rulings are applied, ask the user one question: run
 another round, or close with what is left; say what the round found
 (findings, sustained, what changed) in the question. The third round

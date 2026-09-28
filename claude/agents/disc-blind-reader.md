@@ -1,8 +1,8 @@
 ---
 name: disc-blind-reader
-description: A blind reader of the stage-1 discovery review — reads ONE user story alone and commits to the concrete build for every keyed sentence in it, in the documents' language. Two are dispatched per story by the discovery-review workflow; a referee compares their builds. Haiku 4.5, high.
-model: haiku
-effort: high
+description: A blind reader of the stage-1 discovery review — reads ONE user story alone and commits to the concrete build for every keyed sentence in it, in the documents' language. Two are dispatched per story by the discovery-review workflow; a referee compares their builds. Sonnet 5.5, low.
+model: claude-sonnet-5-5
+effort: low
 tools: Read
 ---
 

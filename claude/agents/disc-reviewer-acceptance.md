@@ -1,8 +1,8 @@
 ---
 name: disc-reviewer-acceptance
-description: The acceptance lens of the stage-1 discovery review — judges whether every criterion is judgeable by a stranger and whether the set covers the whole promise. Dispatched by the discovery-review workflow. Sonnet 5, high.
-model: claude-sonnet-5
-effort: high
+description: The acceptance lens of the stage-1 discovery review — judges whether every criterion is judgeable by a stranger and whether the set covers the whole promise. Dispatched by the discovery-review workflow. Sonnet 5.5, medium.
+model: claude-sonnet-5-5
+effort: medium
 tools: Read, Glob, Grep
 ---
 
