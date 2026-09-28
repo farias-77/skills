@@ -1,6 +1,6 @@
 ---
 name: stage-execute
-description: Conducts stage 4 (Execute) — turns an approved plan into merged, reviewed code on the feature branch with nobody in the loop until the end. One session (Opus 5.5, high) receives one goal, "build the whole plan", and orchestrates without writing code: the foundation first, then every entry whose edges are merged or ready, critical path first, in parallel up to the measured cap, each through the exec-entry workflow — builder-backend ∥ builder-frontend (Opus 5.5, high) in their own worktrees, each checking its own work before it returns; the mechanical gate (exec-gate Sonnet 5.5 medium: the fast check and the affected tests per round, the whole gate before ready); a panel of lenses (Opus 5.5 medium; fidelity and visual Sonnet 5.5 high) and QA (Opus 5.5, high) that never wrote the code; a judge (Opus 5.5, medium) that rules on its own under the goal; fixes back ∥ front and a smaller review of the delta with a QA replay (Sonnet 5.5, medium), three rounds at most. The session merges what comes back ready through a serial queue (rebase, the whole gate, merge), runs foundation amendments, builds the deferred rulings in parallel finishing slices, reads the whole branch once for maintainability, parks what is the user's, and calls him once, when everything is merged and green, for the audit. Use when a workstream's .state.md says stage execute, or to resume an execution in progress.
+description: Conducts stage 4 (Execute) — turns an approved plan into merged, reviewed code on the feature branch with nobody in the loop until the end. One session (Opus 5.5, high) receives one goal, "build the whole plan", and orchestrates without writing code: the foundation first, then every entry whose edges are merged or ready, critical path first, in parallel up to the measured cap, each through the exec-entry workflow — builder-backend ∥ builder-frontend (Opus 5.5, high) in their own worktrees, each checking its own work before it returns; the mechanical gate (exec-gate Sonnet 5.5 medium: the fast check and the affected tests per round, before ready and at the merge queue; the whole gate once, at the end of the stage); a panel of lenses (Opus 5.5 medium; fidelity and visual Sonnet 5.5 high) and QA (Opus 5.5, high) that never wrote the code; a judge (Opus 5.5, medium) that rules on its own under the goal; fixes back ∥ front and a smaller review of the delta with a QA replay (Sonnet 5.5, medium), three rounds at most. The session merges what comes back ready through a serial queue (rebase, the affected gate, merge), runs foundation amendments, builds the deferred rulings in parallel finishing slices, reads the whole branch once for maintainability, parks what is the user's, and calls him once, when everything is merged and green, for the audit. Use when a workstream's .state.md says stage execute, or to resume an execution in progress.
 disable-model-invocation: false
 argument-hint: "<workstream-slug>"
 allowed-tools: Read, Write, Edit, Glob, Grep, Agent, Workflow, AskUserQuestion, Artifact, PushNotification, Bash
@@ -59,7 +59,8 @@ exec-entry (one workflow run per entry, in its own worktree and stack)
           exploring QA
           … until nothing is sustained, a question is someone's (parked, needs-session),
           or three panel rounds pass with something still sustained (parked)
-  ready   the whole gate once, keep-going; then the record: the evidence of the head
+  ready   the fast check and the affected tests against the base, keep-going (the whole
+          gate runs once, at the end of the stage); then the record: the evidence of the head
           written, swept for tokens and redacted, the feature map's pointers checked — a red
           there is fixed and reviewed as a delta round → ready
 ```
@@ -73,7 +74,7 @@ The ruler the judge applies is [references/judging.md](references/judging.md).
 | the session | Opus 5.5, high | worktrees, pipelines, the machine's load, the merge queue, amendments, the finishing slices, the record, the audit |
 | `builder-backend` | Opus 5.5, high | the server side of one entry, in the doctrine's stack, tests first; checks its own work before it returns |
 | `builder-frontend` | Opus 5.5, high | the screen side of one entry, in the doctrine's stack, journeys first; checks its own work before it returns |
-| `exec-gate` | Sonnet 5.5, medium | merges, rebases, runs the fast check + affected tests per round and the whole gate before ready and at the queue, attributes every red to a side, writes and sweeps the evidence of the head |
+| `exec-gate` | Sonnet 5.5, medium | merges, rebases, runs the fast check + affected tests per round, before ready and at the queue, and the whole gate once at the end of the stage, attributes every red to a side, writes and sweeps the evidence of the head |
 | `exec-lens-{workaround, proof, security, operations}` | Opus 5.5, medium | angles over the diff; proof one per side; operations not in a lean panel |
 | `exec-lens-{fidelity, visual}` | Sonnet 5.5, high | the diff against the brief and its contracts; the screenshots against the artboards, only with a front |
 | `exec-lens-craft` | Opus 5.5, medium | the foundation's first read, and the maintainability read of the whole branch once per stage |
@@ -247,12 +248,16 @@ and merges after it; an amendment the critical entry asked for goes
 to the front.
 
 1. If `feat/<workstream>` moved since the entry was cut, run exec-entry
-   with `mode: 'rebase'`. A clean rebase is verified by the whole gate;
+   with `mode: 'rebase'`. A clean rebase is verified by the fast check and
+   the affected tests against the moved base;
    a conflict is resolved by the builders and reviewed by the panel
    like any other code. Anything but `ready` is parked.
-2. **The merge needs the whole gate.** The return's `gate` is the
-   whole gate command on the head in keep-going mode (every step runs
-   past a failure): the last gate before `ready`, or the rebase's. Every
+2. **The merge needs a green gate.** The return's `gate` is the fast
+   check and the affected tests against the base on the head, in
+   keep-going mode (every step runs past a failure): the last gate
+   before `ready`, or the rebase's. The whole gate is not run per entry:
+   it runs once, at the end (Step 7), as its number grows with the
+   suites. Every
    `gate.checks[].green` is true; the session reads every check, never
    only the first red; a red check, known or not, sends the entry back
    through exec-entry.
@@ -315,8 +320,8 @@ When every entry and every finishing slice is merged or parked:
    medium) rules its findings by the same ruler; the sustained ones
    become one correction entry `X.<n>`, brief written by the session,
    run through exec-entry and merged like any other.
-1. The gate on the top of `feat/<workstream>`: exec-gate runs the gate
-   command once more, whole, and the visual lens reads every screenshot
+1. The whole gate, once, on the top of `feat/<workstream>`: exec-gate
+   runs the whole gate command (the only whole run of the stage), and the visual lens reads every screenshot
    of the run together, for the coherence of the screens as one
    product. A red here is a fix entry: brief written by the session,
    run through exec-entry, merged.

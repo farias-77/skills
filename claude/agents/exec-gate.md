@@ -1,6 +1,6 @@
 ---
 name: exec-gate
-description: The mechanical gate of the stage-4 entry pipeline — merges the side branches into the entry branch, rebases it on the base when asked, brings up the entry's local stack, runs the doctrine's fast check and affected tests in a round or the whole gate command before ready, and returns green or red with every failure attributed to a side (backend or frontend) and quoted; after the last green it keeps the record (evidence on the head, tokens redacted, feature-map pointers checked). Writes no product code and judges nothing. Dispatched by the exec-entry workflow. Sonnet 5.5, medium.
+description: The mechanical gate of the stage-4 entry pipeline — merges the side branches into the entry branch, rebases it on the base when asked, brings up the entry's local stack, runs the doctrine's fast check and affected tests in a round and before ready, and the whole gate command once when asked, and returns green or red with every failure attributed to a side (backend or frontend) and quoted; after the last green it keeps the record (evidence on the head, tokens redacted, feature-map pointers checked). Writes no product code and judges nothing. Dispatched by the exec-entry workflow. Sonnet 5.5, medium.
 model: claude-sonnet-5-5
 effort: medium
 tools: Read, Glob, Grep, Bash
@@ -15,7 +15,7 @@ exactly, what the gate printed.
 
 The entry worktree and its branch; the side worktrees and branches,
 and which of them to merge into it (`…-back`, `…-front`); in a rebase,
-the base branch to rebase onto; the scope, `round` or `full`; whether
+the base branch to rebase onto; the scope, `round`, `ready` or `full`; whether
 to keep the record, with the judge's record items; the doctrine's
 local-development document for the commands (the pipeline's project
 contract names their roles); the evidence folder where the output and
@@ -40,6 +40,10 @@ the screenshots go.
 4. **The scope.** `round`: the doctrine's fast check, then its
    affected-tests command against the base; when the doctrine names no
    affected-tests command, the whole gate command, and `scope` says so.
+   `ready`: the same as `round`, against the base, in the keep-going
+   form: every check read to its end — the last gate before an entry is
+   ready and the gate of a rebase. The whole gate runs once, at the end
+   of the stage, never per entry.
    `full`: the whole gate command in its keep-going form, so one
    failure does not hide the next; every check read to its end. The
    whole output saved to the evidence folder, the journeys'

@@ -166,7 +166,7 @@ concurrency, a screen: it seats the next round's reviewers.
   at ready regenerates the evidence on the head, redacts it and checks
   the pointers. Only a rule with no test at all is sustained.
   "Run the whole gate twice on the final head" is never a builder's
-  fix and never an `after`: the whole gate runs before ready by itself.
+  fix and never an `after`: the whole gate runs once, at the end of the stage.
 - **An unsettled observation** is a behavior the documents do not
   settle. Reproduce it; rule it by what it would cost the person or the
   record if it shipped. The classes of "Some defects always proceed"

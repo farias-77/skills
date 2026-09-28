@@ -61,14 +61,17 @@
  *              marked `after` → the gate merges and runs the round scope
  *              → the next round's panel reads the delta. After maxRounds
  *              panel rounds with something still sustained → 'parked'.
- *   6. ready   nothing sustained → the whole gate once, keep-going, then
+ *   6. ready   nothing sustained → the fast check and the affected tests
+ *              against the base, keep-going (the whole gate runs once, at
+ *              the end of the stage, never per entry), then
  *              the record: the doctrine's evidence command on the head,
  *              the evidence swept for tokens and redacted, the feature
  *              map's pointers checked. A red there is fixed and its fix
  *              reviewed as a delta round.
  *
  * THE FLOW (mode 'rebase'): the gate rebases the entry branch on the
- * moved base and runs the whole gate and the record. A clean rebase adds
+ * moved base and runs the fast check and the affected tests against it,
+ * and the record. A clean rebase adds
  * no authored code and the run returns. A conflict is resolved by the
  * builders of the sides it touches, and the resolution is code: gate,
  * then the panel over the whole entry diff, then the judge, as in build
@@ -177,7 +180,7 @@ const GATE_REPORT = {
   properties: {
     green: { type: 'boolean' },
     head: { type: 'string' },
-    scope: { type: 'string', description: 'what ran: "round" (fast check + affected tests), "full" (the whole gate), or "full (no affected-tests command)"' },
+    scope: { type: 'string', description: 'what ran: "round" or "ready" (fast check + affected tests), "full" (the whole gate), or "full (no affected-tests command)"' },
     summary: { type: 'string', description: 'the summary lines of what ran, verbatim' },
     checks: { type: 'array', description: 'one per step that ran, in order', items: { type: 'object', additionalProperties: false, required: ['name', 'green', 'lastLine'], properties: { name: { type: 'string' }, green: { type: 'boolean' }, lastLine: { type: 'string' } } } },
     failures: { type: 'array', items: { type: 'object', additionalProperties: false, required: ['check', 'side', 'where', 'output'], properties: { check: { type: 'string' }, side: { type: 'string', enum: ['back', 'front'] }, where: { type: 'string' }, output: { type: 'string' } } } },
@@ -297,7 +300,9 @@ const mergeSides = (which) => which.length
 const SCOPE = {
   round: `Scope: round — the doctrine's fast check and its affected-tests command against ${args?.base} (the whole gate command when the doctrine names no affected-tests command; say so in \`scope\`).`,
   full: 'Scope: full — the whole gate command in its keep-going form; read every check and report every failure, never only the first.',
+  ready: `Scope: ready — the doctrine's fast check and its affected-tests command against ${args?.base}, every check read to its end and every failure reported, never only the first (the whole gate command when the doctrine names no affected-tests command; say so in \`scope\`). The whole gate runs once, at the end of the stage, never per entry.`,
 }
+const readyScope = args?.readyScope === 'full' ? 'full' : 'ready'
 const recordTask = (items) => `Then, only when green, the record: the doctrine's evidence command on the head; the evidence folder swept for tokens and secrets (the JWT pattern and whatever the doctrine names), each one redacted; every pointer of the feature map this entry touched resolved to a file that exists.${items.length ? `
 The judge's record items, to close with the record or report open:
 ${items.map(i => `- ${i.id}: ${i.fix}`).join('\n')}` : ''}`
@@ -361,7 +366,7 @@ let since = args?.base
 if (mode === 'rebase') {
   phase('Gate')
   const g = await runGate(`Rebase ${args?.branch} onto ${args?.base}. On a conflict, abort the rebase and report the files by side. On a clean rebase, bring the stack up and run the gate.
-${SCOPE.full}
+${SCOPE[readyScope]}
 ${recordTask([])}`, 'rebase')
   result.gate = g
   if (!g) { log(`${entry}: gate returned nothing`); return result }
@@ -369,7 +374,7 @@ ${recordTask([])}`, 'rebase')
     result.head = g.head
     result.status = g.green ? 'ready' : 'parked'
     if (g.green) closeRecord(g, 0)
-    log(`${entry}: clean rebase — ${g.green ? 'the whole gate green, ready' : 'the whole gate red after a clean rebase, parked for the session'}`)
+    log(`${entry}: clean rebase — ${g.green ? 'the gate green, ready' : 'the gate red after a clean rebase, parked for the session'}`)
     return result
   }
   const bySide = {}
@@ -554,7 +559,7 @@ ${JSON.stringify(unsettled, null, 1)}`, { label: `${JUDGE}·${entry}·r${round}`
 
   if (!fixes.length) {
     phase('Gate')
-    const fin = await gateUntilGreen(`Nothing sustained in round ${round}: the last gate before ready, on the entry branch (no merge).`, `final-r${round}`, 'full', recordItems)
+    const fin = await gateUntilGreen(`Nothing sustained in round ${round}: the last gate before ready, on the entry branch (no merge).`, `final-r${round}`, readyScope, recordItems)
     result.gate = fin
     if (!fin || !fin.green) { result.head = head; log(`${entry}: the whole gate is red before ready — parked`); return result }
     if (!fin.fixed.length) {
