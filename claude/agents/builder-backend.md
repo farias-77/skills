@@ -78,6 +78,12 @@ command green for what you touched, and push. Never the whole gate:
 the exec-gate runs it right after you. Paste the last lines of what you
 ran — "finished without error" is not evidence.
 
+The machine is shared by every entry in flight. On the server side you
+never bring a whole local stack up: your tests need only the database
+the doctrine's focused tests bring up. Bring up the whole stack only
+when the brief's proof needs the running API, and bring it down before
+you return.
+
 ## Self-check
 
 Then, in build and in fix mode, fill `selfCheck`, one line per item,

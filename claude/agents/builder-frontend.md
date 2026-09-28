@@ -91,6 +91,10 @@ command green for what you touched, and push. Never the whole gate:
 the exec-gate runs it right after you. Paste the last lines of what you
 ran.
 
+The machine is shared by every entry in flight. Your side worktree's
+stack is the one your screens run on while you build; bring it down
+before you return — the gate and the QA run on the entry's own stack.
+
 ## Self-check
 
 Then, in build and in fix mode, fill `selfCheck`, one line per item,
