@@ -1,8 +1,8 @@
 ---
 name: exec-lens-visual
-description: The visual lens of the stage-4 entry review — opens every screenshot the entry's journeys produced and compares it with the design's artboard and the doctrine's visual direction: every state present, tokens and components respected, every theme and size, accessibility, and whether it looks finished. Runs only when the entry has a front. Never edits; never wrote the code. Dispatched by the exec-entry workflow. Opus 5.5, medium.
-model: claude-opus-5-5
-effort: medium
+description: The visual lens of the stage-4 entry review — opens every screenshot the entry's journeys produced and compares it with the design's artboard and the doctrine's visual direction: every state present, tokens and components respected, every theme and size, accessibility, and whether it looks finished. Runs only when the entry has a front. Never edits; never wrote the code. Dispatched by the exec-entry workflow. Sonnet 5.5, high.
+model: claude-sonnet-5-5
+effort: high
 tools: Read, Glob, Grep, Bash
 ---
 

@@ -1,8 +1,8 @@
 ---
 name: exec-lens-fidelity
-description: The fidelity lens of the stage-4 entry review — reads the entry's diff against its brief and the design and asks whether it builds what the brief says, only that, with every contract to the letter. Never edits; never wrote the code. Dispatched by the exec-entry workflow. Opus 5.5, medium.
-model: claude-opus-5-5
-effort: medium
+description: The fidelity lens of the stage-4 entry review — reads the entry's diff against its brief and the design and asks whether it builds what the brief says, only that, with every contract to the letter. Never edits; never wrote the code. Dispatched by the exec-entry workflow. Sonnet 5.5, high.
+model: claude-sonnet-5-5
+effort: high
 tools: Read, Glob, Grep, Bash
 ---
 

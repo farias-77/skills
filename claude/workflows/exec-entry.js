@@ -17,7 +17,7 @@
  *              the run: status 'needs-amendment'. Before it returns, a
  *              builder fills its self-check item by item with the
  *              evidence, distilled from the lenses' definitions.
- *   2. gate    exec-gate (Sonnet 5, high) merges the sides into the entry
+ *   2. gate    exec-gate (Sonnet 5.5, medium) merges the sides into the entry
  *              branch, brings the stack up and runs the round scope: the
  *              doctrine's fast check and affected tests (the whole gate
  *              when the doctrine names no affected-tests command). Red →
@@ -26,7 +26,8 @@
  *              'parked'.
  *   3. panel   in parallel, over the diff. The whole first reading:
  *              fidelity, workaround, proof (one per side when the entry
- *              has both), security, operations (Opus 5.5, medium); visual
+ *              has both), security, operations (Opus 5.5, medium;
+ *              fidelity Sonnet 5.5, high); visual (Sonnet 5.5, high)
  *              with a front; craft only in the foundation's (F) first
  *              reading; exec-qa-backend with a back, exec-qa-frontend
  *              with a front, exec-qa-abuse on every entry (Opus 5.5,
@@ -39,7 +40,7 @@
  *              credential, a person's data or evidence; visual only when
  *              a fix changes a screen; operations only when it had a
  *              finding sustained the round before; never craft and never
- *              an exploring QA: exec-qa-replay (Sonnet 5, high) replays
+ *              an exploring QA: exec-qa-replay (Sonnet 5.5, medium) replays
  *              the scripts the QA saved and the case of each fix, for the
  *              sides the fixes touched. Every reviewer receives the
  *              rulings of the entry's earlier rounds and runs.
@@ -124,8 +125,8 @@ export const meta = {
   description: 'Stage-4 entry: two Opus builders in parallel, the mechanical gate, a panel of lenses and adversarial QA that never wrote the code, an Opus judge that rules on its own under a goal; fixes back ∥ front and a smaller review of the delta until clean, three rounds at most; the whole gate and the record before ready',
   phases: [
     { title: 'Build', detail: 'builder-backend ∥ builder-frontend (Opus 5.5, high), each in its side worktree, self-check before return', model: 'opus' },
-    { title: 'Gate', detail: 'exec-gate (Sonnet 5, high): merge the sides, fast check + affected tests per round, the whole gate and the record before ready', model: 'sonnet' },
-    { title: 'Panel', detail: 'the lenses (Opus 5.5, medium) and the QA (Opus 5.5, high; replay Sonnet 5, high) over the diff', model: 'opus' },
+    { title: 'Gate', detail: 'exec-gate (Sonnet 5.5, medium): merge the sides, fast check + affected tests per round, the whole gate and the record before ready', model: 'sonnet' },
+    { title: 'Panel', detail: 'the lenses (Opus 5.5, medium; fidelity and visual Sonnet 5.5, high) and the QA (Opus 5.5, high; replay Sonnet 5.5, medium) over the diff', model: 'opus' },
     { title: 'Judge', detail: 'exec-judge (Opus 5.5, medium) rules every finding and every unsettled observation', model: 'opus' },
     { title: 'Fix', detail: 'the builders apply what was sustained, back ∥ front (deferred go to the finishing entries), then the gate, then the panel over the delta', model: 'opus' },
   ],

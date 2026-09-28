@@ -1,6 +1,6 @@
 ---
 name: stage-execute
-description: Conducts stage 4 (Execute) — turns an approved plan into merged, reviewed code on the feature branch with nobody in the loop until the end. One session (Opus 5.5, high) receives one goal, "build the whole plan", and orchestrates without writing code: the foundation first, then every entry whose edges are merged or ready, critical path first, in parallel up to the measured cap, each through the exec-entry workflow — builder-backend ∥ builder-frontend (Opus 5.5, high) in their own worktrees, each checking its own work before it returns; the mechanical gate (exec-gate Sonnet 5 high: the fast check and the affected tests per round, the whole gate before ready); a panel of lenses (Opus 5.5, medium) and QA (Opus 5.5, high) that never wrote the code; a judge (Opus 5.5, medium) that rules on its own under the goal; fixes back ∥ front and a smaller review of the delta with a QA replay (Sonnet 5, high), three rounds at most. The session merges what comes back ready through a serial queue (rebase, the whole gate, merge), runs foundation amendments, builds the deferred rulings in parallel finishing slices, reads the whole branch once for maintainability, parks what is the user's, and calls him once, when everything is merged and green, for the audit. Use when a workstream's .state.md says stage execute, or to resume an execution in progress.
+description: Conducts stage 4 (Execute) — turns an approved plan into merged, reviewed code on the feature branch with nobody in the loop until the end. One session (Opus 5.5, high) receives one goal, "build the whole plan", and orchestrates without writing code: the foundation first, then every entry whose edges are merged or ready, critical path first, in parallel up to the measured cap, each through the exec-entry workflow — builder-backend ∥ builder-frontend (Opus 5.5, high) in their own worktrees, each checking its own work before it returns; the mechanical gate (exec-gate Sonnet 5.5 medium: the fast check and the affected tests per round, the whole gate before ready); a panel of lenses (Opus 5.5 medium; fidelity and visual Sonnet 5.5 high) and QA (Opus 5.5, high) that never wrote the code; a judge (Opus 5.5, medium) that rules on its own under the goal; fixes back ∥ front and a smaller review of the delta with a QA replay (Sonnet 5.5, medium), three rounds at most. The session merges what comes back ready through a serial queue (rebase, the whole gate, merge), runs foundation amendments, builds the deferred rulings in parallel finishing slices, reads the whole branch once for maintainability, parks what is the user's, and calls him once, when everything is merged and green, for the audit. Use when a workstream's .state.md says stage execute, or to resume an execution in progress.
 disable-model-invocation: false
 argument-hint: "<workstream-slug>"
 allowed-tools: Read, Write, Edit, Glob, Grep, Agent, Workflow, AskUserQuestion, Artifact, PushNotification, Bash
@@ -33,14 +33,14 @@ at the end.
 exec-entry (one workflow run per entry, in its own worktree and stack)
   build   builder-backend ∥ builder-frontend (Opus 5.5, high), each in its side worktree;
           each ends on the doctrine's fast check + affected tests and its self-check
-  gate    exec-gate (Sonnet 5, high): merge the sides, stack up, the fast check + the
+  gate    exec-gate (Sonnet 5.5, medium): merge the sides, stack up, the fast check + the
           affected tests (the whole gate when the doctrine names no affected tests)
           red → the failing sides fix, back ∥ front → gate again (3 tries, then parked)
   panel   round 1, whole — in parallel, every reviewer with the rulings of the entry's
           earlier rounds and runs:
             fidelity · workaround · proof (one per side) · security · operations
             · visual (front only) · craft (the foundation's first reading only)
-                                                                  — Opus 5.5, medium
+              — Opus 5.5, medium; fidelity and visual Sonnet 5.5, high
             + qa-backend (back) · qa-frontend (front) · qa-abuse (every entry with a side),
               each with its checklist and a coverage line per category — Opus 5.5, high
           lean panel: the same without operations
@@ -54,7 +54,7 @@ exec-entry (one workflow run per entry, in its own worktree and stack)
   delta   fidelity · workaround · proof of the sides the fixes touched, always;
           security when a fix touches scope, a log, a credential, a person's data or
           evidence; visual when a fix changes a screen; operations (full panel) when it had
-          a finding sustained the round before; exec-qa-replay (Sonnet 5, high) replays the QA's saved
+          a finding sustained the round before; exec-qa-replay (Sonnet 5.5, medium) replays the QA's saved
           scripts + each fix's case for the sides the fixes touched; never craft, never an
           exploring QA
           … until nothing is sustained, a question is someone's (parked, needs-session),
@@ -73,12 +73,13 @@ The ruler the judge applies is [references/judging.md](references/judging.md).
 | the session | Opus 5.5, high | worktrees, pipelines, the machine's load, the merge queue, amendments, the finishing slices, the record, the audit |
 | `builder-backend` | Opus 5.5, high | the server side of one entry, in the doctrine's stack, tests first; checks its own work before it returns |
 | `builder-frontend` | Opus 5.5, high | the screen side of one entry, in the doctrine's stack, journeys first; checks its own work before it returns |
-| `exec-gate` | Sonnet 5, high | merges, rebases, runs the fast check + affected tests per round and the whole gate before ready and at the queue, attributes every red to a side, writes and sweeps the evidence of the head |
-| `exec-lens-{fidelity, workaround, proof, security, operations, visual}` | Opus 5.5, medium | angles over the diff; proof one per side; visual only with a front; operations not in a lean panel |
+| `exec-gate` | Sonnet 5.5, medium | merges, rebases, runs the fast check + affected tests per round and the whole gate before ready and at the queue, attributes every red to a side, writes and sweeps the evidence of the head |
+| `exec-lens-{workaround, proof, security, operations}` | Opus 5.5, medium | angles over the diff; proof one per side; operations not in a lean panel |
+| `exec-lens-{fidelity, visual}` | Sonnet 5.5, high | the diff against the brief and its contracts; the screenshots against the artboards, only with a front |
 | `exec-lens-craft` | Opus 5.5, medium | the foundation's first read, and the maintainability read of the whole branch once per stage |
 | `exec-qa-backend` · `exec-qa-frontend` | Opus 5.5, high | use the running stack and try to break it, by the adversarial checklist, with the coverage reported |
 | `exec-qa-abuse` | Opus 5.5, high | black box over the API and the screens of every entry with a side, abuse only: another actor's ids, tokens, injection, rate, a person's data in logs and e-mails, races on the check |
-| `exec-qa-replay` | Sonnet 5, high | in a delta round, replays the scripts the QA saved plus the fix's case |
+| `exec-qa-replay` | Sonnet 5.5, medium | in a delta round, replays the scripts the QA saved plus the fix's case |
 | `exec-judge` | Opus 5.5, medium | rules every finding of a round, the QA's unsettled observations included; decides the documents' silence on its own under the goal |
 
 ## Preconditions
@@ -229,7 +230,7 @@ shared file goes through step 5 first, then the entry resumes.
 **The coherence pass.** When an entry comes back `ready` after more
 than one run, or a rule changed while it was in flight (a ruling in
 `rulings.md`, a line of the doctrine), one reader goes over its whole
-diff before the queue: `exec-lens-fidelity` (Opus 5.5, medium) with the
+diff before the queue: `exec-lens-fidelity` (Sonnet 5.5, high) with the
 rulings that changed, looking for what the old rule left behind
 (never in a generated file); `exec-judge` (Opus 5.5, medium) rules its
 findings by the same ruler. Sustained → exec-entry `mode: 'resume'`

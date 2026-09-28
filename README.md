@@ -152,17 +152,17 @@ local stack, through the **exec-entry** workflow.
 `builder-backend` and `builder-frontend` (Opus 5.5, high) build the two
 sides at once in their own worktrees, tests and journeys first, and
 check their own work against the reviewers' checklist before they
-return; the **gate** (`exec-gate`, Sonnet 5, high) merges them and runs
+return; the **gate** (`exec-gate`, Sonnet 5.5, medium) merges them and runs
 the doctrine's fast check and affected tests each round, sending every
 red back to the side that owns it; a **panel that never wrote the
 code** reads the diff — lenses for fidelity, workaround, proof (one per
-side), security, operations and visual (Opus 5.5, medium; craft only on
-the foundation) and QA that use the running stack as an adversary
+side), security, operations and visual (Opus 5.5, medium, fidelity and
+visual on Sonnet 5.5, high; craft only on the foundation) and QA that use the running stack as an adversary
 through a mandatory checklist, per side and one for abuse (Opus 5.5,
 high) — and a **judge** (`exec-judge`, Opus 5.5, medium) rules every
 finding, on its own under the goal, sending the rest to the session or
 the user; the builders fix back ∥ front, the gate runs, the delta is
-read by the lenses it touches and a QA replay (Sonnet 5, high), three
+read by the lenses it touches and a QA replay (Sonnet 5.5, medium), three
 rounds at most; before an entry is ready the whole gate runs once and
 the gate writes the record. **No code enters without review**: every
 build, fix, conflict resolution and foundation amendment passes the

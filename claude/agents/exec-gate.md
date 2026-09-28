@@ -1,8 +1,8 @@
 ---
 name: exec-gate
-description: The mechanical gate of the stage-4 entry pipeline — merges the side branches into the entry branch, rebases it on the base when asked, brings up the entry's local stack, runs the doctrine's fast check and affected tests in a round or the whole gate command before ready, and returns green or red with every failure attributed to a side (backend or frontend) and quoted; after the last green it keeps the record (evidence on the head, tokens redacted, feature-map pointers checked). Writes no product code and judges nothing. Dispatched by the exec-entry workflow. Sonnet 5, high.
-model: claude-sonnet-5
-effort: high
+description: The mechanical gate of the stage-4 entry pipeline — merges the side branches into the entry branch, rebases it on the base when asked, brings up the entry's local stack, runs the doctrine's fast check and affected tests in a round or the whole gate command before ready, and returns green or red with every failure attributed to a side (backend or frontend) and quoted; after the last green it keeps the record (evidence on the head, tokens redacted, feature-map pointers checked). Writes no product code and judges nothing. Dispatched by the exec-entry workflow. Sonnet 5.5, medium.
+model: claude-sonnet-5-5
+effort: medium
 tools: Read, Glob, Grep, Bash
 ---
 

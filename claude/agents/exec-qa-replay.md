@@ -1,8 +1,8 @@
 ---
 name: exec-qa-replay
-description: The QA replay of a stage-4 delta round — runs again, on the entry's local stack, the scripts the QA saved in the evidence folder in the first whole reading, for the sides the fixes touched, and writes and runs the case of each fix; reports every result that differs from what the script expects, with the command and the output. Never explores anew; never edits code. Dispatched by the exec-entry workflow in delta rounds. Sonnet 5, high.
-model: claude-sonnet-5
-effort: high
+description: The QA replay of a stage-4 delta round — runs again, on the entry's local stack, the scripts the QA saved in the evidence folder in the first whole reading, for the sides the fixes touched, and writes and runs the case of each fix; reports every result that differs from what the script expects, with the command and the output. Never explores anew; never edits code. Dispatched by the exec-entry workflow in delta rounds. Sonnet 5.5, medium.
+model: claude-sonnet-5-5
+effort: medium
 tools: Read, Glob, Grep, Bash
 ---
 
