@@ -31,8 +31,8 @@ own frictions as they happen — both feed the same file.
 
 In every skill, agent table, README paragraph and message that names
 an agent, the name carries the model and the effort in parentheses:
-`disc-author-stories (Sonnet 5, high)`, `the conductor (Opus 5,
-high)`, `disc-blind-reader (Haiku 4.5, low)`. Model and effort live
+`disc-author-stories (Sonnet 5.5, high)`, `the conductor (Opus 5.5,
+medium)`, `disc-blind-reader (Sonnet 5.5, low)`. Model and effort live
 in the agent's frontmatter (`model:`, `effort:`); the parentheses are
 how the reader sees the cost of a step without opening the file.
 
@@ -46,7 +46,7 @@ context and is paid again on every turn that follows. So the rule is
 the same at every stage: **when the session needs something it has not
 read — what a document says, what a repo already has, what a standard
 requires, what a past workstream recorded — it dispatches
-`scout` (Haiku 4.5, max) and works from what comes back.**
+`scout` (Sonnet 5.5, low) and works from what comes back.**
 
 The scout locates and quotes; it never summarizes and never concludes.
 It returns the literal lines with their `path:line`, where it looked,

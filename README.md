@@ -88,7 +88,7 @@ only enters at stage 2 with the ambiguity already wrung out.
 **2 · Design** — a defined scope in, how the whole demand gets built
 on the system as it is out. The shape is the consuming project's
 doctrine; the design applies it and never reopens it. **Recon first**:
-scouts (Haiku 4.5, max) read the system as it is today (feature maps,
+scouts (Sonnet 5.5, low) read the system as it is today (feature maps,
 docs, the modules the stories touch) and a **deep-research workflow
 per external tool** (Sonnet 5, high: planner, blind searchers,
 synthesizer, critic, citer) reads its documentation into a sourced

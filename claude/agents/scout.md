@@ -1,8 +1,8 @@
 ---
 name: scout
-description: The scout of any stage — answers ONE question the session has about files it has not read (a workstream document, a repo, the standards, a past workstream's record) by finding the places that answer it and quoting them literally with path and line, plus where it looked and what it did not find. Dispatched by a conductor, a master or a worker session that must not spend its own context reading. Locates and quotes; never summarizes, never concludes, never proposes. Haiku 4.5, max.
-model: claude-haiku-4-5
-effort: max
+description: The scout of any stage — answers ONE question the session has about files it has not read (a workstream document, a repo, the standards, a past workstream's record) by finding the places that answer it and quoting them literally with path and line, plus where it looked and what it did not find. Dispatched by a conductor, a master or a worker session that must not spend its own context reading. Locates and quotes; never summarizes, never concludes, never proposes. Sonnet 5.5, low.
+model: claude-sonnet-5-5
+effort: low
 tools: Read, Glob, Grep, Bash(ls *), Bash(cat *), Bash(wc *), Bash(git log *), Bash(git branch *), Bash(git diff *)
 ---
 
