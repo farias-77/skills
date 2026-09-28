@@ -121,7 +121,7 @@ close, where his adjustments are noted and applied in a batch. The
 order of construction is stage 3's.
 
 **3 · Plan** — the design becomes a cut built **as parallel as the
-machine allows**. One scout (Haiku 4.5, max) per area of the codebase
+machine allows**. One scout (Sonnet 5.5, low) per area of the codebase
 writes what exists today; the conductor (Opus 5.5, medium) arrives with
 the cut and the human shapes it. First the **foundation**: everything
 two builders would fight over — every migration of the demand, the
@@ -135,10 +135,10 @@ seeded by the factories, never an edge); everything free runs at once,
 up to a **concurrency cap** measured on the machine. Every entry is
 proved by commands on the local stack (`run`/`expect`, and a
 screenshot against its artboard for a screen); nothing needs alpha or
-prod. One writer (Sonnet 5, high) per entry writes the **brief** its
-builder will receive, deciding nothing; three lenses (Sonnet 5, high)
+prod. One writer (Sonnet 5.5, high) per entry writes the **brief** its
+builder will receive, deciding nothing; three lenses (Sonnet 5.5, high)
 — coverage, verifiability, order — and, per brief, two blind readers
-(Haiku 4.5, high) with a referee (Sonnet 5, low) review it; round 2
+(Sonnet 5.5, low) with a referee (Sonnet 5.5, low) review it; round 2
 runs automatically over the delta, a third only on the human's word.
 The pre-flight (what only he can hand over) is handed at the close.
 

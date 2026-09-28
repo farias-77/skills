@@ -1,7 +1,7 @@
 ---
 name: plan-reviewer-ambiguity
-description: The ambiguity referee of the stage-3 plan review — compares the two blind readers' builds of ONE brief, key by key, and reports every key where they would build different things or call it done on different commands. Dispatched by the plan-review workflow, once per brief, after its readers return. Sonnet 5, low.
-model: claude-sonnet-5
+description: The ambiguity referee of the stage-3 plan review — compares the two blind readers' builds of ONE brief, key by key, and reports every key where they would build different things or call it done on different commands. Dispatched by the plan-review workflow, once per brief, after its readers return. Sonnet 5.5, low.
+model: claude-sonnet-5-5
 effort: low
 tools: Read
 ---

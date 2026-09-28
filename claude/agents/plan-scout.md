@@ -1,8 +1,8 @@
 ---
 name: plan-scout
-description: A scout of stage 3 (Plan) — reads ONE area of the codebase (a backend module, a frontend app, the ingestion, the infra) and its docs and writes 02-plan/recon/<area>.md: what exists today (modules, routes, tables, screens, factories, the commands, the suites with their size, the shared files), every line with where it was read. One is dispatched per area by the stage-plan conductor before the cut, all in parallel, plus one for the machine that measures how many isolated stacks it holds under the screen suite (02-plan/recon/machine.md). Haiku 4.5, max.
-model: claude-haiku-4-5
-effort: max
+description: A scout of stage 3 (Plan) — reads ONE area of the codebase (a backend module, a frontend app, the ingestion, the infra) and its docs and writes 02-plan/recon/<area>.md: what exists today (modules, routes, tables, screens, factories, the commands, the suites with their size, the shared files), every line with where it was read. One is dispatched per area by the stage-plan conductor before the cut, all in parallel, plus one for the machine that measures how many isolated stacks it holds under the screen suite (02-plan/recon/machine.md). Sonnet 5.5, low.
+model: claude-sonnet-5-5
+effort: low
 tools: Read, Write, Glob, Grep, Bash
 ---
 

@@ -1,8 +1,8 @@
 ---
 name: plan-blind-reader
-description: A blind reader of the stage-3 plan review — reads ONE brief alone, exactly as the builder will receive it, and commits, per key, to what it would build and the command it would run to call it done. Two are dispatched per brief by the plan-review workflow; a referee compares their builds. Haiku 4.5, high.
-model: claude-haiku-4-5
-effort: high
+description: A blind reader of the stage-3 plan review — reads ONE brief alone, exactly as the builder will receive it, and commits, per key, to what it would build and the command it would run to call it done. Two are dispatched per brief by the plan-review workflow; a referee compares their builds. Sonnet 5.5, low.
+model: claude-sonnet-5-5
+effort: low
 tools: Read
 ---
 

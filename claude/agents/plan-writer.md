@@ -1,7 +1,7 @@
 ---
 name: plan-writer
-description: A writer of stage 3 (Plan) — writes ONE brief, the whole instruction one builder receives for one entry of the plan (or for the foundation), from the cut the user approved in plan.md, the design and the recon, plus its blueprint JSON; later applies the fixes the conductor and the user sustained. One is dispatched per entry by the stage-plan conductor, all in parallel, from the same source; a writer decides nothing and asks instead. Sonnet 5, high.
-model: claude-sonnet-5
+description: A writer of stage 3 (Plan) — writes ONE brief, the whole instruction one builder receives for one entry of the plan (or for the foundation), from the cut the user approved in plan.md, the design and the recon, plus its blueprint JSON; later applies the fixes the conductor and the user sustained. One is dispatched per entry by the stage-plan conductor, all in parallel, from the same source; a writer decides nothing and asks instead. Sonnet 5.5, high.
+model: claude-sonnet-5-5
 effort: high
 tools: Read, Write, Edit, Glob, Grep, Bash(ls *), Bash(cat *)
 ---

@@ -11,10 +11,10 @@
  * on the user's word, delta again; the conductor enforces the count.
  *
  * THE BLIND READS are per brief (one entry of the plan, or F for the
- * foundation): two Haiku readers (4.5, high) build it alone, reading
+ * foundation): two Sonnet readers (5.5, low) build it alone, reading
  * only that file (and the design sections it points at), in the
  * brief's language, one build per key (`brief`, `back`, `front`,
- * `proof`). A Sonnet referee (5, low) compares the two readings key
+ * `proof`). A Sonnet referee (5.5, low) compares the two readings key
  * by key; only a `different-product` verdict becomes a finding; an
  * open build ("maybe X") is judged by the referee as two possible
  * builds. A reading that misses a key or is empty is invalid and
@@ -64,10 +64,10 @@
 
 export const meta = {
   name: 'plan-review',
-  description: 'Stage-3 review round: three Sonnet lenses in parallel with two Haiku blind readers and a Sonnet referee per brief; whole in round 1, delta after; no judge agent — the conductor judges',
+  description: 'Stage-3 review round: three Sonnet lenses in parallel with two Sonnet blind readers and a Sonnet referee per brief; whole in round 1, delta after; no judge agent — the conductor judges',
   phases: [
     { title: 'Lenses', detail: 'coverage, verifiability and order in parallel, each reads everything (or the delta)', model: 'sonnet' },
-    { title: 'Blind reads', detail: 'per brief: two Haiku readers build it alone from the file, a Sonnet referee compares them key by key' },
+    { title: 'Blind reads', detail: 'per brief: two Sonnet readers build it alone from the file, a Sonnet referee compares them key by key' },
   ],
 }
 

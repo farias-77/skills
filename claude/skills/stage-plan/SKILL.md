@@ -1,6 +1,6 @@
 ---
 name: stage-plan
-description: Conducts stage 3 (Plan) — takes an approved design and cuts, with the user, how the whole demand gets built as fast as the machine allows. One scout (Haiku 4.5, max) per area of the codebase the design touches writes what exists today, and one measures how many stacks the machine holds; the conductor (Opus 5.5, medium) arrives with the cut: the foundation (every migration, the whole contract with its generated code, the modules registered, the shared pieces and factories, laid down once so no entry ever touches a shared file) and the graph of entries (a story or a small group, built vertically, back and front; an edge only where an entry's proof needs another entry's behavior), each proved by commands, sized, the critical path marked; the user shapes and approves it and decides every open rule of doctrine or test; then one writer (Sonnet 5, high) per entry writes the brief its builder will receive, deciding nothing; a review round of three lenses (Sonnet 5, high), two blind readers (Haiku 4.5, high) and a referee (Sonnet 5, low) per brief, judged by the conductor; round 2 automatic over the delta, a third only on the user's word; the blueprint's Plan tab read by the user at the close, the pre-flight handed over. Runs in Claude Code with an Opus 5.5 session at medium effort. Use after a design is approved, or to resume a plan in progress.
+description: Conducts stage 3 (Plan) — takes an approved design and cuts, with the user, how the whole demand gets built as fast as the machine allows. One scout (Sonnet 5.5, low) per area of the codebase the design touches writes what exists today, and one measures how many stacks the machine holds; the conductor (Opus 5.5, medium) arrives with the cut: the foundation (every migration, the whole contract with its generated code, the modules registered, the shared pieces and factories, laid down once so no entry ever touches a shared file) and the graph of entries (a story or a small group, built vertically, back and front; an edge only where an entry's proof needs another entry's behavior), each proved by commands, sized, the critical path marked; the user shapes and approves it and decides every open rule of doctrine or test; then one writer (Sonnet 5.5, high) per entry writes the brief its builder will receive, deciding nothing; a review round of three lenses (Sonnet 5.5, high), two blind readers (Sonnet 5.5, low) and a referee (Sonnet 5.5, low) per brief, judged by the conductor; round 2 automatic over the delta, a third only on the user's word; the blueprint's Plan tab read by the user at the close, the pre-flight handed over. Runs in Claude Code with an Opus 5.5 session at medium effort. Use after a design is approved, or to resume a plan in progress.
 disable-model-invocation: false
 argument-hint: "<workstream-slug>"
 allowed-tools: Read, Write, Edit, Glob, Grep, Agent, SendMessage, Workflow, AskUserQuestion, Artifact, Bash(mkdir *), Bash(date *), Bash(ls *), Bash(cat *), Bash(git status *), Bash(git diff *), Bash(git add *), Bash(git commit *), Bash(node *)
@@ -64,7 +64,7 @@ end a turn on a plan or a promise; do the work.
 
 ```
 0. Open     Opus 5.5, effort medium; read the design whole and the discovery's stories
-1. Recon    one plan-scout (Haiku 4.5, max) per area of the codebase the design touches, in
+1. Recon    one plan-scout (Sonnet 5.5, low) per area of the codebase the design touches, in
             parallel → 02-plan/recon/<area>.md: what exists today (modules, routes, tables, screens,
             factories, the commands and the suites with their size); one more for the machine →
             recon/machine.md: how many stacks it holds at once under the screen suite
@@ -72,12 +72,12 @@ end a turn on a plan or a promise; do the work.
             entries with their size and their edges, drawn as a graph with the critical path; the
             measured cap; the pre-flight with every open decision; approval through the question
             tool; adjustments in a visible list, applied on "apply" → 02-plan/plan.md
-3. Write    one plan-writer (Sonnet 5, high) per entry and one for the foundation, in parallel,
+3. Write    one plan-writer (Sonnet 5.5, high) per entry and one for the foundation, in parallel,
             same source (plan.md + the design + recon + the template): the brief its builder
             receives, every proof as run/expect, plus blueprint/plan/briefs/<id>.json; zero
             decisions — questions come back in one batch, you answer them against the approved cut
-4. Round 1  whole and automatic: plan-review workflow (three lenses Sonnet 5 high; per brief two
-            blind readers Haiku 4.5 high + a referee Sonnet 5 low); you judge every finding by
+4. Round 1  whole and automatic: plan-review workflow (three lenses Sonnet 5.5 high; per brief two
+            blind readers Sonnet 5.5 low + a referee Sonnet 5.5 low); you judge every finding by
             references/judging.md; wording → writers; the cut → you, against what he approved
 5. Round 2  automatic, delta only (the briefs that changed + the fixes); a third round only on
             the user's word
@@ -97,11 +97,11 @@ not answering.
 | Agent | Model, effort | Does |
 |---|---|---|
 | the conductor | Opus 5.5, medium | the cut, the answers to the writers, the judging, the close |
-| `plan-scout` × 1 per area, + 1 for the machine | Haiku 4.5, max | reads one area of the codebase and its docs, writes `recon/<area>.md`: facts and where they are; the machine's scout measures the stacks it holds under the screen suite, writes `recon/machine.md` |
-| `plan-writer` × 1 per entry, + 1 for the foundation | Sonnet 5, high | one brief each, in parallel, from the same source; asks, never decides |
-| `plan-reviewer-{coverage, verifiability, order}` | Sonnet 5, high | three lenses, each reads everything |
-| `plan-blind-reader` × 2 per brief | Haiku 4.5, high | builds and proves one brief alone, reading only that file, in the brief's language |
-| `plan-reviewer-ambiguity` | Sonnet 5, low | compares the two builds key by key |
+| `plan-scout` × 1 per area, + 1 for the machine | Sonnet 5.5, low | reads one area of the codebase and its docs, writes `recon/<area>.md`: facts and where they are; the machine's scout measures the stacks it holds under the screen suite, writes `recon/machine.md` |
+| `plan-writer` × 1 per entry, + 1 for the foundation | Sonnet 5.5, high | one brief each, in parallel, from the same source; asks, never decides |
+| `plan-reviewer-{coverage, verifiability, order}` | Sonnet 5.5, high | three lenses, each reads everything |
+| `plan-blind-reader` × 2 per brief | Sonnet 5.5, low | builds and proves one brief alone, reading only that file, in the brief's language |
+| `plan-reviewer-ambiguity` | Sonnet 5.5, low | compares the two builds key by key |
 
 ## Preconditions
 
@@ -307,10 +307,10 @@ open only their brief.
 
 | Lens | Question |
 |---|---|
-| `plan-reviewer-coverage` (Sonnet 5, high) | every story AC and every acceptance case lands in exactly one entry; every table, route, module and factory the design names is in the foundation; every screen has its entry; nothing is built that nothing forces |
-| `plan-reviewer-verifiability` (Sonnet 5, high) | every `run` is a command the doctrine names or a spec that exists or that the entry creates, and every `expect` is what it prints; every `see` names its journey and artboard; bad paths included; nothing needs a deployed environment or a person |
-| `plan-reviewer-order` (Sonnet 5, high) | every edge is a behavior the proof needs, every such need has its edge, an edge held by one journey is stacked or moved, the graph has no cycle; after the foundation no entry touches a shared file; entries that run at once do not collide on the same file; the foundation is complete and serves every entry; the cap is the measured one |
-| 2 × `plan-blind-reader` (Haiku 4.5, high) → `plan-reviewer-ambiguity` (Sonnet 5, low), per brief | would two builders build the same entry from this brief alone, and call it done on the same command and output? |
+| `plan-reviewer-coverage` (Sonnet 5.5, high) | every story AC and every acceptance case lands in exactly one entry; every table, route, module and factory the design names is in the foundation; every screen has its entry; nothing is built that nothing forces |
+| `plan-reviewer-verifiability` (Sonnet 5.5, high) | every `run` is a command the doctrine names or a spec that exists or that the entry creates, and every `expect` is what it prints; every `see` names its journey and artboard; bad paths included; nothing needs a deployed environment or a person |
+| `plan-reviewer-order` (Sonnet 5.5, high) | every edge is a behavior the proof needs, every such need has its edge, an edge held by one journey is stacked or moved, the graph has no cycle; after the foundation no entry touches a shared file; entries that run at once do not collide on the same file; the foundation is complete and serves every entry; the cap is the measured one |
+| 2 × `plan-blind-reader` (Sonnet 5.5, low) → `plan-reviewer-ambiguity` (Sonnet 5.5, low), per brief | would two builders build the same entry from this brief alone, and call it done on the same command and output? |
 
 Every reviewer answers under the house reviewer contract
 (`docs/standards/reviewer-contract.md` in the pipeline repo). The

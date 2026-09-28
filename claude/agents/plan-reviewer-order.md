@@ -1,7 +1,7 @@
 ---
 name: plan-reviewer-order
-description: The order lens of the stage-3 plan review — the plan as it will RUN, entries in parallel up to the cap after the foundation: every edge is a behavior the proof needs, every such need has its edge, the graph has no cycle, no entry touches a shared file after the foundation, entries that run at once do not collide on a file, an edge held by one journey only is stacked or moved, and the foundation is complete and serves every entry. Dispatched by the plan-review workflow. Sonnet 5, high.
-model: claude-sonnet-5
+description: The order lens of the stage-3 plan review — the plan as it will RUN, entries in parallel up to the cap after the foundation: every edge is a behavior the proof needs, every such need has its edge, the graph has no cycle, no entry touches a shared file after the foundation, entries that run at once do not collide on a file, an edge held by one journey only is stacked or moved, and the foundation is complete and serves every entry. Dispatched by the plan-review workflow. Sonnet 5.5, high.
+model: claude-sonnet-5-5
 effort: high
 tools: Read, Glob, Grep
 ---

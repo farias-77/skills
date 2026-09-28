@@ -1,7 +1,7 @@
 # Recon — `<area>` — <date>
 
 <!--
-  Written by a plan-scout (Haiku 4.5, max) from one area of the
+  Written by a plan-scout (Sonnet 5.5, low) from one area of the
   codebase and its docs only; nothing from the cloud, nothing from
   memory. Every line says where it was read (a path, a line). This is
   A: what exists before the demand. The conductor reads it before the

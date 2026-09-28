@@ -1,7 +1,7 @@
 ---
 name: plan-reviewer-coverage
-description: The coverage lens of the stage-3 plan review — every story AC and every acceptance case of the design lands in exactly one entry, every table, route, module and factory the design names is in the foundation, every screen has its entry, and every entry builds something the design or a story forces. Dispatched by the plan-review workflow. Sonnet 5, high.
-model: claude-sonnet-5
+description: The coverage lens of the stage-3 plan review — every story AC and every acceptance case of the design lands in exactly one entry, every table, route, module and factory the design names is in the foundation, every screen has its entry, and every entry builds something the design or a story forces. Dispatched by the plan-review workflow. Sonnet 5.5, high.
+model: claude-sonnet-5-5
 effort: high
 tools: Read, Glob, Grep
 ---

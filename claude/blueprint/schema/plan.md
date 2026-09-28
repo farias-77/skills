@@ -5,7 +5,7 @@ writes `plan.json` (the cut: from A to B, the foundation, the entries
 with their edges and proofs, the concurrency cap, the cut's cards, the
 pre-flight), `plan-report.json` (the plain layer the tab opens with)
 and `plan-review.json` (the rounds and the rulings); each
-`plan-writer` (Sonnet 5, high) writes `briefs/<id>.json` in the same
+`plan-writer` (Sonnet 5.5, high) writes `briefs/<id>.json` in the same
 pass as its brief (`02-plan/briefs/<id>.md`).
 `node claude/blueprint/build.mjs <workstream>` validates them, embeds
 the brief `.md` files whole, and assembles the Plan tab. The build
