@@ -1,8 +1,8 @@
 ---
 name: close-harvester
-description: The reader of stage 6 (Close) — reads ONE source of a workstream's record (the document stages' reviews and rulings; the execution's board, runs and audit; the release's plan, trace and record; the dreaming and taste notes) and returns, structured, the numbers that source carries, the precision per reviewer where it has a review, and every friction with where it was seen and the quote. Hints where an idea would land; decides nothing. Dispatched by the close-harvest workflow, one per source in parallel. Sonnet 5, high.
-model: claude-sonnet-5
-effort: high
+description: The reader of stage 6 (Close) — reads ONE source of a workstream's record (the document stages' reviews and rulings; the execution's board, runs and audit; the release's plan, trace and record; the dreaming and taste notes) and returns, structured, the numbers that source carries, the precision per reviewer where it has a review, and every friction with where it was seen and the quote. Hints where an idea would land; decides nothing. Dispatched by the close-harvest workflow, one per source in parallel. Sonnet 5.5, medium.
+model: claude-sonnet-5-5
+effort: medium
 tools: Read, Glob, Grep, Bash
 ---
 

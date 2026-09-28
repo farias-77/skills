@@ -3,7 +3,7 @@
 The workstream's record is long: the review audits of three stages,
 the rulings, every entry's run in the execution, the audit, the
 release's trace and record, the notes. The session does not read it
-whole. One close-harvester (Sonnet 5, high) per source reads it and
+whole. One close-harvester (Sonnet 5.5, medium) per source reads it and
 returns what the retro needs, structured: the numbers, the precision
 per reviewer, every friction with its evidence.
 

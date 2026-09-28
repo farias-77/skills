@@ -33,7 +33,7 @@
 export const meta = {
   name: 'close-harvest',
   description: 'Stage 6 · one close-harvester per source of the record returns numbers, reviewer precision and every friction with evidence; decides nothing',
-  phases: [{ title: 'Harvest', detail: 'one harvester (Sonnet 5, high) per source, in parallel' }],
+  phases: [{ title: 'Harvest', detail: 'one harvester (Sonnet 5.5, medium) per source, in parallel' }],
 }
 
 const HARVESTER = 'close-harvester'
@@ -75,7 +75,7 @@ Return the structured result. Ids are ${s.key}-1, ${s.key}-2, … Miss nothing; 
 const valid = (v, key) => !!v && v.key === key && v.numbers && typeof v.numbers === 'object' && Array.isArray(v.frictions) && Array.isArray(v.lenses) && Array.isArray(v.unread)
 
 phase('Harvest')
-log(`${sources.length} sources · one ${HARVESTER} (Sonnet 5, high) each`)
+log(`${sources.length} sources · one ${HARVESTER} (Sonnet 5.5, medium) each`)
 
 const results = await parallel(sources.map(s => async () => {
   const dispatch = () => agent(inputs(s), { label: `${HARVESTER}·${s.key}`, phase: 'Harvest', agentType: HARVESTER, schema: HARVEST })

@@ -1,6 +1,6 @@
 ---
 name: stage-close
-description: Conducts stage 6 (Close) — the retro of one workstream, with nothing changed in the pipeline. The session (Opus 5.5, medium) harvests the whole record through one close-harvester (Sonnet 5, high) per source (the reviews and rulings of the document stages, the execution's board and runs, the release's trace, the notes), writes the workstream in numbers and the precision of every reviewer, cleans what the workstream left behind, and writes the retro — what worked, what went wrong, and what could change in the pipeline, each idea with its evidence and the file it would touch; the user reads it and adds his view, recorded verbatim; nothing is decided, no issue is opened, no pipeline file is edited. The retro is saved in a fixed shape (retro.md + retro.json) so the weekly-retro skill can gather every workstream of the week. Use when a workstream's .state.md says stage close, or to resume a close in progress.
+description: Conducts stage 6 (Close) — the retro of one workstream, with nothing changed in the pipeline. The session (Opus 5.5, medium) harvests the whole record through one close-harvester (Sonnet 5.5, medium) per source (the reviews and rulings of the document stages, the execution's board and runs, the release's trace, the notes), writes the workstream in numbers and the precision of every reviewer, cleans what the workstream left behind, and writes the retro — what worked, what went wrong, and what could change in the pipeline, each idea with its evidence and the file it would touch; the user reads it and adds his view, recorded verbatim; nothing is decided, no issue is opened, no pipeline file is edited. The retro is saved in a fixed shape (retro.md + retro.json) so the weekly-retro skill can gather every workstream of the week. Use when a workstream's .state.md says stage close, or to resume a close in progress.
 disable-model-invocation: false
 argument-hint: "<workstream-slug>"
 allowed-tools: Read, Write, Edit, Glob, Grep, Agent, Workflow, AskUserQuestion, Artifact, Bash
@@ -26,7 +26,7 @@ retro from what they brought and talks it through with the user.
 
 ```
 0. Open      .state.md says close and the release is closed
-1. Harvest   close-harvest workflow: one close-harvester (Sonnet 5, high) per source, in parallel
+1. Harvest   close-harvest workflow: one close-harvester (Sonnet 5.5, medium) per source, in parallel
              → 05-close/harvest/<source>.json: numbers, precision per reviewer, every friction with evidence
 2. Numbers   the workstream in numbers and the precision per stage and reviewer
 3. Sweep     worktrees, branches and stacks the workstream left behind; the state closed
@@ -45,7 +45,7 @@ rule: he reads, comments if he wants, and says it is closed.
 | Agent | Model, effort | Does |
 |---|---|---|
 | the session | Opus 5.5, medium | the numbers, the sweep, the retro, the talk |
-| `close-harvester` × 1 per source | Sonnet 5, high | reads one source of the record; returns numbers, precision and frictions with `file:line` and the quote; decides nothing |
+| `close-harvester` × 1 per source | Sonnet 5.5, medium | reads one source of the record; returns numbers, precision and frictions with `file:line` and the quote; decides nothing |
 
 ## Preconditions
 

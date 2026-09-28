@@ -194,7 +194,7 @@ the workstream is open, and calls him once at the end with everything
 in production.
 
 **6 · Close** — the retro of the workstream, with nothing changed in
-the pipeline. One harvester (Sonnet 5, high) per source of the record
+the pipeline. One harvester (Sonnet 5.5, medium) per source of the record
 returns the numbers, the precision of every reviewer and every
 friction with its evidence; the session (Opus 5.5, medium) sums the
 numbers, cleans what the workstream left behind, and writes the retro:
