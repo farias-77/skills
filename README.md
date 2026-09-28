@@ -90,7 +90,7 @@ on the system as it is out. The shape is the consuming project's
 doctrine; the design applies it and never reopens it. **Recon first**:
 scouts (Sonnet 5.5, low) read the system as it is today (feature maps,
 docs, the modules the stories touch) and a **deep-research workflow
-per external tool** (Sonnet 5, high: planner, blind searchers,
+per external tool** (Sonnet 5.5, medium: planner, blind searchers,
 synthesizer, critic, citer) reads its documentation into a sourced
 file. Then the conductor (Opus 5.5, high) asks whether the human
 already has a shape in mind: if he does, he talks first and the
@@ -104,13 +104,13 @@ exists, a new piece in its owning module when it is new, fix instead
 of a parallel path, never a workaround or a temporary step unless the
 human asks for it, never speculation. They iterate to a final version,
 one card per real fork, `notes.md` holding one version of every
-decision. **Ten writers (Sonnet 5, high) write the ten documents in
+decision. **Ten writers (Sonnet 5.5, high) write the ten documents in
 parallel** from the same notes and research, deciding nothing (a gap
 is a question back), each also writing its blueprint JSON, and round 1
-runs at once: ten lenses (Opus 5.5, medium) — data, code (which blocks
+runs at once: ten lenses (Opus 5.5 or Sonnet 5.5, medium) — data, code (which blocks
 every workaround), infra, security, contracts, alarms, coverage,
 facts, UI and consistency — beside, per flow, two **blind readers**
-(Haiku 4.5, high) and a referee (Sonnet 5, low) reporting where they
+(Sonnet 5.5, low) and a referee (Sonnet 5.5, low) reporting where they
 would build different things. **The conductor judges** every finding
 by the design razor with a closed list of classes never dismissed;
 wording goes to the writer without a question, decisions go to the

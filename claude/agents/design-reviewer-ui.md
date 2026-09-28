@@ -1,7 +1,7 @@
 ---
 name: design-reviewer-ui
-description: The UI reviewer of the stage-2 design review round — the artboards fit the product as it is today and cover every story state. Dispatched by the design-review workflow. Opus 5.5, medium.
-model: claude-opus-5-5
+description: The UI reviewer of the stage-2 design review round — the artboards fit the product as it is today and cover every story state. Dispatched by the design-review workflow. Sonnet 5.5, medium.
+model: claude-sonnet-5-5
 effort: medium
 tools: Read, Glob, Grep
 ---

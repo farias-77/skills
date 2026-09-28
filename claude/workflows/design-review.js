@@ -10,10 +10,10 @@
  * its surroundings; the blind readers reopen only the flows whose text
  * changed. Three rounds at most; the conductor enforces the count.
  *
- * THE BLIND READS are per flow of architecture.md: two Haiku readers
- * (4.5, high) build one flow each, alone, in the documents' language,
+ * THE BLIND READS are per flow of architecture.md: two Sonnet readers
+ * (5.5, low) build one flow each, alone, in the documents' language,
  * one build per key (`flow`, `step:<n>` per numbered step,
- * `failure:<n>` per failure-table row). A Sonnet referee (5, low)
+ * `failure:<n>` per failure-table row). A Sonnet referee (5.5, low)
  * compares the two readings key by key; only a `different-product`
  * verdict becomes a finding. A reading that misses a key, or
  * is written in another language is invalid and re-dispatched once; a
@@ -62,10 +62,10 @@
 
 export const meta = {
   name: 'design-review',
-  description: 'Stage-2 review round: ten Opus lenses in parallel with two Haiku blind readers and a Sonnet referee per flow; whole in round 1, delta only after; no judge agent — the conductor judges',
+  description: 'Stage-2 review round: ten lenses (five Opus, five Sonnet) in parallel with two Sonnet blind readers and a Sonnet referee per flow; whole in round 1, delta only after; no judge agent — the conductor judges',
   phases: [
     { title: 'Lenses', detail: 'the ten lenses in parallel, each reads everything (or the delta), reports its lens', model: 'opus' },
-    { title: 'Blind reads', detail: 'per flow: two Haiku readers build it alone, a Sonnet referee compares them key by key' },
+    { title: 'Blind reads', detail: 'per flow: two Sonnet readers build it alone, a Sonnet referee compares them key by key' },
   ],
 }
 

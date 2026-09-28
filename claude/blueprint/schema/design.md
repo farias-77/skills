@@ -2,7 +2,7 @@
 
 Stage 2 writes one JSON per document under `<workstream>/blueprint/design/`
 (the same name as the document), by that document's `design-writer`
-(Sonnet 5, high), in the same pass as the document; the conductor
+(Sonnet 5.5, high), in the same pass as the document; the conductor
 writes `decisions.json`, `design-report.json` and `design-review.json`
 at the close. `node claude/blueprint/build.mjs <workstream>` validates
 them, embeds the `.md` documents and the artboards whole, and assembles

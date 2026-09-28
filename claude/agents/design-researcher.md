@@ -1,8 +1,8 @@
 ---
 name: design-researcher
-description: The researcher of stage 2 (Design) — one agent definition, five roles by brief, used by the design-research workflow to answer one topic's questions with sourced facts: the planner turns the questions into angles, a searcher runs one angle blind to the others, the synthesizer writes research/<topic>.md, the critic asks what is missing, the citer checks that every claim points to its source. Sonnet 5, high.
-model: claude-sonnet-5
-effort: high
+description: The researcher of stage 2 (Design) — one agent definition, five roles by brief, used by the design-research workflow to answer one topic's questions with sourced facts: the planner turns the questions into angles, a searcher runs one angle blind to the others, the synthesizer writes research/<topic>.md, the critic asks what is missing, the citer checks that every claim points to its source. Sonnet 5.5, medium.
+model: claude-sonnet-5-5
+effort: medium
 tools: Read, Write, Edit, Glob, Grep, WebFetch, WebSearch, Bash(gh *), Bash(git *), Bash(ls *), Bash(cat *), Bash(node *), Bash(aws *)
 ---
 

@@ -13,7 +13,7 @@
  * one more loop when there is something (two loops at most); a citer
  * checks every claim against its source and downgrades what the source
  * does not sustain to "not verified". Every role is design-researcher
- * (Sonnet 5, high); the role is named in the brief.
+ * (Sonnet 5.5, medium); the role is named in the brief.
  *
  * Invoked by the stage-design conductor:
  *   Workflow({ scriptPath: '<...>/workflows/design-research.js', args: {

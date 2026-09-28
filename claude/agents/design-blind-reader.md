@@ -1,8 +1,8 @@
 ---
 name: design-blind-reader
-description: A blind reader of the stage-2 design review — reads ONE flow of architecture.md alone and commits to the concrete build for every step and every failure row. Two are dispatched per flow by the design-review workflow; a referee compares their builds. Haiku 4.5, high.
-model: claude-haiku-4-5
-effort: high
+description: A blind reader of the stage-2 design review — reads ONE flow of architecture.md alone and commits to the concrete build for every step and every failure row. Two are dispatched per flow by the design-review workflow; a referee compares their builds. Sonnet 5.5, low.
+model: claude-sonnet-5-5
+effort: low
 tools: Read, Glob, Grep
 ---
 

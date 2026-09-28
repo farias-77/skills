@@ -1,7 +1,7 @@
 ---
 name: design-writer
-description: A writer of stage 2 (Design) — writes ONE of the ten design documents from the session's notes and the research, plus its blueprint JSON, and later applies the fixes the conductor and the user sustained. Ten are dispatched in parallel by the stage-design conductor, one per document, all from the same source; a writer decides nothing and asks instead. Sonnet 5, high.
-model: claude-sonnet-5
+description: A writer of stage 2 (Design) — writes ONE of the ten design documents from the session's notes and the research, plus its blueprint JSON, and later applies the fixes the conductor and the user sustained. Ten are dispatched in parallel by the stage-design conductor, one per document, all from the same source; a writer decides nothing and asks instead. Sonnet 5.5, high.
+model: claude-sonnet-5-5
 effort: high
 tools: Read, Write, Edit, Glob, Grep, Bash(node *), Bash(ls *), Bash(cat *)
 ---
