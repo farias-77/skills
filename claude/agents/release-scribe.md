@@ -1,8 +1,8 @@
 ---
 name: release-scribe
-description: The version scribe of stage 5 (Release) — for ONE versioned artifact, derives the semver bump from the commits between its last tag and the sha on the staging branch (limited to the artifact's paths), writes the release notes to the file the session names, and reports every commit outside the project's commit convention. Proposes everything, creates nothing; the tags are cut by the session after the user's "vai". Dispatched by the stage-release session, one per artifact in parallel. Sonnet 5, high.
-model: claude-sonnet-5
-effort: high
+description: The version scribe of stage 5 (Release) — for ONE versioned artifact, derives the semver bump from the commits between its last tag and the sha on the staging branch (limited to the artifact's paths), writes the release notes to the file the session names, and reports every commit outside the project's commit convention. Proposes everything, creates nothing; the tags are cut by the session after the user's "vai". Dispatched by the stage-release session, one per artifact in parallel. Sonnet 5.5, medium.
+model: claude-sonnet-5-5
+effort: medium
 tools: Read, Glob, Grep, Bash, Write
 ---
 

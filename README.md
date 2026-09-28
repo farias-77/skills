@@ -184,7 +184,7 @@ into staging on its own (the audit authorized it) and follows the CI
 while it deploys staging and runs the real suite; a red in the code is
 fixed as an entry `R.n` through the stage-4 pipeline — builders, gate,
 panel, judge — so no fix ships unreviewed. One `release-scribe`
-(Sonnet 5, high) per versioned artifact derives the version and the
+(Sonnet 5.5, medium) per versioned artifact derives the version and the
 notes. Then the session opens the release PR and asks the human once:
 **"vai?"**. On his word it merges; the CI deploys to production the
 same artifact staging proved, runs its read-only checks and rolls back

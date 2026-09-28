@@ -1,6 +1,6 @@
 ---
 name: stage-release
-description: Conducts stage 5 (Release) — takes the audited feature branch to production through the project's own delivery pipeline, with one question to the user. The session (Opus 5.5, medium) writes the release plan from the audit and the doctrine's delivery standard; merges the feature branch into staging on its own; follows the CI while it deploys staging and runs the real suite; a red is fixed as an entry R.n through the stage-4 pipeline (builders, gate, panel, judge) and staging runs again; the versions and notes come from one release-scribe (Sonnet 5, high) per versioned artifact; then the session opens the release PR and asks the user once, "vai?"; on his word it merges, follows production through the CI (same artifact, read-only checks, the doctrine's automatic rollback), reads every proof the audit deferred at its hour, and calls him once at the end with everything in prod. Also runs a hotfix the same way while the workstream is not closed. Use when a workstream's .state.md says stage release, to resume a release in progress, or with `hotfix` for a regression found in production.
+description: Conducts stage 5 (Release) — takes the audited feature branch to production through the project's own delivery pipeline, with one question to the user. The session (Opus 5.5, medium) writes the release plan from the audit and the doctrine's delivery standard; merges the feature branch into staging on its own; follows the CI while it deploys staging and runs the real suite; a red is fixed as an entry R.n through the stage-4 pipeline (builders, gate, panel, judge) and staging runs again; the versions and notes come from one release-scribe (Sonnet 5.5, medium) per versioned artifact; then the session opens the release PR and asks the user once, "vai?"; on his word it merges, follows production through the CI (same artifact, read-only checks, the doctrine's automatic rollback), reads every proof the audit deferred at its hour, and calls him once at the end with everything in prod. Also runs a hotfix the same way while the workstream is not closed. Use when a workstream's .state.md says stage release, to resume a release in progress, or with `hotfix` for a regression found in production.
 disable-model-invocation: false
 argument-hint: "<workstream-slug> [hotfix]"
 allowed-tools: Read, Write, Edit, Glob, Grep, Agent, Workflow, AskUserQuestion, Artifact, PushNotification, ScheduleWakeup, Bash
@@ -43,7 +43,7 @@ waits for; never a loop that checks early.
 1. Staging    PR feat/<ws> → staging branch, CI green → merge (the session's) → the CI deploys and runs
               the staging suite → the session follows it
               red → entry R.n through exec-entry → merge into feat/<ws> → staging again · third red stops
-2. Version    one release-scribe (Sonnet 5, high) per versioned artifact, dispatched in parallel
+2. Version    one release-scribe (Sonnet 5.5, medium) per versioned artifact, dispatched in parallel
 3. The ask    the release PR staging → main (notes, versions, the production diff, the watch)
               → ONE question to the user: "vai?"
 4. Production merge → the CI deploys the same artifact → the doctrine's read-only checks → the session follows
@@ -102,7 +102,7 @@ release and calls the user with the three traces.
 
 ## Step 2 — the versions
 
-Dispatch one `release-scribe` (Sonnet 5, high) per versioned artifact
+Dispatch one `release-scribe` (Sonnet 5.5, medium) per versioned artifact
 the doctrine names (one repo, or several deployables in one repo), all
 in one message, each with: the artifact's name, repo, paths and tag
 prefix; its sha on the staging branch; the plan's path; the doctrine
