@@ -34,7 +34,7 @@ enough to change, and what he already said about it.
   "worked": [ { "what": "the foundation removed every merge conflict between entries", "evidence": "board.md: 0 conflicts in 5 rebases" } ],
   "wrong": [
     { "id": "W-1", "stage": "execute", "what": "the visual lens compared screenshots taken before the data loaded",
-      "where": "03-execution/entries/E-03/run.json:212", "quote": "…", "cost": "one round on two entries" }
+      "where": "03-execution/entries/E-03/run-1.json:212", "quote": "…", "cost": "one round on two entries" }
   ],
   "ideas": [
     { "id": "I-1", "stage": "execute", "lands": "pipeline", "target": "claude/agents/builder-frontend.md",

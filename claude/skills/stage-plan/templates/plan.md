@@ -12,7 +12,12 @@
   (back, front, tests) in its own worktree; an EDGE exists only when an
   entry's proof needs another entry's behavior — data is seeded by the
   factories, never an edge. Everything with no edge is built at once,
-  up to the cap.
+  up to the cap. An edge held by one journey only is "stacked": the
+  entry starts on the other's branch when that one is ready.
+
+  Size is relative (S · M · L); the critical path is the longest chain
+  of sizes from the foundation to the last merge. The cap is the
+  measured one in recon/machine.md.
 
   Decision blocks (house format) where the user chose between two
   cuts; the conductor's recommendation kept beside the choice.
@@ -36,14 +41,15 @@
 | factory | <one per entity the proofs seed> |
 
 **Proof:** run `<the gate command>` → expect `<exit 0; the new routes answer 501>`
+**Serves every entry:** <per entry: the fields its screen shows are in the contract · its responses assemble from the foundation's reads · its config and secrets are in the config and the test environment · each state-spending journey has its own target per project and width · its routes' time budget under the write timeout>
 **Brief:** `02-plan/briefs/F.md`
 
 ## The entries
 
-| Id | Name | Stories | Builds (back · front) | After | Proof | Touches |
-|---|---|---|---|---|---|---|
-| E-01 | <name> | S-001 | <use case, route> · <screen> | — | run `<command or spec>` → expect `<cases named>` | <module, screen> |
-| E-05 | <name> | S-005 | <…> · — | E-04 (its test clicks <the button E-04 builds>) | <…> | <…> |
+| Id | Name | Stories | Builds (back · front) | Size | After | Proof | Touches | Feature map |
+|---|---|---|---|---|---|---|---|---|
+| E-01 | <name> | S-001 | <use case, route> · <screen> | M | — | run `<command or spec>` → expect `<cases named>` | <module, screen> | back |
+| E-05 | <name> | S-005 | <…> · — | S | E-04 (its test clicks <the button E-04 builds>) · stacked when one journey only | <…> | <…> | back |
 
 ## The graph
 
@@ -54,13 +60,20 @@ flowchart LR
   E04 --> E05[E-05 · name]
 ```
 
-**Steps:** <foundation, then N entries at once, then …> · **Concurrency cap:** <n> (<cores / memory measured>)
+**Critical path:** <F → E-nn → … → the last merge, with the sizes>
+**Steps:** <foundation, then N entries at once, then …> · **Concurrency cap:** <n> (measured in `recon/machine.md`)
 
 ## Pre-flight
 
 | Item | Entry | Status |
 |---|---|---|
 | <what the user hands over, and where it lives> | <E-nn or F> | handed · missing |
+
+Open decisions of doctrine or test, decided before stage 4:
+
+| Decision | The options | Entries it touches | Decided |
+|---|---|---|---|
+| <a rule the entries lean on that the doctrine leaves open> | <A · B> | <E-nn> | <the choice, his words> |
 
 ## Decisions
 

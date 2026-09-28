@@ -1,9 +1,9 @@
 ---
 name: stage-plan
-description: Conducts stage 3 (Plan) — takes an approved design and cuts, with the user, how the whole demand gets built as fast as the machine allows. One scout (Haiku 4.5, max) per area of the codebase the design touches writes what exists today; the conductor (Opus 5.5, medium) arrives with the cut: the foundation (every migration, the whole contract with its generated code, the modules registered, the shared pieces and factories, laid down once so no entry ever touches a shared file) and the graph of entries (a story or a small group, built vertically, back and front; an edge only where an entry's proof needs another entry's behavior), each proved by commands; the user shapes and approves it; then one writer (Sonnet 5, high) per entry writes the brief its builder will receive, deciding nothing; a review round of three lenses (Sonnet 5, high), two blind readers (Haiku 4.5, high) and a referee (Sonnet 5, low) per brief, judged by the conductor; round 2 automatic over the delta, a third only on the user's word; the blueprint's Plan tab read by the user at the close, the pre-flight handed over. Runs in Claude Code with an Opus 5.5 session at medium effort. Use after a design is approved, or to resume a plan in progress.
+description: Conducts stage 3 (Plan) — takes an approved design and cuts, with the user, how the whole demand gets built as fast as the machine allows. One scout (Haiku 4.5, max) per area of the codebase the design touches writes what exists today, and one measures how many stacks the machine holds; the conductor (Opus 5.5, medium) arrives with the cut: the foundation (every migration, the whole contract with its generated code, the modules registered, the shared pieces and factories, laid down once so no entry ever touches a shared file) and the graph of entries (a story or a small group, built vertically, back and front; an edge only where an entry's proof needs another entry's behavior), each proved by commands, sized, the critical path marked; the user shapes and approves it and decides every open rule of doctrine or test; then one writer (Sonnet 5, high) per entry writes the brief its builder will receive, deciding nothing; a review round of three lenses (Sonnet 5, high), two blind readers (Haiku 4.5, high) and a referee (Sonnet 5, low) per brief, judged by the conductor; round 2 automatic over the delta, a third only on the user's word; the blueprint's Plan tab read by the user at the close, the pre-flight handed over. Runs in Claude Code with an Opus 5.5 session at medium effort. Use after a design is approved, or to resume a plan in progress.
 disable-model-invocation: false
 argument-hint: "<workstream-slug>"
-allowed-tools: Read, Write, Edit, Glob, Grep, Agent, SendMessage, Workflow, AskUserQuestion, Artifact, Bash(mkdir *), Bash(date *), Bash(ls *), Bash(cat *), Bash(git status *), Bash(git diff *), Bash(git add *), Bash(git commit *), Bash(nproc), Bash(free *), Bash(node *)
+allowed-tools: Read, Write, Edit, Glob, Grep, Agent, SendMessage, Workflow, AskUserQuestion, Artifact, Bash(mkdir *), Bash(date *), Bash(ls *), Bash(cat *), Bash(git status *), Bash(git diff *), Bash(git add *), Bash(git commit *), Bash(node *)
 ---
 
 # Stage 3: Plan
@@ -22,7 +22,7 @@ Three words:
 |---|---|---|
 | **foundation** | everything the entries would otherwise fight over, laid down once: every migration of the demand (expansion only), the whole API contract and its generated code, the new modules registered, the shared pieces the design names, the factories the proofs seed with. One entry, built and merged first | built alone, before any entry |
 | **entry** | one story, or a small group of stories that share a screen or a flow and only prove together. Built **vertically**: back and front and tests, in its own worktree with its own stack. Proved by commands: `run` / `expect`, or a screen and its artboard (`see` / `where`) | one builder, one branch, one merge |
-| **edge** | entry B waits for entry A only when B's **proof** needs A's behavior (a button A builds, a state A's action produces). Data is not an edge: the foundation's factories seed it. Everything with no edge runs at once, up to the concurrency cap | the session starts an entry the moment its edges are merged |
+| **edge** | entry B waits for entry A only when B's **proof** needs A's behavior (a button A builds, a state A's action produces). Data is not an edge: the foundation's factories seed it. Everything with no edge runs at once, up to the concurrency cap | the session starts an entry the moment its edges are merged, or `ready` and not yet merged (the entry stacks on that branch) |
 
 The foundation is what makes the fan-out possible. After it, no entry
 edits a migration, the contract, the generated code or the module
@@ -66,10 +66,12 @@ end a turn on a plan or a promise; do the work.
 0. Open     Opus 5.5, effort medium; read the design whole and the discovery's stories
 1. Recon    one plan-scout (Haiku 4.5, max) per area of the codebase the design touches, in
             parallel → 02-plan/recon/<area>.md: what exists today (modules, routes, tables, screens,
-            factories, the commands and the suites with their size)
-2. The cut  SESSION. from A to B in one line; the foundation; the entries and their edges, drawn
-            as a graph; the concurrency cap; the pre-flight; approval through the question tool;
-            adjustments in a visible list, applied on "apply" → 02-plan/plan.md
+            factories, the commands and the suites with their size); one more for the machine →
+            recon/machine.md: how many stacks it holds at once under the screen suite
+2. The cut  SESSION. from A to B in one line; the foundation, checked against every entry; the
+            entries with their size and their edges, drawn as a graph with the critical path; the
+            measured cap; the pre-flight with every open decision; approval through the question
+            tool; adjustments in a visible list, applied on "apply" → 02-plan/plan.md
 3. Write    one plan-writer (Sonnet 5, high) per entry and one for the foundation, in parallel,
             same source (plan.md + the design + recon + the template): the brief its builder
             receives, every proof as run/expect, plus blueprint/plan/briefs/<id>.json; zero
@@ -95,7 +97,7 @@ not answering.
 | Agent | Model, effort | Does |
 |---|---|---|
 | the conductor | Opus 5.5, medium | the cut, the answers to the writers, the judging, the close |
-| `plan-scout` × 1 per area | Haiku 4.5, max | reads one area of the codebase and its docs, writes `recon/<area>.md`: facts and where they are |
+| `plan-scout` × 1 per area, + 1 for the machine | Haiku 4.5, max | reads one area of the codebase and its docs, writes `recon/<area>.md`: facts and where they are; the machine's scout measures the stacks it holds under the screen suite, writes `recon/machine.md` |
 | `plan-writer` × 1 per entry, + 1 for the foundation | Sonnet 5, high | one brief each, in parallel, from the same source; asks, never decides |
 | `plan-reviewer-{coverage, verifiability, order}` | Sonnet 5, high | three lenses, each reads everything |
 | `plan-blind-reader` × 2 per brief | Haiku 4.5, high | builds and proves one brief alone, reading only that file, in the brief's language |
@@ -145,12 +147,16 @@ tables, screens and jobs that exist, the factories and fixtures, the
 commands the doctrine names for the gate, the fast check and the
 focused tests, the suites with their
 size and duration when the docs say, and what the design names that
-does not exist yet. Facts only, each with where it was read.
+does not exist yet. Facts only, each with where it was read. In the
+same message, one more `plan-scout` with the area `machine`: it brings
+up 1, 2, 3… isolated stacks, runs the screen suite in all of them at
+once, reads the load, and writes `02-plan/recon/machine.md` with the
+measured cap (the most stacks at once before the median load passes
+1.5 × the cores or a green spec turns red).
 
 Read every file when the scouts return. This is A: where the demand
-starts from. Measure the machine too (`nproc`, `free -g`): the
-concurrency cap is how many isolated stacks it holds at once, with
-room for the session itself.
+starts from. The concurrency cap is the measured cap of
+`machine.md`, never a count of cores or memory.
 
 ## Step 2 — the cut
 
@@ -160,10 +166,10 @@ approves it. The order of the conversation:
 | Move | You bring | The user |
 |---|---|---|
 | A → B | one line: where the codebase is (from recon), where the design ends | confirms |
-| the foundation | the list: migrations, contract routes, modules, shared pieces, factories; its proof | adds, cuts |
-| the entries | a table: entry · stories · what it builds back and front · how it is proved | splits, groups, cuts |
-| the graph | the edges, each with the behavior the proof needs; the graph drawn; the steps it takes | contests an edge |
-| the cap and the pre-flight | how many entries at once, from the machine; what the entries need from him | confirms, hands over |
+| the foundation | the list: migrations, contract routes, modules, shared pieces, factories; its proof; the walk of every entry against it | adds, cuts |
+| the entries | a table: entry · stories · what it builds back and front · its size · how it is proved | splits, groups, cuts |
+| the graph | the edges, each with the behavior the proof needs; the graph drawn with the critical path; the steps it takes | contests an edge |
+| the cap and the pre-flight | how many entries at once, from `recon/machine.md`; what the entries need from him; every open decision of doctrine or test | confirms, decides, hands over |
 
 **How the foundation is found.** Everything two entries would both
 edit: every new or changed table and column of `data-model.md` as
@@ -175,20 +181,47 @@ names (a component two screens use, a helper two use cases use); one
 factory per entity the proofs seed. Nothing behavioral: no use case,
 no screen. Its proof is the whole gate green on an empty implementation.
 
+**The foundation serves every entry.** Before proposing it, walk each
+entry against it: (a) every field the entry's screen shows is in the
+response of its route in the contract; (b) every route response the
+entry implements can be assembled from the reads the foundation's
+modules expose; (c) every config value and secret the entry reads is
+in the foundation's config and in the test environment; (d) every
+journey that spends or changes state has its own target (an actor, a
+record) per project and width of the screen test runner, reset
+whenever the environment is brought up; (e) every route has a time
+budget, with the terms each entry adds, below the server's write
+timeout with room. What the walk finds missing goes into the
+foundation now; at stage 4 it would be an amendment that stops the
+entry that needs it.
+
 **How the entries are found.** One entry per story. Group two or
 three stories into one entry only when they share a screen or a flow
 and neither proves alone. An entry is vertical: the use case, the
 route implementation, the screen, the tests. An entry with more than
 about eight acceptance criteria splits into thinner vertical slices,
 each still end to end. Every entry names what it builds, the design
-sections it follows, the ACs it carries and what it touches.
+sections it follows, the ACs it carries and what it touches, and the
+one side that updates the feature map for it: the back when the entry
+has one, the front otherwise; the other side never edits it.
 
 **How the edges are found.** Ask, for each entry: does its proof need
 another entry's **behavior**? A test that needs a customer in the
 database seeds one with a factory: no edge. A test that clicks "mark
 ready" needs the entry that builds that button: an edge. An edge is
 written with the behavior consumed. Fewer edges is faster; an edge
-the proof does not need is a queue for nothing.
+the proof does not need is a queue for nothing. An edge held by one
+journey only does not hold its entry: the journey moves to the entry
+that merges last and the edge is dropped, or the edge is marked
+**stacked** — the entry starts on the other entry's branch the moment
+that one is `ready`, never waiting for its merge (stage 4 starts every
+entry that way once its `after` entries are `ready`).
+
+**Size and the critical path.** Every entry gets a relative size
+(S · M · L) by what it builds: screens, journeys, rules, the heavy
+pieces the design names. The longest chain of sizes from the
+foundation to the last merge is the critical path, marked in the
+graph; stage 4 starts and merges it first.
 
 **Ask for the approval through the question tool.** The foundation
 and the graph in one question each, "Approve" first; where the cut has
@@ -202,7 +235,7 @@ recorded as cards with the recommendation beside the choice. A fork
 where he chose against the recommendation goes to `taste-notes.md` on
 the spot, as the pattern.
 
-Four rules inside the proposal:
+Five rules inside the proposal:
 
 - **Every proof is a command or a screen, on the local stack.** `run`
   is a command the doctrine names or a test spec the worktree runs (or that the
@@ -224,6 +257,13 @@ Four rules inside the proposal:
   is listed as the pre-flight and handed over at the close. An entry
   with a pre-flight item is marked; stage 4 parks it if the item is
   missing and finishes everything else.
+- **The ruler is closed before stage 4.** Every rule of doctrine or of
+  test the entries lean on and the doctrine leaves open (the themes and
+  widths the screen proofs run at, the panel's size, a test
+  convention, a pattern the design assumes and the doctrine does not
+  write) is listed in the pre-flight as a decision, and the user
+  decides it at the close. A rule decided mid-execution is re-work on
+  every entry in flight.
 
 > **Example of a graph question** — header `graph`, question: "After
 > the foundation: E-01 clients, E-02 menu, E-03 place an order and
@@ -269,7 +309,7 @@ open only their brief.
 |---|---|
 | `plan-reviewer-coverage` (Sonnet 5, high) | every story AC and every acceptance case lands in exactly one entry; every table, route, module and factory the design names is in the foundation; every screen has its entry; nothing is built that nothing forces |
 | `plan-reviewer-verifiability` (Sonnet 5, high) | every `run` is a command the doctrine names or a spec that exists or that the entry creates, and every `expect` is what it prints; every `see` names its journey and artboard; bad paths included; nothing needs a deployed environment or a person |
-| `plan-reviewer-order` (Sonnet 5, high) | every edge is a behavior the proof needs, every such need has its edge, the graph has no cycle; after the foundation no entry touches a shared file; entries that run at once do not collide on the same file; the foundation is complete |
+| `plan-reviewer-order` (Sonnet 5, high) | every edge is a behavior the proof needs, every such need has its edge, an edge held by one journey is stacked or moved, the graph has no cycle; after the foundation no entry touches a shared file; entries that run at once do not collide on the same file; the foundation is complete and serves every entry; the cap is the measured one |
 | 2 × `plan-blind-reader` (Haiku 4.5, high) → `plan-reviewer-ambiguity` (Sonnet 5, low), per brief | would two builders build the same entry from this brief alone, and call it done on the same command and output? |
 
 Every reviewer answers under the house reviewer contract
@@ -328,7 +368,7 @@ publish `blueprint.html`. The build refuses with the field named: an
 entry with no proof, an edge to nothing, a cycle, a story no entry
 carries, a brief missing, a text over its word cap.
 
-Present: the blueprint URL, the graph, the entry table, the round
+Present: the blueprint URL, the graph with the critical path, the entry table, the round
 table, the decisions you took in his place (the writers' questions you
 answered, the user-owned findings you ruled), one line each, the
 residue, the taste notes added, the stage's telemetry (agents,
@@ -338,8 +378,9 @@ He sends adjustments as they come; you note each in a visible list and
 dispatch nothing until he says "apply"; then one batch per writer (a
 change to `plan.md` is yours, dated under "Amendments"), verify on
 disk, rebuild, republish, and ask again. The pre-flight is handed over
-here: every item checked, or the entry it blocks marked in `plan.md`
-so stage 4 parks it. Approval is explicit; silence does not close the
+here: every item checked and every open decision decided (through the
+question tool, recorded in `plan.md` and `rulings.md`), or the entry
+it blocks marked in `plan.md` so stage 4 parks it. Approval is explicit; silence does not close the
 stage. On approval, and only after he says there is nothing else:
 `.state.md` to `stage: execute`, the close commit of the workstream
 folder (push only with his explicit approval), and suggest `/clear`

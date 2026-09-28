@@ -63,7 +63,7 @@ designs-root/<workstream>/04-release/
 ├── plan.md        # the plan: what the session will do, in order
 ├── trace.md       # one line per step as it ends, `date -u`
 ├── notes/         # the release notes, one file per versioned artifact (the scribes)
-├── entries/R.<n>/ # the fix entries' run.json and evidence
+├── entries/R.<n>/ # the fix entries' run-*.json and evidence
 └── proof/         # the CI summaries, the checks' output, the watch readings
 ```
 

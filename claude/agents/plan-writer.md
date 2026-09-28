@@ -64,7 +64,10 @@ writing a line. Then fill the template:
    of which design section; which files and folders the entry touches.
    The entry never touches a shared file (migrations, the API contract,
    generated code, the module registry) — only the foundation does.
-4. **Fill the closing sections.** "Out of this brief" from the other
+4. **Name the feature map's owner.** In "Before you start", the side
+   `plan.md` gives the feature map for this entry and the feature
+   map's path from the recon; the other side does not edit it.
+5. **Fill the closing sections.** "Out of this brief" from the other
    entries that look like this one's; "The builder decides" from the
    design's latitude sections, only the lines that apply here;
    "Pre-flight" from `plan.md`, with where each item lives;

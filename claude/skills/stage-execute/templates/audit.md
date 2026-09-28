@@ -2,7 +2,7 @@
 
 <!--
   Consolidated by the SESSION from board.md, parked.md, the entries'
-  run.json and the code, BEFORE the user is asked anything. The user
+  run-<n>.json and the code, BEFORE the user is asked anything. The user
   rules item by item; his ruling and words are written next to each
   item and in rulings.md.
 -->
@@ -24,6 +24,10 @@
 - **Recommendation:** <one sentence>
 - **Ruling:** — · **Words:** —
 
+## Decided in his place
+
+- <entry> · <the question> — <the option taken, the one left> · judge (`decided`) | session (`to: 'session'`) · **Ruling:** — · **Words:** —
+
 ## Choices where the documents were silent
 
 ### C.1 — <entry> · <title>
@@ -44,3 +48,17 @@
 | Reviewer | Found | Sustained | Deferred | Latitude | Dismissed | User |
 |---|---|---|---|---|---|---|
 | exec-lens-fidelity | | | | | | |
+
+**Deferred:** <n> done · <n> skipped (the reasons in `deferred.md`)
+
+## The QA's numbers
+
+| Category | Tried in | Cases | Not tried (why) |
+|---|---|---|---|
+| <category of the checklist> | <entries> | | |
+
+| QA | Unsettled | Sustained from unsettled | Exclusive sustained | Minutes | Exclusive per minute |
+|---|---|---|---|---|---|
+| exec-qa-backend | | | | | |
+
+**Escapes so far:** <a defect found after its entry merged that a checklist category covered — where, which category; "none">

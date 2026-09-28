@@ -34,7 +34,7 @@ there, what broke on the way and what still waits for someone.
     { "n": 2, "at": "2026-10-03 16:02", "pr": 43, "run": "123456901", "ok": true,
       "summary": "suite 213 passed", "cause": null, "fix": null, "proof": "proof/staging-2.txt" }
   ],
-  "fixes": [ { "id": "R.1", "kind": "staging", "what": "the ready e-mail job retried on an unknown result", "rounds": 2, "sha": "7c6b5a4", "run": "04-release/entries/R.1/run.json" } ],
+  "fixes": [ { "id": "R.1", "kind": "staging", "what": "the ready e-mail job retried on an unknown result", "rounds": 2, "sha": "7c6b5a4", "run": "04-release/entries/R.1/run-1.json" } ],
   "versions": [ { "artifact": "api", "from": "v1.4.0", "to": "v1.5.0", "bump": "minor", "commits": 23, "unparsed": 0, "notes": "04-release/notes/api.md" } ],
   "ask": { "at": "2026-10-03 16:20", "pr": 44, "words": "vai", "answer": "go" },
   "production": [

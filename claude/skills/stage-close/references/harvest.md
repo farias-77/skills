@@ -12,7 +12,7 @@ per reviewer, every friction with its evidence.
 | Source key | Paths passed | What comes back |
 |---|---|---|
 | `documents` | `00-discovery/reviews.md`, `01-design/reviews.md`, `02-plan/reviews.md`, `rulings.md` | rounds per stage; findings per stage and reviewer; the user's rulings and the patterns in them (a lens he keeps dismissing, a class he keeps overruling, a card chosen against the recommendation); every friction the audits record |
-| `execution` | `03-execution/board.md`, `parked.md`, `audit.md`, `entries/` (every `run.json`), `blueprint/execution/execution.json` | entries, amendments, rounds per entry, findings and precision per reviewer, parked entries and why, the choices where the documents were silent, the audit's items and rulings; every friction the runs and the board show |
+| `execution` | `03-execution/board.md`, `parked.md`, `audit.md`, `entries/` (every `run-*.json`), `blueprint/execution/execution.json` | entries, amendments, rounds per entry, findings and precision per reviewer, parked entries and why, the choices where the documents were silent, the audit's items and rulings; every friction the runs and the board show |
 | `release` | `04-release/plan.md`, `trace.md`, `entries/`, `blueprint/release/release.json` | staging runs and reds, fixes, rollbacks, hotfixes, watch read and owned; every friction the trace notes |
 | `notes` | `dreaming-notes.md`, `taste-notes.md` | every note as a friction, the `[user]` ones marked; every taste note marked `taste` |
 

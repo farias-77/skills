@@ -34,6 +34,8 @@ prompts are illustrations, never the rule.
 | **the fast check** | the loop while coding: lint and the tests of what was touched |
 | **stack up / env / down** | an isolated local stack for this worktree: bring it up, print its URLs and test actors, remove only it |
 | **focused tests** | the tests of one module or one spec, with their arguments |
+| **affected tests** | the tests of every module and screen a diff touched, and of what depends on them, chosen from the diff against a base; prints what it chose and why. The builder's loop and the gate of each review round; without it, the round runs the whole gate |
+| **evidence** | writes the entry's verification record for the head it runs on |
 
 ## The layout the stages rely on
 

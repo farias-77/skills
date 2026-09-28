@@ -67,8 +67,9 @@ The record (`03-execution/`) is named as the authority, never copied.
   names its audit item in `parked`.
 - `sha` is present on every entry and amendment, `null` until merged.
 - `amendments[].id` is `F.<n>`; `for` names the entry that needed it.
-- `precision[].lens` is one of the seven lenses or the two QA
-  (`exec-lens-*`, `exec-qa-*`).
+- `precision[].lens` is one of the panel's lenses or QA
+  (`exec-lens-*`, `exec-qa-*`: the QA are backend, frontend, abuse and
+  replay).
 - `audit.*[].ruling` and `words` are `null` until the user rules;
   `recommendation` is `keep` or `fix` for a choice, one sentence for a
   parked item. A choice's ruling is `keep`, `fix` or `revert`; a

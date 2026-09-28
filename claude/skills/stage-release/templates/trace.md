@@ -11,7 +11,7 @@
 - <date> · plan · `04-release/plan.md` written: <n> staging steps, <n> production steps, <n> watch rows
 - <date> · staging · PR #<n> merged · CI run <id> · suite <passed>/<failed> · `proof/staging-<n>.txt`
 - <date> · red · staging · <the failing case> · cause: code | environment · entry R.<n> opened | traced
-- <date> · entry R.<n> · rounds <n> · merged `<sha>` · `entries/R.<n>/run.json`
+- <date> · entry R.<n> · rounds <n> · merged `<sha>` · `entries/R.<n>/run-*.json`
 - <date> · versions · `<artifact>` `vX.Y.Z` → **vX.Y.Z** (<bump>, <n> commits, <n> outside the convention)
 - <date> · ask · release PR #<n> · "vai?" · answer: "<his words>"
 - <date> · production · merged `<sha>` · CI run <id> · checks <n>/<n> · verified: <read-only call → value> · `proof/prod-<n>.txt`

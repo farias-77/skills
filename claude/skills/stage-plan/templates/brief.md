@@ -23,8 +23,9 @@
 ## Before you start
 
 - Read: `<designs-root>/<workstream>/01-design/` (the design; `notes.md` is the law), the recon of the areas below, the consuming project's `CLAUDE.md` and its engineering doctrine.
-- Starts from: the top of `feat/<workstream>` with the foundation merged<, and E-nn merged>.
+- Starts from: the top of `feat/<workstream>` with the foundation merged<, and E-nn merged — or E-nn's branch when it is ready and not yet merged (stacked)>.
 - Never edit a shared file (the files the doctrine marks as shared: migrations, the API contract, generated code, the module registry): a change there is a foundation amendment; stop and report it.
+- Feature map: the <back | front> side updates `<the feature map's path>` for this entry; the other side does not edit it.
 
 ## Builds
 

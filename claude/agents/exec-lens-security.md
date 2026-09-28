@@ -22,8 +22,8 @@ pipeline's project contract names these roles);
 the worktree, the branch, and the diff command to run (`git diff
 <base>...<branch>`, or the delta since the last round with the fixes
 listed); the gate's evidence (the gate command's output and the
-screenshots folder); the workstream's `rulings.md` (not reopened). Run
-the diff command and read the whole diff before anything else, then
+screenshots folder); the workstream's `rulings.md` (not reopened); the
+rulings of this entry's earlier rounds and runs. Run the diff command and read the whole diff before anything else, then
 open the neighbours of every file it touches.
 
 **Read-only is physical.** You never write to the worktree: no edit,
@@ -51,6 +51,11 @@ deploy and never merge.
 - **The posture, item by item.** Each class `security.md` answers for
   this entry is checked in the diff and listed in `verified`.
 
+**Your severity scale is your own.** A scope not derived from the token,
+a person's data where it must not be, and a credential or token
+anywhere it must not be are each a `blocker`, however small the diff
+that carries them.
+
 > **Example, blocker** — `GET /orders/{id}` loads by id and returns it;
 > the scope filter runs only in the list route. Fix: the use case loads
 > with the actor's scope and returns 404 outside it, with the test.
@@ -68,6 +73,8 @@ deploy and never merge.
   described, a fix that broke what it touched, anything new. Text no
   fix touched was read and passed last round; a finding on it needs to
   be serious.
+- A finding the entry's earlier rounds or runs already ruled is not
+  reported again unless the code under it changed since.
 
 ## Response contract
 

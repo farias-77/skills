@@ -146,26 +146,35 @@ The pre-flight (what only he can hand over) is handed at the close.
 human in the loop until the end. **One session** (Opus 5.5, high)
 receives one goal, "build the whole plan", and orchestrates without
 writing or reviewing code: the foundation first, then every entry whose
-edges are merged, in parallel up to the plan's cap, each in its own
-worktree and local stack, through the **exec-entry** workflow.
+edges are merged or ready, critical path first, in parallel up to the
+cap the machine was measured to hold, each in its own worktree and
+local stack, through the **exec-entry** workflow.
 `builder-backend` and `builder-frontend` (Opus 5.5, high) build the two
-sides at once in their own worktrees, tests and journeys first; the
-**gate** (`exec-gate`, Sonnet 5, high) merges them and runs `make
-verify`, sending every red back to the side that owns it; a **panel
-that never wrote the code** reads the diff — seven lenses (fidelity,
-workaround, craft, proof, security, operations, and visual when there
-is a screen) and two QA that use the running stack and try to break it,
-all Opus 5.5, medium — and a **judge** (`exec-judge`, Opus 5.5, medium)
-rules every finding; the builders fix, the gate runs, the panel reads
-only the delta, three rounds at most. **No code enters without
-review**: every build, fix, conflict resolution and foundation
-amendment passes the gate and the panel. The session merges what comes
-back ready through a serial queue (rebase, gate, merge), writes
-foundation amendments when an entry needs a shared file changed, and
-parks what is the user's. When everything is merged and green it calls
-him once for the **audit**: the parked, the choices the builders made
-where the documents were silent, the latitude the judge granted, the
-precision of every reviewer. `main` is stage 5's.
+sides at once in their own worktrees, tests and journeys first, and
+check their own work against the reviewers' checklist before they
+return; the **gate** (`exec-gate`, Sonnet 5, high) merges them and runs
+the doctrine's fast check and affected tests each round, sending every
+red back to the side that owns it; a **panel that never wrote the
+code** reads the diff — lenses for fidelity, workaround, proof (one per
+side), security, operations and visual (Opus 5.5, medium; craft only on
+the foundation) and QA that use the running stack as an adversary
+through a mandatory checklist, per side and one for abuse (Opus 5.5,
+high) — and a **judge** (`exec-judge`, Opus 5.5, medium) rules every
+finding, on its own under the goal, sending the rest to the session or
+the user; the builders fix back ∥ front, the gate runs, the delta is
+read by the lenses it touches and a QA replay (Sonnet 5, high), three
+rounds at most; before an entry is ready the whole gate runs once and
+the gate writes the record. **No code enters without review**: every
+build, fix, conflict resolution and foundation amendment passes the
+gate and the panel. The session merges what comes back ready through a
+serial queue (rebase, the whole gate, merge), writes foundation
+amendments when an entry needs a shared file changed, builds the
+deferred findings in parallel finishing slices, reads the whole branch
+once for maintainability, and parks what is the user's. When everything
+is merged and green it calls him once for the **audit**: the parked,
+what was decided in his place, the choices the builders made where the
+documents were silent, the precision of every reviewer and the QA's
+coverage. `main` is stage 5's.
 
 **5 · Release** — the audited feature branch reaches production
 through the project's own delivery pipeline, with one question to the
@@ -205,7 +214,7 @@ pipeline, verifies it, and commits with his word.
 ## On cost
 
 This pipeline is expensive to run today, and that was a deliberate
-non-concern. Every entry's diff is read whole by seven lenses and two QA, then its delta, up to three rounds;
+non-concern. Every entry's diff is read whole by the lenses and the adversarial QA, then its delta, up to three rounds;
 discovery and design run up to three rounds on the human's word, plan runs round 2 automatically and a third on his word; ambiguity is hunted by dispatching multiple readers at
 the same document. That redundancy is exactly
 where the quality comes from — and it is priced in tokens.

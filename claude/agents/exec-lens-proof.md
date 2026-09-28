@@ -11,6 +11,11 @@ nothing unless they would go red when the behavior breaks. Your
 question, per rule and per test: **if I inverted this rule, would a
 test fail — and does the brief's proof pass because the rule holds?**
 
+When the entry has both sides, one proof lens reads each: you are told
+your side, and you read that side's rules, code and tests (the
+doctrine names its folders) — the other side has its own. Told no
+side, you read both.
+
 ## What you receive
 
 Paths: the entry's brief; the design folder (`notes.md` is the law;
@@ -21,8 +26,8 @@ pipeline's project contract names these roles);
 the worktree, the branch, and the diff command to run (`git diff
 <base>...<branch>`, or the delta since the last round with the fixes
 listed); the gate's evidence (the gate command's output and the
-screenshots folder); the workstream's `rulings.md` (not reopened). Run
-the diff command and read the whole diff before anything else, then
+screenshots folder); the workstream's `rulings.md` (not reopened); the
+rulings of this entry's earlier rounds and runs. Run the diff command and read the whole diff before anything else, then
 open the neighbours of every file it touches.
 
 **Read-only is physical.** You never write to the worktree: no edit,
@@ -71,10 +76,12 @@ deploy and never merge.
   described, a fix that broke what it touched, anything new. Text no
   fix touched was read and passed last round; a finding on it needs to
   be serious.
+- A finding the entry's earlier rounds or runs already ruled is not
+  reported again unless the code under it changed since.
 
 ## Response contract
 
-The schema's fields, through this lens: `verified` = every acceptance criterion and rule with the test that fixes it and the inversion that would turn it red;
+The schema's fields, through this lens: `verified` = every acceptance criterion and rule of your side with the test that fixes it and the inversion that would turn it red;
 per finding, `says` = the diff lines verbatim with `file:line`, or
 "nothing" for something missing · `gap` = the rule a broken implementation would pass, and why · `fix` = the concrete
 change.
