@@ -45,6 +45,11 @@ from:
 - The bad-path table from the theme's confirmed facts; a category the
   notes do not settle gets your best guess, marked in the Inferred
   list.
+- For a story whose outcome creates, sends or stores something: its
+  validity or expiry, the message the person sees when it fails, how
+  long it is kept, and whether it must be unique. Each comes from the
+  notes, or is your guess in the Inferred list, or is written as out
+  of the story with the reason. None is left unsaid.
 - "Out of this story" from the theme's **Out** block, with the reason
   or the direction as the notes give it.
 
