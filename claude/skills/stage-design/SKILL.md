@@ -298,6 +298,11 @@ to `reviews.md` before any fix moves.
   dispatched in one message; the report carries the mentions table
   and the final lines; a fix without pasted lines is not done. No
   veto question: the user reads the blueprint at the close.
+  When the batch returns, search every term, value and key it changed
+  across all ten documents and their JSON; each hit a fix made wrong
+  goes to the writer who owns that document, as one more batch, before
+  the next round. A writer propagates inside its own document; across
+  documents, propagation is yours.
 - **`implementer`**: real, but latitude: the writer adds one line to
   that document's "The implementer decides".
 - **`user`**: behavior, a data format, a contract's shape, security
