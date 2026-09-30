@@ -98,7 +98,7 @@ are not capped: they are copied exactly.
 - `foundation.items[].kind` is one of `migration`, `contract`,
   `module`, `shared`, `factory`, `other`.
 - An entry carries one or more `stories`; together the entries carry
-  every story of the discovery, each exactly once.
+  every story of the discovery, each at least once (a story split across layer entries, as in a backend-only cut, appears in each entry that builds part of it).
 - `after` lists entry ids whose **behavior** the entry's proof needs;
   it is empty when the foundation and the factories are enough. The
   foundation precedes every entry and is never listed. The edges form

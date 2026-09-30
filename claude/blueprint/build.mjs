@@ -174,7 +174,7 @@ if (existsSync(planDir)) {
     if (!Array.isArray(e.stories) || !e.stories.length) problems.push(`${w}: stories must be a non-empty list`);
     (Array.isArray(e.stories) ? e.stories : []).forEach(s => {
       if (!ids.has(s)) problems.push(`${w}: story ${s} does not exist in the discovery`);
-      if (carried.has(s)) problems.push(`${w}: story ${s} is already carried by entry ${carried.get(s)} (each story in exactly one entry)`); else carried.set(s, e.id);
+      if (!carried.has(s)) carried.set(s, e.id);
     });
     if (e.after !== undefined && !Array.isArray(e.after)) problems.push(`${w}: after must be a list (empty when the foundation is enough)`);
     if (e.proof !== undefined) proofList(e.proof, w);
