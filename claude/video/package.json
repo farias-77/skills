@@ -1,0 +1,20 @@
+{
+  "name": "pipeline-video-kit",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Renders a pipeline storyboard JSON into a short video. See schema.md.",
+  "type": "module",
+  "scripts": {
+    "check": "node prepare.mjs --check"
+  },
+  "dependencies": {
+    "@remotion/bundler": "4.0.532",
+    "@remotion/cli": "4.0.532",
+    "@remotion/renderer": "4.0.532",
+    "@types/react": "^19.3.0",
+    "react": "^19.3.0",
+    "react-dom": "^19.3.0",
+    "remotion": "4.0.532",
+    "typescript": "^7.0.2"
+  }
+}
