@@ -1,634 +1,552 @@
 /*
- * exec-entry.js — one entry of a stage-4 plan as deterministic code:
- * build, gate, review, judge, fix, until clean or parked.
+ * exec-entry.js — one entry of a stage-4 plan as deterministic code (v9):
+ * acceptance first, one builder under its gate, prove ∥ review, a
+ * mechanical triage, one fix, a delta check.
  *
  * Why a workflow: "no code enters without review" must be physical.
- * Every commit that reaches the entry branch passes the mechanical
- * gate (the project's commands) and then a panel of lenses and QA that
- * never wrote it, judged by an agent that did not write it either. The
- * session that runs stage 4 starts one run per entry, in parallel up
- * to the plan's cap, and only merges what comes back ready.
+ * Every commit that reaches the entry branch passes the gate commands
+ * and then a verifier and reviewers that never wrote it. There is no
+ * judge: a finding blocks by a rule written in code below
+ * (references/judging.md is its prose). The session that runs stage 4
+ * starts one run per entry, in parallel up to the measured cap, and
+ * only merges what comes back ready.
  *
  * THE FLOW (mode 'build'):
- *   1. build   builder-backend ∥ builder-frontend (Opus 5.5, high), each
- *              in its own side worktree: two builders never commit to
- *              one tree at once. A side the entry does not have is
- *              skipped. A builder that must change a shared file stops
- *              the run: status 'needs-amendment'. Before it returns, a
- *              builder fills its self-check item by item with the
- *              evidence, distilled from the lenses' definitions.
- *   2. gate    exec-gate (Sonnet 5.5, medium) merges the sides into the entry
- *              branch, brings the stack up and runs the round scope: the
- *              doctrine's fast check and affected tests (the whole gate
- *              when the doctrine names no affected-tests command). Red →
- *              the failing sides fix in parallel, each in its side
- *              worktree → gate again, up to maxGateFixes; still red →
- *              'parked'.
- *   3. panel   in parallel, over the diff. The whole first reading:
- *              fidelity, workaround, proof (one per side when the entry
- *              has both), security (Opus 5.5, medium; fidelity Sonnet
- *              5.5, high) always; the rest by the surface the gate read
- *              from the diff's paths: operations when it touches the
- *              server's product code or the runtime (infra, deploy,
- *              config); visual (Sonnet 5.5, high) and exec-qa-frontend
- *              when it touches a screen; exec-qa-backend when it touches
- *              the server's product code; exec-qa-abuse when it touches
- *              either (Opus 5.5, high); craft only in the foundation's
- *              (F) first reading. A diff of tests, tooling, build files
- *              or docs only seats no QA. Each QA has its adversarial
- *              checklist and a coverage line per category — an output
- *              missing a category is sent back once for the missing
- *              ones. Panel 'lean' seats no operations. A delta round is
- *              a verification, not a new review: did each fix land as
- *              described, did it break what it touched, and only what
- *              the ruler never defers beyond that. It seats fidelity,
- *              workaround and the proof of the sides the fixes touched;
- *              security only when a fix touches scope, a log, a
- *              credential, a person's data or evidence; visual only when
- *              a fix changes a screen; operations only when it had a
- *              finding sustained the round before; never craft and never
- *              an exploring QA: exec-qa-replay (Sonnet 5.5, medium) replays
- *              the scripts the QA saved and the case of each fix, for the
- *              sides the fixes touched whose QA ran. Every reviewer receives the
- *              rulings of the entry's earlier rounds and runs.
- *   4. judge   exec-judge (Opus 5.5, medium) rules every finding and every
- *              QA `unsettled` observation. Autonomous (the default, the
- *              session runs under a goal): it decides where the documents
- *              are silent and records it in `decided` for the audit; a
- *              question for the user (the bar, money, outside the repo,
- *              irreversible, the security posture) → 'parked'; a
- *              recurrence or a fix that needs a shared file →
- *              'needs-session', with the recommended option. Deferred
- *              rulings do not hold the entry: they are returned in
- *              `deferred`, for the finishing entries at the end of the
- *              stage; a record item (evidence, feature-map pointer) goes
- *              to the gate's record, never to a builder.
- *   5. fix     the builders apply the sustained fixes, back ∥ front, each
- *              in its side worktree; in series only where the judge
- *              marked `after` → the gate merges and runs the round scope
- *              → the next round's panel verifies the delta. After maxRounds
- *              (two) panel rounds with something still sustained → 'parked'.
- *   6. ready   nothing sustained → the fast check and the affected tests
- *              against the base, keep-going (the whole gate runs once, at
- *              the end of the stage, never per entry), then
- *              the record: the doctrine's evidence command on the head,
- *              the evidence swept for tokens and redacted, the feature
- *              map's pointers checked. A red there is fixed and its fix
- *              reviewed as a delta round.
+ *   1. acceptance  verifier (Sonnet 5.5, high), author mode, writes the
+ *                  entry's acceptance checks from the brief's acceptance
+ *                  and proof lines (Playwright journeys for screens, Go
+ *                  integration tests for the server, in the doctrine's
+ *                  test layout), runs them on the base where they must
+ *                  fail for the right reason, and commits them. From then
+ *                  on they are read-only for the builder: the gate's
+ *                  first check rejects any diff to them. Skipped when
+ *                  args.acceptance names an earlier run's commit; redone
+ *                  for the named checks only when args.acceptanceRevision
+ *                  points at a ruling or an amendment that changes them.
+ *   2. build       builder (Opus 5.5, medium), the single writer for back
+ *                  and front, in the entry worktree: follows the golden
+ *                  paths, reuses before it writes, keeps functions and
+ *                  files small, and does not end its turn until the gate
+ *                  commands are green. A shared file or an acceptance
+ *                  check it must change stops the run: 'needs-amendment'.
+ *                  What needs the user in person: 'parked' (user).
+ *   3. gate        exec-gate (Sonnet 5.5, low): acceptance untouched, the
+ *                  gate commands (the fast check, the affected tests, the
+ *                  structure check), the surface (api/screen/runtime),
+ *                  the stack up for the verifier. Red → the builder again,
+ *                  up to maxGateFixes, then 'parked' (gate-red).
+ *   4. check       in parallel, over the entry diff: verifier, prove mode
+ *                  (the acceptance checks on the running stack, evidence,
+ *                  the PII canary, the failure-mode block when the server
+ *                  changed; PASS / FAIL / INCONCLUSIVE, INCONCLUSIVE =
+ *                  FAIL) ∥ reviewer (Sonnet 5.5, high): correctness and
+ *                  fidelity ∥ structure-reviewer (Opus 5.5, medium): the
+ *                  golden paths, boundaries, duplication, size, tests of
+ *                  behaviour ∥ exec-lens-security (Opus 5.5, medium):
+ *                  every diff ∥ exec-lens-operations (Opus 5.5, medium):
+ *                  when the server's product code or the runtime changed.
+ *   5. triage      mechanical: a finding blocks when its severity is not
+ *                  'detail' and it carries a repro or a written rule, or
+ *                  when the verifier did not PASS; a non-detail without
+ *                  proof → `deferred`; a detail → `learnLog`.
+ *   6. fix         the same builder at effort high, once, applies every
+ *                  blocking item → the gate → the delta: the verifier runs
+ *                  the acceptance checks again, and only the reviewers that
+ *                  blocked re-check their own items over the delta, under
+ *                  the same triage. Still blocking → 'parked' (round-cap).
+ *                  maxRounds = 2 counts the review and one delta.
+ *   7. ready       the gate commands keep-going against the base, then the
+ *                  record: the doctrine's evidence command on the head, the
+ *                  evidence swept for tokens and redacted, the feature
+ *                  map's pointers checked. A fix the ready gate needed is
+ *                  checked by one delta of the whole panel; still blocking
+ *                  → 'parked' (round-cap).
  *
- * THE FLOW (mode 'update'; 'rebase' is its old name, still accepted):
- * the gate merges the moved base into the entry branch — a merge, never
- * a rebase: the entry branch is made of merges (its sides, its fixes),
- * and a rebase linearizes them and replays commits already resolved —
- * and runs the fast check and the affected tests against it, and the
- * record. A clean merge adds
- * no authored code and the run returns. A conflict is resolved by the
- * builders of the sides it touches, and the resolution is code: gate,
- * then the panel over the whole entry diff, then the judge, as in build
- * mode.
+ * THE FLOW (mode 'update'): the gate merges the moved base into the entry
+ * branch — a merge, never a rebase — and runs the ready gate and the
+ * record. A clean merge adds no authored code and the run returns. A
+ * conflict is resolved by the builder, and the resolution is code: gate,
+ * then the whole check over the entry diff, as in build mode.
  *
- * THE FLOW (mode 'resume'): a run that parked or needed the session (a
- * question answered in the rulings, or the round cap reached) continues
- * without a new build and without a whole review: the builders apply
- * the parked run's last sustained rulings, the gate runs, and the review
- * rounds read only the delta from the parked head, with the parked
- * run's rulings in front of the reviewers and the judge. maxRounds fresh
- * rounds.
+ * THE FLOW (mode 'resume'): a parked run continues without a new build
+ * and without a whole review: the builder (effort high) applies the items
+ * of resume.fixesFile (the session wrote them: the still-blocking items,
+ * an answer of the user's, a gate diagnosis), the gate runs, and one delta
+ * checks them: the verifier and the reviewers the items name.
+ *
+ * THE FLOW (mode 'batch'): a finishing slice of the deferred register. The
+ * builder applies the lines in batchPath; the gate; then only the verifier
+ * and structure-reviewer check it (it opens no new review); one fix and
+ * one delta, as above.
+ *
+ * RUNNING UNREGISTERED AGENTS: with args.inlineAgents, agent() is called
+ * without agentType; the prompt starts by pointing at <agentsDir>/<name>.md
+ * and the model and effort come from the AGENTS map below.
  *
  * THE ARGS CARRY PATHS, NOT TEXT. The prompts below carry inputs only;
  * every instruction lives in the agent definitions.
  *
  * Invoked by the stage-execute session:
  *   Workflow({ scriptPath: '<...>/workflows/exec-entry.js', args: {
- *     mode:          'build' | 'update' | 'resume',   // 'rebase' = 'update'
- *     entry:         'E-03',
- *     briefPath:     '/abs/.../02-plan/briefs/E-03.md',
- *     designDir:     '/abs/.../01-design',
- *     reconDir:      '/abs/.../02-plan/recon',
- *     doctrineDir:   '/abs/.../docs/engineering',
- *     rulingsPath:   '/abs/.../rulings.md',
- *     judgingPath:   '/abs/.../stage-execute/references/judging.md',
- *     agentsDir:     '/abs/.../agents',  // the lenses' definitions the builders read; default: beside the ruler's skill
- *     evidenceDir:   '/abs/.../03-execution/entries/E-03',
- *     worktree:      '/abs/.../.worktrees/<slug>-E-03',
- *     branch:        'story/<slug>/E-03',
- *     base:          'feat/<slug>',
- *     sides:         { back: { worktree, branch } | null, front: { worktree, branch } | null },
- *     trailer:       'the attribution trailer for commits, verbatim',
- *     maxRounds:     2,
- *     maxGateFixes:  3,
- *     panel:         'full' | 'lean',  // lean: no operations lens
- *     autonomous:    true,             // false only when the session does not run under a goal
- *     priorRuns:     ['/abs/.../entries/E-03/run-1.json'],  // earlier runs' returns of this entry, if any
- *     resume:        { rulingsFile: '/abs/.../<parked run return>.json', round: 3, head: '<parked head sha>', after: 'back' | 'front' | undefined },  // 'resume' only; after: the side whose rulings land first, when the parked round marked one
+ *     mode:            'build' | 'update' | 'resume' | 'batch',
+ *     entry:           'E-03',
+ *     briefPath:       '/abs/.../02-plan/briefs/E-03.md',   // batch: the slice's brief
+ *     designDir:       '/abs/.../01-design',
+ *     reconDir:        '/abs/.../02-plan/recon',
+ *     doctrineDir:     '/abs/.../docs/engineering',
+ *     goldenPathsPath: '/abs/.../docs/engineering/golden-paths.md',
+ *     gateCommands:    ['make check', 'make test-affected base=feat/<slug>', 'make structure'],
+ *     rulingsPath:     '/abs/.../rulings.md',
+ *     judgingPath:     '/abs/.../stage-execute/references/judging.md',
+ *     agentsDir:       '/abs/.../agents',
+ *     evidenceDir:     '/abs/.../03-execution/entries/E-03',
+ *     worktree:        '/abs/.../.worktrees/<slug>-E-03',
+ *     branch:          'story/<slug>/E-03',
+ *     base:            'feat/<slug>',
+ *     trailer:         'the attribution trailer for commits, verbatim',
+ *     maxRounds:       2,
+ *     maxGateFixes:    3,
+ *     inlineAgents:    false,
+ *     priorRuns:       ['/abs/.../entries/E-03/run-1.json'],
+ *     acceptance:      { commit: '<sha>', files: ['...'] },  // from an earlier run; omitted on a fresh build
+ *     acceptanceRevision: '/abs/.../amendments/F.2.md',    // only when a ruling changes named checks
+ *     resume:          { fixesFile: '/abs/.../E-03/fixes-2.json', head: '<parked head sha>', reviewers: ['reviewer'] },  // 'resume' only; reviewers: whose items the file carries
+ *     batchPath:       '/abs/.../03-execution/batch-X.1.md',  // 'batch' only
  *   }})
  *
- * Returns { entry, mode, status, reason, head, rounds, precision, questions,
- * amendment, gate, deferred, decided, record } — status is 'ready' |
- * 'parked' | 'needs-session' | 'needs-amendment' | 'interrupted' (an
- * agent returned nothing: the API, the network or the quota failed; the
- * session relaunches the run by its id); reason, when parked, is 'user' |
- * 'gate-red' | 'round-cap'; questions carry `to`
- * ('user' or 'session'); rounds lists each panel round with its
- * findings, unsettled, QA coverage, rulings and fixes; precision sums,
- * per lens and QA, found · sustained · deferred · latitude · dismissed ·
- * user; decided lists what the judge decided where the documents were
- * silent, for the audit; record is the gate's last record.
+ * Returns { entry, mode, status, reason, head, acceptance, verdicts,
+ * rounds, precision, questions, amendment, gate, deferred, learnLog,
+ * decided, choices, record } — status is 'ready' | 'parked' |
+ * 'needs-amendment' | 'interrupted' (an agent returned nothing: the API,
+ * the network or the quota failed; the session relaunches the run by its
+ * id); reason, when parked, is 'user' | 'gate-red' | 'round-cap'.
  */
 
 export const meta = {
   name: 'exec-entry',
-  description: 'Stage-4 entry: two Opus builders in parallel, the mechanical gate, a panel of lenses and adversarial QA that never wrote the code, an Opus judge that rules on its own under a goal; fixes back ∥ front and a verification of the delta, two rounds at most; the whole gate and the record before ready',
+  description: 'Stage-4 entry (v9): acceptance checks written first and read-only, one builder under the gate commands, the verifier proving on the running stack in parallel with the reviewers (correctness, structure, security, operations), a mechanical triage, one fix at high effort and a delta check, the record before ready',
   phases: [
-    { title: 'Build', detail: 'builder-backend ∥ builder-frontend (Opus 5.5, high), each in its side worktree, self-check before return', model: 'opus' },
-    { title: 'Gate', detail: 'exec-gate (Sonnet 5.5, medium): merge the sides, fast check + affected tests per round, the whole gate and the record before ready', model: 'sonnet' },
-    { title: 'Panel', detail: 'the lenses (Opus 5.5, medium; fidelity and visual Sonnet 5.5, high) and the QA (Opus 5.5, high; replay Sonnet 5.5, medium) over the diff, seated by the surface it touches; the delta verified', model: 'opus' },
-    { title: 'Judge', detail: 'exec-judge (Opus 5.5, medium) rules every finding and every unsettled observation', model: 'opus' },
-    { title: 'Fix', detail: 'the builders apply what was sustained, back ∥ front (deferred go to the finishing entries), then the gate, then the panel over the delta', model: 'opus' },
+    { title: 'Acceptance', detail: 'verifier (Sonnet 5.5, high), author mode: the acceptance checks, red on the base for the right reason, committed', model: 'sonnet' },
+    { title: 'Build', detail: 'builder (Opus 5.5, medium), single writer, golden paths, until the gate commands are green', model: 'opus' },
+    { title: 'Gate', detail: 'exec-gate (Sonnet 5.5, low): acceptance untouched, the gate commands, the surface, the stack, the record before ready', model: 'sonnet' },
+    { title: 'Check', detail: 'verifier prove ∥ reviewer (Sonnet 5.5, high) ∥ structure-reviewer (Opus 5.5, medium) ∥ exec-lens-security ∥ exec-lens-operations (Opus 5.5, medium); mechanical triage', model: 'sonnet' },
+    { title: 'Fix', detail: 'builder (Opus 5.5, high), once, on the blocking items; then the gate', model: 'opus' },
+    { title: 'Delta', detail: 'the verifier again and the reviewers that blocked, over their own items only', model: 'sonnet' },
   ],
 }
 
-const BUILDERS = { back: 'builder-backend', front: 'builder-frontend' }
+// name → model and effort, as in each definition's frontmatter (used when the agents run inline).
+const AGENTS = {
+  builder: { model: 'opus', effort: 'medium' },
+  verifier: { model: 'sonnet', effort: 'high' },
+  reviewer: { model: 'sonnet', effort: 'high' },
+  'structure-reviewer': { model: 'opus', effort: 'medium' },
+  'exec-gate': { model: 'sonnet', effort: 'low' },
+  'exec-lens-security': { model: 'opus', effort: 'medium' },
+  'exec-lens-operations': { model: 'opus', effort: 'medium' },
+}
+const BUILDER = 'builder'
+const VERIFIER = 'verifier'
 const GATE = 'exec-gate'
-const JUDGE = 'exec-judge'
-const FIDELITY = 'exec-lens-fidelity'
-const WORKAROUND = 'exec-lens-workaround'
-const PROOF = 'exec-lens-proof'
+const REVIEWER = 'reviewer'
+const STRUCTURE = 'structure-reviewer'
 const SECURITY = 'exec-lens-security'
 const OPERATIONS = 'exec-lens-operations'
-const CRAFT = 'exec-lens-craft'
-const VISUAL = 'exec-lens-visual'
-const QA = { back: 'exec-qa-backend', front: 'exec-qa-frontend' }
-const QA_ABUSE = 'exec-qa-abuse'
-const QA_REPLAY = 'exec-qa-replay'
-const TOUCHES = ['scope', 'log', 'credential', 'personal-data', 'evidence', 'concurrency', 'screen']
-const SECURITY_TOUCHES = ['scope', 'log', 'credential', 'personal-data', 'evidence']
 
-const QA_CATEGORIES = {
-  [QA.back]: ['empty-missing-wrong-type', 'huge-and-limit', 'whitespace', 'unicode', 'injection', 'repetition', 'concurrency', 'other-actor', 'token', 'dependencies', 'log-personal-data'],
-  [QA.front]: ['content', 'injection', 'other-actor', 'double-click', 'navigation', 'two-tabs', 'keyboard', 'narrow-landscape-zoom', 'axe', 'reduced-motion', 'js-storage-blocked', 'slow-and-down'],
-  [QA_ABUSE]: ['idor-enumeration', 'token', 'injection', 'rate-limit', 'personal-data-in-log-or-mail', 'toctou'],
-}
+// ---------- schemas ----------
 
-const BUILD = {
-  type: 'object', additionalProperties: false,
-  required: ['branch', 'head', 'commits', 'checks', 'files', 'choices', 'needsAmendment', 'couldNotHonour', 'applied', 'selfCheck'],
-  properties: {
-    branch: { type: 'string' },
-    head: { type: 'string' },
-    commits: { type: 'array', items: { type: 'object', additionalProperties: false, required: ['sha', 'message'], properties: { sha: { type: 'string' }, message: { type: 'string' } } } },
-    checks: { type: 'array', items: { type: 'object', additionalProperties: false, required: ['name', 'lastLine', 'green'], properties: { name: { type: 'string' }, lastLine: { type: 'string' }, green: { type: 'boolean' } } } },
-    files: { type: 'array', items: { type: 'string' } },
-    choices: { type: 'array', items: { type: 'string' } },
-    needsAmendment: { type: 'string', description: 'the shared file that must change and why; empty when none' },
-    couldNotHonour: { type: 'array', items: { type: 'string' } },
-    applied: { type: 'array', items: { type: 'object', additionalProperties: false, required: ['id', 'commit', 'why'], properties: { id: { type: 'string' }, commit: { type: 'string' }, why: { type: 'string' } } } },
-    selfCheck: { type: 'array', description: 'every item of the self-check in the builder definition, with its evidence', items: { type: 'object', additionalProperties: false, required: ['item', 'evidence', 'ok'], properties: { item: { type: 'string' }, evidence: { type: 'string' }, ok: { type: 'boolean' } } } },
-  },
-}
+const str = { type: 'string' }
+const strs = { type: 'array', items: str }
+const obj = (props, required = Object.keys(props)) => ({ type: 'object', additionalProperties: false, required, properties: props })
 
-const GATE_REPORT = {
-  type: 'object', additionalProperties: false,
-  required: ['green', 'head', 'scope', 'summary', 'checks', 'failures', 'stack', 'screenshots', 'conflicts', 'record', 'surface'],
-  properties: {
-    green: { type: 'boolean' },
-    head: { type: 'string' },
-    scope: { type: 'string', description: 'what ran: "round" or "ready" (fast check + affected tests), "full" (the whole gate), or "full (no affected-tests command)"' },
-    summary: { type: 'string', description: 'the summary lines of what ran, verbatim' },
-    checks: { type: 'array', description: 'one per step that ran, in order', items: { type: 'object', additionalProperties: false, required: ['name', 'green', 'lastLine'], properties: { name: { type: 'string' }, green: { type: 'boolean' }, lastLine: { type: 'string' } } } },
-    failures: { type: 'array', items: { type: 'object', additionalProperties: false, required: ['check', 'side', 'where', 'output'], properties: { check: { type: 'string' }, side: { type: 'string', enum: ['back', 'front'] }, where: { type: 'string' }, output: { type: 'string' } } } },
-    stack: { type: 'string', description: 'the URLs and actors (never a token), or "down"' },
-    screenshots: { type: 'string', description: 'the folder and the file count' },
-    conflicts: { type: 'array', items: { type: 'object', additionalProperties: false, required: ['file', 'side'], properties: { file: { type: 'string' }, side: { type: 'string', enum: ['back', 'front'] } } } },
-    surface: { type: 'object', additionalProperties: false, required: ['api', 'screen', 'runtime', 'paths'], description: 'what the entry diff against the base touches, read from `git diff --name-only <base>...<branch>` and the doctrine\'s layout', properties: {
-      api: { type: 'boolean', description: 'product code of the server side changed (not its tests, tooling, build files or docs)' },
-      screen: { type: 'boolean', description: 'product code of the screen side changed (not its tests, e2e, tooling, build files or docs)' },
-      runtime: { type: 'boolean', description: 'infra, deploy, the config the running service reads, alarms or migrations changed' },
-      paths: { type: 'array', items: { type: 'string' }, description: 'the paths that made each true, as "api: <path>"' },
-    } },
-    record: { type: 'object', additionalProperties: false, required: ['evidence', 'redacted', 'open'], properties: {
-      evidence: { type: 'string', description: 'the evidence command run on the head and what it wrote; empty when the record was not asked' },
-      redacted: { type: 'array', items: { type: 'string' }, description: 'file: what was redacted' },
-      open: { type: 'array', items: { type: 'string' }, description: 'a feature-map pointer to a file that does not exist, or a record item the gate could not close' },
-    } },
-  },
-}
+const QUESTION = obj({ question: str, context: str, options: strs, pick: str })
 
-const FINDING = {
-  type: 'object', additionalProperties: false,
-  required: ['severity', 'title', 'says', 'gap', 'fix'],
-  properties: {
-    severity: { type: 'string', enum: ['blocker', 'fix', 'detail'] },
-    title: { type: 'string' },
-    says: { type: 'string', description: 'the lines verbatim with file:line, the request and response, or the steps and screenshot; "nothing" for something missing' },
-    gap: { type: 'string' },
-    fix: { type: 'string' },
-  },
-}
-
-const REVIEW = {
-  type: 'object', additionalProperties: false,
-  required: ['verdict', 'verified', 'quote', 'findings'],
-  properties: {
-    verdict: { type: 'string', enum: ['pass', 'pass with fixes', 'fail'] },
-    verified: { type: 'array', items: { type: 'string' } },
-    quote: { type: 'string' },
-    findings: { type: 'array', items: FINDING },
-  },
-}
-
-const qaReview = (categories) => ({
-  type: 'object', additionalProperties: false,
-  required: [...REVIEW.required, 'coverage', 'unsettled'],
-  properties: {
-    ...REVIEW.properties,
-    coverage: { type: 'array', description: 'one line per category of your checklist', items: { type: 'object', additionalProperties: false, required: ['category', 'tried', 'cases', 'command', 'result', 'why_not'], properties: {
-      category: { type: 'string', enum: categories }, tried: { type: 'boolean' }, cases: { type: 'integer' }, command: { type: 'string' }, result: { type: 'string' }, why_not: { type: 'string', description: 'required when tried is false' },
-    } } },
-    unsettled: { type: 'array', description: 'behaviors the documents do not settle', items: { type: 'object', additionalProperties: false, required: ['title', 'says', 'why'], properties: { title: { type: 'string' }, says: { type: 'string' }, why: { type: 'string' } } } },
-  },
+const ACCEPTANCE = obj({
+  commit: str,
+  files: strs,
+  checks: { type: 'array', items: obj({ line: str, file: str, redOnBase: str, rightReason: { type: 'boolean' } }) },
+  alreadyGreen: strs,
+  cannotCheck: strs,
 })
 
-const QUESTION = { type: 'object', additionalProperties: false, required: ['question', 'context', 'options', 'pick'], properties: { question: { type: 'string' }, context: { type: 'string' }, options: { type: 'array', items: { type: 'string' } }, pick: { type: 'string' } } }
+const BUILD = obj({
+  branch: str,
+  head: str,
+  commits: { type: 'array', items: obj({ sha: str, message: str }) },
+  checks: { type: 'array', description: 'one per gate command, in order', items: obj({ command: str, lastLine: str, green: { type: 'boolean' } }) },
+  files: strs,
+  reused: strs,
+  goldenPaths: strs,
+  choices: strs,
+  decided: { type: 'array', items: obj({ question: str, pick: str, reason: str }) },
+  questions: { type: 'array', description: 'only what needs the user in person', items: QUESTION },
+  needsAmendment: { type: 'string', description: 'the shared file or the acceptance check that must change, and why; empty when none' },
+  couldNotHonour: strs,
+  applied: { type: 'array', items: obj({ id: str, commit: str, why: str }) },
+})
 
-const RULINGS = {
-  type: 'object', additionalProperties: false,
-  required: ['rulings', 'toUser', 'toSession', 'decided', 'seen', 'precision'],
-  properties: {
-    rulings: { type: 'array', items: { type: 'object', additionalProperties: false, required: ['ids', 'ruling', 'side', 'fix', 'after', 'touches', 'reason'], properties: {
-      ids: { type: 'array', items: { type: 'string' } },
-      ruling: { type: 'string', enum: ['sustained', 'deferred', 'latitude', 'dismissed', 'user', 'session'] },
-      side: { type: 'string', enum: ['back', 'front', 'none'] },
-      fix: { type: 'string' },
-      after: { type: 'string', enum: ['back', 'front', 'none'], description: 'the other side whose fix this one needs first; none when the sides fix in parallel' },
-      touches: { type: 'array', items: { type: 'string', enum: TOUCHES } },
-      reason: { type: 'string' },
-    } } },
-    toUser: { type: 'array', items: QUESTION },
-    toSession: { type: 'array', items: QUESTION },
-    decided: { type: 'array', items: { type: 'object', additionalProperties: false, required: ['ids', 'question', 'pick', 'reason'], properties: { ids: { type: 'array', items: { type: 'string' } }, question: { type: 'string' }, pick: { type: 'string' }, reason: { type: 'string' } } } },
-    seen: { type: 'array', items: { type: 'string' } },
-    precision: { type: 'array', items: { type: 'object', additionalProperties: false, required: ['lens', 'found', 'sustained', 'deferred', 'latitude', 'dismissed', 'user'], properties: {
-      lens: { type: 'string' }, found: { type: 'integer' }, sustained: { type: 'integer' }, deferred: { type: 'integer' }, latitude: { type: 'integer' }, dismissed: { type: 'integer' }, user: { type: 'integer' },
-    } } },
-  },
-}
+const GATE_REPORT = obj({
+  green: { type: 'boolean' },
+  head: str,
+  scope: str,
+  summary: str,
+  checks: { type: 'array', items: obj({ name: str, green: { type: 'boolean' }, lastLine: str }) },
+  failures: { type: 'array', items: obj({ check: str, where: str, output: str, cause: { type: 'string', enum: ['code', 'machine'] } }) },
+  stack: str,
+  conflicts: strs,
+  record: obj({ evidence: str, redacted: strs, open: strs }),
+  surface: obj({ api: { type: 'boolean' }, screen: { type: 'boolean' }, runtime: { type: 'boolean' }, paths: strs }),
+})
 
-const mode = ['update', 'rebase'].includes(args?.mode) ? 'update' : args?.mode === 'resume' ? 'resume' : 'build'
+const FINDING = obj({
+  severity: { type: 'string', enum: ['blocker', 'fix', 'detail'] },
+  title: str,
+  says: str,
+  gap: str,
+  fix: str,
+  repro: { type: 'string', description: 'a failing test, a command and its output, or the steps and what they showed; empty when none' },
+  rule: { type: 'string', description: 'the written rule broken, path:line with the sentence quoted; empty when none' },
+})
+
+const REVIEW = obj({
+  verdict: { type: 'string', enum: ['pass', 'pass with fixes', 'fail'] },
+  verified: strs,
+  quote: str,
+  findings: { type: 'array', items: FINDING },
+  closed: { type: 'array', description: 'in a delta: the ids of your items now closed', items: str },
+})
+
+const VERDICT = obj({
+  verdict: { type: 'string', enum: ['PASS', 'FAIL', 'INCONCLUSIVE'] },
+  head: str,
+  checks: { type: 'array', items: obj({ file: str, green: { type: 'boolean' }, summary: str }) },
+  failures: { type: 'array', items: obj({ check: str, expected: str, observed: str, command: str, output: str, evidence: str }) },
+  sideEffects: { type: 'array', items: obj({ command: str, output: str }) },
+  canary: obj({ hits: strs }),
+  failureModes: { type: 'array', items: obj({ route: str, case: str, expected: str, observed: str, ok: { type: 'boolean' } }) },
+  evidence: obj({ folder: str, files: strs }),
+  blocked: str,
+})
+
+// ---------- the run's state ----------
+
+const mode = ['update', 'rebase'].includes(args?.mode) ? 'update' : ['resume', 'batch'].includes(args?.mode) ? args.mode : 'build'
 const resume = mode === 'resume' ? args?.resume ?? {} : null
 const entry = args?.entry ?? '?'
-const sides = Object.entries(args?.sides ?? {}).filter(([, v]) => v).map(([k]) => k)
-const maxRounds = args?.maxRounds ?? 2
+const maxRounds = Math.max(1, args?.maxRounds ?? 2)
 const maxGateFixes = args?.maxGateFixes ?? 3
-const lean = args?.panel === 'lean'
-const autonomous = args?.autonomous !== false
+const inline = args?.inlineAgents === true
 const priorRuns = Array.isArray(args?.priorRuns) ? args.priorRuns : []
+const gateCommands = Array.isArray(args?.gateCommands) ? args.gateCommands : []
 const agentsDir = args?.agentsDir ?? args?.judgingPath?.replace(/\/skills\/stage-execute\/references\/judging\.md$/, '/agents')
-if (!sides.length) log(`${entry}: no sides given — pass sides: { back: {worktree, branch}, front: {worktree, branch} }`)
+if (!gateCommands.length) log(`${entry}: no gateCommands given — the builder and the gate have nothing to turn green`)
+
+const result = {
+  entry, mode, status: 'parked', reason: null, head: null,
+  acceptance: args?.acceptance ?? null, verdicts: [], rounds: [], precision: {},
+  questions: [], amendment: null, gate: null, deferred: [], learnLog: [], decided: [], choices: [], record: null,
+}
+
+const interrupted = (what) => { result.status = 'interrupted'; result.reason = 'interrupted'; log(`${entry}: ${what} returned nothing — interrupted; relaunch by resumeFromRunId`); return result }
+const park = (reason, what) => { result.status = 'parked'; result.reason = reason; log(`${entry}: ${what} — parked (${reason})`); return result }
+
+// One call shape for registered and inline agents.
+const call = (name, prompt, opts, effort) => {
+  const def = AGENTS[name]
+  const eff = effort ?? def.effort
+  if (inline) {
+    return agent(`Your instructions are the file ${agentsDir}/${name}.md (read it first and follow it; its frontmatter's model/effort are already applied).
+
+${prompt}`, { ...opts, model: def.model, effort: eff })
+  }
+  return agent(prompt, { ...opts, agentType: name, ...(eff !== def.effort ? { effort: eff } : {}) })
+}
 
 const docs = `Brief: ${args?.briefPath}
 Design (notes.md is the law): ${args?.designDir}
 Recon: ${args?.reconDir}
 Engineering doctrine of the project: ${args?.doctrineDir}
+Golden paths: ${args?.goldenPathsPath}
 Rulings of the workstream (not reopened): ${args?.rulingsPath}
-Evidence folder of this entry: ${args?.evidenceDir}`
+Evidence folder of this entry: ${args?.evidenceDir}${priorRuns.length ? `
+Earlier runs of this entry (their returns): ${priorRuns.join(', ')}` : ''}`
 
-const result = { entry, mode, status: 'parked', reason: null, head: null, rounds: [], precision: {}, questions: [], amendment: null, gate: null, deferred: [], decided: [], record: null }
-// An agent that returned nothing failed on the API, the network or the quota: the run is
-// interrupted, never parked, and the session relaunches it by its run id.
-const interrupted = (what) => { result.status = 'interrupted'; result.reason = 'interrupted'; log(`${entry}: ${what} returned nothing — interrupted; relaunch by resumeFromRunId`); return result }
-const park = (reason, what) => { result.status = 'parked'; result.reason = reason; log(`${entry}: ${what} — parked (${reason})`); return result }
-const addPrecision = (rows) => rows.forEach(p => {
-  const t = result.precision[p.lens] ?? (result.precision[p.lens] = { found: 0, sustained: 0, deferred: 0, latitude: 0, dismissed: 0, user: 0 })
-  for (const k of Object.keys(t)) t[k] += p[k] ?? 0
-})
+const where = `Worktree: ${args?.worktree} · branch ${args?.branch} · base ${args?.base}`
+const gateList = gateCommands.map((c, i) => `${i + 1}. ${c}`).join('\n') || '(none given)'
+const acceptanceText = () => result.acceptance
+  ? `Acceptance files (read-only for the builder), added by ${result.acceptance.commit}:\n${(result.acceptance.files ?? []).map(f => `- ${f}`).join('\n')}`
+  : 'Acceptance files: none for this run.'
+const trailer = `Attribution trailer for every commit, verbatim:\n${args?.trailer ?? '(none given)'}`
 
-const builder = (side, prompt, label) => agent(`${prompt}
-The lenses' definitions your self-check is distilled from: ${agentsDir}/exec-lens-*.md`, { label: `${BUILDERS[side]}·${entry}·${label}`, phase: label.startsWith('fix') ? 'Fix' : 'Build', agentType: BUILDERS[side], schema: BUILD })
-  .then(b => {
-    b?.selfCheck.filter(c => !c.ok).forEach(c => log(`${entry}: ${BUILDERS[side]} self-check not met — ${c.item}: ${c.evidence}`))
-    return b
-  })
+// ---------- the agents' calls ----------
 
-const runGate = (task, label) => agent(`Entry ${entry}. ${task}
-Entry worktree: ${args?.worktree} · branch ${args?.branch} · base ${args?.base}
-Side worktrees: ${sides.map(s => `${s} ${args?.sides[s].worktree} · ${args?.sides[s].branch}`).join(' · ') || 'none'}
-Doctrine (its local-development document names the commands): ${args?.doctrineDir}
-Evidence folder: ${args?.evidenceDir}`, { label: `${GATE}·${entry}·${label}`, phase: 'Gate', agentType: GATE, schema: GATE_REPORT })
+const author = (revision) => call(VERIFIER, `Mode: author${revision ? ` (revision: change only the checks ${revision} names)` : ''}. Entry ${entry}.
+${where}
+${docs}
+${revision ? `${acceptanceText()}\n` : ''}${trailer}`, { label: `${VERIFIER}·${entry}·author`, phase: 'Acceptance', schema: ACCEPTANCE })
 
-const mergeSides = (which) => which.length
-  ? `Merge the side branches into ${args?.branch}: ${which.map(s => args?.sides[s].branch).join(', ')}.`
-  : `No side changed; do not merge.`
+const build = (task, label, phaseName, effort) => call(BUILDER, `${task}
+${where}
+${docs}
+${acceptanceText()}
+The gate commands — every one green, in order, on your final head, before you end your turn:
+${gateList}
+${trailer}`, { label: `${BUILDER}·${entry}·${label}`, phase: phaseName, schema: BUILD }, effort)
+
+const runGate = (task, label) => call(GATE, `Entry ${entry}. ${task}
+${where}
+${acceptanceText()}
+The gate commands, in order:
+${gateList}
+Doctrine (its local-development document names the stack, env, whole gate and evidence commands): ${args?.doctrineDir}
+Evidence folder: ${args?.evidenceDir}`, { label: `${GATE}·${entry}·${label}`, phase: 'Gate', schema: GATE_REPORT })
 
 const SCOPE = {
-  round: `Scope: round — the doctrine's fast check and its affected-tests command against ${args?.base} (the whole gate command when the doctrine names no affected-tests command; say so in \`scope\`).`,
-  full: 'Scope: full — the whole gate command in its keep-going form; read every check and report every failure, never only the first.',
-  ready: `Scope: ready — the doctrine's fast check and its affected-tests command against ${args?.base}, every check read to its end and every failure reported, never only the first (the whole gate command when the doctrine names no affected-tests command; say so in \`scope\`). The whole gate runs once, at the end of the stage, never per entry.`,
+  round: 'Scope: round — acceptance untouched, then every gate command in order, stopping at the first red.',
+  ready: 'Scope: ready — acceptance untouched, then every gate command in its keep-going form, each read to its end, every failure reported.',
 }
-const readyScope = args?.readyScope === 'full' ? 'full' : 'ready'
-const recordTask = (items) => `Then, only when green, the record: the doctrine's evidence command on the head; the evidence folder swept for tokens and secrets (the JWT pattern and whatever the doctrine names), each one redacted; every pointer of the feature map this entry touched resolved to a file that exists.${items.length ? `
-The judge's record items, to close with the record or report open:
+const recordTask = (items) => `Then, only when green, the record: the doctrine's evidence command on the head; the evidence folder swept for tokens and secrets, each one redacted; every pointer of the feature map this entry touched resolved to a file that exists.${items.length ? `
+Record items to close with the record, or report open:
 ${items.map(i => `- ${i.id}: ${i.fix}`).join('\n')}` : ''}`
 
-const sideTree = (side) => `Your side worktree: ${args?.sides?.[side]?.worktree} · branch ${args?.sides?.[side]?.branch}. First, before anything else, bring it to the entry branch: \`git merge --ff-only ${args?.branch}\` (every commit of your side is already in it); if that refuses (the side branch moved apart from the entry branch), \`git reset --hard ${args?.branch}\` and push with --force-with-lease to your side branch only.`
-const afterLine = (after) => after ? `
-Then merge the ${after} side's branch, whose fixes of this round yours build on: \`git merge ${args?.sides?.[after]?.branch}\`.` : ''
-
-const fixPrompt = (side, items, after) => `Mode: fix. Entry ${entry}, ${side} side.
-${sideTree(side)}${afterLine(after)}
-${docs}
-Attribution trailer for every commit, verbatim:
-${args?.trailer ?? '(none given)'}
-Apply each item below; return one \`applied\` entry per id.
-${items.map(i => `- ${i.id}: ${i.fix}`).join('\n')}`
-
-// The sides fix in parallel, each in its side worktree; in series only
-// where an item of one side is marked `after` the other.
-const applyFixes = async (bySide, label, promptFor) => {
-  const todo = ['back', 'front'].filter(s => sides.includes(s) && bySide[s]?.length)
-  const first = todo.find(s => todo.some(o => o !== s && bySide[o].some(i => i.after === s)))
-  if (first) {
-    const second = todo.find(s => s !== first)
-    log(`${entry}: the ${second} fixes wait for the ${first} fixes (marked by the judge)`)
-    await builder(first, promptFor(first, bySide[first], null), label)
-    await builder(second, promptFor(second, bySide[second], first), label)
-  } else {
-    await parallel(todo.map(s => () => builder(s, promptFor(s, bySide[s], null), label)))
-  }
-  return todo
+// Absorbs a builder's return: stops the run on an amendment or a question for the user.
+const absorb = (b, who) => {
+  if (!b) return interrupted(who)
+  b.decided.forEach(d => result.decided.push(d))
+  b.choices.forEach(c => result.choices.push(c))
+  if (b.needsAmendment) { result.status = 'needs-amendment'; result.amendment = b.needsAmendment; result.head = b.head; log(`${entry}: needs an amendment: ${b.needsAmendment}`); return result }
+  if (b.questions.length) { result.questions = b.questions.map(q => ({ to: 'user', ...q })); result.head = b.head; return park('user', `${b.questions.length} question(s) only the user can answer`) }
+  return null
 }
 
-// The gate, then its fix loop: the failing sides fix, the gate merges and runs again.
+// The gate, then its fix loop: the builder turns the red green, the gate runs again.
+// Returns { g, fixed } or { stop } when the run must return.
 const gateUntilGreen = async (task, label, scope, record = null) => {
   const fixed = []
   const tail = `${SCOPE[scope]}${record ? `\n${recordTask(record)}` : ''}
-Leave the stack up.`
+When green, bring the stack up on the head (rebuilt when the head changed since it last came up) and leave it up.`
   let g = await runGate(`${task}\n${tail}`, label)
-  for (let n = 1; g && !g.green && n <= maxGateFixes; n++) {
-    if (g.conflicts.length) break
-    const bySide = {}
-    g.failures.forEach((f, i) => (bySide[f.side] ??= []).push({ id: `gate-${label}-${n}#${i + 1}`, side: f.side, fix: `turn green: ${f.check} at ${f.where} — ${f.output}` }))
-    log(`${entry}: gate red (${g.failures.length} failure(s)) — fix ${n}/${maxGateFixes} by ${Object.keys(bySide).join(' and ')}`)
+  for (let n = 1; g && !g.green && !g.conflicts.length && n <= maxGateFixes; n++) {
+    const items = g.failures.map((f, i) => ({ id: `gate-${label}-${n}#${i + 1}`, reviewer: GATE, fix: `turn green: ${f.check} at ${f.where} (${f.cause})`, repro: f.output, rule: '' }))
+    log(`${entry}: gate red (${g.failures.length} failure(s)) — builder try ${n}/${maxGateFixes}`)
     phase('Fix')
-    const touched = await applyFixes(bySide, `fix-gate-${n}`, fixPrompt)
-    touched.forEach(s => fixed.push(...bySide[s]))
+    const b = await build(`Mode: fix. Entry ${entry}. Turn the gate green; the failures, quoted:\n${items.map(i => `- ${i.id}: ${i.fix}\n  ${i.repro}`).join('\n')}`, `fix-gate-${label}-${n}`, 'Fix')
+    const stop = absorb(b, `the builder (gate fix ${n})`)
+    if (stop) return { stop }
+    fixed.push(...items)
     phase('Gate')
-    g = await runGate(`${mergeSides(touched)} Run the gate again on the entry branch.\n${tail}`, `${label}-${n}`)
+    g = await runGate(`Run the gate again on the entry branch after the builder's fix.\n${tail}`, `${label}-${n}`)
   }
-  return g && { ...g, fixed }
+  if (!g) return { stop: interrupted('the gate') }
+  return { g, fixed }
 }
 
-const closeRecord = (g, round) => {
-  result.record = g.record
-  g.record.open.forEach((o, i) => result.deferred.push({ round, id: `record-r${round}#${i + 1}`, side: 'none', fix: o }))
+// ---------- the check: prove ∥ review, then the mechanical triage ----------
+
+const proven = (f) => Boolean((f.repro ?? '').trim() || (f.rule ?? '').trim())
+const precisionOf = (name) => result.precision[name] ?? (result.precision[name] = { found: 0, blocking: 0, deferred: 0, learn: 0, withRepro: 0, ruleOnly: 0, closed: 0 })
+
+const verifyItems = (v, key) => v.verdict === 'PASS' ? [] : v.failures.length
+  ? v.failures.map((f, i) => ({ id: `${key}.${i + 1}`, reviewer: VERIFIER, severity: 'blocker', title: `${f.check}: ${v.verdict}`, fix: `make it pass: expected ${f.expected}; observed ${f.observed}`, repro: `${f.command}\n${f.output}`, rule: f.check }))
+  : [{ id: `${key}.1`, reviewer: VERIFIER, severity: 'blocker', title: `the proof was ${v.verdict}`, fix: v.blocked || 'the verifier could not prove the entry', repro: v.blocked, rule: '' }]
+
+const check = async ({ round, kind, seats, since, own }) => {
+  const diffCmd = kind === 'whole' ? `git diff ${args?.base}...${args?.branch}` : `git diff $(git merge-tree --write-tree ${since} ${args?.base} | head -1) ${args?.branch}`
+  const fixesText = kind === 'delta' ? `
+THIS IS A DELTA (\`${diffCmd}\`). The fixes applied since the last check:
+${(result.rounds.at(-1)?.fixes ?? own?.all ?? []).map(f => `- ${f.id}: ${f.fix}`).join('\n') || '(none listed)'}` : ''
+  const ownText = (name) => kind === 'delta' && own?.[name]?.length ? `
+Your own blocking items of the check before — re-check only these, over the delta; return the closed ones in \`closed\`, and any still open again as a finding with its id in the title:
+${own[name].map(i => `- ${i.id}: ${i.title} — ${i.fix}${i.repro ? `\n  repro: ${i.repro}` : ''}${i.rule ? `\n  rule: ${i.rule}` : ''}`).join('\n')}` : ''
+  const common = `Entry ${entry}. Check ${round} (${kind}).
+${where}
+${docs}
+${acceptanceText()}
+The diff: run \`${diffCmd}\` in the worktree.
+The running stack: ${stackLine}`
+  const thunks = seats.map(name => () => name === VERIFIER
+    ? call(VERIFIER, `Mode: prove. ${common}
+The head to prove: ${head}
+The entry touches the server's product code: ${surface.api ? 'yes — run the failure-mode block' : 'no'}${fixesText}${kind === 'delta' && own?.verifier?.length ? `
+The checks that failed the last proof:\n${own.verifier.map(i => `- ${i.title}`).join('\n')}` : ''}`, { label: `${VERIFIER}·${entry}·prove-r${round}`, phase: kind === 'whole' ? 'Check' : 'Delta', schema: VERDICT })
+    : call(name, `You are ${name}. ${common}${fixesText}${ownText(name)}`, { label: `${name}·${entry}·r${round}`, phase: kind === 'whole' ? 'Check' : 'Delta', schema: REVIEW }))
+  log(`${entry} check ${round} (${kind}): ${seats.join(' ∥ ')}`)
+  const outs = await parallel(thunks)
+  const missing = seats.filter((_, i) => !outs[i])
+  if (missing.length) return { stop: interrupted(missing.join(', ')) }
+
+  const blocking = []
+  const tally = {}
+  seats.forEach((name, i) => {
+    const out = outs[i]
+    const key = `${name}#r${round}`
+    if (name === VERIFIER) {
+      result.verdicts.push({ round, verdict: out.verdict, head: out.head, canary: out.canary.hits.length, failureModes: out.failureModes.length, evidence: out.evidence.folder })
+      const items = verifyItems(out, key)
+      blocking.push(...items)
+      tally[name] = { verdict: out.verdict, blocking: items.length }
+      return
+    }
+    const p = precisionOf(name)
+    p.closed += out.closed.length
+    const t = tally[name] = { found: out.findings.length, blocking: 0, deferred: 0, learn: 0, closed: out.closed.length }
+    out.findings.forEach((f, k) => {
+      const item = { id: `${key}.${k + 1}`, reviewer: name, ...f }
+      p.found++
+      if (f.severity !== 'detail' && proven(f)) {
+        blocking.push(item); p.blocking++; t.blocking++
+        if ((f.repro ?? '').trim()) p.withRepro++; else p.ruleOnly++
+      } else if (f.severity !== 'detail') {
+        result.deferred.push({ round, ...item }); p.deferred++; t.deferred++
+      } else {
+        result.learnLog.push({ round, ...item }); p.learn++; t.learn++
+      }
+    })
+  })
+  result.rounds.push({ round, kind, seats, tally, blocking: blocking.map(b => ({ id: b.id, reviewer: b.reviewer, severity: b.severity, title: b.title, repro: Boolean((b.repro ?? '').trim()), rule: b.rule })), fixes: [] })
+  log(`${entry} check ${round}: ${blocking.length} blocking (${[...new Set(blocking.map(b => b.reviewer))].join(', ') || 'none'}), ${result.deferred.filter(d => d.round === round).length} deferred, ${result.learnLog.filter(d => d.round === round).length} to the learn log`)
+  return { blocking }
 }
 
-// ---------- mode: update — the moved base merged in, never rebased ----------
+// ---------- 1. acceptance ----------
+
+if ((mode === 'build' && !result.acceptance) || args?.acceptanceRevision) {
+  phase('Acceptance')
+  const a = await author(args?.acceptanceRevision)
+  if (!a) return interrupted('the verifier (author)')
+  const wrong = a.checks.filter(c => !c.rightReason)
+  if (wrong.length) log(`${entry}: ${wrong.length} acceptance check(s) red on the base for the wrong reason: ${wrong.map(c => c.file).join(', ')}`)
+  result.acceptance = { commit: a.commit, files: a.files, alreadyGreen: a.alreadyGreen, cannotCheck: a.cannotCheck, wrongReason: wrong.map(c => `${c.file}: ${c.redOnBase}`) }
+  log(`${entry}: ${a.checks.length} acceptance check(s) committed at ${a.commit}${a.cannotCheck.length ? `; ${a.cannotCheck.length} line(s) cannot be a check` : ''}`)
+} else if (!result.acceptance) {
+  log(`${entry}: no acceptance files given for mode ${mode} — the verifier proves what the brief names`)
+}
+
+// ---------- 2. build / update / resume / batch ----------
 
 let since = args?.base
 if (mode === 'update') {
   phase('Gate')
-  const g = await runGate(`Update ${args?.branch} with ${args?.base}: \`git merge --no-ff ${args?.base}\` on the entry branch, never a rebase, then push. On a conflict, \`git merge --abort\` and report the files by side. On a clean merge, bring the stack up and run the gate.
-${SCOPE[readyScope]}
+  const g = await runGate(`Update ${args?.branch} with ${args?.base}: \`git merge --no-ff ${args?.base}\` on the entry branch, never a rebase, then push. On a conflict, \`git merge --abort\` and report the files. On a clean merge, run the gate.
+${SCOPE.ready}
 ${recordTask([])}`, 'update')
   result.gate = g
   if (!g) return interrupted('the gate')
   if (!g.conflicts.length) {
     result.head = g.head
-    result.status = g.green ? 'ready' : 'parked'
-    if (!g.green) result.reason = 'gate-red'
-    if (g.green) closeRecord(g, 0)
-    log(`${entry}: clean merge of the base — ${g.green ? 'the gate green, ready' : 'the gate red after a clean merge, parked for the session'}`)
+    if (!g.green) return park('gate-red', 'the gate is red after a clean merge of the base')
+    result.record = g.record
+    g.record.open.forEach((o, i) => result.deferred.push({ round: 0, id: `record-update#${i + 1}`, reviewer: GATE, kind: 'record', fix: o }))
+    result.status = 'ready'
+    log(`${entry}: clean merge of the base, the gate green — ready`)
     return result
   }
-  const bySide = {}
-  g.conflicts.forEach(c => (bySide[c.side] ??= []).push(c.file))
-  for (const side of Object.keys(bySide)) {
-    await builder(side, `Mode: fix. Entry ${entry}, ${side} side. In ${args?.worktree}, merge ${args?.base} into ${args?.branch} (\`git merge --no-ff ${args?.base}\`; you are asked to) and resolve the conflicts in: ${bySide[side].join(', ')}. Keep both intents; never drop the base's change. Commit the merge and push ${args?.branch}; never a rebase, never a force-push.
-${docs}
-Attribution trailer: ${args?.trailer ?? '(none given)'}`, 'fix-update')
-  }
+  phase('Fix')
+  const b = await build(`Mode: fix. Entry ${entry}. In the worktree, merge ${args?.base} into ${args?.branch} (\`git merge --no-ff ${args?.base}\`; you are asked to) and resolve the conflicts in: ${g.conflicts.join(', ')}. Keep both intents; never drop the base's change. Commit the merge and push; never a rebase, never a force-push.`, 'fix-update', 'Fix')
+  const stop = absorb(b, 'the builder (update)')
+  if (stop) return stop
 }
 
-// ---------- mode: build — the sides in parallel ----------
-
-if (mode === 'build') {
+if (mode === 'build' || mode === 'batch') {
   phase('Build')
-  log(`${entry}: building ${sides.join(' ∥ ')}`)
-  const built = await parallel(sides.map(side => () => builder(side, `Mode: build. Entry ${entry}, ${side} side.
-Your worktree: ${args?.sides[side].worktree} · branch ${args?.sides[side].branch} (cut from ${args?.base})
-${docs}
-Attribution trailer for every commit, verbatim:
-${args?.trailer ?? '(none given)'}`, 'build').then(b => ({ side, b }))))
-  for (const { side, b } of built.filter(Boolean)) {
-    if (!b) return interrupted(BUILDERS[side])
-    if (b.needsAmendment) { result.status = 'needs-amendment'; result.amendment = { side, what: b.needsAmendment }; log(`${entry}: needs a foundation amendment (${side}): ${b.needsAmendment}`); return result }
-  }
+  const b = await build(mode === 'batch'
+    ? `Mode: build (a finishing slice). Entry ${entry}. Apply every line of ${args?.batchPath}: each is a deferred finding of an entry already merged, with its fix; one commit per line where separable, its id in the commit body; a line the code no longer needs is reported in \`applied\` with why.`
+    : `Mode: build. Entry ${entry}.`, 'build', 'Build')
+  const stop = absorb(b, 'the builder')
+  if (stop) return stop
 }
 
-// ---------- mode: resume — a parked run's last rulings, applied back ∥ front, then delta rounds ----------
-
+let resumeItems = []
 if (resume) {
   since = resume.head
-  log(`${entry}: resuming from ${resume.head} — applying the rulings of round ${resume.round} in ${resume.rulingsFile}`)
   phase('Fix')
-  const after = ['back', 'front'].includes(resume.after) ? resume.after : null
-  const resumePrompt = (side, _items, first) => `Mode: fix. Entry ${entry}, ${side} side.
-${sideTree(side)}${afterLine(first)}
-${docs}
-Attribution trailer for every commit, verbatim:
-${args?.trailer ?? '(none given)'}
-The rulings to apply are in ${resume.rulingsFile}: the return of the parked run (its \`rounds\`, round ${resume.round}, \`rulings\`), or a judge's return (its \`rulings\`). Apply every ruling there whose \`ruling\` is "sustained" and whose \`side\` is "${side}"; its id is its \`ids\` joined with "+". Return one \`applied\` entry per id. If nothing there is for your side, change nothing after bringing your worktree to the entry branch.`
-  const bySide = Object.fromEntries(sides.map(s => [s, [{ id: 'resume', side: s, after: after && after !== s ? after : 'none' }]]))
-  await applyFixes(bySide, 'fix-resume', resumePrompt)
+  log(`${entry}: resuming from ${resume.head} — applying ${resume.fixesFile}`)
+  const b = await build(`Mode: fix. Entry ${entry}. The items to apply are in ${resume.fixesFile} (its \`fixes\`: id, reviewer, fix, repro, rule). Apply every one; return one \`applied\` entry per id.`, 'fix-resume', 'Fix', 'high')
+  const stop = absorb(b, 'the builder (resume)')
+  if (stop) return stop
+  resumeItems = Array.isArray(resume.reviewers) ? resume.reviewers : []
 }
+
+// ---------- 3. gate ----------
 
 phase('Gate')
-const g0 = await gateUntilGreen(mode === 'build'
-  ? `${mergeSides(sides)} Bring the stack up and run the gate.`
-  : resume
-    ? `${mergeSides(sides)} Bring the stack up if it is down, and run the gate.`
-    : 'Run the gate on the entry branch after the conflict resolution (no merge).', 'r0', 'round')
+const g0r = await gateUntilGreen(mode === 'update' ? 'Run the gate on the entry branch after the conflict resolution (no merge).' : 'Run the gate on the entry branch.', 'r0', 'round')
+if (g0r.stop) return g0r.stop
+let g0 = g0r.g
 result.gate = g0
-if (!g0) return interrupted('the gate')
-if (!g0.green) return park('gate-red', 'the gate is still red')
+if (!g0.green) { result.head = g0.head; return park('gate-red', g0.conflicts.length ? 'the merge still conflicts' : `the gate is still red after ${maxGateFixes} tries`) }
 
-// ---------- the review rounds ----------
-
-const hasFront = sides.includes('front')
-// The surface the gate read from the diff's paths; unknown → every seat, as before.
 const surface = g0.surface ?? { api: true, screen: true, runtime: true, paths: [] }
-const qaSides = sides.filter(s => s === 'back' ? surface.api : surface.screen)
-log(`${entry}: surface ${['api', 'screen', 'runtime'].filter(k => surface[k]).join(' + ') || 'none (tests, tooling, build or docs only)'}`)
-const proofSeats = (on) => {
-  const split = sides.length > 1 ? sides.filter(s => on.includes(s)) : []
-  return split.length ? split.map(side => ({ agent: PROOF, side })) : [{ agent: PROOF }]
-}
-const wholeSeats = () => [
-  { agent: FIDELITY }, { agent: WORKAROUND }, ...proofSeats(sides), { agent: SECURITY },
-  ...(!lean && (surface.api || surface.runtime) ? [{ agent: OPERATIONS }] : []),
-  ...(entry === 'F' && mode === 'build' ? [{ agent: CRAFT }] : []),
-  ...(hasFront && surface.screen ? [{ agent: VISUAL }] : []),
-  ...qaSides.map(s => ({ agent: QA[s] })),
-  ...(qaSides.length ? [{ agent: QA_ABUSE }] : []),
-]
-const deltaSeats = (f) => {
-  const fixed = f ? sides.filter(s => f.sides.has(s)) : sides
-  const touches = f ? f.touches : new Set(TOUCHES)
-  const replay = sides.filter(s => (fixed.includes(s) || (s === 'back' && touches.has('concurrency'))) && qaSides.includes(s))
-  return [
-    { agent: FIDELITY }, { agent: WORKAROUND }, ...proofSeats(fixed.length ? fixed : sides),
-    ...(SECURITY_TOUCHES.some(t => touches.has(t)) ? [{ agent: SECURITY }] : []),
-    ...(hasFront && touches.has('screen') ? [{ agent: VISUAL }] : []),
-    ...(!lean && (surface.api || surface.runtime) && (!f || f.lenses.has(OPERATIONS)) ? [{ agent: OPERATIONS }] : []),
-    ...(replay.length ? [{ agent: QA_REPLAY, replay }] : []),
-  ]
-}
-const seatName = (seat) => `${seat.agent}${seat.side ? `·${seat.side}` : ''}`
-const coverageGaps = (coverage, cats) => cats.filter(c => !(coverage ?? []).some(x => x.category === c && (x.tried ? x.cases > 0 : x.why_not.trim())))
-
-const priorText = () => {
-  const parts = []
-  if (priorRuns.length) parts.push(`Earlier runs of this entry (their returns, every round's rulings): ${priorRuns.join(', ')}`)
-  if (resume) parts.push(`The parked run this one resumes: ${resume.rulingsFile}`)
-  if (result.rounds.length) parts.push(`This run's earlier rounds:\n${JSON.stringify(result.rounds.map(r => ({ round: r.round, rulings: r.rulings.map(x => ({ ids: x.ids, ruling: x.ruling, reason: x.reason })) })), null, 1)}`)
-  return parts.length ? `
-
-ALREADY RULED — a finding ruled there is not reported again unless the code under it changed since:
-${parts.join('\n')}` : ''
-}
-
 let head = g0.head
-let stack = g0.stack
-let focus = null
-const recordItems = []
-let lastRound = maxRounds
-for (let round = 1; round <= lastRound; round++) {
-  const whole = round === 1 && !resume
-  // The delta is what the entry changed since `since`, never what a merge of the base brought:
-  // compared against the tree of `since` merged with the base.
-  const diffCmd = whole ? `git diff ${args?.base}...${args?.branch}` : `git diff $(git merge-tree --write-tree ${since} ${args?.base} | head -1) ${args?.branch}`
-  const lastFixes = result.rounds.at(-1)?.fixes ?? (resume ? [{ id: `round ${resume.round} of the parked run`, side: 'back+front', fix: `the sustained rulings in ${resume.rulingsFile}` }] : [])
-  const panelInputs = (seat) => `Round ${round} (${whole ? 'whole' : 'delta'}). Entry ${entry}. You are ${seat.agent}${seat.side ? `, for the ${seat.side} side only` : ''}.${seat.replay ? ` Replay the saved QA scripts of the ${seat.replay.join(' and ')} side(s), and write and run the case of each fix.` : ''}
-${docs}
-Worktree: ${args?.worktree} · branch ${args?.branch} · base ${args?.base}
-The diff to read first: run \`${diffCmd}\` in the worktree.
-The gate's evidence: ${args?.evidenceDir} (the gate output; screenshots; the QA scripts under qa-*/)
-The running stack: ${stack}${priorText()}${!whole ? `
+let stackLine = g0.stack
+log(`${entry}: surface ${['api', 'screen', 'runtime'].filter(k => surface[k]).join(' + ') || 'none (tests, tooling, build or docs only)'}`)
 
-THIS IS A DELTA ROUND — a verification of the fixes below, by your definition's delta rule. The fixes applied since the last round:
-${lastFixes.map(f => `- ${f.id} (${f.side}): ${f.fix}`).join('\n') || '(none listed)'}` : ''}`
+const wholeSeats = mode === 'batch'
+  ? [VERIFIER, STRUCTURE]
+  : [VERIFIER, REVIEWER, STRUCTURE, SECURITY, ...(surface.api || surface.runtime ? [OPERATIONS] : [])]
 
-  const runSeat = async (seat) => {
-    const cats = QA_CATEGORIES[seat.agent]
-    const schema = cats ? qaReview(cats) : REVIEW
-    const label = `${seatName(seat)}·${entry}·r${round}`
-    const prompt = panelInputs(seat)
-    let r = await agent(prompt, { label, phase: 'Panel', agentType: seat.agent, schema })
-    let missing = cats && r ? coverageGaps(r.coverage, cats) : []
-    if (missing.length) {
-      log(`${label}: no coverage for ${missing.join(', ')} — sent back for those`)
-      const more = await agent(`${prompt}
+// ---------- 4–6. check, triage, one fix, the delta ----------
 
-YOUR FIRST PASS IS DONE; ITS COVERAGE MISSED: ${missing.join(', ')}. Cover only these categories now (tried with its cases, or not tried with why_not), and report what they find.`, { label: `${label}·more`, phase: 'Panel', agentType: seat.agent, schema })
-      if (more) r = { ...r, verified: [...r.verified, ...more.verified], findings: [...r.findings, ...more.findings], coverage: [...r.coverage, ...more.coverage], unsettled: [...r.unsettled, ...more.unsettled] }
-      missing = coverageGaps(r.coverage, cats)
-    }
-    return { seat, ...(r ?? { verdict: 'fail', verified: [], quote: '', findings: [] }), invalid: !r ? 'no output' : missing.length ? `no coverage for ${missing.join(', ')}` : null }
-  }
+let own = null
+let round = 1
+let pending = { kind: 'whole', seats: wholeSeats }
+if (resume) {
+  // The resume's items were applied above: the first check is already the delta, by the
+  // verifier and the reviewers the items name (reviewer and structure-reviewer when none is named).
+  const named = resumeItems.filter(r => wholeSeats.includes(r) && r !== VERIFIER)
+  own = { all: [{ id: 'resume', fix: `the items in ${resume.fixesFile}` }] }
+  round = maxRounds
+  pending = { kind: 'delta', seats: [VERIFIER, ...(named.length ? named : wholeSeats.filter(s => s === REVIEWER || s === STRUCTURE))] }
+}
 
-  phase('Panel')
-  const seats = whole ? wholeSeats() : deltaSeats(focus)
-  log(`${entry} round ${round}: ${seats.length} reviewers (${seats.map(seatName).join(', ')}) over \`${diffCmd}\``)
-  const reviews = (await parallel(seats.map(seat => () => runSeat(seat)))).filter(Boolean)
-  if (reviews.every(r => r.invalid === 'no output')) return interrupted(`every reviewer of round ${round}`)
+for (;;) {
+  const c = await check({ round, kind: pending.kind, seats: pending.seats, since, own })
+  if (c.stop) return c.stop
+  if (!c.blocking.length) break
+  if (round >= maxRounds) { result.head = head; return park('round-cap', `${c.blocking.length} item(s) still blocking after the fix`) }
 
-  const findings = []
-  const unsettled = []
-  reviews.forEach(r => {
-    const key = `${r.seat.agent}#r${round}${r.seat.side ? `.${r.seat.side}` : ''}`
-    r.findings.forEach((f, i) => findings.push({ id: `${key}.${i + 1}`, lens: r.seat.agent, ...f }))
-    ;(r.unsettled ?? []).forEach((u, i) => unsettled.push({ id: `${key}.u${i + 1}`, lens: r.seat.agent, ...u }))
-  })
-  const invalid = reviews.filter(r => r.invalid).map(r => `${seatName(r.seat)} (${r.invalid})`)
-  if (invalid.length) log(`${entry} round ${round}: invalid output from ${invalid.join(', ')}`)
-  const coverage = reviews.filter(r => r.coverage).map(r => ({ qa: r.seat.agent, coverage: r.coverage }))
-
-  phase('Judge')
-  const j = await agent(`Round ${round}. Entry ${entry}. ${autonomous
-    ? 'Autonomous: the session runs under a goal and nobody answers until the audit — the ruler\'s autonomous mode applies.'
-    : 'Not autonomous: what the ruler sends to the session or decides on its own goes to the user.'}
-${docs}
-The ruler (read it whole first): ${args?.judgingPath}
-Worktree: ${args?.worktree} · the diff: \`${diffCmd}\`
-Reviewers that returned nothing or an incomplete coverage this round: ${invalid.join(', ') || 'none'}
-${priorRuns.length ? `Earlier runs of this entry, with their rulings (a finding ruled there is not ruled again unless the code changed under it): ${priorRuns.join(', ')}\n` : ''}${resume ? `The parked run this one resumes, with its rounds' rulings (a finding ruled there is not ruled again unless the code changed under it): ${resume.rulingsFile}\n` : ''}${result.rounds.length ? `Previous rounds' rulings:\n${JSON.stringify(result.rounds.map(r => ({ round: r.round, rulings: r.rulings })), null, 1)}\n` : ''}
-The findings of this round:
-${JSON.stringify(findings, null, 1)}
-The QA's unsettled observations of this round, each ruled like a finding:
-${JSON.stringify(unsettled, null, 1)}`, { label: `${JUDGE}·${entry}·r${round}`, phase: 'Judge', agentType: JUDGE, schema: RULINGS })
-  if (!j) return interrupted(`the judge of round ${round}`)
-  addPrecision(j.precision)
-
-  const fixes = j.rulings.filter(r => r.ruling === 'sustained' && r.side !== 'none')
-    .map((r, i) => ({ id: r.ids.join('+') || `j#${i + 1}`, side: r.side, fix: r.fix, after: r.after, touches: r.touches }))
-  j.rulings.filter(r => r.ruling === 'deferred').forEach((r, i) => {
-    const item = { round, id: r.ids.join('+') || `d#${round}.${i + 1}`, side: r.side, fix: r.fix }
-    if (r.side === 'none') recordItems.push(item)
-    else result.deferred.push(item)
-  })
-  j.decided.forEach(d => result.decided.push({ round, ...d }))
-  result.rounds.push({ round, findings: findings.length, unsettled: unsettled.length, invalid, coverage, rulings: j.rulings, fixes, seen: j.seen })
-  log(`${entry} round ${round}: ${findings.length} finding(s) and ${unsettled.length} unsettled → ${fixes.length} to fix, ${result.deferred.filter(d => d.round === round).length} deferred, ${j.decided.length} decided, ${j.toSession.length} for the session, ${j.toUser.length} for the user`)
-
-  if (j.toUser.length || j.toSession.length) {
-    result.questions = [...j.toUser.map(q => ({ to: 'user', ...q })), ...j.toSession.map(q => ({ to: 'session', ...q }))]
-    result.status = j.toUser.length ? 'parked' : 'needs-session'
-    if (j.toUser.length) result.reason = 'user'
-    result.head = head
-    log(`${entry}: ${result.status === 'parked' ? 'parked for the user' : 'waits for the session'}`)
-    return result
-  }
-
-  if (!fixes.length) {
-    phase('Gate')
-    const fin = await gateUntilGreen(`Nothing sustained in round ${round}: the last gate before ready, on the entry branch (no merge).`, `final-r${round}`, readyScope, recordItems)
-    result.gate = fin
-    if (!fin) return interrupted('the gate')
-    if (!fin.green) { result.head = head; return park('gate-red', 'the gate is red before ready') }
-    if (!fin.fixed.length) {
-      closeRecord(fin, round)
-      await runGate('The entry is done: bring the stack down.', 'down')
-      result.status = 'ready'; result.head = fin.head
-      log(`${entry}: ready at ${fin.head}`)
-      return result
-    }
-    if (round === lastRound && lastRound > maxRounds) { result.head = fin.head; return park('round-cap', 'the gate needed fixes again after the extra round') }
-    if (round === lastRound) { lastRound++; log(`${entry}: the whole gate needed fixes in the last round — one extra round reviews only them`) }
-    result.rounds.at(-1).fixes = fin.fixed
-    focus = { lenses: new Set(), sides: new Set(fin.fixed.map(f => f.side)), touches: new Set(fin.fixed.some(f => f.side === 'front') ? ['screen'] : []) }
-    since = head; head = fin.head; stack = fin.stack
-    continue
-  }
-  if (round >= maxRounds) { result.head = head; return park('round-cap', `still ${fixes.length} to fix after ${maxRounds} rounds`) }
-
-  focus = {
-    lenses: new Set(j.rulings.filter(r => r.ruling === 'sustained').flatMap(r => r.ids.map(id => id.split('#')[0]))),
-    sides: new Set(fixes.map(f => f.side)),
-    touches: new Set(fixes.flatMap(f => f.touches)),
-  }
   phase('Fix')
   since = head
-  const bySide = {}
-  fixes.forEach(f => (bySide[f.side] ??= []).push(f))
-  const touched = await applyFixes(bySide, `fix-r${round}`, fixPrompt)
-  const g = await gateUntilGreen(`${mergeSides(touched)} Then run the gate on the entry branch.`, `r${round}`, 'round')
-  result.gate = g
-  if (!g) return interrupted('the gate')
-  if (!g.green) return park('gate-red', `the gate is red after the round-${round} fixes`)
-  g.fixed.forEach(f => { focus.sides.add(f.side); if (f.side === 'front') focus.touches.add('screen') })
-  result.rounds.at(-1).fixes = [...fixes, ...g.fixed]
-  head = g.head; stack = g.stack
+  const b = await build(`Mode: fix. Entry ${entry}. Apply every blocking item below; run its proof red first, then make it green; return one \`applied\` entry per id.
+${c.blocking.map(i => `- ${i.id} (${i.reviewer}, ${i.severity}): ${i.title} — ${i.fix}${(i.repro ?? '').trim() ? `\n  repro: ${i.repro}` : ''}${(i.rule ?? '').trim() ? `\n  rule: ${i.rule}` : ''}`).join('\n')}`, `fix-r${round}`, 'Fix', 'high')
+  const stop = absorb(b, `the builder (fix of check ${round})`)
+  if (stop) return stop
+  phase('Gate')
+  const gr = await gateUntilGreen('Run the gate on the entry branch after the fix.', `r${round}`, 'round')
+  if (gr.stop) return gr.stop
+  result.gate = gr.g
+  if (!gr.g.green) { result.head = gr.g.head; return park('gate-red', `the gate is red after the fix of check ${round}`) }
+  result.rounds.at(-1).fixes = [...c.blocking.map(i => ({ id: i.id, fix: i.fix })), ...gr.fixed.map(i => ({ id: i.id, fix: i.fix }))]
+  head = gr.g.head; stackLine = gr.g.stack
+
+  // Only the reviewers that blocked come back, each with its own items; the verifier always.
+  own = {}
+  c.blocking.forEach(i => (own[i.reviewer] ??= []).push(i))
+  pending = { kind: 'delta', seats: [VERIFIER, ...wholeSeats.filter(s => s !== VERIFIER && own[s])] }
+  round++
 }
 
+// ---------- 7. ready: the gate keep-going and the record ----------
+
+phase('Gate')
+const recordItems = result.deferred.filter(d => d.kind === 'record')
+const fin = await gateUntilGreen('Nothing blocks: the last gate before ready, on the entry branch (no merge).', 'ready', 'ready', recordItems)
+if (fin.stop) return fin.stop
+result.gate = fin.g
+if (!fin.g.green) { result.head = fin.g.head; return park('gate-red', 'the gate is red before ready') }
+if (fin.fixed.length) {
+  // The ready gate needed code: one delta of the whole panel over it, no fix after it.
+  log(`${entry}: the ready gate needed ${fin.fixed.length} fix(es) — one delta of the whole panel reads them`)
+  result.rounds.at(-1).fixes.push(...fin.fixed.map(i => ({ id: i.id, fix: i.fix })))
+  since = head; head = fin.g.head; stackLine = fin.g.stack
+  const c = await check({ round: round + 1, kind: 'delta', seats: wholeSeats, since, own: { all: fin.fixed } })
+  if (c.stop) return c.stop
+  if (c.blocking.length) { result.head = head; return park('round-cap', `the fix the ready gate needed still blocks (${c.blocking.length})`) }
+}
+result.record = fin.g.record
+fin.g.record.open.forEach((o, i) => result.deferred.push({ round, id: `record-ready#${i + 1}`, reviewer: GATE, kind: 'record', fix: o }))
+await runGate('The entry is done: bring the stack down.', 'down')
+result.status = 'ready'
+result.head = fin.g.head
+log(`${entry}: ready at ${fin.g.head}`)
 return result

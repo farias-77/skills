@@ -148,33 +148,42 @@ receives one goal, "build the whole plan", and orchestrates without
 writing or reviewing code: the foundation first, then every entry whose
 edges are merged or ready, critical path first, in parallel up to the
 cap the machine was measured to hold, each in its own worktree and
-local stack, through the **exec-entry** workflow.
-`builder-backend` and `builder-frontend` (Opus 5.5, high) build the two
-sides at once in their own worktrees, tests and journeys first, and
-check their own work against the reviewers' checklist before they
-return; the **gate** (`exec-gate`, Sonnet 5.5, medium) merges them and runs
-the doctrine's fast check and affected tests each round, sending every
-red back to the side that owns it; a **panel that never wrote the
-code** reads the diff — lenses for fidelity, workaround, proof (one per
-side), security, operations and visual (Opus 5.5, medium, fidelity and
-visual on Sonnet 5.5, high; craft only on the foundation) and QA that use the running stack as an adversary
-through a mandatory checklist, per side and one for abuse (Opus 5.5,
-high), each seated only when the diff touches what it reads — and a **judge** (`exec-judge`, Opus 5.5, medium) rules every
-finding, on its own under the goal, sending the rest to the session or
-the user; the builders fix back ∥ front, the gate runs, and the delta is
-verified by the lenses it touches and a QA replay (Sonnet 5.5, medium), two
-rounds at most; before an entry is ready the whole gate runs once and
-the gate writes the record. **No code enters without review**: every
-build, fix, conflict resolution and foundation amendment passes the
-gate and the panel. The session merges what comes back ready through a
-serial queue (the base merged in, the affected gate, merge), writes foundation
-amendments when an entry needs a shared file changed, builds the
-deferred findings in parallel finishing slices, reads the whole branch
-once for maintainability, and parks what is the user's. When everything
-is merged and green it calls him once for the **audit**: the parked,
-what was decided in his place, the choices the builders made where the
-documents were silent, the precision of every reviewer and the QA's
-coverage. `main` is stage 5's.
+local stack, through the **exec-entry** workflow. **Acceptance
+first**: the `verifier` (Sonnet 5.5, high) writes the entry's
+acceptance checks from the brief — browser journeys for screens,
+integration tests for the server — proves them red on the base and
+commits them; from then on they are read-only for the builder. One
+`builder` (Opus 5.5, medium) writes back and front in the entry
+worktree, following the project's **golden paths**, reusing what
+exists and keeping functions and files small, and does not stop until
+the gate commands are green; the **gate** (`exec-gate`, Sonnet 5.5,
+low) runs them again (the fast check, the affected tests, the
+structure check) and rejects any change to an acceptance file. Then,
+in parallel, the verifier proves the checks on the running stack with
+evidence (screenshots, video, side effects read back, a PII canary, a
+failure-mode block for server entries) while reviewers that never
+wrote the code read the diff: `reviewer` (Sonnet 5.5, high) for
+correctness and fidelity, `structure-reviewer` (Opus 5.5, medium) for
+maintainability, `exec-lens-security` on every diff and
+`exec-lens-operations` on every server diff (Opus 5.5, medium). There
+is no judge: a finding **blocks** only with a reproduction or a
+violated written rule; the rest is deferred or goes to a learn log.
+The builder fixes once, at high effort, and the verifier and the
+reviewers that blocked check the delta; still blocking, the entry
+parks. **No code enters without review**: every build, fix, conflict
+resolution, foundation amendment and batch slice passes the gate and
+the check. The session merges what comes back ready through a serial
+queue (the base merged in, the affected gate, merge), writes
+foundation amendments when an entry needs a shared file changed,
+builds the deferred findings at the end in one batch slice per side
+group, reads the whole branch once for maintainability
+(`exec-lens-craft`, Opus 5.5, medium), renders a short video of each
+entry (`video-scribe`, Sonnet 5.5, medium), and parks what is the
+user's. When everything is merged and green it closes with the stage
+report (video, slides, blueprint) and calls him once for the
+**audit**: the parked, what was decided in his place, the choices the
+builder made where the documents were silent, the precision of every
+reviewer and the verifier's verdicts. `main` is stage 5's.
 
 **5 · Release** — the audited feature branch reaches production
 through the project's own delivery pipeline, with one question to the
