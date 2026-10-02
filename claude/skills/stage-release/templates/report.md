@@ -16,9 +16,9 @@
 
 ## The release in numbers
 
-| Staging runs | Reds | Fix entries | Rollbacks | Hotfixes | Watch proofs read |
-|---|---|---|---|---|---|
-| <n> | <n> | <n> | <n> | <n> | <n> of <n> |
+| Staging runs | Reds | Verifier on staging | Fix entries | Rollbacks | Hotfixes | Watch proofs read | Waiting on him |
+|---|---|---|---|---|---|---|---|
+| <n> | <n> | <n>/<n> entries PASS | <n> | <n> | <n> | <n> of <n> | <h> |
 
 ## What was fixed on the way
 
@@ -36,4 +36,5 @@
 
 - Blueprint: <url> (Release tab)
 - `04-release/trace.md` · `plan.md` · `entries/` · `proof/`
+- The stage report: follow claude/docs/stage-report.md (video, slides, blueprint).
 - `.state.md` → `stage: close`. Next: `/clear`, then `/stage-close <slug>`.

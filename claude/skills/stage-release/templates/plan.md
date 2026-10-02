@@ -27,15 +27,23 @@
 
 ## Pre-flight — only he can do these
 
-| # | What | Why the session cannot | Status |
-|---|---|---|---|
-| 1 | <what> | <why> | **done** <date> \| **delegated:** <how, where the value lives> |
+| # | What | Why the session cannot | Ready command | Status |
+|---|---|---|---|---|
+| 1 | <what> | <why; "the classifier reserves it" for an apply, a secret's value, a credential or person's data read, a production-deploy agent> | `! <command>` \| `! bash <scratchpad script>` | **done** <date> \| **delegated:** <how, where the value lives> |
+
+Sent to him in one message (and one PushNotification) at <YYYY-MM-DD HH:MM UTC>.
 
 ## Staging
 
 | # | The session | The CI | Check (read-only) → expected |
 |---|---|---|---|
 | 1 | PR `feat/<workstream>` → `<staging branch>`, merge on green | deploys staging, runs the staging suite | `<command>` → `<value>` |
+
+## The verifier on staging
+
+| Entry | Acceptance files | Staging URLs and actors | Lines staging reaches that local could not |
+|---|---|---|---|
+| <E-nn> | `<paths>` @ `<commit>` | <the doctrine's staging actors> | <line> \| none |
 
 ## Production (after "vai")
 
@@ -46,6 +54,8 @@
 **Rollback:** <the doctrine's automatic rollback, one line> · safe for data: yes | **no: <why>**
 
 ## The watch
+
+<!-- Only proofs with their own hour (the first scheduled run, the first real data). An existing alarm's first evaluation is not a row: its state is read at the end of production. -->
 
 | # | What | Readable at (UTC) | Expects | Read by |
 |---|---|---|---|---|

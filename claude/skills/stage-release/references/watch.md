@@ -10,11 +10,22 @@ an hour, and the stage does not close before it is read.
 ## The list
 
 From the audit's residue deferred to production, plus every check the
-design's rollout writes for "after the first <run/day/evaluation>". Each becomes a row in the plan's watch table
+design's rollout writes for "after the first <run/day>": a proof with
+its own hour, whose evidence does not exist until then. Each becomes a row in the plan's watch table
 and a step in `release.json` `watch[]`: what · the hour it can be
 read (absolute, UTC, from the design's schedule; the earliest hour
 at which the evidence exists, not a round number) · what it expects ·
 the command that reads it.
+
+## What is not waited for
+
+An alarm that already exists and notifies its recipient on its own is
+not a watch row, and neither is its first evaluation. Its state is
+read once at the end of production, written as it is (an `OK` from
+"no datapoints" is written as no datapoints, not as health), and the
+alarm watches from then on. Two releases in a row the user skipped
+the hour scheduled for this as a wait that buys nothing: off-peak the alarm reads "no datapoints", and at peak the hour shows
+nothing the alarm would not send him by itself.
 
 ## The wait
 
@@ -24,7 +35,7 @@ held open. The wakeup fires, the session runs the command, saves the
 output to `04-release/proof/watch-<n>.txt`, compares with what was
 expected, writes the trace line, updates `release.json`, and either
 schedules the next hour or, when this was the last, closes the stage
-(SKILL.md step 7). A wakeup that did not fire (the session was
+(SKILL.md step 6). A wakeup that did not fire (the session was
 resumed later) is read as soon as the session is back: the evidence
 is still there.
 

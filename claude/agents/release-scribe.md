@@ -32,7 +32,11 @@ to write, and the project's doctrine (its commit convention).
    after the type ⇒ **major**; else any `feat` ⇒ **minor**; else ⇒
    **patch**. A commit that does not parse counts as patch and is
    reported with its sha and its first line: it slipped past the
-   commit convention, and the session records it.
+   commit convention, and the session records it. Git's own revert
+   (`Revert "<subject>"` with `This reverts commit <sha>.`) is not
+   outside the convention: it cancels the commit it names (both leave
+   the bump and the notes) and is listed under `reverts`, which the
+   close and the weekly read for the revert rate.
 4. **The notes**, written to the file: a title line with the version
    and the date; breaking changes first, each with what the consumer
    must do; then features, fixes, the rest, grouped by type, one line
@@ -61,4 +65,5 @@ its remote.
 `initial`) · `version` (`vX.Y.Z`) · `commits` (the count) · `drivers`
 (the commit lines, verbatim, that drove the bump) · `notesFile` (the
 path you wrote) · `unparsed` (sha and first line of every commit
-outside the convention). Nothing else.
+outside the convention) · `reverts` (sha and first line of every
+revert). Nothing else.
