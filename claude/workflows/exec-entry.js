@@ -506,7 +506,7 @@ let lastRound = maxRounds
 for (let round = 1; round <= lastRound; round++) {
   const whole = round === 1 && !resume
   // The delta is what the entry changed since `since`, never what a merge of the base brought:
-  // compared against the tree of \`since\` merged with the base.
+  // compared against the tree of `since` merged with the base.
   const diffCmd = whole ? `git diff ${args?.base}...${args?.branch}` : `git diff $(git merge-tree --write-tree ${since} ${args?.base} | head -1) ${args?.branch}`
   const lastFixes = result.rounds.at(-1)?.fixes ?? (resume ? [{ id: `round ${resume.round} of the parked run`, side: 'back+front', fix: `the sustained rulings in ${resume.rulingsFile}` }] : [])
   const panelInputs = (seat) => `Round ${round} (${whole ? 'whole' : 'delta'}). Entry ${entry}. You are ${seat.agent}${seat.side ? `, for the ${seat.side} side only` : ''}.${seat.replay ? ` Replay the saved QA scripts of the ${seat.replay.join(' and ')} side(s), and write and run the case of each fix.` : ''}
