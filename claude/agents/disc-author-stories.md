@@ -51,7 +51,11 @@ from:
   notes, or is your guess in the Inferred list, or is written as out
   of the story with the reason. None is left unsaid.
 - "Out of this story" from the theme's **Out** block, with the reason
-  or the direction as the notes give it.
+  or the direction as the notes give it. Every story carries its own
+  Out, because a blind reader reads one story alone: an Out item that
+  touches this story's outcome is repeated here even when another
+  story already lists it, and a story with no screen of its own says
+  "no screen". An empty Out is written as "nothing" with the reason.
 
 The vocabulary block is copied from the notes, not rewritten.
 

@@ -290,8 +290,8 @@ an AC, that the PR-FAQ's "What we are NOT building" matches the notes'
 Out blocks and the cut stories, and that the two JSON files match
 their documents. Anything missing goes back to the author of that
 file in one message before the review starts. What an author had to
-guess sits in its Inferred list; you ask the user about each one with
-the decisions of step 5.
+guess sits in its Inferred list; you ask the user about them with the
+decisions of step 5, the ones you would confirm in one question.
 
 ## Step 4 — the review round
 
@@ -346,6 +346,14 @@ each with its label as the decision and its description as what that
 decision costs or buys. Every answer is a ruling line in `rulings.md`
 as it happens; a pattern across answers is a line in `taste-notes.md`.
 
+The authors' inferences you would confirm are **one question**, not
+one each: the question text lists them (id, the guess, the story),
+and the options are "Confirm all" (yours) and "Confirm all except the
+ones I name". An inference you doubt, or one that touches a
+never-dismissed class, gets its own question. He already answers them
+this way ("Confirmar todos, menos I-6 e I-20"); the skill now asks it
+that way.
+
 **For the design.** A finding whose answer is a mechanism the design
 stage decides (a lock, a retry policy, an HTTP status, a storage
 shape) is not asked and not dropped: it goes to the "For the design"
@@ -392,6 +400,10 @@ The build validates every file against the schema
 refuses with the field named; fix the data, never the HTML. Publish `blueprint.html`,
 keep the same file path at every later stage, and record the owning
 account beside the URL in `.state.md`.
+
+The stage report: follow
+[claude/docs/stage-report.md](../../docs/stage-report.md) (video,
+slides, blueprint).
 
 Present the URL and ask for approval. Approval is explicit; silence or
 a loose "looks good" does not close the stage. The user reads the

@@ -1,6 +1,6 @@
 ---
 name: stage-design
-description: Conducts stage 2 (Design) — takes an approved discovery and designs, with the user, how the whole demand gets built on the system as it is. Recon first (scouts, Sonnet 5.5 low, read the current system; a deep-research workflow, Sonnet 5.5 medium, reads the docs of every external tool); then the conductor asks whether the user already has a shape in mind, builds on it or arrives with its own proposal across the eleven subjects under the construction razor (extend what exists, a new piece only for a new responsibility, never a workaround, never speculation), and iterates with him to a final version; then ten writers (Sonnet 5.5, high) write the ten documents in parallel, deciding nothing, and review round 1 runs at once: ten lenses (five Opus 5.5 medium, five Sonnet 5.5 medium), two blind readers (Sonnet 5.5, low) and a referee (Sonnet 5.5, low) per flow, judged by the conductor; delta rounds on the user's call, three at most; the blueprint's Design tab read by the user at the close. Runs in Claude Code with an Opus 5.5 session at high effort. Use after a discovery is approved, or to resume a design in progress.
+description: Conducts stage 2 (Design) — takes an approved discovery and designs, with the user, how the whole demand gets built on the system as it is. Recon first (scouts, Sonnet 5.5 low, read the current system; a deep-research workflow, Sonnet 5.5 medium, reads the docs of every external tool); then the conductor asks whether the user already has a shape in mind, builds on it or arrives with its own proposal across the eleven subjects under the construction razor (extend what exists, a new piece only for a new responsibility, never a workaround, never speculation), and iterates with him to a final version; then ten writers (Sonnet 5.5, high) write the ten documents in two waves (data-model and contracts first, which fix every name; then the other eight), deciding nothing; video-scribe (Sonnet 5.5, medium) renders a short video per document in the background while review round 1 runs: ten lenses (five Opus 5.5 medium, five Sonnet 5.5 medium), two blind readers (Sonnet 5.5, low) and a referee (Sonnet 5.5, low) per flow, judged by the conductor; delta rounds by the rule the user picks once at the session's close, three at most; the blueprint's Design tab read by the user at the close. Runs in Claude Code with an Opus 5.5 session at high effort. Use after a discovery is approved, or to resume a design in progress.
 disable-model-invocation: false
 argument-hint: "<workstream-slug>"
 allowed-tools: Read, Write, Edit, Glob, Grep, Agent, SendMessage, Workflow, AskUserQuestion, Artifact, WebSearch, WebFetch, Bash(mkdir *), Bash(date *), Bash(ls *), Bash(cat *), Bash(rm *), Bash(git *), Bash(node *)
@@ -64,25 +64,28 @@ plan or a promise; do the work.
              say where you would go another way, with the tradeoffs. No: you arrive with the
              proposal. Either way it covers all eleven subjects, under the construction razor
 3. Converse  iterate with him to the final version; real forks become cards; notes.md rewritten
-             in place, one version of each decision; ends on an explicit "that's it"
-4. Write     ten design-writer (Sonnet 5.5, high) in parallel, one per document, same source:
-             your brief + notes.md + research/ + the template; zero decisions — questions come
-             back to you, you answer or ask the user; each also writes blueprint/design/<doc>.json
-5. Review    round 1 whole and automatic, right after the writers: design-review workflow (ten lenses, Opus/Sonnet 5.5 medium;
-             per flow two blind readers Sonnet 5.5 low + a referee Sonnet 5.5 low); you judge
-             every finding by references/judging.md; wording → writers, decisions → user,
-             one question per decision
-6. Iterate   the user says whether another round runs; rounds 2 and 3 are delta only;
-             three at most
+             in place, one version of each decision; ends on an explicit "that's it" and his
+             pick of the round rule (step 6), asked once
+4. Write     design-writer (Sonnet 5.5, high), one per document, in two waves: data-model and
+             contracts first (they fix every name), then the other eight against them; same
+             source: your brief + notes.md + research/ + the template; zero decisions — questions
+             come back to you, you answer or ask the user; each also writes blueprint/design/<doc>.json
+5. Review    in the background, video-scribe (Sonnet 5.5, medium) renders one 30–60 s video per
+             document; round 1 whole and automatic, right after the writers: design-review workflow
+             (ten lenses, Opus/Sonnet 5.5 medium; per flow two blind readers Sonnet 5.5 low + a
+             referee Sonnet 5.5 low); you judge every finding by references/judging.md; wording →
+             writers, decisions → user, one question per decision
+6. Iterate   rounds 2 and 3 run by the rule he picked at step 3, delta only; three at most
 7. Close     design-report.json + design-review.json + decisions.json, node claude/blueprint/build.mjs,
-             publish; the user reads and sends adjustments in a batch, applied on "apply";
-             approval, close commit last, state → plan, /clear
+             publish, the stage report; the user reads and sends adjustments in a batch, applied
+             on "apply"; approval, close commit last, state → plan, /clear
 ```
 
-The user is interrupted at: the proposal and the conversation (2–3),
-the writers' questions (end of 4), the rulings (5, per round), the
-round question (6) and the approval (7). Everything else runs without
-him.
+The user is interrupted at: the proposal and the conversation (2–3,
+the round rule included), the writers' questions (end of 4), the
+rulings (5, per round) and the approval (7). The videos are his to
+watch while round 1 runs; nothing waits for them. Everything else runs
+without him.
 
 ## The team
 
@@ -91,7 +94,8 @@ him.
 | the conductor | Opus 5.5, high | the proposal, the conversation, the judging, the blueprint |
 | `scout` × N | Sonnet 5.5, low | one question each about the system as it is: quotes with path:line, never conclusions |
 | `design-researcher` | Sonnet 5.5, medium | one deep-research workflow per external tool: planner, searchers, synthesizer, critic, citer |
-| `design-writer` × 10 | Sonnet 5.5, high | one document each, in parallel, from the same source; asks, never decides |
+| `design-writer` × 10 | Sonnet 5.5, high | one document each, in two waves (data-model and contracts fix the names; the other eight copy them); asks, never decides |
+| `video-scribe` × 10 | Sonnet 5.5, medium | one 30–60 s video per document, in the background, so the user can watch the design instead of reading it |
 | `design-reviewer-{data, code, infra, security, contracts}` | Opus 5.5, medium | five lenses that judge mechanism, each reads everything |
 | `design-reviewer-{alarms, coverage, facts, ui, consistency}` | Sonnet 5.5, medium | five lenses that check against a source, each reads everything |
 | `design-blind-reader` × 2 per flow | Sonnet 5.5, low | builds one flow alone, in the documents' language |
@@ -116,6 +120,7 @@ designs-root/2026-08-15-workspace-invites/
     ├── research/              # one file per topic, by the research workflow
     ├── ui/                    # <Screen>.dc.html artboards
     ├── reviews/               # round-N.json: each round's return value, as it came
+    ├── videos/                # <doc>.mp4, one per document, by video-scribe
     ├── architecture.md · data-model.md · contracts.md · ui.md · security.md
     ├── infra.md · observability.md · rollout.md · code.md · acceptance.md
     └── reviews.md             # the round audit: your file
@@ -233,21 +238,49 @@ recommendation goes to `taste-notes.md` on the spot, as the pattern.
 **The final version.** When no subject has a card left, present the
 design back in one pass: per subject what changes (or "nothing,
 because"), the cards and the latitude, as a table. Get an explicit
-"that's it"; the session closes with it, and step 4 starts in the
-same turn.
+"that's it". In the same call, ask him once how rounds 2 and 3 start,
+so no round waits for him later:
+
+- **"By the rule, without asking me"** (recommended): after a round's
+  fixes are applied and verified, a delta round runs when that round
+  changed a mechanism (a ruling of his, or a sustained blocker whose
+  fix changed a flow, a contract or the data model); a round whose
+  fixes were only wording, names and propagation closes the review.
+  Three rounds at most.
+- **"Ask me after each round"**: step 6 asks him, as before.
+
+His pick is a line in `rulings.md`. The session closes, and step 4
+starts in the same turn.
 
 ## Step 4 — write
 
-Ten `Agent` dispatches of **`design-writer`** in one message, one per
-document, in write mode, each with the same brief: the workstream
-path, `notes.md`, `research/`, the discovery, the document's template,
-the blueprint schema, the language. The writer writes its document
-and `blueprint/design/<doc>.json` in the same pass, and returns its
-questions. It decides nothing: a decision the notes do not carry is a
-question. Answer from the notes what the notes settle; ask the user
-the rest through the question tool, grouped by decision; write every
-answer to the "Questions answered after the session" block of
-`notes.md`; send the answers to the writer in one message.
+Ten `Agent` dispatches of **`design-writer`**, one per document, in
+write mode, each with the same brief: the workstream path,
+`notes.md`, `research/`, the discovery, the document's template, the
+blueprint schema, the language. They go in **two waves**, because ten
+writers minting names in parallel write ten vocabularies (in one run,
+round 1 found 18 consistency and some 15 blind-read findings that
+were the same name, enum or status code spelled differently):
+
+1. **The names.** `data-model` and `contracts`, in one message. Between
+   them they fix every name the design uses: tables, columns, enum
+   values, routes, request and response fields, status and error
+   codes, events. Answer what the notes settle and get it applied
+   before the second wave; a question that is the user's stays an
+   `(open: Q-n)` mark and is asked with the second wave's.
+2. **The rest.** The other eight, in one message, with
+   `01-design/data-model.md` and `01-design/contracts.md` added to the
+   brief as the source of every name. They copy names, never mint
+   them; a name they need and do not find is a question.
+
+The writer writes its document and `blueprint/design/<doc>.json` in
+the same pass, and returns its questions. It decides nothing: a
+decision the notes do not carry is a question. Answer from the notes
+what the notes settle; ask the user the rest through the question
+tool, grouped by decision, in one pass after the second wave; write
+every answer to the "Questions answered after the session" block of
+`notes.md`; send the answers to every writer whose document the
+answer touches, in one message.
 
 When the writers return, read the ten documents: every story has a
 flow or a screen, every flow follows the format (numbered steps, a
@@ -258,9 +291,23 @@ its writer in one message before the review starts.
 ## Step 5 — review and judge
 
 Autonomous mode, right after the writers' questions are answered.
-Run [`design-review`](../../workflows/design-review.js) by `scriptPath`
+
+**The videos first, in the background.** Ten `Agent` dispatches of
+**`video-scribe`** (Sonnet 5.5, medium) in one message, one per
+document, each with the document's path, its
+`blueprint/design/<doc>.json`, the language and the output
+`01-design/videos/<doc>.mp4`; the agent's definition does the rest.
+They render a 30–60 s video per document so the user can watch the
+design instead of reading ten documents. Do not wait for them: start
+the review in the same turn. When they return, send him the ten
+videos in one table (document · what it shows · path). What he says
+about them is noted in a visible list and judged with round 1's
+findings, as his rulings; nothing waits for him to watch.
+
+Then run [`design-review`](../../workflows/design-review.js) by `scriptPath`
 with `designDir`, `discoveryDir`, `doctrineDir` (the engineering
-doctrine the project's `CLAUDE.md` names), `round: 1`, `language`, the glossary
+doctrine the project's `CLAUDE.md` names), `repos` (each repo the
+design builds on, with its base branch), `round: 1`, `language`, the glossary
 block, and `flows`: one `{id, text}` per flow of `architecture.md`,
 split at every `### ` heading under `## Flows`.
 
@@ -298,11 +345,16 @@ to `reviews.md` before any fix moves.
   dispatched in one message; the report carries the mentions table
   and the final lines; a fix without pasted lines is not done. No
   veto question: the user reads the blueprint at the close.
-  When the batch returns, search every term, value and key it changed
-  across all ten documents and their JSON; each hit a fix made wrong
-  goes to the writer who owns that document, as one more batch, before
-  the next round. A writer propagates inside its own document; across
-  documents, propagation is yours.
+  **Before the batch**, for every fix that renames, revalues, removes
+  or recounts something, search the **old** term, value, key or count
+  across all ten documents and their JSON, and send the fix to every
+  writer whose document has a hit, in the same batch, with the lines
+  to change. **When the batch returns**, search the old one again: it
+  may survive only as a negation ("`x` is gone"); each other hit goes
+  back to its writer before the next round, and the next round starts
+  only with none left. A writer propagates inside its own document;
+  across documents, propagation is yours, and it is finished in the
+  round that made the fix, never left for the next round's lenses.
 - **`implementer`**: real, but latitude: the writer adds one line to
   that document's "The implementer decides".
 - **`user`**: behavior, a data format, a contract's shape, security
@@ -316,10 +368,16 @@ to `reviews.md` before any fix moves.
 
 ## Step 6 — iterate
 
-After the rulings are applied, ask the user, with the round's numbers
-in a table (findings, sustained by owner, dismissed, what changed):
-run another round, or close. **Round 1 is whole and automatic; rounds
-2 and 3 run only on his word and only over the delta**: the workflow
+After the rulings are applied and the propagation search comes back
+clean, apply the round rule he picked at step 3. **By the rule:** run
+the delta round when this round changed a mechanism (a ruling of his,
+or a sustained blocker whose fix changed a flow, a contract or the
+data model), or close the review when its fixes were only wording,
+names and propagation; say which, with the round's numbers in a table
+(findings, sustained by owner, dismissed, what changed), and go on
+without waiting. **Ask me:** ask him, with the same table, run another
+round or close. **Round 1 is whole and automatic; rounds 2 and 3 run
+only on his word, given at step 3 or here, and only over the delta**: the workflow
 receives `changed` (the documents and flows whose text changed) and
 `fixes` (what was applied); the lenses check that each fix landed and
 did not break its surroundings; the blind readers reopen only the
@@ -340,6 +398,10 @@ layer the tab opens with, in the intern's voice (schema:
 `blueprint.html`. The build refuses with the field named: a missing
 figure, a story a flow names that does not exist, a bill line with
 the wrong number of scales, a text over its word cap.
+
+The stage report: follow
+[claude/docs/stage-report.md](../../docs/stage-report.md) (video,
+slides, blueprint).
 
 Present: the blueprint URL, the round table, the decisions that were
 his, the residue, the taste notes added, the stage's telemetry

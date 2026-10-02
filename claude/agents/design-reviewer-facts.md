@@ -46,6 +46,12 @@ story's "Out of this story" are direction, an extension point at most.
 - **Invoked controls.** "The main branch is protected", "the alarm
   already exists" — claims about the house's own state must show the
   command and its output in the research file, not somebody's memory.
+- **The claim about the code base.** A sentence that says what the
+  repos have today (a module, a table, a route, a job, a workflow, a
+  resource, a count) is checked against the repo at the base branch
+  the design builds on (`git show <base>:<path>`, `git grep`), never
+  against the notes or a memory file. A claim the repo contradicts is
+  a `blocker`; one you could not check says so in `verified`.
 
 ## Standards
 

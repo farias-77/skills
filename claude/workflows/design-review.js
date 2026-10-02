@@ -4,7 +4,8 @@
  * Why a workflow: the guarantee that no lens is skipped must be
  * physical, not discipline. Round 1 is whole: the ten lenses in
  * parallel with, per flow, two blind readers and a referee. Rounds 2
- * and 3 run only on the user's word and only over the delta: the
+ * and 3 run only on the user's word (the round rule he picks once at
+ * the session's close, or his answer after a round) and only over the delta: the
  * lenses receive the documents and flows that changed and the fixes
  * that were applied, and check that each fix landed and did not break
  * its surroundings; the blind readers reopen only the flows whose text
@@ -37,6 +38,7 @@
  *                 // by scriptPath, never by name
  *     designDir:    'absolute path to <slug>/01-design',
  *     discoveryDir: 'absolute path to <slug>/00-discovery',
+ *     repos:        '<each repo the design builds on, path and base branch>',
  *     round:        1,            // 1, 2 or 3; shown in labels and ids
  *     language:     'pt-BR',      // the documents' language; the readers build in it
  *     glossary:     '<the glossary block of the design, verbatim>',
@@ -56,8 +58,8 @@
  * one `design-reviewer-ambiguity` entry; unread lists the flow ids
  * whose readings did not survive; valid is false when the round read
  * no flow it was asked to read. The conductor writes reviews.md,
- * judges, sends the writer fixes, asks the user the rest, and asks
- * him whether another (delta) round runs.
+ * judges, sends the writer fixes, asks the user the rest, and starts
+ * another (delta) round by the round rule he picked, or asks him.
  */
 
 export const meta = {
@@ -167,6 +169,7 @@ The design: ${args.designDir} — everything under it, research/ and ui/ include
 The session's notes (the design as the user decided it; a card is contested only by defect): ${args.designDir}/notes.md
 The demand it must satisfy: ${args.discoveryDir}/pr-faq.md and ${args.discoveryDir}/user-stories.md
 The project's engineering doctrine (the bar the design applies; never reopened): ${args.doctrineDir ?? '(not given)'}
+The repos the design builds on, at their base branch (a claim about what the code has today is checked there): ${args.repos ?? '(not given)'}
 The round audit so far: ${args.designDir}/reviews.md
 Language of the documents: ${language}${delta ? `
 

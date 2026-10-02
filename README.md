@@ -79,8 +79,11 @@ built — with a closed list of classes that are never dismissed
 (personal data, money, legal, security, a contradiction) and a
 "for the design" list for the mechanics that are stage 2's; wording
 goes to the authors without a question, decisions go to the owner
-grouped by decision. Up to three rounds, the owner choosing after each
-whether to run another. In the
+grouped by decision, and the authors' guesses he would confirm go to
+him as one question. Every story carries its own "Out", so a blind
+reader of one story never invents what another story ruled out. Up to
+three rounds, the owner choosing after each whether to run another.
+The close ends with the stage report (video, slides, blueprint). In the
 ideal world, this stage isn't run *for* the business team but *by*
 it — the skill interviews whoever owns the demand, and engineering
 only enters at stage 2 with the ambiguity already wrung out.
@@ -104,21 +107,34 @@ exists, a new piece in its owning module when it is new, fix instead
 of a parallel path, never a workaround or a temporary step unless the
 human asks for it, never speculation. They iterate to a final version,
 one card per real fork, `notes.md` holding one version of every
-decision. **Ten writers (Sonnet 5.5, high) write the ten documents in
-parallel** from the same notes and research, deciding nothing (a gap
-is a question back), each also writing its blueprint JSON, and round 1
-runs at once: ten lenses (Opus 5.5 or Sonnet 5.5, medium) — data, code (which blocks
-every workaround), infra, security, contracts, alarms, coverage,
-facts, UI and consistency — beside, per flow, two **blind readers**
+decision; the human also picks, once, how later review rounds start.
+**Ten writers (Sonnet 5.5, high) write the ten documents in two
+waves** from the same notes and research: data-model and contracts
+first, which fix every name the design uses, then the other eight,
+which copy those names and never mint one. They decide nothing (a gap
+is a question back), each also writing its blueprint JSON. Then, in
+the background, **`video-scribe` (Sonnet 5.5, medium) renders a
+30–60 s video per document**, so the human can watch the design
+instead of reading ten documents, and round 1 runs at once without
+waiting for the videos: ten lenses (Opus 5.5 or Sonnet 5.5, medium) — data, code (which blocks
+every workaround), infra, security, contracts, alarms, coverage (which
+also names a reader for every column, panel and case, and cuts the
+rest), facts (which checks every claim about the code base against
+the repo), UI and consistency — beside, per flow, two **blind readers**
 (Sonnet 5.5, low) and a referee (Sonnet 5.5, low) reporting where they
 would build different things. **The conductor judges** every finding
 by the design razor with a closed list of classes never dismissed;
 wording goes to the writer without a question, decisions go to the
-human one question per decision, latitude to the implementer. The
-human then says whether a second or a third round runs, each over the
-delta only. The blueprint's Design tab is read by the human at the
-close, where his adjustments are noted and applied in a batch. The
-order of construction is stage 3's.
+human one question per decision, latitude to the implementer. A fix
+that renames or revalues something goes to every document that has
+the old term, in the same batch, and the conductor checks on disk that
+the old term is gone before another round starts. A second or a third
+round runs over the delta only, by the rule the human picked (a round
+that changed a mechanism earns another; a round of wording closes) or
+on his word after each round. The blueprint's Design tab is read by
+the human at the close, where his adjustments are noted and applied
+in a batch, and the close ends with the stage report (video, slides,
+blueprint). The order of construction is stage 3's.
 
 **3 · Plan** — the design becomes a cut built **as parallel as the
 machine allows**. One scout (Sonnet 5.5, low) per area of the codebase

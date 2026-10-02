@@ -94,8 +94,10 @@ most `deferred`, never `dismissed`:
   two documents, a missing failure row the flow implies, a step split
   in two, a reference to research that exists. The writer of that
   document applies it; the user is not asked. When the fix touches
-  two documents, both writers get it, and the consistency lens reads
-  the result next round.
+  two documents, both writers get it in the same batch, and you check
+  the result on disk in the same round (the old term searched before
+  and after the batch, SKILL step 5); the next round's lenses are not
+  the propagation check.
 - **`implementer`** — a real observation whose answer the design does
   not owe: a retry count within a stated budget, a hook versus a
   second call, the order of two writes that are both idempotent. The

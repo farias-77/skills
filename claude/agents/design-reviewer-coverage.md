@@ -61,6 +61,16 @@ standard's simplicity clause is your law here). An element built now
 for the recorded direction is a declared decision to check, not an
 automatic pass.
 
+Walk it down to the **element**, not only the mechanism: every column,
+index, database extension, config knob, dashboard panel, log event
+and acceptance case names its reader (the flow, query, alarm or
+screen that reads it) or what it proves. A column nobody reads, a fact
+stored in two places, a panel no alarm or decision uses, an index for
+a volume the design does not have, a case that proves nothing the
+others do not: each is a finding whose fix is the removal. In one
+run, ten such cuts arrived only in round 3, after two rounds had
+reviewed and fixed the elements they removed.
+
 ## Standards
 
 - Answer under the house
