@@ -14,6 +14,18 @@
 |---|---|---|---|---|---|---|---|---|---|---|
 | | | | | | | | | | | |
 
+## Structure of main
+
+| Measure | Before (`<merge-base sha>`) | After (`<release merge sha>`) | Past the threshold |
+|---|---|---|---|
+| Duplication | | | no \| **yes → W-n** |
+| Complexity | | | |
+| Boundary violations | | | |
+| Gate runtime | | | |
+| Reverts | — | <n> | |
+
+<the files the check names when a measure worsened> | not measured: the project has no structure check (→ I-n, doctrine)
+
 ## Precision per reviewer
 
 | Stage | Reviewer | Found | Sustained | Deferred | Latitude | Dismissed |

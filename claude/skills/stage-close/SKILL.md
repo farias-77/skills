@@ -1,6 +1,6 @@
 ---
 name: stage-close
-description: Conducts stage 6 (Close) — the retro of one workstream, with nothing changed in the pipeline. The session (Opus 5.5, medium) harvests the whole record through one close-harvester (Sonnet 5.5, medium) per source (the reviews and rulings of the document stages, the execution's board and runs, the release's trace, the notes), writes the workstream in numbers and the precision of every reviewer, cleans what the workstream left behind, and writes the retro — what worked, what went wrong, and what could change in the pipeline, each idea with its evidence and the file it would touch; the user reads it and adds his view, recorded verbatim; nothing is decided, no issue is opened, no pipeline file is edited. The retro is saved in a fixed shape (retro.md + retro.json) so the weekly-retro skill can gather every workstream of the week. Use when a workstream's .state.md says stage close, or to resume a close in progress.
+description: Conducts stage 6 (Close) — the retro of one workstream, with nothing changed in the pipeline. The session (Opus 5.5, medium) harvests the whole record through one close-harvester (Sonnet 5.5, medium) per source (the reviews and rulings of the document stages, the execution's board and runs, the release's trace, the notes), writes the workstream in numbers and the precision of every reviewer, measures what the workstream did to the structure of main (the project's structure check before and after), cleans what the workstream left behind, and writes the retro — what worked, what went wrong, and what could change in the pipeline, each idea with its evidence and the file it would touch; the user reads it and adds his view, recorded verbatim; nothing is decided, no issue is opened, no pipeline file is edited. The retro is saved in a fixed shape (retro.md + retro.json) so the weekly-retro skill can gather every workstream of the week. Use when a workstream's .state.md says stage close, or to resume a close in progress.
 disable-model-invocation: false
 argument-hint: "<workstream-slug>"
 allowed-tools: Read, Write, Edit, Glob, Grep, Agent, Workflow, AskUserQuestion, Artifact, Bash
@@ -29,12 +29,13 @@ retro from what they brought and talks it through with the user.
 1. Harvest   close-harvest workflow: one close-harvester (Sonnet 5.5, medium) per source, in parallel
              → 05-close/harvest/<source>.json: numbers, precision per reviewer, every friction with evidence
 2. Numbers   the workstream in numbers and the precision per stage and reviewer
+             · the structure of main before and after the workstream (the project's structure check)
 3. Sweep     worktrees, branches and stacks the workstream left behind; the state closed
 4. Retro     what worked · what went wrong · ideas for the pipeline, each with evidence and the
              file it would touch → 05-close/retro.md and blueprint/close/retro.json
 5. Talk      the user reads it (the Close tab) and adds his view; his words go in verbatim as
              his notes; nothing is ruled
-6. Close     the build, .state.md → closed, the commit of the workstream folder
+6. Close     the build, .state.md → closed, the commit of the workstream folder → the stage report
 ```
 
 The user is in the room only at step 5. There are no questions to
@@ -55,6 +56,7 @@ rule: he reads, comments if he wants, and says it is closed.
 ```
 designs-root/<workstream>/05-close/
 ├── harvest/<source>.json   # each harvester's answer, verbatim
+├── structure/              # the structure check before and after, and their comparison
 ├── retro.md                # the retro, for reading
 └── trace.md                # one line per step, `date -u`
 blueprint/close/retro.json  # the same retro, in the fixed shape weekly-retro reads
@@ -79,6 +81,22 @@ watch, the rulings. And the precision per stage and reviewer: found ·
 sustained · deferred · latitude · dismissed. A number the record does
 not carry is `null`, never estimated. There is no comparison with the
 previous workstream here; the weekly retro compares.
+
+**The structure of main.** The user's fear is code that works and
+that nobody can extend later, so every close measures what this
+workstream did to `main`. Run the project's structure check (the role
+`docs/project-contract.md` names; the doctrine names its command) in
+a throwaway worktree at the `main` the workstream started from (the
+merge-base of `feat/<workstream>` with `main`) and at the release's
+merge sha, compare the two with the project's comparison command, and
+save the outputs to `05-close/structure/`; remove the worktrees. Five
+numbers go into the retro, before → after: duplication, complexity,
+boundary violations, the gate's runtime (the CI's duration on the two
+shas) and the reverts the release-scribes listed. A measure past the
+weekly's threshold (weekly-retro, "the structure of main") is a `W-`
+friction with its numbers and the files the check names; the weekly
+decides the refactor. A project with no structure check: the section
+says "not measured" and one idea lands `doctrine`.
 
 ## Step 3 — sweep
 
@@ -124,8 +142,9 @@ it is.
 ## Step 6 — close
 
 Rebuild the blueprint, `.state.md` → `stage: closed`, and commit the
-workstream folder (push only with his explicit approval). Suggest
-`/clear`.
+workstream folder (push only with his explicit approval). Then the
+stage report: follow claude/docs/stage-report.md (video, slides,
+blueprint). Suggest `/clear`.
 
 ## How to write
 

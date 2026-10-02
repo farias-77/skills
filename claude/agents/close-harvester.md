@@ -21,10 +21,13 @@ answer with zero counts and no frictions.
 
 ## How you work
 
-1. **Read everything you were given**, whole: a review audit's
-   precision tables, every entry's run (its rounds, its findings and
-   rulings, why it parked), a trace's every line, the audit's items,
-   the notes one by one.
+1. **Read everything you were given**, whole, and nothing else: a
+   review audit's precision tables, every entry's run (its rounds,
+   its findings and rulings, why it parked), a trace's every line,
+   the audit's items, the notes one by one. You are given files; you
+   never walk a folder or open an entry's evidence (screenshots,
+   videos, test output) — the run file already records what it
+   showed.
 2. **Count what the keys ask** and only what your source carries:
    rounds per stage, findings found · sustained · deferred · latitude
    · dismissed, entries, amendments, parked, staging runs and reds,

@@ -10,6 +10,9 @@
  * remembered.
  *
  * THE ARGS CARRY PATHS, NOT TEXT. The harvester reads the files.
+ * FILES, NOT FOLDERS: the session lists each run-*.json itself; an
+ * entry's folder also holds its evidence (~1,700 files in one
+ * workstream) that the harvester must not walk.
  *
  * Invoked by the stage-close session:
  *   Workflow({ scriptPath: '<...>/workflows/close-harvest.js', args: {
@@ -18,8 +21,8 @@
  *     keys: ['days', 'entries', 'found', ...],          // the numbers retro.json sums (schema/close.md)
  *     sources: [
  *       { key: 'documents', paths: ['/abs/.../00-discovery/reviews.md', '/abs/.../01-design/reviews.md', '/abs/.../02-plan/reviews.md', '/abs/.../rulings.md'] },
- *       { key: 'execution', paths: ['/abs/.../03-execution/board.md', '/abs/.../03-execution/parked.md', '/abs/.../03-execution/audit.md', '/abs/.../03-execution/entries', '/abs/.../blueprint/execution/execution.json'] },
- *       { key: 'release',   paths: ['/abs/.../04-release/plan.md', '/abs/.../04-release/trace.md', '/abs/.../04-release/entries', '/abs/.../blueprint/release/release.json'] },
+ *       { key: 'execution', paths: ['/abs/.../03-execution/board.md', '/abs/.../03-execution/parked.md', '/abs/.../03-execution/audit.md', '/abs/.../03-execution/entries/E-01/run-1.json', '…every run-*.json…', '/abs/.../blueprint/execution/execution.json'] },
+ *       { key: 'release',   paths: ['/abs/.../04-release/plan.md', '/abs/.../04-release/trace.md', '/abs/.../04-release/entries/R.1/run-1.json', '/abs/.../blueprint/release/release.json'] },
  *       { key: 'notes',     paths: ['/abs/.../dreaming-notes.md', '/abs/.../taste-notes.md'] },
  *     ],
  *   }})
@@ -70,6 +73,7 @@ Source key: ${s.key}
 Paths: ${s.paths?.length ? s.paths.join('\n  ') : '(none — this source does not exist; answer with zero counts and no frictions)'}
 Numbers the close sums (count only what this source carries; null where the file does not say): ${(args?.keys || []).join(', ')}
 
+Read exactly these files and nothing else: no folder walked, no evidence file (screenshots, videos, test output) opened.
 Return the structured result. Ids are ${s.key}-1, ${s.key}-2, … Miss nothing; decide nothing.`
 
 const valid = (v, key) => !!v && v.key === key && v.numbers && typeof v.numbers === 'object' && Array.isArray(v.frictions) && Array.isArray(v.lenses) && Array.isArray(v.unread)

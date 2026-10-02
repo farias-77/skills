@@ -188,25 +188,34 @@ reviewer and the verifier's verdicts. `main` is stage 5's.
 **5 · Release** — the audited feature branch reaches production
 through the project's own delivery pipeline, with one question to the
 human. The session (Opus 5.5, medium) writes the release plan from the
-audit and the doctrine's delivery standard, merges the feature branch
-into staging on its own (the audit authorized it) and follows the CI
-while it deploys staging and runs the real suite; a red in the code is
-fixed as an entry `R.n` through the stage-4 pipeline — builders, gate,
-panel, judge — so no fix ships unreviewed. One `release-scribe`
+audit and the doctrine's delivery standard and hands the human, in one
+message, every action only he can run (the commands ready), so nothing
+waits on a block found later. It merges the feature branch into
+staging on its own (the audit authorized it), follows the CI while it
+deploys staging and runs the real suite, and then the `verifier`
+(Sonnet 5.5, high) runs every entry's acceptance checks again on
+staging, in a real browser against the real environment; a red in the
+code is fixed as an entry `R.n` through the stage-4 pipeline, so no
+fix ships unreviewed. One `release-scribe`
 (Sonnet 5.5, medium) per versioned artifact derives the version and the
 notes. Then the session opens the release PR and asks the human once:
-**"vai?"**. On his word it merges; the CI deploys to production the
-same artifact staging proved, runs its read-only checks and rolls back
-on its own when they fail. The session reads every proof the audit
-deferred to production at its hour, runs a hotfix the same way while
-the workstream is open, and calls him once at the end with everything
-in production.
+**"vai?"** (or quotes the goal in which he already said it). On his
+word it merges; the CI deploys to production the same artifact staging
+proved, runs its read-only checks and rolls back on its own when they
+fail. The session reads every proof the audit deferred to production
+that has its own hour (an alarm that already notifies is read once,
+not waited for), runs a hotfix the same way while the workstream is
+open, and calls him once at the end with everything in production.
 
 **6 · Close** — the retro of the workstream, with nothing changed in
 the pipeline. One harvester (Sonnet 5.5, medium) per source of the record
 returns the numbers, the precision of every reviewer and every
 friction with its evidence; the session (Opus 5.5, medium) sums the
-numbers, cleans what the workstream left behind, and writes the retro:
+numbers, measures what the workstream did to the structure of `main`
+(duplication, complexity, boundary violations, test runtime, reverts,
+by the project's structure check; the weekly watches the trend and
+proposes a refactor slice past a threshold), cleans what the
+workstream left behind, and writes the retro:
 what worked, what went wrong, and the ideas for the pipeline, each
 with the file it would touch and the frictions behind it. The human
 reads it and comments; his words go in verbatim; nothing is decided,
