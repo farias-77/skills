@@ -21,6 +21,7 @@ chooses (its index says which):
 | **code** | the rules of the diff, including what the guard rejects mechanically and what a workaround is |
 | **testing** | the test layers, what each proves, the coverage bar, the rules of a good test |
 | **local development** | the commands below and how a stack is isolated per worktree |
+| **golden paths** | a short file naming the exemplary modules to copy, one per kind of unit (a server module, an endpoint, a job, a screen, a component, a migration, a test of each layer): its path and one line on what to copy from it. The builder starts a new unit from its golden path; `structure-reviewer` measures a diff against it. Stage 4 halts at its pre-flight without it |
 
 ## The commands
 
@@ -36,6 +37,7 @@ prompts are illustrations, never the rule.
 | **focused tests** | the tests of one module or one spec, with their arguments |
 | **affected tests** | the tests of every module and screen a diff touched, and of what depends on them, chosen from the diff against a base; prints what it chose and why. The builder's loop and the gate of each review round; without it, the round runs the whole gate |
 | **evidence** | writes the entry's verification record for the head it runs on |
+| **structure check** | checks the changed files against a base for complexity, size (of functions and files), duplication, import and layer boundaries, and new dependencies; prints each violation with its file and line and exits non-zero on any. One of the gate's commands; stage 4 halts at its pre-flight without it |
 
 ## The layout the stages rely on
 

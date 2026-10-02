@@ -138,36 +138,25 @@ blueprint). The order of construction is stage 3's.
 
 **3 · Plan** — the design becomes a cut built **as parallel as the
 machine allows**. One scout (Sonnet 5.5, low) per area of the codebase
-writes what exists today and the **golden path** (the exemplary module)
-for each kind of code the design adds; the conductor (Opus 5.5, medium)
-arrives with the cut and the human shapes it. First the
-**foundation**: everything two builders would fight over — every
-migration of the demand, the whole contract with its generated code,
-the new modules registered, the shared pieces, the factories, and the
-first exemplar of each kind of code the codebase does not have yet —
-laid down once. After it only the doctrine's shared files are frozen;
-everything else the foundation created, entries extend by addition.
-Then the **graph of entries**: one story, or a small group that proves
-only together, built vertically (back, front, tests) by one builder in
-its own worktree with its own local stack, within a **size cap** (one
-screen and one server flow, about 2,500 changed lines); an **edge**
+writes what exists today; the conductor (Opus 5.5, medium) arrives with
+the cut and the human shapes it. First the **foundation**: everything
+two builders would fight over — every migration of the demand, the
+whole contract with its generated code, the new modules registered,
+the shared pieces, the factories — laid down once, so no later piece
+ever touches a shared file. Then the **graph of entries**: one story,
+or a small group that proves only together, built vertically (back,
+front, tests) in its own worktree with its own local stack; an **edge**
 only where an entry's proof needs another entry's behavior (data is
 seeded by the factories, never an edge); everything free runs at once,
 up to a **concurrency cap** measured on the machine. Every entry is
-proved by **acceptance lines** a verifier turns into checks before any
-code — the actor, what they observe, the side effect read back — and
-closes on gate commands the plan fixes once; nothing needs alpha or
-prod. The foundation's writer (Sonnet 5.5, high) fixes every name
-first; then one writer per entry writes, against it, the **brief** its
-builder will receive, deciding nothing — a name the foundation lacks
-comes back as a question and lands in the foundation before review.
-Three lenses (Sonnet 5.5, high) — coverage, verifiability, order — and,
-per brief, two blind readers (Sonnet 5.5, low) with a referee (Sonnet
-5.5, low) review it; round 2 runs automatically over the delta, with
-only the lenses that had a finding sustained, a third only on the
-human's word. The pre-flight (what only he can hand over) is handed at
-the close, and the close ends with the stage report (video, slides,
-blueprint).
+proved by commands on the local stack (`run`/`expect`, and a
+screenshot against its artboard for a screen); nothing needs alpha or
+prod. One writer (Sonnet 5.5, high) per entry writes the **brief** its
+builder will receive, deciding nothing; three lenses (Sonnet 5.5, high)
+— coverage, verifiability, order — and, per brief, two blind readers
+(Sonnet 5.5, low) with a referee (Sonnet 5.5, low) review it; round 2
+runs automatically over the delta, a third only on the human's word.
+The pre-flight (what only he can hand over) is handed at the close.
 
 **4 · Execute** — the plan becomes merged, reviewed code, with no
 human in the loop until the end. **One session** (Opus 5.5, high)
@@ -324,7 +313,7 @@ What the pipeline expects from its surroundings:
 | **blueprint** | the workstream's single review artifact — one URL, tabs per stage |
 | **conductor** | whoever dispatches and audits without doing the work — the stage's session |
 | **lens** | a reviewer scoped to one failure mode |
-| **judge** | whoever rules every finding — sustained/deferred/dismissed, with the reason; reviewers report at the maximum bar. At discovery, design and plan the conductor judges by the stage's `references/judging.md` (at plan it also rules the sequence findings in the user's place against the approved cut); at execution `exec-judge` rules every round of every entry, and the user rules what parked at the audit; at release a fix is judged the same way, and the user's one ruling is his "vai?"; at the close nothing is ruled; at the weekly retro the user rules each group of ideas. |
+| **judge** | whoever rules every finding — sustained/deferred/dismissed, with the reason; reviewers report at the maximum bar. At discovery, design and plan the conductor judges by the stage's `references/judging.md` (at plan it also rules the sequence findings in the user's place against the approved cut); at execution there is no judge: the triage is mechanical (a finding blocks only with a reproduction or a violated written rule; the rest goes to the deferred register or the learn log), and the user rules what parked at the audit; at release a fix is triaged the same way, and the user's one ruling is his "vai?"; at the close nothing is ruled; at the weekly retro the user rules each group of ideas. |
 | **blind reader** | an agent that reads alone, so divergence from its sibling exposes ambiguity |
 | **andon** | stop before building on a broken premise — a cheap halt beats wrong work |
 | **retro** | the close of a workstream: what worked, what went wrong, the ideas for the pipeline with their evidence; nothing is decided there |

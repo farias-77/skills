@@ -10,8 +10,8 @@ against `blueprint/plan/plan.json` and assembles the Execution tab. The
 build refuses with the field named: an entry id the plan does not
 know, a plan entry or `F` missing or listed twice, a merged entry with
 no sha, a parked entry whose audit item does not exist, an amendment
-for an unknown entry, a reviewer that is not `exec-lens-*` or
-`exec-qa-*`, a closed audit with an unruled item, **a text over its
+for an unknown entry, a reviewer that is not `verifier`, `reviewer`,
+`structure-reviewer` or `exec-lens-*`, a closed audit with an unruled item, **a text over its
 word cap**; and it refuses any file of the retired lanes-and-waves
 execution (`lanes/`, `waves/`, `exec-report.json`, `audit.json`). Text
 fields accept two inline marks: `` `code` `` and `**bold**`. No HTML.
@@ -44,7 +44,7 @@ The record (`03-execution/`) is named as the authority, never copied.
   ],
   "amendments": [ { "id": "F.1", "what": "`orders.note` column and the field in `POST /orders`", "for": "E-03", "sha": "5d4c3b2" } ],
   "precision": [
-    { "lens": "exec-lens-workaround", "found": 4, "sustained": 3, "deferred": 0, "latitude": 0, "dismissed": 1, "user": 0 }
+    { "lens": "reviewer", "found": 4, "sustained": 3, "deferred": 0, "latitude": 0, "dismissed": 1, "user": 0 }
   ],
   "report": {
     "inOneSentence": "…",
@@ -67,9 +67,10 @@ The record (`03-execution/`) is named as the authority, never copied.
   names its audit item in `parked`.
 - `sha` is present on every entry and amendment, `null` until merged.
 - `amendments[].id` is `F.<n>`; `for` names the entry that needed it.
-- `precision[].lens` is one of the panel's lenses or QA
-  (`exec-lens-*`, `exec-qa-*`: the QA are backend, frontend, abuse and
-  replay).
+- `precision[].lens` is one of stage 4's reviewers: `verifier`,
+  `reviewer`, `structure-reviewer`, or a lens `exec-lens-*` (security,
+  operations, craft). The retired `exec-qa-*` names are still accepted,
+  so an older record builds.
 - `audit.*[].ruling` and `words` are `null` until the user rules;
   `recommendation` is `keep` or `fix` for a choice, one sentence for a
   parked item. A choice's ruling is `keep`, `fix` or `revert`; a

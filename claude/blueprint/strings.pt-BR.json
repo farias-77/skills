@@ -562,7 +562,7 @@
    }
   },
   "precision": {
-   "lede": "O que cada revisor achou, e o que o juiz manteve. Pouco sustentado é revisor gastando rounds com ruído.",
+   "lede": "O que cada revisor achou, e o que o juiz (na execução, a triagem) manteve. Pouco mantido é revisor gastando rounds com ruído.",
    "lens": "Revisor",
    "found": "Achou",
    "sustained": "Sustentados",

@@ -291,7 +291,7 @@ if (existsSync(execDir) && plan) {
     precision.forEach((p, i) => {
       const w = `${W} precision[${i + 1}]${p.lens ? ` (${p.lens})` : ''}`;
       need(p, ['lens', ...PREC], w);
-      if (p.lens !== undefined && !/^exec-(lens|qa)-[a-z]+$/.test(p.lens)) problems.push(`${w}: lens "${p.lens}" must be exec-lens-<name> or exec-qa-<name>`);
+      if (p.lens !== undefined && !/^(verifier|reviewer|structure-reviewer|exec-(lens|qa)-[a-z]+)$/.test(p.lens)) problems.push(`${w}: lens "${p.lens}" must be verifier, reviewer, structure-reviewer, exec-lens-<name> or exec-qa-<name>`);
       PREC.forEach(k => { if (p[k] !== undefined && !nat(p[k])) problems.push(`${w}: ${k} must be a whole number`); });
     });
     const R = X.report && typeof X.report === 'object' ? X.report : {};

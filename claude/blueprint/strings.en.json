@@ -562,7 +562,7 @@
    }
   },
   "precision": {
-   "lede": "What each reviewer found, and what the judge kept. A low share sustained is a reviewer spending rounds on noise.",
+   "lede": "What each reviewer found, and what the judge (at execution, the triage) kept. A low share kept is a reviewer spending rounds on noise.",
    "lens": "Reviewer",
    "found": "Found",
    "sustained": "Sustained",

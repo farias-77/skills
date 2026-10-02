@@ -30,14 +30,14 @@ enough to change, and what he already said about it.
     "parked": 1, "stagingRuns": 2, "stagingReds": 1, "fixes": 1, "rollbacks": 0, "hotfixes": 0,
     "watchRead": 1, "watchOwned": 1, "rulings": 38, "tokensM": null
   },
-  "lenses": [ { "stage": "execute", "lens": "exec-lens-workaround", "found": 7, "sustained": 6, "deferred": 0, "latitude": 0, "dismissed": 1 } ],
+  "lenses": [ { "stage": "execute", "lens": "reviewer", "found": 7, "sustained": 6, "deferred": 0, "latitude": 0, "dismissed": 1 } ],
   "worked": [ { "what": "the foundation removed every merge conflict between entries", "evidence": "board.md: 0 conflicts in 5 rebases" } ],
   "wrong": [
-    { "id": "W-1", "stage": "execute", "what": "the visual lens compared screenshots taken before the data loaded",
+    { "id": "W-1", "stage": "execute", "what": "the verifier compared screenshots taken before the data loaded",
       "where": "03-execution/entries/E-03/run-1.json:212", "quote": "…", "cost": "one round on two entries" }
   ],
   "ideas": [
-    { "id": "I-1", "stage": "execute", "lands": "pipeline", "target": "claude/agents/builder-frontend.md",
+    { "id": "I-1", "stage": "execute", "lands": "pipeline", "target": "claude/agents/verifier.md",
       "change": "journeys wait for the data to render before the screenshot", "why": "a wasted round per screen", "evidence": ["W-1"] }
   ],
   "userNotes": [ { "on": "I-1", "words": "…" } ],

@@ -111,15 +111,20 @@ the question itself (source, severity, quote, gap, fix, the
 conductor's reason), the rulings as the answers with the conductor's
 pick first and marked as his, four to a call. Wording fixes are applied without a question and without a
 veto: the user reads the blueprint at the approval and reports there
-whatever he wants changed. At execution the judge agent of each entry
-(`exec-judge`) rules every finding of its rounds by the execute stage's
-`judging.md`; what is his (a question the judge raised, an entry still
-sustained after three rounds) is parked, never asked, and the user
-rules it with the builders' choices at the audit that closes stage 4;
-a ruling he gives there is a ruling too. At release his one ruling is his answer to "vai?" on the release PR,
+whatever he wants changed. At execution there is no judge: the
+triage is mechanical, by the execute stage's `judging.md`. A finding
+blocks when it carries a reproduction or names a written rule it
+violates, and the entry is fixed before it merges; the rest goes to
+`deferred.md`, built in batch before the audit, and the details go to
+the learn log, which the retro reads. What is his (an entry still
+blocked after its one fix, what needs him in person, the builders'
+conservative calls in his classes) is parked, never asked, and the
+user rules it with the builders' choices at the audit that closes
+stage 4; a ruling he gives there is a ruling too.
+At release his one ruling is his answer to "vai?" on the release PR,
 recorded verbatim in the trace and in `rulings.md`; a fix built during
-the release is an entry through the stage-4 pipeline, judged there by
-`exec-judge`. At the close nothing is ruled: the retro records what
+the release is an entry through the stage-4 pipeline, triaged there
+the same way. At the close nothing is ruled: the retro records what
 went wrong and the ideas it suggests, and his comments go in verbatim.
 The pipeline changes only at the weekly retro, where he rules each
 group of ideas gathered across the week's workstreams (apply, park,
