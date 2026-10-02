@@ -1,6 +1,6 @@
 ---
 name: plan-reviewer-coverage
-description: The coverage lens of the stage-3 plan review — every story AC and every acceptance case of the design lands in exactly one entry, every table, route, module and factory the design names is in the foundation, every screen has its entry, and every entry builds something the design or a story forces. Dispatched by the plan-review workflow. Sonnet 5.5, high.
+description: The coverage lens of the stage-3 plan review — every story AC and every acceptance case of the design lands in exactly one acceptance line of one entry, every table, route, module and factory the design names is in the foundation, every new kind of code has its exemplar, every screen has its entry, and every entry builds something the design or a story forces. Dispatched by the plan-review workflow. Sonnet 5.5, high.
 model: claude-sonnet-5-5
 effort: high
 tools: Read, Glob, Grep
@@ -31,8 +31,12 @@ direction, never an entry.
 - **Every story AC → one entry.** An AC no entry carries is a
   blocker; an AC carried by two entries is a finding (who owns its
   test?).
-- **Every acceptance case → the entry whose proof names it.** A case
-  no entry proves is never written.
+- **Every acceptance case → the acceptance line that carries it.** At
+  stage 4 a verifier writes one check per acceptance line; a case no
+  line carries is never checked.
+- **Every kind of code the design adds → a golden path.** The recon
+  names an exemplar for it, or F's "Exemplars" creates the first one.
+  A new kind with neither gets as many shapes as there are builders.
 - **Every screen of `ui.md` → the entry whose proof screenshots it**,
   with the states the stories imply.
 - **Every new or changed table and column of `data-model.md`, every

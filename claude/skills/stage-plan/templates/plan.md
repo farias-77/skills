@@ -7,17 +7,22 @@
 
   Three words: the FOUNDATION lays down once everything the entries
   would fight over (migrations, the contract and its generated code,
-  the module registry, the shared pieces, the factories); an ENTRY is a
-  story, or a small group that proves only together, built vertically
-  (back, front, tests) in its own worktree; an EDGE exists only when an
-  entry's proof needs another entry's behavior — data is seeded by the
+  the module registry, the shared pieces, the factories, the first
+  exemplar of each new kind); an ENTRY is a story, or a small group
+  that proves only together, built vertically (back, front, tests) by
+  one builder in its own worktree; an EDGE exists only when an entry's
+  proof needs another entry's behavior — data is seeded by the
   factories, never an edge. Everything with no edge is built at once,
   up to the cap. An edge held by one journey only is "stacked": the
   entry starts on the other's branch when that one is ready.
 
-  Size is relative (S · M · L); the critical path is the longest chain
-  of sizes from the foundation to the last merge. The cap is the
-  measured one in recon/machine.md.
+  After F, only the doctrine's shared files are frozen. Everything else
+  F created, entries extend by addition, as each brief's "Extends"
+  declares.
+
+  Size is relative (S · M · L) and L is the cap; the critical path is
+  the longest chain of sizes from the foundation to the last merge.
+  The cap is the measured one in recon/machine.md.
 
   Decision blocks (house format) where the user chose between two
   cuts; the conductor's recommendation kept beside the choice.
@@ -30,7 +35,8 @@
 
 ## The foundation — `F`
 
-<!-- built alone, first; after it no entry edits any of these files -->
+<!-- built alone, first; after it no entry edits the frozen files (the
+     doctrine's shared files); the rest is extended by addition -->
 
 | Kind | What |
 |---|---|
@@ -38,18 +44,20 @@
 | contract | <every new or changed route in the API contract; the generated code; routes answer 501 until their entry lands> |
 | module | <new modules registered in the composition> |
 | shared | <a component or helper two entries use, as the design names it> |
-| factory | <one per entity the proofs seed> |
+| factory | <one per entity the proofs seed; the fakes and the per-project test targets> |
+| exemplar | <the first module, page or job of a kind the recon found no instance of, in the doctrine's full shape, without business behavior> |
 
-**Proof:** run `<the gate command>` → expect `<exit 0; the new routes answer 501>`
-**Serves every entry:** <per entry: the fields its screen shows are in the contract · its responses assemble from the foundation's reads · its config and secrets are in the config and the test environment · each state-spending journey has its own target per project and width · its routes' time budget under the write timeout>
+**Frozen after F:** <the doctrine's shared files, by path>
+**Proof:** run `<the gate command>` → expect `<exit 0; migrations from empty; the generated code compiles>` (no test pins a stub that an entry replaces)
+**Serves every entry:** <checked by the entries' "Uses from the foundation" against F.md "Provides": the gaps the writers raised and how F absorbed them, one line each>
 **Brief:** `02-plan/briefs/F.md`
 
 ## The entries
 
-| Id | Name | Stories | Builds (back · front) | Size | After | Proof | Touches | Feature map |
+| Id | Name | Stories | Builds (back · front) | Size | After | Acceptance | Touches | Feature map |
 |---|---|---|---|---|---|---|---|---|
-| E-01 | <name> | S-001 | <use case, route> · <screen> | M | — | run `<command or spec>` → expect `<cases named>` | <module, screen> | back |
-| E-05 | <name> | S-005 | <…> · — | S | E-04 (its test clicks <the button E-04 builds>) · stacked when one journey only | <…> | <…> | back |
+| E-01 | <name> | S-001 | <use case, route> · <screen> | M | — | <n lines: the cases named> | <module, screen> | <rows> |
+| E-05 | <name> | S-005 | <…> · — | S | E-04 (its test clicks <the button E-04 builds>) · stacked when one journey only | <…> | <…> | <rows> |
 
 ## The graph
 
@@ -62,6 +70,13 @@ flowchart LR
 
 **Critical path:** <F → E-nn → … → the last merge, with the sizes>
 **Steps:** <foundation, then N entries at once, then …> · **Concurrency cap:** <n> (measured in `recon/machine.md`)
+
+## Gate commands
+
+<!-- Fixed once for every entry, from the recon's Commands; stage 4
+     passes them to each builder. No brief repeats them. -->
+
+<ordered list: the fast check · the affected tests against the feat · the structure check, as the doctrine names them>
 
 ## Pre-flight
 

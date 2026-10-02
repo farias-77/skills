@@ -21,23 +21,28 @@ answers one question per decision, never one per lens.
 
 The plan razor: **a finding is sustained when a builder reading only
 its brief, the design and the codebase could not build the entry one
-way, could not prove it with the commands written, or would run into
-something missing: a behavior it needs from another entry with no
-edge, an AC with no entry, a case with no owner, a shared file it
-would have to edit.** The plan is not a build contract; the builder
+way, a verifier could not turn an acceptance line into one check, or
+either would run into something missing: a behavior it needs from
+another entry with no edge, a name it uses that the foundation does
+not provide, an AC with no entry, a case with no owner, a frozen file
+it would have to edit.** The plan is not a build contract; the builder
 explores the code and decides the execution. What the builder can
 decide without changing what the entry delivers is latitude, not a
 gap.
 
 Some defects always proceed: a story AC or an acceptance case no
-entry carries · a `run` that is not a target or spec in the codebase,
-or an `expect` it cannot print · a proof that needs a deployed environment or a
-person · a proof that needs another entry's behavior with no edge · a
-cycle · an entry that edits a migration, the contract, the generated
-code or the module registry · two entries that run at once and touch
-the same file · two blind readers who built or proved different
-products from one brief · an entry that re-decides the design or
-builds a mechanism the design did not.
+entry carries · an acceptance line with no observation, or with a
+side effect it does not say how to read back · a proof that needs a
+deployed environment or a person · a proof that needs another entry's
+behavior with no edge · a "Uses" name that neither the foundation nor
+an entry with an edge provides · a foundation test that pins a stub an
+entry replaces · a cycle · an entry that edits a migration, the
+contract, the generated code or the module registry · two entries
+that run at once and touch the same file outside a declared "Extends"
+· an entry over the size cap · a kind of code with no golden path and
+no exemplar in the foundation · two blind readers who built or
+checked different products from one brief · an entry that re-decides
+the design or builds a mechanism the design did not.
 
 ## The three rulings
 
@@ -63,11 +68,13 @@ These classes proceed whether or not the build changes. Rule
 `sustained` or at most `deferred`, never `dismissed`:
 
 - a story AC or an acceptance case with no entry;
-- a proof that is not a command, or needs a deployed environment or a person;
+- an acceptance line a verifier cannot check, or a proof that needs a
+  deployed environment or a person;
+- a name an entry uses that nothing provides;
 - a pre-flight item (a credential, a text, an account) an entry needs
   and the list does not carry: the user leaves nothing behind;
-- an entry touching a shared file, or two parallel entries touching
-  the same file;
+- an entry touching a frozen file, or two parallel entries touching
+  the same file outside a declared "Extends";
 - a contradiction between a brief and `plan.md`, or between two
   briefs over one contract (it may be the writer's to fix, but it is
   never dismissed);
@@ -96,9 +103,9 @@ These classes proceed whether or not the build changes. Rule
 ## The owner of a sustained finding
 
 - **`writer`** — the fix changes how something is written and decides
-  nothing: a pointer, a case name the design fixes, a `run` made exact
-  with the recon, an `expect` with its cases, a factory named, a term
-  that differs between two briefs. The writer of that brief applies
+  nothing: a pointer, a case name the design fixes, an acceptance line
+  made checkable with what the design says, a golden path copied from
+  the recon, a factory named, a term that differs between two briefs. The writer of that brief applies
   it; the user is not asked. When the fix touches two briefs, both
   writers get it.
 - **`builder`** — a real observation whose answer the plan does not
@@ -110,8 +117,8 @@ These classes proceed whether or not the build changes. Rule
   group, cut), adds or removes an edge, changes the foundation,
   contests the cut, or the text admits two readings that are two
   products. When the graph and the foundation stay as they are (a
-  missing edge the proof plainly implies, a factory added to the
-  foundation's list), you rule it yourself against the cut he approved
+  missing edge the proof plainly implies, a factory, a field or a read
+  added to the foundation's list), you rule it yourself against the cut he approved
   (`ruled: conductor`, listed at the close for veto); when the graph
   or the foundation would change shape, it is his, one question per
   decision.
@@ -132,6 +139,9 @@ writer's, or yours.
 - **A case name is checked, not believed.** `acceptance.md` names the
   cases; the recon shows what exists; the brief names what it proves.
   Two of the three disagreeing is a `writer` fix, never a question.
+- **A command is not the brief's.** The gate commands live once in
+  `plan.md`. A finding about how a brief spells a command the gate
+  already runs is dismissed with that line of `plan.md` quoted.
 - **In a delta round, a finding on text no fix touched gets the
   razor at full strength.** Round 1 read that text and passed it.
 - **Name a recurrence.** When `reviews.md` shows the same class

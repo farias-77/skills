@@ -4,17 +4,20 @@
  * Why a workflow: the guarantee that no lens is skipped must be
  * physical, not discipline. Round 1 is whole: the three lenses in
  * parallel with, per brief, two blind readers and a referee. Round 2
- * runs automatically over the delta: the lenses receive the briefs
- * that changed and the fixes that were applied, and check that each
- * fix landed and did not break its surroundings; the blind readers
- * reopen only the briefs whose text changed. A third round runs only
- * on the user's word, delta again; the conductor enforces the count.
+ * runs automatically over the delta: only the lenses the conductor
+ * names (`lenses`: those with a finding sustained in round 1) receive
+ * the briefs that changed and the fixes that were applied, and check
+ * that each fix landed and did not break its surroundings; the blind
+ * readers reopen only the briefs named in `changed.briefs`. A third
+ * round runs only on the user's word, delta again; the conductor
+ * enforces the count.
  *
  * THE BLIND READS are per brief (one entry of the plan, or F for the
  * foundation): two Sonnet readers (5.5, low) build it alone, reading
  * only that file (and the design sections it points at), in the
  * brief's language, one build per key (`brief`, `back`, `front`,
- * `proof`). A Sonnet referee (5.5, low) compares the two readings key
+ * `acceptance`: what the checks would assert, since at stage 4 a
+ * verifier and a builder read the same brief apart). A Sonnet referee (5.5, low) compares the two readings key
  * by key; only a `different-product` verdict becomes a finding; an
  * open build ("maybe X") is judged by the referee as two possible
  * builds. A reading that misses a key or is empty is invalid and
@@ -49,8 +52,9 @@
  *       { id: 'E-03', path: '/abs/.../02-plan/briefs/E-03.md' },
  *     ],
  *     // rounds 2 and 3 only — the delta:
- *     changed: { briefs: ['E-03'] },
+ *     changed: { briefs: ['E-03'] },   // the briefs whose acceptance or builds changed
  *     fixes:   [ { id: 'plan-reviewer-order#1', brief: 'E-03', fix: 'what was applied, one line' } ],
+ *     lenses:  ['plan-reviewer-order'], // the lenses with a finding sustained last round; omitted = all three
  *   }})
  *
  * Returns { round, mode, valid, findings, lenses, unread } — findings
@@ -64,14 +68,14 @@
 
 export const meta = {
   name: 'plan-review',
-  description: 'Stage-3 review round: three Sonnet lenses in parallel with two Sonnet blind readers and a Sonnet referee per brief; whole in round 1, delta after; no judge agent — the conductor judges',
+  description: 'Stage-3 review round: three Sonnet lenses in parallel with two Sonnet blind readers and a Sonnet referee per brief; whole in round 1, delta after (only the lenses that had a finding sustained); no judge agent — the conductor judges',
   phases: [
     { title: 'Lenses', detail: 'coverage, verifiability and order in parallel, each reads everything (or the delta)', model: 'sonnet' },
     { title: 'Blind reads', detail: 'per brief: two Sonnet readers build it alone from the file, a Sonnet referee compares them key by key' },
   ],
 }
 
-const LENSES = [
+const ALL_LENSES = [
   'plan-reviewer-coverage',
   'plan-reviewer-verifiability',
   'plan-reviewer-order',
@@ -113,9 +117,9 @@ const READING = {
         type: 'object', additionalProperties: false,
         required: ['key', 'sentence', 'build'],
         properties: {
-          key: { type: 'string', description: 'brief, back, front, or proof' },
+          key: { type: 'string', description: 'brief, back, front, or acceptance' },
           sentence: { type: 'string', description: 'the brief\'s line that drives this key, verbatim' },
-          build: { type: 'string', description: 'what this reader would build and the command and output that prove it; at most sixty words; in the brief\'s language' },
+          build: { type: 'string', description: 'what this reader would build, or for acceptance the checks it would write and what they assert; at most sixty words; in the brief\'s language' },
         },
       },
     },
@@ -152,8 +156,12 @@ const delta = round > 1 && args?.changed ? { briefs: args.changed.briefs ?? [] }
 const fixes = Array.isArray(args?.fixes) ? args.fixes : []
 const mode = delta ? 'delta' : 'whole'
 const briefs = delta ? allBriefs.filter(b => delta.briefs.includes(b.id)) : allBriefs
+// A delta re-runs only the lenses that had a finding sustained: a lens
+// with nothing sustained read that text and passed it.
+const asked = delta && Array.isArray(args?.lenses) ? args.lenses.filter(l => ALL_LENSES.includes(l)) : null
+const LENSES = asked ?? ALL_LENSES
 if (!allBriefs.length) log('no briefs passed in args — the blind reads are skipped this round; pass briefs: [{id, path}] to run them')
-if (delta) log(`delta round: briefs ${delta.briefs.join(', ') || '(none)'} · ${fixes.length} fix(es) applied`)
+if (delta) log(`delta round: briefs ${delta.briefs.join(', ') || '(none)'} · ${fixes.length} fix(es) applied · lenses ${LENSES.join(', ') || '(none)'}`)
 
 const docInputs = `Round ${round}, ${mode}.
 The cut, as the user approved it (the foundation, the entries, the edges, the cap): ${args.planDir}/plan.md
@@ -172,7 +180,7 @@ Read the changed briefs whole and plan.md and every other brief for what the fix
 
 // ---------- mechanical checks on a reading ----------
 
-const KEYS = ['brief', 'back', 'front', 'proof']
+const KEYS = ['brief', 'back', 'front', 'acceptance']
 const normalizeKey = (k) => String(k).trim().replace(/^`|`$/g, '').replace(/\s+/g, '').toLowerCase()
 
 const readingProblems = (reading) => {
