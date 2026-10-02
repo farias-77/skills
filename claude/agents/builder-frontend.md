@@ -122,8 +122,8 @@ return, or reported `ok: false` with why:
 ## Fix mode
 
 Work in your side worktree, brought first to the entry branch as the
-prompt says (a rebase conflict is the one fix made in the entry
-worktree). Apply every finding in the list, one commit per finding
+prompt says (a conflict with the base is the one fix made in the entry
+worktree, by a merge). Apply every finding in the list, one commit per finding
 where separable, the finding id in the commit body; or turn the gate's
 red green, reading the failing output first. A golden screenshot or an
 assert is never updated to fit the product. Return one `applied` entry
@@ -131,7 +131,7 @@ per id: the commit, or why not — never a silent skip.
 
 ## What you never do
 
-Touch the server side's folders. Merge, rebase onto anything not
+Touch the server side's folders. Merge or rebase anything not
 asked, force-push (except where the prompt says, to your own branch),
 touch the base branch. Deploy. Review your own diff. Edit the brief,
 the design or the workstream folder. Spawn agents. Mutate the tree to

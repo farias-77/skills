@@ -76,9 +76,12 @@
  *              map's pointers checked. A red there is fixed and its fix
  *              reviewed as a delta round.
  *
- * THE FLOW (mode 'rebase'): the gate rebases the entry branch on the
- * moved base and runs the fast check and the affected tests against it,
- * and the record. A clean rebase adds
+ * THE FLOW (mode 'update'; 'rebase' is its old name, still accepted):
+ * the gate merges the moved base into the entry branch — a merge, never
+ * a rebase: the entry branch is made of merges (its sides, its fixes),
+ * and a rebase linearizes them and replays commits already resolved —
+ * and runs the fast check and the affected tests against it, and the
+ * record. A clean merge adds
  * no authored code and the run returns. A conflict is resolved by the
  * builders of the sides it touches, and the resolution is code: gate,
  * then the panel over the whole entry diff, then the judge, as in build
@@ -97,7 +100,7 @@
  *
  * Invoked by the stage-execute session:
  *   Workflow({ scriptPath: '<...>/workflows/exec-entry.js', args: {
- *     mode:          'build' | 'rebase' | 'resume',
+ *     mode:          'build' | 'update' | 'resume',   // 'rebase' = 'update'
  *     entry:         'E-03',
  *     briefPath:     '/abs/.../02-plan/briefs/E-03.md',
  *     designDir:     '/abs/.../01-design',
@@ -271,7 +274,7 @@ const RULINGS = {
   },
 }
 
-const mode = ['rebase', 'resume'].includes(args?.mode) ? args.mode : 'build'
+const mode = ['update', 'rebase'].includes(args?.mode) ? 'update' : args?.mode === 'resume' ? 'resume' : 'build'
 const resume = mode === 'resume' ? args?.resume ?? {} : null
 const entry = args?.entry ?? '?'
 const sides = Object.entries(args?.sides ?? {}).filter(([, v]) => v).map(([k]) => k)
@@ -327,7 +330,7 @@ const recordTask = (items) => `Then, only when green, the record: the doctrine's
 The judge's record items, to close with the record or report open:
 ${items.map(i => `- ${i.id}: ${i.fix}`).join('\n')}` : ''}`
 
-const sideTree = (side) => `Your side worktree: ${args?.sides?.[side]?.worktree} · branch ${args?.sides?.[side]?.branch}. First, before anything else, bring it to the entry branch: \`git merge --ff-only ${args?.branch}\` (every commit of your side is already in it); if that refuses because the entry branch was rebased, \`git reset --hard ${args?.branch}\` and push with --force-with-lease to your side branch only.`
+const sideTree = (side) => `Your side worktree: ${args?.sides?.[side]?.worktree} · branch ${args?.sides?.[side]?.branch}. First, before anything else, bring it to the entry branch: \`git merge --ff-only ${args?.branch}\` (every commit of your side is already in it); if that refuses (the side branch moved apart from the entry branch), \`git reset --hard ${args?.branch}\` and push with --force-with-lease to your side branch only.`
 const afterLine = (after) => after ? `
 Then merge the ${after} side's branch, whose fixes of this round yours build on: \`git merge ${args?.sides?.[after]?.branch}\`.` : ''
 
@@ -380,14 +383,14 @@ const closeRecord = (g, round) => {
   g.record.open.forEach((o, i) => result.deferred.push({ round, id: `record-r${round}#${i + 1}`, side: 'none', fix: o }))
 }
 
-// ---------- mode: rebase ----------
+// ---------- mode: update — the moved base merged in, never rebased ----------
 
 let since = args?.base
-if (mode === 'rebase') {
+if (mode === 'update') {
   phase('Gate')
-  const g = await runGate(`Rebase ${args?.branch} onto ${args?.base}. On a conflict, abort the rebase and report the files by side. On a clean rebase, bring the stack up and run the gate.
+  const g = await runGate(`Update ${args?.branch} with ${args?.base}: \`git merge --no-ff ${args?.base}\` on the entry branch, never a rebase, then push. On a conflict, \`git merge --abort\` and report the files by side. On a clean merge, bring the stack up and run the gate.
 ${SCOPE[readyScope]}
-${recordTask([])}`, 'rebase')
+${recordTask([])}`, 'update')
   result.gate = g
   if (!g) return interrupted('the gate')
   if (!g.conflicts.length) {
@@ -395,15 +398,15 @@ ${recordTask([])}`, 'rebase')
     result.status = g.green ? 'ready' : 'parked'
     if (!g.green) result.reason = 'gate-red'
     if (g.green) closeRecord(g, 0)
-    log(`${entry}: clean rebase — ${g.green ? 'the gate green, ready' : 'the gate red after a clean rebase, parked for the session'}`)
+    log(`${entry}: clean merge of the base — ${g.green ? 'the gate green, ready' : 'the gate red after a clean merge, parked for the session'}`)
     return result
   }
   const bySide = {}
   g.conflicts.forEach(c => (bySide[c.side] ??= []).push(c.file))
   for (const side of Object.keys(bySide)) {
-    await builder(side, `Mode: fix. Entry ${entry}, ${side} side. In ${args?.worktree}, rebase ${args?.branch} onto ${args?.base} (you are asked to) and resolve the conflicts in: ${bySide[side].join(', ')}. Keep both intents; never drop the base's change. Push with --force-with-lease to ${args?.branch} only.
+    await builder(side, `Mode: fix. Entry ${entry}, ${side} side. In ${args?.worktree}, merge ${args?.base} into ${args?.branch} (\`git merge --no-ff ${args?.base}\`; you are asked to) and resolve the conflicts in: ${bySide[side].join(', ')}. Keep both intents; never drop the base's change. Commit the merge and push ${args?.branch}; never a rebase, never a force-push.
 ${docs}
-Attribution trailer: ${args?.trailer ?? '(none given)'}`, 'fix-rebase')
+Attribution trailer: ${args?.trailer ?? '(none given)'}`, 'fix-update')
   }
 }
 
@@ -502,7 +505,9 @@ const recordItems = []
 let lastRound = maxRounds
 for (let round = 1; round <= lastRound; round++) {
   const whole = round === 1 && !resume
-  const diffCmd = whole ? `git diff ${args?.base}...${args?.branch}` : `git diff ${since}..${args?.branch}`
+  // The delta is what the entry changed since `since`, never what a merge of the base brought:
+  // compared against the tree of \`since\` merged with the base.
+  const diffCmd = whole ? `git diff ${args?.base}...${args?.branch}` : `git diff $(git merge-tree --write-tree ${since} ${args?.base} | head -1) ${args?.branch}`
   const lastFixes = result.rounds.at(-1)?.fixes ?? (resume ? [{ id: `round ${resume.round} of the parked run`, side: 'back+front', fix: `the sustained rulings in ${resume.rulingsFile}` }] : [])
   const panelInputs = (seat) => `Round ${round} (${whole ? 'whole' : 'delta'}). Entry ${entry}. You are ${seat.agent}${seat.side ? `, for the ${seat.side} side only` : ''}.${seat.replay ? ` Replay the saved QA scripts of the ${seat.replay.join(' and ')} side(s), and write and run the case of each fix.` : ''}
 ${docs}

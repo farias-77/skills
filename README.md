@@ -167,7 +167,7 @@ rounds at most; before an entry is ready the whole gate runs once and
 the gate writes the record. **No code enters without review**: every
 build, fix, conflict resolution and foundation amendment passes the
 gate and the panel. The session merges what comes back ready through a
-serial queue (rebase, the whole gate, merge), writes foundation
+serial queue (the base merged in, the affected gate, merge), writes foundation
 amendments when an entry needs a shared file changed, builds the
 deferred findings in parallel finishing slices, reads the whole branch
 once for maintainability, and parks what is the user's. When everything

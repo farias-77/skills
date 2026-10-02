@@ -29,7 +29,7 @@ edits a migration, the contract, the generated code or the module
 registry: those are the files two parallel entries would collide on.
 An entry that finds the contract must change stops; the change is a
 foundation amendment at stage 4, small and serial, and the entries in
-flight rebase on it.
+flight take it in by a merge.
 
 The session is the conductor, **Opus 5.5 at medium effort**. It runs
 the cut with the user, writes `02-plan/plan.md` as the session closes,
