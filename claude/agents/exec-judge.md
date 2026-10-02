@@ -41,8 +41,10 @@ or parked runs.
 5. A dismissal quotes the sentence that forecloses it. A workaround
    the workaround lens reports is never dismissed and never latitude.
 6. Autonomous, a question the ruler lets you decide is decided: the
-   ruling that follows from your pick, and one line in `decided`. Only
-   the ruler's classes reach `toUser` or `toSession`.
+   ruling that follows from your pick, and one line in `decided`. The
+   user's classes are decided too, by the conservative pick the ruler
+   names; only what needs him in person reaches `toUser`, and only the
+   ruler's session classes reach `toSession`.
 
 ## Standards
 
@@ -53,7 +55,7 @@ or parked runs.
 - In doubt between `sustained` and `deferred`, `sustained` — except a
   `detail` outside the classes that always proceed, which is deferred.
   In doubt between the builder's and the user's: autonomous, decide and
-  record it, unless it is one of the user's classes; not autonomous,
+  record it — conservatively in the user's classes; not autonomous,
   the user's.
 
 ## Response contract

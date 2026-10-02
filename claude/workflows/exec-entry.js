@@ -120,9 +120,12 @@
  *     resume:        { rulingsFile: '/abs/.../<parked run return>.json', round: 3, head: '<parked head sha>', after: 'back' | 'front' | undefined },  // 'resume' only; after: the side whose rulings land first, when the parked round marked one
  *   }})
  *
- * Returns { entry, mode, status, head, rounds, precision, questions,
+ * Returns { entry, mode, status, reason, head, rounds, precision, questions,
  * amendment, gate, deferred, decided, record } — status is 'ready' |
- * 'parked' | 'needs-session' | 'needs-amendment'; questions carry `to`
+ * 'parked' | 'needs-session' | 'needs-amendment' | 'interrupted' (an
+ * agent returned nothing: the API, the network or the quota failed; the
+ * session relaunches the run by its id); reason, when parked, is 'user' |
+ * 'gate-red' | 'round-cap'; questions carry `to`
  * ('user' or 'session'); rounds lists each panel round with its
  * findings, unsettled, QA coverage, rulings and fixes; precision sums,
  * per lens and QA, found · sustained · deferred · latitude · dismissed ·
@@ -287,7 +290,11 @@ Engineering doctrine of the project: ${args?.doctrineDir}
 Rulings of the workstream (not reopened): ${args?.rulingsPath}
 Evidence folder of this entry: ${args?.evidenceDir}`
 
-const result = { entry, mode, status: 'parked', head: null, rounds: [], precision: {}, questions: [], amendment: null, gate: null, deferred: [], decided: [], record: null }
+const result = { entry, mode, status: 'parked', reason: null, head: null, rounds: [], precision: {}, questions: [], amendment: null, gate: null, deferred: [], decided: [], record: null }
+// An agent that returned nothing failed on the API, the network or the quota: the run is
+// interrupted, never parked, and the session relaunches it by its run id.
+const interrupted = (what) => { result.status = 'interrupted'; result.reason = 'interrupted'; log(`${entry}: ${what} returned nothing — interrupted; relaunch by resumeFromRunId`); return result }
+const park = (reason, what) => { result.status = 'parked'; result.reason = reason; log(`${entry}: ${what} — parked (${reason})`); return result }
 const addPrecision = (rows) => rows.forEach(p => {
   const t = result.precision[p.lens] ?? (result.precision[p.lens] = { found: 0, sustained: 0, deferred: 0, latitude: 0, dismissed: 0, user: 0 })
   for (const k of Object.keys(t)) t[k] += p[k] ?? 0
@@ -382,10 +389,11 @@ if (mode === 'rebase') {
 ${SCOPE[readyScope]}
 ${recordTask([])}`, 'rebase')
   result.gate = g
-  if (!g) { log(`${entry}: gate returned nothing`); return result }
+  if (!g) return interrupted('the gate')
   if (!g.conflicts.length) {
     result.head = g.head
     result.status = g.green ? 'ready' : 'parked'
+    if (!g.green) result.reason = 'gate-red'
     if (g.green) closeRecord(g, 0)
     log(`${entry}: clean rebase — ${g.green ? 'the gate green, ready' : 'the gate red after a clean rebase, parked for the session'}`)
     return result
@@ -410,7 +418,7 @@ ${docs}
 Attribution trailer for every commit, verbatim:
 ${args?.trailer ?? '(none given)'}`, 'build').then(b => ({ side, b }))))
   for (const { side, b } of built.filter(Boolean)) {
-    if (!b) { log(`${entry}: ${BUILDERS[side]} returned nothing — parked`); return result }
+    if (!b) return interrupted(BUILDERS[side])
     if (b.needsAmendment) { result.status = 'needs-amendment'; result.amendment = { side, what: b.needsAmendment }; log(`${entry}: needs a foundation amendment (${side}): ${b.needsAmendment}`); return result }
   }
 }
@@ -439,7 +447,8 @@ const g0 = await gateUntilGreen(mode === 'build'
     ? `${mergeSides(sides)} Bring the stack up if it is down, and run the gate.`
     : 'Run the gate on the entry branch after the conflict resolution (no merge).', 'r0', 'round')
 result.gate = g0
-if (!g0 || !g0.green) { log(`${entry}: the gate is still red — parked`); return result }
+if (!g0) return interrupted('the gate')
+if (!g0.green) return park('gate-red', 'the gate is still red')
 
 // ---------- the review rounds ----------
 
@@ -527,6 +536,7 @@ YOUR FIRST PASS IS DONE; ITS COVERAGE MISSED: ${missing.join(', ')}. Cover only 
   const seats = whole ? wholeSeats() : deltaSeats(focus)
   log(`${entry} round ${round}: ${seats.length} reviewers (${seats.map(seatName).join(', ')}) over \`${diffCmd}\``)
   const reviews = (await parallel(seats.map(seat => () => runSeat(seat)))).filter(Boolean)
+  if (reviews.every(r => r.invalid === 'no output')) return interrupted(`every reviewer of round ${round}`)
 
   const findings = []
   const unsettled = []
@@ -552,7 +562,7 @@ The findings of this round:
 ${JSON.stringify(findings, null, 1)}
 The QA's unsettled observations of this round, each ruled like a finding:
 ${JSON.stringify(unsettled, null, 1)}`, { label: `${JUDGE}·${entry}·r${round}`, phase: 'Judge', agentType: JUDGE, schema: RULINGS })
-  if (!j) { log(`${entry} round ${round}: the judge returned nothing — parked`); return result }
+  if (!j) return interrupted(`the judge of round ${round}`)
   addPrecision(j.precision)
 
   const fixes = j.rulings.filter(r => r.ruling === 'sustained' && r.side !== 'none')
@@ -569,6 +579,7 @@ ${JSON.stringify(unsettled, null, 1)}`, { label: `${JUDGE}·${entry}·r${round}`
   if (j.toUser.length || j.toSession.length) {
     result.questions = [...j.toUser.map(q => ({ to: 'user', ...q })), ...j.toSession.map(q => ({ to: 'session', ...q }))]
     result.status = j.toUser.length ? 'parked' : 'needs-session'
+    if (j.toUser.length) result.reason = 'user'
     result.head = head
     log(`${entry}: ${result.status === 'parked' ? 'parked for the user' : 'waits for the session'}`)
     return result
@@ -578,7 +589,8 @@ ${JSON.stringify(unsettled, null, 1)}`, { label: `${JUDGE}·${entry}·r${round}`
     phase('Gate')
     const fin = await gateUntilGreen(`Nothing sustained in round ${round}: the last gate before ready, on the entry branch (no merge).`, `final-r${round}`, readyScope, recordItems)
     result.gate = fin
-    if (!fin || !fin.green) { result.head = head; log(`${entry}: the whole gate is red before ready — parked`); return result }
+    if (!fin) return interrupted('the gate')
+    if (!fin.green) { result.head = head; return park('gate-red', 'the gate is red before ready') }
     if (!fin.fixed.length) {
       closeRecord(fin, round)
       await runGate('The entry is done: bring the stack down.', 'down')
@@ -586,14 +598,14 @@ ${JSON.stringify(unsettled, null, 1)}`, { label: `${JUDGE}·${entry}·r${round}`
       log(`${entry}: ready at ${fin.head}`)
       return result
     }
-    if (round === lastRound && lastRound > maxRounds) { result.head = fin.head; log(`${entry}: the whole gate needed fixes again after the extra round — parked for their review`); return result }
+    if (round === lastRound && lastRound > maxRounds) { result.head = fin.head; return park('round-cap', 'the gate needed fixes again after the extra round') }
     if (round === lastRound) { lastRound++; log(`${entry}: the whole gate needed fixes in the last round — one extra round reviews only them`) }
     result.rounds.at(-1).fixes = fin.fixed
     focus = { lenses: new Set(), sides: new Set(fin.fixed.map(f => f.side)), touches: new Set(fin.fixed.some(f => f.side === 'front') ? ['screen'] : []) }
     since = head; head = fin.head; stack = fin.stack
     continue
   }
-  if (round >= maxRounds) { result.head = head; log(`${entry}: still ${fixes.length} to fix after ${maxRounds} rounds — parked`); return result }
+  if (round >= maxRounds) { result.head = head; return park('round-cap', `still ${fixes.length} to fix after ${maxRounds} rounds`) }
 
   focus = {
     lenses: new Set(j.rulings.filter(r => r.ruling === 'sustained').flatMap(r => r.ids.map(id => id.split('#')[0]))),
@@ -607,7 +619,8 @@ ${JSON.stringify(unsettled, null, 1)}`, { label: `${JUDGE}·${entry}·r${round}`
   const touched = await applyFixes(bySide, `fix-r${round}`, fixPrompt)
   const g = await gateUntilGreen(`${mergeSides(touched)} Then run the gate on the entry branch.`, `r${round}`, 'round')
   result.gate = g
-  if (!g || !g.green) { log(`${entry}: the gate is red after the round-${round} fixes — parked`); return result }
+  if (!g) return interrupted('the gate')
+  if (!g.green) return park('gate-red', `the gate is red after the round-${round} fixes`)
   g.fixed.forEach(f => { focus.sides.add(f.side); if (f.side === 'front') focus.touches.add('screen') })
   result.rounds.at(-1).fixes = [...fixes, ...g.fixed]
   head = g.head; stack = g.stack

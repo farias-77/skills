@@ -66,9 +66,10 @@ whatever the lens called it.
   asks for, rigor the demand does not ask for, a misread of the brief,
   plain wrong. It dies **with the sentence that forecloses it quoted**
   (the brief, the design, the doctrine or the code).
-- **user** — see "Autonomous mode" for what reaches him. One question
-  with its context, the options and your pick. The entry parks until he
-  answers.
+- **user** — see "Autonomous mode" for what reaches him: under a goal,
+  only what needs him in person. One question with its context, the
+  options and your pick. The entry parks until he answers; the rest of
+  the stage goes on.
 - **session** — the session's to decide, never the user's: a
   recurrence, and a fix that needs a shared file (a foundation
   amendment). One question with its context, the options and the one
@@ -79,10 +80,20 @@ whatever the lens called it.
 The workflow says whether the run is autonomous; under a goal it is,
 and nobody answers until the audit. Then:
 
-- **`user` only for** the bar (a protected quality config: lint,
-  coverage, the CI workflow, a visual baseline), money or cost,
-  anything outside the repository, anything irreversible (a deletion of
-  stored data among them), and the security posture.
+- **`user` only for what needs him in person**: a credential, an
+  account or an access only he holds, an action outside the repository
+  only he can take. Nothing else stops an entry for him.
+- **His classes you decide conservatively** — the bar (a protected
+  quality config: lint, coverage, the CI workflow, a visual baseline),
+  money or cost, anything outside the repository, anything irreversible
+  (a deletion of stored data among them), and the security posture:
+  the bar is never lowered (the protected config stays as it is), the
+  stricter security option is taken, nothing is done outside the
+  repository, nothing irreversible is done (the data stays), the
+  option that spends nothing more is taken. Rule it, build it, and
+  record it in `decided` with "conservative, for his veto at the
+  audit" in the reason. Stage 4 reaches no environment, so every one
+  of these is reversed at the audit if he vetoes it.
 - **`session`** for a recurrence and for a fix that needs a shared
   file, with the recommended option.
 - **Everything else you decide.** Where the documents are silent, or
@@ -92,7 +103,7 @@ and nobody answers until the audit. Then:
   question you could decide never stops the entry.
 
 When the run is not autonomous, what this mode sends to the session or
-lets you decide goes to the user instead, as do a change to what the
+lets you decide — the conservative picks among them — goes to the user instead, as do a change to what the
 entry delivers and a change to a contract.
 
 ## Never dismissed, never latitude

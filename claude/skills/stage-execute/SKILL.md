@@ -117,7 +117,9 @@ recon, and the engineering doctrine's documents for local development and
 delivery (the pipeline's `docs/project-contract.md` names the roles).
 Ask the user for the goal only if he did not give it: "build the whole
 plan; call me when everything is merged and green." From then on he is
-not asked anything until the audit.
+not asked anything until the audit: the judge decides his classes
+conservatively and lists them for his veto, and the session unblocks
+every park that is not his in person (Step 3).
 
 Prepare the codebase: `feat/<workstream>` cut from `main` and pushed;
 the concurrency cap and the critical path from `plan.md` (the cap is
@@ -214,13 +216,36 @@ gate could not close. Its `decided` goes to the audit. Then act on
   recurrence, a fix that needs a shared file), each with the judge's
   recommended option, are the session's (below); no question goes to
   the user.
-- **`parked`** → the questions with `to: 'user'` (the bar, money,
-  outside the repo, irreversible, the security posture), the gate that
-  stayed red, or the findings still sustained after two rounds: one
-  line in `parked.md` with the evidence; the entries that depend on it
-  wait; everything else goes on. Questions with `to: 'session'` in the
-  same return are answered by the session now, so the user's answer is
-  the only thing the entry waits for.
+- **`interrupted`** → an agent returned nothing: the API, the network
+  or the quota failed. Not a park. Relaunch the same run with
+  `resumeFromRunId` (what finished returns from the cache); if it fails
+  again at once, wait — until the reset time the limit message names,
+  or 30 minutes for the network — and relaunch. Never relaunched as a
+  new build.
+- **`parked`**, by its `reason`, one line in `parked.md` with the
+  evidence; the entries that depend on it wait; everything else goes
+  on. The session unblocks it itself; only `user` waits for him.
+  - **`user`** — a question only he can answer in person (a credential,
+    an account, an action outside the repo only he can take; under a
+    goal the judge decides the rest conservatively). It waits for him;
+    questions with `to: 'session'` in the same return are answered now,
+    so his answer is the only thing the entry waits for.
+  - **`gate-red`** — the gate stayed red after its fixes. The session
+    reads every failure and diagnoses: **environment** (a timeout under
+    load, a download or the network) → wait until the load is under the
+    threshold and resume with nothing to apply, so the gate runs again;
+    **the foundation** (a defect the entry inherits) → an amendment
+    (step 5), then resume; **the code** → resume with each failure as a
+    sustained ruling of its side, the diagnosis written in its fix. One
+    unblocking per entry; red again after it → parked for the audit with
+    both diagnoses.
+  - **`round-cap`** — findings still sustained after two rounds. One
+    automatic resume. If it caps again, the session rules what is left
+    by the ruler: what the ruler never defers becomes the smallest fix
+    the session writes, as a sustained ruling, for one last resume; the
+    rest goes to `deferred.md`. If that last resume caps too, the entry
+    stays out of the feature branch and goes to the audit with its
+    evidence; the stage goes on.
 
 Once every question of the run is answered in `rulings.md`, or for the
 round cap, the entry continues with exec-entry `mode: 'resume'`
