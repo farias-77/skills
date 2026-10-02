@@ -151,11 +151,14 @@ concurrency, a screen: it seats the next round's reviewers.
 - **A QA finding is a behavior**: reproduce it from the request or the
   steps before ruling; one you cannot reproduce is dismissed with what
   you ran.
-- **In a delta round**, a finding on code no fix touched needs to be
-  serious: the previous round read it. A finding on what the fixes
-  touched is sustained only in the classes of "Some defects always
-  proceed" and "Never dismissed, never latitude"; anything else there
-  is deferred.
+- **A delta round is a verification**, and an entry has two rounds at
+  most: the whole reading and one delta (one more only to review a fix
+  the last gate needed). A fix that did not land as
+  described, or broke what it touched, is sustained. A finding on code
+  no fix touched needs to be serious: the previous round read it. Any
+  other finding on what the fixes touched is sustained only in the
+  classes of "Some defects always proceed" and "Never dismissed, never
+  latitude"; anything else there is deferred.
 - **Evidence is not the product.** A stale or missing record of a proof
   — a screenshot taken before the last fix, a SHA in the evidence that is
   not the head, a green run filed from an earlier commit, a token in an

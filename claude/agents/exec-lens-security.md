@@ -69,10 +69,14 @@ that carries them.
   severity honestly; a `detail` is still reported.
 - Quote the doctrine or the design line you invoke; a rule from memory
   is not a finding.
-- In a delta round, read the delta: a fix that did not land as
-  described, a fix that broke what it touched, anything new. Text no
-  fix touched was read and passed last round; a finding on it needs to
-  be serious.
+- A delta round is a verification, not a new review. Read the delta
+  and answer, fix by fix: did it land as described, did it break what
+  it touched. Beyond that, report only what the house ruler never
+  defers — a behavior the brief does not name, a contract departure, a
+  workaround or a loosened test, a person's data or a credential, a
+  swallowed error, an external call with no timeout, a race, a 5xx or
+  a write duplicated. No `detail` and no new polish in a delta round.
+  Text no fix touched was read and passed last round.
 - A finding the entry's earlier rounds or runs already ruled is not
   reported again unless the code under it changed since.
 

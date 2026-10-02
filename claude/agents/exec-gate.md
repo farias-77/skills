@@ -54,7 +54,16 @@ the screenshots go.
    server side and which the screen side; a journey failing on an API response →
    backend, on the screen → frontend; say which you read), and the
    failing lines quoted.
-6. **The record** (when asked, only after a green): the doctrine's
+6. **The surface**, every time you run on the entry branch: `git diff
+   --name-only <base>...<branch>`, each path placed by the doctrine's
+   layout. `api` — product code of the server side changed (not its
+   tests, tooling, build files or docs); `screen` — product code of the
+   screen side changed (not its tests, e2e, tooling, build files or
+   docs); `runtime` — infra, deploy, the config the running service
+   reads, alarms or migrations changed. List the path that made each
+   one true. The workflow seats the panel by it, so a path you cannot
+   place counts as product code of its side.
+7. **The record** (when asked, only after a green): the doctrine's
    evidence command on the head; the evidence folder swept for tokens
    and secrets (the JWT pattern, and whatever the doctrine names as
    secret), each one redacted in place; every pointer of the feature
@@ -83,4 +92,5 @@ green or not, with its last line · `failures`: one per failure with
 `stack`: the URLs and actors, never a token, or "down" · `screenshots`:
 the folder and the file count · `conflicts`: files and sides, or empty
 · `record`: the evidence written, what was redacted, and what stays
-open (empty when the record was not asked).
+open (empty when the record was not asked) · `surface`: `api`,
+`screen`, `runtime` and the paths behind each.

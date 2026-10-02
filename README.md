@@ -159,10 +159,10 @@ code** reads the diff — lenses for fidelity, workaround, proof (one per
 side), security, operations and visual (Opus 5.5, medium, fidelity and
 visual on Sonnet 5.5, high; craft only on the foundation) and QA that use the running stack as an adversary
 through a mandatory checklist, per side and one for abuse (Opus 5.5,
-high) — and a **judge** (`exec-judge`, Opus 5.5, medium) rules every
+high), each seated only when the diff touches what it reads — and a **judge** (`exec-judge`, Opus 5.5, medium) rules every
 finding, on its own under the goal, sending the rest to the session or
-the user; the builders fix back ∥ front, the gate runs, the delta is
-read by the lenses it touches and a QA replay (Sonnet 5.5, medium), three
+the user; the builders fix back ∥ front, the gate runs, and the delta is
+verified by the lenses it touches and a QA replay (Sonnet 5.5, medium), two
 rounds at most; before an entry is ready the whole gate runs once and
 the gate writes the record. **No code enters without review**: every
 build, fix, conflict resolution and foundation amendment passes the
@@ -214,7 +214,7 @@ pipeline, verifies it, and commits with his word.
 ## On cost
 
 This pipeline is expensive to run today, and that was a deliberate
-non-concern. Every entry's diff is read whole by the lenses and the adversarial QA, then its delta, up to three rounds;
+non-concern. Every entry's diff is read whole by the lenses and the adversarial QA, then its delta verified, two rounds at most;
 discovery and design run up to three rounds on the human's word, plan runs round 2 automatically and a third on his word; ambiguity is hunted by dispatching multiple readers at
 the same document. That redundancy is exactly
 where the quality comes from — and it is priced in tokens.

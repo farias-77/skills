@@ -26,15 +26,22 @@
  *              'parked'.
  *   3. panel   in parallel, over the diff. The whole first reading:
  *              fidelity, workaround, proof (one per side when the entry
- *              has both), security, operations (Opus 5.5, medium;
- *              fidelity Sonnet 5.5, high); visual (Sonnet 5.5, high)
- *              with a front; craft only in the foundation's (F) first
- *              reading; exec-qa-backend with a back, exec-qa-frontend
- *              with a front, exec-qa-abuse on every entry (Opus 5.5,
- *              high), each QA with its adversarial checklist and a
- *              coverage line per category — an output missing a category
- *              is sent back once for the missing ones. Panel 'lean'
- *              seats no operations. A delta round seats fidelity,
+ *              has both), security (Opus 5.5, medium; fidelity Sonnet
+ *              5.5, high) always; the rest by the surface the gate read
+ *              from the diff's paths: operations when it touches the
+ *              server's product code or the runtime (infra, deploy,
+ *              config); visual (Sonnet 5.5, high) and exec-qa-frontend
+ *              when it touches a screen; exec-qa-backend when it touches
+ *              the server's product code; exec-qa-abuse when it touches
+ *              either (Opus 5.5, high); craft only in the foundation's
+ *              (F) first reading. A diff of tests, tooling, build files
+ *              or docs only seats no QA. Each QA has its adversarial
+ *              checklist and a coverage line per category — an output
+ *              missing a category is sent back once for the missing
+ *              ones. Panel 'lean' seats no operations. A delta round is
+ *              a verification, not a new review: did each fix land as
+ *              described, did it break what it touched, and only what
+ *              the ruler never defers beyond that. It seats fidelity,
  *              workaround and the proof of the sides the fixes touched;
  *              security only when a fix touches scope, a log, a
  *              credential, a person's data or evidence; visual only when
@@ -42,7 +49,7 @@
  *              finding sustained the round before; never craft and never
  *              an exploring QA: exec-qa-replay (Sonnet 5.5, medium) replays
  *              the scripts the QA saved and the case of each fix, for the
- *              sides the fixes touched. Every reviewer receives the
+ *              sides the fixes touched whose QA ran. Every reviewer receives the
  *              rulings of the entry's earlier rounds and runs.
  *   4. judge   exec-judge (Opus 5.5, medium) rules every finding and every
  *              QA `unsettled` observation. Autonomous (the default, the
@@ -59,8 +66,8 @@
  *   5. fix     the builders apply the sustained fixes, back ∥ front, each
  *              in its side worktree; in series only where the judge
  *              marked `after` → the gate merges and runs the round scope
- *              → the next round's panel reads the delta. After maxRounds
- *              panel rounds with something still sustained → 'parked'.
+ *              → the next round's panel verifies the delta. After maxRounds
+ *              (two) panel rounds with something still sustained → 'parked'.
  *   6. ready   nothing sustained → the fast check and the affected tests
  *              against the base, keep-going (the whole gate runs once, at
  *              the end of the stage, never per entry), then
@@ -105,7 +112,7 @@
  *     base:          'feat/<slug>',
  *     sides:         { back: { worktree, branch } | null, front: { worktree, branch } | null },
  *     trailer:       'the attribution trailer for commits, verbatim',
- *     maxRounds:     3,
+ *     maxRounds:     2,
  *     maxGateFixes:  3,
  *     panel:         'full' | 'lean',  // lean: no operations lens
  *     autonomous:    true,             // false only when the session does not run under a goal
@@ -125,11 +132,11 @@
 
 export const meta = {
   name: 'exec-entry',
-  description: 'Stage-4 entry: two Opus builders in parallel, the mechanical gate, a panel of lenses and adversarial QA that never wrote the code, an Opus judge that rules on its own under a goal; fixes back ∥ front and a smaller review of the delta until clean, three rounds at most; the whole gate and the record before ready',
+  description: 'Stage-4 entry: two Opus builders in parallel, the mechanical gate, a panel of lenses and adversarial QA that never wrote the code, an Opus judge that rules on its own under a goal; fixes back ∥ front and a verification of the delta, two rounds at most; the whole gate and the record before ready',
   phases: [
     { title: 'Build', detail: 'builder-backend ∥ builder-frontend (Opus 5.5, high), each in its side worktree, self-check before return', model: 'opus' },
     { title: 'Gate', detail: 'exec-gate (Sonnet 5.5, medium): merge the sides, fast check + affected tests per round, the whole gate and the record before ready', model: 'sonnet' },
-    { title: 'Panel', detail: 'the lenses (Opus 5.5, medium; fidelity and visual Sonnet 5.5, high) and the QA (Opus 5.5, high; replay Sonnet 5.5, medium) over the diff', model: 'opus' },
+    { title: 'Panel', detail: 'the lenses (Opus 5.5, medium; fidelity and visual Sonnet 5.5, high) and the QA (Opus 5.5, high; replay Sonnet 5.5, medium) over the diff, seated by the surface it touches; the delta verified', model: 'opus' },
     { title: 'Judge', detail: 'exec-judge (Opus 5.5, medium) rules every finding and every unsettled observation', model: 'opus' },
     { title: 'Fix', detail: 'the builders apply what was sustained, back ∥ front (deferred go to the finishing entries), then the gate, then the panel over the delta', model: 'opus' },
   ],
@@ -176,7 +183,7 @@ const BUILD = {
 
 const GATE_REPORT = {
   type: 'object', additionalProperties: false,
-  required: ['green', 'head', 'scope', 'summary', 'checks', 'failures', 'stack', 'screenshots', 'conflicts', 'record'],
+  required: ['green', 'head', 'scope', 'summary', 'checks', 'failures', 'stack', 'screenshots', 'conflicts', 'record', 'surface'],
   properties: {
     green: { type: 'boolean' },
     head: { type: 'string' },
@@ -187,6 +194,12 @@ const GATE_REPORT = {
     stack: { type: 'string', description: 'the URLs and actors (never a token), or "down"' },
     screenshots: { type: 'string', description: 'the folder and the file count' },
     conflicts: { type: 'array', items: { type: 'object', additionalProperties: false, required: ['file', 'side'], properties: { file: { type: 'string' }, side: { type: 'string', enum: ['back', 'front'] } } } },
+    surface: { type: 'object', additionalProperties: false, required: ['api', 'screen', 'runtime', 'paths'], description: 'what the entry diff against the base touches, read from `git diff --name-only <base>...<branch>` and the doctrine\'s layout', properties: {
+      api: { type: 'boolean', description: 'product code of the server side changed (not its tests, tooling, build files or docs)' },
+      screen: { type: 'boolean', description: 'product code of the screen side changed (not its tests, e2e, tooling, build files or docs)' },
+      runtime: { type: 'boolean', description: 'infra, deploy, the config the running service reads, alarms or migrations changed' },
+      paths: { type: 'array', items: { type: 'string' }, description: 'the paths that made each true, as "api: <path>"' },
+    } },
     record: { type: 'object', additionalProperties: false, required: ['evidence', 'redacted', 'open'], properties: {
       evidence: { type: 'string', description: 'the evidence command run on the head and what it wrote; empty when the record was not asked' },
       redacted: { type: 'array', items: { type: 'string' }, description: 'file: what was redacted' },
@@ -259,7 +272,7 @@ const mode = ['rebase', 'resume'].includes(args?.mode) ? args.mode : 'build'
 const resume = mode === 'resume' ? args?.resume ?? {} : null
 const entry = args?.entry ?? '?'
 const sides = Object.entries(args?.sides ?? {}).filter(([, v]) => v).map(([k]) => k)
-const maxRounds = args?.maxRounds ?? 3
+const maxRounds = args?.maxRounds ?? 2
 const maxGateFixes = args?.maxGateFixes ?? 3
 const lean = args?.panel === 'lean'
 const autonomous = args?.autonomous !== false
@@ -431,27 +444,31 @@ if (!g0 || !g0.green) { log(`${entry}: the gate is still red — parked`); retur
 // ---------- the review rounds ----------
 
 const hasFront = sides.includes('front')
+// The surface the gate read from the diff's paths; unknown → every seat, as before.
+const surface = g0.surface ?? { api: true, screen: true, runtime: true, paths: [] }
+const qaSides = sides.filter(s => s === 'back' ? surface.api : surface.screen)
+log(`${entry}: surface ${['api', 'screen', 'runtime'].filter(k => surface[k]).join(' + ') || 'none (tests, tooling, build or docs only)'}`)
 const proofSeats = (on) => {
   const split = sides.length > 1 ? sides.filter(s => on.includes(s)) : []
   return split.length ? split.map(side => ({ agent: PROOF, side })) : [{ agent: PROOF }]
 }
 const wholeSeats = () => [
   { agent: FIDELITY }, { agent: WORKAROUND }, ...proofSeats(sides), { agent: SECURITY },
-  ...(lean ? [] : [{ agent: OPERATIONS }]),
+  ...(!lean && (surface.api || surface.runtime) ? [{ agent: OPERATIONS }] : []),
   ...(entry === 'F' && mode === 'build' ? [{ agent: CRAFT }] : []),
-  ...(hasFront ? [{ agent: VISUAL }] : []),
-  ...sides.map(s => ({ agent: QA[s] })),
-  ...(sides.length ? [{ agent: QA_ABUSE }] : []),
+  ...(hasFront && surface.screen ? [{ agent: VISUAL }] : []),
+  ...qaSides.map(s => ({ agent: QA[s] })),
+  ...(qaSides.length ? [{ agent: QA_ABUSE }] : []),
 ]
 const deltaSeats = (f) => {
   const fixed = f ? sides.filter(s => f.sides.has(s)) : sides
   const touches = f ? f.touches : new Set(TOUCHES)
-  const replay = sides.filter(s => fixed.includes(s) || (s === 'back' && touches.has('concurrency')))
+  const replay = sides.filter(s => (fixed.includes(s) || (s === 'back' && touches.has('concurrency'))) && qaSides.includes(s))
   return [
     { agent: FIDELITY }, { agent: WORKAROUND }, ...proofSeats(fixed.length ? fixed : sides),
     ...(SECURITY_TOUCHES.some(t => touches.has(t)) ? [{ agent: SECURITY }] : []),
     ...(hasFront && touches.has('screen') ? [{ agent: VISUAL }] : []),
-    ...(!lean && (!f || f.lenses.has(OPERATIONS)) ? [{ agent: OPERATIONS }] : []),
+    ...(!lean && (surface.api || surface.runtime) && (!f || f.lenses.has(OPERATIONS)) ? [{ agent: OPERATIONS }] : []),
     ...(replay.length ? [{ agent: QA_REPLAY, replay }] : []),
   ]
 }
@@ -485,7 +502,7 @@ The diff to read first: run \`${diffCmd}\` in the worktree.
 The gate's evidence: ${args?.evidenceDir} (the gate output; screenshots; the QA scripts under qa-*/)
 The running stack: ${stack}${priorText()}${!whole ? `
 
-THIS IS A DELTA ROUND. The fixes applied since the last round:
+THIS IS A DELTA ROUND — a verification of the fixes below, by your definition's delta rule. The fixes applied since the last round:
 ${lastFixes.map(f => `- ${f.id} (${f.side}): ${f.fix}`).join('\n') || '(none listed)'}` : ''}`
 
   const runSeat = async (seat) => {
