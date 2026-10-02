@@ -742,5 +742,19 @@
   },
   "closedOn": "Fechado em {d}: toda linha da vigília lida ou com dono, nenhuma correção aberta.",
   "openNote": "O release está aberto: uma linha da vigília ainda espera a sua hora ou um dono."
+ },
+ "layers": {
+  "kicker": "Assista · Leia · Aprofunde",
+  "watch": "Assista",
+  "watchSub": "Como funciona, em um ou dois minutos. Comece por aqui.",
+  "watchNone": "Este estágio fechou sem vídeo.",
+  "read": "Leia",
+  "readSub": "Os slides: os detalhes, uma ideia por slide.",
+  "readNone": "Este estágio fechou sem slides.",
+  "readLink": "Abrir os slides",
+  "dig": "Aprofunde",
+  "digSub": "Você está aqui: o blueprint, com tudo. Suba para cá só quando quiser mais detalhe.",
+  "videoLabel": "O vídeo do estágio",
+  "noVideo": "Este navegador não toca o vídeo."
  }
 }

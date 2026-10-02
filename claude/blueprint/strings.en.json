@@ -742,5 +742,19 @@
   },
   "closedOn": "Closed on {d}: every watch row read or owned, no fix open.",
   "openNote": "The release is open: a watch row still waits for its hour or an owner."
+ },
+ "layers": {
+  "kicker": "Watch · Read · Dig deeper",
+  "watch": "Watch",
+  "watchSub": "How it works, in one or two minutes. Start here.",
+  "watchNone": "This stage closed without a video.",
+  "read": "Read",
+  "readSub": "The slides: the details, one idea per slide.",
+  "readNone": "This stage closed without slides.",
+  "readLink": "Open the slides",
+  "dig": "Dig deeper",
+  "digSub": "You are here: the blueprint, with everything. Come up here only when you want more detail.",
+  "videoLabel": "The stage's video",
+  "noVideo": "This browser does not play the video."
  }
 }

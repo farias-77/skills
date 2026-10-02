@@ -410,6 +410,24 @@
   .csweep .row.open { border-left: 3px solid var(--bad); }
   .csweep .row .d code { white-space: normal; overflow-wrap: anywhere; }
 
+  /* ---------- the stage report: watch → read → dig, at the top of a tab (docs/stage-report.md) ---------- */
+  .layers { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 18px 20px; gap: 12px; }
+  .lgrid { display: grid; grid-template-columns: minmax(0, 520px) minmax(0, 1fr); gap: 18px 32px; align-items: center; }
+  .lgrid.novideo { grid-template-columns: minmax(0, 1fr); }
+  .lvid video { display: block; width: 100%; aspect-ratio: 16 / 9; background: var(--surface-2); border-radius: 10px; border: 1px solid var(--line); }
+  .lsteps { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; }
+  .lsteps li { display: grid; grid-template-columns: 34px minmax(0, 1fr); gap: 2px 12px; padding: 10px 0; border-top: 1px solid var(--line); }
+  .lsteps li:first-child { border-top: 0; }
+  .lsteps .k { font-family: var(--f-display); font-size: 24px; line-height: 1.1; color: var(--accent); }
+  .lsteps b { font-size: 18px; }
+  .lsteps p { color: var(--ink-2); font-size: 16px; line-height: 1.5; }
+  .lsteps li.off { opacity: .55; }
+  .lbtn { display: inline-flex; align-items: center; gap: 6px; margin-top: 6px; padding: 7px 14px; border-radius: 8px; background: var(--ink); color: var(--bg); font: 600 15px/1.2 var(--f-body); }
+  .lbtn:hover { text-decoration: none; opacity: .88; }
+  .lgrid.novideo .lsteps { flex-direction: row; flex-wrap: wrap; gap: 0 28px; }
+  .lgrid.novideo .lsteps li { border-top: 0; flex: 1 1 220px; }
+  @media (max-width: 860px) { .lgrid { grid-template-columns: minmax(0, 1fr); } }
+
   .foot { max-width: 1560px; margin: 60px auto 0; padding-top: 16px; border-top: 1px solid var(--line); font-size: 14.5px; color: var(--ink-3); display: flex; flex-wrap: wrap; gap: 8px 20px; }
   mark { background: var(--mark); color: inherit; border-radius: 3px; padding: 0 2px; }
 </style>
@@ -1080,7 +1098,18 @@
   }
 
   // ---- mount: every tab is in the DOM (mermaid renders once); the inactive ones are hidden ----
-  document.getElementById('col').innerHTML = sections.map(s => s.html).join('');
+  // the stage report (docs/stage-report.md): the video first, then the slides, then this page — one bar above the tab's first section
+  const SY = S.layers || {};
+  const layerBar = t => { const L = D.layers?.[t]; if (!L) return '';
+    return `<section class="sec layers" id="layers-${t}" data-tab="${t}" aria-label="${esc(SY.kicker)}"><span class="kicker">${SY.kicker}</span>
+      <div class="lgrid ${L.video ? '' : 'novideo'}">
+        ${L.video ? `<div class="lvid"><video controls preload="metadata" playsinline src="${esc(L.video)}" aria-label="${esc(SY.videoLabel)}">${SY.noVideo}</video></div>` : ''}
+        <ol class="lsteps">
+          <li class="${L.video ? '' : 'off'}"><span class="k">1</span><div><b>${SY.watch}</b><p>${L.video ? SY.watchSub : SY.watchNone}</p></div></li>
+          <li class="${L.slides ? '' : 'off'}"><span class="k">2</span><div><b>${SY.read}</b><p>${L.slides ? SY.readSub : SY.readNone}</p>${L.slides ? `<a class="lbtn" href="${esc(L.slides)}" target="_blank" rel="noopener">${SY.readLink} ↗</a>` : ''}</div></li>
+          <li><span class="k">3</span><div><b>${SY.dig}</b><p>${SY.digSub}</p></div></li>
+        </ol></div></section>`; };
+  document.getElementById('col').innerHTML = tabs.map(layerBar).join('') + sections.map(s => s.html).join('');
   const rail = document.getElementById('rail');
   rail.innerHTML = `<div id="raillinks"></div><button class="theme" id="theme" type="button"></button>`;
   let cur = null;

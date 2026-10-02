@@ -224,3 +224,16 @@ altitude.
 Discovery keeps the PR-FAQ and the stories whole, because they are
 the demand itself and the user approves them there; whole behind the
 click, with the plain sentence in front.
+
+## Every stage closes with video, slides, blueprint
+
+Three layers of one report, read in this order: the **video** says how
+it works in one or two minutes, the **slides** give the details one
+idea at a time, the **blueprint** holds everything. He goes up one
+layer only when he wants more detail, so each layer is whole at its
+altitude and never sends him up for what it should have shown. On a
+normal day he watches and reads; the blueprint is for when he needs
+it. The stage's close message names the three in that order, nothing
+before them. The procedure — `video-scribe (Sonnet 5.5, medium)`,
+`slides-scribe (Sonnet 5.5, high)`, the publishing and the links both
+ways — is [docs/stage-report.md](docs/stage-report.md).

@@ -16,13 +16,15 @@
 //        closed release
 //        <workstream-dir>/blueprint/design/*.json when stage 2 ran (one per document + decisions, design-report, design-review;
 //        the documents themselves and the artboards are embedded from 01-design/)
+//        <workstream-dir>/blueprint/stage-report.json when a stage closed with its video and slides (docs/stage-report.md):
+//        per tab, the video's path (relative to the workstream, published beside the page) and the slides' link
 // writes <workstream-dir>/blueprint.html
 //
 // The agents never open the HTML. They write JSON in the shapes documented
 // in schema/<stage>.md; this script validates the shapes and the cross
 // references and refuses to build with the problem named. A shell fix in
 // this folder reaches every workstream at its next build.
-import { readFileSync, writeFileSync, existsSync, readdirSync } from 'node:fs';
+import { readFileSync, writeFileSync, existsSync, readdirSync, statSync } from 'node:fs';
 import { join, dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -543,9 +545,34 @@ if (existsSync(retroPath)) {
   retro = C;
 }
 const tabs = ['discovery', ...(design ? ['design'] : []), ...(plan ? ['plan'] : []), ...(execution ? ['execution'] : []), ...(release ? ['release'] : []), ...(retro ? ['close'] : [])];
+// ---- the stage report (docs/stage-report.md): watch → read → dig, one bar at the top of each tab that closed with one ----
+// { "<tab>": { "video": "report/<tab>/video.mp4", "slides": "https://claude.ai/artifact/<id>" } }; the video travels beside the page
+// at that same relative path (the Artifact's `files`), so the build checks it is there and within the size the procedure allows
+const layersPath = join(dataDir, 'stage-report.json');
+let layers = null;
+if (existsSync(layersPath)) {
+  const W = 'stage-report.json';
+  const Lr = JSON.parse(readFileSync(layersPath, 'utf8'));
+  if (!Lr || typeof Lr !== 'object' || Array.isArray(Lr)) problems.push(`${W}: must be an object keyed by tab (${tabs.join(', ')})`);
+  else Object.entries(Lr).forEach(([t, v]) => {
+    const w = `${W} ${t}`;
+    if (!tabs.includes(t)) { problems.push(`${w}: "${t}" is not a tab of this build (${tabs.join(', ')})`); return; }
+    if (!v || typeof v !== 'object' || Array.isArray(v)) { problems.push(`${w}: must be an object with video and/or slides`); return; }
+    Object.keys(v).filter(k => !['video', 'slides'].includes(k)).forEach(k => problems.push(`${w}: ${k} is not a field (video, slides)`));
+    if (v.video == null && v.slides == null) problems.push(`${w}: needs video, slides or both`);
+    if (v.video != null) {
+      if (typeof v.video !== 'string' || !/^(?![/\\])(?!.*\.\.)(?![a-z]+:)[\w./-]+\.mp4$/i.test(v.video)) problems.push(`${w}: video "${v.video}" must be a relative .mp4 path inside the workstream (no leading /, no .., no scheme)`);
+      else if (!existsSync(join(ws, v.video))) problems.push(`${w}: video ${v.video} not found in the workstream (the page plays it from that same path)`);
+      else { const mb = statSync(join(ws, v.video)).size / 1048576; if (mb > 10) problems.push(`${w}: video ${v.video} is ${mb.toFixed(1)} MB; the stage report caps it at 10 MB`); }
+    }
+    if (v.slides != null && (typeof v.slides !== 'string' || !/^https:\/\/claude\.ai\/(code\/)?artifact\/[\w-]+$/.test(v.slides))) problems.push(`${w}: slides "${v.slides}" must be the deck's claude.ai artifact link`);
+  });
+  if (problems.length) { console.error('blueprint data problems:\n  ' + problems.join('\n  ')); process.exit(1); }
+  layers = Lr;
+}
 
 const data = {
-  workstream, strings, figures, review, report, design, plan, execution, release, retro, tabs,
+  workstream, strings, figures, review, report, design, plan, execution, release, retro, tabs, layers,
   ...prfaq, ...stories,
   files: ['00-discovery/pr-faq.md', '00-discovery/user-stories.md', '00-discovery/reviews.md', 'rulings.md', ...(design ? ['01-design/*.md', '01-design/notes.md', '01-design/reviews.md', '01-design/ui/'] : []), ...(plan ? ['02-plan/plan.md', '02-plan/briefs/', '02-plan/recon/', '02-plan/reviews.md'] : []), ...(execution ? ['03-execution/board.md', '03-execution/parked.md', '03-execution/entries/', '03-execution/audit.md', '03-execution/explain.md'] : []), ...(release ? ['04-release/plan.md', '04-release/trace.md', '04-release/notes/', '04-release/entries/', '04-release/proof/'] : []), ...(retro ? ['05-close/retro.md', '05-close/harvest/', '05-close/trace.md'] : [])],
   builtAt: new Date().toISOString().slice(0, 16).replace('T', ' ') + ' UTC',
@@ -555,4 +582,4 @@ const json = JSON.stringify(data).replace(/<\/script/gi, '<\\/script');
 const shell = readFileSync(join(here, 'shell.html'), 'utf8');
 // function replacements: a `$&` or `$'` inside the data would otherwise be read as a replacement pattern
 writeFileSync(out, shell.replace('__TITLE__', () => workstream.title.replace(/</g, '&lt;')).replace('__DATA__', () => json));
-console.log(`built ${out}: tabs ${tabs.join(' + ')} · ${stories.stories.length} stories, ${stories.stories.reduce((a, s) => a + s.acs.length, 0)} ACs, ${review.rounds.length} discovery rounds` + (design ? ` · design: ${design.docs.architecture.flows.length} flows, ${design.decisions.length} decisions, ${design.review.rounds.length} rounds` : '') + (plan ? ` · plan: ${plan.plan.entries.length} entries, ${plan.plan.entries.reduce((a, e) => a + e.stories.length, 0)} stories, concurrency ${plan.plan.concurrency}, ${Object.keys(plan.briefs).length} briefs` : '') + (execution ? (x => { const planned = new Set(['F', ...plan.plan.entries.map(e => e.id)]), req = x.entries.filter(e => planned.has(e.id)); return ` · execution: ${req.filter(e => e.status === 'merged').length}/${req.length} merged, ${x.entries.filter(e => e.status === 'parked').length} parked, ${x.amendments.length} amendments, audit ${x.closed ? 'closed' : 'open'}`; })(execution) : '') + (release ? ` · release: in production ${release.inProduction.length} artifact(s), ${release.staging.length} staging runs, ${release.fixes.length} fixes, ${release.watch.filter(r => r.readAt != null && r.got != null && r.ok != null).length}/${release.watch.length} watched, ${release.closed ? 'closed' : 'open'}` : '') + (retro ? ` · close: ${retro.wrong.length} wrong, ${retro.ideas.length} ideas (${retro.ideas.filter(i => i.lands === 'pipeline').length} pipeline), ${retro.userNotes.length} user notes, ${retro.closed ? 'closed' : 'open'}` : ''));
+console.log(`built ${out}: tabs ${tabs.join(' + ')} · ${stories.stories.length} stories, ${stories.stories.reduce((a, s) => a + s.acs.length, 0)} ACs, ${review.rounds.length} discovery rounds` + (design ? ` · design: ${design.docs.architecture.flows.length} flows, ${design.decisions.length} decisions, ${design.review.rounds.length} rounds` : '') + (plan ? ` · plan: ${plan.plan.entries.length} entries, ${plan.plan.entries.reduce((a, e) => a + e.stories.length, 0)} stories, concurrency ${plan.plan.concurrency}, ${Object.keys(plan.briefs).length} briefs` : '') + (execution ? (x => { const planned = new Set(['F', ...plan.plan.entries.map(e => e.id)]), req = x.entries.filter(e => planned.has(e.id)); return ` · execution: ${req.filter(e => e.status === 'merged').length}/${req.length} merged, ${x.entries.filter(e => e.status === 'parked').length} parked, ${x.amendments.length} amendments, audit ${x.closed ? 'closed' : 'open'}`; })(execution) : '') + (release ? ` · release: in production ${release.inProduction.length} artifact(s), ${release.staging.length} staging runs, ${release.fixes.length} fixes, ${release.watch.filter(r => r.readAt != null && r.got != null && r.ok != null).length}/${release.watch.length} watched, ${release.closed ? 'closed' : 'open'}` : '') + (retro ? ` · close: ${retro.wrong.length} wrong, ${retro.ideas.length} ideas (${retro.ideas.filter(i => i.lands === 'pipeline').length} pipeline), ${retro.userNotes.length} user notes, ${retro.closed ? 'closed' : 'open'}` : '') + (layers ? ` · stage report: ${Object.keys(layers).join(', ')}` : ''));
