@@ -120,9 +120,12 @@ The conductor judges every finding by the stage's
 `references/judging.md`; there is no judge agent, and at execution
 no judge at all.
 
-- **Discovery.** One round plus a delta. Wording goes to the author
-  without a question; product, scope and confirmed decisions go to him,
-  one question per decision, in one batch.
+- **Discovery.** His validation is **the lock**: he locks the mock,
+  recorded as `<date> · discovery D4 · lock v<N> · ruled: locked ·
+  "<his words>"` (with an override line when he locks over gate gaps).
+  Then one round plus a delta, automatic. Wording goes to the author
+  without a question; product, scope and confirmed decisions go to
+  him, one question per decision, in one batch.
 - **Design.** Round 1 whole and round 2 over the delta, both
   automatic, then stop: there is no third round. He is asked only at
   the call (one deck, at most one question call). After it, a finding
@@ -259,8 +262,9 @@ altitude.
   6–8 thousand words across its nine subtabs; a subtab in two or three.
   Plan and Execution tabs hold the same altitude.
 
-Discovery keeps the PR-FAQ and the stories whole, because they are
-the demand itself and the user approves them there; whole behind the
+Discovery keeps the PR-FAQ, the stories and the locked journeys with
+their frames whole, because they are the demand itself and the user
+approved them there; whole behind the
 click, with the plain sentence in front.
 
 ## Every stage closes with video, slides, blueprint
