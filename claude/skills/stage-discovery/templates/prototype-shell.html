@@ -12,8 +12,11 @@
     1. the title                    the feature's name + "mock"
     2. style block id=tokens        the project's exported tokens (or the defaults)
     3. style block id=product       the screens' CSS, scoped under #screen
-    4. script block id=product      P.define({...}): copy, seed, screens, frames, journeys, actions
+    4. script block id=product      P.define({...}): copy, seed, screens, frames, journeys, actions,
+                                    and, when the product has them, actors ("view as") and clock
   The blocks marked SHELL are not edited; a shell fix goes to the template.
+  Who is looking and what time it is are mock controls, not product: they live in
+  the debug bar (outside #screen), so they never show in a reference frame.
 
   Addressing (only a bare #token reaches the page inside an artifact):
     #screen.state                     a frame, e.g. #invites.empty
@@ -248,8 +251,18 @@ html[data-bare] .pr-device { width: 100% !important; max-width: none; min-height
     time: (d, o) => new Intl.DateTimeFormat(state.lang, o || { timeStyle: 'short' }).format(new Date(d)),
     relative: (n, unit) => new Intl.RelativeTimeFormat(state.lang, { numeric: 'auto' }).format(n, unit),
   };
-  /** The mock's clock is fixed (meta.clock), so every frame renders the same. */
-  P.now = () => new Date(state.model?.meta.clock || '2026-01-15T09:00:00Z');
+  /** The mock's clock: fixed (meta.clock), so every frame renders the same; the store's
+      `clock` (set by a frame's setup, the bar's Advance, or a journey step's `clock`) moves it. */
+  P.now = () => new Date((state.store && state.store.clock) || state.model?.meta.clock || '2026-01-15T09:00:00Z');
+  /** Who is looking (an id of `actors`), kept in the store's `actor`; null when the product has one actor. */
+  P.actor = () => (state.store && state.store.actor) || null;
+  /** A clock advance: "+30m", "+2h", "+1d", or an absolute ISO time with its offset. Returns the new Date or null. */
+  P._advance = (from, spec) => {
+    const m = /^\+(\d+)([mhd])$/.exec(String(spec));
+    if (m) return new Date(from.getTime() + Number(m[1]) * ({ m: 6e4, h: 36e5, d: 864e5 })[m[2]]);
+    const d = new Date(spec);
+    return /^\d{4}-\d\d-\d\dT/.test(String(spec)) && !isNaN(d) ? d : null;
+  };
 
   /** Side effects the screen cannot show: rows, e-mails, events, jobs, alarms. Shown in the backstage. */
   P.effect = (kind, data) => { state.effects.push(Object.assign({ kind: String(kind) }, data, { _seq: ++state.seq })); };
@@ -293,7 +306,7 @@ html[data-bare] .pr-device { width: 100% !important; max-width: none; min-height
 
   /** The product's single entry point. Validates the model and shows every problem in the bar. */
   P.define = model => {
-    const m = Object.assign({ meta: {}, copy: {}, screens: {}, frames: {}, journeys: [], actions: {}, variants: [] }, model);
+    const m = Object.assign({ meta: {}, copy: {}, screens: {}, frames: {}, journeys: [], actions: {}, variants: [], actors: [], clock: null }, model);
     m.meta = Object.assign({ name: 'Mock', version: 1, languages: Object.keys(m.copy) }, m.meta);
     if (!m.meta.languages.length) m.meta.languages = ['en'];
     const TOKEN = /^[A-Za-z0-9][A-Za-z0-9_-]*(\.[A-Za-z0-9_-]+)+$/;
@@ -304,6 +317,15 @@ html[data-bare] .pr-device { width: 100% !important; max-width: none; min-height
       if (!f || !f.title) P.problem(`frame "${tok}": needs a title`);
     }
     for (const [name, sc] of Object.entries(m.screens)) if (typeof sc.render !== 'function') P.problem(`screen "${name}": needs render(s, P)`);
+    const aids = new Set();
+    for (const a of m.actors) {
+      if (!a || !/^[A-Za-z0-9_-]+$/.test(a.id || '')) P.problem(`actor "${a && a.id}": ids are letters, digits, _ and -`);
+      else if (aids.has(a.id)) P.problem(`actor "${a.id}": duplicate id`);
+      else aids.add(a.id);
+      if (a && !a.title) P.problem(`actor "${a.id}": needs a title (the name the bar shows)`);
+      if (a && a.home && !m.frames[a.home] && !m.screens[String(a.home).split('.')[0]]) P.problem(`actor "${a.id}": home "${a.home}" is not a screen.state`);
+    }
+    if (m.clock) for (const k of m.clock.marks || []) if (!P._advance(new Date(), k.at)) P.problem(`clock mark "${k.label}": at must be an ISO time with its offset`);
     const jids = new Set();
     for (const j of m.journeys) {
       if (!/^J\d+$/.test(j.id || '')) P.problem(`journey "${j.id}": ids are J1, J2, …`);
@@ -314,7 +336,11 @@ html[data-bare] .pr-device { width: 100% !important; max-width: none; min-height
       for (const st of j.steps || []) {
         if (!/^s\d+$/.test(st.id || '')) P.problem(`journey ${j.id}: step ids are s1, s2, … (got "${st.id}")`);
         if (sids.has(st.id)) P.problem(`journey ${j.id}: duplicate step ${st.id}`); sids.add(st.id);
-        if (!st.target) P.problem(`${j.id}.${st.id}: needs a target (a CSS selector inside #screen)`);
+        const events = ['target', 'as', 'clock'].filter(k => st[k]);
+        if (events.length !== 1) P.problem(`${j.id}.${st.id}: needs exactly one event: target (a CSS selector inside #screen), as (an actor id) or clock (an advance)`);
+        if (st.as && !aids.has(st.as)) P.problem(`${j.id}.${st.id}: as "${st.as}" is not an actor id`);
+        if (st.clock && !P._advance(new Date(), st.clock)) P.problem(`${j.id}.${st.id}: clock "${st.clock}" is not "+<n>m|h|d" or an ISO time`);
+        if ((st.as || st.clock) && st.fill && Object.keys(st.fill).length) P.problem(`${j.id}.${st.id}: a step that switches actor or moves the clock fills nothing`);
         if (!m.frames[st.expect]) P.problem(`${j.id}.${st.id}: expect "${st.expect}" is not a frame`);
         if (st.net && !['ok', 'slow', 'error', 'timeout'].includes(st.net)) P.problem(`${j.id}.${st.id}: net must be ok, slow, error or timeout`);
       }
@@ -337,7 +363,14 @@ html[data-bare] .pr-device { width: 100% !important; max-width: none; min-height
    - Actions are named by data-act on a button or on a <form>; they change s, may await P.request,
      and record side effects with P.effect(kind, {...}).
    - Every (screen, state) the mock can show is a frame with a setup that reaches it from seed().
-   - Journeys: J1…; steps s1…; each step = do (words) · target (selector) · fill · net · expect (frame) · see (copy keys) · effects. */
+   - Journeys: J1…; steps s1…; each step = do (words) · ONE event: target (selector), as (actor id) or
+     clock ("+1d", "+2h", or an ISO time) · fill · net · expect (frame) · see (copy keys) · effects.
+   - More than one actor: actors: [{ id, title, home: '<screen>.<state>' or enter(s, P) }]; the bar's
+     "View as" sets s.actor and goes to home (or runs enter); P.actor() reads it; a frame's setup may set it.
+   - Time that matters: clock: { marks: [{ label, at: ISO }], onAdvance(s, P) }; the bar's "Clock" moves
+     s.clock; P.now() reads it; onAdvance runs the jobs that time triggers (expiries, reminders).
+   - P.effect records the WHOLE write (every field of the row, the e-mail, the event); a step's declared
+     effects match a subset. An effect that cannot carry every field says partial: true. */
 P.define({
   meta: { name: 'Example', version: 1, languages: ['en', 'pt-BR'], clock: '2026-01-15T09:00:00-03:00' },
   copy: {
@@ -484,6 +517,26 @@ P.define({
   function setTheme(t) { ui.theme = t; if (t === 'system') delete root.dataset.theme; else root.dataset.theme = t; chrome(); }
   function setWidth(w) { ui.width = w; if (w === 'fit') delete root.dataset.width; else root.dataset.width = w; chrome(); }
   function setLang(l) { if (!M.meta.languages.includes(l)) return; S.lang = l; root.lang = l; S.missing.clear(); render(); }
+  /** View as another actor: the store keeps its data; the screen goes to the actor's home. */
+  function setActor(id) {
+    const a = M.actors.find(x => x.id === id);
+    if (!a || !S.store) { P.problem(`no actor "${id}"`); return false; }
+    S.store.actor = id;
+    try {
+      if (typeof a.enter === 'function') a.enter(S.store, P);
+      else if (a.home) { const scr = String(a.home).split('.')[0]; P.nav(scr, String(a.home).slice(scr.length + 1) || (S.store.view[scr] && S.store.view[scr].state) || 'ideal'); }
+    } catch (e) { P.problem(`actor "${id}": enter threw: ${e.message}`); }
+    render(); return true;
+  }
+  /** Move the mock's clock; the model's clock.onAdvance runs what time triggers. */
+  function advance(spec) {
+    if (!S.store) return false;
+    const to = P._advance(P.now(), spec);
+    if (!to) { P.problem(`clock: "${spec}" is not "+<n>m|h|d" or an ISO time`); return false; }
+    S.store.clock = to.toISOString();
+    try { M.clock && typeof M.clock.onAdvance === 'function' && M.clock.onAdvance(S.store, P); } catch (e) { P.problem(`clock.onAdvance threw: ${e.message}`); }
+    render(); return true;
+  }
 
   // ── router: #token~modifiers ─────────────────────────────────────────
   function route() {
@@ -526,6 +579,16 @@ P.define({
     const st = j.steps[i];
     ui.now = i; chrome();
     if (st.net) P._setNet(st.net);
+    if (st.as || st.clock) {
+      await wait(450);
+      ui.since = S.seq;
+      const ok0 = st.as ? setActor(st.as) : advance(st.clock);
+      const ok = ok0 && P.frame() === st.expect;
+      if (!ok) P.problem(`${j.id}.${st.id}: expected ${st.expect}, the mock shows ${P.frame()}`);
+      else if (i + 1 < j.steps.length) ui.now = i + 1;
+      chrome();
+      return ok;
+    }
     for (const [sel, val] of Object.entries(st.fill || {})) {
       const el = screenEl.querySelector(sel);
       if (!el) { P.problem(`${j.id}.${st.id}: fill target "${sel}" not on screen`); continue; }
@@ -619,6 +682,8 @@ P.define({
       ${seg('theme', ui.theme, [['system', 'Auto'], ['light', 'Light'], ['dark', 'Dark']])}
       ${seg('width', ui.width, [['fit', 'Fit'], ['phone', 'Phone'], ['desktop', 'Desktop']])}
       <label class="pr-field"><span class="${S.net !== 'ok' ? 'pr-net-hot' : ''}">Next request</span><select data-ui="net">${['ok', 'slow', 'error', 'timeout'].map(n => h`<option ${n === S.net ? P.raw('selected') : ''}>${n}</option>`)}</select></label>
+      ${M.actors.length ? h`<label class="pr-field"><span>View as</span><select data-ui="actor" aria-label="View as">${M.actors.map(a => h`<option value="${a.id}" ${a.id === P.actor() ? P.raw('selected') : ''}>${a.title}</option>`)}${P.actor() ? '' : h`<option value="" selected disabled>(none)</option>`}</select></label>` : ''}
+      ${M.clock ? h`<label class="pr-field"><span>Clock</span><span class="pr-token" title="The mock's now">${P.fmt.date(P.now(), { dateStyle: 'medium', timeStyle: 'short' })}</span><select data-ui="clock" aria-label="Advance the clock"><option value="" selected>Advance…</option>${[['+1h', '+1 hour'], ['+1d', '+1 day'], ['+7d', '+7 days']].concat((M.clock.marks || []).map(k => [k.at, k.label])).map(([v, l]) => h`<option value="${v}">${l}</option>`)}</select></label>` : ''}
       ${M.variants.length > 1 ? h`<label class="pr-field"><span>Variant</span><select data-ui="variant">${M.variants.map(v => h`<option ${v === S.variant ? P.raw('selected') : ''}>${v}</option>`)}</select></label>` : ''}
       <span class="pr-token" title="This state's address">#${P.frame()}</span>
       <span class="pr-spacer"></span>
@@ -650,6 +715,8 @@ P.define({
             return h`<li class="pr-step" ${i === ui.now ? P.raw('data-now') : ''} data-comment-target>
               <header><span class="pr-jid">${st.id}</span><b>${st.do}</b></header>
               <dl class="pr-kv">
+                ${st.as ? h`<dt>as</dt><dd>${(M.actors.find(a => a.id === st.as) || {}).title || st.as}</dd>` : ''}
+                ${st.clock ? h`<dt>clock</dt><dd>${st.clock}</dd>` : ''}
                 <dt>expect</dt><dd>${frameTitle(st.expect)}</dd>
                 <dt>behind</dt><dd>${fxLine(st.effects)}</dd>
                 ${st.net ? h`<dt>network</dt><dd>${st.net}</dd>` : ''}
@@ -720,6 +787,8 @@ P.define({
     else if (el.dataset.ui === 'lang') setLang(el.value);
     else if (el.dataset.ui === 'net') P._setNet(el.value);
     else if (el.dataset.ui === 'variant') { S.variant = el.value; render(); }
+    else if (el.dataset.ui === 'actor') setActor(el.value);
+    else if (el.dataset.ui === 'clock' && el.value) advance(el.value);
   });
 
   // ── SHELL API: the surface the walk, the frame renderer and the blind reader use ──
@@ -728,7 +797,12 @@ P.define({
     meta: () => clone(M.meta),
     frames: () => Object.entries(M.frames).map(([token, f]) => ({ token, title: f.title, debugOnly: !!f.debugOnly, terminal: !!f.terminal })),
     journeys: () => M.journeys.map(j => ({ id: j.id, title: j.title, actor: j.actor, job: j.job, start: j.start, rules: j.rules || [],
-      steps: j.steps.map(st => ({ id: st.id, do: st.do, target: st.target, fill: st.fill || {}, net: st.net || null, expect: st.expect, see: st.see || [], effects: st.effects || [], rules: st.rules || [] })) })),
+      steps: j.steps.map(st => ({ id: st.id, do: st.do, target: st.target || null, as: st.as || null, clock: st.clock || null, fill: st.fill || {}, net: st.net || null, expect: st.expect, see: st.see || [], effects: st.effects || [], rules: st.rules || [] })) })),
+    actors: () => M.actors.map(a => ({ id: a.id, title: a.title, home: a.home || null })),
+    actor: () => P.actor(),
+    as: id => setActor(id),
+    now: () => P.now().toISOString(),
+    advance: spec => advance(spec),
     copyKeys: () => Object.fromEntries(M.meta.languages.map(l => [l, Object.keys(M.copy[l] || {})])),
     copy: () => clone(M.copy),
     actions: () => Object.keys(M.actions),

@@ -4,42 +4,65 @@
  *
  *   node proto.mjs walk   <index.html> [--out report.json] [--shots dir]
  *   node proto.mjs frames <index.html> <out-dir> [--widths 390,1280] [--themes light,dark] [--langs all|en,pt-BR]
- *   node proto.mjs look   <index.html|http-url> [token] [--net error] [--fill 'selector::value'] [--click selector] … (in order)
- *                         [--shot out.png] [--width 390] [--theme dark] [--lang pt-BR]
+ *   node proto.mjs look   <index.html|http-url> [token] [--net error] [--fill 'selector::value'] [--click selector]
+ *                         [--as actor] [--clock +1d] [--wait selector|ms] [--wait-url pattern] … (in order)
+ *                         [--shot out.png] [--width 390] [--theme dark] [--lang pt-BR] [--page] [--env-cmd "cmd"]
+ *   node proto.mjs shots  <index.html> <token|J<n>> … [--out dir] [--width 1280] [--theme light] [--lang pt-BR]
  *   node proto.mjs lock   <prototype-dir> --words "his words" [--override "his words, gaps accepted"]
+ *                         [--gap "<where>::<what>"] … (one per gap of the gate he accepted)
  *   node proto.mjs trace  <index.html> <journeys-dir> <stories.md> [--notes notes.md]
+ *   node proto.mjs split  <stories.md> <out-dir>
  *   node proto.mjs model  <index.html>
  *
  * walk    every frame in every language (renders as its own token, no console error, no missing
  *         copy, no sideways scroll at 390 and 1280, no dead end) and every journey driven through
  *         the real UI (fill, click, the frame it lands on, the copy it must show, the side effects
  *         exactly as declared); coverage (frames no journey visits and not marked debugOnly); a taste
- *         audit (font < 12px, target < 24px, transition: all, dashes in copy) reported apart.
- *         Exit 0 when the mechanical gate passes, 1 when it fails.
+ *         audit (font < 12px, target < 24px, transition: all, dashes in copy) reported apart; and
+ *         `idOrder`: journeys whose step ids are not s1, s2, … in play order (the lock refuses them;
+ *         the prototyper renumbers before the lock). Exit 0 when the mechanical gate passes, 1 when it fails.
  * frames  one PNG per frame × theme × language × width (<token>~<theme>~<lang>~<width>.png), one
  *         reference PNG per frame (<token>.png: first theme, first language, widest width), one per
  *         journey step (journeys/<J>.<s>.png), and manifest.json with each file's sha256. The page is
  *         opened as the artifact publishes it (doctype added).
- * look    one state, optionally driven by fills and clicks in order; prints what is on screen (the
- *         frame, the visible text, the new side effects). Takes a URL too, for the current app.
- * lock    walk (must pass, or --override), copy index.html to versions/v<N>.html, render frames/
+ * look    one state, optionally driven by fills, clicks, actor switches (--as), clock advances (--clock)
+ *         and waits in order; prints what is on screen (the frame, the visible text, the new side
+ *         effects). Takes a URL too, for the current app: --wait <selector|ms> and --wait-url <text or
+ *         /regex/> let a logged-in SPA settle after a click; a fill value `env:NAME` is read from the
+ *         environment (or from the KEY=VALUE lines --env-cmd prints: the project's env command, role 5)
+ *         and never printed, so a test actor's password never sits on the command line. --page opens
+ *         a whole HTML page or a file:// URL as it is (no artifact skeleton): a blueprint, a report.
+ * shots   the pictures he looks at when the mock is not published (local mode): one PNG per state
+ *         token, or per step of a journey (J2 → J2.s0.png, J2.s1.png …), into --out (default
+ *         <mock dir>/shots/v<N>/); prints the paths.
+ * lock    walk (must pass, or --override; step ids must be in order, always), copy index.html to versions/v<N>.html, render frames/
  *         (a .gitignore there keeps the matrix out of git: the reference per state, the journey steps
  *         and manifest.json are committed; `frames` regenerates the matrix on demand),
- *         write LOCK.json (version, date, his words, sha256 of the source and of the frames manifest).
+ *         write LOCK.json (version, date, his words, sha256 of the source and of the frames manifest, and
+ *         gaps[]: the walk's failures and every --gap of the gate he accepted, {source, where, what}).
  * model   the mock as data: meta, frames, journeys (with targets, fills, effects), copy, actions.
  * trace   the derivation against the locked mock: one YAML per journey with the same steps and
  *         frames; every step with an expectation has an AC; every AC id resolves; every rule id
- *         (journeys, and the notes' Rules table with --notes) has an AC.
+ *         (journeys, and the notes' Rules table with --notes) has an AC; no story block cites an AC id
+ *         another story defines. An AC marked [build] after its rule ids is proved by the build, not
+ *         the mock: counted apart (buildAcs).
+ * split   stories.md cut for the review: vocabulary.md (the `## Vocabulary` section), one S-NNN.md
+ *         per story block, and index.json { vocabulary, stories: [{ id, file, acs, build }] }: the AC
+ *         ids each block defines (the blind reader's keys) and its [build] ACs (skipped by the reader).
+ *         Prints index.json.
  *
  * Needs playwright-core (or playwright) and a Chromium. Resolution: PLAYWRIGHT_DIR (a folder whose
- * node_modules has it), then the usual import. Browser: PROTO_CHROME, then common system paths,
- * then Playwright's own. Install once:  npm i --prefix "$PLAYWRIGHT_DIR" playwright-core
+ * node_modules has it), then the pipeline's own video kit (claude/video, which installs it), then
+ * the working directory, the usual import and the global node_modules. Browser: PROTO_CHROME, then
+ * common system paths, then Playwright's own. Install once:  npm i --prefix "$PLAYWRIGHT_DIR" playwright-core
  */
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import crypto from 'node:crypto';
 import { createRequire } from 'node:module';
+import { fileURLToPath } from 'node:url';
+import { execSync } from 'node:child_process';
 
 const argv = process.argv.slice(2);
 const cmd = argv.shift();
@@ -48,19 +71,27 @@ for (let i = 0; i < argv.length; i++) {
   const a = argv[i];
   if (a.startsWith('--')) {
     const k = a.slice(2); const v = argv[i + 1] && !argv[i + 1].startsWith('--') ? argv[++i] : true;
-    if (k === 'fill' || k === 'click' || k === 'net') seq.push([k, v]); else flags[k] = v;
+    if (['fill', 'click', 'net', 'as', 'clock', 'wait', 'wait-url'].includes(k)) seq.push([k, v]);
+    else if (k === 'gap') (flags.gap = flags.gap || []).push(v);
+    else flags[k] = v;
   } else pos.push(a);
 }
 const die = (msg, code = 2) => { console.error(msg); process.exit(code); };
 const sha = buf => crypto.createHash('sha256').update(buf).digest('hex');
 
+// the pipeline's video kit installs playwright-core: <pipeline>/claude/video (this file is claude/skills/stage-discovery/scripts/)
+const KIT_VIDEO = path.resolve(path.dirname(fs.realpathSync(fileURLToPath(import.meta.url))), '../../../video');
 async function loadPlaywright() {
-  const dirs = [process.env.PLAYWRIGHT_DIR, process.cwd()].filter(Boolean);
+  const dirs = [process.env.PLAYWRIGHT_DIR, KIT_VIDEO, process.cwd()].filter(Boolean);
   for (const name of ['playwright-core', 'playwright']) {
     for (const d of dirs) { try { return createRequire(path.join(path.resolve(d), 'noop.js'))(name); } catch { /* next */ } }
     try { return await import(name); } catch { /* next */ }
   }
-  die('playwright-core not found. Install it: npm i --prefix <dir> playwright-core, then PLAYWRIGHT_DIR=<dir>.');
+  try {  // the probe: a global install
+    const g = execSync('npm root -g', { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'], timeout: 5000 }).trim();
+    for (const name of ['playwright-core', 'playwright']) { try { return createRequire(path.join(g, 'noop.js'))(name); } catch { /* next */ } }
+  } catch { /* no npm */ }
+  die(`playwright-core not found (looked in PLAYWRIGHT_DIR, ${KIT_VIDEO}, the working directory, the global node_modules). Install it: npm i --prefix <dir> playwright-core, then PLAYWRIGHT_DIR=<dir>; or run npm ci in ${KIT_VIDEO}.`);
 }
 function chromePath() {
   const c = [process.env.PROTO_CHROME, '/usr/bin/google-chrome', '/usr/bin/google-chrome-stable', '/usr/bin/chromium', '/usr/bin/chromium-browser',
@@ -75,14 +106,14 @@ const SKELETON = '<!doctype html><html><head><meta charset="utf-8"><meta name="v
   + 'body{margin:0;font:14px system-ui,-apple-system,sans-serif;background:#fafafa}img{max-width:100%}[hidden]{display:none!important}</style></head><body>';
 function wrap(file) {
   const src = fs.readFileSync(file, 'utf8');
-  if (/<!doctype|<html[\s>]|<head[\s>]|<body[\s>]/i.test(src.replace(/<!--[\s\S]*?-->/g, '').slice(0, 4000))) die(`${file}: an artifact page has no <!doctype>, <html>, <head> or <body> of its own`);
+  if (/<!doctype|<html[\s>]|<head[\s>]|<body[\s>]/i.test(src.replace(/<!--[\s\S]*?-->/g, '').slice(0, 4000))) die(`${file}: an artifact page has no <!doctype>, <html>, <head> or <body> of its own (to look at a whole page, a blueprint or a report, add --page)`);
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'proto-'));
   const out = path.join(dir, 'index.html');
   fs.writeFileSync(out, SKELETON + src + '</body></html>');
   return 'file://' + out;
 }
 
-async function open(target, { width = 1280, height = 900, theme = 'light', hash = '' } = {}) {
+async function open(target, { width = 1280, height = 900, theme = 'light', hash = '', page: whole = false } = {}) {
   const pw = await loadPlaywright();
   const browser = await pw.chromium.launch({ executablePath: chromePath(), headless: true, args: ['--no-sandbox', '--font-render-hinting=none'] });
   const context = await browser.newContext({ viewport: { width, height }, colorScheme: theme, reducedMotion: 'reduce', deviceScaleFactor: 1 });
@@ -90,7 +121,7 @@ async function open(target, { width = 1280, height = 900, theme = 'light', hash 
   const errors = [];
   page.on('console', m => { if (m.type() === 'error') errors.push(m.text()); });
   page.on('pageerror', e => errors.push('pageerror: ' + e.message));
-  const url = /^https?:/.test(target) ? target : wrap(target);
+  const url = /^(https?|file):/.test(target) ? target : whole ? 'file://' + path.resolve(target) : wrap(target);
   await page.goto(url + hash, { waitUntil: 'domcontentloaded', timeout: 30000 });
   await page.evaluate(() => Promise.race([document.fonts ? document.fonts.ready : null, new Promise(r => setTimeout(r, 3000))]));
   return { browser, context, page, errors, url };
@@ -117,6 +148,24 @@ const DEAD_END = () => {
   const scr = document.getElementById('screen');
   return !scr.querySelector('button:not([disabled]), a[href], [data-act]:not([disabled]), input:not([disabled]):not([type=hidden]), select:not([disabled]), textarea:not([disabled])');
 };
+
+// One journey step through the real UI: its fills and its click on #screen, or the bar's actor switch
+// (as) or clock advance (clock); then wait until the mock settles on the step's frame. Throws when it
+// does not; the caller reports from the state the mock is in.
+async function driveStep(page, st) {
+  if (st.net) await page.evaluate(n => window.proto.setNet(n), st.net);
+  if (st.as) await page.evaluate(id => window.proto.as(id), st.as);
+  else if (st.clock) await page.evaluate(c => window.proto.advance(c), st.clock);
+  else {
+    const scr = page.locator('#screen');
+    for (const [sel, val] of Object.entries(st.fill || {})) await scr.locator(sel).first().fill(String(val), { timeout: 3000 });
+    await scr.locator(st.target).first().click({ timeout: 3000 });
+  }
+  await page.waitForFunction(exp => window.proto.idle() && window.proto.frame() === exp, st.expect, { timeout: 4000 });
+}
+// Step ids are s1, s2, … in play order: the AC ids derive from them and freeze at the lock.
+const idOrder = journeys => journeys.filter(j => j.steps.some((st, i) => st.id !== `s${i + 1}`))
+  .map(j => `${j.id}: steps [${j.steps.map(st => st.id).join(', ')}] must be [${j.steps.map((_, i) => 's' + (i + 1)).join(', ')}]`);
 
 async function setLang(page, lang) { await page.evaluate(l => window.proto.setLang(l), lang); }
 async function go(page, token) {
@@ -201,13 +250,7 @@ async function walk(file, opts = {}) {
         const bad = what => { sr.ok = false; jr.ok = false; sr.problems.push(what); fail(where, what); };
         const before = errors.length;
         const fxBefore = (await page.evaluate(() => window.proto.effects())).length;
-        if (st.net) await page.evaluate(n => window.proto.setNet(n), st.net);
-        const scr = page.locator('#screen');
-        try {
-          for (const [sel, val] of Object.entries(st.fill)) await scr.locator(sel).first().fill(String(val), { timeout: 3000 });
-          await scr.locator(st.target).first().click({ timeout: 3000 });
-          await page.waitForFunction(exp => window.proto.idle() && window.proto.frame() === exp, st.expect, { timeout: 4000 });
-        } catch (e) { /* reported below from the state the mock is in */ }
+        try { await driveStep(page, st); } catch (e) { /* reported below from the state the mock is in */ }
         await page.waitForFunction(() => window.proto.idle(), null, { timeout: 8000 }).catch(() => bad('the mock never settled (a request still pending)'));
         sr.got = await page.evaluate(() => window.proto.frame());
         visited.add(sr.got);
@@ -237,10 +280,11 @@ async function walk(file, opts = {}) {
     for (const t of await page.evaluate(() => window.proto.reached())) if (!declared.has(t)) fail(`frame ${t}`, 'reached but not declared');
     for (const p of await page.evaluate(() => window.proto.problems())) if (!fails.some(f => f.what === p)) fail('shell', p);
 
+    const order = idOrder(journeys);
     return {
       ok: fails.length === 0, version: meta.version, languages: langs,
-      summary: { frames: frames.length, debugOnly: frames.filter(f => f.debugOnly).length, journeys: journeys.length, steps: journeys.reduce((a, j) => a + j.steps.length, 0), fails: fails.length, taste: taste.length },
-      fails, taste, frames: frameReport, journeys: jReport, unvisited,
+      summary: { frames: frames.length, debugOnly: frames.filter(f => f.debugOnly).length, journeys: journeys.length, steps: journeys.reduce((a, j) => a + j.steps.length, 0), fails: fails.length, taste: taste.length, idOrder: order.length },
+      fails, taste, idOrder: order, frames: frameReport, journeys: jReport, unvisited,
     };
   } finally { await browser.close(); }
 }
@@ -288,13 +332,7 @@ async function frames(file, outDir, opts = {}) {
           await page.screenshot({ path: p0 });
           files.push({ journey: j.id, step: 's0', frame: j.start, file: `journeys/${j.id}.s0.png`, sha256: sha(fs.readFileSync(p0)) });
           for (const st of j.steps) {
-            if (st.net) await page.evaluate(n => window.proto.setNet(n), st.net);
-            const scr = page.locator('#screen');
-            try {
-              for (const [sel, val] of Object.entries(st.fill)) await scr.locator(sel).first().fill(String(val), { timeout: 3000 });
-              await scr.locator(st.target).first().click({ timeout: 3000 });
-              await page.waitForFunction(exp => window.proto.idle() && window.proto.frame() === exp, st.expect, { timeout: 4000 });
-            } catch { /* the walk reports it; the frame shows what happened */ }
+            try { await driveStep(page, st); } catch { /* the walk reports it; the frame shows what happened */ }
             const p = path.join(outDir, 'journeys', `${j.id}.${st.id}.png`);
             await page.screenshot({ path: p });
             files.push({ journey: j.id, step: st.id, frame: await page.evaluate(() => window.proto.frame()), file: `journeys/${j.id}.${st.id}.png`, sha256: sha(fs.readFileSync(p)) });
@@ -309,10 +347,23 @@ async function frames(file, outDir, opts = {}) {
 }
 
 // ── look ────────────────────────────────────────────────────────────────
+// The KEY=VALUE lines a command prints (`export KEY=VALUE` too): the project's env command (role 5),
+// read for `env:NAME` fill values. Kept in memory, never printed.
+function envFrom(cmd) {
+  if (!cmd) return {};
+  const out = execSync(cmd, { encoding: 'utf8', stdio: ['ignore', 'pipe', 'inherit'], timeout: 120000 });
+  const env = {};
+  for (const m of out.matchAll(/^\s*(?:export\s+)?([A-Za-z_][A-Za-z0-9_]*)=(.*)$/gm)) env[m[1]] = m[2].trim().replace(/^(['"])(.*)\1$/, '$2');
+  return env;
+}
+
 async function look(target, token, opts = {}) {
   const theme = opts.theme || 'light';
-  const hash = /^https?:/.test(target) ? '' : `#${token || ''}~fast~${theme}${opts.lang ? '~' + opts.lang : ''}${opts.chrome ? '' : '~bare'}`;
-  const { browser, page, errors } = await open(target, { width: Number(opts.width || 1280), theme, hash });
+  const extra = envFrom(opts['env-cmd']);
+  const secret = v => { const m = /^env:([A-Za-z_][A-Za-z0-9_]*)$/.exec(v); if (!m) return v; const x = extra[m[1]] ?? process.env[m[1]]; if (x == null) throw new Error(`${v}: ${m[1]} is not set (export it, or pass --env-cmd)`); return x; };
+  const app = /^(https?|file):/.test(target) || opts.page;
+  const hash = app ? '' : `#${token || ''}~fast~${theme}${opts.lang ? '~' + opts.lang : ''}${opts.chrome ? '' : '~bare'}`;
+  const { browser, page, errors } = await open(target, { width: Number(opts.width || 1280), theme, hash, page: !!opts.page });
   try {
     const proto = await hasProto(page);
     const out = { target, frameBefore: proto ? await page.evaluate(() => window.proto.frame()) : null, actions: [] };
@@ -321,7 +372,19 @@ async function look(target, token, opts = {}) {
     for (const [kind, v] of seq) {
       try {
         if (kind === 'net') { if (!proto) throw new Error('--net needs a mock'); await page.evaluate(n => window.proto.setNet(n), v); out.actions.push({ net: v, ok: true }); continue; }
-        if (kind === 'fill') { const i = v.lastIndexOf('::'); if (i < 0) throw new Error('--fill takes "selector::value"'); await scope.locator(v.slice(0, i)).first().fill(v.slice(i + 2), { timeout: 3000 }); }
+        if (kind === 'wait') {
+          if (/^\d+$/.test(String(v))) await page.waitForTimeout(Number(v));
+          else await page.locator(String(v)).first().waitFor({ state: 'visible', timeout: Number(opts.timeout || 15000) });
+          out.actions.push({ wait: v, ok: true, url: page.url() }); continue;
+        }
+        if (kind === 'wait-url') {
+          const re = /^\/(.+)\/([a-z]*)$/.exec(String(v));
+          await page.waitForURL(u => re ? new RegExp(re[1], re[2]).test(u.href) : u.href.includes(String(v)), { timeout: Number(opts.timeout || 15000) });
+          out.actions.push({ 'wait-url': v, ok: true, url: page.url() }); continue;
+        }
+        if (kind === 'as') { if (!proto) throw new Error('--as needs a mock'); if (!(await page.evaluate(id => window.proto.as(id), v))) throw new Error(`no actor "${v}"`); }
+        else if (kind === 'clock') { if (!proto) throw new Error('--clock needs a mock'); if (!(await page.evaluate(c => window.proto.advance(c), v))) throw new Error(`clock "${v}" refused`); }
+        else if (kind === 'fill') { const i = v.lastIndexOf('::'); if (i < 0) throw new Error('--fill takes "selector::value"'); await scope.locator(v.slice(0, i)).first().fill(secret(v.slice(i + 2)), { timeout: 3000 }); }
         else await scope.locator(v).first().click({ timeout: 3000 });
         if (proto) await page.waitForFunction(() => window.proto.idle(), null, { timeout: 8000 });
         await page.waitForTimeout(50);
@@ -329,15 +392,19 @@ async function look(target, token, opts = {}) {
       } catch (e) { out.actions.push({ [kind]: v, ok: false, error: e.message.split('\n')[0] }); }
     }
     out.frameAfter = proto ? await page.evaluate(() => window.proto.frame()) : null;
+    if (!proto) out.url = page.url();
+    if (proto) { out.actor = await page.evaluate(() => window.proto.actor && window.proto.actor()); out.now = await page.evaluate(() => window.proto.now && window.proto.now()); }
     out.text = (await page.evaluate(p => (p ? document.getElementById('screen') : document.body).innerText, proto)).slice(0, 6000);
     out.fields = await page.evaluate(p => [...(p ? document.getElementById('screen') : document.body).querySelectorAll('input:not([type=hidden]), select, textarea')].map(el => ({
       label: (el.labels && el.labels[0] ? el.labels[0].innerText : el.getAttribute('aria-label') || el.name || el.id || el.tagName.toLowerCase()).trim(),
-      value: el.type === 'checkbox' || el.type === 'radio' ? el.checked : el.value,
+      value: el.type === 'checkbox' || el.type === 'radio' ? el.checked : el.type === 'password' ? (el.value ? '(hidden)' : '') : el.value,
       disabled: el.disabled, invalid: el.getAttribute('aria-invalid') === 'true' })), proto);
     if (proto) {
       out.effects = (await page.evaluate(() => window.proto.effects())).slice(fx0);
       out.requests = await page.evaluate(() => window.proto.requests());
       out.frames = (await page.evaluate(() => window.proto.frames())).map(f => `${f.token} · ${f.title}${f.debugOnly ? ' (debug)' : ''}`);
+      const actors = await page.evaluate(() => window.proto.actors ? window.proto.actors() : []);
+      if (actors.length) out.actors = actors.map(a => `${a.id} · ${a.title}`);
       out.problems = await page.evaluate(() => window.proto.problems());
     }
     if (opts.shot) { fs.mkdirSync(path.dirname(path.resolve(opts.shot)), { recursive: true }); await page.screenshot({ path: opts.shot, fullPage: true }); out.shot = opts.shot; }
@@ -346,13 +413,48 @@ async function look(target, token, opts = {}) {
   } finally { await browser.close(); }
 }
 
+// ── shots ───────────────────────────────────────────────────────────────
+// Local mode: the pictures he looks at in place of the published mock.
+async function shots(file, items, opts = {}) {
+  if (!items.length) die('shots needs at least one state token or journey id');
+  const theme = opts.theme || 'light', width = Number(opts.width || 1280);
+  const { browser, page, errors } = await open(file, { width, height: width < 600 ? 844 : 900, theme, hash: `#~bare~fast~${theme}` });
+  const written = [], problems = [];
+  try {
+    if (!(await hasProto(page))) die('window.proto is missing: the shell did not boot\n' + errors.join('\n'), 1);
+    const meta = await page.evaluate(() => window.proto.meta());
+    const out = opts.out || path.join(path.dirname(path.resolve(file)), 'shots', `v${meta.version}`);
+    fs.mkdirSync(out, { recursive: true });
+    if (opts.lang) await setLang(page, opts.lang);
+    const journeys = await page.evaluate(() => window.proto.journeys());
+    const tokens = new Set((await page.evaluate(() => window.proto.frames())).map(f => f.token));
+    const suffix = `${theme === 'light' ? '' : '~' + theme}${opts.lang ? '~' + opts.lang : ''}${width === 1280 ? '' : '~' + width}`;
+    const snap = async name => { const p = path.join(out, `${name}${suffix}.png`); await page.screenshot({ path: p, fullPage: true }); written.push(p); };
+    for (const it of items) {
+      const j = journeys.find(x => x.id === it);
+      if (j) {
+        await go(page, j.start); await snap(`${j.id}.s0`);
+        for (const st of j.steps) {
+          try { await driveStep(page, st); } catch { problems.push(`${j.id}.${st.id}: expected ${st.expect}, the mock shows ${await page.evaluate(() => window.proto.frame())}`); }
+          await snap(`${j.id}.${st.id}`);
+        }
+      } else if (tokens.has(it)) { await go(page, it); await snap(it); }
+      else problems.push(`${it}: neither a state token nor a journey id`);
+    }
+    return { version: meta.version, out, files: written, problems };
+  } finally { await browser.close(); }
+}
+
 // ── lock ────────────────────────────────────────────────────────────────
 async function lock(dir, opts) {
   if (!opts.words) die('lock needs --words "<his words when he locked>"');
   const index = path.join(dir, 'index.html');
   if (!fs.existsSync(index)) die(`${index} not found`);
+  const gateGaps = (opts.gap || []).map(g => { const i = String(g).indexOf('::'); return i < 0 ? { source: 'gate', where: 'gate', what: String(g) } : { source: 'gate', where: g.slice(0, i).trim(), what: g.slice(i + 2).trim() }; });
+  if (gateGaps.length && !opts.override) die('gaps accepted (--gap) need his words: --override "<his words>"');
   const report = await walk(index);
   fs.writeFileSync(path.join(dir, 'walk-lock.json'), JSON.stringify(report, null, 2));
+  if (report.idOrder.length) die(`step ids out of order (the AC ids derive from them and freeze now): renumber, walk again, lock.\n  ${report.idOrder.join('\n  ')}`, 1);
   if (!report.ok && !opts.override) die(`the walk fails (${report.fails.length}); fix the mock or lock with --override "<his words>". Report: ${path.join(dir, 'walk-lock.json')}`, 1);
   const v = report.version;
   fs.mkdirSync(path.join(dir, 'versions'), { recursive: true });
@@ -368,7 +470,7 @@ async function lock(dir, opts) {
   fs.writeFileSync(path.join(fdir, '.gitignore'), '*~*.png\n');
   const LOCK = {
     version: v, date: new Date().toISOString(), words: opts.words, override: opts.override || null,
-    gaps: report.ok ? [] : report.fails,
+    gaps: [...(report.ok ? [] : report.fails.map(f => ({ source: 'walk', ...f }))), ...gateGaps],
     sha256: { 'index.html': sha(src), [`versions/v${v}.html`]: sha(src), 'frames/manifest.json': sha(fs.readFileSync(path.join(fdir, 'manifest.json'))) },
     walk: report.summary, frames: manifest.files.length,
   };
@@ -409,8 +511,15 @@ async function trace(file, jdir, storiesFile, opts = {}) {
   }
   for (const id of Object.keys(parsed)) if (!journeys.some(j => j.id === id)) fails.push(`${parsed[id].file}: journey ${id} is not in the locked mock`);
   const stories = fs.readFileSync(storiesFile, 'utf8').replace(/<!--[\s\S]*?-->/g, '');
-  const acs = [...stories.matchAll(/\b(J\d+)\.(s\d+)\.(\d+)[`*\s]*\[([^\]]*)\]/g)].map(m => ({ id: `${m[1]}.${m[2]}.${m[3]}`, j: m[1], s: m[2], rules: m[4].split(',').map(x => x.trim()).filter(Boolean) }));
-  const frameAcs = [...stories.matchAll(/\bframe:([A-Za-z0-9_.-]+)\.(\d+)[`*\s]*\[([^\]]*)\]/g)].map(m => ({ id: `frame:${m[1]}.${m[2]}`, token: m[1], rules: m[3].split(',').map(x => x.trim()).filter(Boolean) }));
+  // rule ids in the first [ ]; a [build] after it (or "build" among them) marks an AC the build proves, not the mock
+  const ruleList = (r, b) => { const l = r.split(',').map(x => x.trim()).filter(Boolean); return { rules: l.filter(x => x !== 'build'), build: !!b || l.includes('build') }; };
+  const acs = [...stories.matchAll(/\b(J\d+)\.(s\d+)\.(\d+)[`*\s]*\[([^\]]*)\](\s*\[build\])?/g)].map(m => ({ id: `${m[1]}.${m[2]}.${m[3]}`, j: m[1], s: m[2], ...ruleList(m[4], m[5]) }));
+  const frameAcs = [...stories.matchAll(/\bframe:([A-Za-z0-9_.-]+)\.(\d+)[`*\s]*\[([^\]]*)\](\s*\[build\])?/g)].map(m => ({ id: `frame:${m[1]}.${m[2]}`, token: m[1], ...ruleList(m[3], m[4]) }));
+  // a story block stands alone: it never cites an AC id another block defines (it names the criterion instead)
+  const blocks = storyBlocks(stories);
+  const owner = new Map();
+  for (const b of blocks) for (const d of b.defs) owner.set(d.id, b.id);
+  for (const b of blocks) for (const id of new Set(mentions(b.text))) if (owner.has(id) && owner.get(id) !== b.id) fails.push(`${b.id} cites ${id}, an AC of ${owner.get(id)}: cite it by name ("the <what it checks> criterion of ${owner.get(id)}"), never by id`);
   const tokens = new Set(frameList.map(f => f.token));
   for (const a of frameAcs) {
     if (!tokens.has(a.token)) fails.push(`AC ${a.id}: no frame ${a.token} in the locked mock`);
@@ -432,7 +541,34 @@ async function trace(file, jdir, storiesFile, opts = {}) {
     for (const m of sec.matchAll(/^\|\s*([A-Z][A-Z0-9]*-\d+)\s*\|/gm)) ruleIds.add(m[1]);
   }
   for (const r of ruleIds) if (!acRules.has(r)) fails.push(`rule ${r}: no AC carries it`);
-  return { ok: fails.length === 0, journeys: journeys.length, yamls: Object.keys(parsed).length, acs: acs.length, frameAcs: frameAcs.length, rules: ruleIds.size, fails };
+  return { ok: fails.length === 0, journeys: journeys.length, yamls: Object.keys(parsed).length, acs: acs.length, frameAcs: frameAcs.length, buildAcs: [...acs, ...frameAcs].filter(a => a.build).length, rules: ruleIds.size, fails };
+}
+
+// ── stories.md, cut ─────────────────────────────────────────────────────
+const AC_DEF = /^\s*-\s+\*\*`?(J\d+\.s\d+\.\d+|frame:[A-Za-z0-9_.-]+\.\d+)`?\*\*\s*\[([^\]]*)\](\s*\[build\])?/gm;
+const mentions = text => [...text.matchAll(/\b(J\d+\.s\d+\.\d+)\b|\b(frame:[A-Za-z0-9_-]+(?:\.[A-Za-z0-9_-]+)*?\.\d+)\b/g)].map(m => m[1] || m[2]);
+function storyBlocks(text) {
+  return text.split(/^(?=## )/m).filter(p => /^## S-\d+/.test(p)).map(p => {
+    const t = p.replace(/\n-{3,}\s*$/, '\n');
+    const defs = [...t.matchAll(AC_DEF)].map(m => { const l = m[2].split(',').map(x => x.trim()); return { id: m[1], build: !!m[3] || l.includes('build') }; });
+    return { id: p.match(/^## (S-\d+)/)[1], text: t, defs };
+  });
+}
+function split(storiesFile, outDir) {
+  const text = fs.readFileSync(storiesFile, 'utf8').replace(/<!--[\s\S]*?-->/g, '');
+  fs.mkdirSync(outDir, { recursive: true });
+  let vocab = (text.split(/^## Vocabulary\b.*$/m)[1] || '').split(/^## /m)[0];
+  if (!vocab.trim()) vocab = (text.match(/^Vocabulary:\s*\n([\s\S]*?)(?=^#{1,3} |^---)/m) || [])[1] || '';
+  const vfile = path.join(path.resolve(outDir), 'vocabulary.md');
+  fs.writeFileSync(vfile, '## Vocabulary\n' + vocab.trim() + '\n');
+  const stories = storyBlocks(text).map(b => {
+    const file = path.join(path.resolve(outDir), `${b.id}.md`);
+    fs.writeFileSync(file, b.text.trim() + '\n');
+    return { id: b.id, file, acs: b.defs.filter(d => !d.build).map(d => d.id), build: b.defs.filter(d => d.build).map(d => d.id) };
+  });
+  const index = { source: path.resolve(storiesFile), vocabulary: vocab.trim() ? vfile : null, stories };
+  fs.writeFileSync(path.join(outDir, 'index.json'), JSON.stringify(index, null, 2));
+  return index;
 }
 
 // ── model ───────────────────────────────────────────────────────────────
@@ -446,7 +582,7 @@ async function model(file) {
 }
 
 // ── main ────────────────────────────────────────────────────────────────
-const usage = 'usage: proto.mjs walk|frames|look|lock|trace|model … (see the header of this file)';
+const usage = 'usage: proto.mjs walk|frames|look|shots|lock|trace|split|model … (see the header of this file)';
 try {
   if (cmd === 'walk') {
     if (!pos[0]) die(usage);
@@ -455,6 +591,7 @@ try {
     if (flags.out) fs.writeFileSync(flags.out, json);
     console.log(flags.out ? `walk: ${r.ok ? 'PASS' : 'FAIL'} · ${JSON.stringify(r.summary)} · ${flags.out}` : json);
     if (!r.ok && flags.out) for (const f of r.fails.slice(0, 40)) console.log(`  ✕ ${f.where}: ${f.what}`);
+    if (flags.out) for (const o of r.idOrder) console.log(`  ! step ids out of order (renumber before the lock): ${o}`);
     process.exit(r.ok ? 0 : 1);
   } else if (cmd === 'frames') {
     if (!pos[1]) die(usage);
@@ -463,6 +600,16 @@ try {
   } else if (cmd === 'look') {
     if (!pos[0]) die(usage);
     console.log(JSON.stringify(await look(pos[0], pos[1], flags), null, 2));
+  } else if (cmd === 'shots') {
+    if (!pos[1]) die(usage);
+    const r = await shots(pos[0], pos.slice(1), flags);
+    console.log(`shots: ${r.files.length} · v${r.version} · ${r.out}`);
+    for (const f of r.files) console.log(f);
+    for (const p of r.problems) console.log(`  ✕ ${p}`);
+    process.exit(r.problems.length ? 1 : 0);
+  } else if (cmd === 'split') {
+    if (!pos[1]) die(usage);
+    console.log(JSON.stringify(split(pos[0], pos[1]), null, 2));
   } else if (cmd === 'lock') {
     if (!pos[0]) die(usage);
     console.log(JSON.stringify(await lock(pos[0], flags), null, 2));

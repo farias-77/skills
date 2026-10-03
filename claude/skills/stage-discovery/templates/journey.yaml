@@ -57,3 +57,18 @@ steps:
       - a second e-mail to the same address
     rules: [INV-1]
     png: frames/journeys/J1.s2.png
+  # A step whose event is not a click carries `as` (view as another actor, from the
+  # mock's debug bar) or `clock` (the mock's clock moves: "+1d", or an ISO time),
+  # copied from the mock, in place of target and fill:
+  #   - id: s3
+  #     do: Midnight passes
+  #     clock: '2026-10-10T00:00:00-03:00'
+  #     expect:
+  #       frame: invites.expired
+  #       see: [ ... ]
+  #   - id: s4
+  #     do: View as the invited teammate
+  #     as: teammate
+  #     expect:
+  #       frame: inbox.ideal
+  #       see: [ ... ]

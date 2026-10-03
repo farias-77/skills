@@ -26,6 +26,7 @@
 - **Current screens:** `00-discovery/recon/screens/<name>.png` · …
 - **Tokens and components:** <tokens.css path · components list path> | <none exported: shell defaults, gap noted>
 - **Other fronts touching these areas:** <workstream · what it changes> | none
+- **Term collisions:** <word · what it already means in the product · path:line> | none (each one is in the Vocabulary's "avoid")
 
 ## Coverage map
 
@@ -52,9 +53,14 @@
      the ACs cite them. An example per rule ("the one where…"), and its
      boundaries. -->
 
-| ID | Rule | Number | Source | Examples |
-|---|---|---|---|---|
-| <PREFIX-1> | <rule> | <value + unit> | "<his words>" | <the one where…> |
+<!-- Proof: `mock` when a journey step can show it; `[build]` when a one-file
+     mock cannot (real time, a server's refusal, a reload, a second session):
+     he confirms the [build] marking, the lock gate counts the rule as covered
+     by the build, and its ACs carry [build]. -->
+
+| ID | Rule | Number | Source | Examples | Proof |
+|---|---|---|---|---|---|
+| <PREFIX-1> | <rule> | <value + unit> | "<his words>" | <the one where…> | mock |
 
 ## Journeys
 
@@ -119,3 +125,4 @@
 
 - **Version:** v<N> · **Date:** <date> · **His words:** "<verbatim>"
 - **Gate:** <passed> | <overridden: the gaps, and his words>
+- **Walked:** <step verdicts in the artifact> | <local mode: walks/verdicts.json, from his chat answers>

@@ -15,6 +15,14 @@
     table), or the story id when it checks behavior no numbered rule covers.
   - An AC on a state no journey visits (a debug-only frame) is
     frame:<token>.<n> (frame:invites.error.1).
+  - [build] after the rule ids marks an AC only the build can prove (a
+    rule the notes' Rules table marks [build]: real time, a server's
+    refusal, a count that changes on reload). It keeps the shape and says
+    where it is observed in the built product; the blind readers skip it,
+    the lock gate counts its rule as covered by the build.
+  - A story block cites only its own AC ids. Another story's criterion is
+    named in words ("the publish criterion of S-001"), never by id: a
+    blind reader reads one block and would take the id for its own.
 
   An AC (the format `proto.mjs trace` reads):
   - **`J1.s2.1`** [INV-1] GIVEN <the state before the step, no clicks>
@@ -37,7 +45,7 @@ Locked mock: **v<N>** · `00-discovery/prototype/LOCK.json` · frames in `00-dis
 
 Personas: **<persona>** (<who, in one line>), …
 
-Vocabulary:
+## Vocabulary
 
 - **<word>** — <definition, from the notes; the mock's labels use this word>
 
@@ -80,6 +88,9 @@ Vocabulary:
 - **`frame:<token>.1`** [S-001] GIVEN <the state forced from the debug bar>
   WHEN <event>
   THEN <outcome> (observed: screen)
+- **`frame:<token>.2`** [<RULE-ID>] [build] GIVEN <state>
+  WHEN <event the mock cannot play: a reload, a second user, the server>
+  THEN <outcome> (observed: <where, in the built product>)
 
 ### Bad paths
 
