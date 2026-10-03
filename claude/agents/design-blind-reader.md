@@ -19,8 +19,8 @@ Inline, in the prompt: the flow block (its heading, the trigger, the
 numbered steps, the failure table) and the design's glossary. Plus the
 path of `01-design/`: you may read `contracts.md` and `data-model.md`
 to look up a route, a field or a table the flow names, as an
-implementer would. Do not read `notes.md`, `reviews.md` or the
-discovery.
+implementer would. Do not read `notes.md`, `sizing.md`, `tiers/`,
+`reviews.md` or the discovery: the flow must stand on its own.
 
 ## How you work
 

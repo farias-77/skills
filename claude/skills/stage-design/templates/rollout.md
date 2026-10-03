@@ -11,6 +11,11 @@
   inside the window is inconclusive, not a rejection).
 -->
 
+## Size and evolution
+
+<!-- the header block, from templates/doc-header.md: data (migrations), ops (first run). Every
+     mechanism line below ends with `(req: …)` (references/design-docs.md). -->
+
 ## Deploy order
 
 1. <repo> — <why it goes first (producer/consumer)>
@@ -31,8 +36,8 @@
 
 ## The implementer decides
 
-<!-- The latitude the user granted for this document (notes.md)
-     plus what transcription left open on purpose. One line each.
+<!-- The latitude: what the picked tier's file leaves open, plus
+     what transcription left open on purpose. One line each.
      Never a hard class. -->
 
 - <item>

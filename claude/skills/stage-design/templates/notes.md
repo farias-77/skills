@@ -1,109 +1,66 @@
 # Design notes — <workstream>
 
 <!--
-  Written by the CONDUCTOR during the design session, as it happens.
-  This file is the session: if the context is lost, the next session
-  resumes from here. The writers read it as their only source of
-  decisions, next to research/; they never edit it. One block per
-  subject of the script, in order; every card in the fixed block
-  format so decisions.json is written from it at the close, with the
-  recommendation kept beside the choice (a divergence becomes a line
-  in taste-notes.md). Each subject ends with its Latitude list. A
-  decision the session skipped is a writer's question back to the
-  conductor, never the writer's to take. One version of each decision:
-  a revised decision replaces the old text in place (the change is
-  dated in Amendments), so the writers never read two.
+  Written by the CONDUCTOR, as the stage happens. With sizing.md it is
+  the writers' only source of decisions: sizing.md says what is built
+  and at what size; this file says what exists today, the frame the
+  tiers were drawn in, the user's rulings at the call, and every answer
+  given after it. The writers never edit it. If the context is lost,
+  the next session resumes from here and from the files on disk.
+  One version of each decision: a revised decision replaces the old
+  text in place, and the change is dated under Amendments.
 -->
 
-Session opened <date>. Language of the documents: <language>.
-Discovery approved <date> (`00-discovery/`); the rulings the design
-cannot reopen are in `../rulings.md`.
+Opened <date>. Language of the documents: <language>.
+Lock: `00-discovery/prototype/` version <v>, locked <date> · journeys <n> · stories <S-001 … S-0NN>.
+The rulings the design cannot reopen are in `../rulings.md`.
 
 ## What we are building (one sentence)
 
 <the demand in one sentence, in the user's words where he gave them>
 
-Stories to cover: <S-001 … S-0NN>
+## The frame
 
-Shape in mind before the proposal: <none> | <what the user brought, in his words>
+<!-- Written at the end of G0, before the tiers. The architects design
+     inside it. -->
+
+- **Appetite:** <h> h — <why this number: the size of the lock, the user's words if he gave one>
+- **No-gos:** <from the PR-FAQ and the stories' Out lines, one each>
+- **Doctrine:** <the engineering doctrine the project's CLAUDE.md names; the rules this demand touches, with path:line>
+- **Other fronts:** <running workstreams and the files they share with this one, or "none">
 
 ## What exists today
 
-<!-- The recon: one line per fact the scouts and the research brought,
-     with its source (path:line, or research/<topic>.md). The proposal
-     extends what is here. -->
+<!-- G0's recon, one line per fact, each with its source (path:line or
+     research/<topic>.md). The tiers extend what is here. -->
 
 - <fact> — <source>
 
-## 1 · The shape
+## Premises
 
-<!-- what this demand changes in the system's shape against the
-     doctrine (a module, a repo, where something runs, how blocks
-     talk, a store) — usually "nothing, because"; build vs buy; the
-     cost envelope at three scales; extension points. A change to the
-     doctrine is a card marked "changes the doctrine". -->
+<!-- Each premise the breadboard listed: confirmed (source), or
+     assumed, and what the design does if it is false. -->
 
-> **Decision — <title>**
-> Context: <the question that had to be answered>
+## His call
+
+<!-- G3. The deck's link; each question asked, the pick, his answer in
+     his words; what changed in sizing.md because of it (amended by
+     the judge, dated). "Nothing was his" is a complete entry. -->
+
+- Deck: <url>
+- **Q-1** <question> — pick <A> — his answer: "<words>" — sizing.md: <unchanged | amended: what>
+
+## Questions answered after the call
+
+<!-- The writers' questions (G4), one block per decision. A decision
+     of his class that could not wait goes to rulings.md as
+     `ruled: conductor` and is listed at the close for veto. -->
+
+> **Decision — <title>** `(decided in your place)`   <- flag only when the class was his
+> Context: <the writer's question, with its Q-n>
 > Options: A) <option — its cost> · B) <option — its cost>
-> Recommended: <letter>
-> Chosen: <letter> — <why, the tradeoff said out loud; the user's words in quotes>
-
-## 2 · Architecture
-
-<!-- one flow per story or group, end to end; the mechanisms that guard
-     a rule; what happens when the other side fails -->
-
-Latitude: <one line each; "none" when nothing was left open>
-
-## 3 · Data model
-
-Latitude:
-
-## 4 · Contracts
-
-Latitude:
-
-## 5 · Screens
-
-Latitude:
-
-## 6 · Security
-
-Latitude:
-
-## 7 · Infra
-
-Latitude:
-
-## 8 · Observability
-
-Latitude:
-
-## 9 · Rollout
-
-Latitude:
-
-## 10 · Code
-
-Latitude:
-
-## 11 · Acceptance
-
-Latitude:
-
-<!-- Every subject is thought: when the demand changes nothing in it,
-     the block says "Nothing changes: <why>" in one line. -->
-
-## Facts looked up during the session
-
-<!-- one line each: the fact, the scout or research that brought it, the card it weighed on -->
-
-## Questions answered after the session
-
-<!-- the writers' batch: a decision the session did not take, asked and
-     answered here, same block format -->
+> Chosen: <letter> — <why; the conservative pick when the class was his>
 
 ## Amendments
 
-<!-- dated, from the rulings of each round and from the approval -->
+<!-- dated, from the rulings of each round and from the close -->

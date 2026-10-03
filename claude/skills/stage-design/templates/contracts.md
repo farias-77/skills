@@ -5,8 +5,10 @@
   parallel against this file and meet in the middle. MUST have, per
   endpoint: route, auth (who can call), request AND response with example
   payloads (realistic values — each repo builds its fixtures from these),
-  EVERY error case with status + actionable body, idempotency story for
-  every mutation, pagination for every list — and the Cases line: the
+  EVERY error case with status + actionable body, the idempotency of
+  each mutation as sizing.md picked it (a key where the pick or the
+  floor asks for one; otherwise what a repeat does, in one line),
+  paging on the lists sizing.md says grow — and the Cases line: the
   named acceptance cases this endpoint owes, one per promised behavior
   (success + each declared error). The design names them, the plan
   copies them into the brief, the builder writes the tests — the tests
@@ -17,6 +19,11 @@
   Changes after approval are amendments (a decision block with the
   reason) — never silent edits.
 -->
+
+## Size and evolution
+
+<!-- the header block, from templates/doc-header.md: contracts. Every
+     mechanism line below ends with `(req: …)` (references/design-docs.md). -->
 
 ## Endpoints
 
@@ -58,8 +65,8 @@
 
 ## The implementer decides
 
-<!-- The latitude the user granted for this document (notes.md)
-     plus what transcription left open on purpose. One line each.
+<!-- The latitude: what the picked tier's file leaves open, plus
+     what transcription left open on purpose. One line each.
      Never a hard class. -->
 
 - <item>

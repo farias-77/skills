@@ -1,54 +1,68 @@
 /*
- * design-review.js — the stage-2 review round as deterministic code.
+ * design-review.js — the stage-2 review round (G5) as deterministic code.
  *
  * Why a workflow: the guarantee that no lens is skipped must be
- * physical, not discipline. Round 1 is whole: the ten lenses in
- * parallel with, per flow, two blind readers and a referee. Rounds 2
- * and 3 run only on the user's word (the round rule he picks once at
- * the session's close, or his answer after a round) and only over the delta: the
- * lenses receive the documents and flows that changed and the fixes
- * that were applied, and check that each fix landed and did not break
- * its surroundings; the blind readers reopen only the flows whose text
- * changed. Three rounds at most; the conductor enforces the count.
+ * physical, not discipline. Round 1 is whole: eleven lenses in
+ * parallel with, per flow, two blind readers and a referee. Round 2 is
+ * automatic and delta only: the lenses receive the documents and flows
+ * that changed and the fixes that were applied, and check that each
+ * fix landed and did not break its surroundings; the blind readers
+ * reopen only the flows whose text changed. THERE IS NO ROUND 3: the
+ * script refuses round > 2. What is still sustained after round 2 is
+ * applied with line proof and written as residue.
+ *
+ * THE SCOPE (v9): the lenses report only correctness, coverage of the
+ * lock, contradictions between documents (and against sizing.md and
+ * notes.md) and one-way doors. design-reviewer-sizing adds the size:
+ * every mechanism names its requirement (`req:`), every document
+ * builds the tier sizing.md picked. The size itself is decided before
+ * the documents (design-tiers.js); a lens never re-opens it by taste.
  *
  * THE BLIND READS are per flow of architecture.md: two Sonnet readers
  * (5.5, low) build one flow each, alone, in the documents' language,
  * one build per key (`flow`, `step:<n>` per numbered step,
  * `failure:<n>` per failure-table row). A Sonnet referee (5.5, low)
  * compares the two readings key by key; only a `different-product`
- * verdict becomes a finding. A reading that misses a key, or
- * is written in another language is invalid and re-dispatched once; a
- * flow whose two readings do not both survive is reported as unread.
- * A round in which no flow was read is INVALID (`valid: false`): the
- * conductor fixes the cause and runs it again instead of proceeding
- * with the ambiguity lens empty.
+ * verdict becomes a finding. A reading that misses a key is invalid
+ * and re-dispatched once; a flow whose two readings do not both
+ * survive is reported as unread. A round in which no flow was read is
+ * INVALID (`valid: false`): the conductor fixes the cause and runs it
+ * again.
  *
  * THERE IS NO JUDGE AGENT. The conductor judges every finding by
- * stage-design/references/judging.md, with the session in its head:
- * merge by fix, sustained / deferred / dismissed, owner writer / user /
- * implementer. The workflow returns the findings as the lenses gave
- * them, ids assigned.
+ * stage-design/references/judging.md. The workflow returns the
+ * findings as the lenses gave them, ids assigned.
  *
- * The briefs below carry INPUTS only. Every instruction lives in the
- * agent definitions under agents/ and in the shared reviewer contract
- * (docs/standards/reviewer-contract.md).
+ * THE ARGS CARRY PATHS, NOT TEXT (the flows excepted: scripts cannot
+ * read files). Every instruction lives in the agent definitions under
+ * agents/ and in the shared reviewer contract.
+ *
+ * RUNNING UNREGISTERED AGENTS: with args.inlineAgents, agent() is called
+ * without agentType; the prompt points at <agentsDir>/<name>.md and at
+ * the packs the agent loads (<packsDir>/<pack>/SKILL.md), and the model
+ * and effort come from the AGENTS map below.
  *
  * Invoked by the stage-design conductor:
  *   Workflow({ scriptPath: '<...>/workflows/design-review.js', args: {
- *                 // by scriptPath, never by name
  *     designDir:    'absolute path to <slug>/01-design',
  *     discoveryDir: 'absolute path to <slug>/00-discovery',
+ *     doctrineDir:  'the engineering doctrine the project names',
  *     repos:        '<each repo the design builds on, path and base branch>',
- *     round:        1,            // 1, 2 or 3; shown in labels and ids
+ *     packsDir:     'absolute path to the pipeline's skills/ (the packs)',
+ *     agentsDir:    'absolute path to the pipeline's agents/',
+ *     inlineAgents: false,
+ *     round:        1,            // 1 or 2
  *     language:     'pt-BR',      // the documents' language; the readers build in it
  *     glossary:     '<the glossary block of the design, verbatim>',
  *     flows: [                    // one entry per flow of architecture.md,
  *       { id: 'create-leader', text: '### Create a leader (covers S-002)\n...' },
- *     ],                          // verbatim: scripts cannot read files; the
- *                                 // conductor splits the Flows section at every "### "
- *     // rounds 2 and 3 only — the delta:
+ *     ],                          // verbatim: the conductor splits the Flows section at every "### "
+ *     // round 2 only — the delta:
  *     changed: { docs: ['contracts', 'infra'], flows: ['create-leader'] },
  *     fixes:   [ { id: 'design-reviewer-data#1', doc: 'contracts', fix: 'what was applied, one line' } ],
+ *     lenses:  ['design-reviewer-data', ...],   // optional: the lenses to run; default all.
+ *                                               // round 2: the lenses with a sustained finding;
+ *                                               // consistency and sizing always run
  *   }})
  *
  * Returns { round, mode, valid, findings, lenses, unread } — findings
@@ -56,33 +70,35 @@
  * severity, title, says, gap, fix; lenses is [{ lens, verdict,
  * verified, quote, findings, invalid }] with the referees merged as
  * one `design-reviewer-ambiguity` entry; unread lists the flow ids
- * whose readings did not survive; valid is false when the round read
- * no flow it was asked to read. The conductor writes reviews.md,
- * judges, sends the writer fixes, asks the user the rest, and starts
- * another (delta) round by the round rule he picked, or asks him.
+ * whose readings did not survive.
  */
 
 export const meta = {
   name: 'design-review',
-  description: 'Stage-2 review round: ten lenses (five Opus, five Sonnet) in parallel with two Sonnet blind readers and a Sonnet referee per flow; whole in round 1, delta only after; no judge agent — the conductor judges',
+  description: 'Stage-2 review round: eleven lenses (six Opus, five Sonnet) in parallel with two Sonnet blind readers and a Sonnet referee per flow; round 1 whole, round 2 delta, no round 3; no judge agent — the conductor judges',
   phases: [
-    { title: 'Lenses', detail: 'the ten lenses in parallel, each reads everything (or the delta), reports its lens', model: 'opus' },
+    { title: 'Lenses', detail: 'the lenses in parallel, each reads everything (or the delta): correctness, coverage of the lock, contradictions, one-way doors, size', model: 'opus' },
     { title: 'Blind reads', detail: 'per flow: two Sonnet readers build it alone, a Sonnet referee compares them key by key' },
   ],
 }
 
-const LENSES = [
-  'design-reviewer-data',
-  'design-reviewer-code',
-  'design-reviewer-infra',
-  'design-reviewer-security',
-  'design-reviewer-contracts',
-  'design-reviewer-alarms',
-  'design-reviewer-coverage',
-  'design-reviewer-facts',
-  'design-reviewer-ui',
-  'design-reviewer-consistency',
-]
+const AGENTS = {
+  'design-reviewer-data': { model: 'opus', effort: 'medium', packs: [] },
+  'design-reviewer-code': { model: 'opus', effort: 'medium', packs: [] },
+  'design-reviewer-infra': { model: 'opus', effort: 'medium', packs: [] },
+  'design-reviewer-security': { model: 'opus', effort: 'medium', packs: [] },
+  'design-reviewer-contracts': { model: 'opus', effort: 'medium', packs: [] },
+  'design-reviewer-sizing': { model: 'opus', effort: 'medium', packs: ['pack-right-sizing'] },
+  'design-reviewer-alarms': { model: 'sonnet', effort: 'medium', packs: ['pack-ops'] },
+  'design-reviewer-coverage': { model: 'sonnet', effort: 'medium', packs: [] },
+  'design-reviewer-facts': { model: 'sonnet', effort: 'medium', packs: [] },
+  'design-reviewer-ui': { model: 'sonnet', effort: 'medium', packs: [] },
+  'design-reviewer-consistency': { model: 'sonnet', effort: 'medium', packs: [] },
+  'design-blind-reader': { model: 'sonnet', effort: 'low', packs: [] },
+  'design-reviewer-ambiguity': { model: 'sonnet', effort: 'low', packs: [] },
+}
+const ALL_LENSES = Object.keys(AGENTS).filter(n => n.startsWith('design-reviewer-') && n !== 'design-reviewer-ambiguity')
+const ALWAYS = ['design-reviewer-consistency', 'design-reviewer-sizing']
 const REFEREE = 'design-reviewer-ambiguity'
 const READER = 'design-blind-reader'
 
@@ -153,29 +169,46 @@ const REFEREE_REVIEW = {
 }
 
 const round = args?.round ?? 1
+if (round > 2) throw new Error(`round ${round}: there is no round 3 — what is still sustained after round 2 is applied with line proof and written as residue (SKILL G5)`)
 const language = args?.language ?? 'en'
 const glossary = args?.glossary ?? ''
+const inline = args?.inlineAgents === true
 const allFlows = Array.isArray(args?.flows) ? args.flows.filter(f => f && f.id && f.text) : []
 const delta = round > 1 && args?.changed ? { docs: args.changed.docs ?? [], flows: args.changed.flows ?? [] } : null
 const fixes = Array.isArray(args?.fixes) ? args.fixes : []
 const mode = delta ? 'delta' : 'whole'
-// whole round: every flow; delta round: only the flows whose text changed
+// whole round: every flow and every lens; delta round: the flows whose text changed, the lenses asked for (plus the two that always run)
 const flows = delta ? allFlows.filter(f => delta.flows.includes(f.id)) : allFlows
+const asked = Array.isArray(args?.lenses) && args.lenses.length ? args.lenses.filter(l => ALL_LENSES.includes(l)) : ALL_LENSES
+const LENSES = [...new Set([...asked, ...ALWAYS])]
 if (!allFlows.length) log('no flows passed in args — the blind reads are skipped this round; pass flows: [{id, text}] to run them')
-if (delta) log(`delta round: docs ${delta.docs.join(', ') || '(none)'} · flows ${delta.flows.join(', ') || '(none)'} · ${fixes.length} fix(es) applied`)
+if (delta) log(`delta round: docs ${delta.docs.join(', ') || '(none)'} · flows ${delta.flows.join(', ') || '(none)'} · ${fixes.length} fix(es) applied · lenses ${LENSES.length} of ${ALL_LENSES.length}`)
+if (round > 1 && !delta) log('round 2 without `changed` — running whole; pass changed and fixes to run the delta')
 
 const docInputs = `Round ${round}, ${mode}.
-The design: ${args.designDir} — everything under it, research/ and ui/ included.
-The session's notes (the design as the user decided it; a card is contested only by defect): ${args.designDir}/notes.md
-The demand it must satisfy: ${args.discoveryDir}/pr-faq.md and ${args.discoveryDir}/user-stories.md
+The design: ${args.designDir} — the ten documents, sizing.md (the size, decided), tiers/ (the detail of each tier), notes.md (the frame, what exists today, the user's rulings), recon/ and research/.
+The lock it must build (the product the user approved): ${args.discoveryDir} — stories.md, journeys/*.yaml, prototype/ with its frames/, pr-faq.md
+The floor (never traded for speed): §3 D of ${args.packsDir ?? '<packsDir>'}/pack-right-sizing/SKILL.md
 The project's engineering doctrine (the bar the design applies; never reopened): ${args.doctrineDir ?? '(not given)'}
 The repos the design builds on, at their base branch (a claim about what the code has today is checked there): ${args.repos ?? '(not given)'}
 The round audit so far: ${args.designDir}/reviews.md
 Language of the documents: ${language}${delta ? `
 
-THIS IS A DELTA ROUND. The documents that changed since the last round: ${delta.docs.join(', ') || '(none)'}. The flows whose text changed: ${delta.flows.join(', ') || '(none)'}. The fixes that were applied, each with the finding it answers:
+THIS IS ROUND 2, THE DELTA, AND THE LAST. The documents that changed since round 1: ${delta.docs.join(', ') || '(none)'}. The flows whose text changed: ${delta.flows.join(', ') || '(none)'}. The fixes that were applied, each with the finding it answers:
 ${fixes.map(f => `- ${f.id} (${f.doc}): ${f.fix}`).join('\n') || '(none listed)'}
-Read the changed documents whole and every other document for what the fixes touched. Report: a fix that did not land as described, a fix that broke its surroundings or another document, and anything new in the changed text. Text no fix touched was read and passed last round; a finding on it needs the razor at full strength.` : ''}`
+Read the changed documents whole and every other document for what the fixes touched. Report: a fix that did not land as described, a fix that broke its surroundings or another document, a fix that added a mechanism with no requirement, and anything new in the changed text. Text no fix touched was read and passed in round 1; a finding on it needs the razor at full strength.` : ''}`
+
+// One call shape for registered and inline agents.
+const call = (name, prompt, opts) => {
+  const def = AGENTS[name]
+  if (inline) {
+    const packs = def.packs.length ? ` Read these knowledge packs before you work, as its frontmatter's skills: ${def.packs.map(p => `${args.packsDir}/${p}/SKILL.md`).join(', ')}.` : ''
+    return agent(`Your instructions are the file ${args.agentsDir}/${name}.md (read it first and follow it; its frontmatter's model and effort are already applied).${packs}
+
+${prompt}`, { ...opts, model: def.model, effort: def.effort })
+  }
+  return agent(prompt, { ...opts, agentType: name })
+}
 
 // ---------- mechanical checks on a reading ----------
 
@@ -245,9 +278,8 @@ ${f.text}`
 
 const readBlind = async (f, n) => {
   const expected = expectedKeys(f.text)
-  const dispatch = () => agent(flowInputs(f), {
-    label: `${f.id}·read${n}·r${round}`, phase: 'Blind reads',
-    agentType: READER, schema: READING,
+  const dispatch = () => call(READER, flowInputs(f), {
+    label: `${f.id}·read${n}·r${round}`, phase: 'Blind reads', schema: READING,
   })
   let r = await dispatch()
   let problems = readingProblems(r, expected)
@@ -261,15 +293,14 @@ const readBlind = async (f, n) => {
 }
 
 const referee = async (f, readings) => {
-  const r = await reviewed(() => agent(`${flowInputs(f)}
+  const r = await reviewed(() => call(REFEREE, `${flowInputs(f)}
 
 READING 1:
 ${JSON.stringify(readings[0].builds, null, 2)}
 
 READING 2:
 ${JSON.stringify(readings[1].builds, null, 2)}`, {
-    label: `${f.id}·referee·r${round}`, phase: 'Blind reads',
-    agentType: REFEREE, schema: REFEREE_REVIEW,
+    label: `${f.id}·referee·r${round}`, phase: 'Blind reads', schema: REFEREE_REVIEW,
   }), `${f.id} referee`)
   return { flow: f.id, ...r }
 }
@@ -282,7 +313,7 @@ log(`round ${round} (${mode}): ${LENSES.length} lenses · ${flows.length} flows 
 const [lensResults, flowResults] = await parallel([
   () => parallel(LENSES.map(name => () =>
     reviewed(() =>
-      agent(docInputs, { label: `${name}·r${round}`, phase: 'Lenses', agentType: name, schema: REVIEW }),
+      call(name, docInputs, { label: `${name}·r${round}`, phase: 'Lenses', schema: REVIEW }),
       name).then(r => ({ lens: name, ...r }))
   )),
   () => pipeline(

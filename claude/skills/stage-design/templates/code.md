@@ -10,6 +10,11 @@
   NOT change. When nothing in the layout changes, say so and why.
 -->
 
+## Size and evolution
+
+<!-- the header block, from templates/doc-header.md: every part it lays out, tier only. Every
+     mechanism line below ends with `(req: …)` (references/design-docs.md). -->
+
 ## <area>
 
 ```
@@ -21,8 +26,8 @@
 
 ## The implementer decides
 
-<!-- The latitude the user granted for this document (notes.md)
-     plus what transcription left open on purpose. One line each.
+<!-- The latitude: what the picked tier's file leaves open, plus
+     what transcription left open on purpose. One line each.
      Never a hard class. -->
 
 - <item>

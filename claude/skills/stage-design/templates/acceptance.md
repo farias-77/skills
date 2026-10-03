@@ -1,20 +1,43 @@
 # Acceptance — <workstream>
 
 <!--
-  The executable acceptance SPEC — frozen with contracts.md, one line
-  per case. Stage 4 turns each line into a test in the layer the
-  doctrine's testing standard assigns (unit, integration, browser
-  journey, a case against a deployed environment); transcription is
-  mechanical by construction, so every column must be exact. The assert
-  never diverges: implementation proving it wrong is a declared design
-  amendment, never a silent test edit. MUST have: per endpoint, the
-  success case plus one per declared error (the contracts lens audits
-  the mirror against contracts.md); every mutation's side effect checked
-  directly in the store, never via a read endpoint; every screen state
-  the stories imply; every case cleans up what it created.
+  The executable acceptance SPEC: the locked journeys turned into test
+  cases, plus the contract cases the journeys do not walk. Frozen with
+  contracts.md. Stage 3 copies the cases into the briefs; stage 4 turns
+  each into a test in the layer the doctrine's testing standard assigns
+  (unit, integration, browser journey, a case against a deployed
+  environment). Transcription is mechanical by construction, so every
+  column is exact. The assert never diverges: implementation proving it
+  wrong is a declared design amendment, never a silent test edit.
+
+  MUST have:
+  - the header block (templates/doc-header.md) for the part `tests`;
+  - every step of every journey in 00-discovery/journeys/*.yaml
+    mapped to a case: the expected state is the step's frame, the side
+    effects are the step's side effects, checked directly in the store
+    (never through a read endpoint);
+  - per endpoint: the success case plus one per declared error that the
+    sizing pick keeps (the contracts lens audits the mirror);
+  - every case cleans up what it created;
+  - every case beyond the doctrine's floor names the failure it proves
+    (req: …); a case that proves nothing another case does not is cut.
 -->
 
-## <area> — <resource or screen>
+## Size and evolution
+
+<!-- the header block, from templates/doc-header.md, part `tests` -->
+
+## Journeys
+
+### J-<id> — <journey name> (covers S-00N)
+
+| Case | Step | Layer | Given / action | Expect (state · frame) | Side effect (store) | Cleanup |
+|---|---|---|---|---|---|---|
+| `j-<id>-1` | 1 | browser journey | <the step's action, the fixture> | <the state · `prototype/frames/<file>`> | <the row, e-mail or event the step promises> | <delete what was created> |
+
+## Contract cases
+
+### <area> — <resource>
 
 | Case | Layer | Given / request | Expect | Side effect (store) | Cleanup |
 |---|---|---|---|---|---|
@@ -24,6 +47,11 @@
 
 ## The implementer decides
 
-<!-- The latitude the user granted for this document (notes.md)
-     plus what transcription left open on purpose. One line each.
-     Never a hard class. -->
+<!-- Latitude, one line each: request bodies, fixtures, execution
+     order. Never which cases exist or what each proves. -->
+
+- <item>
+
+## References
+
+- <journeys/*.yaml · the doctrine's testing standard, path:line>

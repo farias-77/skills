@@ -7,26 +7,64 @@ document, each carrying its own must-haves as comments:
 | Template | Document |
 |---|---|
 | `research-target.md` | `research/<target>.md`, one per deep-research workflow |
+| `breadboard.md` | `tiers/breadboard.md`: what must happen, no mechanism chosen; the architect's, in breadboard mode |
+| `tier.md` | `tiers/{lean,balanced,hardened}.md`: every part at one tier, with hours, run cost and risks; one architect each |
+| `sizing.md` | `sizing.md`: the one-page final design, the pick per part, the evolution path; the sizing judge's |
+| `doc-header.md` | the `## Size and evolution` block every document below opens with |
 | `architecture.md` | components with where each runs, flows in the fixed format, extension points |
 | `data-model.md` | entities, access patterns, growth |
 | `contracts.md` | the frozen bridge: endpoints, events, evolution |
-| `ui.md` | patterns today, screens, states, the artboard index |
+| `ui.md` | how the locked mock becomes the app: every screen and frame mapped to routes, components, tokens and contract fields; what the mock fakes |
 | `security.md` | the fixed 13-class sweep |
 | `infra.md` | resources with configs, IAM, cost at three scales |
 | `observability.md` | alarms with the four fields |
 | `rollout.md` | deploy order, cutover, rollback |
 | `code.md` | the file-tree preview per repo, a guide, never a build contract |
-| `acceptance.md` | the executable acceptance spec, frozen with `contracts.md`; stage 4 turns each case into a test in the layer the doctrine assigns |
-| `notes.md` | the design session's record, the CONDUCTOR's file; the writers transcribe it and never edit it |
+| `acceptance.md` | the executable acceptance spec: every journey step a case, plus the contract cases; frozen with `contracts.md`; stage 4 turns each case into a test in the layer the doctrine assigns |
+| `notes.md` | the CONDUCTOR's record: the frame, what exists today, the user's call, the answers; the writers transcribe it and never edit it |
 | `reviews.md` | the round audit with the rulings, the conductor's file |
 | `blueprint/design/<doc>.json` | the document's report layer, written by its writer with the document, in the shapes and word caps of `claude/blueprint/schema/design.md` |
 
-The design covers the whole demand: every story in `user-stories.md`. The wave cut is stage 3's. These files are machine
+The design covers the whole demand: the lock (the mock, its journeys,
+every story in `stories.md`). The cut into slices is stage 3's. These files are machine
 input: reviewers and planning consume them; the user reads the
 blueprint. Write to be consumed, not admired: no presentation prose,
 no navigation trails, no headers repeating content.
 
 ## Rules that cross every document
+
+**Build the pick.** `sizing.md` says, per part, which tier is built.
+Each document builds its parts at that tier, from that tier's file,
+and nothing above it. A mechanism the pick does not have is a writer's
+question, never an addition; a mechanism the pick has is never
+dropped.
+
+**The header block.** Every document opens, right under its title,
+with `## Size and evolution` ([template](../templates/doc-header.md)):
+the rows of `sizing.md` for the parts it carries, copied, and their
+evolution-path rows. The sizing lens compares it with `sizing.md` row
+by row.
+
+**The requirement trace.** Every line that adds a mechanism (a table,
+column, index, route, topic, queue, job, sweeper, cap, flag, knob,
+retry, alarm, panel, test case) ends with `(req: …)`, naming what
+forces it. The forms:
+
+| Form | Means |
+|---|---|
+| `S-003/AC-2` | an acceptance criterion, as `stories.md` writes its id |
+| `J-<journey>/<step>` | a journey step of `journeys/*.yaml` |
+| `rule:<id>` | a business rule of the stories |
+| `doctrine:<file>#<anchor>` | a line of the project's engineering doctrine |
+| `floor:D<n>` | an item of the floor (the right-sizing pack, §3 D) |
+| `door:<name>` | a one-way door named in `sizing.md` |
+| `signal:<name>` | an evolution-path signal of `sizing.md` (the watcher of it) |
+| `ruling:<date>#<n>` | a line of `rulings.md` |
+
+Several are separated by commas: `(req: S-003/AC-2, floor:D2)`. A
+mechanism line without one is a finding of the sizing lens; the sweep
+is `rg -n -i '\b(table|column|index|topic|job|sweeper|alarm|cap|flag|retry)\b' 01-design/*.md | rg -v 'req:'`,
+and its hits are read, not counted.
 
 **The decision block.** Every choice that could have gone another way,
 declared inline exactly where it applies (this is what the blueprint
@@ -60,11 +98,10 @@ invented.
 **The implementer decides.** Every document ends with `## The
 implementer decides`, before `## References`. "Latitude" is the word
 for what goes there: a choice left to whoever builds it, with the
-bound the design sets ("retries on the Cognito calls, within the
-call's 10 s budget"). The section holds the items the user left
-open at the session (the Latitude list of that document's section in
-`notes.md`) plus what the writer's transcription left open on
-purpose, one concrete line each. Reviewers do not report an item
+bound the design sets ("the retry count on the provider call, within
+the call's 5 s budget"). The section holds what the picked tier's file
+leaves open and what the writer's transcription left open on purpose,
+one concrete line each. Reviewers do not report an item
 listed there unless it belongs to a hard class.
 
 The rule behind the split: the design fixes what changes the
@@ -76,7 +113,7 @@ the **execution** inside that shape, and the design says the bound.
 | architecture | the components and where each runs; who calls whom; every flow as steps with what is read, written and returned; what happens when the other side fails; the mechanisms that guard a rule (lock, idempotency, cutoff); the extension points | the internal order of steps that does not change the result; retry and backoff values within the stated bound; helpers and the code organization of a flow |
 | data-model | entities, keys, indexes, the format of every field, retention, the access pattern of every screen | secondary attribute names; internal pagination; an extra index that only optimizes without changing the model |
 | contracts | routes, auth, whole request and response, every error with code and envelope, idempotency, pagination | field order; validation messages that are not business rules |
-| ui | the screens, the states of each, what is reused from the product | spacing, microcopy, animation, component order that does not change a state |
+| ui | every screen and state of the mock mapped, the copy verbatim, the data each piece shows, what is reused from the product, what the mock fakes | the internal composition of a component, as long as it draws what the frame shows |
 | security | the 13 classes answered (covered how, risk accepted why, n/a why) | the library used for each mitigation, as long as it does what the class asks |
 | infra | resources, every config that encodes a rule or a cost (timeout, memory, PITR, region), IAM by the verb, cost at three scales | resource names within the convention; tags; stack organization |
 | observability | which alarms exist, what each catches, whom it wakes, the threshold and its argument | log format beyond the required fields; dashboard metrics without an alarm |
@@ -85,7 +122,7 @@ the **execution** inside that shape, and the design says the bound.
 | acceptance | the case list and what each one proves | request bodies, fixtures, execution order |
 
 The hard classes, the left column condensed, never sit in the
-section, whatever the user said at the session:
+section, whatever anyone said before:
 
 - where each piece runs, who calls whom, what happens when the other
   side fails;
@@ -93,7 +130,8 @@ section, whatever the user said at the session:
 - the shape of every contract, success and every error;
 - every class of the security sweep;
 - which alarms exist and whom each one wakes;
-- the cost envelope.
+- the cost envelope;
+- the tier of every part, and its evolution path.
 
 **The flow format.** Every flow in `architecture.md` is a `### `
 heading, a trigger line, numbered steps (one action each, the owning
@@ -104,9 +142,11 @@ blind readers build from each flow and a referee compares the builds.
 A step that leaves room produces two builds and a finding.
 
 **Ten writers, one system.** Each document is written by its own
-writer from the same notes and research, in parallel; none reads the
-others. So every document names the thing the way the notes name it,
-takes every value from the notes or the research (never from memory),
+writer from the same sources (`sizing.md`, the tier files, the notes,
+the research), in two waves: `data-model` and `contracts` fix the
+names, the other eight copy them. So every document names the thing
+the way those two name it, takes every value from the sources (never
+from memory),
 and says where the exact form lives when it is another document's
 ("the whole shape is in `contracts.md`"). The consistency lens reads
 the ten together and reports every drift.

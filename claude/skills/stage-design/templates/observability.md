@@ -7,8 +7,15 @@
   number, against what baseline, honest about the traffic the cost table
   projects; an alarm that rings on a normal quiet day is a design bug).
   What does not demand action is not an alarm: it goes to the dashboard
-  list. Fewer, meaningful alarms beat coverage theater.
+  list. Fewer, meaningful alarms beat coverage theater. An alarm exists
+  for a main-path failure that has an action (the ops pack), or because
+  it watches an evolution-path signal of sizing.md; nothing else.
 -->
+
+## Size and evolution
+
+<!-- the header block, from templates/doc-header.md: ops. Every
+     mechanism line below ends with `(req: …)` (references/design-docs.md). -->
 
 ## Alarms
 
@@ -26,8 +33,8 @@
 
 ## The implementer decides
 
-<!-- The latitude the user granted for this document (notes.md)
-     plus what transcription left open on purpose. One line each.
+<!-- The latitude: what the picked tier's file leaves open, plus
+     what transcription left open on purpose. One line each.
      Never a hard class. -->
 
 - <item>

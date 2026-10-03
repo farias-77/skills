@@ -8,8 +8,15 @@
   permission against the verbs the flows actually perform (no wildcards
   without a decision block); the cost table — fixed (exists at zero
   usage) and variable at current / 10x / 100x with the traffic
-  assumptions written.
+  assumptions written. A resource the tier pick of sizing.md does not
+  call for is not here; a new resource where a primitive the project
+  already runs would carry it names why it does not (req: …).
 -->
+
+## Size and evolution
+
+<!-- the header block, from templates/doc-header.md: compute, integrations, ops (resources). Every
+     mechanism line below ends with `(req: …)` (references/design-docs.md). -->
 
 ## Resources
 
@@ -40,8 +47,8 @@ Assumptions: <the traffic numbers these tables stand on>
 
 ## The implementer decides
 
-<!-- The latitude the user granted for this document (notes.md)
-     plus what transcription left open on purpose. One line each.
+<!-- The latitude: what the picked tier's file leaves open, plus
+     what transcription left open on purpose. One line each.
      Never a hard class. -->
 
 - <item>

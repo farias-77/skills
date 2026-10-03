@@ -13,6 +13,11 @@
   strings). Decisions declared inline where they apply.
 -->
 
+## Size and evolution
+
+<!-- the header block, from templates/doc-header.md: compute, integrations. Every
+     mechanism line below ends with `(req: …)` (references/design-docs.md). -->
+
 ## Components
 
 | Component | Runs where | Responsibility (one line) |
@@ -49,9 +54,8 @@ Trigger: <the business event that starts it>
 
 ## The implementer decides
 
-<!-- The latitude the user granted for this document, copied from
-     notes.md and completed by the writer with what transcription
-     left open on purpose. One line each. Never a hard class: where a
+<!-- The latitude: what the picked tier's file leaves open, plus
+     what transcription left open on purpose. One line each. Never a hard class: where a
      piece runs, who calls whom, what happens when the other side
      fails. -->
 

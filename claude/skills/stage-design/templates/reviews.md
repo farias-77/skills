@@ -11,9 +11,11 @@
   flows read blind, with the keys where the two readers built
   different products; every finding with the conductor's ruling, owner
   and reason (the foreclosing sentence quoted on every dismissal), and,
-  for the user's, his ruling and words. Written before anything is
-  applied. Round 1 is whole; rounds 2 and 3 are delta only, on the
-  user's word, recorded here with his words.
+  for a finding of the user's class, the conductor's conservative
+  ruling marked `ruled: conductor` (listed at the close for his veto).
+  Written before anything is applied. Round 1 is whole and round 2 is
+  delta only, both automatic; there is no round 3: what is still
+  sustained after round 2 is applied with line proof and is residue.
 -->
 
 ## Round <N> — <date> · run <id> · whole | delta over <docs, flows>
@@ -30,6 +32,7 @@
 | design-reviewer-facts | | | |
 | design-reviewer-ui | | | |
 | design-reviewer-consistency | | | |
+| design-reviewer-sizing | | | |
 | design-reviewer-ambiguity | | — | |
 
 ### Blind reads
@@ -45,18 +48,18 @@
 - **Finding:** <gap>
 - **Merged with:** <ids, or —>
 - **Ruling:** <sustained / deferred / dismissed> · owner <writer / user / implementer / —> — <reason; the sentence quoted on a dismissal>
-- **User:** <his ruling and words when the owner was him; "—" otherwise>
+- **His class:** <`ruled: conductor` — the conservative pick and why, for his veto at the close; "—" otherwise>
 
 ### The lists
 
 - **To the writers** (by document): …
-- **To the user** (by decision): …
+- **His class, ruled by the conductor** (by decision, for veto): …
 - **To latitude** (by document): …
 - **Dismissed**: …
 
 ### Round close
 
-<sustained N (writer N · user N · implementer N) · deferred N · dismissed N · the user's word on another round>
+<sustained N (writer N · his class N · implementer N) · deferred N · dismissed N · round 2 runs (round 1) | the review closes (round 2)>
 
 ## Close
 
@@ -67,7 +70,7 @@
 
 ### Residue
 
-<what stayed sustained after the last round and was applied without re-review, with the line proof; what the user accepted as is, with his words>
+<what stayed sustained after round 2 and was applied without re-review, with the line proof>
 
 ### Taste notes added
 
