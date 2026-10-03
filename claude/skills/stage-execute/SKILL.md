@@ -545,9 +545,9 @@ When every entry and every batch slice is merged or parked:
 5. `blueprint/execution/execution.json` (schema:
    `${CLAUDE_SKILL_DIR}/../../blueprint/schema/execution.md`, "Graph
    plans"): the entries with their state and numbers, the amendments,
-   the precision per reviewer (`found`; `sustained` = blocking;
-   `deferred`; `dismissed` = to the learn log; `latitude` and `user`
-   0), the plain report and the audit items with `ruling: null`.
+   the precision per reviewer as exec-entry tallies it (`found`,
+   `blocking`, `deferred`, `learn`, `withRepro`, `ruleOnly`, `closed`;
+   `ux-reviewer` included), the plain report and the audit items with `ruling: null`.
 6. **The stage report**: follow
    `${CLAUDE_SKILL_DIR}/../../docs/stage-report.md` (video, slides,
    blueprint) — the blueprint built with

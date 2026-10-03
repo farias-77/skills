@@ -442,8 +442,9 @@ your reason, and he rules it at the approval.
 
 The blueprint is built, never edited (house rule). Write the files that
 are yours: `blueprint/review.json` (rounds, his decisions, author
-fixes, for-the-design, dismissed, residue; from `reviews.md` and
-`rulings.md`) and `blueprint/report.json`, the plain layer: one
+fixes, for-the-design, dismissed, residue, and `lock` from `LOCK.json`:
+its `date` as `at`, his words, the override and gaps; from `reviews.md`
+and `rulings.md`) and `blueprint/report.json`, the plain layer: one
 sentence, three things to know, the flow in verbs, one sentence per
 story, one per decision. Then build:
 

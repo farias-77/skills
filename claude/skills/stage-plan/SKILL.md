@@ -392,10 +392,12 @@ is marked in `plan.md`, so stage 4 parks it and builds everything else.
 1. **Blueprint JSON** under `blueprint/plan/`, by the schema
    (`${CLAUDE_SKILL_DIR}/../../blueprint/schema/plan.md`):
    - `plan.json` from `plan.md` and `graph.json`: F is `foundation`;
-     every other node is an entry (`after` = its edges' ids; `stories`
-     = the stories it carries — a lane lists the stories of the nodes
-     it serves); `proof` from its acceptance, one `{run, expect}` or
-     `{see, where}` per line; `concurrency` = the widest wave;
+     every other node is an entry with its `kind`, `wave`, `critical`
+     and `owns`; `after` = the graph's edge objects (`{id, class,
+     stacked}`); `stories` = the stories it carries (`[]` for a lane);
+     `proof` from its acceptance, one `{run, expect}` or `{see, where}`
+     per line; `width`, `depth` and `criticalPath` (F and F-b included)
+     as the checker printed them, and `concurrency` = `width`;
      `decisions` = "Decided in his place" (`when: "plan"`);
      `preflight` = `preflight.md`'s items.
    - `plan-review.json` from `reviews.md` and `rulings.md`: every

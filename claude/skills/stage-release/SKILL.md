@@ -358,7 +358,10 @@ hour, by [references/watch.md](references/watch.md). A proof more than
    and create the release with its notes, as the doctrine says.
 2. Write `blueprint/release/release.json` (schema:
    `${CLAUDE_SKILL_DIR}/../../blueprint/schema/release.md`). The play
-   is the `ask`, with `words` set to his words.
+   is the `ask`, with `words` set to his words; `merge`, `rollout`
+   (candidate, shifts, bake), `rollbacks`, `alarms` and `numbers` come
+   from the trace (rates and 5xx in %, p95 in ms, `revertRate` =
+   reverts ÷ commits).
 3. Build and publish with
    `node "${CLAUDE_SKILL_DIR}/../../blueprint/build.mjs" <workstream>`.
 4. Write the numbers line in the trace, by

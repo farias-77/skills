@@ -388,6 +388,10 @@ Write the conductor's JSON under `blueprint/design/`:
 from `sizing.md`, plus his rulings from the call and every
 `ruled: conductor` line, each with the recommendation and the pick),
 `design-review.json` from `reviews.md` and `rulings.md`, and
+`sizing.json` from `sizing.md` (the Size subtab: the appetite, the
+three tiers side by side, each pick with `rvc` `[R, V, C]` and its
+why, the doors with `his` = the call's question or null, the evolution
+path with its signal and `watchedBy`), and
 `design-report.json`, the plain layer the tab opens with, in the
 intern's voice (schema: `${CLAUDE_SKILL_DIR}/../../blueprint/schema/design.md`):
 its `needsYourEye` carries the parts above lean and why, and the
