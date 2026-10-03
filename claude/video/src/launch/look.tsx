@@ -63,7 +63,8 @@ export const useGrid = () => {
   const {width, height} = useVideoConfig();
   const vertical = height > width;
   return vertical
-    ? {vertical, W: width, H: height, mx: 72, win: {x: 40, y: 500, w: 1000, h: 1000}, hudY: 410, capY: 1556, safeW: width - 144}
+    ? // a phone: the window takes the middle and most of the height, the caption the lower band
+      {vertical, W: width, H: height, mx: 72, win: {x: 40, y: 390, w: 1000, h: 1160}, hudY: 300, capY: 1630, safeW: width - 144}
     : {vertical, W: width, H: height, mx: 120, win: {x: 192, y: 92, w: 1536, h: 864}, hudY: 34, capY: 978, safeW: Math.round(width * 0.68)};
 };
 

@@ -127,7 +127,7 @@ const StepCaption: React.FC<{s: any; len: number; accent: string; swapOut: boole
   const sp = useSpring();
   const p = sp(f, 4, CALM, 16);
   const o = 1 - ease(f, len - (swapOut ? 8 : 12), len, 0, 1, EXIT);
-  const size = g.vertical ? fitSize(s.label, 860, 54, 40, 0.52, 2) : fitSize(s.label, 1100, 44, 34, 0.5);
+  const size = g.vertical ? fitSize(s.label, 860, 62, 44, 0.52, 2) : fitSize(s.label, 1100, 44, 34, 0.5);
   return (
     <div
       style={{
@@ -244,7 +244,7 @@ export const FootageScene: React.FC<P> = ({s, len, story, next}) => {
   const enter = !s.continues;
   const nextContinues = !!(next && next.continues);
   // tilted hero shots sit to the right, the title beside them
-  const shift = tilt ? (g.vertical ? {left: 0, top: 360, scale: 1} : {left: 400, top: 36, scale: 0.86}) : null;
+  const shift = tilt ? (g.vertical ? {left: 0, top: 230, scale: 0.9} : {left: 400, top: 36, scale: 0.86}) : null;
   return (
     <AbsoluteFill>
       <div style={{position: 'absolute', inset: 0, transform: shift ? `translate(${shift.left}px, ${shift.top}px) scale(${shift.scale})` : undefined}}>

@@ -79,7 +79,8 @@ const Cards: React.FC<{n: number; textures: (THREE.Texture | null)[]; accent: st
   const out = ease(f, len - 14, len, 0, 1, EXIT);
   const drift = f / len;
   const group = vertical
-    ? {pos: [0.05, 0.95, 0] as const, rot: [0.1, -0.32 + 0.1 * drift, 0.03] as const, scale: 0.58}
+    ? // a phone frame is ~2.4 world units wide at the dolly's distance: a smaller, flatter stack stays inside it
+      {pos: [0, 0.8, 0] as const, rot: [0.1, -0.22 + 0.08 * drift, 0.03] as const, scale: 0.44}
     : {pos: [1.3, 0.05, 0] as const, rot: [0.08, -0.42 + 0.12 * drift, 0.035] as const, scale: 0.9};
   return (
     <group position={group.pos as any} rotation={group.rot as any} scale={group.scale}>
@@ -118,7 +119,11 @@ export const HeroScene: React.FC<{s: any; len: number; story: any}> = ({s, len, 
   const cards = s.cards.length ? s.cards : [{}, {}, {}];
   const textures = useTextures(cards.map((c: any) => c.src));
   const out = len - 14;
-  const titleSize = g.vertical ? fitSize(s.title, 940, 132, 84, 0.5, 2) : fitSize(s.title, 820, 132, 84, 0.5, 2);
+  // 16:9: the longest word must end before the stack (the front card starts near x 820)
+  const longest = Math.max(1, ...String(s.title).split(/\s+/).map((w) => [...w].length));
+  const titleSize = g.vertical ? fitSize(s.title, 940, 132, 84, 0.5, 2) : Math.max(84, Math.min(fitSize(s.title, 820, 132, 84, 0.5, 2), Math.floor(660 / (longest * 0.56))));
+  // the subtitle keeps to two lines and to the left of the stack (16:9: the front card starts near x 820)
+  const subSize = g.vertical ? fitSize(s.subtitle || '', 936, 58, 42, 0.42, 2) : fitSize(s.subtitle || '', 640, 50, 36, 0.42, 2);
   const dolly = ease(f, 0, len, 7.4, 6.7);
   return (
     <AbsoluteFill>
@@ -151,7 +156,7 @@ export const HeroScene: React.FC<{s: any; len: number; story: any}> = ({s, len, 
         </Rise>
         {s.subtitle ? (
           <Rise at={30} out={out} style={{marginTop: 26}}>
-            <div style={{fontFamily: SERIF, fontStyle: 'italic', fontSize: g.vertical ? 58 : 50, lineHeight: 1.15, color: L.ink2}}>{s.subtitle}</div>
+            <div style={{fontFamily: SERIF, fontStyle: 'italic', fontSize: subSize, lineHeight: 1.15, color: L.ink2, maxWidth: g.vertical ? undefined : 640}}>{s.subtitle}</div>
           </Rise>
         ) : null}
       </div>
