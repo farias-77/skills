@@ -132,7 +132,14 @@ affected tests against a base, the structure check), the **whole
 gate**, and the **signoff** command (the project contract's local-CI
 signoff: it runs a gate command on one commit in a fresh worktree and
 posts the commit status on that sha; the pipeline-setup skill has a
-template). A missing golden paths file, structure check or signoff
+template). When the product repository has no `CLAUDE.md` of its own
+(a two-root layout: the session root holds `CLAUDE.md` and the
+doctrine, and the product repositories sit beside or under it), the
+session root's `CLAUDE.md` and the doctrine's contract table (the roles
+of the pipeline's `docs/project-contract.md`, each with the command or
+file that fills it) are the source; a role either one names is
+present, and the missing `CLAUDE.md` in the product repository is not
+a gap. A missing golden paths file, structure check or signoff
 command joins the pre-flight (Step 0). Missing plan: halt, back to
 stage 3.
 
@@ -170,14 +177,16 @@ If the session is not on **Opus 5.5 at high effort**, ask the user to
 switch (`/model`) and wait. Read `plan.md`, `plan.graph.json`,
 `graph.json`, `preflight.md`, the
 pipeline's `docs/project-contract.md` (it names the roles) and the
-project's `CLAUDE.md`; every brief, the recon and the doctrine are read
+project's `CLAUDE.md` (the session root's in a two-root layout, with
+the doctrine's contract table); every brief, the recon and the doctrine are read
 by the agents that use them, never by the session to look something up.
 
 **1. The pre-flight, once.** Show `02-plan/preflight.md` whole, as one
 table: item · why · the ready `!` command to paste (its **Do**) · what
 it blocks · status. Add to it what the session checks itself before
 the foundation: the golden paths file, the structure check, the whole
-gate and the signoff command named in `CLAUDE.md`; `gh auth status`
+gate and the signoff command named in `CLAUDE.md` or the doctrine's
+contract table; `gh auth status`
 able to post a commit status on the repository; the stack-up command
 of the doctrine bringing a stack up on `main`; the session's
 permission mode (auto mode, or a project allow list that covers the

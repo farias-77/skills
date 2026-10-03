@@ -9,6 +9,13 @@ doctrine names the command, the file or the folder that fills each
 role. Agents run what the doctrine names. The examples in agent
 prompts and in this file are illustrations, never the rule.
 
+In a two-root layout (a session root holds `CLAUDE.md`, the doctrine
+and `.claude/skills/`; the product repositories sit beside or under
+it) the product repositories need no `CLAUDE.md` of their own: the
+session root's `CLAUDE.md` and the doctrine's contract table (one row
+per role of this file, with the command, file or folder that fills
+it) are the source every stage reads.
+
 `/pipeline-setup <path-to-project>` audits a project against this bar,
 writes `pipeline-readiness.md` on a setup branch of it (✓ present · ✗
 missing · ~ partial, each with its evidence), proposes the cheapest order to close
