@@ -2,6 +2,8 @@
 // Plain ESM with no imports, so the same file runs in node (prepare.mjs, before
 // a render) and in the Remotion bundle (calculateMetadata, in the Studio).
 // Every failure names the field: `scenes[3].items[2]: longer than 64 characters (71)`.
+// `"mode": "launch"` switches to the launch vocabulary (src/launch/contract.mjs).
+import {makeLaunch} from './launch/contract.mjs';
 
 export const FPS = 30;
 export const SECONDS_PER_LINE = 2.5;
@@ -306,7 +308,9 @@ export function secondsFor(lines, type) {
 // story.scenes[i].frames is filled; story.frames is the total.
 export function normalize(raw) {
   if (!isObj(raw)) fail('storyboard', 'must be a JSON object');
-  unknownKeys(raw, ['title', 'stamp', 'source', 'lang', 'scenes'], 'storyboard');
+  if (raw.mode !== undefined && raw.mode !== 'review' && raw.mode !== 'launch') fail('storyboard.mode', `must be "review" (the default) or "launch", got "${raw.mode}"`);
+  if (raw.mode === 'launch') return normalizeLaunchStory(raw);
+  unknownKeys(raw, ['mode', 'title', 'stamp', 'source', 'lang', 'scenes'], 'storyboard');
   const story = {
     title: str(raw, 'title', 'storyboard', {required: true, max: 120}),
     stamp: str(raw, 'stamp', 'storyboard', {max: LIMITS.stamp}) || '',
@@ -326,6 +330,7 @@ export function normalize(raw) {
     return s;
   });
   if (story.scenes[story.scenes.length - 1].type !== 'end') warnings.push('the last scene is not an "end" scene');
+  story.mode = 'review';
   story.frames = total;
   const secs = total / FPS;
   if (secs > LIMITS.total.max) fail('storyboard.scenes', `total ${secs.toFixed(1)} s is over the ${LIMITS.total.max} s ceiling`);
@@ -333,3 +338,24 @@ export function normalize(raw) {
     warnings.push(`total ${secs.toFixed(1)} s is outside the ${LIMITS.total.warnBelow}-${LIMITS.total.warnAbove} s target`);
   return {story, warnings};
 }
+
+const {normalizeLaunch} = makeLaunch({fail, str, arr, isObj, unknownKeys, words, FPS});
+
+function normalizeLaunchStory(raw) {
+  unknownKeys(raw, ['mode', 'title', 'stamp', 'source', 'lang', 'accent', 'footage', 'music', 'scenes'], 'storyboard');
+  const story = {
+    mode: 'launch',
+    title: str(raw, 'title', 'storyboard', {required: true, max: 120}),
+    stamp: str(raw, 'stamp', 'storyboard', {max: LIMITS.stamp}) || '',
+    source: str(raw, 'source', 'storyboard'),
+    lang: str(raw, 'lang', 'storyboard', {max: 10}) || 'pt-BR',
+  };
+  const {warnings} = normalizeLaunch(raw, story);
+  story.frames = story.scenes.reduce((a, s) => a + s.frames, 0);
+  const secs = story.frames / FPS;
+  if (secs > LAUNCH_TOTAL.max) fail('storyboard.scenes', `total ${secs.toFixed(1)} s is over the ${LAUNCH_TOTAL.max} s ceiling`);
+  if (secs < LAUNCH_TOTAL.warnBelow || secs > LAUNCH_TOTAL.warnAbove)
+    warnings.push(`total ${secs.toFixed(1)} s is outside the ${LAUNCH_TOTAL.warnBelow}-${LAUNCH_TOTAL.warnAbove} s target of a launch video`);
+  return {story, warnings};
+}
+const LAUNCH_TOTAL = {warnBelow: 150, warnAbove: 360, max: 600};

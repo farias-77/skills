@@ -7,6 +7,7 @@ import {SCENES} from './scenes';
 // carries its length in frames.
 export const Story: React.FC<{story: any; normalized?: any}> = ({normalized}) => {
   const story = normalized;
+  if (story.mode === 'launch') throw new Error('a "mode": "launch" storyboard renders with render-launch.sh (composition launch)');
   const starts: number[] = [];
   let t = 0;
   for (const s of story.scenes) {

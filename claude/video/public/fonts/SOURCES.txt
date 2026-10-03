@@ -6,3 +6,7 @@ IBMPlexSans-400         https://fonts.gstatic.com/s/ibmplexsans/v23/zYXzKVElMYYa
 IBMPlexMono-400         https://fonts.gstatic.com/s/ibmplexmono/v20/-F63fjptAgt5VM-kVkqdyU8n1i8q1w.woff2
 IBMPlexMono-500         https://fonts.gstatic.com/s/ibmplexmono/v20/-F6qfjptAgt5VM-kVkqdyU8n3twJwlBFgg.woff2
 IBMPlexMono-600         https://fonts.gstatic.com/s/ibmplexmono/v20/-F6qfjptAgt5VM-kVkqdyU8n3vAOwlBFgg.woff2
+Launch mode (SIL Open Font License); InterTight-var is variable, one file covers 100-900.
+InterTight-var          https://fonts.gstatic.com/s/intertight/v9/NGSwv5HMAFg6IuGlBNMjxLsH8ag.woff2
+InstrumentSerif-400     https://fonts.gstatic.com/s/instrumentserif/v5/jizBRFtNs2ka5fXjeivQ4LroWlx-6zUTjg.woff2
+InstrumentSerif-400i    https://fonts.gstatic.com/s/instrumentserif/v5/jizHRFtNs2ka5fXjeivQ4LroWlx-6zAjjH7M.woff2
