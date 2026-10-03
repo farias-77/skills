@@ -14,8 +14,10 @@
 #          be resolved
 #   none   everything else: the settings' allow/ask/deny rules decide
 #
-# Install (pipeline-setup does this): copy to <project>/.claude/hooks/,
-# chmod +x, and register it in <project>/.claude/settings.json:
+# Install (pipeline-setup does this): copy to .claude/hooks/ of every
+# directory the pipeline's sessions open in (Claude Code loads settings and
+# hooks from the session's directory, so a two-root layout installs it at
+# the root), chmod +x, and register it in that .claude/settings.json:
 #   "hooks": {"PreToolUse": [{"matcher": "Bash|Edit|Write|MultiEdit|NotebookEdit",
 #     "hooks": [{"type": "command", "timeout": 30,
 #       "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/guard-irreversible.sh"}]}]}

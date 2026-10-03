@@ -10,8 +10,8 @@ role. Agents run what the doctrine names. The examples in agent
 prompts and in this file are illustrations, never the rule.
 
 `/pipeline-setup <path-to-project>` audits a project against this bar,
-writes `pipeline-readiness.md` in it (✓ present · ✗ missing · ~
-partial, each with its evidence), proposes the cheapest order to close
+writes `pipeline-readiness.md` on a setup branch of it (✓ present · ✗
+missing · ~ partial, each with its evidence), proposes the cheapest order to close
 the gaps, and applies the generic pieces on a branch when the user
 says so ([the skill](../claude/skills/pipeline-setup/SKILL.md)).
 
@@ -194,6 +194,10 @@ the warning line at the p95 and the failing line at the p99 of each
 class (product and test, per language). A gate at a number the code
 already lives far inside never fires; a gate at a number half the code
 breaks is ignored. Re-measure between workstreams, never during one.
+Its tools are dependencies like any other: declared in a manifest with
+exact versions, not fetched ad hoc. Because it diffs against a base,
+a hosted CI job that runs it needs the history and the base ref (a
+full-depth checkout, the base passed explicitly).
 Template: [structure-check](../claude/skills/pipeline-setup/templates/structure-check/).
 
 **Why.** Code that works and that nobody can extend later is the
@@ -226,8 +230,10 @@ foundation amendment.
 ### 9 · Feature maps
 
 **What it is.** The doctrine names where the documentation of each
-feature lives: one file per feature, saying what it does, the screens
-and routes it has, the tables it writes, the jobs and events it owns.
+feature lives: one file per feature or per business domain, saying
+what it does, the screens and routes it has, the tables it writes, the
+jobs and events it owns. A technical module without a map of its own
+is covered when the doctrine names where its rules are written.
 
 **Why.** Recon must find what exists without reading the whole
 codebase, and a scout can only quote what is written down.
@@ -278,7 +284,13 @@ plan.
 
 ### 12 · Permission settings and the guard hook
 
-**What it is.** The project's `.claude/settings.json` with:
+**What it is.** The `.claude/settings.json` of **every directory the
+pipeline's sessions open in**, with the items below. Claude Code loads
+the settings and the hooks they register from the session's own
+directory, so where `CLAUDE.md`, the doctrine and `.claude/skills/`
+sit in a root above the product repository, the root carries them
+(and the product repository too, when sessions open there as well); a
+copy only in a repository no session opens in guards nothing.
 
 - **allow** rules for what the stages run all day: the gate commands,
   the stack commands, read-only `git` and `gh`, staging deploys, and
@@ -293,7 +305,8 @@ plan.
 - the pipeline's **PreToolUse guard hook**,
   [`claude/hooks/guard-irreversible.sh`](../claude/hooks/guard-irreversible.sh),
   copied to `.claude/hooks/` and registered on `Bash` and every file
-  tool. It **denies** the irreversible classes even when a rule is
+  tool. It is the pipeline's file and keeps its header comments: a
+  doctrine rule against code comments excludes `.claude/hooks/`. It **denies** the irreversible classes even when a rule is
   broad, unless the allow file names that exact command; it **asks**
   before a secret's value is written or read, and before a merge into
   a protected branch whose head the user's play did not authorize. The
@@ -329,10 +342,18 @@ contexts**: `local-ci/affected` for the affected gate on each merge of
 the execute queue, and `local-ci` for the whole gate, run once at the
 end of the stage. Branch protection on `main` requires `local-ci`
 only, so no intermediate head of the feature branch satisfies `main`
-after only an affected gate. Hosted CI keeps the deploy and a cheap
+after only an affected gate. An affected run whose selection is empty
+on a non-empty diff runs the whole gate instead of signing off a run
+that tested nothing. The command removes its worktree and the stack
+the gate brought up on exit. Hosted CI keeps the deploy and a cheap
 trust check. Template:
 [local-ci.sh](../claude/skills/pipeline-setup/templates/local-ci.sh)
-(`--context` picks the context).
+and its document
+[local-ci.md](../claude/skills/pipeline-setup/templates/local-ci.md)
+(`--context` picks the context). When the doctrine names another
+check as the one `main` requires, requiring `local-ci` is a doctrine
+ruling before it is a protection change. A remote that is not GitHub
+has no commit status: the signoff's protection part does not apply.
 
 **Why.** A hosted queue on every merge is the slowest step of a
 parallel build. A local run of the same commands takes minutes, and the
@@ -409,7 +430,7 @@ medium)` compare screens against the same tokens.
 |---|---|
 | log-based metrics | structured logs with stable event names, and metrics derived from them in code |
 | alarm definitions | alarms declared in the repo (infrastructure as code), each with a threshold, a window and a channel |
-| runbooks | one per alarm: what it means, how to check, how to mitigate, who is told |
+| runbooks | one per alarm: what it means, how to check, how to mitigate, who is told; text inline in the alarm's definition counts when it states the action and the first command to run |
 
 **Why.** Design right-sizes operations per part; a mechanism without a
 reader is cut, and an alarm without a runbook wakes someone for
