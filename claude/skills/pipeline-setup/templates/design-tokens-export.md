@@ -32,13 +32,20 @@ true:
 
 ## Step 2 — the export script
 
-One script, run by the export command. A TypeScript example for a
-theme object; adapt the import for the project's source:
+One script, run by the export command, **written in the language the
+repo's own tooling uses** and placed where that tooling lives, so its
+lint, formatting and file-layout rules already apply (a new TypeScript
+file inside a front end with strict file boundaries would fail them; a
+Go, Python or shell tool beside the repo's other tools does not). It
+reads the source of truth, flattens the token tree into `--group-name`
+custom properties, and writes the two token files. Give it a test when
+the repo tests its tooling.
+
+The shape, in TypeScript, for a theme object:
 
 ```ts
-// scripts/design-export.ts — run: npx tsx scripts/design-export.ts
 import { writeFileSync, mkdirSync } from 'node:fs'
-import { theme, darkTheme } from '../src/shared/ui/theme' // the source of truth
+import { theme, darkTheme } from '../src/shared/ui/theme'
 
 type Tree = { [k: string]: string | number | Tree }
 const flat = (t: Tree, prefix = ''): [string, string][] =>
@@ -88,10 +95,19 @@ every component in every state. Light and dark, at 1x.
 - Discovery's recon passes the three files to the prototyper; the mock
   inlines `tokens.css` and copies the component shapes.
 
+## What it costs
+
+| Part | Cost | Why |
+|---|---|---|
+| the token export (`tokens.css`, `tokens.json`) and the components list without screenshots | S, or M when the source needs parsing | one script over one source of truth |
+| a screenshot per state of each component | M with a component catalogue (Storybook) already running; **L without one** | rendering every component in every state needs a page that does it, which is product work: a demand of its own |
+
 ## Done when
 
 - `design/export/tokens.css` renders a sample page in light and dark
   with no hard-coded color;
 - every token in the source appears in `tokens.json`;
 - `components.md` lists every component the last three features used,
-  each with a screenshot per state.
+  with its source, props and states;
+- each component has a screenshot per state, or the readiness file
+  carries the per-state samples as an L demand.

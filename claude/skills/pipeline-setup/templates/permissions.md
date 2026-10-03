@@ -1,11 +1,35 @@
 # Permissions — notes on `settings.json` and the guard
 
-`settings.json` (beside this file) is the project's
-`.claude/settings.json` for a pipeline run. Its PreToolUse hook is the
-pipeline's own guard, `claude/hooks/guard-irreversible.sh`, copied to the
-project's `.claude/hooks/`; `claude/hooks/tests/guard-irreversible.test.sh`
-checks it. There is one guard: setup installs it, release relies on it.
-JSON has no comments, so each rule's reason is here.
+`settings.json` (beside this file) is the `.claude/settings.json` for a
+pipeline run. Its PreToolUse hook is the pipeline's own guard,
+`claude/hooks/guard-irreversible.sh`, copied to `.claude/hooks/`;
+`claude/hooks/tests/guard-irreversible.test.sh` checks it. There is one
+guard: setup installs it, release relies on it. JSON has no comments,
+so each rule's reason is here.
+
+## Where they go: every directory a session opens in
+
+Claude Code loads `.claude/settings.json`, and the hooks it registers,
+from the directory the session opens in (its project directory), not
+from the repository a command later touches. A guard installed only in
+the product repository does not guard a session opened above it.
+
+| Layout | Install the settings and the guard in |
+|---|---|
+| one repository: `CLAUDE.md`, the doctrine and the product together | that repository |
+| two roots: `CLAUDE.md`, the doctrine and `.claude/skills/` in a root repository, the product in a child repository | the root (the pipeline's sessions open there), and also the product repository when sessions open there too |
+
+The rules are written for the session's directory: at the root, a
+command into the product names it (`git -C <product> …`,
+`make -C <product> …`), so the allow rules carry that form. Each copy is
+committed in its own repository, on that repository's setup branch.
+
+## The comment rule
+
+The guard and its test are the pipeline's files, copied verbatim and
+updated from the pipeline: they keep their header comments. When the
+project's doctrine or a linter forbids comments in code, that rule
+excludes `.claude/hooks/`, written where the rule is.
 
 ## Replace the placeholders
 
@@ -21,9 +45,23 @@ commands the doctrine names. Replace each with the project's own:
 | `make stack-up`, `make stack-env`, `make stack-down`, `make migrate-local` | the stack per worktree (5) |
 | `./scripts/local-ci.sh` | the local-CI signoff (13) |
 | `make deploy-staging`, `make deploy-prod`, `make migrate-prod`, `make migrate-down` | release roles (11) |
+| `env.GUARD_PROTECTED` | the branches besides `main`, `master`, `production` and `prod` that take changes only through a pull request (a staging or alpha branch the doctrine names), comma separated; delete the key when there are none |
 
 A project whose deploys run only in hosted CI on a merge drops the deploy
 lines: the merge is the deploy, and the guard already holds the merge.
+
+**Dead rules are pruned, not left in.** After filling, every rule that
+names a target is probed with the runner's dry run: `make -n <target>`
+(or `just --dry-run <recipe>`, `task --dry <task>`, the `scripts` key of
+`package.json`), run in the repository the rule reaches. A target the
+probe does not find is removed from every list, and the readiness file
+lists what was removed. A deny rule for a command the project does not
+have is removed too: the guard already denies its class.
+
+`env.GUARD_PROTECTED` is how the guard learns the project's other
+protected branches without the allow file, which is the user's alone.
+The settings are an agent-unwritable file too (the guard denies the
+write), so the value holds like the allow file's `protected` lines.
 
 ## The three lists
 
@@ -98,8 +136,11 @@ samples; the test file runs every case.
 | **supervised** | moved back to **ask** | the user clicks each one |
 
 The autonomous posture holds only once the signoff is required on
-`main` (see the header of `local-ci.sh`). Until he sets that
-protection, setup moves the three rules back to **ask** and says why.
+`main` (see `local-ci.md`). Until he sets that protection, setup moves
+the three rules back to **ask** and says why. When the doctrine names
+another check as the one `main` requires (the hosted CI's aggregate),
+requiring `local-ci` is a doctrine ruling first: the plan lists it as
+his, with the doctrine lines it changes.
 
 ## The limits that sit outside the session
 

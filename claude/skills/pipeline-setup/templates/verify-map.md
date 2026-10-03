@@ -1,13 +1,5 @@
 ## How to verify
 
-<!--
-A section appended to each feature map (the file the doctrine names for
-this feature). The verifier, the release check and the footage recorder
-read it to reach and drive the feature without rediscovering the path.
-Keep it to what a machine needs: where, who, the steps, what to read back.
-Update it in the same diff that changes the feature.
--->
-
 | | |
 |---|---|
 | **Reach** | `<route or URL path on the local stack>`; entry point in the UI: `<menu > item>` |

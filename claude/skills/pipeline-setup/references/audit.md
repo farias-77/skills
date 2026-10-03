@@ -1,8 +1,12 @@
 # The audit — what each scout looks for, and how a role is rated
 
 Six scouts, one per group of roles, dispatched together. Each gets its
-group's rows below **as the question**, the project path, and the
-shape of the answer: per role, the literal lines that answer it with
+group's rows below **as the question**, the path of the **audit
+worktree** (a detached checkout of the default branch's sha, never the
+user's working tree, which may sit on another branch or carry
+uncommitted work), the doctrine's path read the same way when it lives
+in another repository, the session roots of Step 0, and the shape of
+the answer: per role, the literal lines that answer it with
 `path:line`, where it looked, what it did not find. The scout quotes;
 the session rates.
 
@@ -25,10 +29,10 @@ the reason.
 | Role | Look for | ✓ when | ~ when |
 |---|---|---|---|
 | 1 doctrine | `CLAUDE.md` naming a docs/engineering folder; an index (`README.md`, `index.md`) in it; documents on architecture, backend, frontend, code, testing, local development, delivery; where the sides (server, screen folders) are named | folder + index + every topic, named from `CLAUDE.md` | docs exist but no index, topics missing, or `CLAUDE.md` does not point at them |
-| 2 golden paths | a file named like `golden-paths*`, or a doctrine section "exemplars", "copy this module", "reference implementation" | one exemplar per kind, each an existing path | exemplars only for some kinds, or paths that no longer exist |
+| 2 golden paths | a file named like `golden-paths*`, or a doctrine section "exemplars", "copy this module", "reference implementation" | one exemplar per kind, each present at the audited sha (`git ls-tree`) and under the calibrated p95 | exemplars only for some kinds, paths that no longer exist, or exemplars over p95 |
 | 8 shared files | a doctrine list of migrations folder, API contract (OpenAPI, proto, GraphQL schema), generated code, module registry, route table | the list exists in the doctrine | the files exist but no list names them |
-| 9 feature maps | `docs/features/`, `*.feature.md`, a per-module README the doctrine names as the feature's documentation | one per feature, named in the doctrine | some features only, or not named |
-| 14 verify map | in the feature maps: a route, an actor, steps per state, side effects to read back | most maps carry it | a few do |
+| 9 feature maps | `docs/features/`, `*.feature.md`, a per-module README the doctrine names as the feature's documentation | named in the doctrine, one per feature **or per business domain**, as the doctrine organizes them; a technical module without a map of its own counts when the doctrine names where its rules live (another map, its README) | some features or domains have no map and no other written home, or the maps are not named |
+| 14 verify map | in the feature maps: a route, an actor, steps per state, side effects to read back | every map whose feature has something built to drive (a screen, a server effect) carries it; a map with nothing built yet is not counted | some of those maps carry it |
 
 ## Group B — commands (roles 3, 4, 6, 7, 13)
 
@@ -38,7 +42,7 @@ the reason.
 | 4 fast check · focused · affected | targets like `check`, `lint`, `test`, `test:changed`, `--changed`, `affected`, `nx affected`, `turbo --filter=...[base]`, `go list -deps` scripts | all three, named | fast check only; affected missing |
 | 6 evidence | a command writing a verification record (sha, commands, result) — often named `evidence`, `verify-record`, `proof` | exists, named | — |
 | 7 structure check | a script or target running lizard, gocyclo, gocognit, eslint complexity / max-lines, jscpd, dependency-cruiser, depguard, import-linter, ArchUnit; its thresholds and where they came from | diff-scoped, all five checks, thresholds calibrated from the code, a compare mode | some checks only, thresholds from a book, whole-tree only |
-| 13 signoff | a script posting a commit status (`gh api .../statuses/`, `gh signoff`), and whether CI or branch protection requires the context | a local status is posted under `local-ci/affected` (per merge) and `local-ci` (whole gate), and `main` requires `local-ci` only | posted but not required, one context for both, or nothing local |
+| 13 signoff | a script posting a commit status (`gh api .../statuses/`, `gh signoff`), and whether CI or branch protection requires the context; the doctrine lines that name `main`'s required check | a local status is posted under `local-ci/affected` (per merge) and `local-ci` (whole gate), and `main` requires `local-ci` only | posted but not required, one context for both, or nothing local. When the doctrine names another required check (the hosted CI's aggregate), ✓ needs his doctrine ruling first: the plan lists it with the lines it changes. On a non-GitHub remote, the protection part is `n/a: non-GitHub remote` |
 
 ## Group C — the local stack (roles 5, 10)
 
@@ -52,7 +56,7 @@ the reason.
 | Role | Look for | ✓ when | ~ when |
 |---|---|---|---|
 | 11 release | a delivery document; deploy workflows per environment; a staging/alpha environment; a rollback command or workflow; a production diff (`terraform plan`, a dry run); a migrations policy (expand/contract) | every row of the bar's table, written | deploy exists but rollback or staging is missing or unwritten |
-| 12 permissions | `.claude/settings.json` `permissions.allow/deny/ask`; `hooks.PreToolUse` and the hook scripts | deny covers the irreversible classes and a guard hook exists | rules but no hook, or allow rules broad enough to cover a destroy |
+| 12 permissions | `.claude/settings.json` `permissions.allow/deny/ask`; `hooks.PreToolUse` and the hook scripts — **in every session root** of Step 0 (the root repository of a two-root layout, the product repository when sessions open there) | deny covers the irreversible classes and a guard hook exists, in every directory the pipeline's sessions open in | rules but no hook; allow rules broad enough to cover a destroy; or settings and guard only in a repository no session opens in (Claude Code loads them from the session's directory, so they are inert there) |
 | 18 autonomous | merge and prod deploy in `allow`, with the signoff required on `main` | both | merge allowed without a required signoff (a risk: rate it ~ and say so) |
 | 19 progressive | traffic split, tagged revisions, canary config, feature flags in the deploy code | the deploy can send a share of traffic and move it back | flags exist but deploys are all-or-nothing |
 
@@ -61,7 +65,7 @@ the reason.
 | Role | Look for | ✓ when | ~ when |
 |---|---|---|---|
 | 15 tokens | tokens file, Tailwind config or `@theme`, global CSS custom properties, theme objects; an export folder; a component catalogue (Storybook) | an export the prototype can inline, plus the components list | tokens centralized but not exported, or no components list |
-| 16 observability | a structured logger and stable event names; log-based metrics in IaC; alarm definitions in IaC; a runbooks folder linked from the alarms | metrics, alarms and runbooks all in the repo | alarms exist only in a console, or no runbooks |
+| 16 observability | a structured logger and stable event names; log-based metrics in IaC; alarm definitions in IaC; a runbooks folder linked from the alarms, or runbook text inline in the alarm (its documentation field) | metrics, alarms and runbooks all in the repo; an inline runbook counts when it states the action to take and the first command to run | alarms exist only in a console, no runbooks, or inline text that only restates the alarm |
 
 ## Group F — capacity and runner (roles 17, 20)
 
@@ -78,8 +82,14 @@ quotes the output in the readiness file:
 | Probe | For |
 |---|---|
 | `node --version`, `ffmpeg -version \| head -1` | role 21 (on the station) |
-| `node --version`; `ls "$PLAYWRIGHT_DIR"/node_modules/playwright-core/package.json`; `node <pipeline>/claude/skills/stage-discovery/scripts/proto.mjs look about:blank --shot /tmp/proto-probe.png` (opens the Chromium it resolves, writes one PNG) | role 22 (on the station) |
+| `node --version`; `ls "$PLAYWRIGHT_DIR"/node_modules/playwright-core/package.json`; `printf '<p>probe</p>\n' > "${TMPDIR:-/tmp}/proto-probe.html" && node <pipeline>/claude/skills/stage-discovery/scripts/proto.mjs look "${TMPDIR:-/tmp}/proto-probe.html" --shot "${TMPDIR:-/tmp}/proto-probe.png"` (the target is a file holding an HTML **fragment**: `proto.mjs` adds the page skeleton itself, refuses a full page, and reads a non-URL target as a file; it opens the Chromium it resolves and writes one PNG) | role 22 (on the station) |
 | `nproc`, `free -g \| head -2` | role 17, the machine's size |
-| `git -C <project> remote get-url origin` | which GitHub repo the signoff targets |
-| `gh api repos/<owner>/<repo>/branches/main/protection` (read-only; a 404 means no protection) | roles 13 and 18 |
-| `git -C <project> rev-parse HEAD` | the sha the audit read |
+| `git -C <project> remote get-url origin` | the remote's kind: GitHub (`github.com[:/]<owner>/<repo>`) or not |
+| GitHub remote only: `gh api repos/<owner>/<repo>/branches/<default>/protection` (read-only; a 404 means no protection), with owner and repo taken from the remote URL | roles 13 and 18 |
+| `git -C <audit worktree> rev-parse HEAD` | the sha the audit read |
+
+**A remote that is not GitHub** (a bare path, another host): never call
+`gh` or the GitHub API for this project, and never guess an owner from
+the project's name — a lookalike repository on GitHub is someone
+else's. The protection probe is not run; roles 13 and 18 record their
+protection part as `n/a: non-GitHub remote` and are rated on the rest.

@@ -1,4 +1,7 @@
 {
+  "env": {
+    "GUARD_PROTECTED": "staging"
+  },
   "permissions": {
     "allow": [
       "Bash(make ci)",

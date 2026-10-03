@@ -4,6 +4,14 @@ Audited at `<sha>` on `<date>` against the pipeline's bar
 (`docs/project-contract.md` in the pipeline repo) by `/pipeline-setup`.
 ✓ present · ~ partial · ✗ missing · n/a does not apply.
 
+| Layout | |
+|---|---|
+| Sessions open in | `<session root(s)>` — Claude Code loads `.claude/settings.json` from there |
+| Product repository | `<path>` · default branch `<branch>` at `<sha>` |
+| Doctrine | `<folder>` in `<the product repository, or the root repository at its path>` |
+| Remote | `<GitHub owner/repo, or "non-GitHub: <kind>">` |
+| Scouts read | a detached worktree at `<sha>`, not the working tree |
+
 | Level | ✓ | ~ | ✗ | n/a |
 |---|---|---|---|---|
 | Required (1–13, 22) | <n> | <n> | <n> | <n> |
@@ -74,6 +82,7 @@ demand of its own through the pipeline.
 
 | Action | Why it is his | Ready command |
 |---|---|---|
+| <a doctrine ruling: `local-ci` becomes the check `main` requires> | <the doctrine names another required check; the lines it changes: `file:line`> | <the doctrine edit, then the protection command below> |
 | <require the `local-ci` context on `main`> | <branch protection is a security posture> | `<! gh api ...>` |
 
 ## Applied
@@ -83,3 +92,15 @@ Branch `<branch>` from `<base sha>`:
 | Commit | Gap (#) | Files | Checked by |
 |---|---|---|---|
 | `<sha>` | <#> | `<paths>` | <the command that proved it> |
+
+Doctrine, in `<the doctrine's repository>`, branch `<branch>`:
+
+| Commit | Gap (#) | Doctrine lines | Why |
+|---|---|---|---|
+| `<sha>` | <#> | `<file:line>` | <the reason the commit message gives> |
+
+Rules removed as dead (their target not found by the runner's dry run):
+`<rules>`, or "none".
+
+**Final proof:** `<the whole-gate command>` at `<branch tip sha>`:
+`<its last output line, verbatim>`.
