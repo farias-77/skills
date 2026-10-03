@@ -23,6 +23,15 @@ This procedure is the stage's last step. It runs once the stage's own
 close has written its blueprint JSON, and it replaces "present the
 blueprint URL": the stage presents the three layers instead.
 
+**The close is the exception.** Stage 6 makes no review video and no
+slides. Its two layers are the **launch film**, on its own launch page
+(web copies under the artifact asset cap; the masters, ~50 MB, as local
+files), and the **retro tab** of the blueprint. The film is for the
+people who use the product; the retro is for the weekly retro. The
+close skill and its `references/launch.md` ("Delivery") fix the steps;
+`stage-report.json` gets no `close` key, because the blueprint's videos
+stop at 10 MB.
+
 ## Inputs
 
 - the stage's blueprint JSON (the report block first: it is the plain
@@ -190,12 +199,15 @@ bake against the previous revision) or the straight deploy and its
 smoke; any rollback, with its trigger; the alarms' first evaluation and
 what is still left to an owner.
 
-**Close — what went wrong, the ideas.** (For the team, the close also
-makes the launch video; this paragraph is his retro report.) The
-workstream in numbers;
-what worked; what went wrong, each with its cost and where it
-happened; the ideas each one suggests and where they would land; his
-own notes verbatim; what the sweep leaves for him to run.
+**Close — the launch film and the retro tab; no slides.** The film,
+on the launch page, is what he forwards: the need, what is new, and
+how to use every new feature, step by step on the real product, at
+16:9 and 9:16 (stage-close, "Delivery"). The retro tab is the
+blueprint layer, written for the weekly retro rather than for him: the
+workstream in numbers and the delivery metrics; what worked; what went
+wrong, each with its cost and where it happened; the pipeline issues
+each friction suggests and where they would land; his own notes
+verbatim; what the sweep leaves for him to run.
 
 ## Costs and limits
 

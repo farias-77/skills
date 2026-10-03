@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="__LANG__">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>__TITLE__</title>
+<style>
+  :root {
+    --bg: #fafaf9; --ink: #18181b; --ink2: #52525b; --line: #e4e4e7; --panel: #ffffff;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) { --bg: #0b0b0c; --ink: #f4f4f5; --ink2: #a1a1aa; --line: #27272a; --panel: #141416; }
+  }
+  :root[data-theme="dark"] { --bg: #0b0b0c; --ink: #f4f4f5; --ink2: #a1a1aa; --line: #27272a; --panel: #141416; }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font: 18px/1.55 system-ui, -apple-system, "Segoe UI", sans-serif; }
+  main { max-width: 1040px; margin: 0 auto; padding: 40px 16px 64px; }
+  h1 { font-size: clamp(28px, 5vw, 44px); line-height: 1.1; margin: 0 0 8px; letter-spacing: -0.02em; }
+  .sub { color: var(--ink2); margin: 0 0 28px; }
+  video { display: block; width: 100%; height: auto; border-radius: 14px; background: #000; border: 1px solid var(--line); }
+  .vertical { max-width: 360px; margin: 32px auto 0; }
+  .vertical p { color: var(--ink2); font-size: 15px; text-align: center; margin: 8px 0 0; }
+  section { margin-top: 40px; padding-top: 24px; border-top: 1px solid var(--line); }
+  h2 { font-size: 20px; margin: 0 0 12px; }
+  .text { white-space: pre-wrap; background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 18px 20px; }
+  ul { padding-left: 20px; margin: 0; }
+  li { margin: 4px 0; }
+  .hidden { display: none; }
+</style>
+</head>
+<body>
+<main>
+  <h1>__TITLE__</h1>
+  <p class="sub">__SUBTITLE__</p>
+  <video data-src="__FILM_URL__" controls playsinline preload="metadata"></video>
+  <div class="vertical">
+    <video data-src="__VERTICAL_URL__" controls playsinline preload="metadata"></video>
+    <p>__VERTICAL_LABEL__</p>
+  </div>
+  <section>
+    <h2>__WHATS_NEW_HEADING__</h2>
+    <div class="text">__WHATS_NEW__</div>
+  </section>
+  <section>
+    <h2>__CHANGELOG_HEADING__</h2>
+    <ul>__CHANGELOG_ITEMS__</ul>
+  </section>
+</main>
+<script>
+  for (const v of document.querySelectorAll('video[data-src]')) {
+    const src = v.getAttribute('data-src');
+    if (!src || src.startsWith('__')) {
+      (v.closest('.vertical') || v).classList.add('hidden');
+    } else {
+      v.src = src;
+    }
+  }
+</script>
+</body>
+</html>

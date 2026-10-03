@@ -1,4 +1,4 @@
-# The launch package — L1 to L4 of stage 6
+# The launch package — L1 to L4 and its delivery, stage 6
 
 The package is what he forwards to the people who use the product: the
 film (16:9 and 9:16), its captions, a "what's new" text and the
@@ -10,6 +10,7 @@ L1  launch-director (Opus 5.5, high) · plan  ─┐ dispatched at step 0, backg
 L2  footage-recorder (Sonnet 5.5, medium)     │ when L1 returns
 L3  launch-director (Opus 5.5, high) · film   │ when L2 returns, background; render ~1 h per cut loaded
 L4  the session checks                        ─┘ before the step-5 message
+D   the launch page                            web copies on the Artifact asset store; local files without the tool
 ```
 
 ## L1 · plan
@@ -80,6 +81,51 @@ them) and `whats-new.md`, and checks:
 
 One more director pass at most; what remains goes in the step-5
 message as a known flaw.
+
+## Delivery — the launch page
+
+The master is too big for the blueprint (its videos stop at 10 MB) and
+for one artifact file (15 MB). It reaches him on its own page, a link he
+can forward inside his organization, with the masters as local files
+beside it:
+
+```
+D1  web copies   scripts/web-copy.sh launch.mp4 web/launch.mp4    (≤ 19 MB each; the asset cap is 20 MiB)
+                 scripts/web-copy.sh launch-vertical.mp4 web/launch-vertical.mp4
+D2  the page     templates/launch-page.html → web/index.html, placeholders filled,
+                 published with capabilities {assets: {}}
+D3  upload       Artifact publish, url = the page, asset: true, file_paths = the two web copies → their urls
+D4  republish    __FILM_URL__ and __VERTICAL_URL__ ← those urls, exactly as returned; the same file again
+```
+
+- **D1.** `web-copy.sh` copies a file already under the cap; otherwise
+  it re-encodes in two passes at the bitrate the cap allows (full size
+  from 2.5 Mbit/s, 720 px on the short side from 0.6 Mbit/s). Exit 3
+  means the film is too long for one asset: no page; the message gives
+  the local files only and says why.
+- **D2.** The session writes `05-close/launch/web/index.html` from the
+  template and fills every `__PLACEHOLDER__`: the title and a one-line
+  subtitle (the release's name and date), the language, the headings
+  and the vertical cut's label in the workstream's language,
+  `whats-new.md` as the text (HTML-escaped) and one `<li>` per
+  changelog line. The first publish passes `icon: "video"` and
+  `capabilities: {"assets": {}}`; the players stay hidden while their
+  URL is still a placeholder. A page that declares `assets` is visible
+  inside his organization only, never public: the message says so.
+- **D3.** One upload call with both web copies. The result gives each
+  file's `url`; the page uses it exactly as given.
+- **D4.** Fill the two URLs and publish the same file again (same URL).
+  No vertical cut: leave `__VERTICAL_URL__`, its player stays hidden.
+  The page's URL goes in `trace.md`, so a later round of his notes
+  republishes it instead of making a new one. The session does not
+  render or screenshot the page afterwards.
+
+**No Artifact tool** (a headless run, a host without it), or a publish
+or an upload refused: the delivery is the local files (the master, the
+vertical cut, the captions, each with its absolute path and size), and
+the message says why the film has no link. The close never waits on
+it. The web copies and `index.html` are committed with the workstream;
+the masters follow the footage rule of step 6.
 
 ## When the film cannot be made
 

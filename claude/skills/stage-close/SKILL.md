@@ -1,6 +1,6 @@
 ---
 name: stage-close
-description: Conducts stage 6 (Close) — finishes one workstream and produces two different things for two different readers. For the pipeline, a sprint-style retro that changes nothing: the session (Opus 5.5, medium) harvests the whole record through one close-harvester (Sonnet 5.5, medium) per source, writes the workstream in numbers and the delivery metrics (lead time, his hours, agent hours, tokens, rounds, findings by class, revert rate, change failure rate), measures what the workstream did to the structure of main, sweeps the branches and worktrees, and writes what went well, what went wrong and the pipeline issues each friction suggests — a file for the weekly-retro, not his report. For the people, the launch package: launch-director (Opus 5.5, high) plans the film from the locked mock, the delivery page and the release record, footage-recorder (Sonnet 5.5, medium) records the real app journey by journey, the video kit renders it in launch mode (3D cold open, zoom-to-cursor tutorial per feature, captions, music bed) at 16:9 and 9:16, plus a "what's new" text and a changelog line per feature. Ends with one message: the film to forward, the text to paste, the retro's link. Use when a workstream's .state.md says stage close, or to resume a close in progress.
+description: Conducts stage 6 (Close) — finishes one workstream and produces two different things for two different readers. For the pipeline, a sprint-style retro that changes nothing: the session (Opus 5.5, medium) harvests the whole record through one close-harvester (Sonnet 5.5, medium) per source, writes the workstream in numbers and the delivery metrics (lead time, his hours, agent hours, tokens, rounds, findings by class, revert rate, change failure rate), measures what the workstream did to the structure of main, sweeps the branches and worktrees, and writes what went well, what went wrong and the pipeline issues each friction suggests — a file for the weekly-retro, not his report. For the people, the launch package: launch-director (Opus 5.5, high) plans the film from the locked mock, the delivery page and the release record, footage-recorder (Sonnet 5.5, medium) records the real app journey by journey, the video kit renders it in launch mode (3D cold open, zoom-to-cursor tutorial per feature, captions, music bed) at 16:9 and 9:16, plus a "what's new" text and a changelog line per feature. Delivers the film on a launch page (web copies on the Artifact asset store; local files when the tool is missing) and ends with one message: the film's link to forward, the text to paste, the retro's link. Use when a workstream's .state.md says stage close, or to resume a close in progress.
 disable-model-invocation: false
 argument-hint: "<workstream-slug>"
 allowed-tools: Read, Write, Edit, Glob, Grep, Agent, Workflow, AskUserQuestion, Artifact, Bash
@@ -46,7 +46,8 @@ checks and talks.
              six frames checked → launch.mp4 · launch-vertical.mp4 · launch.srt
    L4 Check  the session reads the director's frames and the text; the package is complete
                                                        ┘
-5. Message   one message: the film to forward, the text to paste, the retro's link
+5. Deliver   web copies ≤ 19 MB → the launch page (Artifact, asset store) · local paths without the tool
+   Message   one message: the film to forward, the text to paste, the retro's link
 6. Close     his notes verbatim · .state.md → closed · the commit
 ```
 
@@ -92,7 +93,8 @@ designs-root/<workstream>/05-close/
     ├── launch.srt          # the captions, from the step data
     ├── whats-new.md        # the text he pastes, in the workstream's language
     ├── changelog.md        # one line per feature
-    └── credits.md          # the music's licence line, when there is music
+    ├── credits.md          # the music's licence line, when there is music
+    └── web/                # the launch page: index.html + the web copies (≤ 19 MB each), committed
 blueprint/close/retro.json  # the retro in the fixed shape weekly-retro reads
 ```
 
@@ -211,21 +213,36 @@ By [references/launch.md](references/launch.md). In short:
    both the film and the cut list. One more director pass at most;
    what remains goes in the message as a known flaw.
 
-## Step 5 — the message
+## Step 5 — deliver, then the message
 
-One message, in his language, and nothing before it:
+**Deliver** by [references/launch.md](references/launch.md), "Delivery":
+the master (~50 MB) is too big for the blueprint and for one artifact
+file, so `scripts/web-copy.sh` makes a copy of each cut under the asset
+cap (19 MB), the session publishes the launch page from
+`templates/launch-page.html` with the `assets` capability, uploads the
+two copies to its asset store and publishes the page again with their
+URLs. Without the Artifact tool, or when a publish is refused or the
+film is too long for one asset, the film goes out as local files and
+the message says why.
+
+One message, in his language (the labels below are the English form),
+and nothing before it:
 
 ```
-▶ Vídeo de lançamento   05-close/launch/launch.mp4            <m:ss> · <MB> MB · para encaminhar
-▯ Corte vertical        05-close/launch/launch-vertical.mp4   <MB> MB · celular
-✎ Legendas              05-close/launch/launch.srt
-◧ Retro                 <blueprint URL>#close                  para a retro semanal
+▶ Launch film   <launch page URL>                  <m:ss> · to forward (inside the organization)
+▣ Masters       <abs>/05-close/launch/launch.mp4   <MB> MB · launch-vertical.mp4 <MB> MB · launch.srt
+◧ Retro         <blueprint URL>#close              for the weekly retro
 ```
+
+Without the page, the first line is the master's absolute path and the
+reason there is no link.
 
 Then `whats-new.md` in a code block, ready to paste, and the changelog
 lines under it. Then, in at most three lines: the features cut from the
 film and why, a known flaw, what the film still needs from him (a
 licensed track, a demo account) if anything. The paths are absolute.
+A film redone after his notes is copied and uploaded again, and the
+same page republished with the new URLs.
 
 He forwards the film; anything he says goes on record:
 
@@ -242,8 +259,8 @@ When he says it is closed, it is: rebuild the blueprint, `.state.md` →
 `stage: closed`, and commit the workstream folder (the footage only
 when it is under 50 MB in all; the films always), push only with his
 explicit approval. The close's stage report is this package:
-the film replaces the stage video (`claude/docs/stage-report.md`), the
-retro's tab is its blueprint layer, and there are no slides — the retro
+the launch page replaces the stage video (`claude/docs/stage-report.md`), the
+retro's tab is its blueprint layer, and there are no slides: the retro
 is the weekly's, not his. Suggest `/clear`.
 
 ## How to write
@@ -259,7 +276,8 @@ were not in the room: the product's own names, no pipeline term.
 Everything is in files. Read `.state.md`, `05-close/trace.md`,
 `05-close/harvest/`, `retro.md`, `05-close/launch/`. Continue from the
 first step with no trace line; a launch step whose output exists (the
-brief, a journey's `log.json`, `launch.mp4`) is not redone.
+brief, a journey's `log.json`, `launch.mp4`, the launch page's URL in
+`trace.md`) is not redone.
 
 ## Boundaries
 
