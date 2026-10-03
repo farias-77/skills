@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # The launch profile: renders a "mode": "launch" storyboard into the film the
 # company forwards, at 16:9 and 9:16, with its audio and its captions.
-#   claude/video/render-launch.sh <storyboard.json> <out.mp4> [--no-vertical]
+#   claude/video/render-launch.sh <storyboard.json> <out.mp4> [--no-vertical | --vertical-only]
 # Writes <out>.mp4 (1920x1080), <out>-vertical.mp4 (1080x1920) and <out>.srt.
 #
 # Against render.sh (the stage-review profile): the audio is kept (AAC
@@ -15,15 +15,17 @@ set -euo pipefail
 export LC_ALL=C
 
 VERTICAL=1
+HORIZONTAL=1
 ARGS=()
 for a in "$@"; do
   case "$a" in
     --no-vertical) VERTICAL=0 ;;
+    --vertical-only) HORIZONTAL=0 ;;
     *) ARGS+=("$a") ;;
   esac
 done
 if [ ${#ARGS[@]} -ne 2 ]; then
-  echo "usage: $0 <storyboard.json> <out.mp4> [--no-vertical]" >&2
+  echo "usage: $0 <storyboard.json> <out.mp4> [--no-vertical | --vertical-only]" >&2
   exit 2
 fi
 
@@ -66,6 +68,7 @@ render() { # <composition> <raw.mp4>
     --public-dir="$RUN/public" \
     --concurrency=2 \
     --gl="$GL" \
+    --timeout=180000 \
     --codec=h264 --crf=16 --audio-codec=aac --audio-bitrate=192k \
     --log=error >&2
 }
@@ -90,12 +93,20 @@ encode() { # <raw.mp4> <out.mp4> <max MB>
 }
 
 mkdir -p "$(dirname "$OUT")"
-render launch "$RUN/raw.mp4"
-encode "$RUN/raw.mp4" "$OUT" "$MAX_MB"
-if [ "$VERTICAL" = 1 ]; then
-  render launch-vertical "$RUN/raw-v.mp4"
-  encode "$RUN/raw-v.mp4" "$BASE-vertical.mp4" "$VMAX_MB"
-fi
-flock -u 9
 cp "$RUN/captions.srt" "$BASE.srt"
 printf '%s\tcaptions\n' "$BASE.srt"
+if [ "$HORIZONTAL" = 1 ]; then
+  render launch "$RUN/raw.mp4"
+  encode "$RUN/raw.mp4" "$OUT" "$MAX_MB"
+fi
+if [ "$VERTICAL" = 1 ]; then
+  # the phone cut never costs the film: a failure here is reported, the 16:9 stays
+  if render launch-vertical "$RUN/raw-v.mp4"; then
+    encode "$RUN/raw-v.mp4" "$BASE-vertical.mp4" "$VMAX_MB"
+  else
+    echo "render-launch.sh: the vertical cut failed; rerun with --vertical-only" >&2
+    flock -u 9
+    exit 3
+  fi
+fi
+flock -u 9

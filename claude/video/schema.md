@@ -160,7 +160,7 @@ the step data, an optional music bed, and a 16:9 film plus a 9:16 cut.
 node claude/video/record.mjs <shots.json> <footage-dir>              # record the journeys (footage-recorder)
 node claude/video/prepare.mjs --check <storyboard.json>              # validate
 node claude/video/stills.mjs <storyboard.json> <dir> [0.5] [--vertical]   # one PNG per scene
-claude/video/render-launch.sh <storyboard.json> <out.mp4> [--no-vertical]
+claude/video/render-launch.sh <storyboard.json> <out.mp4> [--no-vertical | --vertical-only]
 #  → <out>.mp4 (1920x1080) · <out>-vertical.mp4 (1080x1920) · <out>.srt
 ```
 
@@ -168,7 +168,10 @@ claude/video/render-launch.sh <storyboard.json> <out.mp4> [--no-vertical]
 time on the machine) and holds it for both cuts; it renders with
 `--concurrency=2` under `nice`, `--gl=swangle` for the 3D (`VIDEO_GL`
 overrides), keeps the audio (AAC, loudness-normalized to −16 LUFS), and
-encodes at CRF 18 capped by a budget: ~50 MB for the film
+waits up to 180 s for a footage frame (a loaded machine needs it),
+writes the `.srt` first and the 9:16 cut last (a failed vertical cut
+exits 3 and leaves the film; `--vertical-only` redoes it), and
+encodes at CRF 18 capped by a budget and by 8 Mbit/s: ~50 MB for the film
 (`LAUNCH_MAX_MB`), ~25 MB for the vertical cut (`LAUNCH_VERTICAL_MAX_MB`).
 Measured on a loaded 4-core laptop: footage scenes cost ~0.7 s a frame and
 the 3D opening ~0.8 s, so a 4-minute film is about an hour per cut there,
