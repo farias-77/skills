@@ -226,7 +226,7 @@ code is fixed as an entry `R.n` through the stage-4 pipeline, so no
 fix ships unreviewed. One `release-scribe`
 (Sonnet 5.5, medium) per versioned artifact derives the version and the
 notes. Then the session opens the release PR and asks the human once:
-**"vai?"** (or quotes the goal in which he already said it). On his
+**"go?"** (or quotes the goal in which he already said it). On his
 word it merges; the CI deploys to production the same artifact staging
 proved, runs its read-only checks and rolls back on its own when they
 fail. The session reads every proof the audit deferred to production
@@ -275,7 +275,8 @@ we chose.
 
 ```
 claude/                 the pipeline — the six stages, Claude Code
-  skills/               one folder per stage — SKILL.md + templates + references
+  skills/               one folder per stage — SKILL.md + templates + references;
+                        pipeline-setup brings a project to the bar
   agents/               every agent, named <stage>-<role>[-<lens>], five fixed sections
   workflows/            the deterministic review rounds (plain JS, single-file)
   blueprint/            the blueprint shell, its build, the strings per language, the JSON schemas, an example
@@ -313,6 +314,15 @@ What the pipeline expects from its surroundings:
 - Project specifics — environments, credentials, deploy targets, the
   build-guard slot count — live in **your** project's `CLAUDE.md`,
   never in these files.
+- **The bar.** [docs/project-contract.md](docs/project-contract.md)
+  names, as roles, everything the project provides for the stages to
+  run smoothly — the doctrine, golden paths, a gate that runs locally,
+  a stack per worktree, the structure check, the release roles, the
+  permissions — in three levels: required, recommended, for the full
+  experience. Run **`/pipeline-setup <path-to-project>`** first: it
+  audits the project against the bar, writes `pipeline-readiness.md`
+  in it, proposes the cheapest order to close the gaps, and applies
+  the generic pieces on a branch when you say so.
 
 ## Glossary
 
@@ -324,7 +334,7 @@ What the pipeline expects from its surroundings:
 | **blueprint** | the workstream's single review artifact — one URL, tabs per stage |
 | **conductor** | whoever dispatches and audits without doing the work — the stage's session |
 | **lens** | a reviewer scoped to one failure mode |
-| **judge** | whoever rules every finding — sustained/deferred/dismissed, with the reason; reviewers report at the maximum bar. At discovery, design and plan the conductor judges by the stage's `references/judging.md` (at plan it also rules the sequence findings in the user's place against the approved cut); at execution there is no judge: the triage is mechanical (a finding blocks only with a reproduction or a violated written rule; the rest goes to the deferred register or the learn log), and the user rules what parked at the audit; at release a fix is triaged the same way, and the user's one ruling is his "vai?"; at the close nothing is ruled; at the weekly retro the user rules each group of ideas. |
+| **judge** | whoever rules every finding — sustained/deferred/dismissed, with the reason; reviewers report at the maximum bar. At discovery, design and plan the conductor judges by the stage's `references/judging.md` (at plan it also rules the sequence findings in the user's place against the approved cut); at execution there is no judge: the triage is mechanical (a finding blocks only with a reproduction or a violated written rule; the rest goes to the deferred register or the learn log), and the user rules what parked at the audit; at release a fix is triaged the same way, and the user's one ruling is his "go?"; at the close nothing is ruled; at the weekly retro the user rules each group of ideas. |
 | **blind reader** | an agent that reads alone, so divergence from its sibling exposes ambiguity |
 | **andon** | stop before building on a broken premise — a cheap halt beats wrong work |
 | **retro** | the close of a workstream: what worked, what went wrong, the ideas for the pipeline with their evidence; nothing is decided there |

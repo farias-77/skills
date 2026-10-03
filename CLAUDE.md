@@ -18,7 +18,7 @@ skill resumes from `.state.md`.
 ## "Note this for the dreaming"
 
 At any stage, when the user says to note something for the dreaming
-("anote no dreaming note", or words to that effect), append it to the
+("note this for the dreaming", or words to that effect), append it to the
 workstream's `dreaming-notes.md` on the spot, marked **`[user]`** —
 his words as close to verbatim as the entry allows, plus what he
 already wants changed when he says it. These entries are first-class
@@ -121,7 +121,7 @@ blocked after its one fix, what needs him in person, the builders'
 conservative calls in his classes) is parked, never asked, and the
 user rules it with the builders' choices at the audit that closes
 stage 4; a ruling he gives there is a ruling too.
-At release his one ruling is his answer to "vai?" on the release PR,
+At release his one ruling is his answer to "go?" on the release PR,
 recorded verbatim in the trace and in `rulings.md`; a fix built during
 the release is an entry through the stage-4 pipeline, triaged there
 the same way. At the close nothing is ruled: the retro records what
@@ -134,7 +134,7 @@ Every ruling is appended, as it happens, to the workstream's
 line each:
 
 ```
-2026-09-01 · design r3 · design-reviewer-infra#2 · judge: dismissed · ruled: sustained · "the cost line encodes the SLA, it stays"
+2025-11-04 · design r3 · design-reviewer-infra#2 · judge: dismissed · ruled: sustained · "the cost line encodes the SLA, it stays"
 ```
 
 Date · stage and round (or the PR at stage 4) · the finding id · what

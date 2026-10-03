@@ -4,10 +4,9 @@ Every stage closes with three layers of the same report: a **video**,
 **slides** and the **blueprint**. They are one path, read in that
 order, each one a step up in detail:
 
-> "eu vou assistir o vídeo e vou entender como funciona, aí eu vou ver
-> os slides e vou pegar mais detalhes, aí só vejo o blueprint mais
-> completo se realmente precisar … é sempre 'se eu quero ver mais
-> detalhado, subo um material'" — the CTO
+> Watch the video to understand how it works, then the slides for the
+> details, and the full blueprint only when it is really needed: always
+> "if I want more detail, I go up one layer."
 
 | Layer | What it answers | Size | Made by |
 |---|---|---|---|
@@ -177,7 +176,7 @@ made in his place, and what is parked for his ruling at the audit.
 
 **Release — what went live, the gates.** What is in production, with
 its versions; the path through staging and production, gate by gate,
-with the reds and their fixes; his "vai?" verbatim; what the watch
+with the reds and their fixes; his "go?" verbatim; what the watch
 read after the deploy and what is still left to an owner.
 
 **Close — what went wrong, the ideas.** The workstream in numbers;
