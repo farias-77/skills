@@ -1,28 +1,4 @@
 #!/usr/bin/env python3
-"""structure_check.py — diff-scoped maintainability gate, any stack.
-
-Subcommands (structure-check.sh wraps them and finds the tools):
-  check     <repo> <base> <head> [--json] [--allow-deps a,b]
-            what `git diff base head` adds: complexity, size, duplication,
-            import boundaries, new dependencies. Exit 0 pass, 1 violation.
-  calibrate <repo> <ref> [--write]
-            measures every function and file at <ref> and prints the
-            thresholds: warn = p95, fail = p99 of each class, rounded up.
-            --write puts them into the config file.
-  summary   <repo> <ref> [--json]
-            the whole codebase at <ref>: the numbers the close and the
-            weekly compare.
-  compare   <repo> <refA> <refB>
-            two summaries side by side, with the delta (markdown).
-
-Config: structure-check.json beside this file, or $STRUCTURE_CONFIG.
-Tools from the environment: LIZARD, JSCPD, TS_LIB (structure-check.sh sets
-them). Exit 2 on a usage or tool error.
-
-Blind spots, by design: structure only, never behavior. CCN is cyclomatic,
-not cognitive. Duplication finds token clones, not a second implementation
-of a helper under another name. Boundaries are regexes over added lines.
-"""
 import argparse
 import collections
 import json
@@ -37,8 +13,6 @@ import tempfile
 HERE = os.path.dirname(os.path.abspath(__file__))
 CONFIG_PATH = os.environ.get("STRUCTURE_CONFIG") or os.path.join(HERE, "structure-check.json")
 
-
-# ---------------------------------------------------------------- plumbing
 
 def die(msg):
     print("structure-check: " + msg, file=sys.stderr)
@@ -69,8 +43,6 @@ def load_config():
 
 
 class Worktree:
-    """A detached worktree of one sha, removed on exit. Nothing in the repo changes."""
-
     def __init__(self, repo, sha):
         self.repo, self.sha = repo, sha
         self.path = tempfile.mkdtemp(prefix="structure-" + sha[:10] + "-")
@@ -115,7 +87,6 @@ def tracked_code(repo, sha, clf):
 
 
 def diff_added(repo, base, head):
-    """{path: {line_no: text}} of the lines head adds, plus the status of each path."""
     status = {}
     for line in git(repo, "diff", "--no-renames", "--name-status", base, head).splitlines():
         st, path = line.split("\t", 1)
@@ -138,10 +109,7 @@ def diff_added(repo, base, head):
     return status, added
 
 
-# ---------------------------------------------------------------- measuring
-
 def functions(tree, paths, clf):
-    """Every function in paths (relative to tree): path, name, start, end, nloc, ccn."""
     rows = []
     by_tool = collections.defaultdict(list)
     for p in paths:
@@ -201,7 +169,6 @@ def base_functions(repo, sha, paths, clf):
 
 
 def clones(tree, cfg, clf):
-    """jscpd over the tree: [(pathA, startA, endA, pathB, startB, endB)] plus line totals per class."""
     dup = cfg.get("duplication", {})
     out_dir = tempfile.mkdtemp(prefix="structure-jscpd-")
     jscpd = os.environ.get("JSCPD") or "jscpd"
@@ -244,16 +211,28 @@ def pct(values, q):
     return s[min(len(s) - 1, max(0, math.ceil(q / 100.0 * len(s)) - 1))]
 
 
-# ---------------------------------------------------------------- the rules
+CAPTURE = re.compile(r"\{\{(\w+)\}\}")
+
+
+def forbid_for(rule, match):
+    def group(ref):
+        name = ref.group(1)
+        try:
+            value = match.group(int(name) if name.isdigit() else name)
+        except IndexError:
+            die("boundary %s: forbid names {{%s}}, which files does not capture" % (rule.get("id", "?"), name))
+        return re.escape(value or "")
+    return re.compile(CAPTURE.sub(group, rule["forbid"]))
+
 
 def boundary_hits(cfg, path, lines):
-    """lines: {line_no: text}. Yields (rule, line_no, text) for each forbidden import."""
     for rule in cfg.get("boundaries", []):
-        if not re.search(rule["files"], path):
+        match = re.search(rule["files"], path)
+        if not match:
             continue
         if rule.get("except") and re.search(rule["except"], path):
             continue
-        forbid = re.compile(rule["forbid"])
+        forbid = forbid_for(rule, match)
         for n, text in lines.items():
             if forbid.search(text):
                 yield rule, n, text.strip()
@@ -314,8 +293,6 @@ def dependency_findings(repo, base, head, status, cfg, allow):
     return viol, warn
 
 
-# ---------------------------------------------------------------- check
-
 def check(repo, base_ref, head_ref, allow, as_json):
     cfg = load_config()
     clf = Classifier(cfg)
@@ -333,7 +310,6 @@ def check(repo, base_ref, head_ref, allow, as_json):
         head_fns = functions(tree, code, clf)
         base_fns, base_sizes = base_functions(repo, base, [p for p in code if status[p] != "A"], clf)
 
-        # complexity and function size: a changed function, new or taken across the line
         for f in head_fns:
             lines = added.get(f["path"], {})
             if not any(f["start"] <= n <= f["end"] for n in lines):
@@ -353,7 +329,6 @@ def check(repo, base_ref, head_ref, allow, as_json):
                 elif v > t[metric + "_warn"]:
                     warn.append((label, f["path"], f["start"], "%s %s=%d > p95 %d" % (f["name"], metric, v, t[metric + "_warn"])))
 
-        # file size
         for p in code:
             lim = file_limits.get(clf.cls(p))
             if not lim or not added.get(p):
@@ -365,7 +340,6 @@ def check(repo, base_ref, head_ref, allow, as_json):
             elif n > lim["warn"]:
                 warn.append(("file size", p, 0, "%d lines > p95 %d" % (n, lim["warn"])))
 
-        # duplication: the share of added lines that sit in a clone
         pairs = clones(tree, cfg, clf)
         if pairs is None:
             warn.append(("duplication", "-", 0, "jscpd produced no report; duplication not measured"))
@@ -394,7 +368,6 @@ def check(repo, base_ref, head_ref, allow, as_json):
                     share, totals[cls], cls, limit, first_hit.get(cls, "-"))
                 (viol if cls in fails_on else warn).append(("duplication", "-", 0, msg))
 
-    # boundaries: added lines only
     for p in status:
         if status[p] == "D" or clf.excluded(p):
             continue
@@ -417,8 +390,6 @@ def check(repo, base_ref, head_ref, allow, as_json):
         print("structure-check: %d violation(s), %d warning(s) · %s..%s" % (len(viol), len(warn), base[:10], head[:10]))
     return 1 if viol else 0
 
-
-# ---------------------------------------------------------------- whole tree
 
 def measure_tree(repo, ref, cfg, clf):
     sha = rev(repo, ref)
@@ -519,8 +490,46 @@ def compare(repo, a, b):
     return 0
 
 
+def measure(repo, ref, targets):
+    cfg = load_config()
+    clf = Classifier(cfg)
+    sha = rev(repo, ref)
+    listed = git(repo, "ls-tree", "-r", "--name-only", sha, "--", *targets).splitlines()
+    missing = [t for t in targets if not any(p == t or p.startswith(t.rstrip("/") + "/") for p in listed)]
+    paths = [p for p in listed if clf.lang(p) and not clf.excluded(p)]
+    thresholds = cfg.get("thresholds", {})
+    file_limits = cfg.get("fileLines", {})
+    over = []
+    with Worktree(repo, sha) as tree:
+        for f in functions(tree, paths, clf):
+            t = thresholds.get("%s/%s" % (f["lang"], f["cls"]))
+            if t and (f["ccn"] > t["ccn_warn"] or f["nloc"] > t["nloc_warn"]):
+                over.append("%s:%d %s ccn=%d nloc=%d > p95 ccn %d nloc %d" % (
+                    f["path"], f["start"], f["name"], f["ccn"], f["nloc"], t["ccn_warn"], t["nloc_warn"]))
+        for p in paths:
+            lim = file_limits.get(clf.cls(p))
+            n = file_nloc(tree, p)
+            if lim and n > lim["warn"]:
+                over.append("%s %d lines > p95 %d" % (p, n, lim["warn"]))
+    for t in missing:
+        print("missing   %s  not in the tree at %s" % (t, sha[:10]))
+    for line in over:
+        print("over-p95  " + line)
+    print("structure-check: %d file(s) at %s · %d over p95 · %d missing" % (len(paths), sha[:10], len(over), len(missing)))
+    return 1 if over or missing else 0
+
+
+USAGE = """subcommands:
+  check     <repo> <base> <head> [--json] [--allow-deps a,b]   what the diff adds; exit 1 on a violation
+  calibrate <repo> <ref> [--write]                             warn = p95, fail = p99 of each class
+  summary   <repo> <ref>                                       the whole tree's numbers (JSON)
+  compare   <repo> <refA> <refB>                               two summaries side by side (markdown)
+  measure   <repo> <ref> <path>...                             paths present at ref and under p95; exit 1 otherwise
+exit 2 on a usage or tool error"""
+
+
 def main():
-    ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
+    ap = argparse.ArgumentParser(description=USAGE, formatter_class=argparse.RawDescriptionHelpFormatter)
     sub = ap.add_subparsers(dest="cmd", required=True)
     c = sub.add_parser("check")
     c.add_argument("repo"); c.add_argument("base"); c.add_argument("head")
@@ -532,6 +541,8 @@ def main():
     s.add_argument("repo"); s.add_argument("ref"); s.add_argument("--json", action="store_true")
     m = sub.add_parser("compare")
     m.add_argument("repo"); m.add_argument("a"); m.add_argument("b")
+    e = sub.add_parser("measure")
+    e.add_argument("repo"); e.add_argument("ref"); e.add_argument("paths", nargs="+")
     args = ap.parse_args()
     repo = os.path.abspath(args.repo)
     if args.cmd == "check":
@@ -542,6 +553,8 @@ def main():
     if args.cmd == "summary":
         print(json.dumps(summary(repo, args.ref), indent=2))
         return 0
+    if args.cmd == "measure":
+        return measure(repo, args.ref, args.paths)
     return compare(repo, args.a, args.b)
 
 

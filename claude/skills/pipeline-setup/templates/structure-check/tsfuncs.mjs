@@ -1,13 +1,3 @@
-// Per-function cyclomatic complexity and length for .ts/.tsx/.js/.jsx, from
-// the TypeScript compiler's own parser: the fallback for TS, where lizard
-// loses function boundaries in TSX. Usage: node tsfuncs.mjs <file>...
-// Prints one JSON array: {path, name, start, end, nloc, ccn, params}.
-// CCN = 1 + if, ?:, case, for/for-in/for-of/while/do, catch, &&, ||, ??
-// (and their assignment forms), counted in the function's own body —
-// nested functions are measured on their own. NLOC = non-blank lines of the
-// whole span, nested functions included (the length a reader scrolls).
-// A Playwright describe-block callback is a container, not a function: it is
-// skipped and the tests inside it are measured.
 import { createRequire } from 'node:module'
 import { readFileSync } from 'node:fs'
 

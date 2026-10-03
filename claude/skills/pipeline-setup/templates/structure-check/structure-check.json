@@ -45,6 +45,12 @@
       "rule": "<doctrine file>:<line> — the domain layer imports no transport, storage or OS"
     },
     {
+      "id": "example/module-only-through-its-root",
+      "files": "^backend/internal/(?P<module>[^/]+)/",
+      "forbid": "\"[^\"]*/internal/(?!{{module}}[/\"])[^/\"]+/[^\"]+\"",
+      "rule": "<doctrine file>:<line> — another module is imported only through its root package, never its inner layers"
+    },
+    {
       "id": "example/feature-only-via-index",
       "files": "^frontend/src/features/",
       "forbid": "from ['\"](@/|\\.\\./)+features/[^/'\"]+/(?!index)",
