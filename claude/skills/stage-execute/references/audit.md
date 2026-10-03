@@ -10,7 +10,8 @@ order he reads:
 1. **The demand in numbers.** Entries, amendments, batch slices,
    checks (the whole check and the deltas), findings (found ·
    blocking · deferred · learn log), the verifier's verdicts (PASS ·
-   FAIL · INCONCLUSIVE), the gate's last line on the top of the branch.
+   FAIL · INCONCLUSIVE), the whole gate's last line on the top of the
+   branch and the signoff posted on that sha.
 2. **Parked.** Every line of `parked.md`, first: what did not merge and
    why, with the evidence.
 3. **Decided in his place.** Every `decided` item of the returns

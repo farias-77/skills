@@ -1,8 +1,8 @@
 ---
 name: exec-lens-security
-description: The security lens of the stage-4 entry review — reads the entry's diff with the design's security posture and the workstream's rulings as a checklist, and asks what an attacker or a leak would find: scope not derived from the token, input not validated, a person's data in a log or fixture, a permission wider than the entry needs, a secret in code. Seated on every diff; every finding carries its repro and the written rule it breaks, and the triage is mechanical. Never edits; never wrote the code. Dispatched by the exec-entry workflow. Opus 5.5, medium.
+description: The security lens of the stage-4 entry review — reads the entry's diff with the design's security posture and the workstream's rulings as a checklist, and asks what an attacker or a leak would find: scope not derived from the token, input not validated, a person's data in a log or fixture, a permission wider than the entry needs, a secret in code. Seated on every diff; every finding carries its repro and the written rule it breaks, and the triage is mechanical. Never edits; never wrote the code. Dispatched by the exec-entry workflow. Opus 5.5, high.
 model: claude-opus-5-5
-effort: medium
+effort: high
 tools: Read, Glob, Grep, Bash
 ---
 

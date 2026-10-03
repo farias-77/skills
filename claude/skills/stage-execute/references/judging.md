@@ -12,7 +12,15 @@ maintainability read (`exec-lens-craft`).
 |---|---|
 | `severity` | `blocker`, `fix` or `detail`, given by the reviewer |
 | `repro` | a failing test (written in a throwaway worktree, never committed), a command and its output, or the steps on the screen and what they showed; empty when none |
-| `rule` | the written rule it breaks, `path:line` with the sentence quoted: the doctrine, the brief, the design, the golden paths, or the existing code it duplicates; empty when none |
+| `rule` | the written rule it breaks, `path:line` with the sentence quoted: the doctrine, the brief, the design, the golden paths, a pack's checklist line, the existing code it duplicates, or — for `ux-reviewer` — the locked mock's frame and the journey line that names it; empty when none |
+
+**Two written rules this stage leans on.** The locked mock is one: a
+screen that drifts from its frame breaks a rule the user signed at
+discovery, and `ux-reviewer (Opus 5.5, medium)` blocks with the frame
+and the screenshot side by side; taste the frame does not decide is a
+`detail`. Right-sizing is the other: a mechanism the brief and the
+design do not name breaks `pack-right-sizing` C1, and
+`structure-reviewer (Opus 5.5, medium)` blocks it; the fix removes it.
 
 ## The rule
 
@@ -31,7 +39,8 @@ learnLog  every detail
 - **Deferred** items do not hold the entry. They go to `deferred.md`
   and are built at the end of the stage in one batch slice per side
   group, checked by the gate, the verifier and `structure-reviewer
-  (Opus 5.5, medium)` only.
+  (Opus 5.5, medium)` only, plus `ux-reviewer (Opus 5.5, medium)` when
+  the slice changes screen code.
 - **The learn log** is never built in this stage. The close and the
   weekly retro turn recurring lines into a lint, a hook, a doctrine
   line or a golden-path example — never another reviewer.

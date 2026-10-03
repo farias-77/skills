@@ -13,7 +13,7 @@
 |---|---|---|---|---|---|---|---|---|
 | | | | | | | | | |
 
-**Branch:** `feat/<workstream>` @ `<sha>` · gate: `<make verify summary line>`
+**Branch:** `feat/<workstream>` @ `<sha>` · whole gate: `<its summary line>` · signoff: `local-ci = <state>` on `<sha>`
 
 ## Parked
 
@@ -49,6 +49,9 @@
 |---|---|---|---|---|---|
 | reviewer | | | | | |
 | structure-reviewer | | | | | |
+| ux-reviewer | | | | | |
+| exec-lens-security | | | | | |
+| exec-lens-operations | | | | | |
 
 **Deferred:** <n> done · <n> skipped (the reasons in `deferred.md`)
 

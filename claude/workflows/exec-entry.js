@@ -9,46 +9,52 @@
  * judge: a finding blocks by a rule written in code below
  * (references/judging.md is its prose). The session that runs stage 4
  * starts one run per entry, in parallel up to the measured cap, and
- * only merges what comes back ready.
+ * only merges what comes back ready, through its local-CI queue.
  *
  * THE FLOW (mode 'build'):
- *   1. acceptance  verifier (Sonnet 5.5, high), author mode, writes the
+ *   1. acceptance  verifier (Opus 5.5, medium), author mode, writes the
  *                  entry's acceptance checks from the brief's acceptance
- *                  and proof lines (Playwright journeys for screens, Go
- *                  integration tests for the server, in the doctrine's
- *                  test layout), runs them on the base where they must
- *                  fail for the right reason, and commits them. From then
- *                  on they are read-only for the builder: the gate's
- *                  first check rejects any diff to them. Skipped when
- *                  args.acceptance names an earlier run's commit; redone
- *                  for the named checks only when args.acceptanceRevision
- *                  points at a ruling or an amendment that changes them.
+ *                  and proof lines and the discovery journeys (browser
+ *                  journeys for screens, integration tests for the
+ *                  server, in the doctrine's test layout), runs them on
+ *                  the base where they must fail for the right reason,
+ *                  and commits them. From then on they are read-only for
+ *                  the builder: the gate's first check rejects any diff
+ *                  to them. Skipped when args.acceptance names an earlier
+ *                  run's commit; redone for the named checks only when
+ *                  args.acceptanceRevision points at a ruling or an
+ *                  amendment that changes them.
  *   2. build       builder (Opus 5.5, medium), the single writer for back
- *                  and front, in the entry worktree: follows the golden
- *                  paths, reuses before it writes, keeps functions and
- *                  files small, and does not end its turn until the gate
- *                  commands are green. A shared file or an acceptance
- *                  check it must change stops the run: 'needs-amendment'.
- *                  What needs the user in person: 'parked' (user).
- *   3. gate        exec-gate (Sonnet 5.5, low): acceptance untouched, the
- *                  gate commands (the fast check, the affected tests, the
- *                  structure check), the surface (api/screen/runtime),
- *                  the stack up for the verifier. Red → the builder again,
- *                  up to maxGateFixes, then 'parked' (gate-red).
- *   4. check       in parallel, over the entry diff: verifier, prove mode
- *                  (the acceptance checks on the running stack, evidence,
- *                  the PII canary, the failure-mode block when the server
- *                  changed; PASS / FAIL / INCONCLUSIVE, INCONCLUSIVE =
- *                  FAIL) ∥ reviewer (Sonnet 5.5, high): correctness and
- *                  fidelity ∥ structure-reviewer (Opus 5.5, medium): the
- *                  golden paths, boundaries, duplication, size, tests of
- *                  behaviour ∥ exec-lens-security (Opus 5.5, medium):
- *                  every diff ∥ exec-lens-operations (Opus 5.5, medium):
- *                  when the server's product code or the runtime changed.
+ *                  and front, in the entry worktree: the smallest change
+ *                  that passes the acceptance, along the golden paths,
+ *                  with the packs of its surface; no mechanism the brief
+ *                  does not name. A shared file or an acceptance check it
+ *                  must change stops the run: 'needs-amendment'. What
+ *                  needs the user in person: 'parked' (user).
+ *   3. gate        exec-gate (Sonnet 5.5, medium): acceptance untouched,
+ *                  the gate commands (the fast check, the affected tests,
+ *                  the structure check), the surface (api/screen/runtime),
+ *                  the stack up for the verifier. Red → the builder again
+ *                  at effort high, up to maxGateFixes, then 'parked'
+ *                  (gate-red).
+ *   4. check       in parallel, over the entry diff: the verifier, prove
+ *                  mode (the acceptance checks on the running stack,
+ *                  screenshots and video, the PII canary, the failure-mode
+ *                  block when the server changed; PASS / FAIL /
+ *                  INCONCLUSIVE, INCONCLUSIVE = FAIL), followed, when the
+ *                  screen changed, by ux-reviewer (Opus 5.5, medium) on
+ *                  that evidence against the locked mock's frames ∥
+ *                  reviewer (Opus 5.5, medium): correctness and fidelity ∥
+ *                  structure-reviewer (Opus 5.5, medium): golden paths,
+ *                  boundaries, duplication, mechanisms nobody named ∥
+ *                  exec-lens-security (Opus 5.5, high): every diff ∥
+ *                  exec-lens-operations (Opus 5.5, medium): when the
+ *                  server's product code or the runtime changed.
  *   5. triage      mechanical: a finding blocks when its severity is not
- *                  'detail' and it carries a repro or a written rule, or
- *                  when the verifier did not PASS; a non-detail without
- *                  proof → `deferred`; a detail → `learnLog`.
+ *                  'detail' and it carries a repro or a written rule (for
+ *                  ux-reviewer the locked mock's frame is the written
+ *                  rule), or when the verifier did not PASS; a non-detail
+ *                  without proof → `deferred`; a detail → `learnLog`.
  *   6. fix         the same builder at effort high, once, applies every
  *                  blocking item → the gate → the delta: the verifier runs
  *                  the acceptance checks again, and only the reviewers that
@@ -60,13 +66,14 @@
  *                  evidence swept for tokens and redacted, the feature
  *                  map's pointers checked. A fix the ready gate needed is
  *                  checked by one delta of the whole panel; still blocking
- *                  → 'parked' (round-cap).
+ *                  → 'parked' (round-cap). Ready is not the merge: the
+ *                  session's queue tests the merged tree and signs it off.
  *
- * THE FLOW (mode 'update'): the gate merges the moved base into the entry
- * branch — a merge, never a rebase — and runs the ready gate and the
- * record. A clean merge adds no authored code and the run returns. A
- * conflict is resolved by the builder, and the resolution is code: gate,
- * then the whole check over the entry diff, as in build mode.
+ * THE FLOW (mode 'update'): the session merges a moved base into the entry
+ * branch itself and calls this mode only on a conflict. The gate tries the
+ * merge (never a rebase); a clean merge runs the ready gate and the record
+ * and returns. A conflict is resolved by the builder, and the resolution
+ * is code: gate, then the whole check over the entry diff, as in build.
  *
  * THE FLOW (mode 'resume'): a parked run continues without a new build
  * and without a whole review: the builder (effort high) applies the items
@@ -75,9 +82,28 @@
  * checks them: the verifier and the reviewers the items name.
  *
  * THE FLOW (mode 'batch'): a finishing slice of the deferred register. The
- * builder applies the lines in batchPath; the gate; then only the verifier
- * and structure-reviewer check it (it opens no new review); one fix and
- * one delta, as above.
+ * builder applies the lines in batchPath; the gate; then only the verifier,
+ * structure-reviewer and, when the screen changed, ux-reviewer check it
+ * (it opens no new review); one fix and one delta, as above.
+ *
+ * MODELS. The builder builds at medium: on mergeable-without-edits work
+ * Opus 5.5 peaks at medium and adds out-of-scope edits above it; every fix
+ * (gate red, blocking items, a resume) runs at high. The reviewers are
+ * Opus 5.5 (higher precision than Sonnet at a similar cost on judgment
+ * work), security at high. The gate runs scripted commands and reads logs:
+ * Sonnet 5.5, medium. Source: the model-selection pack.
+ *
+ * PACKS. Each registered agent preloads its packs through `skills:` in its
+ * frontmatter. With args.packsDir, the prompt also names the SKILL.md of
+ * each of the agent's packs (PACKS below); the agent reads the ones not
+ * already in its context. That is how inline agents get them, and it
+ * covers a pack that cannot be preloaded.
+ *
+ * STOP HOOKS. A project may run its fast check in a Stop or SubagentStop
+ * hook so the builder cannot end its turn red. Claude Code overrides a hook
+ * after 8 consecutive blocks by default (CLAUDE_CODE_STOP_HOOK_BLOCK_CAP,
+ * hooks and env-vars docs). Nothing here depends on that number: after
+ * every builder return the gate runs and its result decides what follows.
  *
  * RUNNING UNREGISTERED AGENTS: with args.inlineAgents, agent() is called
  * without agentType; the prompt starts by pointing at <agentsDir>/<name>.md
@@ -92,6 +118,7 @@
  *     entry:           'E-03',
  *     briefPath:       '/abs/.../02-plan/briefs/E-03.md',   // batch: the slice's brief
  *     designDir:       '/abs/.../01-design',
+ *     discoveryDir:    '/abs/.../00-discovery',             // the locked mock's prototype/frames/ and journeys/*.yaml
  *     reconDir:        '/abs/.../02-plan/recon',
  *     doctrineDir:     '/abs/.../docs/engineering',
  *     goldenPathsPath: '/abs/.../docs/engineering/golden-paths.md',
@@ -99,6 +126,7 @@
  *     rulingsPath:     '/abs/.../rulings.md',
  *     judgingPath:     '/abs/.../stage-execute/references/judging.md',
  *     agentsDir:       '/abs/.../agents',
+ *     packsDir:        '/abs/.../skills',                   // holds pack-<name>/SKILL.md
  *     evidenceDir:     '/abs/.../03-execution/entries/E-03',
  *     worktree:        '/abs/.../.worktrees/<slug>-E-03',
  *     branch:          'story/<slug>/E-03',
@@ -124,32 +152,42 @@
 
 export const meta = {
   name: 'exec-entry',
-  description: 'Stage-4 entry (v9): acceptance checks written first and read-only, one builder under the gate commands, the verifier proving on the running stack in parallel with the reviewers (correctness, structure, security, operations), a mechanical triage, one fix at high effort and a delta check, the record before ready',
+  description: 'Stage-4 entry (v9): acceptance checks written first and read-only, one builder under the gate commands, the verifier proving on the running stack (then ux-reviewer on its screenshots against the locked mock) in parallel with the reviewers (correctness, structure, security, operations), a mechanical triage, one fix at high effort and a delta check, the record before ready',
   phases: [
-    { title: 'Acceptance', detail: 'verifier (Sonnet 5.5, high), author mode: the acceptance checks, red on the base for the right reason, committed', model: 'sonnet' },
-    { title: 'Build', detail: 'builder (Opus 5.5, medium), single writer, golden paths, until the gate commands are green', model: 'opus' },
-    { title: 'Gate', detail: 'exec-gate (Sonnet 5.5, low): acceptance untouched, the gate commands, the surface, the stack, the record before ready', model: 'sonnet' },
-    { title: 'Check', detail: 'verifier prove ∥ reviewer (Sonnet 5.5, high) ∥ structure-reviewer (Opus 5.5, medium) ∥ exec-lens-security ∥ exec-lens-operations (Opus 5.5, medium); mechanical triage', model: 'sonnet' },
-    { title: 'Fix', detail: 'builder (Opus 5.5, high), once, on the blocking items; then the gate', model: 'opus' },
-    { title: 'Delta', detail: 'the verifier again and the reviewers that blocked, over their own items only', model: 'sonnet' },
+    { title: 'Acceptance', detail: 'verifier (Opus 5.5, medium), author mode: the acceptance checks, red on the base for the right reason, committed', model: 'opus' },
+    { title: 'Build', detail: 'builder (Opus 5.5, medium), single writer, golden paths and its packs, the smallest change until the gate commands are green', model: 'opus' },
+    { title: 'Gate', detail: 'exec-gate (Sonnet 5.5, medium): acceptance untouched, the gate commands, the surface, the stack, the record before ready', model: 'sonnet' },
+    { title: 'Check', detail: 'verifier prove → ux-reviewer on screen diffs ∥ reviewer ∥ structure-reviewer ∥ exec-lens-operations (Opus 5.5, medium) ∥ exec-lens-security (Opus 5.5, high); mechanical triage', model: 'opus' },
+    { title: 'Fix', detail: 'builder (Opus 5.5, high), on the gate red or the blocking items; then the gate', model: 'opus' },
+    { title: 'Delta', detail: 'the verifier again and the reviewers that blocked, over their own items only', model: 'opus' },
   ],
 }
 
 // name → model and effort, as in each definition's frontmatter (used when the agents run inline).
 const AGENTS = {
   builder: { model: 'opus', effort: 'medium' },
-  verifier: { model: 'sonnet', effort: 'high' },
-  reviewer: { model: 'sonnet', effort: 'high' },
+  verifier: { model: 'opus', effort: 'medium' },
+  reviewer: { model: 'opus', effort: 'medium' },
   'structure-reviewer': { model: 'opus', effort: 'medium' },
-  'exec-gate': { model: 'sonnet', effort: 'low' },
-  'exec-lens-security': { model: 'opus', effort: 'medium' },
+  'ux-reviewer': { model: 'opus', effort: 'medium' },
+  'exec-gate': { model: 'sonnet', effort: 'medium' },
+  'exec-lens-security': { model: 'opus', effort: 'high' },
   'exec-lens-operations': { model: 'opus', effort: 'medium' },
+}
+// name → the knowledge packs it reads, as in each definition's `skills:` (named in the prompt with args.packsDir).
+const PACKS = {
+  builder: ['pack-go-backend', 'pack-react-frontend', 'pack-design-taste', 'pack-motion-3d', 'pack-ops'],
+  reviewer: ['pack-go-backend', 'pack-react-frontend'],
+  'structure-reviewer': ['pack-right-sizing', 'pack-go-backend', 'pack-react-frontend'],
+  'ux-reviewer': ['pack-design-taste', 'pack-motion-3d', 'pack-react-frontend'],
+  'exec-lens-operations': ['pack-ops'],
 }
 const BUILDER = 'builder'
 const VERIFIER = 'verifier'
 const GATE = 'exec-gate'
 const REVIEWER = 'reviewer'
 const STRUCTURE = 'structure-reviewer'
+const UX = 'ux-reviewer'
 const SECURITY = 'exec-lens-security'
 const OPERATIONS = 'exec-lens-operations'
 
@@ -250,20 +288,27 @@ const result = {
 const interrupted = (what) => { result.status = 'interrupted'; result.reason = 'interrupted'; log(`${entry}: ${what} returned nothing — interrupted; relaunch by resumeFromRunId`); return result }
 const park = (reason, what) => { result.status = 'parked'; result.reason = reason; log(`${entry}: ${what} — parked (${reason})`); return result }
 
+// The packs of an agent, as paths, when args.packsDir is given.
+const packsText = (name) => args?.packsDir && PACKS[name]?.length
+  ? `\nYour knowledge packs (read each one whose content is not already in your context, before you work):\n${PACKS[name].map(p => `- ${args.packsDir}/${p}/SKILL.md`).join('\n')}`
+  : ''
+
 // One call shape for registered and inline agents.
 const call = (name, prompt, opts, effort) => {
   const def = AGENTS[name]
   const eff = effort ?? def.effort
   if (inline) {
-    return agent(`Your instructions are the file ${agentsDir}/${name}.md (read it first and follow it; its frontmatter's model/effort are already applied).
+    return agent(`Your instructions are the file ${agentsDir}/${name}.md (read it first and follow it; its frontmatter's model/effort are already applied).${packsText(name)}
 
 ${prompt}`, { ...opts, model: def.model, effort: eff })
   }
-  return agent(prompt, { ...opts, agentType: name, ...(eff !== def.effort ? { effort: eff } : {}) })
+  return agent(`${prompt}${packsText(name)}`, { ...opts, agentType: name, ...(eff !== def.effort ? { effort: eff } : {}) })
 }
 
+const mockText = args?.discoveryDir ? `
+The locked mock (screens are built to it and checked against it): frames ${args.discoveryDir}/prototype/frames · journeys ${args.discoveryDir}/journeys` : ''
 const docs = `Brief: ${args?.briefPath}
-Design (notes.md is the law): ${args?.designDir}
+Design (notes.md is the law): ${args?.designDir}${mockText}
 Recon: ${args?.reconDir}
 Engineering doctrine of the project: ${args?.doctrineDir}
 Golden paths: ${args?.goldenPathsPath}
@@ -330,7 +375,7 @@ When green, bring the stack up on the head (rebuilt when the head changed since 
     const items = g.failures.map((f, i) => ({ id: `gate-${label}-${n}#${i + 1}`, reviewer: GATE, fix: `turn green: ${f.check} at ${f.where} (${f.cause})`, repro: f.output, rule: '' }))
     log(`${entry}: gate red (${g.failures.length} failure(s)) — builder try ${n}/${maxGateFixes}`)
     phase('Fix')
-    const b = await build(`Mode: fix. Entry ${entry}. Turn the gate green; the failures, quoted:\n${items.map(i => `- ${i.id}: ${i.fix}\n  ${i.repro}`).join('\n')}`, `fix-gate-${label}-${n}`, 'Fix')
+    const b = await build(`Mode: fix. Entry ${entry}. Turn the gate green; the failures, quoted:\n${items.map(i => `- ${i.id}: ${i.fix}\n  ${i.repro}`).join('\n')}`, `fix-gate-${label}-${n}`, 'Fix', 'high')
     const stop = absorb(b, `the builder (gate fix ${n})`)
     if (stop) return { stop }
     fixed.push(...items)
@@ -364,14 +409,30 @@ ${docs}
 ${acceptanceText()}
 The diff: run \`${diffCmd}\` in the worktree.
 The running stack: ${stackLine}`
-  const thunks = seats.map(name => () => name === VERIFIER
-    ? call(VERIFIER, `Mode: prove. ${common}
+  const phaseName = kind === 'whole' ? 'Check' : 'Delta'
+  const prove = () => call(VERIFIER, `Mode: prove. ${common}
 The head to prove: ${head}
-The entry touches the server's product code: ${surface.api ? 'yes — run the failure-mode block' : 'no'}${fixesText}${kind === 'delta' && own?.verifier?.length ? `
-The checks that failed the last proof:\n${own.verifier.map(i => `- ${i.title}`).join('\n')}` : ''}`, { label: `${VERIFIER}·${entry}·prove-r${round}`, phase: kind === 'whole' ? 'Check' : 'Delta', schema: VERDICT })
-    : call(name, `You are ${name}. ${common}${fixesText}${ownText(name)}`, { label: `${name}·${entry}·r${round}`, phase: kind === 'whole' ? 'Check' : 'Delta', schema: REVIEW }))
-  log(`${entry} check ${round} (${kind}): ${seats.join(' ∥ ')}`)
-  const outs = await parallel(thunks)
+The entry touches the server's product code: ${surface.api ? 'yes — run the failure-mode block' : 'no'}
+The entry touches the screen's product code: ${surface.screen ? 'yes — a screenshot of every state the journeys reach, named by the frame it matches' : 'no'}${fixesText}${kind === 'delta' && own?.verifier?.length ? `
+The checks that failed the last proof:\n${own.verifier.map(i => `- ${i.title}`).join('\n')}` : ''}`, { label: `${VERIFIER}·${entry}·prove-r${round}`, phase: phaseName, schema: VERDICT })
+  const review = (name, extra = '') => call(name, `You are ${name}. ${common}${extra}${fixesText}${ownText(name)}`, { label: `${name}·${entry}·r${round}`, phase: phaseName, schema: REVIEW })
+  // ux-reviewer reads the verifier's screenshots and video, so it runs after the verifier, inside its seat.
+  const proveThenUx = async () => {
+    const v = await prove()
+    if (!v) return { v: null, u: null }
+    const u = await review(UX, `
+The verifier's evidence of this head (${v.verdict}): ${v.evidence.folder}${v.evidence.files.length ? ` — ${v.evidence.files.join(', ')}` : ''}`)
+    return { v, u }
+  }
+  const uxSeated = seats.includes(UX)
+  const order = seats.filter(s => s !== UX)
+  log(`${entry} check ${round} (${kind}): ${order.map(s => s === VERIFIER && uxSeated ? `${VERIFIER} → ${UX}` : s).join(' ∥ ')}`)
+  const raw = await parallel(order.map(name => () => name === VERIFIER ? (uxSeated ? proveThenUx() : prove()) : review(name)))
+  const outOf = {}
+  order.forEach((name, i) => {
+    if (name === VERIFIER && uxSeated) { outOf[VERIFIER] = raw[i]?.v; outOf[UX] = raw[i]?.u } else outOf[name] = raw[i]
+  })
+  const outs = seats.map(name => outOf[name])
   const missing = seats.filter((_, i) => !outs[i])
   if (missing.length) return { stop: interrupted(missing.join(', ')) }
 
@@ -442,7 +503,7 @@ ${recordTask([])}`, 'update')
     return result
   }
   phase('Fix')
-  const b = await build(`Mode: fix. Entry ${entry}. In the worktree, merge ${args?.base} into ${args?.branch} (\`git merge --no-ff ${args?.base}\`; you are asked to) and resolve the conflicts in: ${g.conflicts.join(', ')}. Keep both intents; never drop the base's change. Commit the merge and push; never a rebase, never a force-push.`, 'fix-update', 'Fix')
+  const b = await build(`Mode: fix. Entry ${entry}. In the worktree, merge ${args?.base} into ${args?.branch} (\`git merge --no-ff ${args?.base}\`; you are asked to) and resolve the conflicts in: ${g.conflicts.join(', ')}. Keep both intents; never drop the base's change. Commit the merge and push; never a rebase, never a force-push.`, 'fix-update', 'Fix', 'high')
   const stop = absorb(b, 'the builder (update)')
   if (stop) return stop
 }
@@ -482,8 +543,8 @@ let stackLine = g0.stack
 log(`${entry}: surface ${['api', 'screen', 'runtime'].filter(k => surface[k]).join(' + ') || 'none (tests, tooling, build or docs only)'}`)
 
 const wholeSeats = mode === 'batch'
-  ? [VERIFIER, STRUCTURE]
-  : [VERIFIER, REVIEWER, STRUCTURE, SECURITY, ...(surface.api || surface.runtime ? [OPERATIONS] : [])]
+  ? [VERIFIER, STRUCTURE, ...(surface.screen ? [UX] : [])]
+  : [VERIFIER, REVIEWER, STRUCTURE, SECURITY, ...(surface.api || surface.runtime ? [OPERATIONS] : []), ...(surface.screen ? [UX] : [])]
 
 // ---------- 4–6. check, triage, one fix, the delta ----------
 

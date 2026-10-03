@@ -1,6 +1,6 @@
 ---
 name: stage-execute
-description: Conducts stage 4 (Execute) — turns an approved plan into merged, reviewed code on the feature branch with nobody in the loop until the end. One session (Opus 5.5, high) receives one goal, "build the whole plan", and orchestrates without writing code: the foundation first, then every entry whose edges are merged or ready, critical path first, in parallel up to the measured cap, each through the exec-entry workflow — the verifier (Sonnet 5.5, high) writes the entry's acceptance checks first, red on the base and read-only from then on; one builder (Opus 5.5, medium) builds back and front in the entry worktree along the golden paths until the gate commands are green; the gate (exec-gate, Sonnet 5.5, low); then, in parallel, the verifier proving on the running stack (evidence, PII canary, failure modes) and the reviewers that never wrote the code — reviewer (Sonnet 5.5, high), structure-reviewer (Opus 5.5, medium), security on every diff and operations on every server diff (Opus 5.5, medium); a mechanical triage with no judge (a finding blocks with a repro or a written rule); one fix at high effort and a delta check. The session merges what comes back ready through a serial queue (the base merged in, the affected gate, merge), runs foundation amendments, builds the deferred register in one batch slice per side group at the end, reads the whole branch once for maintainability, renders a video per entry, closes with the stage report (video, slides, blueprint), parks what is the user's, and calls him once, when everything is merged and green, for the audit. Use when a workstream's .state.md says stage execute, or to resume an execution in progress.
+description: Conducts stage 4 (Execute) — turns an approved plan into merged, reviewed code on the feature branch, from one "play" to one call. Step 0 shows the plan's pre-flight once, waits until every item is handed over, and gives the user the /goal text to paste; from then on nobody asks him anything. One session (Opus 5.5, high) orchestrates without writing code: the foundation first, then every entry whose edges are merged or ready, critical path first, in parallel up to the measured cap, each through the exec-entry workflow — the verifier (Opus 5.5, medium) writes the entry's acceptance checks first, red on the base and read-only from then on; one builder (Opus 5.5, medium; high on every fix) builds the smallest change that passes them, back and front, with the knowledge packs of its surface, along the golden paths, until the gate commands are green; the gate (exec-gate, Sonnet 5.5, medium); then, in parallel, the verifier proving on the running stack (evidence, PII canary, failure modes) followed on screen diffs by ux-reviewer (Opus 5.5, medium) against the locked mock's frames, and the reviewers that never wrote the code — reviewer, structure-reviewer (both Opus 5.5, medium; structure blocks any mechanism nobody named), exec-lens-security (Opus 5.5, high) on every diff, exec-lens-operations (Opus 5.5, medium) on server diffs; a mechanical triage with no judge (a finding blocks with a repro or a written rule); one fix and a delta check. The session is the local CI: its serial queue merges the base into each ready entry, tests the merged tree with the affected gate, merges, and signs the merged head off with a commit status; the whole gate runs once at the end in a fresh worktree and signs off the top that main accepts. It runs foundation amendments, builds the deferred register in one batch slice per side group, reads the whole branch once for maintainability, renders a video per entry, closes with the stage report (video, slides, blueprint), and calls the user once, when everything is merged, green, verified and reported. Use when a workstream's .state.md says stage execute, or to resume an execution in progress.
 disable-model-invocation: false
 argument-hint: "<workstream-slug>"
 allowed-tools: Read, Write, Edit, Glob, Grep, Agent, Workflow, AskUserQuestion, Artifact, PushNotification, Bash
@@ -27,35 +27,56 @@ commands; `structure-reviewer (Opus 5.5, medium)` reads every entry and
 every batch slice, and its findings block like any other; the whole
 branch is read once more for maintainability before the audit.
 
+**Right size, inside the code too.** The builder builds the smallest
+change that passes the acceptance and adds no mechanism the brief or
+the design does not name; `structure-reviewer (Opus 5.5, medium)`
+blocks one that nobody named (`pack-right-sizing`, list C). Overengineering is what turns two
+hours into two hundred, so it is a defect here, not a style.
+
+**The screens are the ones he approved.** On every diff with screen
+code, `ux-reviewer (Opus 5.5, medium)` compares the verifier's
+screenshots and video with the locked mock's frames from discovery; a
+drift with the frame to show for it blocks.
+
+**The queue is the CI.** Nothing reaches `feat/<workstream>` that was
+not tested, on this machine, as the tree it becomes; the session signs
+each merged head off and the whole gate signs off the top once. Hosted
+CI keeps the deploy and is not on the merge path.
+
 The session is the orchestrator, **Opus 5.5 at high effort**. It does
 not write product code and does not review it: it prepares the
-worktrees, starts the pipelines, merges, amends the plan, and keeps the
-record. The user gave one goal and left; the session calls him once,
-at the end.
+worktrees, starts the pipelines, runs the merge queue and its signoff,
+amends the plan, and keeps the record. The user hands over the
+pre-flight, pastes one goal and leaves; the session calls him once, at
+the end, when everything is merged, green, verified and reported.
 
 ## The pipeline of one entry
 
 ```
 exec-entry (one workflow run per entry, in its own worktree and stack)
-  accept   verifier (Sonnet 5.5, high), author mode: the brief's acceptance and proof lines
-           as Playwright journeys (screens) and Go integration tests (server), in the
-           doctrine's test layout; red on the base for the right reason; committed.
-           From here on the acceptance files are read-only for the builder
+  accept   verifier (Opus 5.5, medium), author mode: the brief's acceptance and proof lines,
+           following the discovery journeys, as browser journeys (screens) and integration
+           tests (server), in the doctrine's test layout; red on the base for the right
+           reason; committed. From here on the acceptance files are read-only for the builder
   build    builder (Opus 5.5, medium), one writer for back and front, in the entry worktree:
-           the golden paths followed, existing helpers reused, functions and files small;
-           does not end its turn until the gate commands are green
-  gate     exec-gate (Sonnet 5.5, low): acceptance untouched, the gate commands (fast check,
-           affected tests, structure check), the surface (api · screen · runtime), stack up
-           red → the builder again (3 tries) → parked: gate-red
-  check    in parallel, on the same head:
-             verifier, prove mode — the acceptance checks on the running stack; screenshots,
-               video, side effects read back, the PII canary; the failure-mode block when
-               the server changed; PASS · FAIL · INCONCLUSIVE (= FAIL)
-             reviewer (Sonnet 5.5, high) — correctness and fidelity to the brief and design
-             structure-reviewer (Opus 5.5, medium) — golden paths, boundaries, duplication,
-               abstraction, names, size, dead code, tests of behaviour
-             exec-lens-security (Opus 5.5, medium) — every diff
-             exec-lens-operations (Opus 5.5, medium) — the server's product code or the runtime
+           the smallest change that passes the acceptance, no mechanism the brief does not
+           name; the packs of its surface; the golden paths followed, helpers reused; does
+           not end its turn until the gate commands are green
+  gate     exec-gate (Sonnet 5.5, medium): acceptance untouched, the gate commands (fast
+           check, affected tests, structure check), the surface (api · screen · runtime),
+           stack up; red → the builder at high (3 tries) → parked: gate-red
+  check    on the same head:
+             verifier, prove mode — the acceptance checks on the running stack; a screenshot
+               of every state named by its frame, video, side effects read back, the PII
+               canary; the failure-mode block when the server changed; PASS · FAIL ·
+               INCONCLUSIVE (= FAIL)
+               → ux-reviewer (Opus 5.5, medium), when the screen changed — that evidence
+                 against the locked mock's frames; hierarchy, states, focus, motion, widths, copy
+           ∥ reviewer (Opus 5.5, medium) — correctness and fidelity to the brief and design
+           ∥ structure-reviewer (Opus 5.5, medium) — mechanisms nobody named, golden paths,
+               boundaries, duplication, abstraction, names, size, dead code, tests of behaviour
+           ∥ exec-lens-security (Opus 5.5, high) — every diff
+           ∥ exec-lens-operations (Opus 5.5, medium) — the server's product code or the runtime
   triage   mechanical, no judge: blocks = severity ≠ detail AND (repro or rule), or the
            verifier did not PASS · deferred = the rest but details · learn log = details
   fix      the same builder at effort high, once, every blocking item → the gate
@@ -63,36 +84,51 @@ exec-entry (one workflow run per entry, in its own worktree and stack)
            still blocking → parked: round-cap   (maxRounds 2 = the check and one delta)
   ready    the gate commands keep-going against the base, then the record: the evidence
            of the head written, swept for tokens and redacted, the feature map's pointers
-           checked (the whole gate runs once, at the end of the stage)
+           checked. Ready is not merged: the queue (Step 4) tests the merged tree and signs off
 ```
 
 The triage rule is [references/judging.md](references/judging.md).
 
 ## The team
 
-| Agent | Model, effort | Does |
-|---|---|---|
-| the session | Opus 5.5, high | worktrees, pipelines, the machine's load, the merge queue, amendments, the batch slices, the record, the videos, the audit |
-| `verifier` | Sonnet 5.5, high | writes the acceptance checks first (author); proves them on the running stack with evidence, the PII canary and the failure-mode block (prove) |
-| `builder` | Opus 5.5, medium; high on the fix | the single writer of an entry, back and front, along the golden paths, until the gate commands are green |
-| `exec-gate` | Sonnet 5.5, low | acceptance untouched, the gate commands, the surface, the stack, the base merged in at an update, the whole gate once at the end, the record |
-| `reviewer` | Sonnet 5.5, high | correctness and fidelity to the brief and the design |
-| `structure-reviewer` | Opus 5.5, medium | the maintainability gate of every entry and batch slice |
-| `exec-lens-security` | Opus 5.5, medium | every diff |
-| `exec-lens-operations` | Opus 5.5, medium | every diff with the server's product code or the runtime |
-| `exec-lens-craft` | Opus 5.5, medium | the maintainability read of the whole branch, once per stage |
-| `video-scribe` | Sonnet 5.5, medium | a short video of what the agents did, per entry and once for the stage |
+| Agent | Model, effort | Packs | Does |
+|---|---|---|---|
+| the session | Opus 5.5, high | `pack-parallel-plan-local-ci` (its `SKILL.md` read once, before the first merge) | pre-flight, the goal, worktrees, pipelines, the machine's load, the merge queue and its signoff, amendments, batch slices, the record, the videos, the audit |
+| `verifier` | Opus 5.5, medium | — | writes the acceptance checks first (author); proves them on the running stack with evidence, the PII canary and the failure-mode block (prove) |
+| `builder` | Opus 5.5, medium; high on every fix | go-backend, react-frontend, design-taste, motion-3d, ops — the ones its surface needs | the single writer of an entry, back and front, the smallest change, until the gate commands are green |
+| `exec-gate` | Sonnet 5.5, medium | — | acceptance untouched, the gate commands, the surface, the stack, the base merged in at a conflict, the record |
+| `reviewer` | Opus 5.5, medium | go-backend, react-frontend | correctness and fidelity to the brief and the design |
+| `structure-reviewer` | Opus 5.5, medium | right-sizing, go-backend, react-frontend | the maintainability gate of every entry and batch slice; blocks a mechanism nobody named |
+| `ux-reviewer` | Opus 5.5, medium | design-taste, motion-3d, react-frontend | every diff with screen code, after the verifier: the real screens against the locked mock's frames |
+| `exec-lens-security` | Opus 5.5, high | — | every diff |
+| `exec-lens-operations` | Opus 5.5, medium | ops | every diff with the server's product code or the runtime |
+| `exec-lens-craft` | Opus 5.5, medium | — | the maintainability read of the whole branch, once per stage |
+| `video-scribe` | Sonnet 5.5, medium | — | a short video of what the agents did, per entry and once for the stage |
+
+Registered agents preload their packs through `skills:` in their
+frontmatter; the workflow also names each pack's `SKILL.md` in the
+prompt when it gets `packsDir`, which is how inline agents read them.
+The builder builds at medium because on work that must merge without
+edits Opus 5.5 scores best at medium and adds out-of-scope edits above
+it; every fix runs at high (`pack-model-selection`).
 
 ## Preconditions
 
-`.state.md` says `stage: execute`; `02-plan/plan.md` is approved with a
-brief per entry in `02-plan/briefs/`; the pre-flight is handed. The
-consuming project's `CLAUDE.md` names the codebase root, its
+`.state.md` says `stage: execute`; `02-plan/plan.md` is approved with
+its gate commands and a brief per entry in `02-plan/briefs/` (the
+acceptance lines, the golden paths, the names used from the
+foundation, the files it owns); `02-plan/preflight.md` lists what the
+user must hand over; discovery's locked mock is in
+`00-discovery/prototype/frames/` with its `00-discovery/journeys/*.yaml`.
+The consuming project's `CLAUDE.md` names the codebase root, its
 engineering doctrine, its **golden paths** file (the exemplary modules
-new code must look like) and the **gate commands** (the fast check, the
-affected tests against a base, the structure check). A missing golden
-paths file or structure check is a pre-flight item: halt, and ask the
-user for it once, before the foundation. Missing plan: halt, back to
+new code must look like), the **gate commands** (the fast check, the
+affected tests against a base, the structure check), the **whole
+gate**, and the **signoff** command (the project contract's local-CI
+signoff: it runs a gate command on one commit in a fresh worktree and
+posts the commit status on that sha; the pipeline-setup skill has a
+template). A missing golden paths file, structure check or signoff
+command joins the pre-flight (Step 0). Missing plan: halt, back to
 stage 3.
 
 ```
@@ -111,22 +147,56 @@ designs-root/<workstream>/
     └── audit.md               # at the end: what was decided in the user's place
 ```
 
-## Step 0 — open
+## Step 0 — pre-flight, then play
 
 If the session is not on **Opus 5.5 at high effort**, ask the user to
-switch (`/model`) and wait. Then read `plan.md`, every brief, the
-recon, the golden paths file, and the engineering doctrine's documents
-for local development and delivery (the pipeline's
-`docs/project-contract.md` names the roles). Ask the user for the goal
-only if he did not give it: "build the whole plan; call me when
-everything is merged and green." From then on he is not asked anything
-until the audit: the builder decides his classes conservatively and
-lists them for his veto, and the session unblocks every park that is
-not his in person (Step 3).
+switch (`/model`) and wait. Read `plan.md`, `preflight.md`, the
+pipeline's `docs/project-contract.md` (it names the roles) and the
+project's `CLAUDE.md`; every brief, the recon and the doctrine are read
+by the agents that use them, never by the session to look something up.
 
-Prepare the codebase: `feat/<workstream>` cut from `main` and pushed;
-the concurrency cap and the critical path from `plan.md` (the cap is
-the one measured in `02-plan/recon/machine.md`, with its load);
+**1. The pre-flight, once.** Show `02-plan/preflight.md` whole, as one
+table: item · why · the ready `!` command to paste (its **Do**) · what
+it blocks · status. Add to it what the session checks itself before
+the foundation: the golden paths file, the structure check, the whole
+gate and the signoff command named in `CLAUDE.md`; `gh auth status`
+able to post a commit status on the repository; the stack-up command
+of the doctrine bringing a stack up on `main`; the session's
+permission mode (auto mode, or a project allow list that covers the
+gate, the stack, the merges and the signoff), so no turn stops on a
+prompt. Then wait. As he hands each item over, run its **Check**
+command (it proves the item without printing a secret) and mark it;
+ask nothing else. When every item is checked, go on. An item he says
+he cannot give now is the only exception: the nodes it **Blocks** are
+parked `user` from the start, with the item as the reason, and
+everything else goes on.
+
+**2. Play.** Give him the goal to paste, filled in, in one code block:
+
+```
+/goal Build the whole plan of <workstream> with the stage-execute skill,
+from the foundation to the stage report, without asking me anything.
+Done means, each shown in this conversation: board.md has every entry
+and batch slice merged into feat/<workstream>, or parked only for what
+needs me in person, with its evidence; the whole gate ran once on the
+top of feat/<workstream> in a fresh worktree and exited 0, and the
+signoff posted local-ci = success on that sha (paste its line); the
+maintainability read is done and its blocking findings are merged;
+audit.md is written; the stage report (video, slides, blueprint) is
+published (paste the links). Decide what is mine conservatively and
+list it in the audit for my veto. Then notify me.
+```
+
+`/goal` keeps the session working turn after turn until a separate
+evaluator reads, in the conversation, that the condition holds; a
+running workflow defers the evaluation until it returns. From his
+paste until the end, he is not asked anything: the builder decides his
+classes conservatively and lists them for his veto, and the session
+unblocks every park that is not his in person (Step 3).
+
+**3. Prepare the codebase.** `feat/<workstream>` cut from `main` and
+pushed; the concurrency cap and the critical path from `plan.md` (the
+cap is the one measured in `02-plan/recon/machine.md`, with its load);
 `03-execution/board.md` with every entry `waiting`, the foundation
 first.
 
@@ -137,13 +207,13 @@ average (`cat /proc/loadavg`); above the median load `machine.md`
 measured at the cap, the start waits for the next run to finish.
 
 **The cap does not grow to go faster.** Past the measured cap every run
-gets slower and the stage does not: at five runs on a cap measured at
-one, the landings' runs took 88 minutes at the median against 35 at
-the ingestion's measured cap, the gate 13 minutes against 4.5, and the
-agents spent 15 hours waiting on the load. When the user asks for more
-in flight, the session shows him this and the measurement and keeps
-the cap; a higher cap comes only from a new measurement (the plan's
-`machine` scout run again with this workstream's suites) that holds it.
+gets slower and the stage does not: in one measured run, five runs on
+a cap measured at one took the median run from 35 to 88 minutes, the
+gate from 4.5 to 13, and the agents spent hours waiting on the load. A
+higher cap comes only from a new measurement (the plan's `machine`
+scout run again with this workstream's suites) that holds it. Width
+past the local cap comes from cloud sessions (Step 2), never from
+crowding this machine.
 
 ## Step 1 — the foundation
 
@@ -178,7 +248,10 @@ for it. For each:
    check, its affected tests against the entry's base, its structure
    check — in that order), `rulings.md`, the triage rule
    (`judgingPath: ${CLAUDE_SKILL_DIR}/references/judging.md`),
-   `agentsDir: ${CLAUDE_SKILL_DIR}/../../agents`, the evidence folder
+   `agentsDir: ${CLAUDE_SKILL_DIR}/../../agents`, `packsDir:
+   ${CLAUDE_SKILL_DIR}/..` (the packs' `SKILL.md` files, named in each
+   agent's prompt), `discoveryDir` (the workstream's `00-discovery/`:
+   the locked mock's frames and journeys), the evidence folder
    `03-execution/entries/<id>/`, the worktree and branch, the base
    (`feat/<workstream>`, or the branch it stacks on), `priorRuns` (the
    paths of the entry's earlier `run-<n>.json`, so no reviewer reports
@@ -191,8 +264,25 @@ for it. For each:
    written twice.
 3. **Record** the run id and `building` in `board.md`.
 
+**Past the local cap.** When the ready set is wider than the measured
+cap and the project provides a cloud runner (the project contract's
+role for it), the entries past the cap may run in cloud sessions, one
+entry per session, by [references/cloud.md](references/cloud.md):
+pushed first, the same brief and arguments, the code back on the
+entry branch and the evidence on an evidence branch, and the same
+queue, merged-tree test and signoff as any other. Without a
+runner the cap holds and the rest waits.
+
+**Stop hooks are not the gate.** A project may hold the builder's turn
+open with a Stop hook while its fast check is red. Claude Code
+overrides a Stop or SubagentStop hook after **8** consecutive blocks
+by default (`CLAUDE_CODE_STOP_HOOK_BLOCK_CAP`; 0 turns the cap off), so
+a hook can end silent on a red. The workflow never relies on it: after
+every builder return it runs the gate and reads its result.
+
 The session does not wait on a run and does not poll: the workflow's
-completion wakes it. Every reply while runs are in flight carries the
+completion wakes it (a cloud entry is watched by one background shell
+loop, never by model turns). Every reply while runs are in flight carries the
 board as a table (entry · state · round · run), read from the harness.
 
 ## Step 3 — what comes back
@@ -274,7 +364,35 @@ behind (never in a generated file). Its findings go through the same
 triage: blocking → exec-entry `mode: 'resume'` with them as the fixes
 file; nothing blocking → the queue.
 
-## Step 4 — the merge queue
+## Step 4 — the merge queue is the local CI
+
+The session is the **queue host**: the only process that merges into
+`feat/<workstream>` and the only one that runs the project's
+**signoff** command. Signoff runs one gate command on one commit in a
+fresh worktree (only what is committed and pushed counts), keeps a
+record per tree and command, and posts the result as a commit status
+on that sha:
+
+```
+gh api repos/:owner/:repo/statuses/<sha> -f state=success -f context=local-ci
+```
+
+No agent posts a status, and an agent's green is evidence, not a
+signoff. Hosted CI (GitHub Actions or another) is not on the merge
+path: it keeps the deploy and whatever cheap trust check the project
+wants (stage 5).
+
+```
+for each ready entry, one at a time
+  1 base in        feat moved? merge it into the entry branch (never a rebase); a conflict → exec-entry 'update'
+  2 merged tree    path guard (Owns ∪ Extends), then signoff, the affected gate, on the entry head —
+                   the tree the merge will make; red → resume
+  3 merge          git merge --no-ff into feat/<workstream>, push
+  4 sign off       signoff, the same gate, on the new feat head — same tree, its record reused, status posted
+  5 record         plan.md Status, board.md merged, start what it unblocked, triage its deferred lines
+once, at the end (Step 7)
+  whole gate       signoff, the whole gate, on the top of feat — the status main requires
+```
 
 One entry at a time: the critical path first, then in the order they
 came back. An amendment that changes a convention the entries in
@@ -283,27 +401,43 @@ golden path) waits while the critical entry in flight is `ready` or in
 its delta, and merges after it; an amendment the critical entry asked
 for goes to the front.
 
-1. If `feat/<workstream>` moved since the entry was cut, run exec-entry
-   with `mode: 'update'`: the base merged into the entry branch,
-   never a rebase (the entry branch is made of merges; a rebase replays
-   commits already resolved). A clean merge is verified by the gate
-   commands keep-going against the moved base; a conflict is resolved
-   by the builder and checked like any other code. Anything but
-   `ready` is parked.
-2. **The merge needs a green gate.** The return's `gate` is the gate
-   commands against the base on the head, in keep-going mode (every
-   step runs past a failure): the last gate before `ready`, or the
-   update's. The whole gate is not run per entry: it runs once, at the
-   end (Step 7), as its number grows with the suites. Every
-   `gate.checks[].green` is true; the session reads every check, never
-   only the first red; a red check, known or not, sends the entry back
-   through exec-entry.
-3. Merge the entry branch into `feat/<workstream>` with a merge commit,
-   push, remove the entry's worktree.
-4. The entry's line in `plan.md`'s Status: date · entry · sha · the
-   proof line (the verifier's verdict and its evidence folder).
-   `board.md` to `merged`. Start what it unblocked, and triage its
-   deferred lines (step 6).
+1. **The base in.** If `feat/<workstream>` moved since the entry was
+   cut, merge it into the entry branch in the entry worktree (`git
+   merge --no-ff feat/<workstream>`) and push: a merge, never a rebase
+   (the entry branch is made of merges; a rebase replays commits
+   already resolved). A clean merge adds no authored code. A conflict:
+   `git merge --abort`, then exec-entry `mode: 'update'`: the builder
+   resolves it and the resolution is checked like any other code;
+   anything but `ready` is parked.
+2. **The merged-tree test.** Signoff with the affected gate (the gate
+   commands against `feat/<workstream>`) on the entry's head, with the
+   per-merge context (`local-ci/affected`, or the one the project
+   names): that head holds the base, so its tree is the tree the merge
+   will produce. A merge git calls clean can still break the build or
+   a test; this run is what catches it. Before it, the path guard:
+   `git diff --name-only feat/<workstream>...<entry branch>` against
+   the brief's Owns and Extends; a path outside both goes back as a
+   resume item (move it, or an amendment when it is a shared file),
+   so two entries in flight never write the same file. Read every check, never only
+   the first red. Red → exec-entry `mode: 'resume'` with one item per
+   failure (the check, the log's path and its failing lines), then
+   this step again. The entry's own ready gate does not replace this
+   run: it ran before the base moved, inside an agent's tree.
+3. **Merge** the entry branch into `feat/<workstream>` with a merge
+   commit, push, remove the entry's worktree.
+4. **Sign off** the merged head: signoff with the same gate and
+   context on the new top of `feat/<workstream>`. Its tree is the one
+   step 2 passed, so the record is reused and only the status is
+   posted.
+5. **Record.** The entry's line in `plan.md`'s Status: date · entry ·
+   sha · the proof line (the verifier's verdict and its evidence
+   folder) · the signoff's line. `board.md` to `merged`. Start what it
+   unblocked, and triage its deferred lines (step 6).
+
+The whole gate is not run per entry: its time grows with the suites,
+and the affected gate on the merged tree is what each merge needs. It
+runs once, at the end (Step 7), and only that run posts the context
+`main` requires (`local-ci`).
 
 ## Step 5 — foundation amendments
 
@@ -340,7 +474,8 @@ learn log is not built here; it is the retro's.
    through exec-entry `mode: 'batch'` with `batchPath` and the
    `acceptance` files of the entries its lines touch. The builder
    applies the lines; the gate, the verifier and `structure-reviewer
-   (Opus 5.5, medium)` check it; it opens no new review. It merges
+   (Opus 5.5, medium)` check it, and `ux-reviewer (Opus 5.5, medium)`
+   when it changes screen code; it opens no new review. It merges
    through the queue.
 3. **Close** each line in `deferred.md`: `done` with the slice and its
    sha, or `skipped` with the reason (the code moved and the finding
@@ -360,11 +495,15 @@ When every entry and every batch slice is merged or parked:
    correction entry `X.<n>`, brief written by the session, run through
    exec-entry and merged like any other; the rest go to the audit and
    the learn log.
-1. The whole gate, once, on the top of `feat/<workstream>`: exec-gate
-   runs the whole gate command (the only whole run of the stage); then
-   the verifier, in prove mode, runs every acceptance check of the
-   stage on that top, with video. A red here is a fix entry: brief
-   written by the session, run through exec-entry, merged.
+1. **The whole gate, once**, on the top of `feat/<workstream>`:
+   signoff with the whole gate command and the context `main` requires
+   (`local-ci`), in a fresh worktree with its own stack. It runs every
+   acceptance check of the stage with the rest of the suites; it is
+   the only whole run of the stage. Green: the status is posted on
+   that sha, and stage 5 merges into `main` behind it. Red: one fix
+   entry, its brief written by the session with the log's path and
+   its failing lines, run through exec-entry, merged through the
+   queue; then the whole gate again on the new top.
 2. `explain.md` from [templates/explain.md](templates/explain.md): what
    was built, for the intern.
 3. `audit.md` by [references/audit.md](references/audit.md): the
@@ -386,8 +525,9 @@ When every entry and every batch slice is merged or parked:
    blueprint) — the blueprint built with
    `node "${CLAUDE_SKILL_DIR}/../../blueprint/build.mjs" <workstream>`
    and published.
-7. **PushNotification** to the user: everything merged and green, the
-   audit waiting.
+7. **PushNotification** to the user: everything merged, green,
+   verified and signed off, the stage report's links and the audit
+   waiting. This is the first time he is called since the pre-flight.
 
 ## Step 8 — the audit
 
@@ -409,7 +549,8 @@ harness, never assumed. Every agent named carries its model and effort.
 
 Everything is in files. Read `.state.md`, `board.md`, `parked.md`,
 `deferred.md`, `plan.md`'s Status and Amendments, and
-`entries/*/run-*.json`. An entry `building` with no live run restarts
+`entries/*/run-*.json`. A goal set with `/goal` is restored when the
+session is resumed. An entry `building` with no live run restarts
 from its branch with the `acceptance` of its last run: its worktree
 exists, and the builder reads what is on disk. Never from memory of a
 previous session.
@@ -418,7 +559,8 @@ previous session.
 
 The session writes no product code and reviews none. No deploy: alpha
 and production are stage 5's. No merge of anything that did not come
-back `ready`. No edit to an acceptance file outside the verifier's
+back `ready` and pass the merged-tree test. No commit status posted by
+anything but the signoff command, run by the session. No edit to an acceptance file outside the verifier's
 author mode. No re-decision of the design or the plan: what cannot be
 built as planned is an amendment the design already decides, or it is
 parked for the user. Frictions worth learning from go to the
