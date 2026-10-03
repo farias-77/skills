@@ -30,4 +30,4 @@ Versions and documented limits as checked in October 2026.
 - **goose v3.28.0.** `create` without `-s`, then `fix` in the queue
   (hybrid versioning).
 - **`plan-lint`** (inference). About 60 lines over the plan's JSON:
-  cycles, depth, first-step width, `Owns` overlap, producers.
+  cycles, depth, `Owns` overlap, producers; it reports the width.

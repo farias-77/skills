@@ -19,7 +19,8 @@ Use this pack in two situations:
 
 The project's doctrine names the commands for each role (gate, fast
 check, affected tests, generator, migrations), the shared files, the
-branches and the measured parallelism cap; `make verify`, `make gen`
+branches and the measured parallelism cap (it throttles the run, never
+the cut); `make verify`, `make gen`
 and `test-affected` here are illustrations.
 
 ## Principles
@@ -70,8 +71,8 @@ and `test-affected` here are illustrations.
 3. A journey that crosses entries lives in the entry that merges last,
    or in one integration entry `X-int` of size S. It never holds a whole
    entry back.
-4. After F, the graph is at most 2 edges deep, and the first step is at
-   least as wide as the measured cap (inference).
+4. After F, the graph is at most 2 edges deep. Its width is whatever
+   the needs allow; the machine's capacity never shapes the cut.
 5. The critical path is marked, and it is at most F + 2 × L.
 6. Each entry is at most L: one screen with its states, one server
    flow, about 2,500 changed lines (inference; the project's doctrine
@@ -219,7 +220,7 @@ and `test-affected` here are illustrations.
 4 size      S/M/L; split any L on the critical path into thinner vertical slices; shared part → F0
 5 levels    bottom(n) = size(n) + max bottom(successors); critical path = max from F
 6 widen     each edge on the critical path: fake it (step 3) or stack it; recompute
-7 accept    depth after F ≤ 2 · first-step width ≥ cap · no Owns overlap without an edge
+7 accept    depth after F ≤ 2 · no Owns overlap without an edge
 8 schedule  ready set by bottom level, descending, up to the measured cap;
             an entry starts on its producer's branch once that one is `ready` (stacked)
 ```

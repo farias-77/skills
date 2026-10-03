@@ -39,8 +39,8 @@ need to exist, and at what size). Its rules are not repeated here; this
 file says when each one runs. Two names differ from the pack's, so that
 stage 4's ids stay unambiguous: the pack's **F0** is the node `F`
 here, and the pack's **X-int** is the node `E-int` (`X.<n>` is stage
-4's fix entry). The pack's "first-step width ≥ cap" does not apply:
-the graph is cut as wide as the needs allow, whatever the machine.
+4's fix entry). The graph is cut as wide as the needs allow, whatever
+the machine.
 
 ## The words
 
