@@ -371,6 +371,10 @@ discovery folder, the brief template
 (`${CLAUDE_SKILL_DIR}/../../blueprint/schema/plan.md`), the project's
 `CLAUDE.md` and the language. It writes the header, "Provides",
 "Seams" and "Exemplars" of `briefs/F.md` and returns its questions.
+A helper F provides that has no caller until later nodes merge fails a
+linter that flags unused code; the brief names the one self-test that
+keeps such helpers in use, and the node that removes it once the
+callers exist, so no reviewer has to rule on it in stage 4.
 Answer them; wait until those sections have no open mark. If F
 splits, F-b's names run right after F's, the same way.
 

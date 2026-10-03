@@ -143,3 +143,9 @@ for any project that meets the bar.
 | The plan pins its checker | the plan's close writes `plan-graph.mjs`'s git blob into `plan.graph.json`'s `checker`; stage 4 runs that version for an amendment, or reads a newer checker's new rules as notes, never as reds | the checker changed during a run and re-judged a plan that had closed green |
 | Two-root projects | when the product repository has no `CLAUDE.md`, the session root's `CLAUDE.md` and the doctrine's contract table are the source of the roles; the bar says so | the execute stage looked for a `CLAUDE.md` the layout never has |
 | The foundation's own amendment | an amendment to the foundation's own Owns widens its node and brief, restarts it with its acceptance kept, and lists the amendment as closed in `closedAmendments` | the foundation stopped for files its own generators wrote |
+
+## Pass 4 (the execute E2E stopped by the user's call; lessons closed)
+| Change | Why |
+|---|---|
+| stage-execute: the load threshold carries the outside load read before the first run, and one run always goes (d8b715f) | on a shared machine at load 12–20 the threshold (nproc) never opened, so the root entries could never start in parallel |
+| stage-plan: F's brief names the self-test that keeps its not-yet-called helpers in use, and who removes it | a reviewer blocked that test in stage 4 because no written rule named it, which cost the foundation one more run |
