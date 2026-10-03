@@ -1,6 +1,6 @@
 ---
 name: stage-discovery
-description: Conducts stage 1 (Discovery) — an interview in which the user says what to build while a clickable mock of it is built and iterated in front of him. The mock is exact in look and behavior, every state reachable, fully faked and never fragile; he validates through it and locks it ("crava"). From the locked mock, journeys, use cases and acceptance criteria (given/when/then, tied to a journey step and a rule) are derived, a one-page PR-FAQ is written, one review round plus a delta runs, and the stage closes with video, slides and blueprint. The conductor is Opus 5.5 (medium; high on the turns that rule). Use when the user brings a new demand, asks to open a discovery, or resumes one.
+description: Conducts stage 1 (Discovery) — an interview in which the user says what to build while a clickable mock of it is built and iterated in front of him. The mock is exact in look and behavior, every state reachable, fully faked and never fragile; he validates through it and locks it ("lock it", in his words). From the locked mock, journeys, use cases and acceptance criteria (given/when/then, tied to a journey step and a rule) are derived, a one-page PR-FAQ is written, one review round plus a delta runs, and the stage closes with video, slides and blueprint. The conductor is Opus 5.5 (medium; high on the turns that rule). Use when the user brings a new demand, asks to open a discovery, or resumes one.
 disable-model-invocation: false
 argument-hint: "[slug]"
 allowed-tools: Read, Write, Edit, Glob, Grep, Agent, SendMessage, Workflow, AskUserQuestion, Artifact, ArtifactData, ArtifactComments, Skill, WebSearch, WebFetch, Bash(mkdir *), Bash(date *), Bash(ls *), Bash(cat *), Bash(cp *), Bash(rm *), Bash(git *), Bash(node *), Bash(sha256sum *)
@@ -12,7 +12,7 @@ He says everything that needs to be built. You compile it into
 something nobody can misread: a **mock** of the product, built while he
 talks, that looks and behaves exactly like what will be built, with
 every screen and every state, all of it faked and none of it fragile.
-He validates by using it. When he locks it ("crava"), the journeys, the
+He validates by using it. When he locks it ("lock it", in his words), the journeys, the
 use cases and the acceptance criteria are derived from it, so every
 later stage builds against a thing he clicked, not a text he read.
 
@@ -54,7 +54,7 @@ D2 mock loop    one journey clear → prototyper (Opus 5.5, medium) builds v1 in
                 D1 and D2 run together until no question passes the razor
 D3 lock gate    prototype-checker (Sonnet 5.5, high): the mechanical walk of every journey and
                 every state, the taste checklist on screenshots, his verdicts on this version
-D4 lock         he says "crava" → proto.mjs lock → LOCK.json, versions/vN.html, frames/
+D4 lock         he says "lock it" → proto.mjs lock → LOCK.json, versions/vN.html, frames/
 D5 derivation   journey-scribe (Sonnet 5.5, high) ∥ disc-author-prfaq (Sonnet 5.5, high)
                 → journeys/*.yaml, stories.md, pr-faq.md, their JSON → proto.mjs trace
 D6 review       discovery-review: round 1 whole, round 2 delta. You judge; his questions go
@@ -302,7 +302,7 @@ now and parking the visual polish as a named follow-up; he decides.
 ## D3 — the lock gate
 
 When no question passes the razor and he says the mock is right, or he
-says "crava" before the gate ran, dispatch
+says "lock it" before the gate ran, dispatch
 `prototype-checker (Sonnet 5.5, high)` with `index.html`, `notes.md`,
 the walk of this version, the verdict rows of this version (from
 `ArtifactData`, passed inline), the unanswered comments, and the
@@ -331,12 +331,12 @@ when:
 Show him the gate in one short table (check · result · the gaps). Gaps
 the prototyper can close go back to it; a gap that is his (an Inferred
 line, a journey he did not walk) becomes a question. He may lock over
-the gaps ("crava assim"): that is an override, recorded in `rulings.md`
+the gaps ("lock it as it is"): that is an override, recorded in `rulings.md`
 with the gaps listed, and the gaps travel to the blueprint.
 
 ## D4 — the lock
 
-He says "crava" (or its equivalent). Then:
+He says "lock it" (or its equivalent in his language). Then:
 
 ```
 node proto.mjs lock 00-discovery/prototype --words "<his words, verbatim>" [--override "<his words>"]
