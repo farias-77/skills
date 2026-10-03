@@ -94,7 +94,10 @@ cannot know, `__VIDEO_URL__` and `__BLUEPRINT_URL__`.
   `title: "<workstream title> · <Stage>"`,
   `auto_open: "after_first_write"`, and no files. The reply carries
   the deck's URL. The deck's look is the house identity in
-  `slides-scribe`: no design system is installed.
+  `slides-scribe`: no design system is installed. A stage may make one
+  more deck the same way before its report: design's sizing call, in
+  `01-design/call/`, eight slides with no video and no blueprint
+  placeholders.
 - **b. The blueprint.** Add the tab to `blueprint/stage-report.json`
   (`{"<tab>": {"video": "report/<tab>/video.mp4", "slides": "<deck URL>"}}`,
   keeping the earlier stages' keys), rebuild, and publish
@@ -105,7 +108,7 @@ cannot know, `__VIDEO_URL__` and `__BLUEPRINT_URL__`.
   kept. The build refuses a missing video, one over 10 MB, a tab that
   is not on the page or a slides link that is not a claude.ai
   Artifact. The page shows, above the tab's first section, the bar
-  **Assista · Leia · Aprofunde**: the player, the link to the slides,
+  **Watch · Read · Dig in** (in the workstream's language): the player, the link to the slides,
   and "you are here".
 
 **5 · Link both ways.** The blueprint already links the slides (4b).
@@ -148,25 +151,30 @@ The session passes the stage's paragraph to both scribes. The video
 tells it as a story in one or two minutes; the slides give the detail,
 one idea per slide.
 
-**Discovery — the demand, the stories, the decisions.** What is being
-asked and for whom, in the PR-FAQ's headline and the problem in one
-picture; the stories as a map, one line each, with what each lets the
-persona do; what stays out; the bets still open; and the decisions he
-took in the interview, with the inferences that were confirmed in his
-place on their own slide.
+**Discovery — the mock he locked, the stories, the decisions.** What
+is being asked and for whom, in the PR-FAQ's headline; the locked mock
+being used, journey by journey, from its frames, so he re-watches what
+he approved; the stories as a map, one line each, with what each lets
+the persona do; what stays out; and the decisions he took in the
+interview, with the inferences confirmed in his place on their own
+slide.
 
 **Design — how it works, the decisions taken, the risks.** The one
 picture of the system and the flow that matters most, step by step;
 what it costs at each scale; the decisions he took (those against the
 recommendation first) and, apart, the ones the conductor or a writer
 took in his place; the risks accepted, with who accepted them; how it
-reaches the first environment; the review in numbers.
+reaches the first environment; the review in numbers. And **why it is
+this size**: the three tiers in one picture, what got care and what was
+relaxed, the evolution path as the way it grows.
 
-**Plan — the cut, the order, the foundation.** From A to B in one
-picture; the foundation and why it comes first; the entries as a
-graph, with what can run in parallel and the edges that force an
-order; the proof each entry must show; what the pre-flight still needs
-from him; the rulings the conductor took in his place, listed for veto.
+**Plan — the graph, the width, the foundation.** From A to B in one
+picture; the thin foundation and why it comes first; the build as a
+flow of parallel lanes, the widest wave and the critical path drawn in
+the hot tone; the few edges that force an order and the proof behind
+each; the proof each node must show; what the pre-flight needs from
+him in person; every choice the conductor made in his place, listed
+for veto.
 
 **Execute — what was built, the proof, what was decided in his place.**
 What is merged, entry by entry, against the plan's graph; the proof
@@ -175,11 +183,16 @@ blocked and how it was fixed; the choices the builders and the session
 made in his place, and what is parked for his ruling at the audit.
 
 **Release — what went live, the gates.** What is in production, with
-its versions; the path through staging and production, gate by gate,
-with the reds and their fixes; his "go?" verbatim; what the watch
-read after the deploy and what is still left to an owner.
+its versions; his play verbatim; the path from the merge into `main`
+through staging and production, gate by gate, with the reds and their
+fixes; the rollout (the candidate smoked on its tag, the shift, the
+bake against the previous revision) or the straight deploy and its
+smoke; any rollback, with its trigger; the alarms' first evaluation and
+what is still left to an owner.
 
-**Close — what went wrong, the ideas.** The workstream in numbers;
+**Close — what went wrong, the ideas.** (For the team, the close also
+makes the launch video; this paragraph is his retro report.) The
+workstream in numbers;
 what worked; what went wrong, each with its cost and where it
 happened; the ideas each one suggests and where they would land; his
 own notes verbatim; what the sweep leaves for him to run.

@@ -19,28 +19,31 @@ pass**. The verdict is arithmetic, not mood.
 Never inflate severity to look productive — a reviewer is judged by the
 precision of its findings, not their count.
 
-## The bar is maximum; the judge calibrates
+## The bar is the requirement; the conductor rules
 
-Report at the highest bar, always — including what might be too strict
-for this system. Severity says how bad the finding is IF real; whether
-it proceeds is not the reviewer's call: the round's judge rules every
-finding: the conductor, by the stage's `references/judging.md`. At
-stages 1, 2 and 3 the ruling also names who decides the fix (the
-author or writer for wording, the user for product, scope, cost, the
-sequence and confirmed decisions, at design the implementer for
-declared latitude and at plan the builder for execution latitude), and
-**the user gives the final ruling on what is his**; at stage 4 the
-judge agent of each entry (`exec-judge`) rules every round, by
-`stage-execute/references/judging.md`, up to three rounds, and what is
-the user's parks for the audit; at stage 5 the release session rules
-the same way inside a fix row's two rounds, and the note rides into
-the release report; at stage 6 there are no reviewers: the harvesters
-report every friction with its evidence, the session suggests, and
-the user rules the board by reading. There is no scrutiny tier: the bar is the maximum
-everywhere, and the user is the filter. Never pre-soften a finding
-because the target is "just an internal tool" — and never inflate one
-to survive the judge; both distort the only thing a reviewer is judged
-by, precision.
+Report against the lock, the requirement and the floor the project's
+doctrine sets — not against the most hardened version imaginable. A
+mechanism no requirement names is itself a finding (`pack-right-sizing`,
+list C); a fix that adds a mechanism names its requirement (`req:`) and
+passes the same list. A stage may narrow the classes its lenses report:
+design reports only correctness, coverage of the lock, contradictions
+between documents and one-way doors.
+
+Severity says how bad the finding is IF real; whether it proceeds is
+not the reviewer's call. Who rules, per stage:
+
+| Stage | Who rules | How |
+|---|---|---|
+| discovery | the conductor, by `references/judging.md` | his product questions go out in one batch |
+| design | the conductor | the owner is the writer, the implementer (declared latitude) or his class; after his one call, his class is ruled conservatively (`ruled: conductor`) and listed for his veto |
+| plan | the conductor, every finding | owners: writer, conductor, builder; listed for his veto at the report |
+| execute | no judge: a mechanical triage, by `stage-execute/references/judging.md` | blocks with a repro or a written rule; the rest is deferred, details go to the learn log |
+| release | a fix row goes through the execute pipeline | the same triage |
+| close | no reviewers | the harvesters report every friction with its evidence |
+
+Never pre-soften a finding because the target is "just an internal
+tool" — and never inflate one to survive the ruling; both distort the
+only thing a reviewer is judged by, precision.
 
 ## Wrong, and missing
 

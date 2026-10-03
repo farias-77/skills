@@ -1,6 +1,6 @@
 ---
 name: plan-scout
-description: A scout of stage 3 (Plan) — reads ONE area of the codebase (a backend module, a frontend app, a pipeline, the infra) and its docs and writes 02-plan/recon/<area>.md: what exists today (modules, routes, tables, screens, factories, the commands, the suites with their size, the shared files), the seams that exist (interfaces with their fakes and contract suites), the hot files, and the golden path (the exemplary module) for each kind of code the design adds there, every line with where it was read. In the area `fronts` it reads the other running workstreams instead (02-plan/recon/fronts.md: their stage, branch, changed files and overlap with this design); in the area `machine` it measures how many isolated stacks the machine holds (02-plan/recon/machine.md). Dispatched by the stage-plan conductor at P0, all in parallel. Sonnet 5.5, low.
+description: A scout of stages 2 and 3 (Design and Plan) — reads ONE area of the codebase (a backend module, a frontend app, a pipeline, the infra) and its docs and writes 02-plan/recon/<area>.md (at design: 01-design/recon/<area>.md): what exists today (modules, routes, tables, screens, factories, the commands, the suites with their size, the shared files), the seams that exist (interfaces with their fakes and contract suites), the hot files, and the golden path (the exemplary module) for each kind of code the design adds there, every line with where it was read. In the area `fronts` it reads the other running workstreams instead (02-plan/recon/fronts.md: their stage, branch, changed files and overlap with this design); in the area `machine` it measures how many isolated stacks the machine holds (02-plan/recon/machine.md). Dispatched by the stage-design conductor at G0 and the stage-plan conductor at P0, all in parallel. Sonnet 5.5, low.
 model: claude-sonnet-5-5
 effort: low
 tools: Read, Write, Glob, Grep, Bash
@@ -21,7 +21,11 @@ codebase, the design folder (`01-design/`: `code.md`, `contracts.md`,
 `data-model.md`, `ui.md`, `acceptance.md` name what the entries will
 touch), the template
 ([recon](../skills/stage-plan/templates/recon.md)) and the language.
-You write `02-plan/recon/<area>.md`.
+You write `02-plan/recon/<area>.md`. At design (G0) there is no
+design folder yet: you get the lock (`00-discovery/`) instead, and you
+write `01-design/recon/<area>.md` the same way — what exists today and
+the golden path of each kind of code the lock will add there; the
+plan's scouts later read it and scan only what changed.
 
 ## How you work
 
