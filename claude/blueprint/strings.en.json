@@ -578,7 +578,8 @@
    "numbers": "The numbers",
    "precision": "Precision per reviewer",
    "retro": "The retro",
-   "sweep": "The sweep"
+   "sweep": "The sweep",
+   "metrics": "The delivery metrics"
   },
   "closedOn": "closed",
   "stages": {
@@ -586,7 +587,8 @@
    "design": "Design",
    "plan": "Plan",
    "execute": "Execute",
-   "release": "Release"
+   "release": "Release",
+   "close": "Close"
   },
   "cells": {
    "days": "days from opening to production",
@@ -686,6 +688,23 @@
    "openLede": "What the workstream left behind, cleaned or waiting.",
    "closedLede": "Closed: every line is done, or left for you with the command to run.",
    "none": "Nothing to sweep."
+  },
+  "metrics": {
+   "lede": "What the workstream cost, stage by stage, from each stage's own telemetry. A dash means the stage did not measure it; nothing is estimated. The exact figures live in 05-close/metrics.json.",
+   "leadTime": "days from the first commit to production",
+   "revertRate": "of the merged commits reverted",
+   "changeFailureRate": "of the production deploys rolled back or hotfixed",
+   "stage": "Stage",
+   "total": "All stages",
+   "none": "No stage recorded its telemetry.",
+   "keys": {
+    "wallClockH": "Wall-clock (h)",
+    "hisH": "Your hours",
+    "agentH": "Agent hours",
+    "tokensM": "Tokens (M)",
+    "rounds": "Rounds",
+    "costUSD": "Cost"
+   }
   }
  },
  "release": {

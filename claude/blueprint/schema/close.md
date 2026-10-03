@@ -10,6 +10,14 @@ that names no friction, a user note attached to an id that does not
 exist, a closed retro with a sweep line open, **a text over its word
 cap**.
 
+The delivery metrics are not in `retro.json`: the build reads
+`05-close/metrics.json` when it exists (stage-close
+`references/metrics.md`) and shows it in the Close tab, after the
+numbers: the lead time, the revert and change failure rates, and one
+row per stage (wall-clock, his hours, agent hours, tokens, rounds,
+cost) with the totals. It refuses a value there that is neither a
+number nor `null`, naming the field.
+
 ## The voice
 
 Short sentences, one idea each; the user's words verbatim. The reader

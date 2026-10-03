@@ -1144,6 +1144,25 @@
     const numTables = Object.entries(GROUPS).map(([g, keys]) => `<div class="tbl-wrap cnum"><table><thead><tr><th colspan="2">${SC.numbers.groups[g]}</th></tr></thead><tbody>${keys.map(k => `<tr><td>${SC.numbers.keys[k]}</td><td class="num">${N[k] == null ? `<span class="nil">—</span>` : `<b>${esc(N[k])}</b>`}</td></tr>`).join('')}</tbody></table></div>`).join('');
     sec('cl-numbers', SC.sec.numbers, SC.numbers.lede, `<div class="cnums">${numTables}</div>`);
 
+    // ---- 2b. the delivery metrics (05-close/metrics.json, from every stage's telemetry), when the close wrote them ----
+    const MX = C.metrics, SM = SC.metrics;
+    if (MX && SM) {
+      const pctv = v => v == null ? '—' : `${Math.round(v * 1000) / 10}%`;
+      const usd = v => v == null ? '—' : `$${esc(v)}`;
+      const MK = ['wallClockH', 'hisH', 'agentH', 'tokensM', 'rounds', 'costUSD'];
+      const cellv = (k, v) => k === 'costUSD' ? usd(v) : nv(v);
+      const rows = MX.stages.map(s => [SC.stages[s.stage] || esc(s.stage), ...MK.map(k => cellv(k, s[k]))]);
+      const T = MX.totals || {};
+      const tot = { cls: 'tot', cells: [SM.total, '', cellv('hisH', T.hisH), cellv('agentH', T.agentH), cellv('tokensM', T.tokensM), '', usd(T.costUSD)] };
+      sec('cl-metrics', SC.sec.metrics, SM.lede, `
+        <div class="cells ccells">
+          <div class="cell"><span class="v">${nv(MX.leadTimeDays)}</span><span class="l">${SM.leadTime}</span></div>
+          <div class="cell"><span class="v">${pctv(MX.revertRate)}</span><span class="l">${SM.revertRate}</span></div>
+          <div class="cell"><span class="v">${pctv(MX.changeFailureRate)}</span><span class="l">${SM.changeFailureRate}</span></div>
+        </div>
+        ${MX.stages.length ? tbl6([SM.stage, ...MK.map(k => '#' + SM.keys[k])], [...rows, tot], 'cprec') : none6(SM.none)}`);
+    }
+
     // ---- 3. precision per reviewer, grouped by stage; a reviewer that sustained under a fifth of what it found is marked ----
     const STG = ['discovery', 'design', 'plan', 'execute', 'release'], LK = ['found', 'sustained', 'deferred', 'latitude', 'dismissed'];
     const P = SC.precision;

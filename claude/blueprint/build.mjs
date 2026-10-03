@@ -762,6 +762,22 @@ if (existsSync(retroPath)) {
   };
   cwalk(C, '');
   if (problems.length) fail();
+  // the delivery metrics (stage-close references/metrics.md) live beside the retro, in 05-close/metrics.json; shown when present
+  const mPath = join(ws, '05-close', 'metrics.json');
+  if (existsSync(mPath)) {
+    const MW = '05-close/metrics.json';
+    const M = JSON.parse(readFileSync(mPath, 'utf8'));
+    const nn = (v, n) => { if (v != null && !(typeof v === 'number' && Number.isFinite(v))) problems.push(`${MW}: ${n} must be a number or null`); };
+    const SK = ['wallClockH', 'hisH', 'agentH', 'tokensM', 'rounds', 'costUSD'];
+    if (!Array.isArray(M.stages)) problems.push(`${MW}: stages must be a list`);
+    else M.stages.forEach((s, i) => { if (!s || typeof s.stage !== 'string') problems.push(`${MW}: stages[${i}].stage must be a stage name`); else SK.forEach(k => nn(s[k], `stages[${i}].${k}`)); });
+    nn(M.leadTimeDays, 'leadTimeDays');
+    if (M.totals != null) ['hisH', 'agentH', 'tokensM', 'costUSD'].forEach(k => nn(M.totals[k], `totals.${k}`));
+    ['revertRate', 'changeFailureRate'].forEach(k => { if (M[k] != null) nn(M[k].value, `${k}.value`); });
+    if (problems.length) fail();
+    C.metrics = { leadTimeDays: M.leadTimeDays ?? null, stages: (M.stages || []).map(s => Object.fromEntries(['stage', ...SK].map(k => [k, s[k] ?? null]))),
+      totals: M.totals || null, revertRate: M.revertRate?.value ?? null, changeFailureRate: M.changeFailureRate?.value ?? null };
+  }
   retro = C;
 }
 const tabs = ['discovery', ...(design ? ['design'] : []), ...(plan ? ['plan'] : []), ...(execution ? ['execution'] : []), ...(release ? ['release'] : []), ...(retro ? ['close'] : [])];
@@ -797,7 +813,7 @@ if (existsSync(layersPath)) {
 const data = {
   workstream, strings, figures, review, report, mock, design, plan, execution, release, retro, tabs, layers,
   ...prfaq, ...stories,
-  files: ['00-discovery/pr-faq.md', '00-discovery/stories.md', '00-discovery/journeys/', '00-discovery/prototype/LOCK.json', '00-discovery/prototype/frames/', '00-discovery/reviews.md', 'rulings.md', ...(design ? ['01-design/*.md', ...(design.sizing ? ['01-design/sizing.md'] : []), '01-design/notes.md', '01-design/reviews.md', '01-design/ui/'] : []), ...(plan ? ['02-plan/plan.md', '02-plan/briefs/', '02-plan/recon/', '02-plan/reviews.md'] : []), ...(execution ? ['03-execution/board.md', '03-execution/parked.md', '03-execution/entries/', '03-execution/audit.md', '03-execution/explain.md'] : []), ...(release ? ['04-release/plan.md', '04-release/trace.md', '04-release/notes/', '04-release/entries/', '04-release/proof/'] : []), ...(retro ? ['05-close/retro.md', '05-close/harvest/', '05-close/trace.md'] : [])],
+  files: ['00-discovery/pr-faq.md', '00-discovery/stories.md', '00-discovery/journeys/', '00-discovery/prototype/LOCK.json', '00-discovery/prototype/frames/', '00-discovery/reviews.md', 'rulings.md', ...(design ? ['01-design/*.md', ...(design.sizing ? ['01-design/sizing.md'] : []), '01-design/notes.md', '01-design/reviews.md', '01-design/ui/'] : []), ...(plan ? ['02-plan/plan.md', '02-plan/briefs/', '02-plan/recon/', '02-plan/reviews.md'] : []), ...(execution ? ['03-execution/board.md', '03-execution/parked.md', '03-execution/entries/', '03-execution/audit.md', '03-execution/explain.md'] : []), ...(release ? ['04-release/plan.md', '04-release/trace.md', '04-release/notes/', '04-release/entries/', '04-release/proof/'] : []), ...(retro ? ['05-close/retro.md', '05-close/metrics.json', '05-close/harvest/', '05-close/trace.md'] : [])],
   builtAt: new Date().toISOString().slice(0, 16).replace('T', ' ') + ' UTC',
 };
 // `</script` inside JSON would end the data block early; escape it.

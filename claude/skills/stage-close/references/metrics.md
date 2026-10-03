@@ -22,8 +22,9 @@ block in `.state.md`, a `telemetry.md`) goes through the `telemetry`
 harvester instead, with those paths.
 
 The retro's `numbers` (blueprint schema) stay as they are; these
-metrics live beside them, in their own file, because the blueprint's
-build accepts only its own keys.
+metrics live beside them, in their own file, and the blueprint's build
+reads that file and shows it in the Close tab ("The delivery
+metrics").
 
 ## `metrics.json`
 
