@@ -234,7 +234,11 @@ never coordinate the machine among themselves. The session holds the
 cap by the load: before it starts a run, it reads the load average
 (`cat /proc/loadavg`); above the median load `machine.md` measured at
 the cap (without `machine.md`: above the core count, `nproc`), the
-start waits for the next run to finish.
+start waits for the next run to finish. On a machine other work shares,
+the threshold carries that work: the session reads the load once before
+its first run, writes it on the board as the outside load, and holds the
+cap at the threshold plus that load. One run always goes: with none of
+its own running, the session starts the next one whatever the load.
 
 **The cap does not grow to go faster.** Past the measured cap every run
 gets slower and the stage does not: in one measured run, five runs on
