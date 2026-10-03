@@ -131,3 +131,15 @@ for any project that meets the bar.
 | Generators owned by the foundation | the plan's scouts run each generator once in a scratch worktree and list every path it writes; the foundation owns them all | the foundation asked for an amendment to its own generated files |
 | Smooth footage under load | `record.mjs --slow <rate>` slows the page's CSS animations and compresses the take back to real speed; the recorder checks the motion fps, not the whole take's | a loaded machine captured transitions at a few frames a second |
 | The 9:16 cut | the hero stack stays inside the phone frame; the step window and its caption use the lower band; titles end before the stack at 16:9 | cards ran off the edge and the bottom quarter stayed empty |
+
+## Pass 3
+
+| Change | Mechanism | Why |
+|---|---|---|
+| Machine reds and closed amendments | `exec-gate` tags a failure `machine` only for a timeout under load or a known infrastructure flake; a red that is only the machine's runs the gate again after a load wait, at most twice, then parks with reason `machine`; a mixed red sends only the code failures to the builder; the run takes `closedAmendments` and a builder asking twice for a closed one returns `repeats closed <id>` | a load timeout went to a builder that changed nothing, then the builder asked again for an amendment already applied |
+| Acceptance cites the criteria | a case in `acceptance.md` names its criterion by id (`J1.s2.1`) and carries only what the test adds (layer, setup, frame, the row read back, cleanup); the criterion's text lives in `stories.md` | the acceptance document copied every criterion and was the largest document of the design |
+| A size budget for the design | `review-prep.mjs` warns when one document passes 40 KB or the set passes 320 KB (`--doc-budget-kb`, `--total-budget-kb`); a warning never stops the round | a design for about four days of build reached half a megabyte of documents |
+| The cut ignores the machine | the parallel-plan pack drops "the first step at least as wide as the measured cap"; the cap throttles the run, never the cut | the pack contradicted the plan stage, which cuts as wide as the needs allow |
+| The plan pins its checker | the plan's close writes `plan-graph.mjs`'s git blob into `plan.graph.json`'s `checker`; stage 4 runs that version for an amendment, or reads a newer checker's new rules as notes, never as reds | the checker changed during a run and re-judged a plan that had closed green |
+| Two-root projects | when the product repository has no `CLAUDE.md`, the session root's `CLAUDE.md` and the doctrine's contract table are the source of the roles; the bar says so | the execute stage looked for a `CLAUDE.md` the layout never has |
+| The foundation's own amendment | an amendment to the foundation's own Owns widens its node and brief, restarts it with its acceptance kept, and lists the amendment as closed in `closedAmendments` | the foundation stopped for files its own generators wrote |
