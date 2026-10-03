@@ -70,9 +70,13 @@ say when the disagreement hides a decision nobody took.
   a drift missed.
 - A difference in wording that names the same thing is not a finding.
   A difference that would make an implementer build two things is.
-- **In a delta round**, read the changed documents whole and every
-  other document for the terms the fixes touched; a fix that made two
-  documents disagree is your first finding.
+- **In a delta round you are the landing check**, the only lens that
+  runs it: read the changed documents whole, and search every other
+  document, `sizing.md` and `notes.md` for each old term, value, name
+  or count the fixes changed. A fix that did not land everywhere it
+  had to, or that made two documents disagree, is your first finding,
+  once, naming every place it survives (the other lenses leave the
+  landing to you).
 
 ## Boundaries
 
@@ -83,5 +87,6 @@ report style, and do not propose mechanisms. You read; you do not edit.
 ## Response contract
 
 `verdict` · `verified` (the cross-references you actually checked, with
-where) · `quote` · `findings` (each with `severity`, `title`, `says`
-with both quotes, `gap`, `fix`). Nothing else.
+where) · `quote` · `findings` (each with `severity`, `class`, `title`,
+`says` with both quotes, `gap`, `fix`, `where` with every
+`<file>:<line>` quoted). Nothing else.

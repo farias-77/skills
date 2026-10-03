@@ -9,8 +9,11 @@
   at the close. MUST have, per round: every lens that ran with verdict,
   run id (from the workflow journal, not prose) and verified list; the
   flows read blind, with the keys where the two readers built
-  different products; every finding with the conductor's ruling, owner
-  and reason (the foreclosing sentence quoted on every dismissal), and,
+  different products; every finding (or merged group) as ONE ROW with
+  the conductor's ruling, owner and reason (the foreclosing sentence
+  quoted on every dismissal); the finding's own text (title, says,
+  gap, fix) stays in reviews/round-N.json and is never copied here;
+  and,
   for a finding of the user's class, the conductor's conservative
   ruling marked `ruled: conductor` (listed at the close for his veto).
   Written before anything is applied. Round 1 is whole and round 2 is
@@ -43,12 +46,12 @@
 
 ### Findings and rulings
 
-#### [<severity>] <lens>#<n> — <title>
+<!-- One row per finding or merged group (the workflow's `clusters` are
+     the candidates). The short lens name is enough: data#1. -->
 
-- **Finding:** <gap>
-- **Merged with:** <ids, or —>
-- **Ruling:** <sustained / deferred / dismissed> · owner <writer / user / implementer / —> — <reason; the sentence quoted on a dismissal>
-- **His class:** <`ruled: conductor` — the conservative pick and why, for his veto at the close; "—" otherwise>
+| Finding(s) | Severity | Class | Ruling | Owner | Reason |
+|---|---|---|---|---|---|
+| <data#1 + coverage#1> | <blocker / fix / detail> | <correctness / coverage / contradiction / door / size> | <sustained / deferred / dismissed> | <writer / implementer / his class / —> | <one or two sentences; the sentence quoted on a dismissal; for his class: `ruled: conductor`, the conservative pick and why> |
 
 ### The lists
 

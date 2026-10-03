@@ -5,9 +5,14 @@
  * physical, not discipline. Round 1 is whole: eleven lenses in
  * parallel with, per flow, two blind readers and a referee. Round 2 is
  * automatic and delta only: the lenses receive the documents and flows
- * that changed and the fixes that were applied, and check that each
- * fix landed and did not break its surroundings; the blind readers
- * reopen only the flows whose text changed. THERE IS NO ROUND 3: the
+ * that changed and the fixes that were applied; design-reviewer-
+ * consistency checks that each fix landed in every document it touches,
+ * and every other lens reads the changed text through its own lens
+ * only; the blind readers reopen only the flows whose text changed.
+ * ROUND 2 SEATS consistency plus each lens that had a sustained finding
+ * of severity blocker or fix in round 1 (a lens with only `detail`
+ * findings does not return): the conductor passes `lenses`, or each
+ * fix carries its `severity` and the seat is derived from the fix ids. THERE IS NO ROUND 3: the
  * script refuses round > 2. What is still sustained after round 2 is
  * applied with line proof and written as residue.
  *
@@ -33,9 +38,18 @@
  * stage-design/references/judging.md. The workflow returns the
  * findings as the lenses gave them, ids assigned.
  *
- * THE ARGS CARRY PATHS, NOT TEXT (the flows excepted: scripts cannot
- * read files). Every instruction lives in the agent definitions under
- * agents/ and in the shared reviewer contract.
+ * THE ARGS CARRY PATHS, NOT TEXT. The flows, and in round 2 the fixes,
+ * the changed documents and flows and the seat, are text a script cannot
+ * read from disk: stage-design/scripts/review-prep.mjs writes a copy of
+ * this file into the workstream's _run/ with them embedded (it replaces
+ * the EMBEDDED line below), so the args stay small. Args given
+ * explicitly win over the embedded values. Every instruction lives in
+ * the agent definitions under agents/ and in the shared reviewer
+ * contract.
+ *
+ * MERGE CANDIDATES: every finding names the places it quotes (`where`,
+ * `<file>:<line>`); findings that share a place are returned as one
+ * cluster in `clusters`, for the conductor to merge before ruling.
  *
  * RUNNING UNREGISTERED AGENTS: with args.inlineAgents, agent() is called
  * without agentType; the prompt points at <agentsDir>/<name>.md and at
@@ -59,15 +73,18 @@
  *     ],                          // verbatim: the conductor splits the Flows section at every "### "
  *     // round 2 only — the delta:
  *     changed: { docs: ['contracts', 'infra'], flows: ['create-leader'] },
- *     fixes:   [ { id: 'design-reviewer-data#1', doc: 'contracts', fix: 'what was applied, one line' } ],
- *     lenses:  ['design-reviewer-data', ...],   // optional: the lenses to run; default all.
- *                                               // round 2: the lenses with a sustained finding;
- *                                               // consistency and sizing always run
+ *     fixes:   [ { id: 'design-reviewer-data#1', doc: 'contracts', fix: 'what was applied, one line', severity: 'fix' } ],
+ *              // a merged group: id 'design-reviewer-data#1+design-reviewer-coverage#1'
+ *     lenses:  ['design-reviewer-data', ...],   // optional: the lenses to run; round 1 default all;
+ *                                               // round 2 default: the lenses of the fixes with
+ *                                               // severity blocker or fix; consistency always runs
  *   }})
  *
- * Returns { round, mode, valid, findings, lenses, unread } — findings
- * is every finding with its id, lens, flow (for referee findings),
- * severity, title, says, gap, fix; lenses is [{ lens, verdict,
+ * Returns { round, mode, valid, findings, clusters, byClass, lenses,
+ * unread } — findings is every finding with its id, lens, flow (for
+ * referee findings), severity, class, title, says, gap, fix, where;
+ * clusters lists the ids that share a quoted place; byClass counts the
+ * findings per class (the telemetry's table); lenses is [{ lens, verdict,
  * verified, quote, findings, invalid }] with the referees merged as
  * one `design-reviewer-ambiguity` entry; unread lists the flow ids
  * whose readings did not survive.
@@ -98,19 +115,26 @@ const AGENTS = {
   'design-reviewer-ambiguity': { model: 'sonnet', effort: 'low', packs: [] },
 }
 const ALL_LENSES = Object.keys(AGENTS).filter(n => n.startsWith('design-reviewer-') && n !== 'design-reviewer-ambiguity')
-const ALWAYS = ['design-reviewer-consistency', 'design-reviewer-sizing']
+const ALWAYS = ['design-reviewer-consistency']
+const CLASSES = ['correctness', 'coverage', 'contradiction', 'door', 'size']
+
+// review-prep.mjs replaces this line in the workstream's _run/ copy:
+const EMBEDDED = null
+const E = EMBEDDED ?? {}
 const REFEREE = 'design-reviewer-ambiguity'
 const READER = 'design-blind-reader'
 
 const FINDING = {
   type: 'object', additionalProperties: false,
-  required: ['severity', 'title', 'says', 'gap', 'fix'],
+  required: ['severity', 'class', 'title', 'says', 'gap', 'fix', 'where'],
   properties: {
     severity: { type: 'string', enum: ['blocker', 'fix', 'detail'] },
+    class: { type: 'string', enum: CLASSES, description: 'correctness (it would not work, or the repo says otherwise) · coverage (a piece of the lock with no home) · contradiction (two documents, or a document and sizing.md or notes.md, disagree) · door (a one-way door) · size (a mechanism with no requirement, or above its pick)' },
     title: { type: 'string' },
     says: { type: 'string', description: 'what the material says, verbatim or "nothing"' },
     gap: { type: 'string', description: 'the concrete problem, through this lens' },
     fix: { type: 'string', description: 'the concrete change that would resolve it' },
+    where: { type: 'array', items: { type: 'string', description: '<file>:<line> as the file has it now (contracts.md:55, notes.md:49), one per place quoted' } },
   },
 }
 
@@ -173,19 +197,25 @@ if (round > 2) throw new Error(`round ${round}: there is no round 3 — what is 
 const language = args?.language ?? 'en'
 const glossary = args?.glossary ?? ''
 const inline = args?.inlineAgents === true
-const allFlows = Array.isArray(args?.flows) ? args.flows.filter(f => f && f.id && f.text) : []
-const delta = round > 1 && args?.changed ? { docs: args.changed.docs ?? [], flows: args.changed.flows ?? [] } : null
-const fixes = Array.isArray(args?.fixes) ? args.fixes : []
+const allFlows = (Array.isArray(args?.flows) ? args.flows : Array.isArray(E.flows) ? E.flows : []).filter(f => f && f.id && f.text)
+const changed = args?.changed ?? E.changed
+const delta = round > 1 && changed ? { docs: changed.docs ?? [], flows: changed.flows ?? [] } : null
+const fixes = Array.isArray(args?.fixes) ? args.fixes : Array.isArray(E.fixes) ? E.fixes : []
 const mode = delta ? 'delta' : 'whole'
-// whole round: every flow and every lens; delta round: the flows whose text changed, the lenses asked for (plus the two that always run)
 const flows = delta ? allFlows.filter(f => delta.flows.includes(f.id)) : allFlows
-const asked = Array.isArray(args?.lenses) && args.lenses.length ? args.lenses.filter(l => ALL_LENSES.includes(l)) : ALL_LENSES
-const LENSES = [...new Set([...asked, ...ALWAYS])]
+// whole round: every flow and every lens; delta round: the flows whose text changed and the seat:
+// the lenses asked for, else the lenses of the fixes whose finding was a blocker or a fix (a fix
+// with no severity seats its lens), plus consistency, which always runs
+const lensesOf = (id) => String(id).match(/design-reviewer-[a-z]+/g) ?? []
+const seatFromFixes = () => [...new Set(fixes.filter(f => !f.severity || ['blocker', 'fix'].includes(f.severity)).flatMap(f => lensesOf(f.id)))].filter(l => ALL_LENSES.includes(l))
+const askedList = Array.isArray(args?.lenses) && args.lenses.length ? args.lenses : Array.isArray(E.lenses) && E.lenses.length ? E.lenses : null
+const asked = askedList ? askedList.filter(l => ALL_LENSES.includes(l)) : delta ? seatFromFixes() : ALL_LENSES
+const LENSES = ALL_LENSES.filter(l => asked.includes(l) || ALWAYS.includes(l))
 if (!allFlows.length) log('no flows passed in args — the blind reads are skipped this round; pass flows: [{id, text}] to run them')
 if (delta) log(`delta round: docs ${delta.docs.join(', ') || '(none)'} · flows ${delta.flows.join(', ') || '(none)'} · ${fixes.length} fix(es) applied · lenses ${LENSES.length} of ${ALL_LENSES.length}`)
 if (round > 1 && !delta) log('round 2 without `changed` — running whole; pass changed and fixes to run the delta')
 
-const docInputs = `Round ${round}, ${mode}.
+const docInputs = (lens) => `Round ${round}, ${mode}.
 The design: ${args.designDir} — the ten documents, sizing.md (the size, decided), tiers/ (the detail of each tier), notes.md (the frame, what exists today, the user's rulings), recon/ and research/.
 The lock it must build (the product the user approved): ${args.discoveryDir} — stories.md, journeys/*.yaml, prototype/ with its frames/, pr-faq.md
 The floor (never traded for speed): §3 D of ${args.packsDir ?? '<packsDir>'}/pack-right-sizing/SKILL.md
@@ -196,7 +226,9 @@ Language of the documents: ${language}${delta ? `
 
 THIS IS ROUND 2, THE DELTA, AND THE LAST. The documents that changed since round 1: ${delta.docs.join(', ') || '(none)'}. The flows whose text changed: ${delta.flows.join(', ') || '(none)'}. The fixes that were applied, each with the finding it answers:
 ${fixes.map(f => `- ${f.id} (${f.doc}): ${f.fix}`).join('\n') || '(none listed)'}
-Read the changed documents whole and every other document for what the fixes touched. Report: a fix that did not land as described, a fix that broke its surroundings or another document, a fix that added a mechanism with no requirement, and anything new in the changed text. Text no fix touched was read and passed in round 1; a finding on it needs the razor at full strength.` : ''}`
+${lens === 'design-reviewer-consistency'
+    ? `You check the landing: read the changed documents whole, and search every other document, sizing.md and notes.md for each term, value, name or count the fixes changed. Report a fix that did not land as described, an old term, value or count that survives anywhere (as anything but a negation), and two documents that now disagree.`
+    : `Whether each fix reached every document is design-reviewer-consistency's check and the conductor's search, not yours: do not report a fix that is missing from another document. Read the changed documents whole, through your lens only, and report a fix that is wrong through your lens, a fix that broke its surroundings, a fix that added a mechanism with no requirement, and anything new in the changed text.`} Text no fix touched was read and passed in round 1; a finding on it needs the razor at full strength.` : ''}`
 
 // One call shape for registered and inline agents.
 const call = (name, prompt, opts) => {
@@ -313,7 +345,7 @@ log(`round ${round} (${mode}): ${LENSES.length} lenses · ${flows.length} flows 
 const [lensResults, flowResults] = await parallel([
   () => parallel(LENSES.map(name => () =>
     reviewed(() =>
-      call(name, docInputs, { label: `${name}·r${round}`, phase: 'Lenses', schema: REVIEW }),
+      call(name, docInputs(name), { label: `${name}·r${round}`, phase: 'Lenses', schema: REVIEW }),
       name).then(r => ({ lens: name, ...r }))
   )),
   () => pipeline(
@@ -357,7 +389,22 @@ for (const r of lenses) r.findings.forEach((f, i) => {
 const valid = !(flows.length > 0 && perFlow.length === 0)
 if (!valid) log(`round ${round} is INVALID: ${flows.length} flow(s) to read, none survived — fix the cause (language, keys) and run the round again`)
 
-const bySeverity = (s) => findings.filter(f => f.severity === s).length
-log(`round ${round}: ${findings.length} finding(s) — ${bySeverity('blocker')} blocker · ${bySeverity('fix')} fix · ${bySeverity('detail')} detail${lenses.some(l => l.invalid) ? ' · INVALID lens: ' + lenses.filter(l => l.invalid).map(l => l.lens).join(', ') : ''} → the conductor judges by references/judging.md`)
+// Merge candidates: findings that quote the same place (union by a shared
+// `<file>:<line>`). Candidates only: the conductor merges by the fix.
+const placeKey = (w) => String(w).trim().replace(/^`|`$/g, '').replace(/^.*\//, '').replace(/[-–]\d+$/, '').toLowerCase()
+const parent = new Map(findings.map(f => [f.id, f.id]))
+const root = (id) => { while (parent.get(id) !== id) id = parent.get(id); return id }
+const firstAt = new Map()
+findings.forEach(f => (Array.isArray(f.where) ? f.where : []).map(placeKey).filter(k => /:\d+$/.test(k)).forEach(k => {
+  if (firstAt.has(k)) parent.set(root(f.id), root(firstAt.get(k))); else firstAt.set(k, f.id)
+}))
+const groups = new Map()
+findings.forEach(f => { const r = root(f.id); groups.set(r, [...(groups.get(r) ?? []), f.id]) })
+const clusters = [...groups.values()].filter(g => g.length > 1)
+const byClass = Object.fromEntries(CLASSES.map(c => [c, findings.filter(f => f.class === c).length]))
+if (clusters.length) log(`merge candidates (findings that quote the same place): ${clusters.map(g => g.join(' + ')).join(' | ')}`)
 
-return { round, mode, valid, findings, lenses, unread }
+const bySeverity = (s) => findings.filter(f => f.severity === s).length
+log(`round ${round}: ${findings.length} finding(s) — ${bySeverity('blocker')} blocker · ${bySeverity('fix')} fix · ${bySeverity('detail')} detail · ${CLASSES.map(c => `${byClass[c]} ${c}`).join(' · ')}${lenses.some(l => l.invalid) ? ' · INVALID lens: ' + lenses.filter(l => l.invalid).map(l => l.lens).join(', ') : ''} → the conductor judges by references/judging.md`)
+
+return { round, mode, valid, findings, clusters, byClass, lenses, unread }

@@ -20,7 +20,16 @@ Eleven lenses and a referee per flow read the same documents, so one
 defect arrives as several findings (the same orphan column seen by
 data, coverage and sizing). Before ruling, group the findings whose
 fix is the same edit and rule the group once: one ruling, one owner,
-the ids of the merged findings listed in the reason.
+the ids of the merged findings listed in the reason. The workflow's
+`clusters` (findings that quote the same `<file>:<line>`) are the
+candidates; confirm each by the fix, not by the place.
+
+A `contradiction` between two documents where one of them owns the
+name or the value (`data-model`, `contracts` and `code` own the names;
+`sizing.md` the tiers and hours; `notes.md` his rulings and your
+answers) is sustained, owner `writer`, toward the owner, in one row:
+the two quotes are the reason. Open the files only when neither side
+owns it.
 
 ## The ruler
 
@@ -146,6 +155,10 @@ at most `deferred`, never `dismissed`:
   and note.
 - **In round 2, a finding on text no fix touched gets the razor at
   full strength.** Round 1 read that text and passed it.
+- **In round 2, a fix that did not land is one finding**, the
+  consistency lens's (the others leave the landing to it); the
+  `propagation-check.mjs` run before the round should have caught it,
+  so name the term your search missed in `dreaming-notes.md`.
 - **Name a recurrence.** When `reviews.md` shows the same class
   sustained in round 1 and the fix did not move the document, say so,
   and rule it as his class.
@@ -155,9 +168,10 @@ at most `deferred`, never `dismissed`:
 
 ## What you write
 
-In `reviews.md`, before any fix is sent: per finding (or merged
-group), the id, lens, severity, title, ruling, owner, reason with the
-quote. Then the lists the round produced: to the writers (by
+In `reviews.md`, before any fix is sent: one row per finding (or
+merged group): the ids, severity, class, ruling, owner, reason with
+the quote. The finding's own text stays in `reviews/round-N.json`;
+never copy it. Then the lists the round produced: to the writers (by
 document), his class ruled in his place (by decision), to latitude (by
 document), to the evolution path, dismissed. `design-review.json` is
 filled from this file at the close, so the user reads every dismissal
