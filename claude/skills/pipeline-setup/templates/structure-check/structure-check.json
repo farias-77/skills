@@ -1,0 +1,65 @@
+{
+  "calibratedAt": "run `structure-check.sh --calibrate <repo> <ref> --write` to fill the thresholds below",
+  "languages": {
+    "go": { "ext": [".go"], "tool": "lizard" },
+    "ts": { "ext": [".ts", ".tsx", ".js", ".jsx", ".mjs", ".cjs"], "tool": "tsparser" },
+    "py": { "ext": [".py"], "tool": "lizard" },
+    "java": { "ext": [".java", ".kt"], "tool": "lizard" }
+  },
+  "testPaths": [
+    "_test\\.go$",
+    "\\.(spec|test)\\.[cm]?[jt]sx?$",
+    "(^|/)(e2e|tests?|__tests__|testdata)/",
+    "(^|/)test_[^/]+\\.py$"
+  ],
+  "exclude": [
+    "(^|/)(node_modules|dist|build|vendor|\\.next|coverage)/",
+    "(^|/)generated/",
+    "\\.gen\\.",
+    "\\.pb\\.go$",
+    "\\.d\\.ts$",
+    "\\.min\\.js$"
+  ],
+  "thresholds": {
+    "go/product": { "ccn_warn": 8, "nloc_warn": 26, "ccn_fail": 11, "nloc_fail": 36 },
+    "go/test": { "ccn_warn": 8, "nloc_warn": 26, "ccn_fail": 13, "nloc_fail": 40 },
+    "ts/product": { "ccn_warn": 4, "nloc_warn": 46, "ccn_fail": 8, "nloc_fail": 80 },
+    "ts/test": { "ccn_warn": 3, "nloc_warn": 35, "ccn_fail": 5, "nloc_fail": 50 }
+  },
+  "fileLines": {
+    "product": { "warn": 250, "fail": 400 },
+    "test": { "warn": 400, "fail": 700 }
+  },
+  "duplication": {
+    "minTokens": 50,
+    "minLines": 5,
+    "rate": { "product": 3.0, "test": 4.0 },
+    "failOn": ["product"],
+    "ignore": ["**/node_modules/**", "**/dist/**", "**/vendor/**", "**/generated/**", ".git/**"]
+  },
+  "boundaries": [
+    {
+      "id": "example/domain-is-pure",
+      "files": "^backend/internal/[^/]+/domain/",
+      "forbid": "^\\s*(import\\s+)?\"(net/http|database/sql|os)\"",
+      "rule": "<doctrine file>:<line> — the domain layer imports no transport, storage or OS"
+    },
+    {
+      "id": "example/feature-only-via-index",
+      "files": "^frontend/src/features/",
+      "forbid": "from ['\"](@/|\\.\\./)+features/[^/'\"]+/(?!index)",
+      "rule": "<doctrine file>:<line> — another feature is imported only through its index"
+    },
+    {
+      "id": "example/no-wall-clock-in-domain",
+      "files": "^backend/internal/",
+      "except": "^backend/internal/platform/clock/",
+      "forbid": "time\\.Now\\(",
+      "rule": "<doctrine file>:<line> — time comes from the injected clock"
+    }
+  ],
+  "dependencies": {
+    "requirePinned": true,
+    "otherManifests": ["pyproject.toml", "Cargo.toml", "Gemfile", "pom.xml", "build.gradle", "composer.json"]
+  }
+}
