@@ -6,7 +6,7 @@ user-invocable: false
 
 # Pack: right-sizing a design
 
-## When this pack applies
+## 1 · When this pack applies
 
 Read it before you produce or judge a design: the three tiers, the
 pick for each part, `sizing.md`, or a review asking "does this need to
@@ -28,7 +28,7 @@ the alarm set, the test floor, which deferrals it has already named
 (an outbox, high availability) and how the system grows; where this
 pack gives a default, the doctrine's choice wins.
 
-## Principles
+## 2 · Principles
 
 1. **Set the appetite, then design.** Write the hours before any tier.
    *Why:* "Appetites start with a number and end with a design" (Shape
@@ -65,7 +65,7 @@ pack gives a default, the doctrine's choice wins.
     never shrink. *Why:* trimming review by guessed risk level
     undervalues the task that turns out to matter.
 
-## The checklist
+## 3 · The checklist
 
 Every item is pass/fail on the tier files, `sizing.md` or a design
 document.
@@ -164,7 +164,7 @@ cites its requirement.
 - E2. "Nothing to cut" or "nothing missing" is a complete answer.
 - E3. A fix that adds a mechanism must pass list C first.
 
-## Anti-patterns
+## 4 · Anti-patterns
 
 **Hardening on hardening.** Typical proposals and what they should
 have been:
@@ -200,9 +200,9 @@ a status column and one guard would do.
 - a window of raw snapshots kept so the database can be rebuilt;
 - a timeline the user asked for.
 
-## Core recipes
+## 5 · Core recipes
 
-### The procedure
+### R1 · The procedure
 
 1. **Bound the work.** Read the lock and the recon. Write the appetite
    in hours and the no-gos. If the stories do not fit, propose cuts to
@@ -224,7 +224,7 @@ a status column and one guard would do.
 8. **Write `sizing.md`** in one page
    ([references/recipes.md](references/recipes.md)).
 
-### Scoring rubric for each part
+### R2 · Scoring rubric for each part
 
 The scale is our own construction (inference), built on Bezos, SRE and
 YAGNI.
@@ -243,9 +243,11 @@ Pick with need = R × V:
 - C = 3 with need ≤ 4 → flag C6 or C14.
 - A tie → lean.
 
-The default retry, alarm and cap values, the tier ladder, the
-`sizing.md` template, the evolution-path rules and one platform's
-retry defaults are in
-[references/recipes.md](references/recipes.md). Mechanical checks are
-in [references/tooling.md](references/tooling.md); sources in
-[references/sources.md](references/sources.md).
+The other recipes are in [references/recipes.md](references/recipes.md):
+**R3** the tier ladder, **R4** the `sizing.md` template and the
+evolution-path rules, **R5** the default retry, alarm and cap values,
+and one platform's retry defaults. **§6**, the mechanical checks with
+the `req:` trace convention, is
+[references/tooling.md](references/tooling.md); sources in
+[references/sources.md](references/sources.md). Agents cite this pack
+by these numbers (§3 C1, §5 R2); keep them when editing.

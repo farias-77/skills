@@ -1,4 +1,4 @@
-# Right-sizing: tooling
+# Right-sizing: tooling (§6)
 
 Mechanical checks for the checklist in [../SKILL.md](../SKILL.md).
 Replace the `<…>` placeholders with the folders the project's doctrine

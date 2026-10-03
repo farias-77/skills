@@ -2,7 +2,7 @@
 
 Longer patterns behind [../SKILL.md](../SKILL.md).
 
-## Default values
+## R5 · Default values
 
 - **Synchronous call, human in the loop:** up to 3 attempts in about
   5 s, then a visible failed state and a log line that alarms.
@@ -14,7 +14,7 @@ Longer patterns behind [../SKILL.md](../SKILL.md).
   budget alert.
 - **Caps:** one per abusable endpoint, with the value in config.
 
-## The tier ladder
+## R3 · The tier ladder
 
 The cells name roles; the project's doctrine and golden paths name the
 concrete primitive that fills each one (which database, which queue,
@@ -30,7 +30,7 @@ which worker, which alarm set, which test floor).
 | Ops | the doctrine alarms the change touches | + one state alarm per new main-path failure | + dashboards, anomaly alarms |
 | Tests | the doctrine's test floor (the AC test first) | + journeys for the named failure states | + matrices, load |
 
-## `sizing.md`
+## R4 · `sizing.md` and the evolution path
 
 ```
 # Sizing — <workstream>
@@ -41,7 +41,7 @@ Appetite: 6 h · Pick: 5.5 h · Run cost: +US$ 1/month · No-gos: …
 ## Evolution path      | Part | Now | Signal | Next step | Cost |
 ```
 
-## The evolution path
+### The evolution path
 
 Rules:
 - The signal carries a number, and something already watches it: an
