@@ -8,6 +8,12 @@
   the layout the project's engineering doctrine fixes; name the
   patterns and the extension points, each with the line of what does
   NOT change. When nothing in the layout changes, say so and why.
+
+  Written in the FIRST wave, with data-model and contracts: this file
+  fixes the names of the code the other seven documents copy (files,
+  modules, components, exported functions, the test files), each
+  spelled once. A test case's name is acceptance.md's; the tree lists
+  the file it lives in.
 -->
 
 ## Size and evolution

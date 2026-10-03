@@ -58,7 +58,7 @@ forces it. The forms:
 | `doctrine:<file>#<anchor>` | a line of the project's engineering doctrine |
 | `floor:D<n>` | an item of the floor (the right-sizing pack, §3 D) |
 | `door:<name>` | a one-way door named in `sizing.md` |
-| `signal:<name>` | an evolution-path signal of `sizing.md` (the watcher of it) |
+| `signal:<part>` | the evolution-path row of that part in `sizing.md` (its signal and watcher), by the part as `sizing.md` names it (`signal:compute.feed`); never an alias |
 | `ruling:<date>#<n>` | a line of `rulings.md` |
 
 Several are separated by commas: `(req: J1.s2.1, floor:D2)`. A
@@ -118,7 +118,7 @@ the **execution** inside that shape, and the design says the bound.
 | infra | resources, every config that encodes a rule or a cost (timeout, memory, PITR, region), IAM by the verb, cost at three scales | resource names within the convention; tags; stack organization |
 | observability | which alarms exist, what each catches, whom it wakes, the threshold and its argument | log format beyond the required fields; dashboard metrics without an alarm |
 | rollout | deploy order, gates, rollback per step | the exact script of each step, as long as it meets its "confirmed when" |
-| code | where the layout departs from the doctrine's structure | everything else in the layout: the doctrine is the rule, `code.md` a guide |
+| code | where the layout departs from the doctrine's structure; the names of the code the other documents copy (files, components, exported functions, test files) | everything else in the layout: the doctrine is the rule, `code.md` a guide |
 | acceptance | the case list and what each one proves | request bodies, fixtures, execution order |
 
 The hard classes, the left column condensed, never sit in the
@@ -143,13 +143,17 @@ A step that leaves room produces two builds and a finding.
 
 **Ten writers, one system.** Each document is written by its own
 writer from the same sources (`sizing.md`, the tier files, the notes,
-the research), in two waves: `data-model` and `contracts` fix the
-names, the other eight copy them. So every document names the thing
-the way those two name it, takes every value from the sources (never
-from memory),
-and says where the exact form lives when it is another document's
-("the whole shape is in `contracts.md`"). The consistency lens reads
-the ten together and reports every drift.
+the research), in two waves: `data-model`, `contracts` and `code` fix
+the names, the other seven copy them. `data-model` and `contracts` own
+the names of the data and the wire; `code` owns the names of the code:
+files, modules, components, exported functions, the test files. A test
+case is named only in `acceptance.md`: another document says what the
+case proves and points there, and never coins a case name. So every
+document names the thing the way its owner names it, takes every value
+from the sources (never from memory), and says where the exact form
+lives when it is another document's ("the whole shape is in
+`contracts.md`"). The consistency lens reads the ten together and
+reports every drift.
 
 **Infra is proved the doctrine's way.** An acceptance case proves an
 alarm expression, a schedule, a permission or a resource config the way
