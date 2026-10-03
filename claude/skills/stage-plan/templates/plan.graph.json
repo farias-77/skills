@@ -11,9 +11,11 @@
     "nodes[].needs: optional, the P2 classification kept for the audit: {name, class: shared|data|interface|ui|side-effect|e2e, resolved: F | factory | fake | edge:<id> | E-int}.",
     "size: S · M · L, and L is the cap (one screen with its states and one server flow, about 2,500 changed lines with tests). weights turn sizes into the critical path's length.",
     "name: at most 8 words (the blueprint's cap), the same in plan.md, the brief and the blueprint.",
+    "checker: written at the close, never before: the path of the plan's checker in the pipeline repo and its git blob sha (git hash-object), the version whose green closed the plan. Stage 4 runs that version or reads a newer one's new rules as notes.",
     "target.maxAcs: optional. Omitted, the checker's AC guide per slice is 8 scaled by the discovery's grain (ACs per journey step or frame state); over it is a warning: size the node by screens, flows and lines."
   ],
   "workstream": "<workstream-slug>",
+  "checker": { "path": "claude/skills/stage-plan/scripts/plan-graph.mjs", "blob": "<git hash-object of plan-graph.mjs, at the close>" },
   "target": { "depth": 2, "sizeCap": "L" },
   "weights": { "S": 1, "M": 2, "L": 3 },
   "acs": ["<J01.s1.1>", "<J01.s2.1>"],

@@ -494,6 +494,18 @@ with `acceptanceRevision`. A deferred line whose fix touches a shared
 file becomes an amendment the same way, at its triage (step 6), never
 an edit inside a batch slice.
 
+**The plan's checker is pinned.** This stage never re-judges a closed
+plan with a newer checker. `plan.graph.json`'s `checker.blob` is the
+git blob of the `plan-graph.mjs` whose green closed the plan. When an
+amendment runs the checker and `git hash-object` of the current
+`plan-graph.mjs` differs, run the pinned one:
+`git -C <pipeline repo> show <blob> > <workstream>/_run/plan-graph-pinned.mjs`,
+then `node` on that copy. When the blob is not in the repo, or the
+plan carries no `checker` (closed before the pin), run the current
+one, and a red the amendment did not cause (a node it did not touch,
+a rule the plan's close did not run) is a note in the dreaming notes,
+never a red.
+
 ## Step 6 — the deferred batch
 
 Every deferred finding is this execution's, and it is built in this

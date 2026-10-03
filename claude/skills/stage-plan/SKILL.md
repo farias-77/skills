@@ -532,14 +532,19 @@ Then the checker with `--briefs` once more: the plan files are final.
    each), the residue, the pre-flight (item · blocks · `!` command),
    and the stage's telemetry in one line, from `02-plan/telemetry.json`
    (wall-clock, agents, rounds, findings by class, tokens, cost).
-5. **Close**: `telemetry.json` closed (`closedAt`, the totals);
+5. **Close**: pin the checker whose green closed the plan:
+   `git hash-object "${CLAUDE_SKILL_DIR}/scripts/plan-graph.mjs"`
+   into `plan.graph.json`'s `checker`
+   (`{ "path": "claude/skills/stage-plan/scripts/plan-graph.mjs", "blob": "<sha>" }`),
+   so stage 4 never re-judges the plan with a newer one;
+   `telemetry.json` closed (`closedAt`, the totals);
    `.state.md` to `stage: execute`; the close commit of the
    workstream folder (push only on his explicit word); suggest `/clear`
    before stage 4.
 
 **A veto after the report.** If he answers with a change, apply it as
 an amendment: `plan.graph.json` and `plan.md` first, the checker
-green, the writers' apply batches, propagation, the checker with
+green and pinned again, the writers' apply batches, propagation, the checker with
 `--briefs`, rebuild and republish; the video and slides only when the
 change alters what they show. His words go to `rulings.md`. A pattern
 in what he vetoes goes to `taste-notes.md`.
