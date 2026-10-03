@@ -1,0 +1,751 @@
+<title>Feature mock</title>
+<!--
+  prototype-shell.html: the starting point of every discovery mock.
+
+  ONE self-contained page, published as a claude.ai artifact. The publish
+  step wraps it in the doctype, head and body, so this file has none of
+  them. Scripts only from cdnjs / jsdelivr / unpkg (this shell needs none);
+  fonts only from Google Fonts; no alert, confirm or prompt; works at
+  400px; both themes through tokens.
+
+  What the prototyper edits (four places, each one a block with an id):
+    1. the title                    the feature's name + "mock"
+    2. style block id=tokens        the project's exported tokens (or the defaults)
+    3. style block id=product       the screens' CSS, scoped under #screen
+    4. script block id=product      P.define({...}): copy, seed, screens, frames, journeys, actions
+  The blocks marked SHELL are not edited; a shell fix goes to the template.
+
+  Addressing (only a bare #token reaches the page inside an artifact):
+    #screen.state                     a frame, e.g. #invites.empty
+    #play-J2  #play-J2.s3             the journey panel on that journey (and step)
+    modifiers joined by "~":          ~light ~dark ~LANG ~phone ~desktop ~bare ~fast
+    e.g. #invite-form.failed~dark~pt-BR~bare   (what the frame renderer opens)
+
+  Test surface for tools: window.proto (see the SHELL API block).
+-->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500&display=swap">
+
+<style id="tokens">
+/* ── PROJECT TOKENS ────────────────────────────────────────────────────────
+   Replace this block with the project's exported tokens (tokens.css from the
+   project contract's "design tokens and components, exported" role). Keep the
+   three-block shape: light values on bare :root; dark values under the media
+   query guarded by :not([data-theme="light"]); the same dark values again on
+   [data-theme="dark"]. The shell and the screens read only the names below:
+   when the project's names differ, map them here (--background: var(--app-bg)).
+   Defaults: a neutral monochrome set with status colors, contrast-checked. */
+:root {
+  --font-sans: "Geist", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-mono: "Geist Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  --background: oklch(.99 0 0);
+  --foreground: oklch(.18 0 0);
+  --card: oklch(1 0 0);
+  --muted: oklch(.965 0 0);
+  --muted-foreground: oklch(.46 0 0);
+  --border: oklch(.91 0 0);
+  --input: oklch(.60 0 0);
+  --ring: oklch(.18 0 0);
+  --primary: oklch(.18 0 0);
+  --primary-foreground: oklch(.99 0 0);
+  --success: oklch(.52 .13 150);
+  --warning: oklch(.80 .15 85);
+  --warning-text: oklch(.50 .11 70);
+  --danger: oklch(.53 .19 27);
+  --danger-foreground: oklch(.99 0 0);
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --ease-out: cubic-bezier(.23, 1, .32, 1);
+  --ease-drawer: cubic-bezier(.32, .72, 0, 1);
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --background: oklch(.16 0 0); --foreground: oklch(.96 0 0); --card: oklch(.19 0 0);
+    --muted: oklch(.22 0 0); --muted-foreground: oklch(.71 0 0); --border: oklch(.29 0 0);
+    --input: oklch(.54 0 0); --ring: oklch(.96 0 0); --primary: oklch(.96 0 0); --primary-foreground: oklch(.16 0 0);
+    --success: oklch(.74 .15 150); --warning: oklch(.83 .15 85); --warning-text: oklch(.83 .15 85);
+    --danger: oklch(.70 .17 25); --danger-foreground: oklch(.16 0 0);
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --background: oklch(.16 0 0); --foreground: oklch(.96 0 0); --card: oklch(.19 0 0);
+  --muted: oklch(.22 0 0); --muted-foreground: oklch(.71 0 0); --border: oklch(.29 0 0);
+  --input: oklch(.54 0 0); --ring: oklch(.96 0 0); --primary: oklch(.96 0 0); --primary-foreground: oklch(.16 0 0);
+  --success: oklch(.74 .15 150); --warning: oklch(.83 .15 85); --warning-text: oklch(.83 .15 85);
+  --danger: oklch(.70 .17 25); --danger-foreground: oklch(.16 0 0);
+  color-scheme: dark;
+}
+</style>
+
+<style id="shell">
+/* ── SHELL: the mock's chrome. It recedes; the product is the subject. ───── */
+:root {
+  --chrome-bg: color-mix(in oklch, var(--muted) 70%, var(--background));
+  --chrome-fg: var(--foreground);
+  --chrome-dim: var(--muted-foreground);
+  --chrome-line: var(--border);
+  --chrome-hi: color-mix(in oklch, var(--foreground) 8%, transparent);
+}
+*, *::before, *::after { box-sizing: border-box; }
+html, body { height: 100%; }
+body { margin: 0; background: var(--background); color: var(--foreground); font: 14px/1.5 var(--font-sans); -webkit-font-smoothing: antialiased; }
+html[data-still] *, html[data-still] *::before, html[data-still] *::after { transition: none !important; animation: none !important; }
+#proto { min-height: 100%; display: flex; flex-direction: column; }
+.pr-bar { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 40; display: flex; flex-wrap: wrap; align-items: center; gap: 8px 10px; padding: 8px 16px; background: var(--chrome-bg); border-bottom: 1px solid var(--chrome-line); font-size: 12px; color: var(--chrome-dim); }
+.pr-bar[data-collapsed] > :not(.pr-keep) { display: none; }
+.pr-name { font-weight: 600; color: var(--chrome-fg); font-size: 13px; display: flex; align-items: center; gap: 8px; }
+.pr-ver { font: 500 11px/1 var(--font-mono); padding: 4px 6px; border-radius: var(--radius-sm); border: 1px solid var(--chrome-line); color: var(--chrome-dim); }
+.pr-field { display: flex; align-items: center; gap: 6px; }
+.pr-field > span { white-space: nowrap; }
+.pr-bar select, .pr-panel select { font: inherit; font-size: 12px; color: var(--chrome-fg); background: var(--background); border: 1px solid var(--chrome-line); border-radius: var(--radius-sm); padding: 4px 6px; min-height: 28px; max-width: 190px; }
+.pr-seg { display: inline-flex; border: 1px solid var(--chrome-line); border-radius: var(--radius-sm); overflow: hidden; }
+.pr-seg button { font: inherit; font-size: 12px; border: 0; background: transparent; color: var(--chrome-dim); padding: 4px 8px; min-height: 28px; cursor: pointer; }
+.pr-seg button + button { border-left: 1px solid var(--chrome-line); }
+.pr-seg button[aria-pressed="true"] { background: var(--chrome-hi); color: var(--chrome-fg); font-weight: 500; }
+.pr-btn { font: inherit; font-size: 12px; font-weight: 500; color: var(--chrome-fg); background: var(--background); border: 1px solid var(--chrome-line); border-radius: var(--radius-sm); padding: 4px 10px; min-height: 28px; cursor: pointer; }
+.pr-btn[aria-pressed="true"] { background: var(--chrome-fg); color: var(--background); border-color: var(--chrome-fg); }
+.pr-btn:disabled { opacity: .5; cursor: default; }
+.pr-spacer { flex: 1 1 0; }
+.pr-token { font: 11px/1.4 var(--font-mono); color: var(--chrome-fg); user-select: all; padding: 4px 6px; border-radius: var(--radius-sm); background: var(--chrome-hi); overflow-wrap: anywhere; }
+.pr-net-hot { color: var(--danger); font-weight: 600; }
+.pr-problems { flex-basis: 100%; color: var(--danger); font: 12px/1.4 var(--font-mono); white-space: pre-wrap; }
+.pr-body { flex: 1 1 auto; display: flex; min-height: 0; }
+.pr-panel { width: 320px; flex: 0 0 320px; background: var(--chrome-bg); border-right: 1px solid var(--chrome-line); overflow: auto; font-size: 13px; }
+.pr-panel.pr-back { border-right: 0; border-left: 1px solid var(--chrome-line); }
+.pr-panel h2 { margin: 0; font-size: 12px; font-weight: 600; color: var(--chrome-dim); letter-spacing: .04em; text-transform: uppercase; }
+.pr-phead { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 12px 16px; border-bottom: 1px solid var(--chrome-line); position: sticky; top: 0; background: var(--chrome-bg); z-index: 1; }
+.pr-close { display: none; }
+.pr-jlist { list-style: none; margin: 0; padding: 8px; display: grid; gap: 4px; }
+.pr-j { display: grid; grid-template-columns: 16px minmax(0, 1fr) auto; gap: 8px; align-items: start; width: 100%; text-align: left; font: inherit; color: var(--chrome-fg); background: transparent; border: 1px solid transparent; border-radius: var(--radius-md); padding: 8px; cursor: pointer; }
+.pr-j:hover { background: var(--chrome-hi); }
+.pr-j[aria-current="true"] { background: var(--background); border-color: var(--chrome-line); }
+.pr-j small { display: block; color: var(--chrome-dim); font-size: 12px; }
+.pr-dot { width: 10px; height: 10px; border-radius: 50%; margin-top: 5px; border: 1.5px solid var(--chrome-dim); }
+.pr-dot[data-s="ok"] { background: var(--success); border-color: var(--success); }
+.pr-dot[data-s="change"] { background: var(--danger); border-color: var(--danger); }
+.pr-dot[data-s="part"] { background: linear-gradient(90deg, var(--chrome-dim) 50%, transparent 50%); }
+.pr-jid { font: 500 11px/1.6 var(--font-mono); color: var(--chrome-dim); }
+.pr-steps { list-style: none; margin: 0; padding: 0 8px 8px; display: grid; gap: 8px; }
+.pr-step { background: var(--background); border: 1px solid var(--chrome-line); border-radius: var(--radius-md); padding: 12px; display: grid; gap: 8px; }
+.pr-step[data-now] { border-color: var(--ring); box-shadow: 0 0 0 1px var(--ring); }
+.pr-step header { display: flex; gap: 8px; align-items: baseline; }
+.pr-step header b { font-weight: 600; }
+.pr-kv { display: grid; grid-template-columns: 56px minmax(0, 1fr); gap: 2px 8px; font-size: 12px; color: var(--chrome-dim); margin: 0; }
+.pr-kv dt { color: var(--chrome-dim); }
+.pr-kv dd { margin: 0; color: var(--chrome-fg); overflow-wrap: anywhere; }
+.pr-acts { display: flex; flex-wrap: wrap; gap: 6px; }
+.pr-verdict { font-size: 12px; color: var(--chrome-dim); }
+.pr-verdict[data-v="ok"] { color: var(--success); }
+.pr-verdict[data-v="change"] { color: var(--danger); }
+.pr-note { width: 100%; min-height: 64px; font: inherit; font-size: 13px; color: var(--foreground); background: var(--background); border: 1px solid var(--input); border-radius: var(--radius-sm); padding: 8px; resize: vertical; }
+.pr-jtools { display: flex; flex-wrap: wrap; gap: 6px; padding: 8px 16px 12px; }
+.pr-foot { padding: 12px 16px 16px; color: var(--chrome-dim); font-size: 12px; border-top: 1px solid var(--chrome-line); }
+.pr-tabs { display: flex; gap: 4px; padding: 8px 16px 0; }
+.pr-tabs button { font: inherit; font-size: 12px; border: 0; border-bottom: 2px solid transparent; background: none; color: var(--chrome-dim); padding: 6px 4px; cursor: pointer; }
+.pr-tabs button[aria-selected="true"] { color: var(--chrome-fg); border-bottom-color: var(--chrome-fg); }
+.pr-fx { list-style: none; margin: 0; padding: 8px 16px 16px; display: grid; gap: 8px; }
+.pr-fx li { border: 1px solid var(--chrome-line); background: var(--background); border-radius: var(--radius-md); padding: 8px 10px; display: grid; gap: 4px; }
+.pr-fx li[data-new] { border-color: var(--ring); }
+.pr-kind { font: 500 11px/1 var(--font-mono); text-transform: uppercase; letter-spacing: .04em; color: var(--chrome-dim); }
+.pr-fx pre, .pr-tbl { margin: 0; font: 11px/1.5 var(--font-mono); white-space: pre-wrap; overflow-wrap: anywhere; color: var(--chrome-fg); }
+.pr-tblwrap { overflow-x: auto; padding: 0 16px 16px; }
+.pr-tblwrap h3 { font: 600 12px/1 var(--font-mono); margin: 12px 0 6px; color: var(--chrome-dim); }
+.pr-tblwrap table { border-collapse: collapse; font: 11px/1.4 var(--font-mono); }
+.pr-tblwrap th, .pr-tblwrap td { border: 1px solid var(--chrome-line); padding: 4px 6px; text-align: left; white-space: nowrap; }
+.pr-empty { padding: 16px; color: var(--chrome-dim); font-size: 12px; }
+.pr-stage { flex: 1 1 auto; min-width: 0; overflow: auto; padding: 24px 16px; display: flex; justify-content: center; align-items: flex-start; }
+.pr-device { position: relative; width: 100%; max-width: 100%; background: var(--background); color: var(--foreground); }
+html[data-width="phone"] .pr-device { width: 390px; min-height: 760px; border: 1px solid var(--chrome-line); border-radius: 24px; overflow: hidden; }
+html[data-width="desktop"] .pr-device { width: 1440px; max-width: none; min-height: 860px; border: 1px solid var(--chrome-line); border-radius: var(--radius-lg); overflow: hidden; }
+html[data-width="desktop"] .pr-stage { justify-content: flex-start; }
+html[data-bare] .pr-bar, html[data-bare] .pr-panel { display: none !important; }
+html[data-bare] .pr-stage { padding: 0; overflow: visible; }
+html[data-bare] .pr-device { width: 100% !important; max-width: none; min-height: 100vh; border: 0 !important; border-radius: 0 !important; }
+#screen { min-height: inherit; }
+#screen.pr-enter { animation: pr-in 180ms var(--ease-out); }
+@keyframes pr-in { from { opacity: 0; transform: translateY(4px); } }
+@media (prefers-reduced-motion: reduce) { @keyframes pr-in { from { opacity: 0; } } }
+.pr-ring { position: absolute; pointer-events: none; border-radius: var(--radius-md); box-shadow: 0 0 0 2px var(--background), 0 0 0 4px var(--ring); transition: opacity 200ms var(--ease-out); z-index: 30; }
+.pr-toast { position: absolute; left: 50%; bottom: 16px; transform: translateX(-50%); background: var(--foreground); color: var(--background); padding: 8px 14px; border-radius: var(--radius-md); font-size: 13px; z-index: 31; max-width: calc(100% - 32px); }
+.pr-crash { margin: 24px; padding: 16px; border: 1px solid var(--danger); border-radius: var(--radius-md); color: var(--danger); font: 12px/1.5 var(--font-mono); white-space: pre-wrap; }
+.pr-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+:focus-visible { outline: 2px solid var(--ring); outline-offset: 2px; }
+@media (max-width: 1099px) {
+  .pr-panel { position: fixed; z-index: 50; left: 0; right: 0; bottom: 0; width: auto; max-height: 72vh; border: 0; border-top: 1px solid var(--chrome-line); border-radius: var(--radius-lg) var(--radius-lg) 0 0; box-shadow: 0 -8px 24px color-mix(in oklch, var(--foreground) 12%, transparent); padding-bottom: env(safe-area-inset-bottom, 0px); }
+  .pr-panel.pr-back { border-left: 0; }
+  .pr-close { display: inline-flex; }
+}
+</style>
+
+<style id="product">
+/* ── PRODUCT: the screens' CSS. Scope every rule under #screen. Values come
+   from the tokens; no literal colors. ─────────────────────────────────── */
+#screen .ex { max-width: 720px; margin: 0 auto; padding: 32px 16px; display: grid; gap: 16px; }
+#screen .ex h1 { margin: 0; font-size: 24px; line-height: 1.2; font-weight: 600; text-wrap: balance; }
+#screen .ex p { margin: 0; color: var(--muted-foreground); }
+#screen .ex-list { list-style: none; margin: 0; padding: 0; border: 1px solid var(--border); border-radius: var(--radius-md); }
+#screen .ex-list li { padding: 12px 16px; display: flex; justify-content: space-between; gap: 12px; }
+#screen .ex-list li + li { border-top: 1px solid var(--border); }
+#screen .ex-btn { justify-self: start; font: inherit; font-weight: 500; background: var(--primary); color: var(--primary-foreground); border: 0; border-radius: var(--radius-sm); padding: 8px 14px; min-height: 36px; cursor: pointer; transition: transform 160ms var(--ease-out); }
+#screen .ex-btn:active { transform: scale(.97); }
+</style>
+
+<div id="proto">
+  <header class="pr-bar" id="pr-bar" aria-label="Mock controls"></header>
+  <div class="pr-body">
+    <aside class="pr-panel" id="pr-journeys" aria-label="Journeys" hidden></aside>
+    <main class="pr-stage" id="pr-stage">
+      <div class="pr-device" id="pr-device">
+        <div id="screen" data-comment-target></div>
+      </div>
+    </main>
+    <aside class="pr-panel pr-back" id="pr-backstage" aria-label="Backstage" hidden></aside>
+  </div>
+  <div class="pr-sr" id="pr-live" aria-live="polite"></div>
+</div>
+
+<script id="shell-core">
+/* ── SHELL: core. Defines window.P, the API the product block uses. ─────── */
+(() => {
+  'use strict';
+  const P = window.P = {};
+  const ESC = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' };
+  const esc = v => String(v).replace(/[&<>"']/g, c => ESC[c]);
+  class Raw { constructor(s) { this.s = s; } toString() { return this.s; } }
+  const part = v => v == null || v === false ? '' : v instanceof Raw ? v.s : Array.isArray(v) ? v.map(part).join('') : esc(v);
+  /** html`<p>${text}</p>` escapes every value; arrays join; P.raw() passes trusted markup. */
+  P.html = (strings, ...vals) => new Raw(strings.reduce((a, s, i) => a + s + (i < vals.length ? part(vals[i]) : ''), ''));
+  P.raw = s => new Raw(String(s));
+  P.esc = esc;
+
+  const state = P._ = {
+    model: null, store: null, lang: 'en', net: 'ok', fast: false, still: false, bare: false,
+    variant: null, effects: [], requests: [], pending: 0, missing: new Set(), problems: [],
+    reached: new Set(), seq: 0,
+  };
+  P.problem = msg => { if (!state.problems.includes(msg)) { state.problems.push(msg); console.error('[mock] ' + msg); } };
+
+  /** Copy: t('invite.sent', {email}) — every visible string is a key in every language. */
+  P.t = (key, vars) => {
+    const table = (state.model && state.model.copy[state.lang]) || {};
+    let s = table[key];
+    if (s == null) { state.missing.add(state.lang + ':' + key); return '⟦' + key + '⟧'; }
+    if (typeof s === 'object') {
+      const n = vars && typeof vars.count === 'number' ? vars.count : 0;
+      s = s[new Intl.PluralRules(state.lang).select(n)] ?? s.other;
+    }
+    return vars ? String(s).replace(/\{(\w+)\}/g, (m, k) => vars[k] != null ? (typeof vars[k] === 'number' ? P.fmt.number(vars[k]) : vars[k]) : m) : String(s);
+  };
+  P.lang = () => state.lang;
+  P.fmt = {
+    number: (n, o) => new Intl.NumberFormat(state.lang, o).format(n),
+    money: (n, currency) => new Intl.NumberFormat(state.lang, { style: 'currency', currency: currency || state.model?.meta.currency || 'USD' }).format(n),
+    date: (d, o) => new Intl.DateTimeFormat(state.lang, o || { dateStyle: 'medium' }).format(new Date(d)),
+    time: (d, o) => new Intl.DateTimeFormat(state.lang, o || { timeStyle: 'short' }).format(new Date(d)),
+    relative: (n, unit) => new Intl.RelativeTimeFormat(state.lang, { numeric: 'auto' }).format(n, unit),
+  };
+  /** The mock's clock is fixed (meta.clock), so every frame renders the same. */
+  P.now = () => new Date(state.model?.meta.clock || '2026-01-15T09:00:00Z');
+
+  /** Side effects the screen cannot show: rows, e-mails, events, jobs, alarms. Shown in the backstage. */
+  P.effect = (kind, data) => { state.effects.push(Object.assign({ kind: String(kind) }, data, { _seq: ++state.seq })); };
+  /** The current screen's view: { state, fields, ...whatever the product keeps }. */
+  P.view = () => state.store.view[state.store.screen];
+  /** Move to a screen and state (inside an action). Extra keys merge into that screen's view. */
+  P.nav = (screen, st, extra) => {
+    const s = state.store;
+    if (!state.model.screens[screen]) P.problem(`P.nav: no screen "${screen}"`);
+    s.view[screen] = Object.assign({ fields: {} }, s.view[screen], extra || {}, { state: st });
+    s.screen = screen;
+  };
+  /** The frame token of what is on screen now. */
+  P.frame = () => state.store ? state.store.screen + '.' + P.view().state : '';
+  P.variant = () => state.variant;
+
+  /** Fake network. The debug bar (or a journey step's `net`) sets the answer of the NEXT request:
+      ok · slow · error · timeout. fn runs only on ok/slow and does the write (db + effects). */
+  P.request = (name, fn) => {
+    const mode = state.net;
+    P._setNet('ok');
+    state.requests.push({ name, answer: mode, _seq: ++state.seq });
+    const ms = ({ ok: 600, slow: 2400, error: 700, timeout: 6000 })[mode] * (state.fast ? 0.02 : 1);
+    state.pending++;
+    return new Promise((resolve, reject) => setTimeout(() => {
+      state.pending--;
+      if (mode === 'ok' || mode === 'slow') { try { resolve(fn ? fn() : undefined); } catch (e) { reject(e); } }
+      else reject({ code: mode });
+    }, ms));
+  };
+  /** A transient message (not part of any frame). A message a frame must show belongs to the view state. */
+  P.toast = (text, ms = 3200) => {
+    const dev = document.getElementById('pr-device');
+    const el = document.createElement('div');
+    el.className = 'pr-toast'; el.setAttribute('role', 'status'); el.textContent = text;
+    dev.appendChild(el);
+    document.getElementById('pr-live').textContent = text;
+    if (!state.still) setTimeout(() => el.remove(), ms);
+  };
+  P.render = () => P._render && P._render();
+
+  /** The product's single entry point. Validates the model and shows every problem in the bar. */
+  P.define = model => {
+    const m = Object.assign({ meta: {}, copy: {}, screens: {}, frames: {}, journeys: [], actions: {}, variants: [] }, model);
+    m.meta = Object.assign({ name: 'Mock', version: 1, languages: Object.keys(m.copy) }, m.meta);
+    if (!m.meta.languages.length) m.meta.languages = ['en'];
+    const TOKEN = /^[A-Za-z0-9][A-Za-z0-9_-]*(\.[A-Za-z0-9_-]+)+$/;
+    if (typeof m.seed !== 'function') P.problem('P.define: seed must be a function returning a fresh store');
+    for (const [tok, f] of Object.entries(m.frames)) {
+      if (!TOKEN.test(tok)) P.problem(`frame "${tok}": tokens are <screen>.<state>, letters digits _ - and dots only`);
+      if (!m.screens[tok.split('.')[0]]) P.problem(`frame "${tok}": no screen "${tok.split('.')[0]}"`);
+      if (!f || !f.title) P.problem(`frame "${tok}": needs a title`);
+    }
+    for (const [name, sc] of Object.entries(m.screens)) if (typeof sc.render !== 'function') P.problem(`screen "${name}": needs render(s, P)`);
+    const jids = new Set();
+    for (const j of m.journeys) {
+      if (!/^J\d+$/.test(j.id || '')) P.problem(`journey "${j.id}": ids are J1, J2, …`);
+      if (jids.has(j.id)) P.problem(`journey "${j.id}": duplicate id`); jids.add(j.id);
+      if (!m.frames[j.start]) P.problem(`journey ${j.id}: start "${j.start}" is not a frame`);
+      if (!Array.isArray(j.steps) || !j.steps.length) P.problem(`journey ${j.id}: no steps`);
+      const sids = new Set();
+      for (const st of j.steps || []) {
+        if (!/^s\d+$/.test(st.id || '')) P.problem(`journey ${j.id}: step ids are s1, s2, … (got "${st.id}")`);
+        if (sids.has(st.id)) P.problem(`journey ${j.id}: duplicate step ${st.id}`); sids.add(st.id);
+        if (!st.target) P.problem(`${j.id}.${st.id}: needs a target (a CSS selector inside #screen)`);
+        if (!m.frames[st.expect]) P.problem(`${j.id}.${st.id}: expect "${st.expect}" is not a frame`);
+        if (st.net && !['ok', 'slow', 'error', 'timeout'].includes(st.net)) P.problem(`${j.id}.${st.id}: net must be ok, slow, error or timeout`);
+      }
+    }
+    for (const l of m.meta.languages) if (!m.copy[l]) P.problem(`language "${l}" has no copy table`);
+    state.model = m;
+    state.lang = m.meta.languages[0];
+    state.variant = m.variants[0] || null;
+  };
+})();
+</script>
+
+<script id="product">
+/* ── PRODUCT: the mock itself. EXAMPLE below: replace all of it. ─────────
+   Rules (the prototype-checker walks them mechanically):
+   - seed() returns a FRESH store: { screen, view: { <screen>: { state, fields } }, db: { <table>: [rows] } }.
+   - A screen's state is ONE value (a frame token's tail), never a set of booleans.
+   - render(s, P) is pure: it reads s, returns P.html`…`, starts nothing async.
+   - Every visible string is P.t('key'); every key exists in every language.
+   - Actions are named by data-act on a button or on a <form>; they change s, may await P.request,
+     and record side effects with P.effect(kind, {...}).
+   - Every (screen, state) the mock can show is a frame with a setup that reaches it from seed().
+   - Journeys: J1…; steps s1…; each step = do (words) · target (selector) · fill · net · expect (frame) · see (copy keys) · effects. */
+P.define({
+  meta: { name: 'Example', version: 1, languages: ['en', 'pt-BR'], clock: '2026-01-15T09:00:00-03:00' },
+  copy: {
+    en: { 'list.title': 'Saved reports', 'list.lead': 'Reports you saved appear here.', 'list.empty': 'No saved reports yet', 'list.add': 'Save report', 'list.saved': 'Report saved', 'list.count': { one: '{count} report', other: '{count} reports' } },
+    'pt-BR': { 'list.title': 'Relatórios salvos', 'list.lead': 'Os relatórios que você salvar aparecem aqui.', 'list.empty': 'Nenhum relatório salvo ainda', 'list.add': 'Salvar relatório', 'list.saved': 'Relatório salvo', 'list.count': { one: '{count} relatório', other: '{count} relatórios' } },
+  },
+  seed: () => ({ screen: 'reports', view: { reports: { state: 'loaded', fields: {} } }, db: { reports: [{ id: 'r1', name: 'Weekly churn by region' }] } }),
+  screens: {
+    reports: {
+      render: (s, P) => {
+        const rows = s.db.reports;
+        return P.html`<section class="ex">
+          <h1>${P.t('list.title')}</h1>
+          <p>${s.view.reports.state === 'empty' ? P.t('list.empty') : P.t('list.count', { count: rows.length })}</p>
+          ${s.view.reports.state === 'empty' ? '' : P.html`<ul class="ex-list">${rows.map(r => P.html`<li><span>${r.name}</span></li>`)}</ul>`}
+          <button class="ex-btn" data-act="save">${P.t('list.add')}</button>
+        </section>`;
+      },
+    },
+  },
+  frames: {
+    'reports.loaded': { title: 'Reports, one saved' },
+    'reports.empty': { title: 'Reports, none yet', setup: s => { s.db.reports = []; } },
+  },
+  actions: {
+    save: async (s, ctx, P) => {
+      await P.request('POST /reports', () => {
+        const row = { id: 'r' + (s.db.reports.length + 1), name: 'Monthly revenue' };
+        s.db.reports.push(row);
+        P.effect('db', { table: 'reports', op: 'insert', id: row.id });
+      });
+      P.nav('reports', 'loaded');
+      P.toast(P.t('list.saved'));
+    },
+  },
+  journeys: [
+    { id: 'J1', title: 'Save a first report', actor: 'analyst', job: 'When I build a report I will need again, I want to save it, so I can open it next week.',
+      start: 'reports.empty',
+      steps: [
+        { id: 's1', do: 'Save the report', target: '[data-act="save"]', expect: 'reports.loaded', see: ['list.title'], effects: [{ kind: 'db', table: 'reports', op: 'insert' }] },
+      ] },
+  ],
+});
+</script>
+
+<script id="shell-boot">
+/* ── SHELL: boot, router, chrome, journey panel, backstage, verdicts. ──── */
+(() => {
+  'use strict';
+  const S = P._, M = S.model;
+  const $ = id => document.getElementById(id);
+  const root = document.documentElement;
+  const screenEl = $('screen'), bar = $('pr-bar'), jp = $('pr-journeys'), bp = $('pr-backstage'), device = $('pr-device');
+  const h = P.html;
+  if (!M) { screenEl.innerHTML = '<div class="pr-crash">The product block did not call P.define({...}).</div>'; return; }
+
+  const ui = {
+    theme: 'system', width: 'fit', journey: M.journeys[0]?.id || null, now: 0, collapsed: false,
+    tab: 'effects', since: 0, verdicts: {}, notes: {}, editing: null, playing: false,
+    panels: { journeys: innerWidth >= 1100, backstage: innerWidth >= 1100 },
+  };
+  const V = String(M.meta.version);
+
+  // ── store and frames ──────────────────────────────────────────────────
+  const clone = o => (typeof structuredClone === 'function' ? structuredClone(o) : JSON.parse(JSON.stringify(o)));
+  function load(token) {
+    const f = M.frames[token];
+    if (!f) { P.problem(`no frame "${token}"`); return false; }
+    const scr = token.split('.')[0], st = token.slice(scr.length + 1);
+    let s;
+    try { s = clone(M.seed()); } catch (e) { P.problem('seed() threw: ' + e.message); return false; }
+    s.view = s.view || {}; s.db = s.db || {};
+    s.screen = scr;
+    s.view[scr] = Object.assign({ fields: {} }, s.view[scr], { state: st });
+    S.store = s;
+    try { f.setup && f.setup(s, P); } catch (e) { P.problem(`frame ${token}: setup threw: ${e.message}`); }
+    S.effects = []; S.requests = []; S.missing.clear(); ui.since = 0; S.epoch = (S.epoch || 0) + 1;
+    return true;
+  }
+
+  let lastScreen = null;
+  function render() {
+    const token = P.frame();
+    const sc = M.screens[S.store.screen];
+    const focusedId = document.activeElement && screenEl.contains(document.activeElement) ? document.activeElement.id : null;
+    let out;
+    try { out = sc.render(S.store, P); }
+    catch (e) { console.error(e); out = h`<div class="pr-crash">render of ${token} threw: ${e.message}</div>`; }
+    screenEl.innerHTML = String(out);
+    if (lastScreen !== null && lastScreen !== S.store.screen && !S.still) {
+      screenEl.classList.remove('pr-enter'); void screenEl.offsetWidth; screenEl.classList.add('pr-enter');
+    }
+    lastScreen = S.store.screen;
+    root.dataset.frame = token;
+    if (!M.frames[token]) P.problem(`the mock reached "${token}", which is not a declared frame`);
+    S.reached.add(token);
+    if (focusedId) { const el = document.getElementById(focusedId); if (el) el.focus({ preventScroll: true }); }
+    chrome();
+  }
+  P._render = render;
+
+  // ── actions and fields ────────────────────────────────────────────────
+  function run(name, ctx) { S.lastRun = runAction(name, ctx); return S.lastRun; }
+  async function runAction(name, ctx) {
+    const fn = M.actions[name];
+    if (!fn) { P.problem(`no action "${name}"`); return; }
+    try {
+      const r = fn(S.store, ctx, P);
+      render();
+      if (r && typeof r.then === 'function') { await r; render(); }
+    } catch (e) {
+      console.error(e);
+      P.problem(`action "${name}" threw: ${e && (e.message || e.code || e)}`);
+      render();
+    }
+  }
+  screenEl.addEventListener('click', e => {
+    const el = e.target.closest('[data-act]');
+    if (!el || el.tagName === 'FORM' || !screenEl.contains(el)) return;
+    if (el.form && el.type === 'submit') return; // the form's submit handler runs it
+    if (el.disabled || el.getAttribute('aria-disabled') === 'true') return;
+    e.preventDefault();
+    run(el.dataset.act, { arg: el.dataset.arg, el });
+  });
+  screenEl.addEventListener('submit', e => {
+    const f = e.target;
+    e.preventDefault();
+    const name = (e.submitter && e.submitter.dataset.act) || f.dataset.act;
+    if (!name) { P.problem('a form was submitted with no data-act'); return; }
+    run(name, { values: Object.fromEntries(new FormData(f)), arg: e.submitter && e.submitter.dataset.arg, el: f });
+  });
+  const keep = e => {
+    const el = e.target;
+    if (!el.name || !S.store) return;
+    const v = P.view();
+    v.fields = v.fields || {};
+    v.fields[el.name] = el.type === 'checkbox' ? el.checked : el.value;
+  };
+  screenEl.addEventListener('input', keep);
+  screenEl.addEventListener('change', keep);
+
+  // ── settings ──────────────────────────────────────────────────────────
+  P._setNet = n => { S.net = n; chrome(); };
+  function setTheme(t) { ui.theme = t; if (t === 'system') delete root.dataset.theme; else root.dataset.theme = t; chrome(); }
+  function setWidth(w) { ui.width = w; if (w === 'fit') delete root.dataset.width; else root.dataset.width = w; chrome(); }
+  function setLang(l) { if (!M.meta.languages.includes(l)) return; S.lang = l; root.lang = l; S.missing.clear(); render(); }
+
+  // ── router: #token~modifiers ─────────────────────────────────────────
+  function route() {
+    const raw = decodeURIComponent(location.hash.replace(/^#/, ''));
+    const [head, ...mods] = raw.split('~');
+    S.bare = mods.includes('bare'); S.still = S.bare || mods.includes('still'); S.fast = mods.includes('fast') || S.bare;
+    if (S.bare) root.dataset.bare = ''; else delete root.dataset.bare;
+    if (S.still) root.dataset.still = ''; else delete root.dataset.still;
+    for (const m of mods) {
+      if (m === 'light' || m === 'dark') setTheme(m);
+      else if (m === 'phone' || m === 'desktop') setWidth(m);
+      else if (M.meta.languages.includes(m)) { S.lang = m; root.lang = m; }
+      else if (m.startsWith('variant-') && M.variants.includes(m.slice(8))) S.variant = m.slice(8);
+    }
+    const play = head.match(/^play-(J\d+)(?:\.(s\d+))?$/);
+    if (play) {
+      const j = M.journeys.find(x => x.id === play[1]);
+      if (j) { ui.panels.journeys = true; return startJourney(j, play[2] ? j.steps.findIndex(x => x.id === play[2]) : 0); }
+    }
+    const token = M.frames[head] ? head : (M.journeys[0]?.start || Object.keys(M.frames)[0]);
+    if (head && !M.frames[head] && !play) P.problem(`#${head} is not a frame; showing ${token}`);
+    if (token && load(token)) render(); else chrome();
+  }
+  addEventListener('hashchange', route);
+
+  // ── journeys ──────────────────────────────────────────────────────────
+  const wait = ms => new Promise(r => setTimeout(r, S.fast ? 0 : ms));
+  const idle = async () => { while (S.pending > 0) await new Promise(r => setTimeout(r, 20)); };
+  function ring(el) {
+    document.querySelectorAll('.pr-ring').forEach(x => x.remove());
+    if (!el) return;
+    const d = device.getBoundingClientRect(), r = el.getBoundingClientRect();
+    const ringEl = document.createElement('div');
+    ringEl.className = 'pr-ring';
+    Object.assign(ringEl.style, { left: (r.left - d.left - 2) + 'px', top: (r.top - d.top - 2) + 'px', width: (r.width + 4) + 'px', height: (r.height + 4) + 'px' });
+    device.appendChild(ringEl);
+    el.scrollIntoView({ block: 'nearest', behavior: S.still ? 'auto' : 'smooth' });
+  }
+  async function playStep(j, i) {
+    const st = j.steps[i];
+    ui.now = i; chrome();
+    if (st.net) P._setNet(st.net);
+    for (const [sel, val] of Object.entries(st.fill || {})) {
+      const el = screenEl.querySelector(sel);
+      if (!el) { P.problem(`${j.id}.${st.id}: fill target "${sel}" not on screen`); continue; }
+      if (el.type === 'checkbox') el.checked = !!val; else el.value = val;
+      el.dispatchEvent(new Event('input', { bubbles: true }));
+      await wait(120);
+    }
+    const t = screenEl.querySelector(st.target);
+    if (!t) { P.problem(`${j.id}.${st.id}: target "${st.target}" not on screen at ${P.frame()}`); return false; }
+    ring(t); await wait(450);
+    ui.since = S.seq;
+    const epoch = S.epoch;
+    S.lastRun = null;
+    if (t.form && t.type === 'submit') t.form.requestSubmit(t); else t.click();
+    if (S.lastRun) await S.lastRun; else await idle();
+    setTimeout(() => ring(null), S.fast ? 0 : 900);
+    if (S.epoch !== epoch) return false;   // another state was loaded meanwhile: the play stops quietly
+    const ok = P.frame() === st.expect;
+    if (!ok) P.problem(`${j.id}.${st.id}: expected ${st.expect}, the mock shows ${P.frame()}`);
+    else if (i + 1 < j.steps.length) ui.now = i + 1;
+    chrome();
+    return ok;
+  }
+  async function startJourney(j, upto) {
+    ui.journey = j.id; ui.now = 0;
+    load(j.start); render();
+    if (upto > 0) {
+      const fast = S.fast; S.fast = true;
+      for (let i = 0; i < upto; i++) if (!(await playStep(j, i))) break;
+      S.fast = fast;
+    }
+    ui.now = Math.max(0, upto);   // the step to play next
+    chrome();
+  }
+  async function playAll(j) {
+    if (ui.playing) return;
+    ui.playing = true; await startJourney(j, 0);
+    for (let i = 0; i < j.steps.length; i++) { if (!(await playStep(j, i))) break; await wait(700); }
+    ui.playing = false; chrome();
+  }
+
+  // ── verdicts: the artifact's db when it is there, this browser otherwise ──
+  let db = null;
+  const vkey = (jid, sid) => `v${V}_${jid}_${sid}`;
+  const LS = 'mock-verdicts:' + M.meta.name;
+  try { Object.assign(ui.verdicts, JSON.parse(localStorage.getItem(LS) || '{}')); } catch (e) { /* storage blocked: fine */ }
+  async function saveVerdict(j, st, verdict, note) {
+    const k = vkey(j.id, st.id);
+    const row = { journey: j.id, step: st.id, verdict, note: note || '', version: Number(V), frame: P.frame(), at: new Date().toISOString() };
+    ui.verdicts[k] = row; chrome();
+    try { localStorage.setItem(LS, JSON.stringify(ui.verdicts)); } catch (e) { /* fine */ }
+    if (db) { try { await db.collection('walks').doc(k).set(row); } catch (e) { console.warn('[mock] verdict not saved to the artifact store', e); } }
+  }
+  let comments = null;
+  (async () => {
+    if (!window.claude || typeof window.claude.use !== 'function') return;
+    try {
+      db = await window.claude.use('db');
+      if (db) db.collection('walks').where('version', '==', Number(V)).onSnapshot(snap => {
+        for (const d of snap.docs) if (d.exists) ui.verdicts[d.id] = d.data();
+        chrome();
+      }, () => {});
+    } catch (e) { db = null; }
+    try { comments = await window.claude.use('comments'); chrome(); } catch (e) { comments = null; }
+  })();
+
+  // ── chrome: bar, journey panel, backstage ────────────────────────────
+  const seg = (name, cur, opts) => h`<span class="pr-seg" role="group" aria-label="${name}">${opts.map(([v, l]) => h`<button type="button" data-ui="${name}" data-v="${v}" aria-pressed="${String(cur === v)}">${l}</button>`)}</span>`;
+  const frameTitle = tok => (M.frames[tok] && M.frames[tok].title) || tok;
+  const jStatus = j => {
+    const vs = j.steps.map(st => ui.verdicts[vkey(j.id, st.id)]);
+    if (vs.some(v => v && v.verdict === 'change')) return 'change';
+    if (vs.every(v => v && v.verdict === 'ok')) return 'ok';
+    return vs.some(Boolean) ? 'part' : 'none';
+  };
+  const fxText = e => Object.entries(e).filter(([k]) => k !== 'kind' && k !== '_seq').map(([k, v]) => `${k}: ${typeof v === 'object' ? JSON.stringify(v) : v}`).join('\n');
+  const fxLine = list => list && list.length ? list.map(e => e.kind + (e.table ? ' ' + e.table : e.to ? ' → ' + e.to : e.name ? ' ' + e.name : '')).join(' · ') : 'nothing';
+
+  function chrome() {
+    if (!S.store) return;
+    const frames = Object.entries(M.frames);
+    const groups = {};
+    for (const [tok, f] of frames) (groups[tok.split('.')[0]] = groups[tok.split('.')[0]] || []).push([tok, f]);
+    bar.toggleAttribute('data-collapsed', ui.collapsed);
+    bar.innerHTML = String(h`
+      <span class="pr-name pr-keep">${M.meta.name}<span class="pr-ver">v${V}</span></span>
+      <label class="pr-field"><span>State</span><select data-ui="frame" aria-label="State">
+        ${Object.entries(groups).map(([g, list]) => h`<optgroup label="${g}">${list.map(([tok, f]) => h`<option value="${tok}" ${tok === P.frame() ? P.raw('selected') : ''}>${f.title}${f.debugOnly ? ' (debug)' : ''}</option>`)}</optgroup>`)}
+      </select></label>
+      ${M.meta.languages.length > 1 ? h`<label class="pr-field"><span>Language</span><select data-ui="lang">${M.meta.languages.map(l => h`<option ${l === S.lang ? P.raw('selected') : ''}>${l}</option>`)}</select></label>` : ''}
+      ${seg('theme', ui.theme, [['system', 'Auto'], ['light', 'Light'], ['dark', 'Dark']])}
+      ${seg('width', ui.width, [['fit', 'Fit'], ['phone', 'Phone'], ['desktop', 'Desktop']])}
+      <label class="pr-field"><span class="${S.net !== 'ok' ? 'pr-net-hot' : ''}">Next request</span><select data-ui="net">${['ok', 'slow', 'error', 'timeout'].map(n => h`<option ${n === S.net ? P.raw('selected') : ''}>${n}</option>`)}</select></label>
+      ${M.variants.length > 1 ? h`<label class="pr-field"><span>Variant</span><select data-ui="variant">${M.variants.map(v => h`<option ${v === S.variant ? P.raw('selected') : ''}>${v}</option>`)}</select></label>` : ''}
+      <span class="pr-token" title="This state's address">#${P.frame()}</span>
+      <span class="pr-spacer"></span>
+      ${M.journeys.length ? h`<button type="button" class="pr-btn" data-ui="panel" data-v="journeys" aria-pressed="${String(ui.panels.journeys)}">Journeys</button>` : ''}
+      <button type="button" class="pr-btn" data-ui="panel" data-v="backstage" aria-pressed="${String(ui.panels.backstage)}">Backstage</button>
+      <button type="button" class="pr-btn pr-keep" data-ui="collapse" aria-label="${ui.collapsed ? 'Show controls' : 'Hide controls'}">${ui.collapsed ? 'Controls' : 'Hide'}</button>
+      ${S.problems.length ? h`<div class="pr-problems" role="alert">${S.problems.length} mock problem(s):\n${S.problems.slice(-6).join('\n')}</div>` : ''}`);
+
+    if (innerWidth < 1100 && ui.panels.journeys && ui.panels.backstage) ui.panels.backstage = false;
+    jp.hidden = !ui.panels.journeys || !M.journeys.length;
+    if (!jp.hidden) {
+      const j = M.journeys.find(x => x.id === ui.journey) || M.journeys[0];
+      const total = frames.length, reached = frames.filter(([t]) => S.reached.has(t)).length;
+      jp.innerHTML = String(h`
+        <div class="pr-phead"><h2>Journeys</h2><button type="button" class="pr-btn pr-close" data-ui="panel" data-v="journeys" aria-pressed="true">Close</button></div>
+        <ul class="pr-jlist">${M.journeys.map(x => h`<li><button type="button" class="pr-j" data-ui="journey" data-v="${x.id}" aria-current="${String(x.id === j.id)}">
+          <span class="pr-dot" data-s="${jStatus(x)}" aria-hidden="true"></span>
+          <span><span class="pr-jid">${x.id}</span> ${x.title}<small>${x.steps.length} step${x.steps.length === 1 ? '' : 's'} · ${({ ok: 'walked on v' + V, change: 'change asked', part: 'partly walked', none: 'not walked' })[jStatus(x)]}</small></span>
+        </button></li>`)}</ul>
+        ${j ? h`
+          <div class="pr-jtools">
+            <button type="button" class="pr-btn" data-ui="play-all" ${ui.playing ? P.raw('disabled') : ''}>Play all</button>
+            <button type="button" class="pr-btn" data-ui="restart">Restart</button>
+          </div>
+          ${j.job ? h`<p class="pr-empty" style="padding-top:0">${j.job}</p>` : ''}
+          <ol class="pr-steps">${j.steps.map((st, i) => {
+            const v = ui.verdicts[vkey(j.id, st.id)];
+            const editing = ui.editing === j.id + '.' + st.id;
+            return h`<li class="pr-step" ${i === ui.now ? P.raw('data-now') : ''} data-comment-target>
+              <header><span class="pr-jid">${st.id}</span><b>${st.do}</b></header>
+              <dl class="pr-kv">
+                <dt>expect</dt><dd>${frameTitle(st.expect)}</dd>
+                <dt>behind</dt><dd>${fxLine(st.effects)}</dd>
+                ${st.net ? h`<dt>network</dt><dd>${st.net}</dd>` : ''}
+              </dl>
+              <div class="pr-acts">
+                <button type="button" class="pr-btn" data-ui="step" data-v="${i}" ${ui.playing ? P.raw('disabled') : ''}>Play step</button>
+                <button type="button" class="pr-btn" data-ui="ok" data-v="${i}" aria-pressed="${String(!!v && v.verdict === 'ok')}">As it should</button>
+                <button type="button" class="pr-btn" data-ui="change" data-v="${i}" aria-pressed="${String(!!v && v.verdict === 'change')}">Change…</button>
+                ${comments ? h`<button type="button" class="pr-btn" data-ui="comment" data-v="${i}">Comment</button>` : ''}
+              </div>
+              ${editing ? h`<label class="pr-sr" for="pr-note-${st.id}">What should change</label>
+                <textarea class="pr-note" id="pr-note-${st.id}" placeholder="What should change">${(v && v.note) || ''}</textarea>
+                <div class="pr-acts"><button type="button" class="pr-btn" data-ui="save-change" data-v="${i}">Save</button><button type="button" class="pr-btn" data-ui="cancel">Cancel</button></div>` : ''}
+              ${v ? h`<span class="pr-verdict" data-v="${v.verdict}">${v.verdict === 'ok' ? 'As it should' : 'Change: ' + (v.note || '(no note)')}</span>` : ''}
+            </li>`;
+          })}</ol>` : ''}
+        <div class="pr-foot">States reached ${reached}/${total} · verdicts ${db ? 'saved to this artifact' : 'kept in this browser only'}</div>`);
+    }
+
+    bp.hidden = !ui.panels.backstage;
+    if (!bp.hidden) {
+      const fx = S.effects.slice().reverse();
+      const tables = Object.entries(S.store.db || {}).filter(([, rows]) => Array.isArray(rows));
+      bp.innerHTML = String(h`
+        <div class="pr-phead"><h2>Backstage</h2><button type="button" class="pr-btn pr-close" data-ui="panel" data-v="backstage" aria-pressed="true">Close</button></div>
+        <div class="pr-tabs" role="tablist">${[['effects', 'Effects (' + fx.length + ')'], ['data', 'Data'], ['network', 'Network (' + S.requests.length + ')']].map(([k, l]) => h`<button type="button" role="tab" data-ui="tab" data-v="${k}" aria-selected="${String(ui.tab === k)}">${l}</button>`)}</div>
+        ${ui.tab === 'effects' ? (fx.length ? h`<ul class="pr-fx">${fx.map(e => h`<li ${e._seq > ui.since ? P.raw('data-new') : ''}><span class="pr-kind">${e.kind}</span><pre>${fxText(e)}</pre></li>`)}</ul>` : h`<p class="pr-empty">No side effects yet. Rows written, e-mails sent and events emitted appear here as the mock runs.</p>`) : ''}
+        ${ui.tab === 'data' ? (tables.length ? h`<div class="pr-tblwrap">${tables.map(([name, rows]) => {
+          const cols = [...new Set(rows.flatMap(r => Object.keys(r)))];
+          return h`<h3>${name} · ${rows.length}</h3>${rows.length ? h`<table><thead><tr>${cols.map(c => h`<th>${c}</th>`)}</tr></thead><tbody>${rows.map(r => h`<tr>${cols.map(c => h`<td>${typeof r[c] === 'object' ? JSON.stringify(r[c]) : r[c]}</td>`)}</tr>`)}</tbody></table>` : ''}`;
+        })}</div>` : h`<p class="pr-empty">No tables in the store.</p>`) : ''}
+        ${ui.tab === 'network' ? (S.requests.length ? h`<ul class="pr-fx">${S.requests.slice().reverse().map(r => h`<li><span class="pr-kind">${r.answer}</span><pre>${r.name}</pre></li>`)}</ul>` : h`<p class="pr-empty">No requests yet. Set the answer of the next one in the bar.</p>`) : ''}`);
+    }
+  }
+
+  document.addEventListener('click', async e => {
+    const el = e.target.closest('[data-ui]');
+    if (!el || screenEl.contains(el)) return;
+    const k = el.dataset.ui, v = el.dataset.v;
+    const j = M.journeys.find(x => x.id === ui.journey);
+    if (k === 'theme') setTheme(v);
+    else if (k === 'width') setWidth(v);
+    else if (k === 'panel') {
+      ui.panels[v] = !ui.panels[v];
+      if (ui.panels[v] && innerWidth < 1100) for (const other of Object.keys(ui.panels)) if (other !== v) ui.panels[other] = false;  // one sheet at a time on narrow screens
+      chrome();
+    }
+    else if (k === 'collapse') { ui.collapsed = !ui.collapsed; chrome(); }
+    else if (k === 'journey') { const x = M.journeys.find(y => y.id === v); if (x) await startJourney(x, 0); }
+    else if (k === 'restart' && j) await startJourney(j, 0);
+    else if (k === 'play-all' && j) await playAll(j);
+    else if (k === 'step' && j) { ui.playing = true; await playStep(j, Number(v)); ui.playing = false; chrome(); }
+    else if (k === 'ok' && j) await saveVerdict(j, j.steps[v], 'ok');
+    else if (k === 'change' && j) { ui.editing = j.id + '.' + j.steps[v].id; chrome(); const t = jp.querySelector('textarea'); if (t) t.focus(); }
+    else if (k === 'save-change' && j) { const t = jp.querySelector('textarea'); ui.editing = null; await saveVerdict(j, j.steps[v], 'change', t ? t.value.trim() : ''); }
+    else if (k === 'cancel') { ui.editing = null; chrome(); }
+    else if (k === 'tab') { ui.tab = v; chrome(); }
+    else if (k === 'comment' && j && comments) {
+      const st = j.steps[v];
+      const target = screenEl.querySelector(st.target) || screenEl;
+      try { await comments.openComposer({ element: target }); } catch (err) { /* soft refusal: nothing to do */ }
+    }
+  });
+  document.addEventListener('change', e => {
+    const el = e.target;
+    if (!el.dataset || !el.dataset.ui || screenEl.contains(el)) return;
+    if (el.dataset.ui === 'frame') { load(el.value); render(); }
+    else if (el.dataset.ui === 'lang') setLang(el.value);
+    else if (el.dataset.ui === 'net') P._setNet(el.value);
+    else if (el.dataset.ui === 'variant') { S.variant = el.value; render(); }
+  });
+
+  // ── SHELL API: the surface the walk, the frame renderer and the blind reader use ──
+  window.proto = Object.freeze({
+    version: Number(V),
+    meta: () => clone(M.meta),
+    frames: () => Object.entries(M.frames).map(([token, f]) => ({ token, title: f.title, debugOnly: !!f.debugOnly, terminal: !!f.terminal })),
+    journeys: () => M.journeys.map(j => ({ id: j.id, title: j.title, actor: j.actor, job: j.job, start: j.start, rules: j.rules || [],
+      steps: j.steps.map(st => ({ id: st.id, do: st.do, target: st.target, fill: st.fill || {}, net: st.net || null, expect: st.expect, see: st.see || [], effects: st.effects || [], rules: st.rules || [] })) })),
+    copyKeys: () => Object.fromEntries(M.meta.languages.map(l => [l, Object.keys(M.copy[l] || {})])),
+    copy: () => clone(M.copy),
+    actions: () => Object.keys(M.actions),
+    t: (key, lang) => { const l = S.lang; if (lang) S.lang = lang; const out = P.t(key); S.lang = l; return out; },
+    go: token => { const ok = load(token); if (ok) render(); return ok; },
+    frame: () => P.frame(),
+    idle: () => S.pending === 0,
+    setNet: n => P._setNet(n),
+    setLang: l => setLang(l),
+    effects: () => S.effects.map(({ _seq, ...e }) => e),
+    requests: () => S.requests.map(({ _seq, ...r }) => r),
+    missing: () => [...S.missing],
+    problems: () => S.problems.slice(),
+    reached: () => [...S.reached],
+  });
+
+  root.lang = S.lang;
+  route();
+})();
+</script>

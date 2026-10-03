@@ -3,61 +3,72 @@
 The conductor judges. The reviewers report at the maximum bar: told to
 find problems, they always find problems. That is by design, and it is
 why the round does not close on their word. It closes on yours. You
-have what a judge agent never had: the interview, the user's words,
-what he already decided. Use it, and never rule on a finding's text
-alone: open the sentence it quotes.
+have what no agent has: the interview, his words, what he locked. Use
+it, and never rule on a finding's text alone: open the sentence it
+quotes, and when it is about behavior, open the frame.
+
+## The oracle is the locked mock
+
+Discovery's documents are derived from a mock he clicked and locked.
+So the first question for any finding about behavior is: **what does
+the locked mock do?** Answer it with `proto.mjs look` on the locked
+version, never from memory.
+
+- The documents say what the mock does → the documents are right; a
+  lens that wants other behavior is asking for an amendment, which is
+  his (owner `user`), or is wrong.
+- The documents say something the mock does not do → the derivation is
+  wrong; owner `author`, the fix is to say what the mock does.
+- The mock is silent (no state, no step covers the case) → a gap in
+  what he locked; owner `user`: either a new state in the mock (an
+  amendment) or an Out line.
 
 ## Merge first
 
-Three lenses and a referee per story read the same documents, so one
-defect arrives as several findings. Before ruling, group the findings
-whose fix is the same edit (the same sentence, value, AC or Out item,
-seen by walkthrough, acceptance, boundary and ambiguity) and
-rule the group once: one ruling, one owner, the ids of the merged
-findings listed in the reason. The user answers one question per
-decision, never one per lens.
+Two lenses and a reader per story read the same documents and the same
+mock, so one defect arrives as several findings. Before ruling, group
+the findings whose fix is the same edit (the same AC, value, Out item,
+or the same missing state) and rule the group once: one ruling, one
+owner, the merged ids listed in the reason. He answers one question
+per decision, never one per lens.
 
 ## The ruler
 
-The discovery razor: **a finding is sustained when a wrong guess at
-its answer would change what gets built** (scope, data, behavior). A
-gap every plausible answer fills the same way is not a gap; it is a
+The discovery razor: **a finding is sustained when a wrong guess at its
+answer would change what gets built** (scope, data, behavior, a look he
+would notice). A gap every plausible answer fills the same way is a
 preference.
 
-Some defects always proceed: a contradiction between the two
-documents · an acceptance criterion a stranger could not judge · an
-item neither In nor Out · two blind readers who would ship different
-products from one sentence · money, legal, or a stated constraint
-violated.
+Some defects always proceed: an AC that disagrees with the locked mock ·
+an AC a stranger could not judge · a capability neither In nor Out · a
+contradiction between the PR-FAQ and the stories · money, legal, or a
+stated constraint violated.
 
 ## The four rulings
 
-- **sustained** — a real hole: written as it stands, two competent
-  engineers build different things, or the demand's owner would not
-  recognize what got built. It becomes a document fix, by its owner.
+- **sustained** — a real hole: as written, two competent engineers build
+  different things, or he would not recognize what got built as what he
+  locked. It becomes a fix, by its owner.
 - **deferred** — a right observation that does not change what gets
   built: polish, a tightening worth doing once. Applied with the
   sustained ones in the same author batch, at its simplest form.
 - **for the design** — the answer is a mechanism the design stage
-  decides: lock contention, retry and DLQ policy, HTTP status codes,
-  storage shape, alarm thresholds, where a job runs. Not a discovery
-  gap, and not garbage: it is written to the "For the design" list of
-  `reviews.md`, with the story it came from, and stage 2 reads that
-  list at its macro shape. Never dismissed, never asked here.
+  decides: a lock, a retry policy, an HTTP status, a storage shape, an
+  alarm threshold, where a job runs. Written to the "For the design"
+  list of `reviews.md` with its story; stage 2 reads it. Never
+  dismissed, never asked here.
 - **dismissed** — preference wearing severity, wording taste, a
   divergence that leads to the same build, direction (the evolution
-  answers) mistaken for commitment, format preference (a confirmed
-  bad-path row asked to become a numbered AC), a plain misread of a
-  sentence the story forecloses, or plain wrong. It dies **with the
-  sentence that forecloses it quoted** in the reason; "already clear"
-  without the quote is not a dismissal, it is a sustain you did not
-  want to write.
+  answers) mistaken for commitment, a format preference, a misread of
+  a sentence or a frame that settles it, or plain wrong. It dies **with
+  the sentence or the frame token that forecloses it quoted** in the
+  reason; "already clear" without the quote is not a dismissal.
 
 ## Never dismissed
 
-These classes are the user's whether or not the build changes; the
-razor does not apply to them. Rule `sustained`, owner `user`, or at
-most `deferred`, never `dismissed`:
+These classes are his whether or not the build changes; the razor does
+not apply. Rule `sustained`, owner `user`, or at most `deferred`, never
+`dismissed`:
 
 - **personal data**: retention (keep forever is a decision), who can
   see it, the consent basis, export or deletion;
@@ -65,64 +76,65 @@ most `deferred`, never `dismissed`:
 - **legal** and stated constraints;
 - **security posture**: a secret's home, who holds a credential;
 - **a confirmed fact contested** by a lens with a contradiction;
-- **a contradiction between the two documents**.
+- **a contradiction between the PR-FAQ and the stories**, or between a
+  document and the locked mock.
 
-> In the first end-to-end run, "retention period for ingested session
-> records never stated" and "consent basis for orphan-session e-mails
-> not addressed" were dismissed as "every reading gives the same
-> build". Both were the user's to decide. That is the mistake this
-> list exists for.
+> A mock that stores people's data looks finished long before anyone
+> asked how long the data is kept. "Every reading gives the same build"
+> is never the answer to a retention question: it is his to decide.
 
 ## Three tests, in order
 
-1. **Is it true?** The quoted material says that, and the gap follows.
+1. **Is it true?** The quoted material says that, the frame shows that,
+   and the gap follows.
 2. **Does it bite?** Name what gets built wrong, or left unbuilt, if
    this stands. No named consequence, no sustain; unless the class is
    in the list above.
-3. **Is it already decided?** A fact the user confirmed is contested
-   only by contradiction, never by taste. Taste requirements close in
-   the user's words by rule; do not sustain precision the stage does
-   not owe.
+3. **Is it already decided?** What he locked is contested only by a
+   contradiction or a never-dismissed class, never by taste.
 
 ## The owner of a sustained finding
 
 - **`author`** — the fix changes how something is written and decides
-  nothing: splitting an AC in two, adding the missing value the
-  documents already imply elsewhere, naming an Out item the interview
-  already settled, aligning two sentences that say the same thing
-  differently. The author of that file applies it; the user is not
-  asked.
-- **`user`** — the fix changes the product's behavior, adds or removes
-  scope, changes cost, touches personal data, contests a fact the user
-  confirmed, or chooses between two readings the text admits and the
-  two are different products. The user rules it, grouped by decision.
+  nothing: an AC rewritten to say what the mock does, a THEN given its
+  "observed" place, a value the mock shows added, an Out item the
+  notes already settle. The file's author applies it (journey-scribe
+  for journeys and stories, disc-author-prfaq for the PR-FAQ); he is
+  not asked.
+- **`user`** — the fix changes what the mock does or would have to do
+  (an amendment), adds or removes scope, changes cost, touches personal
+  data, or contests something he confirmed. He rules it, grouped by
+  decision, in the one batch of the round.
 
-In doubt between `author` and `user`, `user`: the cost of a wrong
-`user` is one question; the cost of a wrong `author` is a product
-decision nobody took. A fix that is mechanical given what the user
-already decided is not a doubt: it is the author's.
+In doubt between `author` and `user`, `user`: a wrong `user` costs one
+question; a wrong `author` is a product decision nobody took.
 
 ## Calibrations
 
-- **A referee's `different-product` is evidence, not a verdict.** Read
-  the sentence. If it admits both readings, sustain, owner `user`, and
-  put both builds in the reason. If one reader misread a sentence that
-  is plain, dismiss with the sentence quoted.
-- **Mechanics are not readings.** Two readers who differ on a lock, a
-  retry count or a status code did not find an ambiguity in the
-  story; that is for the design.
-- **A finding raised for the first time on text no fix touched, in a
-  later round, gets the razor at full strength.** The earlier round
-  read that text and passed it.
+- **A blind reader's `fail` is evidence, not a verdict.** Run the
+  reader's `how` yourself with `proto.mjs look`. If the mock does what
+  the AC says and the reader drove it wrong, dismiss with the frame and
+  the actions quoted. If the mock does something else, the AC is wrong:
+  owner `author`, fix it to the mock.
+- **A blind reader's `cannot-judge` usually means the AC lacks its
+  "observed" place or a concrete value.** Owner `author`. When the
+  reader could not reach the state at all from the story's words, the
+  story is missing its GIVEN; same owner.
+- **Mechanics are not behavior.** A lens that wants a lock, a retry
+  count or a status code named found nothing for discovery; that is for
+  the design.
+- **Round 2 reads only the delta.** A finding raised in round 2 on text
+  no fix touched gets the razor at full strength: round 1 read it and
+  passed it.
 - **Name a recurrence.** When `reviews.md` shows the same class
-  sustained before and the fix did not move the document, say so, and
-  take it to the user instead of the author.
+  sustained in round 1 and the fix did not move the document, say so,
+  and take it to him instead of the author.
 
 ## What you write
 
-In `reviews.md`, before any fix is sent: per finding (or merged
-group), the id, lens, severity, title, ruling, owner, reason with the
-quote. Then the four lists the round produced: to the authors (by
-file), to the user (by decision), for the design, dismissed. The
-blueprint's review block is filled from this file at the close, so the
-user can read every dismissal there and reopen any at the approval.
+In `reviews.md`, before any fix is sent: per finding (or merged group)
+the id, lens, severity, title, ruling, owner, and the reason with the
+quote or the frame. Then the round's lists: to the authors (by file),
+to the user (by decision), for the design, dismissed. The blueprint's
+review block is filled from this file at the close, so he can read
+every dismissal there and reopen any at the approval.
