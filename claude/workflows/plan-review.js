@@ -16,7 +16,11 @@
  * names (`lenses`: those with a finding sustained in round 1) receive
  * the briefs that changed and the fixes that were applied, and check
  * that each fix landed and did not break its surroundings; the blind
- * readers reopen only the briefs named in `changed.briefs`.
+ * readers reopen only the briefs named in `changed.reread` (those whose
+ * Builds or Acceptance a fix changed, and any new brief; default: every
+ * brief in `changed.briefs`). A brief changed only in its Uses, Owns,
+ * Extends or pointers is not re-read blind: the checker compares those
+ * with the graph, and the lenses read it.
  *
  * THE BLIND READS are per brief (one node of the graph: F, a lane F-x<n>,
  * a slice E-<nn>, or E-int): two Sonnet readers (5.5, low) build it alone, reading
@@ -65,7 +69,8 @@
  *       { id: 'E-03', path: '/abs/.../02-plan/briefs/E-03.md' },
  *     ],
  *     // round 2 only — the delta:
- *     changed: { briefs: ['E-03'] },   // the briefs whose acceptance or builds changed
+ *     changed: { briefs: ['E-03', 'E-05'],   // every brief whose text changed: the lenses read them
+               reread: ['E-03'] },         // the blind readers reopen only these (Builds or Acceptance changed, or new)
  *     fixes:   [ { id: 'plan-reviewer-order#1', brief: 'E-03', fix: 'what was applied, one line' } ],
  *     lenses:  ['plan-reviewer-order'], // the lenses with a finding sustained last round; omitted = all three
  *     // when the v9 agents are not installed in the running Claude Code:
@@ -191,16 +196,18 @@ const round = args?.round ?? 1
 if (round > 2) throw new Error(`round ${round}: there is no round 3 — round 1 is whole, round 2 is the delta, then stop; what is still sustained is ruled by the conductor and listed for veto`)
 const language = args?.language ?? 'en'
 const allBriefs = Array.isArray(args?.briefs) ? args.briefs.filter(b => b && b.id && b.path) : []
-const delta = round > 1 && args?.changed ? { briefs: args.changed.briefs ?? [] } : null
+const delta = round > 1 && args?.changed
+  ? { briefs: args.changed.briefs ?? [], reread: args.changed.reread ?? args.changed.briefs ?? [] }
+  : null
 const fixes = Array.isArray(args?.fixes) ? args.fixes : []
 const mode = delta ? 'delta' : 'whole'
-const briefs = delta ? allBriefs.filter(b => delta.briefs.includes(b.id)) : allBriefs
+const briefs = delta ? allBriefs.filter(b => delta.reread.includes(b.id)) : allBriefs
 // A delta re-runs only the lenses that had a finding sustained: a lens
 // with nothing sustained read that text and passed it.
 const asked = delta && Array.isArray(args?.lenses) ? args.lenses.filter(l => ALL_LENSES.includes(l)) : null
 const LENSES = asked ?? ALL_LENSES
 if (!allBriefs.length) log('no briefs passed in args — the blind reads are skipped this round; pass briefs: [{id, path}] to run them')
-if (delta) log(`delta round: briefs ${delta.briefs.join(', ') || '(none)'} · ${fixes.length} fix(es) applied · lenses ${LENSES.join(', ') || '(none)'}`)
+if (delta) log(`delta round: briefs ${delta.briefs.join(', ') || '(none)'} · re-read blind ${delta.reread.join(', ') || '(none)'} · ${fixes.length} fix(es) applied · lenses ${LENSES.join(', ') || '(none)'}`)
 
 const docInputs = `Round ${round}, ${mode}.
 The plan the conductor drew (the foundation, the nodes, the edges, the ownership, the gate): ${args.planDir}/plan.md
