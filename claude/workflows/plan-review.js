@@ -188,6 +188,7 @@ const REFEREE_REVIEW = {
 }
 
 const round = args?.round ?? 1
+if (round > 2) throw new Error(`round ${round}: there is no round 3 — round 1 is whole, round 2 is the delta, then stop; what is still sustained is ruled by the conductor and listed for veto`)
 const language = args?.language ?? 'en'
 const allBriefs = Array.isArray(args?.briefs) ? args.briefs.filter(b => b && b.id && b.path) : []
 const delta = round > 1 && args?.changed ? { briefs: args.changed.briefs ?? [] } : null
