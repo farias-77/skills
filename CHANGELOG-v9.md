@@ -105,3 +105,29 @@ blueprint; the pipeline measures itself.
 | Plain sentence first | every group on the weekly board opens with what changes in practice | fewer good ideas dropped because they were unclear |
 | Settled ground stays settled | an idea the user dropped before is listed as "dropped before" and not asked again | his rulings hold |
 | The launch package | the close records the real app journey by journey and renders a launch video for the product's users | the release is shown to the people who use it, not only to the team |
+
+## Fixes from the first end-to-end run
+
+The first run of v9 on a real project, headless, stage by stage, found
+what the builders' self-tests could not. Each fix is generic: it holds
+for any project that meets the bar.
+
+| Area | Fix | What the run showed |
+|---|---|---|
+| Setup (F1–F15) | step 0 finds where the pipeline's sessions open and installs the settings and the guard there; a doctrine kept in another repository gets its own branch; no GitHub query for another remote; scouts read a detached worktree at the audited sha; `pipeline-readiness.md` is committed on the setup branch; calibration before golden paths, exemplars checked at the sha and under p95; requiring `local-ci` on `main` is a doctrine ruling when the doctrine names another check; dead settings targets pruned by a dry run; the rubric accepts maps per domain and inline runbooks; templates carry no comments; `local-ci.sh` stops its stack on exit, shares its cache across worktrees and runs the whole gate on an empty selection; the structure check pins its tools and takes capture groups; the final step runs the whole gate once and greps that no placeholder survives | the settings were installed where no session loaded them, the readiness file was left in the user's tree, and an empty affected selection passed the signoff with nothing run |
+| Discovery: local mode | without the Artifact tools the mock is shot locally, his verdicts go to `walks/verdicts.json`, the lock records `url: "local"` and the report stays local; the question tool has a text fallback; the review workflow is copied when its path is refused | a headless or cloud run had no way to publish, ask or run the workflow |
+| Discovery: the toolkit | actors and a clock in the mock's debug bar, never in a reference frame; `proto.mjs` gains shots, waits for a logged-in app, takes secrets from the environment, refuses step ids out of order, structures the lock's gaps and cuts the stories for the review; `[build]` acceptance criteria are judged against the build | reference frames carried mock controls, ids drifted before the lock, and the review pasted whole files into its arguments |
+| Design: cuts | the code document fixes the code's names in wave 1; the host table covers local mode, no model switch and waiting without sleep; scouts quote per file and the conductor saves their answers; the review embeds the flows and the delta by script, round 2 seats only consistency and the lenses that had a sustained blocker; a 10 % appetite band needs no question, and over it a question never cuts a criterion, the floor or his ruling; inversions between tiers are named to the judge | round 2 re-read what had not changed, and small overruns stopped the stage for a question |
+| Plan: cuts | stage 4's contract is quoted at the open; scouts go out before the long read; the recon carries the gate rules that bite and the unmerged branches; the foundation's names come first so the slice writers start while it finishes; the AC count is a warning scaled by the discovery's grain; renamed names propagate by script; round 2 re-reads blind only the briefs whose build or acceptance changed; no HTML comment reaches a plan file | a fixed AC cap split nodes that were the right size, and round 2 re-read briefs nobody had changed |
+| Video: the cache | `stills.mjs` runs from the kit's folder, so Remotion's ~220 MB browser cache never lands in a report folder; `.remotion/` is ignored; the launch render waits 180 s for a footage frame and keeps the film when the vertical cut fails | the cache was committed twice under a stage's report folder, and a loaded machine lost the vertical cut |
+
+## Pass 2
+
+| Change | Mechanism | Why |
+|---|---|---|
+| The launch film gets a link | the close makes web copies under the artifact asset cap (`scripts/web-copy.sh`), publishes a launch page with the `assets` capability and uploads them; the masters stay local files; without the Artifact tool the delivery is the local files | the film (~50 MB) fits neither the blueprint (10 MB) nor one artifact file |
+| The close's report | the launch film plus the retro tab; no slides, no review video | the film is for the people, the retro for the weekly |
+| One telemetry shape | every stage writes `<stage-folder>/telemetry.json` with the same fields (`docs/telemetry.md`); the close sums them with `telemetry-sum.mjs` into `metrics.json` | each stage measured itself in its own format, so the delivery metrics were partly guessed |
+| Generators owned by the foundation | the plan's scouts run each generator once in a scratch worktree and list every path it writes; the foundation owns them all | the foundation asked for an amendment to its own generated files |
+| Smooth footage under load | `record.mjs --slow <rate>` slows the page's CSS animations and compresses the take back to real speed; the recorder checks the motion fps, not the whole take's | a loaded machine captured transitions at a few frames a second |
+| The 9:16 cut | the hero stack stays inside the phone frame; the step window and its caption use the lower band; titles end before the stack at 16:9 | cards ran off the edge and the bottom quarter stayed empty |

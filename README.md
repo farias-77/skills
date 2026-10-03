@@ -242,10 +242,12 @@ for the full experience (autonomous release, progressive delivery, a
 cloud runner, the video toolchain).
 
 Run **`/pipeline-setup <path-to-project>`** first. It audits the
-project against the bar with scouts, writes `pipeline-readiness.md` in
-it (present · partial · missing, each with its evidence), proposes the
-cheapest order to close the gaps, and applies the generic pieces on a
-branch when you say so — the settings template, the guard and its
+project against the bar with scouts reading a detached worktree at the
+default branch's sha, writes `pipeline-readiness.md` (present ·
+partial · missing, each with its evidence) and commits it on the setup
+branch, never in your working tree, proposes the cheapest order to
+close the gaps, and applies the generic pieces on that branch when you
+say so — the settings template, the guard and its
 tests, the local-CI script, the structure check. What is the user's
 alone (branch protection, the autonomous posture, anything with a
 secret) is listed with a ready command, never run.
