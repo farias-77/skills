@@ -202,10 +202,11 @@ saying which.
 
 1. Open the PR from `feat/<workstream>` into `main`. The body carries
    the plan's summary and the play, verbatim.
-2. Confirm the local-CI signoff on its head sha (role 13). The
-   execute stage's queue posted it. If it is missing, run the
-   project's local CI in a clean worktree at that head, which posts
-   it. Never post a status by hand: the guard denies that.
+2. Confirm the local-CI signoff on its head sha (role 13): the
+   context `local-ci`, which only the whole gate posts, at the end of
+   execute — a `local-ci/affected` status from a merge of the queue
+   does not count. If it is missing, run the project's local CI with
+   the whole gate in a clean worktree at that head, which posts it. Never post a status by hand: the guard denies that.
 3. When the required checks are green, merge:
    `gh pr merge <n> --merge --match-head-commit <head>`. It is a merge
    commit. `--match-head-commit` makes the merge refuse a head that
@@ -295,8 +296,10 @@ serves, and they only expand. The mode comes from the plan, by
   revision, a traffic split, a canary):
   1. Deploy the candidate with no traffic, under a tag.
   2. The smoke runs on the tag URL. It covers health, the sha and
-     digest served, and a `verifier (Opus 5.5, medium)` running the
-     read-only journeys only.
+     digest served, and a `verifier (Opus 5.5, medium)` in its
+     read-only mode (`mode: read-only`, `target`: the tag URL,
+     `journeys`: the plan's read-only list) running those journeys
+     only.
   3. Shift the traffic. When production gives a signal (≥ 100 requests
      expected in the bake window), shift a share first and bake it
      against the previous revision in the same window. When it does
