@@ -12,6 +12,10 @@
 | | 1 | harvest back: documents <n> frictions · execution <n> · release <n> · notes <n> | ok | `05-close/harvest/` |
 | | 2 | numbers and precision summed · structure of main: <measure before → after, each> | ok | `retro.json` · `05-close/structure/` |
 | | 3 | sweep: <n> worktrees, <n> branches removed; <n> left for the user | ok | `retro.md` |
-| | 4 | retro written: <n> worked · <n> wrong · <n> ideas; blueprint published | ok | `<URL>` |
-| | 5 | the user's notes: <n> | ok | `retro.md` |
-| | 6 | closed · stage report | ok | `.state.md` |
+| | 4 | retro written: <n> worked · <n> wrong · <n> ideas; metrics.json; blueprint published | ok | `<URL>` |
+| | L1 | launch plan: <n> features, <n> cut, <n> journeys | ok | `05-close/launch/brief.md` |
+| | L2 | footage: <n> journeys recorded, <n> failed, <fps> min captured fps | ok | `05-close/launch/footage/` |
+| | L3 | film rendered: <m:ss> · <MB> MB · vertical <MB> MB · <n> problems | ok | `05-close/launch/launch.mp4` |
+| | L4 | package checked: <n> fixes asked | ok | `05-close/launch/` |
+| | 5 | message sent: film · text · retro link | ok | — |
+| | 6 | his notes: <n> · closed | ok | `.state.md` |

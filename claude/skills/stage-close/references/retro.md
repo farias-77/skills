@@ -5,6 +5,20 @@ retro later, which gathers every workstream of the week and looks for
 what repeats. Both need the same thing: each claim with its evidence,
 each idea with the file it would touch.
 
+It reads like a sprint retro: the team looks back at everything, what
+went well and what went wrong, and collects what would make the next
+workstream faster, better and smoother. It is the pipeline's file, not
+his report: he gets its link in the close's message, and the weekly
+reads it.
+
+## In numbers
+
+The retro's numbers (the blueprint schema's keys) and, beside them, the
+delivery metrics of `metrics.json` ([metrics.md](metrics.md)): lead
+time, his hours, agent hours, tokens, rounds per stage, findings by
+class, revert rate, change failure rate. A stage that did not record
+its telemetry is a line in "what went wrong".
+
 ## What worked
 
 What the record shows went smoothly and should not be lost when the

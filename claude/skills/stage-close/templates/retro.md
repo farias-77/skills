@@ -14,6 +14,17 @@
 |---|---|---|---|---|---|---|---|---|---|---|
 | | | | | | | | | | | |
 
+## Delivery metrics
+
+| Lead time | His hours | Agent hours | Tokens (M) | Revert rate | Change failure rate |
+|---|---|---|---|---|---|
+| <days> | <h> | <h> | <M> | <n/m> | <n/m> |
+
+| Stage | Wall-clock (h) | His (h) | Agents (h) | Tokens (M) | Rounds | Findings by class (found → sustained) |
+|---|---|---|---|---|---|---|
+
+(`metrics.json`; `null` where the stage did not record it)
+
 ## Structure of main
 
 | Measure | Before (`<merge-base sha>`) | After (`<release merge sha>`) | Past the threshold |
@@ -55,6 +66,12 @@
 ## The user's notes
 
 - "<his words, verbatim>" — on <I-n | W-n | general>
+
+## Launch package
+
+- Film: `05-close/launch/launch.mp4` · <m:ss> · <MB> MB · vertical <MB> MB | not made: <why>
+- Features in the film: <n> · cut: <feature — why>
+- Known flaws: <what> | none
 
 ## Sweep
 

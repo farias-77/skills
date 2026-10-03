@@ -1,6 +1,6 @@
 ---
 name: weekly-retro
-description: Runs the weekly retro of the pipeline — gathers the retro of every workstream closed in the week (blueprint/close/retro.json), groups the ideas that repeat across workstreams, sums the precision of every reviewer over the week, measures the structure of main (duplication, complexity, boundary violations, test runtime, revert rate) against its trend and, past a threshold, proposes a refactor slice, and brings the user a board of proposed changes to the pipeline, the ones seen most and the ones he commented first; he decides each group (apply, park, drop); the session applies the approved ones to the pipeline repo, verifies them, and commits with his word. The only place where the pipeline changes. Runs in Claude Code with an Opus 5.5 session at medium effort. Use once a week, or when the user asks to review the pipeline's lessons.
+description: Runs the weekly retro of the pipeline — gathers the retro of every workstream closed in the week (blueprint/close/retro.json), groups the ideas that repeat across workstreams, sums the precision of every reviewer over the week, measures the structure of main (duplication, complexity, boundary violations, test runtime, revert rate) and the delivery metrics (lead time, his hours, agent hours, tokens, change failure rate) against their trend and, past a threshold, proposes a refactor slice, and brings the user a board of proposed changes to the pipeline, the ones seen most and the ones he commented first; he decides each group (apply, park, drop); the session applies the approved ones to the pipeline repo, verifies them, and commits with his word. The only place where the pipeline changes. Runs in Claude Code with an Opus 5.5 session at medium effort. Use once a week, or when the user asks to review the pipeline's lessons.
 disable-model-invocation: false
 argument-hint: "[week, e.g. 2026-W40; defaults to the week that just ended]"
 allowed-tools: Read, Write, Edit, Glob, Grep, Agent, AskUserQuestion, Artifact, Bash
@@ -27,6 +27,8 @@ pipeline.
              previous weekly records parked
    Measure   the structure of main: the project's structure check, the test runtime, the revert rate
              → the trend over the last four weeks → past a threshold, a refactor-slice group
+   Metrics   each workstream's metrics.json: lead time, his hours, agent hours, tokens, change
+             failure rate → against the four-week median → past a threshold, a group
 2. Group     ideas that propose the same change merge into one group, with every workstream and
              friction behind it; the precision of every reviewer summed over the week; a group he
              already dropped is listed, not asked
@@ -47,7 +49,9 @@ weekly records live in the designs root, under `_retros/`.
 ## Step 1 — gather
 
 Every `blueprint/close/retro.json` under the designs root whose
-`closed` falls inside the week; and every group the earlier weekly
+`closed` falls inside the week, with the workstream's
+`05-close/metrics.json` beside it (stage-close, references/metrics.md);
+and every group the earlier weekly
 records under `_retros/` ruled `park`, which come back this week. The
 retros are small and structured: the session reads them itself. A
 workstream closed without a retro is listed and skipped.
@@ -92,6 +96,26 @@ the project builds, through stage 4 like any entry. A project with no
 structure check: the trend table says "not measured" and the board
 lists a doctrine group to add one.
 
+## Step 1c — the delivery metrics
+
+The pipeline measures itself so it can get faster without getting
+worse. From each workstream's `metrics.json`: lead time, his hours,
+agent hours, tokens, rounds per stage, findings by class, revert rate,
+change failure rate. The week's median of each against the median of
+the last four weekly records (fewer weeks: what exists):
+
+| Measure | A group when |
+|---|---|
+| His hours per workstream | 20% above the four-week median: where his time went, by stage |
+| Lead time | 20% above the four-week median: the stage that grew |
+| Agent hours, tokens | 25% above the four-week median: the stage and the agents that grew |
+| Change failure rate | above 15% of the week's production deploys |
+| A stage with no telemetry | always: the stage that did not measure itself |
+
+Each such group names the stage, the numbers and the workstreams, and
+competes on the board like any other. The numbers go into the weekly
+record so the next week has its median.
+
 ## Step 2 — group
 
 - **Ideas.** Two ideas are one group when they would make the same
@@ -117,7 +141,8 @@ lists a doctrine group to add one.
 ## Step 3 — the board
 
 Write `_retros/<YYYY>-W<ww>.md`: the week in one table (each
-workstream with its numbers), the structure of main (the five numbers
+workstream with its numbers), the delivery metrics against their
+four-week median, the structure of main (the five numbers
 per repo, this week against the four-week median, past the threshold
 or not), the precision table, the groups in rank order, and "dropped
 before". Each pipeline group opens with one plain sentence of what

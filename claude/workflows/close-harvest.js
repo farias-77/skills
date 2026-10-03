@@ -4,7 +4,7 @@
  * each returning the numbers, the precision per reviewer and every
  * friction with its evidence; the session writes the retro.
  *
- * Why a workflow: four sources, four independent readings, one
+ * Why a workflow: five sources, five independent readings, one
  * structured answer each (no parsing of prose), and the guarantee
  * that the session sums numbers a reader counted, never numbers it
  * remembered.
@@ -24,10 +24,11 @@
  *       { key: 'execution', paths: ['/abs/.../03-execution/board.md', '/abs/.../03-execution/parked.md', '/abs/.../03-execution/audit.md', '/abs/.../03-execution/entries/E-01/run-1.json', '…every run-*.json…', '/abs/.../blueprint/execution/execution.json'] },
  *       { key: 'release',   paths: ['/abs/.../04-release/plan.md', '/abs/.../04-release/trace.md', '/abs/.../04-release/entries/R.1/run-1.json', '/abs/.../blueprint/release/release.json'] },
  *       { key: 'notes',     paths: ['/abs/.../dreaming-notes.md', '/abs/.../taste-notes.md'] },
+ *       { key: 'telemetry', paths: ['/abs/.../.state.md', '/abs/.../01-design/telemetry.md', '…each stage's telemetry…', '/abs/.../04-release/trace.md'] },
  *     ],
  *   }})
  *
- * Returns [{ key, numbers, lenses, frictions, unread }], one per
+ * Returns [{ key, numbers, lenses, frictions, findingsByClass, stages, unread }], one per
  * source in the order given; a source whose harvester died twice
  * comes back as { key, failed: true } and the session reads it itself
  * (the trace says so).
@@ -35,7 +36,7 @@
 
 export const meta = {
   name: 'close-harvest',
-  description: 'Stage 6 · one close-harvester per source of the record returns numbers, reviewer precision and every friction with evidence; decides nothing',
+  description: 'Stage 6 · one close-harvester per source of the record returns numbers, reviewer precision, findings by class, stage telemetry and every friction with evidence; decides nothing',
   phases: [{ title: 'Harvest', detail: 'one harvester (Sonnet 5.5, medium) per source, in parallel' }],
 }
 
@@ -43,7 +44,7 @@ const HARVESTER = 'close-harvester'
 
 const HARVEST = {
   type: 'object', additionalProperties: false,
-  required: ['key', 'numbers', 'lenses', 'frictions', 'unread'],
+  required: ['key', 'numbers', 'lenses', 'frictions', 'findingsByClass', 'stages', 'unread'],
   properties: {
     key: { type: 'string' },
     numbers: { type: 'object', additionalProperties: { type: ['number', 'null'] }, description: 'only the keys this source carries; null where the file does not say' },
@@ -59,6 +60,10 @@ const HARVEST = {
       taste: { type: 'boolean', description: 'a taste-notes line' },
       landsHint: { type: 'string', enum: ['pipeline', 'doctrine', 'venture', 'incident'] },
       destinationHint: { type: ['string', 'null'], description: 'the pipeline file it would point at, if known' } } } },
+    findingsByClass: { type: 'array', items: { type: 'object', additionalProperties: false, required: ['stage', 'class', 'found', 'sustained'], properties: {
+      stage: { type: 'string' }, class: { type: 'string' }, found: { type: 'integer' }, sustained: { type: 'integer' } } } },
+    stages: { type: 'array', description: 'telemetry only: one row per stage that recorded itself', items: { type: 'object', additionalProperties: false, required: ['stage', 'wallClockH', 'hisH', 'agentH', 'tokensM', 'rounds', 'source'], properties: {
+      stage: { type: 'string' }, wallClockH: { type: ['number', 'null'] }, hisH: { type: ['number', 'null'] }, agentH: { type: ['number', 'null'] }, tokensM: { type: ['number', 'null'] }, rounds: { type: ['integer', 'null'] }, source: { type: ['string', 'null'], description: 'file:line' } } } },
     unread: { type: 'array', items: { type: 'string' } },
   },
 }
@@ -72,11 +77,13 @@ Workstream: ${args?.workstream} (language: ${args?.language ?? 'the files\' own'
 Source key: ${s.key}
 Paths: ${s.paths?.length ? s.paths.join('\n  ') : '(none — this source does not exist; answer with zero counts and no frictions)'}
 Numbers the close sums (count only what this source carries; null where the file does not say): ${(args?.keys || []).join(', ')}
+Findings by class: per stage and class as the files name their classes (found, sustained); empty when this source has no review.
+${s.key === 'telemetry' ? 'Telemetry: one stages[] row per stage that recorded its wall-clock, his hours, agent hours, tokens and rounds, with the file:line; a stage that recorded nothing is a friction.' : 'stages: [] (only the telemetry source fills it).'}
 
 Read exactly these files and nothing else: no folder walked, no evidence file (screenshots, videos, test output) opened.
 Return the structured result. Ids are ${s.key}-1, ${s.key}-2, … Miss nothing; decide nothing.`
 
-const valid = (v, key) => !!v && v.key === key && v.numbers && typeof v.numbers === 'object' && Array.isArray(v.frictions) && Array.isArray(v.lenses) && Array.isArray(v.unread)
+const valid = (v, key) => !!v && v.key === key && v.numbers && typeof v.numbers === 'object' && Array.isArray(v.frictions) && Array.isArray(v.lenses) && Array.isArray(v.unread) && Array.isArray(v.findingsByClass) && Array.isArray(v.stages)
 
 phase('Harvest')
 log(`${sources.length} sources · one ${HARVESTER} (Sonnet 5.5, medium) each`)

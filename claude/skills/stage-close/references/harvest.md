@@ -7,7 +7,7 @@ whole. One close-harvester (Sonnet 5.5, medium) per source reads it and
 returns what the retro needs, structured: the numbers, the precision
 per reviewer, every friction with its evidence.
 
-## The four sources
+## The five sources
 
 | Source key | Paths passed | What comes back |
 |---|---|---|
@@ -15,6 +15,7 @@ per reviewer, every friction with its evidence.
 | `execution` | `03-execution/board.md`, `parked.md`, `audit.md`, every `entries/*/run-*.json` listed by path (never the `entries/` folder), `blueprint/execution/execution.json` | entries, amendments, rounds per entry, findings and precision per reviewer, parked entries and why, the choices where the documents were silent, the audit's items and rulings; every friction the runs and the board show |
 | `release` | `04-release/plan.md`, `trace.md`, every `04-release/entries/*/run-*.json` listed by path, `blueprint/release/release.json` | staging runs and reds, fixes, rollbacks, hotfixes, watch read and owned; every friction the trace notes |
 | `notes` | `dreaming-notes.md`, `taste-notes.md` | every note as a friction, the `[user]` ones marked; every taste note marked `taste` |
+| `telemetry` | `.state.md`, `01-design/telemetry.md`, the plan's and the execution's telemetry where the stages wrote it, `04-release/trace.md` | per stage: wall-clock, his hours, agent hours, tokens, rounds, findings by class, each with its line ([metrics.md](metrics.md)); a stage that recorded nothing is a friction |
 
 A source with no file comes back empty; the trace says so.
 
@@ -37,7 +38,7 @@ touch.
 
 ## The workflow
 
-`close-harvest.js`: `parallel` over the four sources, one structured
+`close-harvest.js`: `parallel` over the five sources, one structured
 answer each, one re-dispatch on an invalid answer; a source that
 failed twice comes back `{ key, failed: true }` and the session reads
 it itself, saying so in the trace. The args carry paths, never text.
