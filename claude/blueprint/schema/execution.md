@@ -11,7 +11,8 @@ build refuses with the field named: an entry id the plan does not
 know, a plan entry or `F` missing or listed twice, a merged entry with
 no sha, a parked entry whose audit item does not exist, an amendment
 for an unknown entry, a reviewer that is not `verifier`, `reviewer`,
-`structure-reviewer` or `exec-lens-*`, a closed audit with an unruled item, **a text over its
+`structure-reviewer`, `ux-reviewer` or `exec-lens-*`, a precision row
+whose `withRepro` + `ruleOnly` is not its `blocking`, a closed audit with an unruled item, **a text over its
 word cap**; and it refuses any file of the retired lanes-and-waves
 execution (`lanes/`, `waves/`, `exec-report.json`, `audit.json`). Text
 fields accept two inline marks: `` `code` `` and `**bold**`. No HTML.
@@ -44,7 +45,7 @@ The record (`03-execution/`) is named as the authority, never copied.
   ],
   "amendments": [ { "id": "F.1", "what": "`orders.note` column and the field in `POST /orders`", "for": "E-03", "sha": "5d4c3b2" } ],
   "precision": [
-    { "lens": "reviewer", "found": 4, "sustained": 3, "deferred": 0, "latitude": 0, "dismissed": 1, "user": 0 }
+    { "lens": "reviewer", "found": 4, "blocking": 3, "withRepro": 2, "ruleOnly": 1, "deferred": 0, "learn": 1, "closed": 3 }
   ],
   "report": {
     "inOneSentence": "…",
@@ -68,9 +69,16 @@ The record (`03-execution/`) is named as the authority, never copied.
 - `sha` is present on every entry and amendment, `null` until merged.
 - `amendments[].id` is `F.<n>`; `for` names the entry that needed it.
 - `precision[].lens` is one of stage 4's reviewers: `verifier`,
-  `reviewer`, `structure-reviewer`, or a lens `exec-lens-*` (security,
-  operations, craft). The retired `exec-qa-*` names are still accepted,
-  so an older record builds.
+  `reviewer`, `structure-reviewer`, `ux-reviewer`, or a lens
+  `exec-lens-*` (security, operations, craft). The retired `exec-qa-*`
+  names are still accepted, so an older record builds.
+- A precision row is exec-entry's tally summed across entries
+  (`references/judging.md`, "Precision"): `found`, `blocking`,
+  `deferred`, `learn` (to the learn log), and optionally, of the
+  blocking ones, `withRepro` and `ruleOnly` (they add up to
+  `blocking`), and `closed` (its items closed in the delta). A v8 row
+  (`found`, `sustained`, `deferred`, `latitude`, `dismissed`, `user`)
+  still builds; the table shows the columns the record carries.
 - `audit.*[].ruling` and `words` are `null` until the user rules;
   `recommendation` is `keep` or `fix` for a choice, one sentence for a
   parked item. A choice's ruling is `keep`, `fix` or `revert`; a

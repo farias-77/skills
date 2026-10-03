@@ -10,7 +10,8 @@ the workstream's language. See `../example/` for a filled set.
 |---|---|---|
 | `workstream.json` | the conductor | at open |
 | `prfaq.json` | `disc-author-prfaq` | with `pr-faq.md`, kept in step through every fix |
-| `stories.json` | `disc-author-stories` | with `user-stories.md`, kept in step through every fix |
+| `stories.json` | `journey-scribe` | with `00-discovery/stories.md`, kept in step through every fix |
+| `mock.json` | the conductor | optional, at D7: the locked journeys step by step, with their pictures |
 | `figures.json` | the conductor | optional: the flow in one picture (mermaid) |
 | `review.json` | the conductor | after each round, from `reviews.md` and `rulings.md` |
 | `report.json` | the conductor | at the close: the plain-language layer |
@@ -44,17 +45,23 @@ the workstream's language. See `../example/` for a filled set.
   "vocabulary": [ { "term": "…", "def": "…" } ],
   "stories": [ {
     "id": "S-001", "name": "…", "as": "…", "want": "…", "so": "…",
-    "acs": [ { "id": "<SLUG>-S-001-AC-1", "kind": "WHEN | IF | WHILE", "text": "the sentence after the keyword" } ],
+    "acs": [ { "id": "J1.s2.1", "kind": "GIVEN", "text": "GIVEN … WHEN … THEN … AND …, the whole criterion" } ],
     "badPaths": [ { "category": "Boundary input | Repeat / concurrency | Dependency failure | Permission", "case": "…", "behavior": "…" } ],
     "out": [ "…" ]
   } ],
-  "inferred": [ { "id": "I-1", "landed": "S-001 AC-6", "assumed": "…", "why": "…", "ruling": "confirmed | rejected | open | superseded", "changed": false, "note": "…" } ],
+  "inferred": [ { "id": "I-1", "landed": "J1.s2.1", "assumed": "…", "why": "…", "ruling": "confirmed | rejected | open | superseded", "changed": false, "note": "…" } ],
   "openQuestions": []
 }
 ```
 
-`changed: true` marks an inference the user's rulings altered after
-validation; the tab shows those first.
+- An AC id is the journey step it proves, `J<n>.s<k>.<m>`, or
+  `frame:<token>.<m>` for a state only a debug path reaches, exactly as
+  `stories.md` writes it. `kind` is `GIVEN` and `text` is the whole
+  GIVEN/WHEN/THEN/AND. A v8 record (`<SLUG>-S-NNN-AC-n`, kind `WHEN`,
+  `IF` or `WHILE`, the text after the keyword) still builds.
+- `inferred[].landed` names the AC id the inference landed in.
+- `changed: true` marks an inference the user's rulings altered after
+  the lock; the tab shows those first.
 
 ## figures.json
 
@@ -69,9 +76,9 @@ Mermaid renders natively in the published page. An `svg` field
 
 ```json
 {
-  "opened": "2026-09-08", "approved": "2026-09-09",
+  "opened": "2026-01-05", "approved": "2026-01-06",
   "rounds": [ { "n": 1, "run": "wf_…", "findings": 24, "toAuthor": 2, "toUser": 5, "deferred": 1, "dismissed": 16, "unread": [ "S-001" ], "changed": "one line" } ],
-  "validation": [ { "story": "S-001", "ruling": "confirm | reduce | adjust | cut", "words": "…" } ],
+  "lock": { "version": 4, "at": "2026-01-05 15:40", "words": "lock it", "override": null, "gaps": [], "url": "https://…" },
   "decisions": [ { "id": "disc-reviewer-boundary#3", "round": 1, "lens": "boundary", "title": "…", "gap": "…", "ruling": "what the user chose", "words": "his reason, verbatim" } ],
   "authorFixes": [ { "id": "…", "round": 1, "title": "…" } ],
   "forDesign": [ { "id": "…", "story": "S-004", "title": "…", "why": "…" } ],
@@ -79,6 +86,28 @@ Mermaid renders natively in the published page. An `svg` field
   "residue": [ { "id": "…", "title": "…", "why": "…" } ]
 }
 ```
+
+- `lock` (optional) is the mock's `LOCK.json` as he locked it:
+  `version`, `at` (its `date`), `words` (his, verbatim), `override`
+  (his words when he locked over a failing walk, else `null`), `gaps`
+  (the walk's failures he accepted, `{where, what}` or one line each;
+  every gap shows under "What needs your eye") and `url` (the mock's
+  link). Gaps need an override.
+- `validation` (one ruling per story, v8) is optional; nothing reads it.
+
+## mock.json (optional)
+
+```json
+{ "url": "https://…", "version": 4,
+  "journeys": [ { "id": "J1", "title": "Invite a teammate",
+    "steps": [ { "id": "s1", "do": "the admin opens Members and types an e-mail", "frame": "invite-form.idle",
+                 "png": "00-discovery/prototype/frames/journeys/J1.s1.png" } ] } ] }
+```
+
+The Discovery tab shows each journey step by step, after "How it
+works". `png` is optional, a path inside the workstream; the picture
+is published beside the page at that same path (like the stage
+report's video), and the build refuses one that is not there.
 
 ## report.json — the plain-language layer
 

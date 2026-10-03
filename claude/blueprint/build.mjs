@@ -4,7 +4,7 @@
 //
 //   node claude/blueprint/build.mjs <workstream-dir>
 //
-// reads  <workstream-dir>/blueprint/*.json   (workstream, prfaq, stories, report, review; figures optional)
+// reads  <workstream-dir>/blueprint/*.json   (workstream, prfaq, stories, report, review; figures and mock optional)
 //        <workstream-dir>/blueprint/plan/*.json when stage 3 ran: plan.json, plan-report, plan-review; briefs/<id>.json per
 //        entry and briefs/F.json, the brief files embedded from 02-plan/briefs/
 //        <workstream-dir>/blueprint/execution/execution.json when stage 4 ran (one file by the session: the entries, the amendments,
@@ -15,7 +15,7 @@
 //        reviewer, what worked, what went wrong, the ideas with their evidence, the user's notes, the sweep), read only against a
 //        closed release
 //        <workstream-dir>/blueprint/design/*.json when stage 2 ran (one per document + decisions, design-report, design-review;
-//        the documents themselves and the artboards are embedded from 01-design/)
+//        sizing optional; the documents themselves and the artboards are embedded from 01-design/)
 //        <workstream-dir>/blueprint/stage-report.json when a stage closed with its video and slides (docs/stage-report.md):
 //        per tab, the video's path (relative to the workstream, published beside the page) and the slides' link
 // writes <workstream-dir>/blueprint.html
@@ -57,12 +57,46 @@ const ids = new Set(stories.stories.map(s => s.id));
 stories.stories.forEach(s => {
   need(s, ['id', 'name', 'as', 'want', 'so', 'acs', 'badPaths', 'out'], `story ${s.id}`);
   if (!s.acs.length) problems.push(`story ${s.id}: no ACs`);
-  s.acs.forEach(a => { if (!/-S-\d{3}-AC-\d+$/.test(a.id)) problems.push(`story ${s.id}: AC id ${a.id} is not <SLUG>-S-NNN-AC-n`); });
+  // v9: a journey step J<n>.s<k>.<m> or a debug-only state frame:<token>.<m>; v8's <SLUG>-S-NNN-AC-n still builds
+  s.acs.forEach(a => { if (!/^(J\d+\.s\d+\.\d+|frame:[A-Za-z0-9_.-]+\.\d+)$/.test(a.id) && !/-S-\d{3}-AC-\d+$/.test(a.id)) problems.push(`story ${s.id}: AC id ${a.id} is not J<n>.s<k>.<m>, frame:<token>.<m> or <SLUG>-S-NNN-AC-n`); });
   if (!report.stories[s.id]) problems.push(`report.json: story ${s.id} has no plain sentence`);
 });
 if (report.threeThings.length !== 3) problems.push('report.json: threeThings must have exactly three items');
 (review.forDesign || []).forEach(x => { if (x.story && !ids.has(x.story)) problems.push(`forDesign ${x.id}: story ${x.story} does not exist`); });
 (review.decisions || []).forEach(x => { if (!report.decisions?.[`${x.round}:${x.id}`]) problems.push(`report.json: decision ${x.round}:${x.id} has no plain sentence`); });
+// the lock (optional, v9): the mock's LOCK.json as he locked it — version, when, his words, an override and the gaps it accepted, the mock's link
+if (review.lock != null) {
+  const K = review.lock, w = 'review.json lock';
+  if (typeof K !== 'object' || Array.isArray(K)) problems.push(`${w}: must be an object`);
+  else {
+    need(K, ['version', 'at', 'words'], w);
+    if (K.version !== undefined && !(Number.isInteger(K.version) && K.version > 0)) problems.push(`${w}: version must be a positive whole number`);
+    if ('override' in K && K.override !== null && typeof K.override !== 'string') problems.push(`${w}: override must be his words or null`);
+    if (K.gaps !== undefined && !Array.isArray(K.gaps)) problems.push(`${w}: gaps must be a list (empty when the walk passed)`);
+    if (Array.isArray(K.gaps) && K.gaps.length && !K.override) problems.push(`${w}: gaps were accepted, so override carries his words`);
+    if (K.url != null && !/^https:\/\//.test(String(K.url))) problems.push(`${w}: url "${K.url}" must be the mock's https link`);
+  }
+}
+// the mock (optional, v9): the locked journeys step by step, each step's picture published beside the page like the video
+const mock = opt('mock.json');
+if (mock) {
+  const w = 'mock.json';
+  need(mock, ['version', 'journeys'], w);
+  if (mock.journeys !== undefined && !Array.isArray(mock.journeys)) problems.push(`${w}: journeys must be a list`);
+  (Array.isArray(mock.journeys) ? mock.journeys : []).forEach((j, i) => {
+    const wj = `${w} journeys[${i + 1}]${j.id ? ` (${j.id})` : ''}`;
+    need(j, ['id', 'title', 'steps'], wj);
+    if (j.steps !== undefined && (!Array.isArray(j.steps) || !j.steps.length)) problems.push(`${wj}: steps must be a non-empty list`);
+    (Array.isArray(j.steps) ? j.steps : []).forEach((st, k) => {
+      const wst = `${wj} steps[${k + 1}]`;
+      need(st, ['id', 'do'], wst);
+      if (st.png != null) {
+        if (typeof st.png !== 'string' || !/^(?![/\\])(?!.*\.\.)(?![a-z]+:)[\w./~-]+\.png$/i.test(st.png)) problems.push(`${wst}: png "${st.png}" must be a relative .png path inside the workstream`);
+        else if (!existsSync(join(ws, st.png))) problems.push(`${wst}: png ${st.png} not found in the workstream (the page shows it from that same path)`);
+      }
+    });
+  });
+}
 if (problems.length) { console.error('blueprint data problems:\n  ' + problems.join('\n  ')); process.exit(1); }
 
 // an artboard names its images by bare filename (`src="hero.jpg"`); shown by srcdoc there is no base to resolve them, so they travel as data URIs
@@ -134,8 +168,72 @@ if (existsSync(designDir)) {
   decisions.forEach(c => { need(c, ['id', 'doc', 'when', 'question', 'chosen'], `decision ${c.id}`); if (seen.has(c.id)) problems.push(`decision ${c.id}: duplicate id`); seen.add(c.id);
     if (!['macro', ...DOCS].includes(c.doc)) problems.push(`decision ${c.id}: doc "${c.doc}" is not a document`); });
   (dreview.decisions || []).forEach(x => { if (!x.plain) problems.push(`design-review.json: decision ${x.id} has no plain sentence`); });
+  // the size (optional, by the conductor from sizing.md): three tiers side by side, the pick per part with R V C, the doors, the evolution path
+  const sizing = dopt('sizing.json');
+  if (sizing) {
+    const W = 'design/sizing.json', TIERS = ['lean', 'balanced', 'hardened'];
+    const num = v => typeof v === 'number' && Number.isFinite(v) && v >= 0;
+    const lst = (v, name) => { if (v === undefined) return []; if (!Array.isArray(v)) { problems.push(`${W}: ${name} must be a list`); return []; } return v; };
+    need(sizing, ['plain', 'appetite', 'tiers', 'parts', 'picks', 'doors', 'evolution'], W);
+    const ap = sizing.appetite && typeof sizing.appetite === 'object' ? sizing.appetite : {};
+    if (sizing.appetite !== undefined) {
+      need(ap, ['hours', 'pick', 'runCost', 'unit'], `${W} appetite`);
+      ['hours', 'pick', 'runCost'].forEach(k => { if (ap[k] !== undefined && !num(ap[k])) problems.push(`${W}: appetite.${k} must be a number`); });
+      if (num(ap.hours) && num(ap.pick) && ap.pick > ap.hours) problems.push(`${W}: appetite.pick ${ap.pick} h is over appetite.hours ${ap.hours} h (over the appetite the scope is cut, never the floor)`);
+    }
+    const tiers = lst(sizing.tiers, 'tiers');
+    if (sizing.tiers !== undefined && (tiers.length !== 3 || tiers.some((t, i) => t?.tier !== TIERS[i]))) problems.push(`${W}: tiers must be exactly three, in order: ${TIERS.join(', ')}`);
+    tiers.forEach((t, i) => ['hours', 'cost'].forEach(k => { if (!num(t?.[k])) problems.push(`${W}: tiers[${i + 1}].${k} must be a number`); }));
+    const parts = lst(sizing.parts, 'parts'), partNames = new Set();
+    if (sizing.parts !== undefined && !parts.length) problems.push(`${W}: parts must be a non-empty list`);
+    parts.forEach((p, i) => {
+      const w = `${W} parts[${i + 1}]${p.part ? ` (${p.part})` : ''}`;
+      need(p, ['part', ...TIERS], w);
+      if (partNames.has(p.part)) problems.push(`${w}: duplicate part`); partNames.add(p.part);
+      TIERS.forEach(t => { if (p[t] === undefined) return; need(p[t], ['what'], `${w} ${t}`); ['hours', 'cost'].forEach(k => { if (!num(p[t][k])) problems.push(`${w}: ${t}.${k} must be a number`); }); });
+    });
+    const known = n => partNames.has(n) || partNames.has(String(n).split('.')[0]);
+    const picks = lst(sizing.picks, 'picks'), pickNames = new Set();
+    picks.forEach((p, i) => {
+      const w = `${W} picks[${i + 1}]${p.part ? ` (${p.part})` : ''}`;
+      need(p, ['part', 'tier', 'rvc', 'why'], w);
+      if (pickNames.has(p.part)) problems.push(`${w}: duplicate part`); pickNames.add(p.part);
+      if (p.part !== undefined && !known(p.part)) problems.push(`${w}: part "${p.part}" is neither a part of parts nor <part>.<sub-part>`);
+      if (p.tier !== undefined && !TIERS.includes(p.tier)) problems.push(`${w}: tier "${p.tier}" must be one of ${TIERS.join(', ')}`);
+      if (p.rvc !== undefined && !(Array.isArray(p.rvc) && p.rvc.length === 3 && p.rvc.every(x => [1, 2, 3].includes(x)))) problems.push(`${w}: rvc must be three scores 1–3 (R, V, C)`);
+    });
+    partNames.forEach(n => { if (![...pickNames].some(x => x === n || String(x).startsWith(`${n}.`))) problems.push(`${W} picks: part ${n} has no pick (itself or a sub-part)`); });
+    lst(sizing.doors, 'doors').forEach((d, i) => {
+      const w = `${W} doors[${i + 1}]`;
+      need(d, ['door', 'decided'], w);
+      if (!('his' in d)) problems.push(`${w}: missing his (the question id Q-<n>, or null when the door is not his)`);
+      else if (d.his !== null && !/^Q-\d+$/.test(String(d.his))) problems.push(`${w}: his "${d.his}" must be Q-<n> or null`);
+      if (d.his === null && !d.why) problems.push(`${w}: a door that is not his says why (why)`);
+    });
+    const evo = lst(sizing.evolution, 'evolution');
+    evo.forEach((x, i) => {
+      const w = `${W} evolution[${i + 1}]${x.part ? ` (${x.part})` : ''}`;
+      need(x, ['part', 'now', 'signal', 'watchedBy', 'next', 'cost'], w);
+      if (x.part !== undefined && !pickNames.has(x.part) && !partNames.has(x.part)) problems.push(`${w}: part "${x.part}" is not a part or a pick`);
+    });
+    picks.filter(p => p.tier === 'lean' && Array.isArray(p.rvc) && p.rvc[0] >= 2).forEach(p => {
+      if (!evo.some(x => x.part === p.part || x.part === String(p.part).split('.')[0])) problems.push(`${W} evolution: the lean pick ${p.part} has R ${p.rvc[0]} and no evolution-path row`);
+    });
+    lst(sizing.noGos, 'noGos');
+    // word caps by exact path; numbers, ids, part names and req are never capped
+    const SCAPS = { plain: 45, noGos: 14, 'parts.lean.what': 12, 'parts.balanced.what': 12, 'parts.hardened.what': 12, 'picks.why': 25, 'doors.door': 12, 'doors.decided': 18, 'doors.why': 18,
+      'evolution.now': 12, 'evolution.signal': 14, 'evolution.watchedBy': 8, 'evolution.next': 12 };
+    const swalk = (v, path) => {
+      if (Array.isArray(v)) { v.forEach(x => swalk(x, path)); return; }
+      if (v && typeof v === 'object') { Object.entries(v).forEach(([k, x]) => swalk(x, path ? `${path}.${k}` : k)); return; }
+      if (typeof v !== 'string') return;
+      const cap = SCAPS[path];
+      if (cap && words(v) > cap) problems.push(`${W}: ${path} has ${words(v)} words, cap ${cap} — "${v.slice(0, 60)}…"`);
+    };
+    swalk(sizing, '');
+  }
   if (problems.length) { console.error('blueprint data problems:\n  ' + problems.join('\n  ')); process.exit(1); }
-  design = { docs, mdDocs, artboards, report: dreport, review: dreview, decisions };
+  design = { docs, mdDocs, artboards, report: dreport, review: dreview, decisions, sizing };
 }
 // ---- stage 3 (schema/plan.md): the foundation, the entries and their edges, one brief per entry, embedded whole ----
 const planDir = join(dataDir, 'plan');
@@ -166,6 +264,12 @@ if (existsSync(planDir)) {
   if (G.concurrency !== undefined && !(Number.isInteger(G.concurrency) && G.concurrency > 0)) problems.push('plan.json: concurrency must be a positive integer');
   const entries = Array.isArray(G.entries) ? G.entries : [];
   if (G.entries !== undefined && !Array.isArray(G.entries)) problems.push('plan.json: entries must be a list');
+  // the node kinds of the graph (stage-plan): F-b foundation, F-x<n> lane, E-<nn> slice, E-int integration; a kind left out is read from the id
+  const PKINDS = ['foundation', 'lane', 'slice', 'integration', 'fix'];
+  const KIND_ID = { foundation: /^F-[a-z]$/, lane: /^F-x\d+$/, slice: /^E-\d+$/, integration: /^E-int$/ };
+  const kindOf = e => e.kind ?? (KIND_ID.lane.test(e.id) ? 'lane' : KIND_ID.foundation.test(e.id) ? 'foundation' : KIND_ID.integration.test(e.id) ? 'integration' : 'slice');
+  const isFound = e => e && kindOf(e) === 'foundation';
+  const EDGE_CLASSES = ['ui', 'side-effect'];
   const entryIds = new Set(), carried = new Map();
   entries.forEach((e, i) => {
     const w = `plan.json entry ${e.id || `#${i + 1}`}`;
@@ -173,19 +277,40 @@ if (existsSync(planDir)) {
     ['back', 'front'].forEach(k => { if (!(k in e)) problems.push(`${w}: missing ${k} (null when the entry has no such side)`); });
     if (e.id === 'F') problems.push(`${w}: id "F" is the foundation's`);
     if (entryIds.has(e.id)) problems.push(`${w}: duplicate id`); entryIds.add(e.id);
-    if (!Array.isArray(e.stories) || !e.stories.length) problems.push(`${w}: stories must be a non-empty list`);
+    if (e.kind !== undefined && !PKINDS.includes(e.kind)) problems.push(`${w}: kind "${e.kind}" must be one of ${PKINDS.join(', ')}`);
+    else if (e.kind !== undefined && KIND_ID[e.kind] && e.id !== undefined && !KIND_ID[e.kind].test(e.id)) problems.push(`${w}: kind ${e.kind} takes an id like ${{ foundation: 'F-b', lane: 'F-x<n>', slice: 'E-<nn>', integration: 'E-int' }[e.kind]}`);
+    const noStories = ['foundation', 'lane'].includes(kindOf(e));
+    if (!Array.isArray(e.stories) || (!e.stories.length && !noStories)) problems.push(`${w}: stories must be a non-empty list (only a lane F-x<n> or a foundation entry carries none)`);
     (Array.isArray(e.stories) ? e.stories : []).forEach(s => {
       if (!ids.has(s)) problems.push(`${w}: story ${s} does not exist in the discovery`);
       if (!carried.has(s)) carried.set(s, e.id);
     });
     if (e.after !== undefined && !Array.isArray(e.after)) problems.push(`${w}: after must be a list (empty when the foundation is enough)`);
+    // an edge is an id, or {id, class, stacked, need}; the build keeps the ids in after and the whole edge in edges
+    if (Array.isArray(e.after)) {
+      e.edges = e.after.map((a, j) => {
+        const x = typeof a === 'string' ? { id: a } : a;
+        if (!x || typeof x !== 'object' || typeof x.id !== 'string') { problems.push(`${w}: after[${j + 1}] must be an entry id or {id, class, stacked}`); return null; }
+        if (x.class !== undefined && !EDGE_CLASSES.includes(x.class)) problems.push(`${w}: after ${x.id} class "${x.class}" must be ui or side-effect`);
+        if (x.stacked !== undefined && typeof x.stacked !== 'boolean') problems.push(`${w}: after ${x.id} stacked must be true or false`);
+        return x;
+      }).filter(Boolean);
+    }
+    if (e.wave !== undefined && !(Number.isInteger(e.wave) && e.wave >= 0)) problems.push(`${w}: wave must be a whole number`);
+    if (e.critical !== undefined && typeof e.critical !== 'boolean') problems.push(`${w}: critical must be true or false`);
+    if (e.owns !== undefined && !(Array.isArray(e.owns) && e.owns.every(p => typeof p === 'string'))) problems.push(`${w}: owns must be a list of paths`);
     if (e.proof !== undefined) proofList(e.proof, w);
   });
   ids.forEach(s => { if (!carried.has(s)) problems.push(`plan.json entries: story ${s} is carried by no entry`); });
-  entries.forEach(e => (Array.isArray(e.after) ? e.after : []).forEach(a => {
-    if (a === 'F') problems.push(`plan.json entry ${e.id}: after names "F"; the foundation precedes every entry and is never listed`);
+  const byKey = new Map(entries.map(e => [e.id, e]));
+  entries.forEach(e => (e.edges || []).forEach(({ id: a }) => {
+    if (a === 'F') { if (!isFound(e)) problems.push(`plan.json entry ${e.id}: after names "F"; the foundation precedes every entry and is never listed`); }
     else if (!entryIds.has(a)) problems.push(`plan.json entry ${e.id}: after names ${a}, which is not an entry`);
+    else if (isFound(e) && !isFound(byKey.get(a))) problems.push(`plan.json entry ${e.id}: a foundation entry waits only for the foundation, not for ${a}`);
+    else if (!isFound(e) && isFound(byKey.get(a))) problems.push(`plan.json entry ${e.id}: after names ${a}, a foundation entry; the foundation precedes every entry and is never listed`);
   }));
+  // after keeps the entry ids only ("F" is implied); the shell and stage 4 read it as before
+  entries.forEach(e => { if (e.edges) e.after = e.edges.map(x => x.id).filter(a => a !== 'F'); });
   // cycles in the edges: depth-first, a node met again while on the stack closes a cycle
   const byId = new Map(entries.map(e => [e.id, e])), state = new Map(), cycles = [];
   const visit = (id, stack) => {
@@ -194,7 +319,31 @@ if (existsSync(planDir)) {
   };
   entries.forEach(e => { if (Array.isArray(e.after)) visit(e.id, []); });
   cycles.forEach(c => problems.push(`plan.json entries: after forms a cycle (${c})`));
+  // the waves (stage-plan's checker): a foundation entry is wave 0; an entry with no edge is wave 1, else one past its deepest predecessor
   const docOk = d => d === 'F' || entryIds.has(d);
+  if (!cycles.length) {
+    const lvl = new Map();
+    const levelOf = e => { if (lvl.has(e.id)) return lvl.get(e.id); const ups = (e.after || []).map(a => byId.get(a)).filter(x => x && !isFound(x));
+      const l = isFound(e) ? 0 : ups.length ? 1 + Math.max(...ups.map(levelOf)) : 1; lvl.set(e.id, l); return l; };
+    entries.forEach(e => { if (e.id !== undefined) levelOf(e); });
+    entries.forEach(e => { if (Number.isInteger(e.wave) && e.wave !== lvl.get(e.id)) problems.push(`plan.json entry ${e.id}: wave ${e.wave}, but its edges put it in wave ${lvl.get(e.id)}`); });
+    const waveN = [...lvl.values()].filter(l => l > 0), depthC = Math.max(0, ...waveN), widthC = Math.max(0, ...Array.from({ length: depthC }, (_, i) => waveN.filter(l => l === i + 1).length));
+    if (G.depth !== undefined && G.depth !== depthC) problems.push(`plan.json: depth ${G.depth}, but the edges give ${depthC} waves after the foundation`);
+    if (G.width !== undefined && G.width !== widthC) problems.push(`plan.json: width ${G.width}, but the widest wave holds ${widthC} entries`);
+    if (G.width !== undefined && G.concurrency !== undefined && G.concurrency !== G.width) problems.push(`plan.json: concurrency ${G.concurrency} must be the widest wave (width ${G.width})`);
+  }
+  if (G.criticalPath !== undefined) {
+    const cp = G.criticalPath;
+    if (!Array.isArray(cp) || !cp.length) problems.push('plan.json: criticalPath must be a non-empty list of ids (F first)');
+    else {
+      cp.forEach((id, i) => { if (!docOk(id)) problems.push(`plan.json criticalPath[${i + 1}]: "${id}" is neither "F" nor an entry id`); if (cp.indexOf(id) !== i) problems.push(`plan.json criticalPath: ${id} appears twice`); });
+      const tail = cp.filter(id => id !== 'F' && !isFound(byId.get(id)));
+      tail.forEach((id, i) => { if (i && byId.get(id) && !byId.get(id).after.includes(tail[i - 1])) problems.push(`plan.json criticalPath: ${id} follows ${tail[i - 1]}, but ${id} has no edge after it`); });
+      entries.forEach(e => { if (e.critical === true && !cp.includes(e.id)) problems.push(`plan.json entry ${e.id}: critical, but not in criticalPath`);
+        if (e.critical === false && cp.includes(e.id)) problems.push(`plan.json entry ${e.id}: critical false, but in criticalPath`); });
+    }
+  }
+  ['width', 'depth'].forEach(k => { if (G[k] !== undefined && !(Number.isInteger(G[k]) && G[k] >= 0)) problems.push(`plan.json: ${k} must be a whole number`); });
   const seenDec = new Set();
   (G.decisions || []).forEach(c => { need(c, ['id', 'doc', 'when', 'question', 'chosen'], `plan.json decision ${c.id}`); if (seenDec.has(c.id)) problems.push(`plan.json decision ${c.id}: duplicate id`); seenDec.add(c.id);
     if (c.doc !== 'cut' && !docOk(c.doc)) problems.push(`plan.json decision ${c.id}: doc "${c.doc}" is neither "cut", "F" nor an entry id`); });
@@ -287,12 +436,18 @@ if (existsSync(execDir) && plan) {
       if (a.id !== undefined && !/^F\.\d+$/.test(a.id)) problems.push(`${w}: id "${a.id}" must be F.<n>`);
       if (a.for !== undefined && !known.has(a.for)) problems.push(`${w}: for names "${a.for}", which is not a known entry id`);
     });
-    const PREC = ['found', 'sustained', 'deferred', 'latitude', 'dismissed', 'user'];
+    // v8 counted found → sustained · latitude · dismissed · user; v9 (exec-entry's tally) counts found → blocking · deferred · learn,
+    // the blocking split into withRepro and ruleOnly, and closed in the delta. A row carries either set, or both.
+    const PREC = ['found', 'sustained', 'blocking', 'deferred', 'latitude', 'dismissed', 'learn', 'user', 'withRepro', 'ruleOnly', 'closed'];
     precision.forEach((p, i) => {
       const w = `${W} precision[${i + 1}]${p.lens ? ` (${p.lens})` : ''}`;
-      need(p, ['lens', ...PREC], w);
-      if (p.lens !== undefined && !/^(verifier|reviewer|structure-reviewer|exec-(lens|qa)-[a-z]+)$/.test(p.lens)) problems.push(`${w}: lens "${p.lens}" must be verifier, reviewer, structure-reviewer, exec-lens-<name> or exec-qa-<name>`);
+      need(p, ['lens', 'found', 'deferred'], w);
+      if (p.sustained === undefined && p.blocking === undefined) problems.push(`${w}: missing blocking (or sustained, the v8 count)`);
+      if (p.sustained !== undefined) need(p, ['latitude', 'dismissed', 'user'], w);
+      if (p.blocking !== undefined) need(p, ['learn'], w);
+      if (p.lens !== undefined && !/^(verifier|reviewer|structure-reviewer|ux-reviewer|exec-(lens|qa)-[a-z]+)$/.test(p.lens)) problems.push(`${w}: lens "${p.lens}" must be verifier, reviewer, structure-reviewer, ux-reviewer, exec-lens-<name> or exec-qa-<name>`);
       PREC.forEach(k => { if (p[k] !== undefined && !nat(p[k])) problems.push(`${w}: ${k} must be a whole number`); });
+      if ([p.blocking, p.withRepro, p.ruleOnly].every(nat) && p.withRepro + p.ruleOnly !== p.blocking) problems.push(`${w}: withRepro ${p.withRepro} + ruleOnly ${p.ruleOnly} must equal blocking ${p.blocking}`);
     });
     const R = X.report && typeof X.report === 'object' ? X.report : {};
     if (X.report !== undefined) {
@@ -385,7 +540,7 @@ if (existsSync(releasePath)) {
   staging.forEach((s, i) => {
     const w = `${W} staging[${i + 1}]`;
     need(s, ['n', 'at', 'run', 'summary', 'proof'], w); bool(s, 'ok', w);
-    ['pr', 'cause', 'fix'].forEach(k => { if (!(k in s)) problems.push(`${w}: missing ${k} (null when none)`); });
+    ['cause', 'fix'].forEach(k => { if (!(k in s)) problems.push(`${w}: missing ${k} (null when none)`); });
     if (s.at !== undefined && !stamp(s.at)) problems.push(`${w}: at "${s.at}" must be YYYY-MM-DD HH:MM`);
     if (s.cause !== undefined && ![null, 'code', 'environment'].includes(s.cause)) problems.push(`${w}: cause "${s.cause}" must be code, environment or null`);
     if (s.ok === true && s.cause != null) problems.push(`${w}: a green run has cause null`);
@@ -402,19 +557,75 @@ if (existsSync(releasePath)) {
     if (a.answer !== undefined && !['go', 'not-now'].includes(a.answer)) problems.push(`${w}: answer "${a.answer}" must be go or not-now`);
   });
   const goes = asks.filter(a => a && a.answer === 'go' && stamp(a.at)).map(a => a.at);
+  // v9 order: the play → the merge into main behind the local-CI signoff → staging → the verifier → production → the alarms → done
+  const obj = (v, name) => { if (v === undefined || v === null) return null; if (typeof v !== 'object' || Array.isArray(v)) { problems.push(`${W}: ${name} must be an object`); return null; } return v; };
+  const rate = (o, k, w) => { if (o[k] !== undefined && o[k] !== null && !(typeof o[k] === 'number' && Number.isFinite(o[k]) && o[k] >= 0)) problems.push(`${w}: ${k} must be a number or null`); };
+  const M = obj(L.merge, 'merge');
+  if (M) {
+    need(M, ['pr', 'sha', 'at', 'signoff'], `${W} merge`);
+    if (M.at !== undefined && !stamp(M.at)) problems.push(`${W} merge: at "${M.at}" must be YYYY-MM-DD HH:MM`);
+    else if (stamp(M.at) && !goes.some(g => g <= M.at)) problems.push(`${W} merge: the merge into main at ${M.at} before any ask answered go (the play authorizes the merge)`);
+  }
+  const RO = obj(L.rollout, 'rollout');
+  const shifts = RO ? list(RO.shifts, 'rollout.shifts') : [];
+  if (RO) {
+    const w = `${W} rollout`;
+    need(RO, ['mode'], w);
+    if (RO.mode !== undefined && !['progressive', 'straight'].includes(RO.mode)) problems.push(`${w}: mode "${RO.mode}" must be progressive or straight`);
+    const C = obj(RO.candidate, 'rollout.candidate');
+    if (RO.mode === 'progressive' && !C) problems.push(`${w}: a progressive rollout names its candidate {rev, tag, smoke}`);
+    if (C) need(C, ['rev', 'tag', 'smoke'], `${w} candidate`);
+    shifts.forEach((s, i) => { const ws = `${w} shifts[${i + 1}]`; need(s, ['pct', 'at'], ws);
+      if (s.pct !== undefined && !(typeof s.pct === 'number' && s.pct >= 0 && s.pct <= 100)) problems.push(`${ws}: pct must be a number 0–100`);
+      if (s.at !== undefined && !stamp(s.at)) problems.push(`${ws}: at "${s.at}" must be YYYY-MM-DD HH:MM`); });
+    const B = obj(RO.bake, 'rollout.bake');
+    if (B) {
+      const wb = `${w} bake`;
+      need(B, ['minutes', 'verdict'], wb);
+      ['minutes', 'newReq'].forEach(k => { if (B[k] !== undefined && B[k] !== null && !nat(B[k])) problems.push(`${wb}: ${k} must be a whole number`); });
+      ['new5xx', 'prev5xx', 'newP95', 'prevP95'].forEach(k => rate(B, k, wb));
+      if (B.verdict !== undefined && !['hold', 'no-signal', 'trigger'].includes(B.verdict)) problems.push(`${wb}: verdict "${B.verdict}" must be hold, no-signal or trigger`);
+    }
+  }
+  const rollbacks = list(L.rollbacks, 'rollbacks');
+  rollbacks.forEach((r, i) => {
+    const w = `${W} rollbacks[${i + 1}]`;
+    need(r, ['at', 'trigger', 'to'], w);
+    ['value', 'fix'].forEach(k => { if (!(k in r)) problems.push(`${w}: missing ${k} (null when none)`); });
+    if (r.at !== undefined && !stamp(r.at)) problems.push(`${w}: at "${r.at}" must be YYYY-MM-DD HH:MM`);
+    if (r.fix != null) fixOk(r.fix, w);
+  });
+  const ASTATES = ['ok', 'no-datapoints', 'firing', 'not-evaluated'];
+  list(L.alarms, 'alarms').forEach((a, i) => { const w = `${W} alarms[${i + 1}]${a.name ? ` (${a.name})` : ''}`; need(a, ['name', 'state'], w);
+    if (a.state !== undefined && !ASTATES.includes(a.state)) problems.push(`${w}: state "${a.state}" must be one of ${ASTATES.join(', ')}`); });
+  const NUMBERS = ['wallClockH', 'hisMin', 'tokensM', 'reverts', 'revertRate'];
+  const NB = obj(L.numbers, 'numbers');
+  if (NB) {
+    NUMBERS.forEach(k => { if (!(k in NB)) problems.push(`${W}: numbers.${k} missing (a number, or null when the record does not carry it)`); else rate(NB, k, `${W} numbers`); });
+    Object.keys(NB).filter(k => !NUMBERS.includes(k)).forEach(k => problems.push(`${W}: numbers.${k} is not a key of the schema`));
+  }
+  // every production step, traffic shift and rollback in time order: none before a go; after a red or a rollback, a new go first
   const production = list(L.production, 'production');
+  const prod = [
+    ...production.map((p, i) => ({ k: 'p', at: p.at, x: p, w: `${W} production[${i + 1}]`, what: 'a production step' })),
+    ...shifts.map((s, i) => ({ k: 's', at: s.at, x: s, w: `${W} rollout.shifts[${i + 1}]`, what: 'a traffic shift' })),
+    ...rollbacks.map((r, i) => ({ k: 'r', at: r.at, x: r, w: `${W} rollbacks[${i + 1}]`, what: 'a rollback' })),
+  ].sort((a, b) => !stamp(a.at) || !stamp(b.at) ? 0 : a.at < b.at ? -1 : a.at > b.at ? 1 : 0);
   let lastRed = null;
   production.forEach((p, i) => {
     const w = `${W} production[${i + 1}]`;
     need(p, ['n', 'at', 'run', 'checks', 'verified', 'proof'], w); bool(p, 'ok', w); bool(p, 'rolledBack', w);
     if (p.at !== undefined && !stamp(p.at)) problems.push(`${w}: at "${p.at}" must be YYYY-MM-DD HH:MM`);
-    else if (stamp(p.at)) {
-      if (!goes.some(g => g <= p.at)) problems.push(`${w}: a production step at ${p.at} before any ask answered go`);
-      else if (lastRed && !goes.some(g => g > lastRed && g <= p.at)) problems.push(`${w}: a production step after the red at ${lastRed} needs a new ask answered go`);
-    }
     if (p.rolledBack === true) fixOk(p.fix, `${w}: rolled back`);
     else if (p.fix != null) fixOk(p.fix, w);
-    if ((p.ok === false || p.rolledBack === true) && stamp(p.at)) lastRed = p.at;
+  });
+  prod.forEach(({ k, at, x, w, what }) => {
+    if (!stamp(at)) return;
+    if (k !== 'r') {
+      if (!goes.some(g => g <= at)) problems.push(`${w}: ${what} at ${at} before any ask answered go`);
+      else if (lastRed && !goes.some(g => g > lastRed && g <= at)) problems.push(`${w}: ${what} after the red at ${lastRed} needs a new ask answered go`);
+    }
+    if (k === 'r' || (k === 'p' && (x.ok === false || x.rolledBack === true))) lastRed = at;
   });
   const versions = list(L.versions, 'versions'), artifacts = new Set();
   versions.forEach((v, i) => {
@@ -446,7 +657,7 @@ if (existsSync(releasePath)) {
   list(L.pendencies, 'pendencies').forEach((p, i) => need(p, ['what', 'owner'], `${W} pendencies[${i + 1}]`));
   // word caps (schema/release.md): by exact path; ids, shas, runs, paths, dates, versions and words are never capped
   const LCAPS = { 'staging.summary': 25, 'fixes.what': 18, 'watch.what': 18, 'pendencies.what': 18, 'preflight.item': 16, 'production.verified': 25, 'watch.expects': 20,
-    'report.inOneSentence': 35, 'report.threeThings.p': 35, 'report.needsYourEye.p': 35, 'ships.residue': 20 };
+    'report.inOneSentence': 35, 'report.threeThings.p': 35, 'report.needsYourEye.p': 35, 'ships.residue': 20, 'rollbacks.trigger': 14 };
   const lwords = t => String(t).trim().split(/\s+/).filter(Boolean).length;
   const lwalk = (v, path) => {
     if (Array.isArray(v)) { v.forEach(x => lwalk(x, path)); return; }
@@ -572,9 +783,9 @@ if (existsSync(layersPath)) {
 }
 
 const data = {
-  workstream, strings, figures, review, report, design, plan, execution, release, retro, tabs, layers,
+  workstream, strings, figures, review, report, mock, design, plan, execution, release, retro, tabs, layers,
   ...prfaq, ...stories,
-  files: ['00-discovery/pr-faq.md', '00-discovery/user-stories.md', '00-discovery/reviews.md', 'rulings.md', ...(design ? ['01-design/*.md', '01-design/notes.md', '01-design/reviews.md', '01-design/ui/'] : []), ...(plan ? ['02-plan/plan.md', '02-plan/briefs/', '02-plan/recon/', '02-plan/reviews.md'] : []), ...(execution ? ['03-execution/board.md', '03-execution/parked.md', '03-execution/entries/', '03-execution/audit.md', '03-execution/explain.md'] : []), ...(release ? ['04-release/plan.md', '04-release/trace.md', '04-release/notes/', '04-release/entries/', '04-release/proof/'] : []), ...(retro ? ['05-close/retro.md', '05-close/harvest/', '05-close/trace.md'] : [])],
+  files: ['00-discovery/pr-faq.md', '00-discovery/stories.md', '00-discovery/journeys/', '00-discovery/prototype/LOCK.json', '00-discovery/prototype/frames/', '00-discovery/reviews.md', 'rulings.md', ...(design ? ['01-design/*.md', ...(design.sizing ? ['01-design/sizing.md'] : []), '01-design/notes.md', '01-design/reviews.md', '01-design/ui/'] : []), ...(plan ? ['02-plan/plan.md', '02-plan/briefs/', '02-plan/recon/', '02-plan/reviews.md'] : []), ...(execution ? ['03-execution/board.md', '03-execution/parked.md', '03-execution/entries/', '03-execution/audit.md', '03-execution/explain.md'] : []), ...(release ? ['04-release/plan.md', '04-release/trace.md', '04-release/notes/', '04-release/entries/', '04-release/proof/'] : []), ...(retro ? ['05-close/retro.md', '05-close/harvest/', '05-close/trace.md'] : [])],
   builtAt: new Date().toISOString().slice(0, 16).replace('T', ' ') + ' UTC',
 };
 // `</script` inside JSON would end the data block early; escape it.
@@ -582,4 +793,4 @@ const json = JSON.stringify(data).replace(/<\/script/gi, '<\\/script');
 const shell = readFileSync(join(here, 'shell.html'), 'utf8');
 // function replacements: a `$&` or `$'` inside the data would otherwise be read as a replacement pattern
 writeFileSync(out, shell.replace('__TITLE__', () => workstream.title.replace(/</g, '&lt;')).replace('__DATA__', () => json));
-console.log(`built ${out}: tabs ${tabs.join(' + ')} · ${stories.stories.length} stories, ${stories.stories.reduce((a, s) => a + s.acs.length, 0)} ACs, ${review.rounds.length} discovery rounds` + (design ? ` · design: ${design.docs.architecture.flows.length} flows, ${design.decisions.length} decisions, ${design.review.rounds.length} rounds` : '') + (plan ? ` · plan: ${plan.plan.entries.length} entries, ${plan.plan.entries.reduce((a, e) => a + e.stories.length, 0)} stories, concurrency ${plan.plan.concurrency}, ${Object.keys(plan.briefs).length} briefs` : '') + (execution ? (x => { const planned = new Set(['F', ...plan.plan.entries.map(e => e.id)]), req = x.entries.filter(e => planned.has(e.id)); return ` · execution: ${req.filter(e => e.status === 'merged').length}/${req.length} merged, ${x.entries.filter(e => e.status === 'parked').length} parked, ${x.amendments.length} amendments, audit ${x.closed ? 'closed' : 'open'}`; })(execution) : '') + (release ? ` · release: in production ${release.inProduction.length} artifact(s), ${release.staging.length} staging runs, ${release.fixes.length} fixes, ${release.watch.filter(r => r.readAt != null && r.got != null && r.ok != null).length}/${release.watch.length} watched, ${release.closed ? 'closed' : 'open'}` : '') + (retro ? ` · close: ${retro.wrong.length} wrong, ${retro.ideas.length} ideas (${retro.ideas.filter(i => i.lands === 'pipeline').length} pipeline), ${retro.userNotes.length} user notes, ${retro.closed ? 'closed' : 'open'}` : '') + (layers ? ` · stage report: ${Object.keys(layers).join(', ')}` : ''));
+console.log(`built ${out}: tabs ${tabs.join(' + ')} · ${stories.stories.length} stories, ${stories.stories.reduce((a, s) => a + s.acs.length, 0)} ACs, ${review.rounds.length} discovery rounds` + (design ? ` · design: ${design.docs.architecture.flows.length} flows, ${design.decisions.length} decisions, ${design.review.rounds.length} rounds${design.sizing ? `, sizing ${design.sizing.picks.length} picks` : ''}` : '') + (plan ? ` · plan: ${plan.plan.entries.length} entries, ${plan.plan.entries.reduce((a, e) => a + e.stories.length, 0)} stories, concurrency ${plan.plan.concurrency}${plan.plan.criticalPath ? `, critical path ${plan.plan.criticalPath.join(' → ')}` : ''}, ${Object.keys(plan.briefs).length} briefs` : '') + (execution ? (x => { const planned = new Set(['F', ...plan.plan.entries.map(e => e.id)]), req = x.entries.filter(e => planned.has(e.id)); return ` · execution: ${req.filter(e => e.status === 'merged').length}/${req.length} merged, ${x.entries.filter(e => e.status === 'parked').length} parked, ${x.amendments.length} amendments, audit ${x.closed ? 'closed' : 'open'}`; })(execution) : '') + (release ? ` · release: in production ${release.inProduction.length} artifact(s), ${release.staging.length} staging runs, ${release.fixes.length} fixes, ${release.watch.filter(r => r.readAt != null && r.got != null && r.ok != null).length}/${release.watch.length} watched, ${release.closed ? 'closed' : 'open'}` : '') + (retro ? ` · close: ${retro.wrong.length} wrong, ${retro.ideas.length} ideas (${retro.ideas.filter(i => i.lands === 'pipeline').length} pipeline), ${retro.userNotes.length} user notes, ${retro.closed ? 'closed' : 'open'}` : '') + (layers ? ` · stage report: ${Object.keys(layers).join(', ')}` : ''));

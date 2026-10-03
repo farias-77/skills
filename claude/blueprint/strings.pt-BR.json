@@ -14,6 +14,7 @@
  "sec": {
   "what": "O que é isto",
   "how": "Como funciona",
+  "journeys": "As jornadas",
   "faq": "Perguntas e respostas",
   "stories": "As histórias",
   "out": "O que fica de fora",
@@ -40,6 +41,17 @@
   "dismissed": "Descartados na revisão",
   "dismissedTail": "achados descartados pelo condutor, cada um com a frase que o fecha;",
   "seeReview": "leia-os na revisão"
+ },
+ "lock": {
+  "locked": "mock travado · v{v}",
+  "gap": "Lacuna aceita no travamento",
+  "gaps": "{n} lacunas aceitas",
+  "override": "por cima da caminhada:",
+  "open": "abrir o mock"
+ },
+ "mock": {
+  "lede": "O mock travado, versão {v}: cada jornada passo a passo, como foi caminhada.",
+  "open": "abrir o mock"
  },
  "problem": "O problema",
  "solution": "A solução",
@@ -146,6 +158,7 @@
  "design": {
   "sec": {
    "what": "O que estamos construindo",
+   "size": "O tamanho",
    "architecture": "Arquitetura",
    "data": "Modelo de dados",
    "contracts": "Contratos",
@@ -298,7 +311,44 @@
    "forPlan": "Vai para o plano"
   },
   "decisionsOf": "As decisões deste documento",
-  "picked": "escolhida"
+  "picked": "escolhida",
+  "size": {
+   "lede": "Cada parte foi desenhada de três jeitos, enxuto, equilibrado e reforçado, e um nível escolhido por parte pelo risco, pela reversibilidade e pelo custo. Enxuto onde nada força mais.",
+   "cells": {
+    "pick": "a escolha, em horas de construção",
+    "pickTail": "contra um apetite de {a} h",
+    "runCost": "custo de operação por mês",
+    "above": "partes acima do enxuto",
+    "aboveTail": "cada uma cita a nota que a forçou",
+    "doors": "portas de mão única",
+    "doorsTail": "{n} foram decisão sua"
+   },
+   "tiers": {
+    "lean": "enxuto",
+    "balanced": "equilibrado",
+    "hardened": "reforçado"
+   },
+   "noGos": "Fora deste tamanho",
+   "side": "Os três níveis, lado a lado",
+   "picks": "A escolha, por parte",
+   "doors": "As portas de mão única",
+   "evolution": "O caminho de evolução: o que sobe uma parte de nível, e quando",
+   "part": "Parte",
+   "tier": "Nível",
+   "rvc": "R V C",
+   "why": "Por quê",
+   "total": "Total",
+   "noChoice": "sem escolha: igual em todos os níveis",
+   "now": "Agora",
+   "signal": "Sinal",
+   "watchedBy": "vigiado por",
+   "next": "Próximo",
+   "cost": "Custo",
+   "his": "decisão sua · {q}",
+   "notHis": "não é sua",
+   "noDoors": "Nenhuma porta de mão única.",
+   "noEvolution": "Nenhuma linha de evolução: nenhuma parte enxuta tem risco 2 ou mais."
+  }
  },
  "modalClose": "Fechar",
  "plan": {
@@ -315,8 +365,8 @@
    "entriesTail": "{n} começam logo depois da fundação",
    "stories": "histórias",
    "storiesTail": "cada uma em exatamente uma entrada",
-   "concurrency": "construídas ao mesmo tempo, no máximo",
-   "concurrencyTail": "o teto, pela máquina",
+   "concurrency": "na onda mais larga",
+   "concurrencyTail": "o que o plano deixa rodar ao mesmo tempo",
    "steps": "passos",
    "stepsTail": "a cadeia mais longa depois da fundação",
    "cards": "decisões do corte",
@@ -399,7 +449,23 @@
    "conductor": "decididos pelo condutor no seu lugar",
    "toWriters": "Aos escritores"
   },
-  "decLede": "Cada decisão do corte em três linhas: a pergunta, a escolha, o porquê. As marcadas na borda foram contra a recomendação."
+  "decLede": "Cada decisão do corte em três linhas: a pergunta, a escolha, o porquê. As marcadas na borda foram contra a recomendação.",
+  "kinds2": {
+   "foundation": "fundação",
+   "lane": "raia",
+   "slice": "fatia",
+   "integration": "integração",
+   "fix": "correção"
+  },
+  "critical": "caminho crítico",
+  "criticalPath": "O caminho crítico: a cadeia mais longa, a que define o fim",
+  "captionCritical": "As bordas grossas são o caminho crítico.",
+  "edge": {
+   "ui": "usa a tela dela",
+   "side-effect": "lê o efeito dela",
+   "stacked": "empilhada"
+  },
+  "owns": "Os arquivos que ela possui"
  },
  "execution": {
   "sec": {
@@ -460,11 +526,17 @@
    "lens": "Revisor",
    "found": "Achados",
    "sustained": "Mantidos",
+   "blocking": "Bloqueantes",
+   "withRepro": "Com repro",
+   "ruleOnly": "Só regra",
    "deferred": "Adiados",
    "latitude": "Latitude",
    "dismissed": "Descartados",
+   "learn": "Diário de aprendizado",
+   "closed": "Fechados",
    "user": "Para você",
    "ratio": "Mantidos / achados",
+   "ratioBlocking": "Bloqueantes / achados",
    "total": "todos os revisores"
   },
   "noPrecision": "Nenhum revisor reportou ainda.",
@@ -616,6 +688,7 @@
   "sec": {
    "what": "O que foi para produção",
    "path": "O caminho",
+   "rollout": "O rollout, e os alarmes",
    "versions": "Versões, e o que está em produção",
    "fixes": "As correções",
    "watch": "A vigília, e o que espera"
@@ -634,8 +707,8 @@
    "go": "vai",
    "not-now": "agora não"
   },
-  "askTitle": "A pergunta, nas palavras dele",
-  "noAsk": "Ainda não perguntado: o PR de release espera o staging ficar verde.",
+  "askTitle": "O play, nas palavras dele",
+  "noAsk": "Ainda sem play: nada entra na main antes do go dele.",
   "cells": {
    "inProd": "em produção",
    "inProdNone": "nada ainda",
@@ -649,11 +722,11 @@
    "watchTail": "{n} deixadas com um dono"
   },
   "path": {
-   "lede": "A branch da feature vai para staging, um vermelho vira correção e o staging roda de novo, ele responde a pergunta, e só então produção.",
+   "lede": "O play dele autoriza tudo: o merge na main atrás do signoff do CI local, o staging, o verificador nas jornadas travadas, a produção e a primeira avaliação de cada alarme. Um vermelho vira correção e roda de novo.",
    "feat": "branch da feature",
    "staging": "staging {n}",
    "production": "produção {n}",
-   "ask": "a pergunta",
+   "ask": "o play",
    "fix": "correção",
    "caption": "Cada passo na ordem em que aconteceu. Uma seta pontilhada liga um vermelho à correção que ele abriu.",
    "none": "Nenhum passo ainda.",
@@ -665,7 +738,69 @@
     "what": "O que mostrou",
     "verified": "Verificado",
     "fix": "Correção"
-   }
+   },
+   "merge": "main",
+   "rollback": "rollback",
+   "signoff": "signoff"
+  },
+  "rollout": {
+   "lede": "A produção sai de forma progressiva onde a plataforma permite: um candidato a 0% testado na sua tag, a troca de tráfego, um bake contra a revisão anterior. Senão, direto, e depois um smoke.",
+   "mode": "Como saiu",
+   "modes": {
+    "progressive": "progressivo",
+    "straight": "direto"
+   },
+   "modeNote": {
+    "progressive": "um candidato a 0%, testado na sua tag, depois o tráfego trocado e assado contra a revisão anterior.",
+    "straight": "publicado inteiro, depois um smoke das jornadas só de leitura."
+   },
+   "rev": "candidato",
+   "tag": "tag",
+   "smoke": "smoke",
+   "shifts": "As trocas de tráfego",
+   "pct": "Tráfego",
+   "at": "Quando",
+   "bake": {
+    "title": "O bake, revisão nova contra a anterior",
+    "minutes": "Duração",
+    "req": "Requisições",
+    "err": "5xx",
+    "p95": "p95",
+    "verdict": "Veredito",
+    "prev": "anterior"
+   },
+   "verdicts": {
+    "hold": "segura",
+    "no-signal": "sem sinal",
+    "trigger": "gatilho"
+   },
+   "rollbacks": "Os rollbacks",
+   "rb": {
+    "at": "Quando",
+    "trigger": "Gatilho",
+    "value": "Valor",
+    "to": "Volta para",
+    "fix": "Correção"
+   },
+   "noRollback": "Nenhum rollback: nenhum gatilho disparou.",
+   "alarms": "A primeira avaliação de cada alarme, como lida",
+   "al": {
+    "name": "Alarme",
+    "state": "Estado"
+   },
+   "states": {
+    "ok": "OK",
+    "no-datapoints": "sem dados",
+    "firing": "disparado",
+    "not-evaluated": "ainda não avaliado"
+   },
+   "noAlarms": "Nenhum alarme lido ainda."
+  },
+  "numbers": {
+   "wallClockH": "relógio, do play ao fim",
+   "hisMin": "o tempo dele",
+   "tokensM": "tokens",
+   "reverts": "reverts"
   },
   "preflight": {
    "title": "Pré-voo",

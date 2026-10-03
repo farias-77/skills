@@ -4,14 +4,15 @@ Stage 2 writes one JSON per document under `<workstream>/blueprint/design/`
 (the same name as the document), by that document's `design-writer`
 (Sonnet 5.5, high), in the same pass as the document; the conductor
 writes `decisions.json`, `design-report.json` and `design-review.json`
-at the close. `node claude/blueprint/build.mjs <workstream>` validates
+at the close, and `sizing.json` from `01-design/sizing.md` when the
+design was sized. `node claude/blueprint/build.mjs <workstream>` validates
 them, embeds the `.md` documents and the artboards whole, and assembles
 the Design tab. The build refuses with the field named: a missing key,
 a figure absent where one is required, a story or a screen that does
 not exist, a bill line with the wrong number of scales, a duplicate
 decision id, **a text over its word cap**. Text fields accept
 two inline marks: `` `code` `` and `**bold**`. No HTML. Everything in
-the workstream's language (pt-BR here).
+the workstream's language (`workstream.json` names it).
 
 ## The voice: technical, and an intern reads it to the end
 
@@ -40,8 +41,8 @@ have never seen this system and have little experience. Rules:
 - **The text invites reading.** One idea per sentence; no chains of
   semicolons; when a sentence carries a list of details (stacks, TTLs,
   memory sizes, parameter names), keep the one or two that decide
-  something and drop the rest: the `.md` has them. The user's words on
-  the first draft: "esse blocão de texto tira a vontade de ler".
+  something and drop the rest: the `.md` has them. A wall of text is
+  what makes a reader stop.
 
 ## Word caps (the build refuses a field over its cap)
 
@@ -72,6 +73,11 @@ have never seen this system and have little experience. Rules:
 | report `reviewPlain` | 45 | review `decisions[].plain` | 25 |
 | review `title` | 12 | review `ruling` | 25 |
 | review `why` | 30 | review `rounds[].changed` | 20 |
+| sizing `plain` | 45 | sizing `noGos[]` | 14 |
+| sizing `parts[].<tier>.what` | 12 | sizing `picks[].why` | 25 |
+| sizing `doors[].door` | 12 | sizing `doors[].decided` / `.why` | 18 |
+| sizing `evolution[].now` / `.next` | 12 | sizing `evolution[].signal` | 14 |
+| sizing `evolution[].watchedBy` | 8 | | |
 
 ## Common fields (every document JSON)
 
@@ -90,7 +96,7 @@ have never seen this system and have little experience. Rules:
 {
   "figure": { "mermaid": "flowchart LR …", "caption": "what the picture shows, one or two sentences" },
   "components": [ { "name": "extract", "runsWhere": "Lambda, one per organization", "does": "one line" } ],
-  "flows": [ { "id": "extract", "name": "Extract por organização", "stories": ["S-004"],
+  "flows": [ { "id": "extract", "name": "Extract per organization", "stories": ["S-004"],
                "happens": "3–5 sentences: the flow from trigger to end",
                "goesWrong": "2–4 sentences: the failure rows that matter and what the system does",
                "look": "one sentence: where to poke" } ],
@@ -115,7 +121,7 @@ The figure is ONE picture: the blocks, where each runs, the arrows with a label 
 
 ```json
 {
-  "endpoints": [ { "kind": "route | event | table", "name": "GET /ingestion/status", "caller": "who", "returns": "one line", "errors": "the classes, in words" } ],
+  "endpoints": [ { "kind": "route | event | table", "name": "GET /imports/status", "caller": "who", "returns": "one line", "errors": "the classes, in words" } ],
   "shapes": "one sentence naming where the exact shapes live"
 }
 ```
@@ -124,7 +130,7 @@ The figure is ONE picture: the blocks, where each runs, the arrows with a label 
 
 ```json
 {
-  "screens": [ { "name": "Produção · pessoa", "file": "ui/Main.dc.html", "stories": ["S-001"], "whatsNew": "2–3 sentences", "states": ["empty", "loading", "error", "no permission"] } ],
+  "screens": [ { "name": "Production · person", "file": "ui/Main.dc.html", "stories": ["S-001"], "whatsNew": "2–3 sentences", "states": ["empty", "loading", "error", "no permission"] } ],
   "reused": "one or two sentences: what the product already has that this feature reuses",
   "figure": { "mermaid": "optional", "caption": "…" }
 }
@@ -144,8 +150,8 @@ The figure is ONE picture: the blocks, where each runs, the arrows with a label 
 
 ```json
 {
-  "resources": [ { "name": "Tabela DynamoDB", "id": "labs-ingestion-runs-{stage}", "why": "one line", "rule": "the config that encodes a rule or a cost, or —" } ],
-  "bill": { "scales": ["hoje", "5×", "20×"], "envelope": [5, 12, 30], "unit": "US$/mês",
+  "resources": [ { "name": "Runs table", "id": "<app>-import-runs-{stage}", "why": "one line", "rule": "the config that encodes a rule or a cost, or —" } ],
+  "bill": { "scales": ["today", "5×", "20×"], "envelope": [5, 12, 30], "unit": "US$/month",
             "fixed": [ { "name": "…", "obs": "one line", "v": [0.8, 0.8, 0.8] } ],
             "variable": [ { "name": "…", "obs": "one line", "v": [1.2, 4.1, 12.0] } ],
             "totals": [3.9, 8.2, 24.0], "plain": "two sentences: what drives the bill, and where it crosses the envelope" },
@@ -153,7 +159,7 @@ The figure is ONE picture: the blocks, where each runs, the arrows with a label 
 }
 ```
 Every `v` has exactly as many numbers as `scales`. No "total" per line.
-`name` is the plain kind of the thing ("Tabela DynamoDB", "As cinco Lambdas"); `id` is the real resource name, shown small under it.
+`name` is the plain kind of the thing ("Runs table", "The five functions"); `id` is the real resource name, shown small under it.
 
 ## observability.json
 
@@ -179,7 +185,7 @@ Every `v` has exactly as many numbers as `scales`. No "total" per line.
 
 ```json
 {
-  "repos": [ { "repo": "labs-api-ingestion", "isNew": true, "changes": "2–3 sentences", "unchanged": "one line", "tree": "optional: the layout only where it departs from the house structure, as a code block string" } ],
+  "repos": [ { "repo": "api-imports", "isNew": true, "changes": "2–3 sentences", "unchanged": "one line", "tree": "optional: the layout only where it departs from the house structure, as a code block string" } ],
   "seams": "one or two sentences: the interfaces that let a piece be swapped, and why each exists"
 }
 ```
@@ -188,7 +194,7 @@ Every `v` has exactly as many numbers as `scales`. No "total" per line.
 
 ```json
 {
-  "groups": [ { "group": "ingestion · runs", "count": 14, "proves": "one or two sentences", "how": "smoke | vitest | synth | manual" } ],
+  "groups": [ { "group": "imports · runs", "count": 14, "proves": "one or two sentences", "how": "smoke | vitest | synth | manual" } ],
   "convention": "one or two sentences: how a case is run and what green means"
 }
 ```
@@ -218,11 +224,67 @@ Every `v` has exactly as many numbers as `scales`. No "total" per line.
 }
 ```
 
+### sizing.json — the size, from `sizing.md` (optional)
+
+The Design tab opens a **Size** section from it, right after "What we
+are building": the three tiers side by side, the pick per part, the
+one-way doors and the evolution path. A design without it still
+builds; the section is then absent.
+
+```json
+{
+  "plain": "one or two sentences: what gets built, end to end, and why it is this size",
+  "appetite": { "hours": 40, "pick": 34, "runCost": 6.5, "unit": "US$/month", "status": "final" },
+  "noGos": [ "one line each, as sizing.md lists them" ],
+  "tiers": [ { "tier": "lean", "hours": 26, "cost": 3.0 }, { "tier": "balanced", "hours": 34, "cost": 6.5 }, { "tier": "hardened", "hours": 61, "cost": 22.0 } ],
+  "parts": [
+    { "part": "data", "lean": { "what": "one table, no index", "hours": 3, "cost": 0.5 },
+      "balanced": { "what": "one table, a status index", "hours": 4, "cost": 0.6 },
+      "hardened": { "what": "two tables and an audit trail", "hours": 9, "cost": 1.4 } },
+    { "part": "compute", "lean": { "what": "inline in the request", "hours": 4, "cost": 0 },
+      "balanced": { "what": "e-mail through a queue, imports inline", "hours": 7, "cost": 1.2 },
+      "hardened": { "what": "every job queued, a dead-letter sweeper", "hours": 14, "cost": 4.0 } }
+  ],
+  "picks": [
+    { "part": "data", "tier": "lean", "rvc": [2, 1, 2], "why": "a lost row is re-imported by hand within a day", "req": "S-002/AC-1" },
+    { "part": "compute.invite-email", "tier": "balanced", "rvc": [3, 3, 1], "why": "need 6 → balanced; a sent e-mail cannot be unsent", "req": "door:message-sent" },
+    { "part": "compute.csv-import", "tier": "lean", "rvc": [1, 1, 2], "why": "a failed import is retried by the user" }
+  ],
+  "doors": [ { "door": "the shape of the invite token", "decided": "opaque, 32 bytes, stored hashed", "his": "Q-1" },
+             { "door": "the e-mail provider's template ids", "decided": "one template per locale", "his": null, "why": "a config change; no contract shape" } ],
+  "evolution": [ { "part": "data", "now": "list by scan", "signal": "list p95 over 300 ms", "watchedBy": "the latency alarm", "next": "a status index", "cost": "1 h" } ]
+}
+```
+
+- `tiers` is exactly three, in the order `lean`, `balanced`,
+  `hardened`: the totals of the side-by-side table (build hours, run
+  cost a month in `appetite.unit`).
+- `parts[]` are the rows of that table, one per part (the eight parts
+  of the right-sizing pack, or fewer); each carries the three tiers,
+  `{what, hours, cost}`. `noChoice: true` marks a part that is the same
+  in every tier.
+- `picks[]` is the pick per part or sub-part (`compute.invite-email`):
+  `tier`, `rvc` (R, V and C, each 1–3), `why` (above lean: the score
+  that forced it) and `req` (the requirement it answers, optional).
+  Every part has a pick, itself or through its sub-parts.
+- `doors[].his` is the question id of the user's call (`Q-<n>`), or
+  `null` with a `why` when the door is not his.
+- `evolution[]`: the signal with its number, who or what already
+  watches it, the next step and its cost. Every **lean** pick with
+  R ≥ 2 has a row (by its name or its part's).
+- `appetite.pick` is the pick's build hours; it never exceeds
+  `appetite.hours` (over the appetite the scope is cut).
+
+The build refuses with the field named: tiers not three or out of
+order, a pick for an unknown part, a score outside 1–3, a part with no
+pick, a lean pick with R ≥ 2 and no evolution row, a pick over the
+appetite, **a text over its word cap**.
+
 ### design-review.json — like discovery's review.json
 
 ```json
 {
-  "opened": "2026-09-09", "approved": "2026-09-10",
+  "opened": "2026-01-12", "approved": "2026-01-13",
   "rounds": [ { "n": 1, "run": "wf_…", "findings": 75, "toAuthor": 25, "toUser": 12, "toImplementer": 2, "deferred": 15, "dismissed": 4, "unread": ["…"], "changed": "one line" } ],
   "decisions": [ { "id": "R1-U01", "round": 1, "lens": "security", "title": "…", "gap": "…", "ruling": "what the user chose", "words": "his reason, verbatim", "plain": "the decision in one plain sentence" } ],
   "conductorRulings": [ { "id": "R1-cond-1", "round": 1, "title": "…", "ruling": "one line" } ],

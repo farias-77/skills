@@ -12,7 +12,9 @@ the brief `.md` files whole, and assembles the Plan tab. The build
 refuses with the field named: an entry with no proof, an edge to an
 entry that does not exist, a cycle in the edges, a story that no entry
 carries, an entry or the foundation with no brief JSON or no brief
-file, a duplicate id, **a text over its word cap**. Text fields accept
+file, a duplicate id, a `kind` whose id does not fit it, a `wave`,
+`width` or `depth` the edges contradict, a `criticalPath` that is not
+a chain of edges, **a text over its word cap**. Text fields accept
 two inline marks: `` `code` `` and `**bold**`. No HTML. Everything in
 the workstream's language.
 
@@ -86,26 +88,50 @@ are not capped: they are copied exactly.
       "brief": "02-plan/briefs/E-05.md" }
   ],
   "concurrency": 4,
+  "width": 4, "depth": 2, "criticalPath": ["F", "E-04", "E-05"],
   "decisions": [
     { "id": "P-cut-1", "doc": "cut", "when": "session", "question": "One entry for orders and the panel, or two?",
       "options": [ { "label": "A) two entries", "cost": "one more merge" }, { "label": "B) one entry", "cost": "a bigger diff to review" } ],
       "recommended": "A", "pick": "A", "chosen": "A) two entries", "why": "each proves alone", "againstRecommendation": false }
   ],
-  "preflight": [ { "item": "the e-mail provider key in SSM `/labs/alpha/communications/key`", "entry": "E-05", "status": "handed" } ]
+  "preflight": [ { "item": "the e-mail provider key in `/<app>/staging/email/key`", "entry": "E-05", "status": "handed" } ]
 }
 ```
 
+- An entry is a node of `02-plan/plan.graph.json` other than `F`.
+  Its optional `kind` is `foundation` (id `F-b`, only when F splits),
+  `lane` (`F-x<n>`: foundation work nobody waits for), `slice`
+  (`E-<nn>`), `integration` (`E-int`) or `fix`; left out, it is read
+  from the id. Optional too: `wave` (0 for a foundation entry, else the
+  wave the edges put it in), `critical` (`true` on the critical path),
+  `owns` (the paths it owns, as the graph lists them). A lane, in
+  the same shape as an entry:
+
+  ```json
+  { "id": "F-x1", "kind": "lane", "name": "Deploy skeleton", "stories": [], "wave": 1,
+    "what": "The service's deploy files, so staging exists before the first slice merges.",
+    "back": null, "front": null, "after": [], "owns": ["deploy/api/**"],
+    "proof": [ { "run": "make deploy-check", "expect": "exit 0" } ], "brief": "02-plan/briefs/F-x1.md" }
+  ```
+- `width` is the widest wave, `depth` the number of waves after the
+  foundation, `criticalPath` the ids of the longest chain, `F` (and
+  `F-b`) first; all three optional, copied from the graph checker's
+  report and checked against the edges.
 - `foundation.items[].kind` is one of `migration`, `contract`,
   `module`, `shared`, `factory`, `other`.
-- An entry carries one or more `stories`; together the entries carry
+- An entry carries one or more `stories` (a lane or a foundation
+  entry may carry none); together the entries carry
   every story of the discovery, each at least once (a story split across layer entries, as in a backend-only cut, appears in each entry that builds part of it).
 - `after` lists entry ids whose **behavior** the entry's proof needs;
-  it is empty when the foundation and the factories are enough. The
-  foundation precedes every entry and is never listed. The edges form
-  no cycle.
+  it is empty when the foundation and the factories are enough. An
+  edge may be written whole, `{ "id": "E-03", "class": "ui" |
+  "side-effect", "stacked": true }`, as the graph has it. The
+  foundation (F, and F-b) precedes every entry and is never listed;
+  `F-b` alone may name `"F"`. The edges form no cycle.
 - `back` or `front` is `null` when the entry has no such side.
 - A proof step is `{run, expect}` or `{see, where}`; nothing else.
-- `concurrency` is the cap on entries built at once, from the machine.
+- `concurrency` is the widest wave: what the plan lets run at once
+  (equal to `width` when both are written).
 - `decisions` uses the design's card shape; `doc` is `"cut"` or an
   entry id (`"E-03"`, `"F"`).
 - `preflight[].status` is `handed` or `missing`; a missing item names

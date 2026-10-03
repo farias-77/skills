@@ -14,6 +14,7 @@
  "sec": {
   "what": "What this is",
   "how": "How it works",
+  "journeys": "The journeys",
   "faq": "Questions and answers",
   "stories": "The stories",
   "out": "What stays out",
@@ -40,6 +41,17 @@
   "dismissed": "Dismissed in the review",
   "dismissedTail": "findings dismissed by the conductor, each with the sentence that closes it;",
   "seeReview": "read them in the review"
+ },
+ "lock": {
+  "locked": "mock locked · v{v}",
+  "gap": "Gap accepted at the lock",
+  "gaps": "{n} gaps accepted",
+  "override": "over the walk:",
+  "open": "open the mock"
+ },
+ "mock": {
+  "lede": "The locked mock, version {v}: every journey step by step, as it was walked.",
+  "open": "open the mock"
  },
  "problem": "The problem",
  "solution": "The solution",
@@ -146,6 +158,7 @@
  "design": {
   "sec": {
    "what": "What we are building",
+   "size": "The size",
    "architecture": "Architecture",
    "data": "Data model",
    "contracts": "Contracts",
@@ -298,7 +311,44 @@
    "forPlan": "Goes to the plan"
   },
   "decisionsOf": "The decisions of this document",
-  "picked": "chosen"
+  "picked": "chosen",
+  "size": {
+   "lede": "Every part was drawn three ways, lean, balanced and hardened, and one tier picked per part on risk, reversibility and cost. Lean wherever nothing forces more.",
+   "cells": {
+    "pick": "the pick, in build hours",
+    "pickTail": "against an appetite of {a} h",
+    "runCost": "run cost a month",
+    "above": "parts above lean",
+    "aboveTail": "each one cites the score that forced it",
+    "doors": "one-way doors",
+    "doorsTail": "{n} were your call"
+   },
+   "tiers": {
+    "lean": "lean",
+    "balanced": "balanced",
+    "hardened": "hardened"
+   },
+   "noGos": "Not in this size",
+   "side": "The three tiers, side by side",
+   "picks": "The pick, per part",
+   "doors": "The one-way doors",
+   "evolution": "The evolution path: what moves a part up, and when",
+   "part": "Part",
+   "tier": "Tier",
+   "rvc": "R V C",
+   "why": "Why",
+   "total": "Total",
+   "noChoice": "no choice: the same in every tier",
+   "now": "Now",
+   "signal": "Signal",
+   "watchedBy": "watched by",
+   "next": "Next",
+   "cost": "Cost",
+   "his": "your call · {q}",
+   "notHis": "not yours",
+   "noDoors": "No one-way door.",
+   "noEvolution": "No evolution row: no lean part carries a risk of 2 or more."
+  }
  },
  "modalClose": "Close",
  "plan": {
@@ -315,8 +365,8 @@
    "entriesTail": "{n} start right after the foundation",
    "stories": "stories",
    "storiesTail": "each carried by exactly one entry",
-   "concurrency": "built at once, at most",
-   "concurrencyTail": "the cap, from the machine",
+   "concurrency": "in the widest wave",
+   "concurrencyTail": "what the plan lets run at once",
    "steps": "steps",
    "stepsTail": "the longest chain after the foundation",
    "cards": "cut decisions",
@@ -399,7 +449,23 @@
    "conductor": "ruled by the conductor in your place",
    "toWriters": "To the writers"
   },
-  "decLede": "Every cut decision in three lines: the question, the choice, the why. The ones marked on the edge went against the recommendation."
+  "decLede": "Every cut decision in three lines: the question, the choice, the why. The ones marked on the edge went against the recommendation.",
+  "kinds2": {
+   "foundation": "foundation",
+   "lane": "lane",
+   "slice": "slice",
+   "integration": "integration",
+   "fix": "fix"
+  },
+  "critical": "critical path",
+  "criticalPath": "The critical path: the longest chain, the one that sets the finish",
+  "captionCritical": "The thick borders are the critical path.",
+  "edge": {
+   "ui": "drives its UI",
+   "side-effect": "reads its side effect",
+   "stacked": "stacked"
+  },
+  "owns": "The files it owns"
  },
  "execution": {
   "sec": {
@@ -460,11 +526,17 @@
    "lens": "Reviewer",
    "found": "Found",
    "sustained": "Sustained",
+   "blocking": "Blocking",
+   "withRepro": "With repro",
+   "ruleOnly": "Rule only",
    "deferred": "Deferred",
    "latitude": "Latitude",
    "dismissed": "Dismissed",
+   "learn": "Learn log",
+   "closed": "Closed",
    "user": "To you",
    "ratio": "Sustained / found",
+   "ratioBlocking": "Blocking / found",
    "total": "every reviewer"
   },
   "noPrecision": "No reviewer has reported yet.",
@@ -616,6 +688,7 @@
   "sec": {
    "what": "What went to production",
    "path": "The path",
+   "rollout": "The rollout, and the alarms",
    "versions": "Versions, and what is in production",
    "fixes": "The fixes",
    "watch": "The watch, and what waits"
@@ -634,8 +707,8 @@
    "go": "go",
    "not-now": "not now"
   },
-  "askTitle": "The ask, in his words",
-  "noAsk": "Not asked yet: the release PR waits for staging to be green.",
+  "askTitle": "The play, in his words",
+  "noAsk": "No play yet: nothing merges into main before his go.",
   "cells": {
    "inProd": "in production",
    "inProdNone": "nothing yet",
@@ -649,11 +722,11 @@
    "watchTail": "{n} left with an owner"
   },
   "path": {
-   "lede": "The feature branch goes to staging, a red becomes a fix and staging runs again, he answers the ask, and only then production.",
+   "lede": "His play authorizes everything: the merge into main behind the local-CI signoff, staging, the verifier on the locked journeys, production, and each alarm’s first evaluation. A red becomes a fix and runs again.",
    "feat": "feature branch",
    "staging": "staging {n}",
    "production": "production {n}",
-   "ask": "the ask",
+   "ask": "the play",
    "fix": "fix",
    "caption": "Each step in the order it happened. A dotted arrow leads from a red to the fix it opened.",
    "none": "No step yet.",
@@ -665,7 +738,69 @@
     "what": "What it showed",
     "verified": "Verified",
     "fix": "Fix"
-   }
+   },
+   "merge": "main",
+   "rollback": "rollback",
+   "signoff": "signoff"
+  },
+  "rollout": {
+   "lede": "Production goes out progressively where the platform allows: a candidate at 0% smoked on its tag, the traffic shift, a bake against the previous revision. Otherwise straight, then a smoke run.",
+   "mode": "How it went out",
+   "modes": {
+    "progressive": "progressive",
+    "straight": "straight"
+   },
+   "modeNote": {
+    "progressive": "a candidate at 0%, smoked on its tag, then the traffic shifted and baked against the previous revision.",
+    "straight": "deployed whole, then a smoke run of the read-only journeys."
+   },
+   "rev": "candidate",
+   "tag": "tag",
+   "smoke": "smoke",
+   "shifts": "The traffic shifts",
+   "pct": "Traffic",
+   "at": "At",
+   "bake": {
+    "title": "The bake, new revision against the previous",
+    "minutes": "Duration",
+    "req": "Requests",
+    "err": "5xx",
+    "p95": "p95",
+    "verdict": "Verdict",
+    "prev": "previous"
+   },
+   "verdicts": {
+    "hold": "hold",
+    "no-signal": "no signal",
+    "trigger": "trigger"
+   },
+   "rollbacks": "The rollbacks",
+   "rb": {
+    "at": "At",
+    "trigger": "Trigger",
+    "value": "Value",
+    "to": "Back to",
+    "fix": "Fix"
+   },
+   "noRollback": "No rollback: no trigger fired.",
+   "alarms": "Each alarm’s first evaluation, as read",
+   "al": {
+    "name": "Alarm",
+    "state": "State"
+   },
+   "states": {
+    "ok": "OK",
+    "no-datapoints": "no datapoints",
+    "firing": "firing",
+    "not-evaluated": "not evaluated yet"
+   },
+   "noAlarms": "No alarm read yet."
+  },
+  "numbers": {
+   "wallClockH": "wall-clock, play to done",
+   "hisMin": "his time",
+   "tokensM": "tokens",
+   "reverts": "reverts"
   },
   "preflight": {
    "title": "Pre-flight",

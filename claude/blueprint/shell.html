@@ -149,7 +149,7 @@
   .story .body { padding: 0 20px 20px; display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 18px 28px; border-top: 1px solid var(--line); padding-top: 16px; }
   .story .body .full { grid-column: 1 / -1; }
   .acs { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 8px; }
-  .acs li { display: grid; grid-template-columns: 56px minmax(0, 1fr); gap: 10px; align-items: baseline; font-size: 16.5px; line-height: 1.5; }
+  .acs li { display: grid; grid-template-columns: 76px minmax(0, 1fr); gap: 10px; align-items: baseline; font-size: 16.5px; line-height: 1.5; }
   .acs li .n { font-family: var(--f-mono); font-size: 11.5px; color: var(--ink-3); }
   .acs li .kw { font-family: var(--f-mono); font-size: 11.5px; color: var(--accent-ink); }
   .bad { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; }
@@ -314,6 +314,9 @@
   .repo { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 16px 18px; display: flex; flex-direction: column; gap: 8px; }
   .repo .hd { display: flex; gap: 10px; align-items: baseline; flex-wrap: wrap; }
   .repo p { color: var(--ink-2); line-height: 1.55; }
+  /* the size: the three tiers side by side read across; the table scrolls inside its box on a phone */
+  .zside td { min-width: 20ch; }
+  .zpicks td:last-child { min-width: 28ch; }
 
   /* ---------- plan tab ---------- */
   .ab { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 14px; }
@@ -331,6 +334,11 @@
   .walk.g { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 6px; }
   .walk.g li { display: grid; grid-template-columns: 30px minmax(0, 1fr); gap: 6px 10px; padding: 8px 0; border-top: 1px solid var(--line); }
   .walk.g li .k { font-family: var(--f-display); font-size: 20px; color: var(--accent); line-height: 1.2; }
+  .jsteps { margin: 0; padding: 0; list-style: none; display: grid; align-items: start; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; }
+  .jsteps li { display: grid; grid-template-columns: 34px minmax(0, 1fr); gap: 4px 10px; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; }
+  .jsteps li > * { min-width: 0; }
+  .jsteps .k { font-family: var(--f-mono); font-size: 12px; color: var(--ink-3); padding-top: 4px; }
+  .jsteps img { display: block; margin-top: 8px; width: 100%; height: auto; border: 1px solid var(--line); border-radius: 8px; }
   .rules { margin: 0; padding-left: 18px; color: var(--ink-2); display: flex; flex-direction: column; gap: 4px; font-size: 16.5px; }
 
   /* ---------- execution tab ---------- */
@@ -361,6 +369,7 @@
   .xhead b { color: var(--ink-3); font-weight: 600; font-size: 12px; text-transform: uppercase; letter-spacing: .05em; margin-right: 6px; }
   .xent td:first-child { white-space: nowrap; }
   .xent td:nth-child(6) { min-width: 24ch; }
+  .xprec td:not(:first-child) { text-align: right; }
   .xprec tbody tr.tot td { font-weight: 700; border-top: 2px solid var(--line-2); }
 
   /* ---------- release tab ---------- */
@@ -476,11 +485,17 @@
   (D.review?.residue || []).forEach(r => eye.push(`<b>${S.eye.residue}</b> — ${md(r.title)}`));
   D.bets.filter(b => b.status !== 'holds').forEach(b => eye.push(`<b>${S.eye.bet}</b> — ${md(b.claim)}${b.note ? `: ${md(b.note)}` : ''}`));
   D.inferred.filter(i => i.ruling === 'open').forEach(i => eye.push(`<b>${S.eye.inferred}</b> ${i.id} — ${md(i.assumed)}`));
+  // the lock (v9): the version he locked, when, his words; gaps accepted over the walk go to "needs your eye"
+  const LK = D.review?.lock, SK = S.lock || {};
+  const gapText = g => typeof g === 'string' ? md(g) : `${g.where ? `<code>${esc(g.where)}</code> ` : ''}${md(g.what || '')}`;
+  (LK?.gaps || []).forEach(g => eye.push(`<b>${SK.gap}</b> — ${gapText(g)}`));
+  const lockLine = LK ? `<div class="meta"><span class="pill acc">${SK.locked.replace('{v}', esc(LK.version))}</span><span>${esc(LK.at)}</span><span><i>“${esc(LK.words)}”</i></span>${(LK.gaps || []).length ? `<span class="pill warn">${SK.gaps.replace('{n}', LK.gaps.length)}</span>` : ''}${LK.override ? `<span>${SK.override} <i>“${esc(LK.override)}”</i></span>` : ''}${LK.url ? `<a href="${esc(LK.url)}" target="_blank" rel="noopener">${SK.open} ↗</a>` : ''}</div>` : '';
   if (D.review?.dismissed?.length) eye.push(`<b>${S.eye.dismissed}</b> — ${D.review.dismissed.length} ${S.eye.dismissedTail} <a href="#review">${S.eye.seeReview}</a>`);
   sec('what', S.sec.what, null, `
     <div class="hero">
       <h1>${md(D.headline)}</h1>
       <div class="meta"><span>${S.opened} ${D.review?.opened || ''}</span><span>${S.approved} ${D.review?.approved || '—'}</span><span>${S.slug} <code>${D.workstream.slug}</code></span></div>
+      ${lockLine}
       <div><span class="kicker">${S.inOneSentence}</span><p class="one">${md(RP.inOneSentence)}</p></div>
       <div><span class="kicker">${S.threeThings}</span><div class="three">${RP.threeThings.map(t => `<div class="th"><b>${md(t.t)}</b><p>${md(t.p)}</p></div>`).join('')}</div></div>
       <div class="cells">
@@ -498,6 +513,14 @@
     ${figures}
     ${fold(S.howFull, `<div class="prose"><p><b>${S.problem}.</b> ${md(D.problem)}</p><p><b>${S.solution}.</b> ${md(D.solution)}</p><p><b>${S.howItWorks}.</b> ${md(D.how)}</p></div>`, false)}`);
 
+  // ---- the journeys of the locked mock (optional, mock.json): each step in order, with its picture when the stage published one ----
+  if (D.mock) {
+    const SM = S.mock || {};
+    const jour = D.mock.journeys.map(j => `<article class="flow" id="journey-${esc(j.id)}"><div class="hd"><h3><code>${esc(j.id)}</code> · ${md(j.title)}</h3></div>
+      <ol class="jsteps">${j.steps.map(st => `<li><span class="k">${esc(st.id)}</span><div><p>${md(st.do)}</p>${st.frame ? `<span class="rid">${esc(st.frame)}</span>` : ''}${st.png ? `<img loading="lazy" src="${esc(st.png)}" alt="${esc(`${j.id}.${st.id}`)}">` : ''}</div></li>`).join('')}</ol></article>`).join('');
+    sec('journeys', S.sec.journeys || 'Journeys', `${SM.lede ? SM.lede.replace('{v}', esc(D.mock.version)) : ''}${D.mock.url ? ` <a href="${esc(D.mock.url)}" target="_blank" rel="noopener">${SM.open} ↗</a>` : ''}`, `<div>${jour}</div>`);
+  }
+
   // ---- 3. FAQ ----
   const qa = list => `<div class="faq">${list.map(x => `<div class="qa"><p class="q">${md(x.q)}</p><p class="a">${md(x.a)}</p></div>`).join('')}</div>`;
   const keyE = (RP.keyFaq?.external || []).map(i => D.faq.external[i]).filter(Boolean), keyI = (RP.keyFaq?.internal || []).map(i => D.faq.internal[i]).filter(Boolean);
@@ -505,7 +528,7 @@
   sec('faq', S.sec.faq, S.faqLede, `${qa([...keyE, ...keyI])}${(restE.length + restI.length) ? fold(S.faqMore.replace('{n}', restE.length + restI.length), `${qa(restE)}${restI.length ? `<div style="margin-top:10px"><span class="kicker">${S.faqInternal}</span></div>${qa(restI)}` : ''}`, false) : ''}`);
 
   // ---- 4. stories ----
-  const kw = t => t.replace(/^(WHEN|IF|WHILE)\s/,'');
+  const kw = t => t.replace(/^(WHEN|IF|WHILE|GIVEN)\s/,'');
   const smap = `<div class="smap">${st.map(s => `<a class="sm" href="#${s.id}"><span class="id">${s.id}</span><span>${md(s.name)}</span><span class="who">${esc(s.as)}</span></a>`).join('')}</div>`;
   const stories = st.map(s => `<article class="story2" id="${s.id}">
     <span class="id">${s.id}</span><h3>${md(s.name)}</h3>
@@ -626,6 +649,30 @@
         <div class="eye"><span class="kicker">${S.eye.title}</span>${RD.needsYourEye?.length ? `<ul>${RD.needsYourEye.map(e => `<li><b>${md(e.t)}</b> — ${md(e.p)}</li>`).join('')}</ul>` : `<p class="none">${S.eye.none}</p>`}</div>
         ${RD.costPlain ? `<p class="plain">${md(RD.costPlain)}</p>` : ''}
       </div>${decs('macro')}`);
+
+    // ---- the size (optional, sizing.json): the three tiers side by side, the pick per part, the doors, the evolution path ----
+    if (G.sizing) {
+      const Z = G.sizing, SZ = SD.size, TIERS = ['lean', 'balanced', 'hardened'], ap = Z.appetite;
+      const hc = x => `${esc(x.hours)} h · ${money(x.cost)}`;
+      const tierPill = t => `<span class="pill ${t === 'lean' ? 'mute' : 'acc'}">${SZ.tiers[t] || esc(t)}</span>`;
+      const pickOf = part => (Z.picks.find(p => p.part === part) || {}).tier;
+      const side = tbl([SZ.part, ...TIERS.map(t => SZ.tiers[t])], [
+        ...Z.parts.map(p => [`<b>${esc(p.part)}</b>${p.noChoice ? `<span class="rid">${SZ.noChoice}</span>` : ''}`, ...TIERS.map(t => `${pickOf(p.part) === t ? `<b>${md(p[t].what)}</b> ${tierPill(t)}` : md(p[t].what)}<span class="rid">${hc(p[t])}</span>`)]),
+        [`<b>${SZ.total}</b>`, ...Z.tiers.map(t => `<b>${hc(t)}</b>`)]], 'zside');
+      const picks = tbl([SZ.part, SZ.tier, SZ.rvc, SZ.why], Z.picks.map(p => [`<code>${esc(p.part)}</code>`, tierPill(p.tier), `<span class="mono">${p.rvc.join(' ')}</span>`, `${md(p.why)}${p.req ? `<span class="rid">req: ${esc(p.req)}</span>` : ''}`]), 'zpicks');
+      const doors = Z.doors.length ? `<div class="list">${Z.doors.map(d => `<div class="row"><span class="t">${md(d.door)}</span><span class="pill ${d.his ? 'acc' : 'mute'}">${d.his ? SZ.his.replace('{q}', esc(d.his)) : SZ.notHis}</span><span class="d">${md(d.decided)}${d.why ? ` — ${md(d.why)}` : ''}</span></div>`).join('')}</div>` : `<p style="color:var(--ink-3)">${SZ.noDoors}</p>`;
+      const evo = Z.evolution.length ? tbl([SZ.part, SZ.now, SZ.signal, SZ.next, SZ.cost], Z.evolution.map(x => [`<code>${esc(x.part)}</code>`, md(x.now), `${md(x.signal)}<span class="rid">${SZ.watchedBy} ${md(x.watchedBy)}</span>`, md(x.next), esc(x.cost)])) : `<p style="color:var(--ink-3)">${SZ.noEvolution}</p>`;
+      const above = Z.picks.filter(p => p.tier !== 'lean').length;
+      sec('design-size', SD.sec.size, SZ.lede, `<p class="plain">${md(Z.plain)}</p>
+        <div class="cells">
+          <div class="cell"><span class="v">${esc(ap.pick)} h</span><span class="l">${SZ.cells.pick}</span><span class="s">${SZ.cells.pickTail.replace('{a}', esc(ap.hours))}</span></div>
+          <div class="cell"><span class="v">${money(ap.runCost)}</span><span class="l">${SZ.cells.runCost}</span><span class="s">${esc(ap.unit)}</span></div>
+          <div class="cell"><span class="v">${above}/${Z.picks.length}</span><span class="l">${SZ.cells.above}</span><span class="s">${SZ.cells.aboveTail}</span></div>
+          <div class="cell"><span class="v">${Z.doors.length}</span><span class="l">${SZ.cells.doors}</span><span class="s">${SZ.cells.doorsTail.replace('{n}', Z.doors.filter(d => d.his).length)}</span></div>
+        </div>
+        ${(Z.noGos || []).length ? kick(SZ.noGos, `<div class="chipline">${Z.noGos.map(x => `<span class="chip">${md(x)}</span>`).join('')}</div>`) : ''}
+        ${kick(SZ.side, side)}${kick(SZ.picks, picks)}${kick(`${SZ.doors} · ${Z.doors.length}`, doors)}${kick(`${SZ.evolution} · ${Z.evolution.length}`, evo)}`);
+    }
 
     // ---- 2. architecture ----
     sec('design-architecture', SD.sec.architecture, null, `${intro(A)}${fig(A.figure)}
@@ -749,12 +796,18 @@
     };
     const decsG = (k, title) => { const L = DECG.filter(c => c.doc === k); return L.length ? kickG(`${title} · ${L.length}`, `<div class="cards">${L.map(dcardG).join('')}</div>`) : ''; };
     const entryLink = id => id === 'F' ? `<a class="chip" href="#plan-foundation">F</a>` : `<a class="chip" href="#entry-${esc(id)}">${esc(id)}</a>`;
-    // the step of an entry: the foundation is 0, an entry with no edge is 1, else one past its deepest predecessor (the build refused cycles)
+    // the kind of an entry (F-b foundation, F-x<n> lane, E-<nn> slice, E-int integration), read from the id when the plan leaves it out
+    const kindOf = e => e.kind || (/^F-x\d+$/.test(e.id) ? 'lane' : /^F-[a-z]$/.test(e.id) ? 'foundation' : e.id === 'E-int' ? 'integration' : 'slice');
+    const isFound = e => kindOf(e) === 'foundation';
+    const CP = G.criticalPath || [], onCP = id => CP.includes(id) || byId[id]?.critical === true;
+    const badges = e => `<span class="pill mute">${SG.kinds2[kindOf(e)] || esc(kindOf(e))}</span>${onCP(e.id) ? `<span class="pill acc">${SG.critical}</span>` : ''}`;
+    // the step of an entry (its wave): a foundation entry is 0, an entry with no edge is 1, else one past its deepest predecessor (the build refused cycles)
     const byId = Object.fromEntries(E.map(e => [e.id, e])), stepOf = {};
-    const step = id => stepOf[id] ?? (stepOf[id] = byId[id].after.length ? 1 + Math.max(...byId[id].after.map(step)) : 1);
+    const step = id => stepOf[id] ?? (stepOf[id] = isFound(byId[id]) ? 0 : (ups => ups.length ? 1 + Math.max(...ups.map(step)) : 1)(byId[id].after.filter(a => byId[a] && !isFound(byId[a]))));
     E.forEach(e => step(e.id));
-    const depth = Math.max(0, ...Object.values(stepOf));
-    const storiesN = E.reduce((a, e) => a + e.stories.length, 0), roots = E.filter(e => !e.after.length), handedG = (G.preflight || []).filter(p => p.status === 'handed').length, againstG = DECG.filter(c => c.againstRecommendation);
+    const depth = G.depth ?? Math.max(0, ...Object.values(stepOf));
+    const FE = E.filter(isFound), WE = E.filter(e => !isFound(e));
+    const storiesN = E.reduce((a, e) => a + e.stories.length, 0), roots = WE.filter(e => !e.after.length), handedG = (G.preflight || []).filter(p => p.status === 'handed').length, againstG = DECG.filter(c => c.againstRecommendation);
 
     // ---- 1. what we build ----
     sec('plan-what', SG.sec.what, null, `
@@ -777,12 +830,19 @@
     // ---- 2. the graph: generated from the entries and their edges ----
     const nid = id => 'n_' + String(id).replace(/[^A-Za-z0-9]/g, '_');
     const lbl = t => String(t).replace(/[`*]/g, '').replace(/"/g, '#quot;');
+    // the foundation is a chain (F, then F-b when split); every entry with no edge hangs from its last link; an edge says its class, and "stacked" when it starts on the other's branch
+    const fLast = FE.length ? nid(FE[FE.length - 1].id) : 'F0';
+    const edgeLbl = x => [x.class ? (SG.edge[x.class] || x.class) : null, x.stacked ? SG.edge.stacked : null].filter(Boolean).join(' · ');
     const mer = ['flowchart LR', `  F0["${lbl(SG.foundationNode)}"]`, ...E.map(e => `  ${nid(e.id)}["${lbl(`${e.id} · ${e.name}`)}"]`),
-      ...roots.map(e => `  F0 --> ${nid(e.id)}`), ...E.flatMap(e => e.after.map(a => `  ${nid(a)} --> ${nid(e.id)}`))].join('\n');
+      ...FE.map((e, i) => `  ${i ? nid(FE[i - 1].id) : 'F0'} --> ${nid(e.id)}`),
+      ...roots.map(e => `  ${fLast} --> ${nid(e.id)}`), ...WE.flatMap(e => (e.edges || e.after.map(id => ({ id }))).filter(x => x.id !== 'F').map(x => `  ${nid(x.id)} -->${edgeLbl(x) ? `|"${lbl(edgeLbl(x))}"|` : ''} ${nid(e.id)}`)),
+      ...(CP.length || E.some(e => e.critical) ? ['  classDef crit stroke-width:3px', ...[...(CP.includes('F') ? ['F0'] : []), ...E.filter(e => onCP(e.id)).map(e => nid(e.id))].map(n => `  class ${n} crit`)] : [])].join('\n');
     const bySteps = Array.from({ length: depth }, (_, i) => [i + 1, E.filter(e => stepOf[e.id] === i + 1)]);
+    const cpLine = CP.length ? kickG(SG.criticalPath, `<div class="chipline">${CP.map(entryLink).join('<span style="color:var(--ink-3)">→</span>')}</div>`) : '';
     sec('plan-graph', SG.sec.graph, null, `<p class="plain">${md(RPG.graphPlain)}</p>
-      <figure><pre class="mermaid">${esc(mer)}</pre><figcaption>${SG.caption.replace('{c}', G.concurrency)}</figcaption></figure>
-      ${kickG(SG.byStep, tblG([SG.step, SG.stepEntries], [[0, `<a class="chip" href="#plan-foundation">F</a> ${SG.stepZero}`], ...bySteps.map(([n, es]) => [n, `<span class="chips">${es.map(e => entryLink(e.id)).join('')}</span>`])]))}`);
+      <figure><pre class="mermaid">${esc(mer)}</pre><figcaption>${SG.caption.replace('{c}', G.concurrency)}${CP.length ? ` ${SG.captionCritical}` : ''}</figcaption></figure>
+      ${cpLine}
+      ${kickG(SG.byStep, tblG([SG.step, SG.stepEntries], [[0, `<span class="chips"><a class="chip" href="#plan-foundation">F</a>${FE.map(e => entryLink(e.id)).join('')}</span> ${SG.stepZero}`], ...bySteps.map(([n, es]) => [n, `<span class="chips">${es.map(e => entryLink(e.id)).join('')}</span>`])]))}`);
 
     // ---- 3. the foundation ----
     const FB = P.briefs.F;
@@ -799,14 +859,15 @@
     const proofSum = list => `<div class="proof">${list.map(p => p.run ? `<span><code>${esc(p.run)}</code></span>` : `<span><span class="pk">${SG.seeStep}</span>${md(p.where)}</span>`).join('')}</div>`;
     const table = tblG([SG.table.id, SG.table.name, SG.table.stories, SG.table.after, SG.table.back, SG.table.front, SG.table.proof], E.map(e => [
       `<a href="#entry-${esc(e.id)}" style="white-space:nowrap"><code>${esc(e.id)}</code></a>`,
-      `<b>${md(e.name)}</b>`,
-      `<span class="chips">${e.stories.map(s => `<a class="chip acc" href="#${esc(s)}">${esc(s)}</a>`).join('')}</span>`,
+      `<b>${md(e.name)}</b><span class="chips" style="margin-top:4px">${badges(e)}</span>`,
+      e.stories.length ? `<span class="chips">${e.stories.map(s => `<a class="chip acc" href="#${esc(s)}">${esc(s)}</a>`).join('')}</span>` : '—',
       e.after.length ? `<span class="chips">${e.after.map(entryLink).join('')}</span>` : `<span class="pill mute">${SG.noAfter}</span>`,
       e.back == null ? SG.noSide : md(e.back), e.front == null ? SG.noSide : md(e.front), proofSum(e.proof)]));
     const cards = E.map(e => { const b = P.briefs[e.id] || {};
-      return `<article class="lane" id="entry-${esc(e.id)}"><div class="hd"><h3><code>${esc(e.id)}</code> · ${md(e.name)}</h3>${e.stories.map(s => `<a class="chip acc" href="#${esc(s)}">${esc(s)}</a>`).join('')}<span class="chip">${SG.step} ${stepOf[e.id]}</span></div>
+      return `<article class="lane" id="entry-${esc(e.id)}"><div class="hd"><h3><code>${esc(e.id)}</code> · ${md(e.name)}</h3>${e.stories.map(s => `<a class="chip acc" href="#${esc(s)}">${esc(s)}</a>`).join('')}${badges(e)}<span class="chip">${SG.step} ${stepOf[e.id]}</span></div>
         <p class="plain">${md(e.what)}</p>
-        <div class="facts"><span><b>${SG.table.after}</b>${e.after.length ? e.after.map(esc).join(' · ') : SG.noAfter}</span>${e.touches ? `<span><b>${SG.touches}</b>${md(e.touches)}</span>` : ''}</div>
+        <div class="facts"><span><b>${SG.table.after}</b>${e.after.length ? (e.edges || e.after.map(id => ({ id }))).filter(x => x.id !== 'F').map(x => `${esc(x.id)}${edgeLbl(x) ? ` (${esc(edgeLbl(x))})` : ''}`).join(' · ') : SG.noAfter}</span>${e.touches ? `<span><b>${SG.touches}</b>${md(e.touches)}</span>` : ''}</div>
+        ${(e.owns || []).length ? fold(`${SG.owns} · ${e.owns.length}`, `<div class="chipline">${e.owns.map(o => `<code>${esc(o)}</code>`).join(' ')}</div>`, false) : ''}
         ${b.intro ? `<p class="plain">${md(b.intro)}</p>` : ''}
         ${listG(SG.brief.back, b.back)}${listG(SG.brief.front, b.front)}
         ${kickG(SG.proof, walkG(e.proof))}${listG(SG.brief.proof, b.proof)}
@@ -875,9 +936,12 @@
     const nid = id => 'n_' + String(id).replace(/[^A-Za-z0-9]/g, '_');
     const lbl = t => String(t).replace(/[`*]/g, '').replace(/"/g, '#quot;');
     const mark = st => st === 'merged' ? '✓ ' : st === 'parked' ? '✕ ' : '';
-    const roots4 = E4.filter(e => !e.after.length);
+    // a foundation entry (F-b) chains after F; the entries with no edge hang from the chain's last link
+    const isF4 = e => e.kind === 'foundation' || (!e.kind && /^F-[a-z]$/.test(e.id)), FE4 = E4.filter(isF4);
+    const roots4 = E4.filter(e => !isF4(e) && !e.after.length), fLast4 = FE4.length ? nid(FE4[FE4.length - 1].id) : 'F0';
     const mer = ['flowchart LR', `  F0["${lbl(mark(stOf('F')) + S.plan.foundationNode)}"]`, ...E4.map(e => `  ${nid(e.id)}["${lbl(`${mark(stOf(e.id))}${e.id} · ${e.name}`)}"]`),
-      ...roots4.map(e => `  F0 --> ${nid(e.id)}`), ...E4.flatMap(e => e.after.map(a => `  ${nid(a)} --> ${nid(e.id)}`)),
+      ...FE4.map((e, i) => `  ${i ? nid(FE4[i - 1].id) : 'F0'} --> ${nid(e.id)}`),
+      ...roots4.map(e => `  ${fLast4} --> ${nid(e.id)}`), ...E4.filter(e => !isF4(e)).flatMap(e => e.after.map(a => `  ${nid(a)} --> ${nid(e.id)}`)),
       '  classDef xmerged stroke-width:2px', '  classDef xparked stroke-width:3px', '  classDef xbuilding stroke-width:2px,stroke-dasharray:6 4', '  classDef xwaiting stroke-width:1px',
       `  class F0 x${stOf('F')}`, ...E4.map(e => `  class ${nid(e.id)} x${stOf(e.id)}`)].join('\n');
     const legend = `<div class="xleg">${['merged', 'building', 'waiting', 'parked'].map(k => `<span><i class="${k}">${k === 'parked' ? '✕' : ''}</i>${SX.status[k]}</span>`).join('')}</div>`;
@@ -896,11 +960,14 @@
       ${kick4(`${SX.amendments} · ${X.amendments.length}`, amend)}`);
 
     // ---- 4. the review: how precise each reviewer was ----
-    const PK = ['found', 'sustained', 'deferred', 'latitude', 'dismissed', 'user'];
-    const ratio = p => p.found ? `${Math.round(100 * p.sustained / p.found)}%` : '—';
-    const sumP = Object.fromEntries(PK.map(k => [k, X.precision.reduce((a, p) => a + p[k], 0)]));
-    const prec = X.precision.length ? tbl4([SX.prec.lens, ...PK.map(k => '#' + SX.prec[k]), '#' + SX.prec.ratio],
-      [...X.precision.map(p => [`<code>${esc(p.lens)}</code>`, ...PK.map(k => p[k]), `<b>${ratio(p)}</b>`]), { cls: 'tot', cells: [SX.prec.total, ...PK.map(k => sumP[k]), `<b>${ratio(sumP)}</b>`] }], 'xprec')
+    // v8 rows count sustained · latitude · dismissed · user; v9 rows count blocking · learn · withRepro · ruleOnly · closed: the table shows the columns the record carries
+    const PK = ['found', 'sustained', 'blocking', 'withRepro', 'ruleOnly', 'deferred', 'learn', 'closed', 'latitude', 'dismissed', 'user'].filter(k => X.precision.some(p => p[k] !== undefined));
+    const kept = p => p.blocking ?? p.sustained ?? 0;
+    const ratio = (k, f) => f ? `${Math.round(100 * k / f)}%` : '—';
+    const sumP = Object.fromEntries(PK.map(k => [k, X.precision.reduce((a, p) => a + (p[k] ?? 0), 0)]));
+    const keptAll = X.precision.reduce((a, p) => a + kept(p), 0);
+    const prec = X.precision.length ? tbl4([SX.prec.lens, ...PK.map(k => '#' + SX.prec[k]), '#' + (PK.includes('blocking') ? SX.prec.ratioBlocking : SX.prec.ratio)],
+      [...X.precision.map(p => [`<code>${esc(p.lens)}</code>`, ...PK.map(k => p[k] ?? '—'), `<b>${ratio(kept(p), p.found)}</b>`]), { cls: 'tot', cells: [SX.prec.total, ...PK.map(k => sumP[k]), `<b>${ratio(keptAll, sumP.found)}</b>`] }], 'xprec')
       : `<p class="plain" style="color:var(--ink-3)">${SX.noPrecision}</p>`;
     sec('exec-review', SX.sec.review, null, `<p class="plain">${md(RP4.reviewPlain)}</p>${kick4(SX.precTitle, prec)}`);
 
@@ -935,7 +1002,7 @@
     const okPill = ok => `<span class="pill ${ok ? 'good' : 'bad'}">${ok ? SL.ok : SL.red}</span>`;
     const isRead = r => r.readAt != null && r.got != null && r.ok != null;
     const green = L.staging.filter(s => s.ok).length, red = L.staging.length - green;
-    const openFixes = L.fixes.filter(f => !f.sha).length, rollbacks = L.production.filter(p => p.rolledBack).length;
+    const openFixes = L.fixes.filter(f => !f.sha).length, rollbacks = (L.rollbacks || []).length || L.production.filter(p => p.rolledBack).length;
     const readN = L.watch.filter(isRead).length, ownedN = L.watch.filter(r => !isRead(r) && r.owner != null).length;
     const fixLink = id => id ? `<a class="chip" href="#rfix-${esc(id)}">${esc(id)}</a>` : '—';
     const ansPill = a => `<span class="pill ${a === 'go' ? 'good' : 'warn'}">${SL.answers[a] || esc(a)}</span>`;
@@ -954,19 +1021,25 @@
           <div class="cell"><span class="v">${rollbacks}</span><span class="l">${SL.cells.rollbacks}</span><span class="s">${SL.cells.rollbacksTail.replace('{n}', L.production.length)}</span></div>
           <div class="cell"><span class="v">${readN}/${L.watch.length}</span><span class="l">${SL.cells.watch}</span><span class="s">${SL.cells.watchTail.replace('{n}', ownedN)}</span></div>
         </div>
+        ${L.numbers ? `<div class="cells">${[['wallClockH', v => `${v} h`], ['hisMin', v => `${v} min`], ['tokensM', v => `${v} M`], ['reverts', v => `${v}${L.numbers.revertRate != null ? ` · ${Math.round(100 * L.numbers.revertRate)}%` : ''}`]].map(([k, f]) => `<div class="cell"><span class="v">${L.numbers[k] == null ? '—' : esc(f(L.numbers[k]))}</span><span class="l">${SL.numbers[k]}</span></div>`).join('')}</div>` : ''}
         <div class="askbox"><span class="kicker">${SL.askTitle}</span>${askBox}</div>
         <div class="eye"><span class="kicker">${S.eye.title}</span>${RP5.needsYourEye.length ? `<ul>${RP5.needsYourEye.map(e => `<li><b>${md(e.t)}</b> — ${md(e.p)}</li>`).join('')}</ul>` : `<p class="none">${S.eye.none}</p>`}</div>
       </div>`);
 
     // ---- 2. the path: feature branch → staging → the ask → production ----
-    const events = [...L.staging.map(s => ({ k: 'staging', at: s.at, s })), ...L.asks.map(a => ({ k: 'ask', at: a.at, s: a })), ...L.production.map(p => ({ k: 'production', at: p.at, s: p }))]
-      .sort((a, b) => a.at < b.at ? -1 : a.at > b.at ? 1 : ['staging', 'ask', 'production'].indexOf(a.k) - ['staging', 'ask', 'production'].indexOf(b.k));
+    // v9 order: the play → the merge into main → staging (and the verifier) → production → a rollback when a trigger fires
+    const KORD = ['ask', 'merge', 'staging', 'production', 'rollback'];
+    const events = [...L.staging.map(s => ({ k: 'staging', at: s.at, s })), ...L.asks.map(a => ({ k: 'ask', at: a.at, s: a })), ...(L.merge ? [{ k: 'merge', at: L.merge.at, s: L.merge }] : []),
+      ...L.production.map(p => ({ k: 'production', at: p.at, s: p })), ...(L.rollbacks || []).map(r => ({ k: 'rollback', at: r.at, s: r }))]
+      .sort((a, b) => a.at < b.at ? -1 : a.at > b.at ? 1 : KORD.indexOf(a.k) - KORD.indexOf(b.k));
     const lbl5 = t => String(t).replace(/[`*]/g, '').replace(/"/g, '#quot;');
     const nodes = ['flowchart LR', `  feat["${lbl5(`${SL.path.feat} · ${X5.branch}`)}"]`], klass = [];
     let prev = 'feat';
     events.forEach((e, i) => {
       const id = `e${i}`;
       if (e.k === 'ask') { nodes.push(`  ${id}{{"${lbl5(`${SL.path.ask} · “${e.s.words}”`)}"}}`); klass.push(`  class ${id} ${e.s.answer === 'go' ? 'xbuilding' : 'xwaiting'}`); }
+      else if (e.k === 'merge') { nodes.push(`  ${id}["${lbl5(`✓ ${SL.path.merge} · ${e.s.sha}`)}"]`); klass.push(`  class ${id} xmerged`); }
+      else if (e.k === 'rollback') { nodes.push(`  ${id}["${lbl5(`✕ ${SL.path.rollback} → ${e.s.to}`)}"]`); klass.push(`  class ${id} xparked`); }
       else { const ok = e.s.ok && !e.s.rolledBack; nodes.push(`  ${id}["${lbl5(`${ok ? '✓' : '✕'} ${SL.path[e.k].replace('{n}', e.s.n)}`)}"]`); klass.push(`  class ${id} ${ok ? 'xmerged' : 'xparked'}`); }
       nodes.push(`  ${prev} --> ${id}`); prev = id;
       if (e.s.fix && e.k !== 'ask') { const f = `f${i}`; nodes.push(`  ${f}["${lbl5(`${SL.path.fix} ${e.s.fix}`)}"]`, `  ${id} -.-> ${f}`); klass.push(`  class ${f} xwaiting`); }
@@ -976,6 +1049,8 @@
     const stepRows = events.map(e => {
       const x = e.s;
       if (e.k === 'ask') return { cls: 'askrow', cells: [`<b>${SL.path.ask}</b>`, esc(x.at), x.pr ? `${SL.pr} #${esc(x.pr)}` : '—', ansPill(x.answer), `<i>“${esc(x.words)}”</i>`, '—', '—'] };
+      if (e.k === 'merge') return { cls: '', cells: [`<b>${SL.path.merge}</b>${x.pr ? `<span class="rid">${SL.pr} #${esc(x.pr)}</span>` : ''}`, esc(x.at), code5(x.signoff), okPill(true), `${SL.path.signoff} <code>${esc(x.signoff)}</code><span class="rid">${esc(x.sha)}</span>`, '—', '—'] };
+      if (e.k === 'rollback') return { cls: 'red', cells: [`<b>${SL.path.rollback}</b>`, esc(x.at), '—', `<span class="pill bad">${SL.rolledBack}</span>`, `${md(x.trigger)}${x.value != null ? `<span class="rid">${esc(x.value)}</span>` : ''}`, `→ <code>${esc(x.to)}</code>`, fixLink(x.fix)] };
       const red = !x.ok || x.rolledBack;
       const result = `${okPill(x.ok)}${x.rolledBack ? `<span class="rid">${SL.rolledBack}</span>` : ''}${x.cause ? `<span class="rid">${SL.cause[x.cause] || esc(x.cause)}</span>` : ''}`;
       const what = `${md(e.k === 'staging' ? x.summary : x.checks)}${x.proof ? `<span class="rid">${esc(x.proof)}</span>` : ''}`;
@@ -987,6 +1062,23 @@
       <figure class="xgraph rflow"><pre class="mermaid">${esc(mer5)}</pre>${leg5}<figcaption>${SL.path.caption}</figcaption></figure>
       ${events.length ? tbl5([T.step, T.at, T.run, T.result, T.what, T.verified, T.fix], stepRows, 'rsteps') : none5(SL.path.none)}
       ${kick5(`${SL.preflight.title} · ${(L.preflight || []).length}`, pre)}`);
+
+    // ---- the rollout and the alarms (v9): the candidate, the shifts, the bake against the previous revision, the rollbacks, each alarm's first evaluation ----
+    if (L.rollout || (L.alarms || []).length || (L.rollbacks || []).length) {
+      const RO = L.rollout, SR = SL.rollout, B = RO?.bake;
+      const VERD = { hold: 'good', 'no-signal': 'warn', trigger: 'bad' }, AST = { ok: 'good', 'no-datapoints': 'warn', firing: 'bad', 'not-evaluated': 'mute' };
+      const nv5 = (v, u) => v == null ? '—' : `${esc(v)}${u || ''}`;
+      const cand = RO?.candidate ? `<div class="xhead"><span><b>${SR.rev}</b><code>${esc(RO.candidate.rev)}</code></span><span><b>${SR.tag}</b><code>${esc(RO.candidate.tag)}</code></span><span><b>${SR.smoke}</b>${md(String(RO.candidate.smoke))}</span></div>` : '';
+      const shifts = (RO?.shifts || []).length ? tbl5([SR.pct, SR.at], RO.shifts.map(x => [`${esc(x.pct)}%`, esc(x.at)])) : '';
+      const bake = B ? tbl5([SR.bake.minutes, SR.bake.req, SR.bake.err, SR.bake.p95, SR.bake.verdict], [[nv5(B.minutes, ' min'), nv5(B.newReq), `${nv5(B.new5xx, '%')} <span class="rid">${SR.bake.prev} ${nv5(B.prev5xx, '%')}</span>`, `${nv5(B.newP95, ' ms')} <span class="rid">${SR.bake.prev} ${nv5(B.prevP95, ' ms')}</span>`, `<span class="pill ${VERD[B.verdict] || 'mute'}">${SR.verdicts[B.verdict] || esc(B.verdict)}</span>`]]) : '';
+      const rbs = (L.rollbacks || []).length ? tbl5([SR.rb.at, SR.rb.trigger, SR.rb.value, SR.rb.to, SR.rb.fix], L.rollbacks.map(r => ({ cls: 'red', cells: [esc(r.at), md(r.trigger), r.value == null ? '—' : esc(r.value), `<code>${esc(r.to)}</code>`, fixLink(r.fix)] })), 'rsteps') : none5(SR.noRollback);
+      const alarms = (L.alarms || []).length ? tbl5([SR.al.name, SR.al.state], L.alarms.map(a => [`<code>${esc(a.name)}</code>`, `<span class="pill ${AST[a.state] || 'mute'}">${SR.states[a.state] || esc(a.state)}</span>`])) : none5(SR.noAlarms);
+      sec('rel-rollout', SL.sec.rollout, SR.lede, `
+        ${RO ? kick5(SR.mode, `<p class="plain"><span class="pill acc">${SR.modes[RO.mode] || esc(RO.mode)}</span> ${SR.modeNote[RO.mode] || ''}</p>${cand}`) : ''}
+        ${shifts ? kick5(`${SR.shifts} · ${RO.shifts.length}`, shifts) : ''}${bake ? kick5(SR.bake.title, bake) : ''}
+        ${kick5(`${SR.rollbacks} · ${(L.rollbacks || []).length}`, rbs)}
+        ${kick5(`${SR.alarms} · ${(L.alarms || []).length}`, alarms)}`);
+    }
 
     // ---- 3. versions, what shipped, what is in production ----
     const V = SL.versions;
