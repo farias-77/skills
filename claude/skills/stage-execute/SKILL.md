@@ -65,7 +65,9 @@ exec-entry (one workflow run per entry, in its own worktree and stack)
            not end its turn until the gate commands are green
   gate     exec-gate (Sonnet 5.5, medium): acceptance untouched, the gate commands (fast
            check, affected tests, structure check), the surface (api · screen · runtime),
-           stack up; red → the builder at high (3 tries) → parked: gate-red
+           stack up; red → the builder at high (3 tries) → parked: gate-red;
+           a red only the machine caused → no builder: the gate again after a
+           load wait (2×) → parked: machine
   check    on the same head:
              verifier, prove mode — the acceptance checks on the running stack; a screenshot
                of every state named by its frame, video, side effects read back, the PII
@@ -285,7 +287,13 @@ for it. For each:
    later run of the entry (`resume`, `update`) gets the same arguments,
    with `priorRuns` grown by one and `acceptance` (the `commit` and
    `files` of the run that authored them), so the checks are never
-   written twice.
+   written twice. Every relaunch after an amendment also passes
+   `closedAmendments: [{ id, what, sha }]`, one per amendment of the
+   entry closed in `rulings.md`, `what` naming its files by path or
+   glob: the builder sees them as done, and a run whose builder asks
+   for one twice returns `needs-amendment` with reason `repeats closed
+   <id>`. `loadThreshold` is the load the session holds the cap by
+   (omitted: `nproc`).
 3. **Record** the run id and `building` in `board.md`.
 
 **Past the local cap.** When the ready set is wider than the measured
@@ -354,6 +362,9 @@ on `status`:
     **the code** → resume with each failure as an item, the diagnosis
     written in its fix. One unblocking per entry; red again after it →
     parked for the audit with both diagnoses.
+  - **`machine`** — the gate stayed red only for the machine after two
+    load waits (its log and `gate.load` name the load): wait until the
+    load is under the threshold, then resume with an empty fixes file.
   - **`round-cap`** — items still blocking after the fix and its delta.
     One automatic resume with them. If it caps again, the session
     writes the smallest fix of what is left, by the triage rule, for

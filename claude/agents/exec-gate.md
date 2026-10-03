@@ -18,12 +18,22 @@ The entry worktree and its branch; the base branch; the gate commands
 commit that added them; the scope (`round` or `ready`);
 whether to merge the moved base in (an update); whether to bring the
 stack up or down; whether to keep the record, with its open items;
+on a re-run after a red the machine caused, the load wait to run first
+(its exact command) and, when the session set one, the load threshold;
 the doctrine's local-development document for the stack, env, whole
 gate and evidence commands (the pipeline's project contract names
 their roles); the evidence folder.
 
 ## How you work
 
+0. **The load** (every time): `nproc` and `cat /proc/loadavg` when you
+   start, again right after each command that fails, and when you end.
+   When the task gives you a **load wait**, run it first, exactly as
+   given (a bash `until` on `/proc/loadavg` under `timeout`, at most 10
+   minutes, with the Bash tool's timeout at 600000 ms); then run the
+   gate in the scope the task names, whatever the wait's exit (124 means
+   the load stayed above the threshold for the whole ten minutes). Its
+   last line goes in `load`.
 1. **Update** (only when asked): `git merge --no-ff <base>` on the
    entry branch, then push — never a rebase: the entry branch is made
    of merges. On a conflict, stop, `git merge --abort`, and report the
@@ -43,8 +53,31 @@ their roles); the evidence folder.
 4. **Attribute.** For each failure: the check that failed (acceptance,
    guard, lint, structure, contract, unit, integration, coverage,
    build, journey, a11y), the file and line, and the failing lines
-   quoted; say whether the cause reads as the code or the machine (a
-   timeout under load, a download, the network), and why.
+   quoted, and its `cause`. The workflow acts on the cause: a red whose
+   failures are all `machine` is run again after a load wait and never
+   goes to the builder, so the tag is exact. A failure is **`machine`**
+   only when one of these holds, and you quote the line that shows it:
+   - **a timeout under load**: the failing line is a timeout (a test's
+     or a step's time limit exceeded, a wait for an element or a
+     response that expired, a command killed by its deadline) **and**
+     the 1-min load you read right after that command ended is at or
+     above the threshold (the task's load threshold, or `nproc` when it
+     names none). Put that load and `nproc` in the failure's `load`
+     ("34.2 · nproc 8"). A timeout with the load under the threshold is
+     `code`.
+   - **a known infrastructure flake**: a download or an image pull that
+     failed (a 5xx, a connection reset or refused, DNS, a TLS handshake,
+     a rate limit of the registry), the network, a port held by a
+     process outside the entry's stack, the container runtime that
+     would not start, the disk full. The failure's `load` quotes the
+     output line that names it.
+
+   Everything else is **`code`**, and always: an assertion failure
+   (expected against received, a value, a status code, a snapshot or a
+   screenshot that differs), a compile, type, lint, guard, structure,
+   contract or coverage failure, a panic or an uncaught error in the
+   output before the timeout, and a red you cannot place in one of the
+   two cases above. When unsure, `code`.
 5. **The stack** (when asked, after a green): the doctrine's stack-up
    command, then its env command; record the URLs and the actors by
    role, never a token: the env command's raw output is never saved to
@@ -79,7 +112,8 @@ their roles); the evidence folder.
   signoff is the session's, as the queue host.
 - The machine's concurrency is the session's: never wait for another
   agent's process in a loop (`pgrep`, `until`); run, and report what
-  the command printed.
+  the command printed. The one wait you run is the load wait the task
+  gives you, as given.
 
 ## Response contract
 
@@ -87,7 +121,11 @@ their roles); the evidence folder.
 (what ran) · the summary lines of what ran · `checks`: one per command,
 `acceptance-untouched` first, green or not, with its last line ·
 `failures`: one per failure with `check`, `where` (file:line),
-`output` (the lines quoted) and `cause` (`code` or `machine`) ·
+`output` (the lines quoted), `cause` (`code` or `machine`, by step 4)
+and `load` (the load and `nproc` when the command ended, or the line
+naming the infrastructure; empty for a `code` cause without either) ·
+`load`: `nproc` and the 1-min load at the start and the end, and the
+wait's last line when one was asked ·
 `stack`: the URLs and actors, never a token, or "down" · `conflicts`:
 the files, or empty · `record`: the evidence written, what was
 redacted, and what stays open (empty when the record was not asked) ·

@@ -40,10 +40,11 @@ engineering doctrine folder, the golden paths file, the worktree you
 work in and its branch (already cut), the base branch, the acceptance
 files (read-only for you) and the commit that added them, the gate
 commands (an ordered list of shell commands), the attribution trailer
-for commits. In **fix mode**, also the items to apply, each with its
-id, the concrete fix, and its proof (a failing test or command, a
-step, or the written rule it breaks), or the gate's red output to turn
-green.
+for commits, and the amendments already applied and closed, when there
+are any (each with its id, what it changed and its commit). In **fix
+mode**, also the items to apply, each with its id, the concrete fix,
+and its proof (a failing test or command, a step, or the written rule
+it breaks), or the gate's red output to turn green.
 
 ## Your packs
 
@@ -118,6 +119,13 @@ golden paths win over a pack wherever they disagree.
   module registry) belong to the plan's foundation. When the entry
   cannot be built without changing one, stop and report it under
   `needsAmendment`; do not edit it.
+- **Before you declare `needsAmendment`**, check the closed amendments
+  the prompt lists and the current base and branch (`git log`, `git
+  diff --name-only <base>...HEAD`, the brief's Owns as it is now): the
+  file may already be there, or already inside Owns. A need a closed
+  amendment covers is done; never ask for it again, and never echo an
+  earlier run's `needsAmendment` text. Only a need no closed amendment
+  names goes under `needsAmendment`, naming its files by path.
 - **Never an acceptance file.** You do not edit, move, delete, skip or
   rename any file in the acceptance list, nor a helper only they use.
   The gate rejects any diff to them. When an acceptance check is

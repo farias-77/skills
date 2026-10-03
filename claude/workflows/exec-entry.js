@@ -30,13 +30,28 @@
  *                  with the packs of its surface; no mechanism the brief
  *                  does not name. A shared file or an acceptance check it
  *                  must change stops the run: 'needs-amendment'. What
- *                  needs the user in person: 'parked' (user).
+ *                  needs the user in person: 'parked' (user). The
+ *                  amendments already closed (args.closedAmendments) are
+ *                  listed to the builder as done; a needsAmendment whose
+ *                  files a closed one already names is logged and the run
+ *                  goes on to the gate, once; a second such echo returns
+ *                  'needs-amendment' with reason "repeats closed <id>".
  *   3. gate        exec-gate (Sonnet 5.5, medium): acceptance untouched,
  *                  the gate commands (the fast check, the affected tests,
  *                  the structure check), the surface (api/screen/runtime),
  *                  the stack up for the verifier. Red → the builder again
  *                  at effort high, up to maxGateFixes, then 'parked'
- *                  (gate-red).
+ *                  (gate-red). A failure the gate tags `machine` (a
+ *                  timeout with the load at or above the threshold, a
+ *                  known infrastructure flake; never an assertion) never
+ *                  goes to a builder: a red that is only the machine's
+ *                  runs the gate again after a wait for the load (at most
+ *                  10 min, until the 1-min load is under loadThreshold,
+ *                  nproc by default), at most twice, then 'parked'
+ *                  (machine); a mixed red sends only the code failures to
+ *                  the builder, and the gate after its fix waits for the
+ *                  load first. A builder that changed nothing and whose
+ *                  own gate commands are green goes straight to the gate.
  *   4. check       in parallel, over the entry diff: the verifier, prove
  *                  mode (the acceptance checks on the running stack,
  *                  screenshots and video, the PII canary, the failure-mode
@@ -136,6 +151,8 @@
  *     maxGateFixes:    3,
  *     inlineAgents:    false,
  *     priorRuns:       ['/abs/.../entries/E-03/run-1.json'],
+ *     closedAmendments: [{ id: 'F.1', what: 'Owns += backend/generated/**, e2e/teamFixtures.ts', sha: '<sha>' }],  // optional; from rulings.md
+ *     loadThreshold:   8,                                   // optional; the 1-min load the gate waits under before a re-run (default: nproc)
  *     acceptance:      { commit: '<sha>', files: ['...'] },  // from an earlier run; omitted on a fresh build
  *     acceptanceRevision: '/abs/.../amendments/F.2.md',    // only when a ruling changes named checks
  *     resume:          { fixesFile: '/abs/.../E-03/fixes-2.json', head: '<parked head sha>', reviewers: ['reviewer'] },  // 'resume' only; reviewers: whose items the file carries
@@ -147,7 +164,10 @@
  * decided, choices, record } — status is 'ready' | 'parked' |
  * 'needs-amendment' | 'interrupted' (an agent returned nothing: the API,
  * the network or the quota failed; the session relaunches the run by its
- * id); reason, when parked, is 'user' | 'gate-red' | 'round-cap'.
+ * id); reason, when parked, is 'user' | 'gate-red' | 'round-cap' |
+ * 'machine' (red only for the machine after two load waits: wait for
+ * the load, then resume); with 'needs-amendment' it is null, or
+ * 'repeats closed <id>' when the builder asked twice for a closed one.
  */
 
 export const meta = {
@@ -156,7 +176,7 @@ export const meta = {
   phases: [
     { title: 'Acceptance', detail: 'verifier (Opus 5.5, medium), author mode: the acceptance checks, red on the base for the right reason, committed', model: 'opus' },
     { title: 'Build', detail: 'builder (Opus 5.5, medium), single writer, golden paths and its packs, the smallest change until the gate commands are green', model: 'opus' },
-    { title: 'Gate', detail: 'exec-gate (Sonnet 5.5, medium): acceptance untouched, the gate commands, the surface, the stack, the record before ready', model: 'sonnet' },
+    { title: 'Gate', detail: 'exec-gate (Sonnet 5.5, medium): acceptance untouched, the gate commands, the surface, the stack, the record before ready; a red only the machine caused runs again after a load wait', model: 'sonnet' },
     { title: 'Check', detail: 'verifier prove → ux-reviewer on screen diffs ∥ reviewer ∥ structure-reviewer ∥ exec-lens-operations (Opus 5.5, medium) ∥ exec-lens-security (Opus 5.5, high); mechanical triage', model: 'opus' },
     { title: 'Fix', detail: 'builder (Opus 5.5, high), on the gate red or the blocking items; then the gate', model: 'opus' },
     { title: 'Delta', detail: 'the verifier again and the reviewers that blocked, over their own items only', model: 'opus' },
@@ -210,7 +230,7 @@ const ACCEPTANCE = obj({
 const BUILD = obj({
   branch: str,
   head: str,
-  commits: { type: 'array', items: obj({ sha: str, message: str }) },
+  commits: { type: 'array', description: 'the commits of this turn only; empty when you changed nothing', items: obj({ sha: str, message: str }) },
   checks: { type: 'array', description: 'one per gate command, in order', items: obj({ command: str, lastLine: str, green: { type: 'boolean' } }) },
   files: strs,
   reused: strs,
@@ -229,7 +249,8 @@ const GATE_REPORT = obj({
   scope: str,
   summary: str,
   checks: { type: 'array', items: obj({ name: str, green: { type: 'boolean' }, lastLine: str }) },
-  failures: { type: 'array', items: obj({ check: str, where: str, output: str, cause: { type: 'string', enum: ['code', 'machine'] } }) },
+  failures: { type: 'array', items: obj({ check: str, where: str, output: str, cause: { type: 'string', enum: ['code', 'machine'] }, load: { type: 'string', description: 'the 1-min load from /proc/loadavg when the failing command ended, and nproc (e.g. "34.2 · nproc 8"); for a machine flake that is not a timeout, the output line that names the infrastructure' } }) },
+  load: { type: 'string', description: 'nproc and the 1-min load when the gate started and ended; the wait line when a load wait was asked' },
   stack: str,
   conflicts: strs,
   record: obj({ evidence: str, redacted: strs, open: strs }),
@@ -277,6 +298,9 @@ const inline = args?.inlineAgents === true
 const priorRuns = Array.isArray(args?.priorRuns) ? args.priorRuns : []
 const gateCommands = Array.isArray(args?.gateCommands) ? args.gateCommands : []
 const agentsDir = args?.agentsDir ?? args?.judgingPath?.replace(/\/skills\/stage-execute\/references\/judging\.md$/, '/agents')
+const closedAmendments = Array.isArray(args?.closedAmendments) ? args.closedAmendments.filter(a => a?.id) : []
+const loadThreshold = Number(args?.loadThreshold) > 0 ? Number(args.loadThreshold) : null
+const MACHINE_RERUNS = 2
 if (!gateCommands.length) log(`${entry}: no gateCommands given — the builder and the gate have nothing to turn green`)
 
 const result = {
@@ -322,6 +346,49 @@ const acceptanceText = () => result.acceptance
   ? `Acceptance files (read-only for the builder), added by ${result.acceptance.commit}:\n${(result.acceptance.files ?? []).map(f => `- ${f}`).join('\n')}`
   : 'Acceptance files: none for this run.'
 const trailer = `Attribution trailer for every commit, verbatim:\n${args?.trailer ?? '(none given)'}`
+const closedText = closedAmendments.length ? `
+Amendments already applied and closed — done: their files are inside the entry's Owns or on the base; never ask for them again:
+${closedAmendments.map(a => `- ${a.id}${a.sha ? ` (${a.sha})` : ''}: ${a.what ?? ''}`).join('\n')}` : ''
+
+// The files a text names (paths with a slash, globs and {a,b} groups expanded), for matching an
+// amendment the builder asks for against the closed ones.
+const expandBraces = (s) => {
+  const m = s.match(/\{([^{}]*)\}/)
+  return m ? m[1].split(',').flatMap(p => expandBraces(s.slice(0, m.index) + p + s.slice(m.index + m[0].length))) : [s]
+}
+const pathsIn = (text) => [...new Set((String(text ?? '').match(/(?:[\w.@*-]|\{[^{}\s]*\})*\/(?:[\w.@*\/-]|\{[^{}\s]*\})*/g) ?? [])
+  .map(p => p.replace(/^\.\//, '').replace(/\.+$/, '').replace(/\/$/, '/**'))
+  .filter(p => /\w/.test(p))
+  .flatMap(expandBraces))]
+const globRe = (g) => new RegExp(`^${g.split('**').map(part => part.split('*').map(x => x.replace(/[.+?^${}()|[\]\\]/g, '\\$&')).join('[^/]*')).join('.*')}$`)
+const covers = (pattern, path) => pattern === path || globRe(pattern).test(path) || globRe(path).test(pattern)
+// The ids of the closed amendments that already name every file the request names; null when one is new.
+const closedEcho = (text) => {
+  const asked = pathsIn(text)
+  if (!asked.length || !closedAmendments.length) return null
+  const ids = new Set()
+  for (const p of asked) {
+    const hit = closedAmendments.filter(a => pathsIn(a.what).some(q => covers(q, p)))
+    if (!hit.length) return null
+    hit.forEach(a => ids.add(a.id))
+  }
+  return [...ids]
+}
+let closedEchoes = 0
+
+// The load wait the gate runs before a re-run of a red the machine caused.
+const loadWait = () => {
+  const t = loadThreshold ?? '$(nproc)'
+  return `First wait for the load (this is the one wait you are asked for): until the 1-min load average is under ${loadThreshold ?? 'the core count (nproc)'}, at most 10 minutes. Run exactly this, with the Bash tool's timeout at 600000 ms:
+timeout 590 bash -c 'until awk -v t="${t}" "{ exit !(\\$1 + 0 < t + 0) }" /proc/loadavg; do sleep 15; done'; echo "wait exit $? · load $(cut -d' ' -f1-3 /proc/loadavg) · nproc $(nproc) · threshold ${t}"
+Put its last line in \`load\`. Exit 0: the load is under the threshold. Exit 124: ten minutes passed above it; run the gate anyway.`
+}
+const onlyMachine = (g) => Boolean(g && !g.green && !g.conflicts.length && g.failures.length && g.failures.every(f => f.cause === 'machine'))
+const machineList = (g) => g.failures.filter(f => f.cause === 'machine').map(f => `${f.check} at ${f.where}${f.load ? ` (load ${f.load})` : ''}`).join('; ')
+const parkMachine = (g, waits) => {
+  result.gate = g; result.head = g.head
+  return park('machine', `the gate is still red only for the machine after ${waits} load wait(s) and re-run(s) — load ${g.load || '?'}, threshold ${loadThreshold ?? 'nproc'}: ${machineList(g)}`)
+}
 
 // ---------- the agents' calls ----------
 
@@ -332,19 +399,21 @@ ${revision ? `${acceptanceText()}\n` : ''}${trailer}`, { label: `${VERIFIER}·${
 
 const build = (task, label, phaseName, effort) => call(BUILDER, `${task}
 ${where}
-${docs}
+${docs}${closedText}
 ${acceptanceText()}
 The gate commands — every one green, in order, on your final head, before you end your turn:
 ${gateList}
 ${trailer}`, { label: `${BUILDER}·${entry}·${label}`, phase: phaseName, schema: BUILD }, effort)
 
+let lastHead = null // the head the last gate ran on: a builder that returns it changed nothing
 const runGate = (task, label) => call(GATE, `Entry ${entry}. ${task}
 ${where}
 ${acceptanceText()}
 The gate commands, in order:
-${gateList}
+${gateList}${loadThreshold ? `
+Load threshold (a timeout at or above it reads as the machine): ${loadThreshold}` : ''}
 Doctrine (its local-development document names the stack, env, whole gate and evidence commands): ${args?.doctrineDir}
-Evidence folder: ${args?.evidenceDir}`, { label: `${GATE}·${entry}·${label}`, phase: 'Gate', schema: GATE_REPORT })
+Evidence folder: ${args?.evidenceDir}`, { label: `${GATE}·${entry}·${label}`, phase: 'Gate', schema: GATE_REPORT }).then(g => { if (g?.head) lastHead = g.head; return g })
 
 const SCOPE = {
   round: 'Scope: round — acceptance untouched, then every gate command in order, stopping at the first red.',
@@ -355,12 +424,28 @@ Record items to close with the record, or report open:
 ${items.map(i => `- ${i.id}: ${i.fix}`).join('\n')}` : ''}`
 
 // Absorbs a builder's return: stops the run on an amendment or a question for the user.
+// An amendment a closed one already covers goes on to the gate once; twice, it stops the run.
 const absorb = (b, who) => {
   if (!b) return interrupted(who)
   b.decided.forEach(d => result.decided.push(d))
   b.choices.forEach(c => result.choices.push(c))
-  if (b.needsAmendment) { result.status = 'needs-amendment'; result.amendment = b.needsAmendment; result.head = b.head; log(`${entry}: needs an amendment: ${b.needsAmendment}`); return result }
+  if (b.needsAmendment) {
+    const ids = closedEcho(b.needsAmendment)
+    if (ids && closedEchoes === 0) {
+      closedEchoes++
+      log(`${entry}: ${who} asked again for closed amendment ${ids.join(', ')} (the same files) — logged, not an amendment; on to the gate: ${b.needsAmendment}`)
+    } else {
+      result.status = 'needs-amendment'; result.amendment = b.needsAmendment; result.head = b.head
+      if (ids) { result.reason = `repeats closed ${ids.join(', ')}`; log(`${entry}: needs an amendment, but it repeats closed ${ids.join(', ')} a second time — stopped: ${b.needsAmendment}`) } else log(`${entry}: needs an amendment: ${b.needsAmendment}`)
+      return result
+    }
+  }
   if (b.questions.length) { result.questions = b.questions.map(q => ({ to: 'user', ...q })); result.head = b.head; return park('user', `${b.questions.length} question(s) only the user can answer`) }
+  const red = b.checks.filter(c => !c.green).map(c => c.command)
+  const sameHead = Boolean(lastHead && b.head && (lastHead.startsWith(b.head) || b.head.startsWith(lastHead)))
+  log(b.commits.length && !sameHead
+    ? `${entry}: ${who} returned ${b.head}: ${b.commits.length} commit(s); its own gate commands ${red.length ? `red on ${red.join(', ')}` : 'green'} — the gate`
+    : `${entry}: ${who} changed nothing (${sameHead ? 'the head the gate last ran on' : 'no commit'}) at ${b.head}; its own gate commands ${red.length ? `red on ${red.join(', ')} — the gate decides` : 'green — nothing to do, straight to the gate'}`)
   return null
 }
 
@@ -371,16 +456,32 @@ const gateUntilGreen = async (task, label, scope, record = null) => {
   const tail = `${SCOPE[scope]}${record ? `\n${recordTask(record)}` : ''}
 When green, bring the stack up on the head (rebuilt when the head changed since it last came up) and leave it up.`
   let g = await runGate(`${task}\n${tail}`, label)
-  for (let n = 1; g && !g.green && !g.conflicts.length && n <= maxGateFixes; n++) {
-    const items = g.failures.map((f, i) => ({ id: `gate-${label}-${n}#${i + 1}`, reviewer: GATE, fix: `turn green: ${f.check} at ${f.where} (${f.cause})`, repro: f.output, rule: '' }))
-    log(`${entry}: gate red (${g.failures.length} failure(s)) — builder try ${n}/${maxGateFixes}`)
+  let n = 0
+  let waits = 0
+  while (g && !g.green && !g.conflicts.length) {
+    // A red that is only the machine's never goes to a builder: the gate waits for the load and runs again.
+    if (onlyMachine(g)) {
+      if (waits >= MACHINE_RERUNS) return { stop: parkMachine(g, waits) }
+      waits++
+      log(`${entry}: gate red only for the machine (${machineList(g)}; load ${g.load || '?'}) — no builder; the gate waits for the load under ${loadThreshold ?? 'nproc'} and runs again (${waits}/${MACHINE_RERUNS})`)
+      g = await runGate(`${loadWait()}\nThen run the gate again on the entry branch, in the same scope; nothing changed since its last run.\n${tail}`, `${label}-wait${waits}`)
+      continue
+    }
+    if (n >= maxGateFixes) break
+    n++
+    // A mixed red: the code failures go to the builder; the machine ones are re-run by the gate after the fix.
+    const machine = g.failures.filter(f => f.cause === 'machine')
+    const items = g.failures.filter(f => f.cause !== 'machine').map((f, i) => ({ id: `gate-${label}-${n}#${i + 1}`, reviewer: GATE, fix: `turn green: ${f.check} at ${f.where} (${f.cause})`, repro: f.output, rule: '' }))
+    log(machine.length
+      ? `${entry}: gate red (${items.length} code failure(s), ${machine.length} machine: ${machineList(g)}) — builder try ${n}/${maxGateFixes} on the code ones only; the gate after it waits for the load`
+      : `${entry}: gate red (${g.failures.length} failure(s)) — builder try ${n}/${maxGateFixes}`)
     phase('Fix')
-    const b = await build(`Mode: fix. Entry ${entry}. Turn the gate green; the failures, quoted:\n${items.map(i => `- ${i.id}: ${i.fix}\n  ${i.repro}`).join('\n')}`, `fix-gate-${label}-${n}`, 'Fix', 'high')
+    const b = await build(`Mode: fix. Entry ${entry}. Turn the gate green; the failures, quoted:\n${items.map(i => `- ${i.id}: ${i.fix}\n  ${i.repro}`).join('\n')}${machine.length ? `\nNot yours (the machine's, re-run by the gate after your fix): ${machineList(g)}` : ''}`, `fix-gate-${label}-${n}`, 'Fix', 'high')
     const stop = absorb(b, `the builder (gate fix ${n})`)
     if (stop) return { stop }
     fixed.push(...items)
     phase('Gate')
-    g = await runGate(`Run the gate again on the entry branch after the builder's fix.\n${tail}`, `${label}-${n}`)
+    g = await runGate(`${machine.length ? `${loadWait()}\n` : ''}Run the gate again on the entry branch after the builder's fix.\n${tail}`, `${label}-${n}`)
   }
   if (!g) return { stop: interrupted('the gate') }
   return { g, fixed }
@@ -488,9 +589,16 @@ if ((mode === 'build' && !result.acceptance) || args?.acceptanceRevision) {
 let since = args?.base
 if (mode === 'update') {
   phase('Gate')
-  const g = await runGate(`Update ${args?.branch} with ${args?.base}: \`git merge --no-ff ${args?.base}\` on the entry branch, never a rebase, then push. On a conflict, \`git merge --abort\` and report the files. On a clean merge, run the gate.
+  let g = await runGate(`Update ${args?.branch} with ${args?.base}: \`git merge --no-ff ${args?.base}\` on the entry branch, never a rebase, then push. On a conflict, \`git merge --abort\` and report the files. On a clean merge, run the gate.
 ${SCOPE.ready}
 ${recordTask([])}`, 'update')
+  // A red only the machine caused: the gate waits for the load and runs again, as in gateUntilGreen.
+  for (let w = 0; onlyMachine(g);) {
+    if (w >= MACHINE_RERUNS) return parkMachine(g, w)
+    w++
+    log(`${entry}: gate red only for the machine after the merge (${machineList(g)}; load ${g.load || '?'}) — the gate waits for the load under ${loadThreshold ?? 'nproc'} and runs again (${w}/${MACHINE_RERUNS})`)
+    g = await runGate(`${loadWait()}\nThen run the gate again on the entry branch (no merge: the base is already merged), in the same scope.\n${SCOPE.ready}\n${recordTask([])}`, `update-wait${w}`)
+  }
   result.gate = g
   if (!g) return interrupted('the gate')
   if (!g.conflicts.length) {
