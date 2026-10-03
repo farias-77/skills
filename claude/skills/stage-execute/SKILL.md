@@ -297,7 +297,7 @@ on `status`:
 
 - **`ready`** → the merge queue, after the coherence pass when it is
   due (below); and, in the background, **the entry's video**:
-  `video-scribe (Sonnet 5.5, medium)` with the run return
+  `video-scribe (Sonnet 5.5, high)` with the run return
   (`run-<n>.json`) and the evidence folder (`entries/<id>/`), writing
   under `entries/<id>/video/` (its definition is
   `${CLAUDE_SKILL_DIR}/../../agents/video-scribe.md`; it renders with
@@ -358,8 +358,8 @@ through step 5 first, then the entry resumes.
 **The coherence pass.** When an entry comes back `ready` after more
 than one run, or a rule changed while it was in flight (a ruling in
 `rulings.md`, a line of the doctrine or the golden paths), one reader
-goes over its whole diff before the queue: `reviewer (Sonnet 5.5,
-high)` with the rules that changed, looking for what the old rule left
+goes over its whole diff before the queue: `reviewer (Opus 5.5,
+medium)` with the rules that changed, looking for what the old rule left
 behind (never in a generated file). Its findings go through the same
 triage: blocking → exec-entry `mode: 'resume'` with them as the fixes
 file; nothing blocking → the queue.
@@ -511,7 +511,7 @@ When every entry and every batch slice is merged or parked:
    in the user's place, the choices the builder made where the
    documents were silent, the precision per reviewer, the verifier's
    verdicts, and the learn log's size.
-4. **The stage's video**: `video-scribe (Sonnet 5.5, medium)` once
+4. **The stage's video**: `video-scribe (Sonnet 5.5, high)` once
    more, with every `run-*.json` and the evidence folders of the
    stage, for the whole of it.
 5. `blueprint/execution/execution.json` (schema:

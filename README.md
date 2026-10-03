@@ -113,7 +113,7 @@ waves** from the same notes and research: data-model and contracts
 first, which fix every name the design uses, then the other eight,
 which copy those names and never mint one. They decide nothing (a gap
 is a question back), each also writing its blueprint JSON. Then, in
-the background, **`video-scribe` (Sonnet 5.5, medium) renders a
+the background, **`video-scribe` (Sonnet 5.5, high) renders a
 30–60 s video per document**, so the human can watch the design
 instead of reading ten documents, and round 1 runs at once without
 waiting for the videos: ten lenses (Opus 5.5 or Sonnet 5.5, medium) — data, code (which blocks
@@ -176,7 +176,7 @@ writing or reviewing code: the foundation first, then every entry whose
 edges are merged or ready, critical path first, in parallel up to the
 cap the machine was measured to hold, each in its own worktree and
 local stack, through the **exec-entry** workflow. **Acceptance
-first**: the `verifier` (Sonnet 5.5, high) writes the entry's
+first**: the `verifier` (Opus 5.5, medium) writes the entry's
 acceptance checks from the brief — browser journeys for screens,
 integration tests for the server — proves them red on the base and
 commits them; from then on they are read-only for the builder. One
@@ -189,7 +189,7 @@ structure check) and rejects any change to an acceptance file. Then,
 in parallel, the verifier proves the checks on the running stack with
 evidence (screenshots, video, side effects read back, a PII canary, a
 failure-mode block for server entries) while reviewers that never
-wrote the code read the diff: `reviewer` (Sonnet 5.5, high) for
+wrote the code read the diff: `reviewer` (Opus 5.5, medium) for
 correctness and fidelity, `structure-reviewer` (Opus 5.5, medium) for
 maintainability, `exec-lens-security` on every diff and
 `exec-lens-operations` on every server diff (Opus 5.5, medium). There
@@ -220,7 +220,7 @@ message, every action only he can run (the commands ready), so nothing
 waits on a block found later. It merges the feature branch into
 staging on its own (the audit authorized it), follows the CI while it
 deploys staging and runs the real suite, and then the `verifier`
-(Sonnet 5.5, high) runs every entry's acceptance checks again on
+(Opus 5.5, medium) runs every entry's acceptance checks again on
 staging, in a real browser against the real environment; a red in the
 code is fixed as an entry `R.n` through the stage-4 pipeline, so no
 fix ships unreviewed. One `release-scribe`

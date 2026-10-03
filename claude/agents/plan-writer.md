@@ -1,8 +1,8 @@
 ---
 name: plan-writer
-description: A writer of stage 3 (Plan) — writes ONE brief, the whole instruction one builder and its verifier receive for one node of the build graph (the foundation F, a foundation lane F-x<n>, a slice E-<nn>, or the integration node E-int), from plan.md, the node's line in plan.graph.json, the sized design, the discovery's journeys and stories, the recon and, for every node but F, the foundation's brief; acceptance lines tied to AC ids with their side effects, the golden paths, the names used from the foundation, Owns and Extends exactly as the graph has them, the size and the gate; plus its blueprint JSON; later applies the fixes the conductor ruled. F's writer runs first and fixes every name; then one per node, in parallel. A writer decides nothing and asks instead. Sonnet 5.5, high.
-model: claude-sonnet-5-5
-effort: high
+description: A writer of stage 3 (Plan) — writes ONE brief, the whole instruction one builder and its verifier receive for one node of the build graph (the foundation F, a foundation lane F-x<n>, a slice E-<nn>, or the integration node E-int), from plan.md, the node's line in plan.graph.json, the sized design, the discovery's journeys and stories, the recon and, for every node but F, the foundation's brief; acceptance lines tied to AC ids with their side effects, the golden paths, the names used from the foundation, Owns and Extends exactly as the graph has them, the size and the gate; plus its blueprint JSON; later applies the fixes the conductor ruled. F's writer runs first and fixes every name; then one per node, in parallel. A writer decides nothing and asks instead. Opus 5.5, medium.
+model: claude-opus-5-5
+effort: medium
 tools: Read, Write, Edit, Glob, Grep, Bash(ls *), Bash(cat *)
 skills: pack-parallel-plan-local-ci, pack-right-sizing
 ---

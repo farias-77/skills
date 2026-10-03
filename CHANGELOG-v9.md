@@ -26,7 +26,7 @@ blueprint; the pipeline measures itself.
 | Change | Mechanism | Why |
 |---|---|---|
 | **The stage report** | every stage closes with three layers read in order: a 1–2 minute video, 8–15 slides, the blueprint (`docs/stage-report.md`) | the reader goes up one layer only when he wants more detail; each layer is whole at its altitude |
-| **The video kit** | `claude/video/`: a storyboard JSON rendered to MP4 with no code per video; `video-scribe (Sonnet 5.5, medium)` writes the storyboards; renders queue on one lock | a video per design document, per entry and per stage costs one cheap read and CPU time, off the critical path |
+| **The video kit** | `claude/video/`: a storyboard JSON rendered to MP4 with no code per video; `video-scribe (Sonnet 5.5, high)` writes the storyboards; renders queue on one lock | a video per design document, per entry and per stage costs one cheap read and CPU time, off the critical path |
 | **Knowledge packs** | reference-only skills (`pack-<craft>`) that agents load before they work: a checklist plus recipes per craft | the bar of each craft is written once and read by every agent of that craft |
 | **The bar** | `docs/project-contract.md` rewritten as 21 roles in three levels (required, recommended, full experience), each with what it is, why, and how a stage uses it | a project knows what to provide before the first run instead of finding out at a pre-flight |
 | **`/pipeline-setup`** | audits a project against the bar with six scouts, writes `pipeline-readiness.md` with evidence, proposes the cheapest order to close the gaps, applies the generic pieces on a branch | adoption becomes a checklist with templates, not a week of discovery |

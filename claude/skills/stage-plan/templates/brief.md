@@ -1,7 +1,7 @@
 # Brief — <workstream> — <F | F-x<n> | E-<nn> | E-int> — <name>
 
 <!--
-  Written by `plan-writer (Sonnet 5.5, high)` from plan.md, the node's
+  Written by `plan-writer (Opus 5.5, medium)` from plan.md, the node's
   line in plan.graph.json, the design, the discovery's journeys and
   stories, the recon and, for every node but F, the foundation's brief
   F.md (written first, so every name used from it is fixed).
@@ -9,7 +9,7 @@
   This file is the whole instruction one `builder (Opus 5.5, medium)`
   receives at stage 4. It has no conversation, only the codebase, the
   design folder, the golden paths and this file. Before any code a
-  `verifier (Sonnet 5.5, high)` writes one check per Acceptance line and
+  `verifier (Opus 5.5, medium)` writes one check per Acceptance line and
   runs it red against the base. The builder builds until those checks
   and the Gate commands are green.
 

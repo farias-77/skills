@@ -53,11 +53,11 @@ It never deploys by hand what the doctrine says the CI deploys.
 | Agent | Does |
 |---|---|
 | the session (Opus 5.5, medium) | the plan, the pre-flight, the merges, the deploys, the reads, the rollback, the record |
-| `verifier (Sonnet 5.5, high)` | prove mode: the locked journeys on staging, and the read-only ones on the candidate and on production |
+| `verifier (Opus 5.5, medium)` | prove mode: the locked journeys on staging, and the read-only ones on the candidate and on production |
 | `release-scribe (Sonnet 5.5, medium)` | one per versioned artifact: the version, the notes, the reverts |
-| the stage-4 pipeline | an `R.n` fix: `builder (Opus 5.5, medium; high on the fix)`, `exec-gate (Sonnet 5.5, low)`, the verifier, the reviewers |
+| the stage-4 pipeline | an `R.n` fix: `builder (Opus 5.5, medium; high on the fix)`, `exec-gate (Sonnet 5.5, medium)`, the verifier, the reviewers |
 | `scout (Sonnet 5.5, low)` | whatever the session needs to look up, by the house rule |
-| `video-scribe (Sonnet 5.5, medium)`, `slides-scribe (Sonnet 5.5, high)` | the stage report |
+| `video-scribe (Sonnet 5.5, high)`, `slides-scribe (Sonnet 5.5, high)` | the stage report |
 
 **Packs.** At step 0 the session loads `pack-release` and `pack-ops`
 with the Skill tool. They hold the checklists and recipes this skill
@@ -82,7 +82,7 @@ sized to it. It never loops to check early.
             --match-head-commit · the guard checks the head against the play
             ‖ release-scribe (Sonnet 5.5, medium) per artifact on the merge sha
 3 staging   the doctrine's deploy of that sha → read-only: staging serves it · migrations ran
-4 verify    verifier (Sonnet 5.5, high) per entry, on staging: the locked journeys
+4 verify    verifier (Opus 5.5, medium) per entry, on staging: the locked journeys
             red → R.n through exec-entry → PR into main → 3 again · third red on a step: stop
 5 prod      progressive: candidate at 0% + tag → smoke on the tag → shift → bake vs previous → 100%
             straight:    deploy → smoke run of the read-only journeys
@@ -246,7 +246,7 @@ and forward, before production relies on it.
 
 ## Step 4 — the verifier on staging
 
-Dispatch one `verifier (Sonnet 5.5, high)` per entry in prove mode,
+Dispatch one `verifier (Opus 5.5, medium)` per entry in prove mode,
 all in one message. Each one gets:
 
 - `pack-release` to read first;
@@ -295,7 +295,7 @@ serves, and they only expand. The mode comes from the plan, by
   revision, a traffic split, a canary):
   1. Deploy the candidate with no traffic, under a tag.
   2. The smoke runs on the tag URL. It covers health, the sha and
-     digest served, and a `verifier (Sonnet 5.5, high)` running the
+     digest served, and a `verifier (Opus 5.5, medium)` running the
      read-only journeys only.
   3. Shift the traffic. When production gives a signal (≥ 100 requests
      expected in the bake window), shift a share first and bake it

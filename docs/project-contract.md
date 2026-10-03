@@ -112,7 +112,7 @@ and cannot wait for a hosted CI queue on every round. A gate that
 differs from CI lets a green entry turn red at merge.
 
 **How the stages use it.** Plan fixes the gate commands once in
-`plan.md`; `exec-gate (Sonnet 5.5, low)` runs them on every round; the
+`plan.md`; `exec-gate (Sonnet 5.5, medium)` runs them on every round; the
 execute session runs the whole gate once on the feature branch at the
 end; release reads its result before the first merge.
 
@@ -130,7 +130,7 @@ end; release reads its result before the first merge.
 whole gate each time multiplies the clock by the number of entries.
 
 **How the stages use it.** The builder loops on the fast check and the
-focused tests; `exec-gate (Sonnet 5.5, low)` runs the fast check, the
+focused tests; `exec-gate (Sonnet 5.5, medium)` runs the fast check, the
 affected tests and the structure check on each round. Without affected
 tests, each round runs the whole gate.
 
@@ -248,10 +248,10 @@ the tool's version and its browsers.
 reading the code that draws it. Screenshots and video are the
 evidence the user audits.
 
-**How the stages use it.** `verifier (Sonnet 5.5, high)` writes the
+**How the stages use it.** `verifier (Opus 5.5, medium)` writes the
 screen acceptance as browser journeys, proves them red on the base and
-green on the entry, and records video; `ux-reviewer (Sonnet 5.5,
-high)` compares the screenshots with the locked mock's frames; release
+green on the entry, and records video; `ux-reviewer (Opus 5.5,
+medium)` compares the screenshots with the locked mock's frames; release
 runs the same journeys against staging.
 
 ### 11 · Release roles: environments, deploy, rollback
@@ -357,9 +357,9 @@ looks like a different product is approved for the wrong reasons, and
 the builder then rebuilds it in the real look.
 
 **How the stages use it.** Discovery's recon hands the export to
-`prototyper (Opus 5.5, high)`, so the mock uses the real tokens and
-the real component shapes; the builder and `ux-reviewer (Sonnet 5.5,
-high)` compare screens against the same tokens.
+`prototyper (Opus 5.5, medium)`, so the mock uses the real tokens and
+the real component shapes; the builder and `ux-reviewer (Opus 5.5,
+medium)` compare screens against the same tokens.
 
 ### 16 · Observability as code
 
@@ -450,7 +450,7 @@ or production with an actor, and the browser tool able to record at
 **Why.** Every stage report opens with a video, and the close's launch
 video is recorded from the real app.
 
-**How the stages use it.** `video-scribe (Sonnet 5.5, medium)` renders
+**How the stages use it.** `video-scribe (Sonnet 5.5, high)` renders
 each stage's video; `footage-recorder (Sonnet 5.5, medium)` records
 the journeys; the kit renders the launch video. Without the toolchain,
 the stage report has slides and the blueprint only, and says so.
