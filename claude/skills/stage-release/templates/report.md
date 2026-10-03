@@ -1,40 +1,49 @@
 # The report — the one message at the end
 
 <!--
-  Sent by the SESSION after the PushNotification, in the workstream's
-  language, built to be followed at a glance. Everything here is also
-  in release.json and the Release tab.
+  Sent by the SESSION as the stage report's message (claude/docs/stage-report.md):
+  the three layers first, then this. In the workstream's language,
+  built to be followed at a glance. Everything here is also in
+  release.json and the Release tab.
 -->
+
+▶ Vídeo      <blueprint URL>#layers-release   1–2 min · comece por aqui
+▤ Slides     <deck URL>                       <n> slides · os detalhes
+◧ Blueprint  <blueprint URL>                  tudo · só se precisar
 
 **<One sentence: what is in production, since when, and whether anything waits for him.>**
 
 ## In production
 
-| Artifact | Version | Sha | Deployed | Checks |
+| Artifact | Version | Sha | Deployed | Rollout |
 |---|---|---|---|---|
-| `<artifact>` | `vX.Y.Z` | `<sha>` | <YYYY-MM-DD HH:MM UTC> | <n>/<n> green |
+| `<artifact>` | `vX.Y.Z` | `<sha>` | <YYYY-MM-DD HH:MM UTC> | progressive: candidate smoked, <n>% baked, 100% \| straight + smoke |
+
+## The path
+
+```
+play <hh:mm> → main <hh:mm> → staging <hh:mm> → verifier <n>/<n> → candidate → <n>% bake → 100% <hh:mm> → alarms read
+```
 
 ## The release in numbers
 
-| Staging runs | Reds | Verifier on staging | Fix entries | Rollbacks | Hotfixes | Watch proofs read | Waiting on him |
+| Wall-clock | His time | Staging runs | Reds | Fixes R.n | Rollbacks | Alarms (OK · no data · not yet) | Reverts |
 |---|---|---|---|---|---|---|---|
-| <n> | <n> | <n>/<n> entries PASS | <n> | <n> | <n> | <n> of <n> | <h> |
+| <h> | <min> | <n> | <n> | <n> | <n> | <n> · <n> · <n> | <n>/<n> commits |
 
-## What was fixed on the way
+## What was fixed or rolled back on the way
 
 - `R.<n>` · <where it was seen> · <what changed, one line> | none
-
-## What the watch read
-
-- <what> · <hour> · <got> ✅ | ❌ → `R.<n>`
+- rollback · <trigger, value> · <what followed> | none
 
 ## What stays with an owner
 
-- <what> · <owner> · <why> | nothing
+- <watch row> · readable at <hour> · I write here when read
+- <pendency> · <owner> · <why>
+- <toggle> · removal task at <where>
+- the signoff was not enforced on `main` | the session's identity can write production outside the CI | nothing
 
 ## Files
 
-- Blueprint: <url> (Release tab)
-- `04-release/trace.md` · `plan.md` · `entries/` · `proof/`
-- The stage report: follow claude/docs/stage-report.md (video, slides, blueprint).
-- `.state.md` → `stage: close`. Next: `/clear`, then `/stage-close <slug>`.
+- `04-release/trace.md` · `plan.md` · `entries/` · `proof/` · `notes/`
+- `.state.md` → `stage: close` | `stage: release` until <hour> (watch). Next: `/clear`, then `/stage-close <slug>`.
