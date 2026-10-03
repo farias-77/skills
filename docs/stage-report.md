@@ -223,4 +223,4 @@ verbatim; what the sweep leaves for him to run.
   publish them and nothing else: it never reads the storyboard or the
   stage's documents for this step; the scribes do.
 
-**Never commit the renderer's cache.** Remotion keeps a ~220 MB browser in a `.remotion/` folder next to wherever it runs; the kit runs from its own folder, and the workstream's `.gitignore` carries `**/.remotion/` as a second fence.
+**Never commit the renderer's cache.** Remotion keeps a ~220 MB browser in a `.remotion/` folder next to wherever it runs; the kit runs from its own folder, and the workstream's `.gitignore` (written by discovery when it creates the folder) carries `**/.remotion/` as a second fence.

@@ -89,6 +89,7 @@ the lock (D4), the one batch of questions (D6) and the approval (D7).
 ```
 designs-root/<slug>/
 ├── .state.md                 # stage, step (D0–D7), kit (resolved), mode (artifact | local), mock URL and version, locked version, round
+├── .gitignore                # **/.remotion/ and _run/: never committed
 ├── rulings.md · taste-notes.md · dreaming-notes.md      # house files, created on first use
 ├── blueprint/                # workstream.json, prfaq.json, stories.json, review.json, report.json, figures.json
 ├── blueprint.html            # built, never edited
@@ -180,8 +181,10 @@ On open:
    one-line warning with a compliant slug, and he picks.
 3. Create the workstream folder at the designs root (the consuming
    project's `CLAUDE.md` says where), `.state.md` with
-   `stage: discovery` and `step: D1`, and `blueprint/workstream.json`
-   (slug, title, his language, `stage: discovery`).
+   `stage: discovery` and `step: D1`, `blueprint/workstream.json`
+   (slug, title, his language, `stage: discovery`), and a `.gitignore`
+   with `**/.remotion/` (the video kit's browser cache) and `_run/`
+   (the workflows' copies), which no stage commits.
 4. Create `00-discovery/notes.md` from
    [templates/notes.md](templates/notes.md) on the first turn and write
    it every turn. A dead session loses nothing. Create
