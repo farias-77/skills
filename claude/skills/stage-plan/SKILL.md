@@ -92,13 +92,13 @@ the plan; a veto he sends then is applied as an amendment (Step P6).
 |---|---|---|
 | the conductor (the session) | Opus 5.5, high | the foundation, the graph, plan.graph.json and plan.md, the writers' answers, every ruling, the pre-flight, the close |
 | `plan-scout` × each repo and area, + `fronts`, (+ `machine`) | Sonnet 5.5, low | facts with `path:line`: what exists, the commands, the seams, the golden paths, the hot files; the other fronts and their overlap; the measured stack capacity |
-| `plan-writer` × 1 for F, then × every other node | Sonnet 5.5, high | one brief each and its blueprint JSON; asks, never decides |
+| `plan-writer` × 1 for F, then × every other node | Opus 5.5, medium | one brief each and its blueprint JSON; asks, never decides |
 | `plan-reviewer-order` | Sonnet 5.5, high | the graph as it will run: edges true, width maximal, F thin and sufficient, ownership, hot files |
 | `plan-reviewer-coverage` | Sonnet 5.5, high | every AC and case carried exactly once; every design part in a node; nothing built that nothing forces |
 | `plan-reviewer-verifiability` | Sonnet 5.5, high | every acceptance line becomes one check on the local stack; golden paths exist; sizes within the cap |
 | `plan-blind-reader` × 2 per brief | Sonnet 5.5, low | builds and checks one brief alone, from that file only |
 | `plan-reviewer-ambiguity` × 1 per brief | Sonnet 5.5, high | compares the two blind builds key by key |
-| `video-scribe` · `slides-scribe` | Sonnet 5.5, medium · Sonnet 5.5, high | the stage report |
+| `video-scribe` · `slides-scribe` | Sonnet 5.5, high · Sonnet 5.5, high | the stage report |
 
 ## Preconditions
 

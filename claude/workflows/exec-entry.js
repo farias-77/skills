@@ -8,7 +8,7 @@
  * and then a verifier and reviewers that never wrote it. There is no
  * judge: a finding blocks by a rule written in code below
  * (references/judging.md is its prose). The session that runs stage 4
- * starts one run per entry, in parallel up to the measured cap, and
+ * starts one run per entry, in parallel up to the cap, and
  * only merges what comes back ready, through its local-CI queue.
  *
  * THE FLOW (mode 'build'):

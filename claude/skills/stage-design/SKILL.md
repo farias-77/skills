@@ -110,7 +110,7 @@ waits for him.
 | `design-reviewer-{alarms, coverage, facts, ui, consistency}` | Sonnet 5.5, medium | five lenses that check against a source: the ops pack, the lock, the repo and research, the mock, the other documents |
 | `design-blind-reader` × 2 per flow | Sonnet 5.5, low | builds one flow alone, in the documents' language |
 | `design-reviewer-ambiguity` | Sonnet 5.5, low | compares the two builds key by key |
-| `video-scribe` | Sonnet 5.5, medium | the stage report's video |
+| `video-scribe` | Sonnet 5.5, high | the stage report's video |
 
 ## Preconditions
 

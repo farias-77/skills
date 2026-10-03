@@ -1,6 +1,6 @@
 ---
 name: stage-execute
-description: Conducts stage 4 (Execute) — turns an approved plan into merged, reviewed code on the feature branch, from one "play" to one call. Step 0 shows the plan's pre-flight once, waits until every item is handed over, and gives the user the /goal text to paste; from then on nobody asks him anything. One session (Opus 5.5, high) orchestrates without writing code: the foundation first, then every entry whose edges are merged or ready, critical path first, in parallel up to the measured cap, each through the exec-entry workflow — the verifier (Opus 5.5, medium) writes the entry's acceptance checks first, red on the base and read-only from then on; one builder (Opus 5.5, medium; high on every fix) builds the smallest change that passes them, back and front, with the knowledge packs of its surface, along the golden paths, until the gate commands are green; the gate (exec-gate, Sonnet 5.5, medium); then, in parallel, the verifier proving on the running stack (evidence, PII canary, failure modes) followed on screen diffs by ux-reviewer (Opus 5.5, medium) against the locked mock's frames, and the reviewers that never wrote the code — reviewer, structure-reviewer (both Opus 5.5, medium; structure blocks any mechanism nobody named), exec-lens-security (Opus 5.5, high) on every diff, exec-lens-operations (Opus 5.5, medium) on server diffs; a mechanical triage with no judge (a finding blocks with a repro or a written rule); one fix and a delta check. The session is the local CI: its serial queue merges the base into each ready entry, tests the merged tree with the affected gate, merges, and signs the merged head off with a commit status; the whole gate runs once at the end in a fresh worktree and signs off the top that main accepts. It runs foundation amendments, builds the deferred register in one batch slice per side group, reads the whole branch once for maintainability, renders a video per entry, closes with the stage report (video, slides, blueprint), and calls the user once, when everything is merged, green, verified and reported. Use when a workstream's .state.md says stage execute, or to resume an execution in progress.
+description: Conducts stage 4 (Execute) — turns an approved plan into merged, reviewed code on the feature branch, from one "play" to one call. Step 0 shows the plan's pre-flight once, waits until every item is handed over, and gives the user the /goal text to paste; from then on nobody asks him anything. One session (Opus 5.5, high) orchestrates without writing code: the foundation first, then every node of plan.graph.json whose edges are merged or ready, in the graph's start order (critical path first), in parallel up to the cap, each through the exec-entry workflow — the verifier (Opus 5.5, medium) writes the entry's acceptance checks first, red on the base and read-only from then on; one builder (Opus 5.5, medium; high on every fix) builds the smallest change that passes them, back and front, with the knowledge packs of its surface, along the golden paths, until the gate commands are green; the gate (exec-gate, Sonnet 5.5, medium); then, in parallel, the verifier proving on the running stack (evidence, PII canary, failure modes) followed on screen diffs by ux-reviewer (Opus 5.5, medium) against the locked mock's frames, and the reviewers that never wrote the code — reviewer, structure-reviewer (both Opus 5.5, medium; structure blocks any mechanism nobody named), exec-lens-security (Opus 5.5, high) on every diff, exec-lens-operations (Opus 5.5, medium) on server diffs; a mechanical triage with no judge (a finding blocks with a repro or a written rule); one fix and a delta check. The session is the local CI: its serial queue merges the base into each ready entry, tests the merged tree with the affected gate, merges, and signs the merged head off with a commit status; the whole gate runs once at the end in a fresh worktree and signs off the top that main accepts. It runs foundation amendments, builds the deferred register in one batch slice per side group, reads the whole branch once for maintainability, renders a video per entry, closes with the stage report (video, slides, blueprint), and calls the user once, when everything is merged, green, verified and reported. Use when a workstream's .state.md says stage execute, or to resume an execution in progress.
 disable-model-invocation: false
 argument-hint: "<workstream-slug>"
 allowed-tools: Read, Write, Edit, Glob, Grep, Agent, Workflow, AskUserQuestion, Artifact, PushNotification, Bash
@@ -8,8 +8,9 @@ allowed-tools: Read, Write, Edit, Glob, Grep, Agent, Workflow, AskUserQuestion, 
 
 # Stage 4: Execute
 
-An approved plan comes in: the foundation, the entries, their edges,
-the cap, a brief per entry. Merged code comes out on `feat/<workstream>`:
+An approved plan comes in: the build graph (`plan.graph.json`: the
+foundation, the lanes, the slices, the integration node, their edges
+and the files each owns), a brief per node. Merged code comes out on `feat/<workstream>`:
 every entry with its acceptance checks written before its code, built,
 gated, proved on the running stack and reviewed, the whole gate green
 on the top of the branch, and an audit of what was decided in the
@@ -103,7 +104,7 @@ The triage rule is [references/judging.md](references/judging.md).
 | `exec-lens-security` | Opus 5.5, high | — | every diff |
 | `exec-lens-operations` | Opus 5.5, medium | ops | every diff with the server's product code or the runtime |
 | `exec-lens-craft` | Opus 5.5, medium | — | the maintainability read of the whole branch, once per stage |
-| `video-scribe` | Sonnet 5.5, medium | — | a short video of what the agents did, per entry and once for the stage |
+| `video-scribe` | Sonnet 5.5, high | — | a short video of what the agents did, per entry and once for the stage |
 
 Registered agents preload their packs through `skills:` in their
 frontmatter; the workflow also names each pack's `SKILL.md` in the
@@ -115,10 +116,12 @@ it; every fix runs at high (`pack-model-selection`).
 ## Preconditions
 
 `.state.md` says `stage: execute`; `02-plan/plan.md` is approved with
-its gate commands and a brief per entry in `02-plan/briefs/` (the
-acceptance lines, the golden paths, the names used from the
-foundation, the files it owns); `02-plan/preflight.md` lists what the
-user must hand over; discovery's locked mock is in
+its gate commands; `02-plan/plan.graph.json` is the build graph the
+plan's checker passed, and `02-plan/graph.json` its last output (the
+waves, the width, the critical path, the `startOrder`); a brief per
+node in `02-plan/briefs/` (the acceptance lines, the golden paths, the
+names used from the foundation, Owns and Extends);
+`02-plan/preflight.md` lists what the user must hand over; discovery's locked mock is in
 `00-discovery/prototype/frames/` with its `00-discovery/journeys/*.yaml`.
 The consuming project's `CLAUDE.md` names the codebase root, its
 engineering doctrine, its **golden paths** file (the exemplary modules
@@ -147,10 +150,23 @@ designs-root/<workstream>/
     └── audit.md               # at the end: what was decided in the user's place
 ```
 
+**The ids.** The plan's nodes and this stage's own entries keep apart:
+
+| Id | What | When it starts |
+|---|---|---|
+| `F` | the foundation, from the plan | first, alone |
+| `F-b` | the foundation's second half, only when the plan split it | after `F` merges, alone; every other node waits for it too |
+| `F-x<n>` | a foundation lane nobody waits for (deploy skeleton, harness extras) | with wave 1, once the foundation merged |
+| `E-<nn>` | a slice | by its edges, in the start order |
+| `E-int` | the integration node: journeys across three or more slices | when its edges are `ready` (stacked); merges last |
+| `F.<n>` | a foundation amendment, this stage's | alone in the queue (Step 5) |
+| `X.<n>` | a batch slice or a fix entry, this stage's | at the end (Steps 6 and 7) |
+
 ## Step 0 — pre-flight, then play
 
 If the session is not on **Opus 5.5 at high effort**, ask the user to
-switch (`/model`) and wait. Read `plan.md`, `preflight.md`, the
+switch (`/model`) and wait. Read `plan.md`, `plan.graph.json`,
+`graph.json`, `preflight.md`, the
 pipeline's `docs/project-contract.md` (it names the roles) and the
 project's `CLAUDE.md`; every brief, the recon and the doctrine are read
 by the agents that use them, never by the session to look something up.
@@ -195,23 +211,26 @@ classes conservatively and lists them for his veto, and the session
 unblocks every park that is not his in person (Step 3).
 
 **3. Prepare the codebase.** `feat/<workstream>` cut from `main` and
-pushed; the concurrency cap and the critical path from `plan.md` (the
-cap is the one measured in `02-plan/recon/machine.md`, with its load);
-`03-execution/board.md` with every entry `waiting`, the foundation
+pushed; the critical path and the start order from `graph.json`; the
+cap: the one measured in `02-plan/recon/machine.md` with its load when
+that file exists (the plan runs the machine scout only when asked), or
+else the plan's widest wave, held by the load below;
+`03-execution/board.md` with every node `waiting`, the foundation
 first.
 
 **The machine is the session's.** Agents never wait on each other and
 never coordinate the machine among themselves. The session holds the
-cap by the measured load: before it starts a run, it reads the load
-average (`cat /proc/loadavg`); above the median load `machine.md`
-measured at the cap, the start waits for the next run to finish.
+cap by the load: before it starts a run, it reads the load average
+(`cat /proc/loadavg`); above the median load `machine.md` measured at
+the cap (without `machine.md`: above the core count, `nproc`), the
+start waits for the next run to finish.
 
 **The cap does not grow to go faster.** Past the measured cap every run
 gets slower and the stage does not: in one measured run, five runs on
 a cap measured at one took the median run from 35 to 88 minutes, the
 gate from 4.5 to 13, and the agents spent hours waiting on the load. A
-higher cap comes only from a new measurement (the plan's `machine`
-scout run again with this workstream's suites) that holds it. Width
+higher cap comes only from a measurement (the plan's `machine` scout,
+run with this workstream's suites) that holds it. Width
 past the local cap comes from cloud sessions (Step 2), never from
 crowding this machine.
 
@@ -219,8 +238,9 @@ crowding this machine.
 
 The foundation is an entry like the others, built alone. Prepare its
 worktree and run exec-entry for `F` (below). When it returns `ready`,
-it goes through the merge queue. Nothing else starts until it is
-merged, with one exception: when the foundation's run comes back
+it goes through the merge queue. When the plan split it, `F-b` runs
+the same way right after `F` merges, alone. Nothing else starts until
+the foundation is merged, with one exception: when the foundation's run comes back
 without `ready` after its gate went green (parked on a question or on
 the round cap), the root entries (no `after`) start on the
 foundation's branch at that green head while the foundation goes on,
@@ -228,11 +248,15 @@ and take `feat/<workstream>` in by a merge once it merges.
 
 ## Step 2 — the fan-out
 
-Every time something merges or comes back `ready`, start every entry
-whose `after` entries are merged or `ready`, the critical path first,
-up to the cap and under the load. An entry whose one unmerged `after`
-entry is `ready` is **stacked**: it starts on that entry's branch and
-takes `feat/<workstream>` in by a merge in the queue. With two or more `after`
+Every time something merges or comes back `ready`, start every node
+of `plan.graph.json` whose `after` nodes are merged or `ready`, in
+`graph.json`'s `startOrder` (the critical path first), up to the cap
+and under the load. The lanes `F-x<n>` start with wave 1: nothing waits
+for them, so they only take width. `E-int` starts when its edges are
+`ready` and merges last. A node whose one unmerged `after` node is
+`ready` is **stacked** (the graph marks the edge `stacked: true`): it
+starts on that node's branch and takes `feat/<workstream>` in by a
+merge in the queue. With two or more `after`
 entries still unmerged, it waits until at most one is left. If the
 entry under a stacked one parks at the queue, the stacked one waits
 for it. For each:
@@ -416,8 +440,11 @@ for goes to the front.
    will produce. A merge git calls clean can still break the build or
    a test; this run is what catches it. Before it, the path guard:
    `git diff --name-only feat/<workstream>...<entry branch>` against
-   the brief's Owns and Extends; a path outside both goes back as a
-   resume item (move it, or an amendment when it is a shared file),
+   the node's `owns` and `extends` in `plan.graph.json` (literal paths
+   and `dir/**` globs; the brief carries the same lists, and the plan's
+   checker keeps them equal); an entry of this stage (`F.<n>`, `X.<n>`)
+   is held to the paths its own brief names. A path outside them goes
+   back as a resume item (move it, or an amendment when it is a shared file),
    so two entries in flight never write the same file. Read every check, never only
    the first red. Red → exec-entry `mode: 'resume'` with one item per
    failure (the check, the log's path and its failing lines), then
@@ -449,8 +476,9 @@ changes, why, the design section it follows, and the proof; a change
 the design does not already decide is parked for the user instead.
 A shared-file amendment runs through exec-entry as entry `F.<n>`, alone
 in the queue (in the queue's order above), merges, and is recorded
-under "Amendments" in `plan.md`; the entries in flight pick it up at
-their update. An acceptance amendment is the entry's own: it restarts
+under "Amendments" in `plan.md` (and in `plan.graph.json` when it
+changes what a node owns, the plan's checker green after it); the
+entries in flight pick it up at their update. An acceptance amendment is the entry's own: it restarts
 with `acceptanceRevision`. A deferred line whose fix touches a shared
 file becomes an amendment the same way, at its triage (step 6), never
 an edit inside a batch slice.

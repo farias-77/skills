@@ -32,12 +32,9 @@ To change a pick, change the row and the agent's frontmatter together.
 | `prototype-checker` | discovery | Sonnet 5.5 | high | A mechanical gate plus a checklist: literal reading |
 | `journey-scribe` | discovery | Sonnet 5.5 | high | Derives text from a locked source: templated writing |
 | `disc-author-prfaq` | discovery | Sonnet 5.5 | high | One page from a template |
-| `disc-author-stories` | discovery | Sonnet 5.5 | high | Stories from the notes: templated writing |
 | `disc-blind-reader` | discovery | Sonnet 5.5 | low | A blind reader must read literally; low keeps it cheap |
 | `disc-reviewer-acceptance` | discovery | Sonnet 5.5 | medium | Checklist critic |
-| `disc-reviewer-ambiguity` | discovery | Sonnet 5.5 | low | Literal reading for words with two readings |
 | `disc-reviewer-boundary` | discovery | Sonnet 5.5 | medium | Checklist critic |
-| `disc-reviewer-walkthrough` | discovery | Sonnet 5.5 | medium | Checklist critic |
 | `design-researcher` | design | Sonnet 5.5 | medium | Searches and cites; the citer downgrades what a source does not hold |
 | `architect` | design | Opus 5.5 | high | Open-ended design judgment: GDPval 1576 (medium) → 1690 (high) |
 | `sizing-judge` | design | Opus 5.5 | high | Weighs risk, reversibility and cost per part: sustained judgment |

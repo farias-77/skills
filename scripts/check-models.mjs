@@ -5,7 +5,8 @@
 //   - a model outside Opus 5.5 / Sonnet 5.5;
 //   - an agent in claude/agents/ with no row in docs/models.md;
 //   - a model or effort that differs from the agent's row;
-//   - a description whose "(Model 5.5, effort)" mention differs from the frontmatter.
+//   - a description whose "(Model 5.5, effort)" mention differs from the frontmatter;
+//   - a workflow's AGENTS map entry that differs from the row.
 // Warns on a row with no agent file (an agent planned or removed).
 //
 // Usage: node scripts/check-models.mjs [repo-root]
@@ -53,6 +54,20 @@ for (const file of readdirSync(agentsDir).filter((f) => f.endsWith('.md')).sort(
   const said = (fm.description || '').match(/\b(Opus|Sonnet|Haiku|Fable) (\d[\d.]*),? (low|medium|high|xhigh|max)\b/);
   if (said && (`${said[1]} ${said[2]}` !== model || said[3] !== fm.effort))
     errors.push(`${file}: description says ${said[1]} ${said[2]}, ${said[3]} ≠ frontmatter ${model}, ${fm.effort}`);
+}
+// The workflows' AGENTS maps (used when agents run inline) must agree too.
+const wfDir = join(root, 'claude/workflows');
+const SHORT = { opus: 'Opus 5.5', sonnet: 'Sonnet 5.5' };
+for (const file of readdirSync(wfDir).filter((f) => f.endsWith('.js')).sort()) {
+  const text = readFileSync(join(wfDir, file), 'utf8');
+  for (const m of text.matchAll(/^\s*'?([a-z][a-z0-9-]*)'?:\s*\{\s*model:\s*'(\w+)',\s*effort:\s*'(\w+)'/gm)) {
+    const [, name, short, effort] = m;
+    const row = rows.get(name);
+    if (!SHORT[short]) { errors.push(`workflows/${file}: ${name} model "${short}" is not opus or sonnet`); continue; }
+    if (!row) { errors.push(`workflows/${file}: "${name}" has no row in docs/models.md`); continue; }
+    if (row.model !== SHORT[short] || row.effort !== effort)
+      errors.push(`workflows/${file}: ${name} ${SHORT[short]}, ${effort} ≠ docs/models.md ${row.model}, ${row.effort}`);
+  }
 }
 for (const name of rows.keys()) if (!seen.has(name)) warnings.push(`docs/models.md: "${name}" has no file in claude/agents/`);
 
