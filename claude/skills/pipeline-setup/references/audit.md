@@ -38,7 +38,7 @@ the reason.
 | 4 fast check · focused · affected | targets like `check`, `lint`, `test`, `test:changed`, `--changed`, `affected`, `nx affected`, `turbo --filter=...[base]`, `go list -deps` scripts | all three, named | fast check only; affected missing |
 | 6 evidence | a command writing a verification record (sha, commands, result) — often named `evidence`, `verify-record`, `proof` | exists, named | — |
 | 7 structure check | a script or target running lizard, gocyclo, gocognit, eslint complexity / max-lines, jscpd, dependency-cruiser, depguard, import-linter, ArchUnit; its thresholds and where they came from | diff-scoped, all five checks, thresholds calibrated from the code, a compare mode | some checks only, thresholds from a book, whole-tree only |
-| 13 signoff | a script posting a commit status (`gh api .../statuses/`, `gh signoff`), and whether CI or branch protection requires the context | a local status is posted and required on `main` | posted but not required, or nothing local |
+| 13 signoff | a script posting a commit status (`gh api .../statuses/`, `gh signoff`), and whether CI or branch protection requires the context | a local status is posted under `local-ci/affected` (per merge) and `local-ci` (whole gate), and `main` requires `local-ci` only | posted but not required, one context for both, or nothing local |
 
 ## Group C — the local stack (roles 5, 10)
 

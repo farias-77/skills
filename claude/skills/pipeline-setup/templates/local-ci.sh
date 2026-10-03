@@ -22,6 +22,11 @@
 #   LOCAL_CI_DIR   logs and records (default: ~/.cache/local-ci/<repo name>)
 #   SIGNOFF_CONTEXT  the status context (default: local-ci); --context overrides
 #
+# Two contexts: the execute queue posts `local-ci/affected` on each merge
+# (--context local-ci/affected, with the affected gate as GATE_CMD); the
+# whole gate at the end of the stage posts `local-ci`. `main` requires
+# `local-ci` only, so no intermediate head satisfies it.
+#
 # ---------------------------------------------------------------------------
 # BRANCH PROTECTION — the note that makes the signoff count
 #

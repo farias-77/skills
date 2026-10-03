@@ -34,12 +34,12 @@
       "Bash(gh run view *)",
       "Bash(gh run watch *)",
       "Bash(./scripts/local-ci.sh *)",
-      "Bash(make deploy-staging *)"
-    ],
-    "ask": [
+      "Bash(make deploy-staging *)",
       "Bash(gh pr merge *)",
       "Bash(make deploy-prod *)",
-      "Bash(make migrate-prod *)",
+      "Bash(make migrate-prod *)"
+    ],
+    "ask": [
       "Bash(gh workflow run *)",
       "Bash(gh run rerun *)",
       "Bash(gh release create *)",
@@ -83,11 +83,12 @@
   "hooks": {
     "PreToolUse": [
       {
-        "matcher": "Bash",
+        "matcher": "Bash|Edit|Write|MultiEdit|NotebookEdit",
         "hooks": [
           {
             "type": "command",
-            "command": "${CLAUDE_PROJECT_DIR}/.claude/hooks/guard-irreversible.sh"
+            "timeout": 30,
+            "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/guard-irreversible.sh"
           }
         ]
       }

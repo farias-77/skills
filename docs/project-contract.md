@@ -39,7 +39,7 @@ says so ([the skill](../claude/skills/pipeline-setup/SKILL.md)).
 | 10 | A browser-drivable app | required when the product has screens | execute, release, close |
 | 11 | Release roles: environments, deploy, rollback | required | release |
 | 12 | Permission settings and the guard hook | required | execute, release |
-| 13 | Local-CI signoff that main accepts | recommended | execute, release |
+| 13 | Local-CI signoff that main accepts | required | execute, release |
 | 14 | The verify map inside each feature map | recommended | execute, release, close |
 | 15 | Design tokens and components, exported | recommended | discovery, execute |
 | 16 | Observability as code: log metrics, alarms, runbooks | recommended | design, execute, release |
@@ -280,18 +280,30 @@ plan.
 **What it is.** The project's `.claude/settings.json` with:
 
 - **allow** rules for what the stages run all day: the gate commands,
-  the stack commands, read-only `git` and `gh`, staging deploys;
-- **ask** rules for what reaches production or `main`: the merge into
-  `main`, the production deploy, a production migration;
+  the stack commands, read-only `git` and `gh`, staging deploys, and
+  (role 18) the merge into `main` and the production deploy and
+  migration;
+- **ask** rules for the rest that reaches production: re-running a
+  deploy workflow, a release, writing a secret, `terraform apply`;
 - **deny** rules for what cannot be undone: force-push, destroying
   infrastructure, dropping data, deleting a bucket or a repository,
-  and edits to the settings and hooks themselves;
-- a **PreToolUse guard hook** on `Bash` that denies the irreversible
-  command classes even when a rule is broad, unless the release plan
-  names that exact command and the user approved it.
+  posting a commit status by hand, and edits to the settings and hooks
+  themselves;
+- the pipeline's **PreToolUse guard hook**,
+  [`claude/hooks/guard-irreversible.sh`](../claude/hooks/guard-irreversible.sh),
+  copied to `.claude/hooks/` and registered on `Bash` and every file
+  tool. It **denies** the irreversible classes even when a rule is
+  broad, unless the allow file names that exact command; it **asks**
+  before a secret's value is written or read, and before a merge into
+  a protected branch whose head the user's play did not authorize. The
+  allow file (`.claude/hooks/irreversible.allow`, written only by the
+  user) takes verbatim commands and the lines `merge-from <sha>`,
+  `merge-head <sha>`, `protected <branch>` and
+  `default-branch <branch>`.
 
 Templates: [settings.json](../claude/skills/pipeline-setup/templates/settings.json),
-[guard-irreversible.sh](../claude/skills/pipeline-setup/templates/guard-irreversible.sh),
+the guard's tests in
+[claude/hooks/tests/](../claude/hooks/tests/guard-irreversible.test.sh),
 and the notes on each rule in
 [permissions.md](../claude/skills/pipeline-setup/templates/permissions.md).
 
@@ -306,26 +318,34 @@ read.
 with no prompt; release merges and deploys under it; the hook stops
 the class of command no stage should ever run on its own.
 
-## Recommended
-
 ### 13 · Local-CI signoff that main accepts
 
-**What it is.** The gate of role 3, run in a clean worktree at the
-head to merge, posts a commit status on that sha through the GitHub
-commit status API (`gh api repos/:owner/:repo/statuses/:sha`, context
-for example `local-ci`). Branch protection on `main` requires that
-context, so `main` accepts a head the local gate passed. Hosted CI
-keeps the deploy and a cheap trust check. Template:
-[local-ci.sh](../claude/skills/pipeline-setup/templates/local-ci.sh).
+**What it is.** One command that runs a gate command of role 3 in a
+clean worktree at one commit and posts a commit status on that sha
+through the GitHub commit status API
+(`gh api repos/:owner/:repo/statuses/:sha`). It posts under **two
+contexts**: `local-ci/affected` for the affected gate on each merge of
+the execute queue, and `local-ci` for the whole gate, run once at the
+end of the stage. Branch protection on `main` requires `local-ci`
+only, so no intermediate head of the feature branch satisfies `main`
+after only an affected gate. Hosted CI keeps the deploy and a cheap
+trust check. Template:
+[local-ci.sh](../claude/skills/pipeline-setup/templates/local-ci.sh)
+(`--context` picks the context).
 
 **Why.** A hosted queue on every merge is the slowest step of a
 parallel build. A local run of the same commands takes minutes, and the
 status makes the claim checkable.
 
-**How the stages use it.** The execute session's merge queue posts the
-signoff on each merged head; release merges into `main` behind it. A
-signoff is only as strong as who can post it: the strongest setup
-posts it from one host with a token that agent shells cannot read.
+**How the stages use it.** Execute requires it: without the command,
+it is an item of the pre-flight. The execute session's merge queue
+posts `local-ci/affected` on each merged head and `local-ci` once on
+the top of the feature branch after the whole gate; release merges
+into `main` behind `local-ci`. A signoff is only as strong as who can
+post it: the strongest setup posts it from one host with a token that
+agent shells cannot read.
+
+## Recommended
 
 ### 14 · The verify map inside each feature map
 
@@ -392,19 +412,23 @@ resources written down (cores, memory, disk pressure).
 **Why.** The plan maximizes parallel width; past the measured cap,
 every run gets slower and the stage does not finish sooner.
 
-**How the stages use it.** Plan's machine scout measures it and the
-plan records the cap; the execute session starts runs up to the cap
-and watches the load.
+**How the stages use it.** The plan draws the widest graph the work
+allows and does not measure the machine by default; its machine scout
+runs only when the conductor asks for it. The execute session starts
+runs up to the measured cap, or the plan's widest wave, and watches
+the load.
 
 ## For the full experience
 
 ### 18 · Autonomous release permissions
 
-**What it is.** The merge into `main` and the production deploy move
-from **ask** to **allow** in the settings, kept safe by three things:
-branch protection that requires the local-CI signoff (role 13), the
-guard hook (role 12), and the user's go for the exact head, given when
-he presses play.
+**What it is.** The merge into `main` and the production deploy sit
+in **allow** in the settings (the template's default), kept safe by
+three things: branch protection that requires the `local-ci` signoff
+(role 13), the guard hook (role 12), and the user's play, which writes
+`merge-from <audited head>` into the guard's allow file (the strict
+variant is `merge-head`, the exact head). The guard asks on any other
+head.
 
 **Why.** Release then runs from play to done, and his one ruling is
 the play.
@@ -437,7 +461,9 @@ wider.
 
 **How the stages use it.** The execute session sends the entries past
 the local cap to the runner and merges what comes back through the
-same queue.
+same queue; how one entry runs in a cloud session, what it needs and
+how its evidence comes back is in
+[stage-execute/references/cloud.md](../claude/skills/stage-execute/references/cloud.md).
 
 ### 21 · The video toolchain
 

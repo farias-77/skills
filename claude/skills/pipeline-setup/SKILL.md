@@ -106,7 +106,7 @@ What each gap becomes:
 
 | # | Role | Usual fix | Cost | Template |
 |---|---|---|---|---|
-| 12 | permissions and guard | `.claude/settings.json` merged with the project's, the hook installed and tested | S | [settings.json](templates/settings.json), [guard-irreversible.sh](templates/guard-irreversible.sh), [guard-irreversible.test.sh](templates/guard-irreversible.test.sh), [permissions.md](templates/permissions.md) |
+| 12 | permissions and guard | `.claude/settings.json` merged with the project's; the pipeline's guard copied to `.claude/hooks/` (its test to `.claude/hooks/tests/`), registered for Bash and every file tool, and tested | S | [settings.json](templates/settings.json), the pipeline's `claude/hooks/guard-irreversible.sh` and its test `claude/hooks/tests/guard-irreversible.test.sh`, [permissions.md](templates/permissions.md) |
 | 1 | doctrine index | the index of the documents that exist, and the pointer in `CLAUDE.md` | S | — |
 | 8 | shared files list | a doctrine section listing the files the audit found | S | — |
 | 9 | feature maps | a doctrine line naming where they live | S | — |
@@ -117,7 +117,7 @@ What each gap becomes:
 | 15 | design tokens | the export script and its three files | M | [design-tokens-export.md](templates/design-tokens-export.md) |
 | 3, 4, 5, 6, 10, 11, 16, 19, 20 | gate, commands, stack, evidence, browser, release, observability, progressive delivery, runner | engineering | L, or M when the pieces exist and only need a command that names them | — |
 | 17 | capacity | measured by the plan stage's machine scout on its first run | — | — |
-| 18 | autonomous release | after 12 and 13: merge and prod deploy moved to allow | S, his call | [permissions.md](templates/permissions.md) |
+| 18 | autonomous release | after 12 and 13: the template already allows the merge and the prod deploy; the guard asks on any merge whose head the play did not authorize; the signoff required on `main` is his | S, his call | [permissions.md](templates/permissions.md) |
 | 21 | video toolchain | install Node LTS and ffmpeg on the station | S, his machine | — |
 
 Some steps are the user's alone: requiring the signoff on `main`
@@ -161,7 +161,7 @@ worktree. Then, per approved step, in plan order:
 
    | Step | The check |
    |---|---|
-   | permissions | `jq . .claude/settings.json`; `.claude/hooks/guard-irreversible.test.sh` all green, with the project's own rules added as cases |
+   | permissions | `jq . .claude/settings.json`; `bash .claude/hooks/tests/guard-irreversible.test.sh` all green and `.claude/hooks/guard-irreversible.sh --self-test` passes, with the project's own rules added as cases |
    | structure check | `--calibrate origin/<default> --write`, then `--summary origin/<default>` shows `boundary_violations: 0` (a fence that fires on today's code goes to the readiness file as a question for the team, and its rule is left out), then a check of `HEAD~1..HEAD` on any recent commit exits 0 or 1, never 2 |
    | local CI | `scripts/local-ci.sh` without `--post` runs the gate in a clean worktree |
    | golden paths | every path in the file exists at the sha (`git ls-files`) |

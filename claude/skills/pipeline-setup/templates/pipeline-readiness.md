@@ -6,8 +6,8 @@ Audited at `<sha>` on `<date>` against the pipeline's bar
 
 | Level | ✓ | ~ | ✗ | n/a |
 |---|---|---|---|---|
-| Required (1–12) | <n> | <n> | <n> | <n> |
-| Recommended (13–17) | <n> | <n> | <n> | <n> |
+| Required (1–13) | <n> | <n> | <n> | <n> |
+| Recommended (14–17) | <n> | <n> | <n> | <n> |
 | Full experience (18–21) | <n> | <n> | <n> | <n> |
 
 **Verdict:** <one sentence: which stages can run today, and the first
@@ -29,12 +29,12 @@ gap that halts one>.
 | 10 | Browser-drivable app | | | |
 | 11 | Release roles | | | |
 | 12 | Permission settings and guard hook | | | |
+| 13 | Local-CI signoff main accepts (two contexts) | | | |
 
 ## Recommended
 
 | # | Role | | Evidence | Gap |
 |---|---|---|---|---|
-| 13 | Local-CI signoff main accepts | | | |
 | 14 | Verify map in feature maps | | | |
 | 15 | Design tokens and components exported | | | |
 | 16 | Observability as code | | | |
