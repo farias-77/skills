@@ -28,6 +28,15 @@
  *     every lean part with R >= 2 has an evolution row whose signal
  *     has a watcher; the picked hours add up from the tier files;
  *   - every critic finding has a ruling.
+ * Two more, with no re-dispatch:
+ *   - a higher tier priced below a lower one for the same part (the
+ *     architects are blind to each other) is an INVERSION: the judge is
+ *     told which, may pick the cheaper higher tier with the reason in
+ *     offRubric, and marks it in the side-by-side table;
+ *   - over the appetite by at most APPETITE_BAND (10 %), no question is
+ *     needed: the overrun is written on the totals line and the
+ *     conductor lists it for the user's veto. Above the band, a question
+ *     for his call, whose options never cut an AC or the floor.
  * What still fails after the re-dispatch is returned in `problems`;
  * the conductor reads sizing.md and rules on it before the call.
  *
@@ -56,7 +65,7 @@
  *   }})
  *
  * Returns { status, files, appetiteHours, totals, picks, evolution,
- * doors, questions, critics, problems }. status is 'sized' or
+ * doors, questions, inversions, critics, problems }. status is 'sized' or
  * 'incomplete' (a tier, the pick or the reconcile did not survive; rerun
  * with resumeFromRunId after fixing the cause).
  */
@@ -82,6 +91,7 @@ const AGENTS = {
 const TIERS = ['lean', 'balanced', 'hardened']
 const PARTS = ['data', 'contracts', 'compute', 'integrations', 'security', 'ops', 'ui', 'tests']
 const CRITICS = ['overengineering-critic', 'risk-critic']
+const APPETITE_BAND = 0.10 // an overrun up to 10 % of the appetite needs no question; it goes to the veto list
 
 // ---------- schemas ----------
 
@@ -285,7 +295,7 @@ const pickProblems = (pick, tiers, expected, critique) => {
   const hours = sum(picked.map(p => p.buildHours)), cost = sum(picked.map(p => p.runCostMonth))
   if (Math.abs(hours - pick.totals.buildHours) > 0.5) problems.push(`the picked hours add up to ${hours} h from the tier files; sizing.md says ${pick.totals.buildHours} h`)
   if (Math.abs(cost - pick.totals.runCostMonth) > 1) problems.push(`the picked run cost adds up to US$ ${cost}/month; sizing.md says ${pick.totals.runCostMonth}`)
-  if (appetite !== null && hours > appetite && !pick.questions.length) problems.push(`the pick (${hours} h) is over the appetite (${appetite} h) and asks no scope question: cut scope (a question for the user), never the floor or an AC`)
+  if (appetite !== null && hours > appetite * (1 + APPETITE_BAND) && !pick.questions.length) problems.push(`the pick (${hours} h) is over the appetite (${appetite} h) by more than ${APPETITE_BAND * 100} % and asks no question: a question for the user (accept the hours, or lower a part above lean), never a cut of the floor, an AC or a ruling of his`)
   if (critique) {
     const ruled = new Set((pick.rulings || []).map(r => r.id))
     critique.forEach(f => { if (!ruled.has(f.id)) problems.push(`critic finding ${f.id} has no ruling`) })
@@ -347,6 +357,21 @@ if (missing.length) { log(`tier(s) with no output: ${missing.join(', ')} — the
 const totals = Object.fromEntries(TIERS.map(t => [t, tiers[t].totals]))
 log(`tiers: ${TIERS.map(t => `${t} ${totals[t].buildHours} h · US$ ${totals[t].runCostMonth}/mo`).join(' | ')}`)
 
+// Inversions: a higher tier priced below a lower one for the same part.
+// The architects are blind to each other, so two of them can draw the
+// same part two ways; the reader of the side-by-side then sees the
+// "safer" tier come out cheaper. No re-dispatch: the judge is told.
+const hoursOf = (tier, part) => tiers[tier]?.parts.find(x => x.part === part)?.buildHours
+const inversions = expected.flatMap(part => TIERS.flatMap((lo, i) => TIERS.slice(i + 1).map(hi => {
+  const l = hoursOf(lo, part), h = hoursOf(hi, part)
+  return typeof l === 'number' && typeof h === 'number' && h < l ? { part, lower: lo, lowerHours: l, higher: hi, higherHours: h } : null
+}))).filter(Boolean)
+if (inversions.length) log(`inversions (a higher tier cheaper than a lower one): ${inversions.map(v => `${v.part} ${v.lower} ${v.lowerHours} h > ${v.higher} ${v.higherHours} h`).join(' · ')}`)
+const inversionNote = inversions.length ? `
+INVERSIONS — for these parts a higher tier is priced below a lower one (the architects drew the part two ways):
+${inversions.map(v => `- ${v.part}: ${v.lower} ${v.lowerHours} h, ${v.higher} ${v.higherHours} h`).join('\n')}
+For each: when the cheaper higher tier meets the part's need, you may pick it, with offRubric "cheaper than <the lower tier>: <its hours> h"; either way, the side-by-side table marks the inversion with one line saying why the two designs differ.` : ''
+
 // ---------- 3 · the pick ----------
 
 phase('Pick')
@@ -356,9 +381,10 @@ ${sources}
 The breadboard: ${files.breadboard}
 The three tiers: ${tierFiles}
 Template: ${args?.templatesDir}/sizing.md
-Write: ${files.sizing} (status draft)`
+Write: ${files.sizing} (status draft)${inversionNote}`
 const pick = await checked('sizing-judge', pickPrompt, { label: 'sizing-judge·pick', phase: 'Pick', schema: PICK }, (p) => pickProblems(p, tiers, expected))
 if (!pick.r) { problems.push(...pick.problems.map(p => `pick: ${p}`)); return result('incomplete', { at: 'pick', totals }) }
+if (appetite !== null && pick.r.totals.buildHours > appetite && pick.r.totals.buildHours <= appetite * (1 + APPETITE_BAND)) log(`pick ${pick.r.totals.buildHours} h is within ${APPETITE_BAND * 100} % over the appetite (${appetite} h): no question needed; the overrun goes to the veto list`)
 if (pick.problems.length) log(`pick: still ${pick.problems.length} problem(s) — the critics read the draft as it is; reconcile gets them`)
 const draftByTier = TIERS.map(t => `${pick.r.parts.filter(p => p.tier === t).length} ${t}`).join(' · ')
 log(`draft pick: ${draftByTier} · ${pick.r.totals.buildHours} h · US$ ${pick.r.totals.runCostMonth}/mo${appetite !== null ? ` (appetite ${appetite} h)` : ''}`)
@@ -383,7 +409,7 @@ ${sources}
 The draft pick: ${files.sizing}
 The breadboard and the three tiers: ${files.breadboard}, ${tierFiles}
 Template: ${args?.templatesDir}/sizing.md
-Write: ${files.sizing} (status final) and ${files.critics} (one row per finding)
+Write: ${files.sizing} (status final) and ${files.critics} (one row per finding)${inversionNote}
 ${pick.problems.length ? `
 THE DRAFT FAILED THESE CHECKS; the final must not:
 ${pick.problems.map(p => `- ${p}`).join('\n')}
@@ -404,6 +430,7 @@ return result('sized', {
   evolution: final.r.evolution,
   doors: final.r.doors,
   questions: final.r.questions,
+  inversions,
   critics: {
     findings: criticFindings.length,
     kept,

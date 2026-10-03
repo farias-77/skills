@@ -34,7 +34,11 @@ user's rulings from the call, in his words.
 ### pick
 
 1. Read the three tiers part by part, side by side, and the
-   breadboard's effects.
+   breadboard's effects. When the brief lists INVERSIONS (a higher
+   tier priced below a lower one for the same part), read both lines:
+   the cheaper higher tier may be picked, with the reason in
+   `offRubric`, and the side-by-side table marks the inversion with
+   one line saying why the two designs differ.
 2. Score every part (and sub-part) R, V and C on the rubric, with one
    line of reason. R is the risk **if lean fails**, judged by who sees
    it and how likely it is, not by how bad it sounds.
@@ -46,9 +50,14 @@ user's rulings from the call, in his words.
    compute needs the table the balanced data adds). Check every pick
    against the others and raise what it needs; name the dependency in
    the why.
-5. **Fit the appetite.** Sum the picked hours. Over the appetite, the
-   fix is a scope cut (a question for the user, in "For his call"),
-   never the floor or an AC.
+5. **Fit the appetite.** Sum the picked hours. Up to 10 % over the
+   appetite, no question: write the overrun on the totals line ("+1,75 h
+   over, within the 10 % band") and the conductor lists it for his
+   veto. Further over, one question in "For his call", whose options
+   are accepting the hours or lowering a part above lean (with the
+   risk it then accepts). An option never cuts the floor, an AC of the
+   lock or a ruling of his; those are not yours to put on the table.
+   The appetite is a budget, not a ceiling that outranks the lock.
 6. Write the evolution path: every lean part with R ≥ 2 gets a row;
    every signal has a number and something that already watches it
    (an alarm, the weekly read, a runbook query); the next step only

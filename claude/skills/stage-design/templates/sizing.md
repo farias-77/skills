@@ -19,8 +19,13 @@
     rewrite data is a one-way door, decided now;
   - picks compose: a part whose pick needs another part's tier says so
     in its why, and that part is at least that tier;
-  - over the appetite, scope is cut (a question for the user), never
-    the floor or an AC.
+  - up to 10 % over the appetite, the overrun is written on the
+    totals line and goes to the user's veto; further over, a question
+    for him (accept the hours, or lower a part above lean), never a
+    cut of the floor, an AC or a ruling of his;
+  - a higher tier priced below a lower one (an inversion) is marked in
+    the side-by-side table with one line saying why the two designs
+    differ.
 -->
 
 Appetite: <h> h · Pick: <h> h · Run cost: +US$ <n>/month · Status: <draft | final | amended YYYY-MM-DD>
