@@ -52,16 +52,16 @@ forces it. The forms:
 
 | Form | Means |
 |---|---|
-| `S-003/AC-2` | an acceptance criterion, as `stories.md` writes its id |
-| `J-<journey>/<step>` | a journey step of `journeys/*.yaml` |
-| `rule:<id>` | a business rule of the stories |
+| `J1.s2.1` | an acceptance criterion: its id is the locked journey step and its number (`<journey>.<step>.<n>`), as `stories.md` writes it; `frame:<token>.<n>` for a state no journey visits |
+| `J1.s2` | a journey step of `journeys/*.yaml`, when no single criterion carries the need |
+| `rule:<id>` | a business rule of the stories' Rules table (`rule:INV-1`) |
 | `doctrine:<file>#<anchor>` | a line of the project's engineering doctrine |
 | `floor:D<n>` | an item of the floor (the right-sizing pack, §3 D) |
 | `door:<name>` | a one-way door named in `sizing.md` |
 | `signal:<name>` | an evolution-path signal of `sizing.md` (the watcher of it) |
 | `ruling:<date>#<n>` | a line of `rulings.md` |
 
-Several are separated by commas: `(req: S-003/AC-2, floor:D2)`. A
+Several are separated by commas: `(req: J1.s2.1, floor:D2)`. A
 mechanism line without one is a finding of the sizing lens; the sweep
 is `rg -n -i '\b(table|column|index|topic|job|sweeper|alarm|cap|flag|retry)\b' 01-design/*.md | rg -v 'req:'`,
 and its hits are read, not counted.

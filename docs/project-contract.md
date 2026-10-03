@@ -40,6 +40,7 @@ says so ([the skill](../claude/skills/pipeline-setup/SKILL.md)).
 | 11 | Release roles: environments, deploy, rollback | required | release |
 | 12 | Permission settings and the guard hook | required | execute, release |
 | 13 | Local-CI signoff that main accepts | required | execute, release |
+| 22 | The mock toolchain, on the station | required | discovery |
 | 14 | The verify map inside each feature map | recommended | execute, release, close |
 | 15 | Design tokens and components, exported | recommended | discovery, execute |
 | 16 | Observability as code: log metrics, alarms, runbooks | recommended | design, execute, release |
@@ -344,6 +345,25 @@ the top of the feature branch after the whole gate; release merges
 into `main` behind `local-ci`. A signoff is only as strong as who can
 post it: the strongest setup posts it from one host with a token that
 agent shells cannot read.
+
+### 22 · The mock toolchain, on the station
+
+**What it is.** On the machine that runs the discovery session, not in
+the project: Node 18 or later, `playwright-core` (or `playwright`) and
+a Chromium. Discovery's `claude/skills/stage-discovery/scripts/proto.mjs`
+finds them through `PLAYWRIGHT_DIR` (a folder whose `node_modules` has
+playwright-core) and `PROTO_CHROME` (a Chromium binary; otherwise the
+common system paths, then Playwright's own browser). Install once:
+`npm i --prefix "$PLAYWRIGHT_DIR" playwright-core`.
+
+**Why.** The mock is proved mechanically: every journey walked, every
+state reached, every frame rendered headless before he can lock it.
+Without a browser the lock gate cannot run.
+
+**How the stages use it.** `prototyper` and `prototype-checker` walk
+the mock and render its frames; the lock freezes the frames; the
+recon screenshots the current app's screens (role 10) with
+`proto.mjs look`.
 
 ## Recommended
 

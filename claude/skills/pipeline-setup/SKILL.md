@@ -13,7 +13,7 @@ provides the roles the bar names: a doctrine, golden paths, a gate that
 runs locally, an isolated stack per worktree, a structure check, the
 release roles, the permissions that make autonomy safe. The bar is
 [`docs/project-contract.md`](../../../docs/project-contract.md); it
-names 21 roles in three levels (required, recommended, for the full
+names 22 roles in three levels (required, recommended, for the full
 experience). This skill measures the project against it, says what is
 missing, and closes the cheap gaps itself.
 
@@ -119,6 +119,7 @@ What each gap becomes:
 | 17 | capacity | measured by the plan stage's machine scout on its first run | — | — |
 | 18 | autonomous release | after 12 and 13: the template already allows the merge and the prod deploy; the guard asks on any merge whose head the play did not authorize; the signoff required on `main` is his | S, his call | [permissions.md](templates/permissions.md) |
 | 21 | video toolchain | install Node LTS and ffmpeg on the station | S, his machine | — |
+| 22 | mock toolchain | install Node 18+, `playwright-core` and a Chromium on the station; set `PLAYWRIGHT_DIR` (and `PROTO_CHROME` when the browser is not on a common path) | S, his machine | — |
 
 Some steps are the user's alone: requiring the signoff on `main`
 (branch protection is a security posture), moving release to the

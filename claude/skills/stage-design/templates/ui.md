@@ -36,7 +36,7 @@
 
 ## Screens
 
-### <screen name> (covers S-00N · journeys J-<id>)
+### <screen name> (covers S-00N · journeys J<n>)
 
 - **Route and page:** <route> · <page component path, existing or new>
 - **Carried by:** <existing components, each with its path>

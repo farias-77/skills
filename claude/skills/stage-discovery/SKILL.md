@@ -1,6 +1,6 @@
 ---
 name: stage-discovery
-description: Conducts stage 1 (Discovery) — an interview in which the user says what to build while a clickable mock of it is built and iterated in front of him. The mock is exact in look and behavior, every state reachable, fully faked and never fragile; he validates through it and locks it ("crava"). From the locked mock, journeys, use cases and acceptance criteria (given/when/then, tied to a journey step and a rule) are derived, a one-page PR-FAQ is written, one review round plus a delta runs, and the stage closes with video, slides and blueprint. The conductor is Opus 5.5 (high). Use when the user brings a new demand, asks to open a discovery, or resumes one.
+description: Conducts stage 1 (Discovery) — an interview in which the user says what to build while a clickable mock of it is built and iterated in front of him. The mock is exact in look and behavior, every state reachable, fully faked and never fragile; he validates through it and locks it ("crava"). From the locked mock, journeys, use cases and acceptance criteria (given/when/then, tied to a journey step and a rule) are derived, a one-page PR-FAQ is written, one review round plus a delta runs, and the stage closes with video, slides and blueprint. The conductor is Opus 5.5 (medium; high on the turns that rule). Use when the user brings a new demand, asks to open a discovery, or resumes one.
 disable-model-invocation: false
 argument-hint: "[slug]"
 allowed-tools: Read, Write, Edit, Glob, Grep, Agent, SendMessage, Workflow, AskUserQuestion, Artifact, ArtifactData, ArtifactComments, Skill, WebSearch, WebFetch, Bash(mkdir *), Bash(date *), Bash(ls *), Bash(cat *), Bash(cp *), Bash(rm *), Bash(git *), Bash(node *), Bash(sha256sum *)
@@ -20,8 +20,10 @@ Discovery decides **what** gets built and **how it looks and behaves**.
 It does not decide how it is built: no architecture, no data model, no
 technology. Stage 2 makes the mock real.
 
-The conductor is **Opus 5.5 (high)**. If the session runs another
-model, ask him to switch (`/model`) before the first question and wait.
+The conductor is **Opus 5.5 at medium effort**, raised with `/effort
+high` for the turns where it rules (the lock gate, judging the
+review). If the session runs another model, ask him to switch
+(`/model`) before the first question and wait.
 At the open, load the interview pack: `Skill` →
 `pack-interview-journeys-copy`. Its checklist (I-, J-, C-, A- items) is
 the bar this stage is held to.
@@ -47,7 +49,7 @@ its own. Never end a turn on a plan or a promise.
 D0 recon        from his first sentence, in the background: feature maps, current screens,
                 exported tokens and components, other fronts           scout (Sonnet 5.5, low) ×N
 D1 interview    voice dump → grilling in batches of ≤ 4 through the question tool → notes.md
-D2 mock loop    one journey clear → prototyper (Opus 5.5, high) builds v1 in the background →
+D2 mock loop    one journey clear → prototyper (Opus 5.5, medium) builds v1 in the background →
                 walk → publish → he clicks, gives step verdicts, comments, talks → v2, v3 …
                 D1 and D2 run together until no question passes the razor
 D3 lock gate    prototype-checker (Sonnet 5.5, high): the mechanical walk of every journey and
@@ -67,9 +69,9 @@ the lock (D4), the one batch of questions (D6) and the approval (D7).
 
 | Agent | Model, effort | Does |
 |---|---|---|
-| the conductor (this session) | Opus 5.5, high | interviews, relays feedback, publishes, judges, asks |
+| the conductor (this session) | Opus 5.5, medium; high on the turns that rule | interviews, relays feedback, publishes, judges, asks |
 | `scout` | Sonnet 5.5, low | recon: quotes the feature maps, the tokens export, other fronts |
-| `prototyper` | Opus 5.5, high | builds and iterates the mock from the shell, the notes and the recon |
+| `prototyper` | Opus 5.5, medium | builds and iterates the mock from the shell, the notes and the recon |
 | `prototype-checker` | Sonnet 5.5, high | the lock gate: mechanical walk plus the design-taste checklist |
 | `journey-scribe` | Sonnet 5.5, high | derives journeys, stories and AC from the locked mock and the notes |
 | `disc-author-prfaq` | Sonnet 5.5, high | the one-page PR-FAQ from the locked mock and the notes |
@@ -95,7 +97,7 @@ designs-root/<slug>/
     │   ├── versions/vN.html  # every published version, copied before the publish
     │   ├── walks/vN.json     # the walk of each version
     │   ├── gate-vN.md        # the checker's report at D3
-    │   ├── frames/           # at the lock: <screen>.<state>.png (the reference), every state × theme × language × width,
+    │   ├── frames/           # at the lock: <screen>.<state>.png (the reference), every state × theme × language × width (gitignored),
     │   │                     # journeys/J<n>.s<k>.png (every step), manifest.json
     │   └── LOCK.json         # version, date, his words, sha256 of the source and of the frames
     ├── journeys/J<n>-<name>.yaml
@@ -121,7 +123,7 @@ creates state.
 
 On open:
 
-1. Ask for Opus 5.5 at high effort if the session is not on it.
+1. Ask for Opus 5.5 (medium effort) if the session is not on it.
 2. Derive the slug: `YYYY-MM-DD-<short-kebab-name>`.
 3. Create the workstream folder at the designs root (the consuming
    project's `CLAUDE.md` says where), `.state.md` with
@@ -236,7 +238,7 @@ trigger, its steps and where it ends are in the notes' Journeys block.
 That is usually after the first one or two batches. Do not wait for
 the whole interview.
 
-**The dispatch.** `prototyper (Opus 5.5, high)`, in the background,
+**The dispatch.** `prototyper (Opus 5.5, medium)`, in the background,
 with: the path to `notes.md`, the recon folder, the tokens and
 components paths (or "none"), the shell
 ([templates/prototype-shell.html](templates/prototype-shell.html)),
@@ -343,7 +345,11 @@ node proto.mjs lock 00-discovery/prototype --words "<his words, verbatim>" [--ov
 It walks the mock once more, refuses on a failure unless overridden,
 writes `versions/v<N>.html`, renders `frames/` (one reference picture
 per state, `<screen>.<state>.png`; every state × light and dark × each
-language × 390 and 1280 px; every journey step) with `manifest.json`, and writes `LOCK.json` with the sha256 of each. Write
+language × 390 and 1280 px; every journey step) with `manifest.json`, and writes `LOCK.json` with the sha256 of each. Only the
+reference per state, the journey steps and the manifest are committed:
+the full matrix is gitignored (a `.gitignore` the lock writes in
+`frames/`) and regenerated on demand with `proto.mjs frames`, its
+hashes kept in the manifest. Write
 the notes' Lock block, a line in `rulings.md`
 (`<date> · discovery D4 · lock v<N> · ruled: locked · "<his words>"`)
 and `.state.md` (`step: D5`, `locked: v<N>`). Commit the workstream

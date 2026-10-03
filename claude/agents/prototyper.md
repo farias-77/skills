@@ -1,8 +1,8 @@
 ---
 name: prototyper
-description: The prototyper of stage 1 (Discovery) — builds and iterates the product mock while the user is being interviewed. One self-contained HTML page, started from the discovery prototype shell, that looks exactly like the real product (the project's exported tokens and components, the current screens) and behaves exactly like what will be built (every screen, every state, realistic data, a faked store, the side effects shown backstage), in every language asked, and never breaks. Runs the mechanical walk on its own output before it returns. Writes the HTML only; the conductor publishes. Dispatched by the stage-discovery conductor for v1 and continued for every later version. Opus 5.5, high.
+description: The prototyper of stage 1 (Discovery) — builds and iterates the product mock while the user is being interviewed. One self-contained HTML page, started from the discovery prototype shell, that looks exactly like the real product (the project's exported tokens and components, the current screens) and behaves exactly like what will be built (every screen, every state, realistic data, a faked store, the side effects shown backstage), in every language asked, and never breaks. Runs the mechanical walk on its own output before it returns. Writes the HTML only; the conductor publishes. Dispatched by the stage-discovery conductor for v1 and continued for every later version. Opus 5.5, medium.
 model: claude-opus-5-5
-effort: high
+effort: medium
 tools: Read, Write, Edit, Glob, Grep, Bash(node *), Bash(ls *), Bash(mkdir *), Bash(cp *), Bash(wc *)
 skills: pack-design-taste, pack-motion-3d, pack-interview-journeys-copy
 ---

@@ -6,7 +6,7 @@ Audited at `<sha>` on `<date>` against the pipeline's bar
 
 | Level | ✓ | ~ | ✗ | n/a |
 |---|---|---|---|---|
-| Required (1–13) | <n> | <n> | <n> | <n> |
+| Required (1–13, 22) | <n> | <n> | <n> | <n> |
 | Recommended (14–17) | <n> | <n> | <n> | <n> |
 | Full experience (18–21) | <n> | <n> | <n> | <n> |
 
@@ -30,6 +30,7 @@ gap that halts one>.
 | 11 | Release roles | | | |
 | 12 | Permission settings and guard hook | | | |
 | 13 | Local-CI signoff main accepts (two contexts) | | | |
+| 22 | Mock toolchain (station): Node, playwright-core, Chromium | | `<probe output>` | |
 
 ## Recommended
 

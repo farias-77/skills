@@ -26,7 +26,7 @@ Lock: `00-discovery/prototype/` version <v> · journeys <n> · stories <S-001 �
 
 | AC | Journey step | entry → use case → writes → effects |
 |---|---|---|
-| <S-001/AC-1> | <J-id/n> | <route or event → use case → what it writes → E-n> |
+| <J1.s2.1> | <J1.s2> | <route or event → use case → what it writes → E-n> |
 
 ## Effects that leave the process
 
@@ -50,7 +50,7 @@ Lock: `00-discovery/prototype/` version <v> · journeys <n> · stories <S-001 �
 
 | Part | Sub-parts | Carries (effects, ACs) | What exists today it extends |
 |---|---|---|---|
-| data | — | <S-001/AC-1, S-002/AC-3> | <table · path:line from recon> |
+| data | — | <J1.s2.1, J2.s1.1> | <table · path:line from recon> |
 | contracts | | | |
 | compute | <compute.a, compute.b> | <E-1, E-2> | |
 | integrations | | | |

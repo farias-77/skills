@@ -22,7 +22,9 @@
  *         opened as the artifact publishes it (doctype added).
  * look    one state, optionally driven by fills and clicks in order; prints what is on screen (the
  *         frame, the visible text, the new side effects). Takes a URL too, for the current app.
- * lock    walk (must pass, or --override), copy index.html to versions/v<N>.html, render frames/,
+ * lock    walk (must pass, or --override), copy index.html to versions/v<N>.html, render frames/
+ *         (a .gitignore there keeps the matrix out of git: the reference per state, the journey steps
+ *         and manifest.json are committed; `frames` regenerates the matrix on demand),
  *         write LOCK.json (version, date, his words, sha256 of the source and of the frames manifest).
  * model   the mock as data: meta, frames, journeys (with targets, fills, effects), copy, actions.
  * trace   the derivation against the locked mock: one YAML per journey with the same steps and
@@ -361,6 +363,9 @@ async function lock(dir, opts) {
   const fdir = path.join(dir, 'frames');
   fs.rmSync(fdir, { recursive: true, force: true });
   const manifest = await frames(index, fdir, {});
+  // Committed: the reference per state (<token>.png), the journey steps and the manifest. The full
+  // matrix (<token>~<theme>~<lang>~<width>.png) is regenerated on demand with `frames`; its hashes stay in the manifest.
+  fs.writeFileSync(path.join(fdir, '.gitignore'), '*~*.png\n');
   const LOCK = {
     version: v, date: new Date().toISOString(), words: opts.words, override: opts.override || null,
     gaps: report.ok ? [] : report.fails,

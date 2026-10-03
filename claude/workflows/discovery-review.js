@@ -22,7 +22,7 @@
  * changed stories plus the round-1 findings they must confirm closed
  * (`verify`). The conductor decides what changed; the script runs it.
  *
- * THERE IS NO JUDGE HERE. The conductor (Opus 5.5, high) rules every
+ * THERE IS NO JUDGE HERE. The conductor (Opus 5.5, medium; high when it rules) rules every
  * finding by the stage's references/judging.md.
  *
  * The briefs carry INPUTS only; every instruction lives in the agent

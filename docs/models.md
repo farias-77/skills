@@ -83,7 +83,8 @@ session runs on; the skill states it and the session sets it with
 
 | Session | Model, effort | Evidence |
 |---|---|---|
-| discovery, design, plan conductors | Opus 5.5, medium; high on the turns that rule | Long human conversation: Opus wins on knowledge work, long context and facts at the same cost |
-| execute session | Opus 5.5, medium; high on the turns that rule | Same role: it rules every finding the judges park |
+| discovery conductor | Opus 5.5, medium; `/effort high` on the turns that rule | Long human conversation: Opus wins on knowledge work, long context and facts at the same cost |
+| design, plan conductors | Opus 5.5, high | Autonomous: almost every turn designs, cuts or rules, so the ruling effort is the default |
+| execute session | Opus 5.5, high | Orchestrates the queue and rules what comes back from many runs at once |
 | release, close sessions | Opus 5.5, medium | Reads results and runs a written plan |
 | `/pipeline-setup` session | Opus 5.5, medium | Rates each role from the scouts' quotes |

@@ -29,11 +29,11 @@
 
 ## Journeys
 
-### J-<id> — <journey name> (covers S-00N)
+### J<n> — <journey name> (covers S-00N)
 
 | Case | Step | Layer | Given / action | Expect (state · frame) | Side effect (store) | Cleanup |
 |---|---|---|---|---|---|---|
-| `j-<id>-1` | 1 | browser journey | <the step's action, the fixture> | <the state · `prototype/frames/<file>`> | <the row, e-mail or event the step promises> | <delete what was created> |
+| `J<n>.s1.1` | s1 | browser journey | <the step's action, the fixture> | <the state · `prototype/frames/<file>`> | <the row, e-mail or event the step promises> | <delete what was created> |
 
 ## Contract cases
 

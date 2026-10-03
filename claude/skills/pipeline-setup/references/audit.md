@@ -78,6 +78,7 @@ quotes the output in the readiness file:
 | Probe | For |
 |---|---|
 | `node --version`, `ffmpeg -version \| head -1` | role 21 (on the station) |
+| `node --version`; `ls "$PLAYWRIGHT_DIR"/node_modules/playwright-core/package.json`; `node <pipeline>/claude/skills/stage-discovery/scripts/proto.mjs look about:blank --shot /tmp/proto-probe.png` (opens the Chromium it resolves, writes one PNG) | role 22 (on the station) |
 | `nproc`, `free -g \| head -2` | role 17, the machine's size |
 | `git -C <project> remote get-url origin` | which GitHub repo the signoff targets |
 | `gh api repos/<owner>/<repo>/branches/main/protection` (read-only; a 404 means no protection) | roles 13 and 18 |
