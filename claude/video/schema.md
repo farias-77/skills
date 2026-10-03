@@ -38,8 +38,8 @@ tab and is the check before the render (legibility, overflow, accents).
 
 ```json
 {
-  "title": "Landings — a arquitetura",
-  "stamp": "landings · design",
+  "title": "Pedidos — a arquitetura",
+  "stamp": "pedidos · design",
   "source": "/abs/path/to/the/source.md",
   "lang": "pt-BR",
   "scenes": [ ... ]
