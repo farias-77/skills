@@ -45,8 +45,8 @@ Paths, and what the video is:
 3. **Write the storyboard** in the kit's vocabulary (`title`,
    `statement`, `bullets`, `flow`, `table`, `code`, `image`,
    `numbers`, `timeline`, `end`). The on-screen text is in the
-   workstream's language (`workstream.json` names it; pt-BR with
-   correct accents by default); the JSON's keys stay as the schema
+   workstream's language (`workstream.json` names it, with every
+   accent of that language right); the JSON's keys stay as the schema
    names them.
 4. **Validate and preview:** `node <kit>/prepare.mjs --check <sb>`,
    then `node <kit>/stills.mjs <sb> <dir>` and Read the PNGs. Fix
@@ -82,10 +82,10 @@ Paths, and what the video is:
   or the conductor took without him (a latitude line — "the
   implementer decides", "the worker decides" —, a ruling marked
   `ruled: conductor`, a judge's call under a goal) carries a `badge`
-  ("sem você", "decidido pelo juiz"). A risk accepted carries one
-  too. Decisions he took himself may be shown as his ("você
-  decidiu"); never present one of his as the agents', or the
-  reverse.
+  in the workstream's language (in English: "without you", "the
+  judge decided"). A risk accepted carries one too. Decisions he took
+  himself may be shown as his ("you decided"); never present one of
+  his as the agents', or the reverse.
 - **Honest.** A failure is shown as a failure (`tone: "fail"`): a
   red check, a blocking review, a parked round, a gate that went red,
   a rejected fix. A video that only shows green when the record has

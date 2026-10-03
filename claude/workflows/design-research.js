@@ -1,8 +1,8 @@
 /*
  * design-research.js — deep research on ONE topic of a design, as
  * deterministic code. The stage-design conductor runs one of these per
- * topic listed from the session's notes, all in parallel, between the
- * session and the playback per subject.
+ * topic listed from the recon, all in parallel, where a premise of the
+ * design is unconfirmed (an external platform, a limit, a price).
  *
  * The shape is the research pattern Anthropic documents for multi-agent
  * systems (orchestrator-workers): a planner turns the topic's questions
@@ -17,14 +17,14 @@
  *
  * Invoked by the stage-design conductor:
  *   Workflow({ scriptPath: '<...>/workflows/design-research.js', args: {
- *     topic:      'minute-api',                 // the file name: research/<topic>.md
- *     title:      'The Minute panel API',       // for the file heading
- *     questions:  [ 'does the export carry the verdict?', 'rate limits?' ],
+ *     topic:      'maps-api',                   // the file name: research/<topic>.md
+ *     title:      'The maps provider API',      // for the file heading
+ *     questions:  [ 'does geocoding return the timezone?', 'rate limits?' ],
  *     designDir:  'absolute path to <slug>/01-design',
  *     template:   'absolute path to stage-design/templates/research-target.md',
  *     repos:      [ 'absolute paths the searchers may read' ],
- *     language:   'pt-BR',
- *     date:       '2026-09-11',                 // scripts cannot read the clock
+ *     language:   'en',
+ *     date:       '2026-01-12',                 // scripts cannot read the clock
  *   }})
  *
  * Returns { topic, file, angles, findings, notConfirmed, loops, downgraded }.
