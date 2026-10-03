@@ -13,11 +13,14 @@ import {renderStill, selectComposition} from '@remotion/renderer';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const vertical = process.argv.includes('--vertical');
-const [storyPath, outDir, scaleArg] = process.argv.slice(2).filter((a) => a !== '--vertical');
-if (!storyPath || !outDir) {
+const [storyArg, outArg, scaleArg] = process.argv.slice(2).filter((a) => a !== '--vertical');
+if (!storyArg || !outArg) {
   console.error('usage: node stills.mjs <storyboard.json> <out-dir> [scale]');
   process.exit(2);
 }
+const storyPath = path.resolve(storyArg);
+const outDir = path.resolve(outArg);
+process.chdir(here);
 const run = fs.mkdtempSync(path.join(os.tmpdir(), 'video-stills-'));
 try {
   execFileSync('node', [path.join(here, 'prepare.mjs'), storyPath, run], {stdio: ['ignore', 'ignore', 'inherit']});

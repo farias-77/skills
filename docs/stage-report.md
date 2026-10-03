@@ -210,3 +210,5 @@ own notes verbatim; what the sweep leaves for him to run.
 - **The session's context** pays for the slide files it must read to
   publish them and nothing else: it never reads the storyboard or the
   stage's documents for this step; the scribes do.
+
+**Never commit the renderer's cache.** Remotion keeps a ~220 MB browser in a `.remotion/` folder next to wherever it runs; the kit runs from its own folder, and the workstream's `.gitignore` carries `**/.remotion/` as a second fence.
