@@ -15,7 +15,7 @@ per reviewer, every friction with its evidence.
 | `execution` | `03-execution/board.md`, `parked.md`, `audit.md`, every `entries/*/run-*.json` listed by path (never the `entries/` folder), `blueprint/execution/execution.json` | entries, amendments, rounds per entry, findings and precision per reviewer, parked entries and why, the choices where the documents were silent, the audit's items and rulings; every friction the runs and the board show |
 | `release` | `04-release/plan.md`, `trace.md`, every `04-release/entries/*/run-*.json` listed by path, `blueprint/release/release.json` | staging runs and reds, fixes, rollbacks, hotfixes, watch read and owned; every friction the trace notes |
 | `notes` | `dreaming-notes.md`, `taste-notes.md` | every note as a friction, the `[user]` ones marked; every taste note marked `taste` |
-| `telemetry` | `.state.md`, `01-design/telemetry.md`, the plan's and the execution's telemetry where the stages wrote it, `04-release/trace.md` | per stage: wall-clock, his hours, agent hours, tokens, rounds, findings by class, each with its line ([metrics.md](metrics.md)); a stage that recorded nothing is a friction |
+| `telemetry` | only for a workstream older than the shared `<stage>/telemetry.json` (claude/docs/telemetry.md): `.state.md`, `01-design/telemetry.md`, whatever telemetry the other stages wrote, `04-release/trace.md`. With the shared files, `scripts/telemetry-sum.mjs` replaces this source ([metrics.md](metrics.md)) | per stage: wall-clock, his hours, agent hours, tokens, rounds, findings by class, each with its line; a stage that recorded nothing is a friction |
 
 A source with no file comes back empty; the trace says so.
 

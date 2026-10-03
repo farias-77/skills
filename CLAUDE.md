@@ -278,10 +278,22 @@ normal day he watches and reads; the blueprint is for when he needs
 it. The stage's close message names the three in that order, nothing
 before them. The procedure — `video-scribe (Sonnet 5.5, high)`,
 `slides-scribe (Sonnet 5.5, high)`, the publishing and the links both
-ways — is [docs/stage-report.md](docs/stage-report.md). The close adds
-a different video, for other readers: the **launch video**, made for
-the product's users and the team from the real app, portfolio-grade,
-with a step-by-step tutorial per feature.
+ways — is [docs/stage-report.md](docs/stage-report.md). The close is
+the exception: no review video and no slides. Its layers are the
+**launch film**, made for the product's users and the team from the
+real app, portfolio-grade, with a step-by-step tutorial per feature,
+delivered on its own launch page; and the retro tab of the blueprint.
+
+## Every stage measures itself, in one shape
+
+Each stage's session writes `<stage-folder>/telemetry.json` as it runs:
+a row per step (wall-clock, his minutes), the agents by model and
+effort with their hours and tokens, the rounds, the findings by class,
+the cost when the harness reports it, and the gaps it could not
+measure. The shape is the same at every stage
+([docs/telemetry.md](docs/telemetry.md)); the close sums the six files
+into `metrics.json` with a script, and the weekly retro compares them.
+A value nobody measured is `null`, never estimated.
 
 ## The CI is local
 

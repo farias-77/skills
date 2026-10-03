@@ -80,6 +80,7 @@ designs-root/<workstream>/05-close/
 ├── harvest/<source>.json   # each harvester's answer, verbatim
 ├── structure/              # the structure check before and after, and their comparison
 ├── metrics.json            # the delivery metrics, in the shape references/metrics.md fixes
+├── telemetry.json          # the close's own measures (claude/docs/telemetry.md)
 ├── retro.md                # the retro, for reading
 ├── trace.md                # one line per step, `date -u`
 └── launch/
@@ -106,16 +107,23 @@ the background, by [references/launch.md](references/launch.md): the
 film is the long pole (recording, then up to an hour of rendering per
 cut on a loaded machine), so it runs while the retro is written. The
 music bed is his to give: a track he licensed, with its licence line;
-none given, the film has no music and says nothing about it.
+none given, the film has no music and says nothing about it. Create
+`05-close/telemetry.json` with `openedAt` and the session's model
+([claude/docs/telemetry.md](../../docs/telemetry.md)); a step row as
+each step ends.
 
 ## Step 1 — harvest
 
 By [references/harvest.md](references/harvest.md): run
 `${CLAUDE_SKILL_DIR}/../../workflows/close-harvest.js` by `scriptPath`
-with the workstream, the language, the number keys and the five
-sources (documents, execution, release, notes, telemetry) with their
-paths. Save each answer as it came to `05-close/harvest/<source>.json`
-before anything is summed.
+with the workstream, the language, the number keys and the four
+sources (documents, execution, release, notes) with their paths. Save
+each answer as it came to `05-close/harvest/<source>.json` before
+anything is summed. The stages' telemetry is not harvested: it is one
+JSON shape per stage, summed by
+`scripts/telemetry-sum.mjs` into `05-close/harvest/telemetry.json`
+([references/metrics.md](references/metrics.md)); only a workstream
+older than that shape adds the fifth source, `telemetry`.
 
 ## Step 2 — the numbers
 
@@ -130,10 +138,11 @@ workstreams here: the weekly compares.
 
 **The delivery metrics**, by [references/metrics.md](references/metrics.md),
 into `05-close/metrics.json`: the lead time (the workstream's first
-commit to its production deploy), his hours and the agent hours per
-stage, the tokens, the rounds, the findings by class, the revert rate
-and the change failure rate. Each with its source; `null` where the
-record does not carry it.
+commit to its production deploy); from the stages' telemetry
+(`telemetry-sum.mjs`) his hours and the agent hours per stage, the
+tokens, the rounds, the cost and the findings by class; the revert
+rate and the change failure rate. Each with its source; `null` where
+the record does not carry it.
 
 **The structure of main.** The fear is code that works and that nobody
 can extend later, so every close measures what this workstream did to
@@ -255,7 +264,9 @@ He forwards the film; anything he says goes on record:
 
 ## Step 6 — close
 
-When he says it is closed, it is: rebuild the blueprint, `.state.md` →
+When he says it is closed, it is: close `05-close/telemetry.json`, add
+its row to `metrics.json` (run `telemetry-sum.mjs` again and take its
+`stages` and `totals`), rebuild the blueprint, `.state.md` →
 `stage: closed`, and commit the workstream folder (the footage only
 when it is under 50 MB in all; the films always), push only with his
 explicit approval. The close's stage report is this package:

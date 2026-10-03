@@ -24,6 +24,7 @@
  *       { key: 'execution', paths: ['/abs/.../03-execution/board.md', '/abs/.../03-execution/parked.md', '/abs/.../03-execution/audit.md', '/abs/.../03-execution/entries/E-01/run-1.json', '…every run-*.json…', '/abs/.../blueprint/execution/execution.json'] },
  *       { key: 'release',   paths: ['/abs/.../04-release/plan.md', '/abs/.../04-release/trace.md', '/abs/.../04-release/entries/R.1/run-1.json', '/abs/.../blueprint/release/release.json'] },
  *       { key: 'notes',     paths: ['/abs/.../dreaming-notes.md', '/abs/.../taste-notes.md'] },
+ *       // telemetry: only for a workstream older than <stage>/telemetry.json; otherwise scripts/telemetry-sum.mjs
  *       { key: 'telemetry', paths: ['/abs/.../.state.md', '/abs/.../01-design/telemetry.md', '…each stage's telemetry…', '/abs/.../04-release/trace.md'] },
  *     ],
  *   }})

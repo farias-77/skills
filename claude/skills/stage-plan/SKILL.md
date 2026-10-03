@@ -146,14 +146,18 @@ Missing any of these: halt, back to the stage that owns it.
     ├── briefs/<id>.md         # F.md, F-x<n>.md, E-<nn>.md, E-int.md — the writers'
     ├── preflight.md           # yours
     ├── reviews/round-N.json   # each round's return, as it came
-    └── reviews.md             # the round audit — yours
+    ├── reviews.md             # the round audit — yours
+    └── telemetry.json         # the stage's measures, shared shape (claude/docs/telemetry.md) — yours
 ```
 
 ## Step 0 — open
 
 If the session is not on **Opus 5.5 at high effort**, say so in one
 line and continue only after the switch (`/model`); that is a setting,
-not a question about the plan. Load `pack-parallel-plan-local-ci` and
+not a question about the plan. Create `02-plan/telemetry.json` with
+`openedAt` and the session's model, in the shape every stage shares
+([claude/docs/telemetry.md](../../docs/telemetry.md)), and add a step
+row as each of P0–P6 ends. Load `pack-parallel-plan-local-ci` and
 `pack-right-sizing` with the Skill tool. Read `sizing.md` and the
 areas `code.md` names, enough to name P0's scouts, and dispatch P0.
 **While the scouts run**, read the rest: the design documents
@@ -520,9 +524,10 @@ Then the checker with `--briefs` once more: the plan files are final.
    then the graph as a flow in a code block with the critical path
    marked, the wave table, the decisions taken in his place (one line
    each), the residue, the pre-flight (item · blocks · `!` command),
-   and the stage's telemetry (wall-clock, agents, rounds, findings by
-   class, tokens).
-5. **Close**: `.state.md` to `stage: execute`; the close commit of the
+   and the stage's telemetry in one line, from `02-plan/telemetry.json`
+   (wall-clock, agents, rounds, findings by class, tokens, cost).
+5. **Close**: `telemetry.json` closed (`closedAt`, the totals);
+   `.state.md` to `stage: execute`; the close commit of the
    workstream folder (push only on his explicit word); suggest `/clear`
    before stage 4.
 

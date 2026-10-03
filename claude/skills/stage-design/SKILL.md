@@ -34,7 +34,7 @@ The session is the conductor, **Opus 5.5 at high effort**. It runs the
 recon, writes the frame, runs the sizing, holds the call, dispatches
 the writers, runs the review, judges every finding, and closes with the
 stage report. It writes `notes.md`, `reviews.md`, `rulings.md`,
-`taste-notes.md`, `telemetry.md`, the conductor's blueprint JSON, a
+`taste-notes.md`, `telemetry.json`, the conductor's blueprint JSON, a
 scout's answer saved under `recon/`, and a doctrine change he ruled at
 the call.
 Every other file is written by its agent, first draft to last fix: the
@@ -131,7 +131,7 @@ what is missing and run on:
 
 | Missing | What changes |
 |---|---|
-| a model switch (print mode, no human) | the stage runs on the session's model and effort; write both in `telemetry.md` and go on |
+| a model switch (print mode, no human) | the stage runs on the session's model and effort; write both in `telemetry.json` (`session`) and go on |
 | `Artifact` (a headless or cloud run) | **local mode**, `.state.md` gets `mode: local`: the call's deck stays in `01-design/call/` and the message gives the path of its first slide and its rendered pictures; the stage report stays in `report/design/`, each slide's `__VIDEO_URL__` and `__BLUEPRINT_URL__` replaced by the relative path, `stage-report.json`'s `slides` the relative path of the first slide |
 | the question tool | the call's questions go as text, in the same shape: the context, the options with their cost, the pick first and marked |
 | `Workflow` accepting a `scriptPath` that resolves outside the working directories | copy `design-tiers.js` into `<workstream>/_run/` and check both `sha256sum`s match; `review-prep.mjs` writes the review's copy there anyway. `_run/` is not committed |
@@ -154,7 +154,7 @@ designs-root/2026-08-15-workspace-invites/
 ├── 00-discovery/              # the lock (stage 1, untouched here)
 └── 01-design/
     ├── notes.md               # your record: the frame, what exists today, his call, the answers
-    ├── telemetry.md           # your record: time, agents, tokens, rounds, findings by class
+    ├── telemetry.json         # your record, in the shared shape (claude/docs/telemetry.md)
     ├── recon/                 # <area>.md, by plan-scout
     ├── research/              # <topic>.md, by the research workflow, only where needed
     ├── tiers/                 # breadboard.md · lean.md · balanced.md · hardened.md · critics.md
@@ -175,7 +175,8 @@ and `pr-faq.md` whole, in pages (`offset`, `limit`) when a file is
 over the Read tool's cap (you rule on them all stage long);
 the journeys, the mock and the doctrine are read by agents. Create
 `01-design/notes.md` from [templates/notes.md](templates/notes.md)
-and `01-design/telemetry.md` with the stage's start time.
+and `01-design/telemetry.json` with `openedAt` and the session's model
+([claude/docs/telemetry.md](../../docs/telemetry.md)).
 
 Then, in one message, in parallel:
 
@@ -257,7 +258,8 @@ Anything in `problems`, or anything you would rule otherwise, goes
 back to `sizing-judge (Opus 5.5, high)` in amend mode, one dispatch,
 with the lines to change and why; never edit `sizing.md` yourself.
 Status `incomplete`: fix the cause (a premise, a missing file) and
-relaunch with `resumeFromRunId`.
+relaunch with `resumeFromRunId`. Every run id goes in
+`telemetry.json`'s `design` object as the run starts.
 
 A premise the breadboard marked "changes the doctrine" is a question
 for the call, never decided here.
@@ -483,11 +485,15 @@ decisions taken in his place. Then
 The build refuses with the field named; a refusal goes back to the
 writer of that JSON.
 
-Close `telemetry.md`: per step (G0–G6) the wall-clock time, his
-minutes (the call, the close), the agents dispatched with their model,
-their hours and tokens as the harness reports them, the rounds, and
-the findings by class (correctness, coverage, contradiction, door,
-size: each round's `byClass`) with how many were sustained.
+Close `telemetry.json` in the shared shape
+([claude/docs/telemetry.md](../../docs/telemetry.md)): a step row per
+G0–G6 with its wall-clock and his minutes (the call, the close), the
+agents dispatched with their model and effort, their hours and tokens
+as the harness reports them, the rounds, the findings by class
+(correctness, coverage, contradiction, door, size: each round's
+`byClass`) with how many were sustained, and the cost when the
+harness reports one. The design-tiers run id goes in a `design`
+object, for a resume.
 
 **The stage report**: follow
 [docs/stage-report.md](../../docs/stage-report.md) (video, then
@@ -495,7 +501,7 @@ slides, then blueprint). To the design's focus paragraph add: **why it
 is this size**: the three tiers in one picture, what got care and
 what was relaxed, and the evolution path as the way it grows. Every
 number on a slide is quoted from `sizing.md`, `notes.md` or
-`telemetry.md`, never summed by the scribe: check each against its
+`telemetry.json`, never summed by the scribe: check each against its
 file before you publish.
 
 Then present, after the three-layer message: the review in a table
@@ -533,10 +539,10 @@ a paragraph only for the one argument that is prose.
 ## Resuming
 
 Everything is in files. Read `.state.md`, then `notes.md` and
-`telemetry.md` (the steps closed say where the stage stopped). Then
+`telemetry.json` (the step rows say where the stage stopped). Then
 continue from the first step whose output is missing: no `recon/` →
 G0; no `sizing.md` with status `final` → G1 (a design-tiers run with
-`resumeFromRunId` when its run id is in `telemetry.md`); no "His call"
+`resumeFromRunId` when its run id is in `telemetry.json`); no "His call"
 block → G3; documents missing → G4 (a writer redispatched with the
 list of what is on disk; it never rewrites a finished file); no
 `reviews/round-2.json` → G5; otherwise G6. Never from memory of a

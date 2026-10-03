@@ -115,10 +115,17 @@ designs-root/<workstream>/04-release/
 ├── trace.md       # one line per step as it ends, `date -u`
 ├── notes/         # per versioned artifact: <artifact>.md (the notes) and <artifact>.json (the scribe's return)
 ├── entries/R.<n>/ # the fix entries' run-*.json and evidence
-└── proof/         # CI summaries, smoke and bake reads, the alarms, the watch, verify/<entry>/
+├── proof/         # CI summaries, smoke and bake reads, the alarms, the watch, verify/<entry>/
+└── telemetry.json # the stage's measures, shared shape (claude/docs/telemetry.md)
 ```
 
 ## Step 0 — open: the permissions, then the plan
+
+Create `04-release/telemetry.json` with `openedAt` and the session's
+model, in the shape every stage shares
+([claude/docs/telemetry.md](../../docs/telemetry.md)); a step row as
+each step of the pattern ends (the play is the step where `hisMin`
+lives; a watch row's wait is wall-clock, not his).
 
 **Permissions first.** These checks are read-only, by
 [references/permissions.md](references/permissions.md):
@@ -366,7 +373,9 @@ hour, by [references/watch.md](references/watch.md). A proof more than
    `node "${CLAUDE_SKILL_DIR}/../../blueprint/build.mjs" <workstream>`.
 4. Write the numbers line in the trace, by
    [templates/trace.md](templates/trace.md).
-5. `.state.md` → `stage: close`, once no watch row is still waiting.
+5. `telemetry.json` closed (`closedAt`, the totals, the fix entries'
+   rounds and findings by class), then `.state.md` → `stage: close`,
+   once no watch row is still waiting.
    Until then, it stays `stage: release` with the hours of the
    waiting rows.
 6. Commit the workstream folder and send one **PushNotification**:

@@ -88,13 +88,14 @@ the lock (D4), the one batch of questions (D6) and the approval (D7).
 
 ```
 designs-root/<slug>/
-├── .state.md                 # stage, step (D0–D7), kit (resolved), mode (artifact | local), mock URL and version, locked version, round, metrics
+├── .state.md                 # stage, step (D0–D7), kit (resolved), mode (artifact | local), mock URL and version, locked version, round
 ├── rulings.md · taste-notes.md · dreaming-notes.md      # house files, created on first use
 ├── blueprint/                # workstream.json, prfaq.json, stories.json, review.json, report.json, figures.json
 ├── blueprint.html            # built, never edited
 ├── report/discovery/         # storyboard.json, video.mp4, project/ (the deck)
 └── 00-discovery/
     ├── notes.md              # the interview, written every turn
+    ├── telemetry.json        # the stage's measures (claude/docs/telemetry.md)
     ├── recon/                # areas.md (the scouts' quotes), screens/*.png
     ├── prototype/
     │   ├── index.html        # the mock: the file published; the prototyper's only output
@@ -183,7 +184,9 @@ On open:
    (slug, title, his language, `stage: discovery`).
 4. Create `00-discovery/notes.md` from
    [templates/notes.md](templates/notes.md) on the first turn and write
-   it every turn. A dead session loses nothing.
+   it every turn. A dead session loses nothing. Create
+   `00-discovery/telemetry.json` with `openedAt` and the session's
+   model (claude/docs/telemetry.md).
 5. Start D0 in the same turn.
 
 When he points to a document that already decides things (a spec, an
@@ -601,17 +604,21 @@ Present the three layers and ask for approval. Approval is explicit;
 silence or a loose "looks good" does not close the stage. He may send
 adjustments one at a time: note each in a visible list and apply only
 when he says "apply" (a behavior change is an amendment). On approval:
-`.state.md` to `stage: design`, the metrics block filled, commit the
+`.state.md` to `stage: design`, `telemetry.json` closed, commit the
 workstream folder (push only on his word), and suggest `/clear` before
 stage 2 (house rule). The close commit is the last act.
 
-## Metrics
+## Telemetry
 
-`.state.md` carries a `## Metrics` block, filled as the stage runs:
-opened, first mock published, locked, closed (timestamps); versions
-published; his question calls and questions; review rounds; findings
-by class (sustained author, sustained user, deferred, for the design,
-dismissed); gate overrides. The close's retro reads it.
+`00-discovery/telemetry.json`, in the shape every stage shares
+([claude/docs/telemetry.md](../../docs/telemetry.md)), filled as the
+stage runs: a step row as each of D0–D7 ends (the interview and the
+mock loop are where `hisMin` lives), the agents with their model and
+effort, the review rounds and the findings by class (the classes
+`judging.md` names). The counts only discovery has (versions
+published, his question calls and questions, gate overrides, the
+times of the first mock and of the lock) go in a `discovery` object
+beside the shared fields. The close's harvester reads the file.
 
 ## How to write, in every file and every question
 
