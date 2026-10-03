@@ -1,7 +1,7 @@
 ---
 name: pack-motion-3d
 description: Motion, animation and 3D for product UIs; read it before adding, changing, removing or reviewing any transition, keyframe, scroll effect, chart animation or WebGL scene, or a recording of one.
-disable-model-invocation: true
+user-invocable: false
 ---
 
 # Pack: motion, animation and 3D for product UIs

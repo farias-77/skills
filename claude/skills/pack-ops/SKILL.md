@@ -1,7 +1,7 @@
 ---
 name: pack-ops
 description: Operations for a small team; read it before designing, planning, building or reviewing anything that adds a server path, a scheduled job, an external call, a log event, an alarm or a dashboard, and when the close stage computes delivery numbers.
-disable-model-invocation: true
+user-invocable: false
 ---
 
 # Pack: ops for a small team

@@ -1,7 +1,7 @@
 ---
 name: pack-launch-video
 description: Launch and tutorial videos made in code (Playwright capture, Remotion, three.js, optional Blender); read it before storyboarding, capturing, editing or reviewing the end-of-release video of a product with screens.
-disable-model-invocation: true
+user-invocable: false
 ---
 
 # Pack: launch and tutorial video in code

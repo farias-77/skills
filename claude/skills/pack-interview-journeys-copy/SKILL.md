@@ -1,7 +1,7 @@
 ---
 name: pack-interview-journeys-copy
 description: Interview, journeys, states, copy and acceptance criteria for a discovery that ends in a clickable prototype; read it before the first interview question and again before writing acceptance criteria.
-disable-model-invocation: true
+user-invocable: false
 ---
 
 # Pack: interview → journeys → copy → acceptance

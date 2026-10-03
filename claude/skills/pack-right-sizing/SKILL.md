@@ -1,7 +1,7 @@
 ---
 name: pack-right-sizing
 description: Right-sizing a design; read it before producing, picking or judging design tiers, writing sizing.md, or reviewing whether a mechanism needs to exist at all.
-disable-model-invocation: true
+user-invocable: false
 ---
 
 # Pack: right-sizing a design

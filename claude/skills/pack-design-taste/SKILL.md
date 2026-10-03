@@ -1,7 +1,7 @@
 ---
 name: pack-design-taste
 description: Design taste for product screens and prototypes; read it before drawing, building or reviewing any screen, from an HTML prototype to a data-dense app view or a public marketing page.
-disable-model-invocation: true
+user-invocable: false
 ---
 
 # Pack: design taste for product screens and prototypes

@@ -1,7 +1,7 @@
 ---
 name: pack-release
 description: Autonomous, responsible releases; read it before writing a release plan, before any merge that deploys staging or production, and when configuring the release session's permissions and guard hook.
-disable-model-invocation: true
+user-invocable: false
 ---
 
 # Pack: autonomous, responsible releases

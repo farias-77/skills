@@ -1,7 +1,7 @@
 ---
 name: pack-react-frontend
 description: React and strict TypeScript craft for screens and their browser journeys; read it before writing or reviewing React components, routes, forms, data fetching or Playwright journeys.
-disable-model-invocation: true
+user-invocable: false
 ---
 
 # Pack: React frontend

@@ -1,7 +1,7 @@
 ---
 name: pack-parallel-plan-local-ci
 description: Cutting an approved design into a wide build graph that many coding agents run at once, and designing or running the local gate that says "green" before a merge; read it when writing or reviewing a plan, a foundation entry, entry briefs, or the merge queue and its sign-off.
-disable-model-invocation: true
+user-invocable: false
 ---
 
 # Pack: parallel plan and local CI

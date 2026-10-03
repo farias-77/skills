@@ -1,7 +1,7 @@
 ---
 name: pack-model-selection
 description: Picking the model and effort for an agent or a session between Opus 5.5 and Sonnet 5.5, writing its prompt, and pricing a run; read it before setting or changing any agent's model or effort.
-disable-model-invocation: true
+user-invocable: false
 ---
 
 # Pack: model and effort selection (Opus 5.5, Sonnet 5.5)

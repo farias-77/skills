@@ -1,7 +1,7 @@
 ---
 name: pack-go-backend
 description: Senior-grade Go backend work; read it before writing, reviewing or testing any Go diff on a server (a use case, handler, query, consumer, CLI subcommand or test).
-disable-model-invocation: true
+user-invocable: false
 ---
 
 # Pack: Go backend
