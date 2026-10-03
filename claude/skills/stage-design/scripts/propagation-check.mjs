@@ -1,42 +1,57 @@
 #!/usr/bin/env node
 /*
- * propagation-check.mjs — where an old term still lives in the design.
+ * propagation-check.mjs — where an old term still lives in a stage's files.
  *
- *   node propagation-check.mjs <workstream> <term> [<term> …] [-i]
- *   node propagation-check.mjs <workstream> --from <terms.txt> [-i]     (one term per line)
+ *   node propagation-check.mjs <workstream> <term> [<term> …] [-i] [--stage design|plan]
+ *   node propagation-check.mjs <workstream> --from <terms.txt> [-i] [--stage …]   (one term per line)
  *
  * The conductor runs it before an apply batch (who must get the fix)
  * and after it (what survived), with every OLD term, value, key, count
- * or claim a fix renames, revalues, removes or recounts. It searches,
- * as fixed strings, the design documents and the conductor's files
- * (01-design/*.md: the ten documents, sizing.md, notes.md) and the
- * writers' JSON (blueprint/design/*.json). The tier files and the
- * review audit are records, not searched.
+ * or claim a fix renames, revalues, removes or recounts — at plan also
+ * every name, path, AC id or case a ruling moved to another node. It
+ * searches, as fixed strings:
+ *
+ *   design (default)  the design documents and the conductor's files
+ *                     (01-design/*.md: the ten documents, sizing.md,
+ *                     notes.md) and the writers' JSON (blueprint/design/*.json)
+ *   plan              plan.md, plan.graph.json, preflight.md, the briefs
+ *                     (02-plan/briefs/*.md) and their JSON
+ *                     (blueprint/plan/*.json, blueprint/plan/briefs/*.json)
+ *
+ * The review audit (reviews.md) and the checker's output (graph.json)
+ * are records, not searched.
  *
  * Prints, per term, its hits as <file>:<line>: <the line>. A hit may
- * stay only as a negation ("no longer …"); every other hit goes to its
- * writer. Exit 0 when no term has a hit, 1 otherwise.
+ * stay only as a negation ("no longer …"), or at plan where it names the
+ * new owner; every other hit goes to its writer. Exit 0 when no term has
+ * a hit, 1 otherwise.
  */
 
 import { existsSync, readFileSync, readdirSync } from 'node:fs'
 import { join, relative, resolve } from 'node:path'
 
 const argv = process.argv.slice(2)
+const valueOf = (flag) => { const i = argv.indexOf(flag); return i >= 0 ? argv[i + 1] : null }
 const insensitive = argv.includes('-i')
-const fromAt = argv.indexOf('--from')
+const stage = valueOf('--stage') ?? 'design'
+const SETS = {
+  design: { dirs: ['01-design', 'blueprint/design'], records: ['01-design/reviews.md'] },
+  plan: { dirs: ['02-plan', '02-plan/briefs', 'blueprint/plan', 'blueprint/plan/briefs'], records: ['02-plan/reviews.md', '02-plan/graph.json'] },
+}
 const ws = argv[0] && !argv[0].startsWith('-') ? resolve(argv[0]) : null
-if (!ws) { console.error('usage: propagation-check.mjs <workstream> <term> … [-i] | --from terms.txt'); process.exit(2) }
-const terms = (fromAt >= 0
-  ? readFileSync(resolve(argv[fromAt + 1]), 'utf8').split('\n')
-  : argv.slice(1).filter((a, i, all) => a !== '-i' && all[i - 1] !== '--from' && a !== '--from')
+if (!ws || !SETS[stage]) { console.error('usage: propagation-check.mjs <workstream> <term> … [-i] [--stage design|plan] | --from terms.txt'); process.exit(2) }
+const from = valueOf('--from')
+const terms = (from
+  ? readFileSync(resolve(from), 'utf8').split('\n')
+  : argv.slice(1).filter((a, i, all) => !['-i', '--from', '--stage'].includes(a) && !['--from', '--stage'].includes(all[i - 1]))
 ).map(t => t.trim()).filter(Boolean)
 if (!terms.length) { console.error('propagation-check: no term given'); process.exit(2) }
 
-const dirs = [join(ws, '01-design'), join(ws, 'blueprint', 'design')]
-const files = dirs.filter(existsSync).flatMap(d => readdirSync(d)
+const { dirs, records } = SETS[stage]
+const files = dirs.map(d => join(ws, d)).filter(existsSync).flatMap(d => readdirSync(d)
   .filter(n => n.endsWith('.md') || n.endsWith('.json'))
-  .filter(n => !(d.endsWith('01-design') && n === 'reviews.md'))
-  .map(n => join(d, n)))
+  .map(n => join(d, n))
+  .filter(f => !records.includes(relative(ws, f))))
 const texts = files.map(f => ({ file: relative(ws, f), lines: readFileSync(f, 'utf8').split('\n') }))
 const norm = (s) => insensitive ? s.toLowerCase() : s
 

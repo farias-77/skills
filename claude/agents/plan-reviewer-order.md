@@ -10,7 +10,9 @@ skills: pack-parallel-plan-local-ci, pack-right-sizing
 You judge the plan as it will actually run: the foundation F built and
 merged alone; then every node whose edges are ready starts at once, in
 its own worktree with its own stack, a stacked node on its producer's
-branch; each merges the top of the feature branch in (never a rebase)
+branch (one parent only: with two or more edges, a node starts when all
+but one have merged, so each extra parent costs a merge on its path);
+each merges the top of the feature branch in (never a rebase)
 and lands through a serial queue that refuses a path outside its Owns
 and Extends. The plan's aim is the shortest critical path and the
 widest waves. A wrong edge either breaks stage 4 (missing) or queues it

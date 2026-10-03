@@ -34,7 +34,12 @@ One of two briefs from the conductor:
   schema (`claude/blueprint/schema/plan.md`), the language and, for
   every node but F, `02-plan/briefs/F.md`. You write
   `02-plan/briefs/<id>.md` and `blueprint/plan/briefs/<id>.json` in the
-  same pass, and return your questions in one batch.
+  same pass, and return your questions in one batch. F's writer gets a
+  **part**: `names` — the header, "Provides", "Seams" and "Exemplars"
+  only, every name final, then return (the other writers start from
+  them); `rest` — every other section and `F.json`, while the others
+  write. A name the rest needs that "Provides" lacks is a question
+  marked `F gap`, never a silent addition.
 - **apply** — the paths and a list of fixes, each with an id, the
   finding it answers (`says`, `gap`, `fix`), the owner and the
   conductor's ruling. You edit the brief and the JSON in place.
@@ -50,7 +55,9 @@ template:
 
 1. **The header.** Kind, size, wave, whether it is on the critical
    path, its edges with their class and need, where it starts from —
-   all from the graph.
+   all from the graph. With two or more edges, it starts on the last
+   unmerged one's branch once the others have merged (stage 4 stacks
+   on one parent only).
 2. **What it builds, on each side.** From the node's line in
    `plan.md`: the back (use case, rules, route implementation, jobs)
    and the front (screen, states, actions) in the concrete names the
@@ -72,6 +79,9 @@ template:
    Every route and every permission has a bad path. A screen line
    names both themes and 390 px. A line that needs a deployed
    environment or a person is a question, never a softer sentence.
+   Each line is red on this node's base for the right reason: a clause
+   asserting that an element another node builds is absent passes
+   there vacuously, so name it as proved by the whole gate or ask.
    Seeds: the factory calls, each test creating what it spends.
 4. **Golden paths.** For every kind of code the node adds, the
    exemplar: the recon's "Golden paths", or F's exemplar where the
@@ -84,19 +94,23 @@ template:
    test env; (d) every journey that spends state creates its own actor
    or record; (e) the route's deadlines sum below the write timeout. A
    behaviour another slice implements behind an interface is used
-   through F's seam and fake, never by waiting. A name F.md lacks is a
+   through F's seam and fake, never by waiting. The Producer column
+   starts with the graph's producer id (`F`, or the node behind the
+   edge); a script holds it to the graph. A name F.md lacks is a
    question marked `F gap`, and so is a duty no node produces. The
    list must equal the node's `uses` in the graph; a difference is a
    question, not an edit to the graph.
 6. **Owns and Extends**, exactly the node's `owns` and `extends` in the
-   graph, one bullet each with what the node does there. A file your
+   graph, one bullet each with what the node does there; filling a
+   stub F left for you is an Extends that says "fills". A file your
    acceptance makes you write that is in neither is a question ("E-03
    must write `x`, owned by E-01"): the conductor moves the ownership
    or the work.
 7. **Size** against the cap (one screen with its states and one server
-   flow, ≤ 8 ACs, about ≤ 2,500 changed lines with tests): the ACs, the
-   flows, an estimate of the lines. Over the cap is a question, with
-   the split you see.
+   flow, about ≤ 2,500 changed lines with tests): the ACs, the flows,
+   an estimate of the lines. Over the cap is a question, with the split
+   you see. The AC count alone is not the cap: the discovery may write
+   one AC per frame state.
 8. **Gate.** The commands of `plan.md` §Gate commands, copied
    verbatim, then the node's focused commands (the test packages and
    journey specs its acceptance names).
@@ -193,6 +207,11 @@ bound.
   a key, a rule, a case name, a name from F.md, an AC id, a path.
 - Items of Owns, Extends, Uses, Provides and the AC column are written
   in backticks, exactly as the graph has them: a script compares them.
+  It finds each section by its whole heading: keep the template's
+  headings as they are, and give any extra section its own heading
+  ("Shapes of the provided names", never "Provides, in detail").
+- The template's `<!-- -->` comments are instructions to you; none
+  reaches your brief.
 - Say what you mean. Literal sentences, concrete values, no metaphor.
 - Write in the language the brief names. IDs, headings, case names,
   commands and code stay as the templates, the design and the recon

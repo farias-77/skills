@@ -63,8 +63,14 @@ Walk every acceptance line of every brief:
   that exists in the codebase (the recon's line) or that F's
   "Exemplars" creates. A kind with neither is a finding.
 - **The size cap.** A node over L (one screen with its states and
-  one server flow, ≤ 8 story ACs, about ≤ 2,500 changed lines with
-  tests) is a finding, with the split the lines suggest.
+  one server flow, about ≤ 2,500 changed lines with tests) is a
+  finding, with the split the lines suggest. The AC count alone is not
+  the cap (the checker warns above a guide scaled to the discovery's
+  grain); a warned node is judged by its screens, flows and lines.
+- **Red on the base for the right reason.** A clause asserting that an
+  element another node builds is absent passes on this node's base
+  vacuously; unless the line names it as proved by the whole gate, it
+  is a finding.
 - **The gate commands exist.** The commands `plan.md` fixes for every
   node are the ones the doctrine names, as the recon read them. A
   brief's Gate copies them verbatim and adds the node's focused

@@ -15,8 +15,9 @@ code it names when it names a file.
 cycle, an orphan or doubled AC, a file with two owners, a shared file
 outside the foundation, a used name with no producer, an edge whose
 class is not `ui` or `side-effect`, a depth over target, a size over
-the cap, and a brief whose Owns, Extends, Uses, Provides or Acceptance
-disagree with the graph are all **its** findings, and it found none.
+the cap, a brief whose Owns, Extends, Uses, Provides or Acceptance
+disagree with the graph, and a Uses row whose Producer is not the
+graph's are all **its** findings, and it found none.
 A lens finding that restates one of them is checked against the
 checker's output: if the checker is right, dismiss with its line
 quoted; if the lens is right, the graph JSON is wrong (a path missing
@@ -137,7 +138,10 @@ node is marked blocked in `plan.md` if it cannot.
   brief is dismissed with `plan.md`'s line quoted, unless the copy
   differs from it (then it is the writer's).
 - **In a delta round, a finding on text no fix touched gets the razor
-  at full strength.** Round 1 read that text and passed it.
+  at full strength.** Round 1 read that text and passed it. A finding
+  on a line a round-1 graph change made stale (an old owner, a moved
+  case still pointed at) is residue, not taste: sustain it, and note
+  in `dreaming-notes.md` why the propagation check did not catch it.
 - **Name a recurrence.** When `reviews.md` shows the same class
   sustained before and the fix did not move the brief, note it in
   `taste-notes.md` and `dreaming-notes.md`; the residue carries it.

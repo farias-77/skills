@@ -29,12 +29,26 @@ plan's scouts later read it and scan only what changed.
 
 ## How you work
 
+0. **Read the template first.** Your file has its headings, in its
+   order, and nothing it does not ask for. A question the conductor
+   adds is answered under the heading it belongs to, or under "The
+   conductor's questions" at the end; it never replaces the template.
+   The file opens with the base you read: `<repo>@<branch> <sha>`, the
+   head of the base branch. When you get the design's recon of the
+   same area, read it and scan only what changed since its sha.
 1. Read the root's `CLAUDE.md`, `README.md`, the doctrine's
    local-development document, the command runner it names, and the area's
    `docs/` and the feature maps that cover it, whole. From them: the
    commands for each role of the pipeline's project contract (the gate,
    the fast check, focused tests with their arguments, stack up, env,
    down), the journey commands, what CI runs.
+1b. **The gate rules that bite a plan**, each with the config line: a
+   linter that rejects unused code (and whether it runs on tests), a
+   coverage floor and which command measures it, a file-size or
+   structure limit, the test clock (shared per package? forward
+   only?), the lifetime of fake tokens or sessions measured on that
+   clock, and what the per-change gate runs that the whole gate does
+   not. These decide how a foundation's stubs and helpers pass.
 2. List the tests of the area: unit, integration, journeys; the case
    count per suite (count the test functions or specs); the duration
    when the docs state it, "not stated" otherwise; every factory and
@@ -82,13 +96,16 @@ bottom of the recon template, and write `02-plan/recon/fronts.md`.
    whole: quote every line that names an area, a file or a window.
 2. Every workstream folder under the designs root whose `.state.md`
    stage is not `closed`, except this one: its slug, stage and branch.
-3. Per running branch in the codebase: `git diff --stat main...<branch>`
-   and the files it changed. Then, from this design's `code.md` and
+3. Every branch not merged into the base that changed in the last 30
+   days (`git branch -a --no-merged <base> --sort=-committerdate`),
+   with or without a workstream folder: `git diff --stat
+   <base>...<branch>` and the files it changed, the shared ones (the
+   next migration number above all) first. Then, from this design's `code.md` and
    `architecture.md`, the areas it will touch: every path a front
    changed inside them, and every shared file a front changed, with
-   what changed there (`git diff main...<branch> -- <path>`, read, not
+   what changed there (`git diff <base>...<branch> -- <path>`, read, not
    judged).
-4. What this design calls that a running front is building and `main`
+4. What this design calls that a running front is building and the base
    does not have yet, with the design's line.
 
 Facts only. You do not say what the plan should do about an overlap.
@@ -108,6 +125,9 @@ number, never a count of cores or memory.
    where the doctrine puts worktrees, bring a stack up in each, run
    the journey command in all N at once, and read the load average
    (`cat /proc/loadavg`) every ten seconds until the last suite ends.
+   Before N = 1, list the stacks already running on the machine
+   (another front's, by the doctrine's container listing) with their
+   memory; measure with them up and write them in the file.
    Record per N: the median and the peak load, the wall time of the
    slowest suite, the specs that went red.
 3. Stop at the first N whose median load passes 1.5 × the cores, or
@@ -142,9 +162,10 @@ throwaway worktrees and stacks); you do not talk to the user.
 ## Response contract
 
 The path written · the counts (routes, tables, screens, test cases) ·
-the golden paths (kind · exemplar, or none) · the seams (interface ·
+the gate rules that bite a plan · the golden paths (kind · exemplar, or none) · the seams (interface ·
 fake · suite, or none) · the hot files (top five) · the "What does not
 exist yet" list · the shared files · the "Not verified" list. Nothing
-else. Fronts: the path written · the running fronts · every overlap
-(path · front) · the behaviour needed from a front. The machine: the
+else. Fronts: the path written · the running fronts · the unmerged branches
+with the shared files they change · every overlap (path · front) · the
+behaviour needed from a front. The machine: the
 path written · one row per N · the measured cap.
