@@ -1,109 +1,155 @@
 # Plan — <workstream> — from A to B
 
 <!--
-  Written by the CONDUCTOR, whole, once the user approved the cut. The
-  writers never edit it; stage 4 fills the Status column as entries
-  merge and writes the amendments.
+  Written by THE CONDUCTOR (Opus 5.5, high), whole, at the end of P2,
+  from the same decisions as 02-plan/plan.graph.json. The two never
+  disagree: every change to one is made to the other in the same pass,
+  and scripts/plan-graph.mjs runs after it. The writers never edit this
+  file. Stage 4 fills Status and writes Amendments.
 
-  Three words: the FOUNDATION lays down once everything the entries
-  would fight over (migrations, the contract and its generated code,
-  the module registry, the shared pieces, the factories, the first
-  exemplar of each new kind); an ENTRY is a story, or a small group
-  that proves only together, built vertically (back, front, tests) by
-  one builder in its own worktree; an EDGE exists only when an entry's
-  proof needs another entry's behavior — data is seeded by the
-  factories, never an edge. Everything with no edge is built at once,
-  up to the cap. An edge held by one journey only is "stacked": the
-  entry starts on the other's branch when that one is ready.
+  The words (pack-parallel-plan-local-ci):
+  - F — the foundation, the thin serial head: migrations, the contract
+    and its generated code, the registry and wiring, config and the test
+    env, the cross-slice seams (interface + fake + contract suite), the
+    factories, one exemplar per new kind of code. At most one L of
+    hand-written code. Nothing behavioural. It owns every shared file.
+  - F-x<n> — a foundation lane: foundation work no slice waits for
+    (deploy skeleton, docs fragments, extra fake modes), built beside
+    the slices.
+  - E-<nn> — a slice: one story (or 2–3 that only prove together), built
+    vertically, back and front and tests, by one builder in one context.
+  - E-int — the integration node: the journeys that cross three or more
+    slices, size S, merges last. At most one.
+  - an edge — only real behaviour: a journey drives another node's UI
+    (class ui), or a check reads another node's real side effect (class
+    side-effect). Data is a factory; an interface is a fake. Neither is
+    an edge.
+  - a wave — the nodes at one depth after F. A reading aid: stage 4
+    starts each node the moment its edges are ready, never by wave.
 
-  After F, only the doctrine's shared files are frozen. Everything else
-  F created, entries extend by addition, as each brief's "Extends"
-  declares.
-
-  Size is relative (S · M · L) and L is the cap; the critical path is
-  the longest chain of sizes from the foundation to the last merge.
-  The cap is the measured one in recon/machine.md.
-
-  Decision blocks (house format) where the user chose between two
-  cuts; the conductor's recommendation kept beside the choice.
+  Nobody was asked. Every choice below is the conductor's, recorded
+  under "Decided in his place" for his veto.
 -->
 
 ## From A to B
 
-**A (today):** <one paragraph from recon/: what each area of the codebase has>
-**B (the design):** <one paragraph: what exists when the last entry is merged>
-
-## The foundation — `F`
-
-<!-- built alone, first; after it no entry edits the frozen files (the
-     doctrine's shared files); the rest is extended by addition -->
-
-| Kind | What |
-|---|---|
-| migration | <tables and columns, expansion only, with the data-model.md section> |
-| contract | <every new or changed route in the API contract; the generated code; routes answer 501 until their entry lands> |
-| module | <new modules registered in the composition> |
-| shared | <a component or helper two entries use, as the design names it> |
-| factory | <one per entity the proofs seed; the fakes and the per-project test targets> |
-| exemplar | <the first module, page or job of a kind the recon found no instance of, in the doctrine's full shape, without business behavior> |
-
-**Frozen after F:** <the doctrine's shared files, by path>
-**Proof:** run `<the gate command>` → expect `<exit 0; migrations from empty; the generated code compiles>` (no test pins a stub that an entry replaces)
-**Serves every entry:** <checked by the entries' "Uses from the foundation" against F.md "Provides": the gaps the writers raised and how F absorbed them, one line each>
-**Brief:** `02-plan/briefs/F.md`
-
-## The entries
-
-| Id | Name | Stories | Builds (back · front) | Size | After | Acceptance | Touches | Feature map |
-|---|---|---|---|---|---|---|---|---|
-| E-01 | <name> | S-001 | <use case, route> · <screen> | M | — | <n lines: the cases named> | <module, screen> | <rows> |
-| E-05 | <name> | S-005 | <…> · — | S | E-04 (its test clicks <the button E-04 builds>) · stacked when one journey only | <…> | <…> | <rows> |
+**A (today):** <one paragraph from recon/: what each area has, and what the other fronts are changing right now>
+**B (the design):** <one paragraph from sizing.md: what exists when the last node merges>
 
 ## The graph
 
 ```mermaid
-flowchart LR
-  F[Foundation] --> E01[E-01 · name]
-  F --> E04[E-04 · name]
-  E04 --> E05[E-05 · name]
+<scripts/plan-graph.mjs --mermaid output: F → the wave-1 nodes; edges labelled with their class; the critical path drawn thick>
 ```
 
-**Critical path:** <F → E-nn → … → the last merge, with the sizes>
-**Steps:** <foundation, then N entries at once, then …> · **Concurrency cap:** <n> (measured in `recon/machine.md`)
+| Nodes | Waves | Width | Depth (target ≤ 2) | Critical path | Parallelism |
+|---|---|---|---|---|---|
+| <n> (F <n> · lanes <n> · slices <n> · E-int <0/1>) | <n> | <widest wave> | <n> | <F → E-nn → E-int> · weight <n> | ×<total ÷ critical> |
+
+**Start order** (critical path first, then by bottom level): <E-03, E-01, …>
+
+### Waves
+
+| Wave | Nodes | Starts when |
+|---|---|---|
+| 0 | F | play |
+| 1 | <F-x1 · E-01 · E-02 · E-03 · E-04> | F is merged |
+| 2 | <E-int> | <E-03 and E-04 are ready (stacked)> |
+
+## The foundation — `F`
+
+| Kind | What |
+|---|---|
+| migration | <tables and columns, expansion only, with enums, indexes and grants — `data-model.md` §…> |
+| contract | <every route with every input and output field, one file per path, `<make gen>`; handlers answer "not implemented" and no test asserts it> |
+| wiring | <modules registered, config loaded, every secret faked in the test env> |
+| seam | <interface · fake · contract suite, one per need classified "interface"> |
+| factory | <one per entity, unique keys on every call; `actors.New(t, role)`> |
+| exemplar | <the first instance of each kind the recon marks "none", without behaviour> |
+
+**Size:** <S | M | L> (≤ L of hand-written code; what did not fit went to <F-x<n> / the first slice that needs it>)
+**Frozen after F:** <the shared globs from plan.graph.json>
+**Proof:** `<make gen>` + `git diff --exit-code` · `uses-check` compiles · contract suites green on the fakes · migrations from empty · the gate green on the empty implementation · no test pins a stub
+**Brief:** `02-plan/briefs/F.md`
+
+## The nodes
+
+| Id | Kind | Name | Stories · ACs | Builds (back · front) | Size | After (class · need) | Wave | Critical |
+|---|---|---|---|---|---|---|---|---|
+| F-x1 | lane | <Deploy skeleton> | — | <…> · — | S | — | 1 | |
+| E-01 | slice | <Place an order> | <S-001> · <J01.s1.1, J01.s2.1> | <use case, route> · <screen> | M | — | 1 | |
+| E-int | integration | <Order to e-mail> | <S-003, S-004> · <J03.s3.1> | — · <journey> | S | <E-03 (ui · clicks Mark ready) · E-04 (side-effect · reads the e-mail), stacked> | 2 | ✓ |
+
+## How each need was resolved
+
+<!-- P2's classification: every need that crosses a slice boundary, and
+     what stood in for it. This is why the graph is this wide. -->
+
+| Need | Of | Class | Resolved by |
+|---|---|---|---|
+| <a customer in the database> | <E-03> | data | `factory.Customer` in F — no edge |
+| <the store of orders> | <E-03, E-04> | interface | `orders.Store` + `fake.Store` + `RunStoreContract` in F — no edge |
+| <the "Mark ready" button> | <the J03 walk> | ui | edge E-int → E-03, stacked |
+| <the order-to-e-mail walk> | <J03> | e2e across 3 slices | E-int |
+
+## Ownership
+
+<!-- Every file has one owner. Shared files belong only to F. Extends are
+     append-only; a file two nodes extend is a hot file made cold or
+     declared append-safe here. -->
+
+| Path | Owner | Extended by |
+|---|---|---|
+| `<api/openapi/**>` · `<db/migrations/**>` · `<internal/gen/**>` · `<registry>` | F (frozen) | — |
+| `<internal/orders/place/**>` | E-01 | — |
+| `<web/src/tokens.css>` (existing, append-safe) | — | <E-01, E-03> |
+
+**Hot files made cold:** <the contract split one file per path; the feature map as per-node fragments the queue assembles; "none">
+
+## Other fronts
+
+<!-- From recon/fronts.md: what other running workstreams touch that
+     this plan touches too, and what the plan did about it. -->
+
+| Front | Touches | Overlap with this plan | What the plan did |
+|---|---|---|---|
+| <workstream slug> | <paths> | <path> | <moved the touch into F; a merge of the base first; none> |
 
 ## Gate commands
 
-<!-- Fixed once for every entry, from the recon's Commands; stage 4
-     passes them to each builder. No brief repeats them. -->
+<!-- Fixed once, from the recon's Commands, in the project contract's
+     roles. Every brief copies them verbatim; stage 4 hands them to every
+     builder. -->
 
-<ordered list: the fast check · the affected tests against the feat · the structure check, as the doctrine names them>
+1. `<the fast check>`
+2. `<the affected tests, base=feat/<workstream>>`
+3. `<the structure check>`
+
+The whole gate (`<make -k verify>`) runs once, at the end of stage 4, on the top of `feat/<workstream>`.
+
+**Concurrency at stage 4:** the graph is cut for width, not for the machine. Stage 4 runs as many nodes as the widest wave (<n>) up to the capacity it measures where it runs (`recon/machine.md` when measured: <n>).
 
 ## Pre-flight
 
-| Item | Entry | Status |
-|---|---|---|
-| <what the user hands over, and where it lives> | <E-nn or F> | handed · missing |
+`02-plan/preflight.md` — <n> items, every one with its `!` command. Nodes that wait on an item: <F (the provider key), E-04 (…)>; "none".
 
-Open decisions of doctrine or test, decided before stage 4:
+## Decided in his place
 
-| Decision | The options | Entries it touches | Decided |
-|---|---|---|---|
-| <a rule the entries lean on that the doctrine leaves open> | <A · B> | <E-nn> | <the choice, his words> |
-
-## Decisions
+<!-- Every choice the conductor made that he could have made: a fork in
+     the cut, an open rule of doctrine or test, a writer's question, a
+     finding owned by the user. Listed for his veto; the same lines are
+     in rulings.md marked `ruled: conductor`. -->
 
 > **Decision — <title>**
 > Context: <the cut in question>
 > Options: A) <option — its cost> · B) <option — its cost>
-> Recommended: <letter>
-> Chosen: <letter> — <why, the user's words>
+> Picked: <letter> — <why, one line>
 
 ## Status
 
-<!-- stage 4 fills: one line per entry as it merges: date · entry · sha · proof line -->
+<!-- stage 4 fills: date · node · sha · proof line -->
 
 ## Amendments
 
-<!-- An entry, an edge or the foundation that changes while being built:
-     date, what changed, why, in the user's words where he gave them.
-     The sections above are edited in place; the amendment is the trail. -->
+<!-- dated: what changed, why, who ruled; plan.graph.json changed in the
+     same pass and plan-graph.mjs green after it. -->

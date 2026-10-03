@@ -1,5 +1,13 @@
 /*
- * plan-review.js — the stage-3 review round as deterministic code.
+ * plan-review.js — the stage-3 review round as deterministic code (v9).
+ *
+ * v9: the stage runs with nobody to ask. The round reads the build graph
+ * (plan.graph.json) and the checker's output (graph.json) beside the
+ * briefs; the lenses judge what scripts/plan-graph.mjs cannot (whether an
+ * edge's class is true, whether F is thin and sufficient, whether a line
+ * says what its AC says) and never re-report what it settled. Round 1 is
+ * whole, round 2 the delta, then the stage stops: the conductor enforces
+ * the count.
  *
  * Why a workflow: the guarantee that no lens is skipped must be
  * physical, not discipline. Round 1 is whole: the three lenses in
@@ -8,16 +16,14 @@
  * names (`lenses`: those with a finding sustained in round 1) receive
  * the briefs that changed and the fixes that were applied, and check
  * that each fix landed and did not break its surroundings; the blind
- * readers reopen only the briefs named in `changed.briefs`. A third
- * round runs only on the user's word, delta again; the conductor
- * enforces the count.
+ * readers reopen only the briefs named in `changed.briefs`.
  *
- * THE BLIND READS are per brief (one entry of the plan, or F for the
- * foundation): two Sonnet readers (5.5, low) build it alone, reading
+ * THE BLIND READS are per brief (one node of the graph: F, a lane F-x<n>,
+ * a slice E-<nn>, or E-int): two Sonnet readers (5.5, low) build it alone, reading
  * only that file (and the design sections it points at), in the
  * brief's language, one build per key (`brief`, `back`, `front`,
  * `acceptance`: what the checks would assert, since at stage 4 a
- * verifier and a builder read the same brief apart). A Sonnet referee (5.5, low) compares the two readings key
+ * verifier and a builder read the same brief apart). A Sonnet referee (5.5, high) compares the two readings key
  * by key; only a `different-product` verdict becomes a finding; an
  * open build ("maybe X") is judged by the referee as two possible
  * builds. A reading that misses a key or is empty is invalid and
@@ -30,13 +36,18 @@
  *
  * THERE IS NO JUDGE AGENT. The conductor judges every finding by
  * stage-plan/references/judging.md, with the cut in its head: merge
- * by fix, sustained / deferred / dismissed, owner writer / user /
+ * by fix, sustained / deferred / dismissed, owner writer / conductor /
  * builder. The workflow returns the findings as the lenses gave them,
  * ids assigned.
  *
  * The prompts below carry INPUTS only. Every instruction lives in the
  * agent definitions under agents/ and in the shared reviewer contract
  * (docs/standards/reviewer-contract.md).
+ *
+ * RUNNING UNREGISTERED AGENTS: with args.inlineAgents, agent() is called
+ * without agentType; the prompt points at <agentsDir>/<name>.md and at the
+ * SKILL.md of each pack the definition lists (<skillsDir>/<pack>/SKILL.md),
+ * and the model and effort come from the AGENTS map below.
  *
  * Invoked by the stage-plan conductor:
  *   Workflow({ scriptPath: '<...>/workflows/plan-review.js', args: {
@@ -45,16 +56,20 @@
  *     designDir:    'absolute path to <slug>/01-design',
  *     discoveryDir: 'absolute path to <slug>/00-discovery',
  *     reconDir:     'absolute path to <slug>/02-plan/recon',
+ *     graphPath:    'absolute path to <slug>/02-plan/plan.graph.json',
+ *     graphReport:  'absolute path to <slug>/02-plan/graph.json',   // plan-graph.mjs --json output
  *     root:         'absolute path to the codebase',
- *     round:        1,            // 1, 2 or 3; shown in labels and ids
+ *     round:        1,            // 1 or 2; shown in labels and ids
  *     language:     'pt-BR',      // the briefs' language; the readers build in it
  *     briefs: [                   // one entry per brief file
  *       { id: 'E-03', path: '/abs/.../02-plan/briefs/E-03.md' },
  *     ],
- *     // rounds 2 and 3 only — the delta:
+ *     // round 2 only — the delta:
  *     changed: { briefs: ['E-03'] },   // the briefs whose acceptance or builds changed
  *     fixes:   [ { id: 'plan-reviewer-order#1', brief: 'E-03', fix: 'what was applied, one line' } ],
  *     lenses:  ['plan-reviewer-order'], // the lenses with a finding sustained last round; omitted = all three
+ *     // when the v9 agents are not installed in the running Claude Code:
+ *     inlineAgents: true, agentsDir: '<...>/claude/agents', skillsDir: '<...>/claude/skills',
  *   }})
  *
  * Returns { round, mode, valid, findings, lenses, unread } — findings
@@ -68,12 +83,35 @@
 
 export const meta = {
   name: 'plan-review',
-  description: 'Stage-3 review round: three Sonnet lenses in parallel with two Sonnet blind readers and a Sonnet referee per brief; whole in round 1, delta after (only the lenses that had a finding sustained); no judge agent — the conductor judges',
+  description: 'Stage-3 review round (v9): three Sonnet lenses (5.5, high) over the graph and the briefs in parallel with two Sonnet blind readers (5.5, low) and a Sonnet referee (5.5, high) per brief; whole in round 1, delta in round 2 (only the lenses that had a finding sustained); no judge agent — the conductor rules everything',
   phases: [
-    { title: 'Lenses', detail: 'coverage, verifiability and order in parallel, each reads everything (or the delta)', model: 'sonnet' },
+    { title: 'Lenses', detail: 'coverage, verifiability and order (the graph) in parallel, each reads everything (or the delta)', model: 'sonnet' },
     { title: 'Blind reads', detail: 'per brief: two Sonnet readers build it alone from the file, a Sonnet referee compares them key by key' },
   ],
 }
+
+// name → model, effort and packs, as in each definition's frontmatter (used when the agents run inline).
+const AGENTS = {
+  'plan-reviewer-coverage': { model: 'sonnet', effort: 'high', packs: ['pack-parallel-plan-local-ci', 'pack-right-sizing'] },
+  'plan-reviewer-verifiability': { model: 'sonnet', effort: 'high', packs: ['pack-parallel-plan-local-ci'] },
+  'plan-reviewer-order': { model: 'sonnet', effort: 'high', packs: ['pack-parallel-plan-local-ci', 'pack-right-sizing'] },
+  'plan-reviewer-ambiguity': { model: 'sonnet', effort: 'high', packs: [] },
+  'plan-blind-reader': { model: 'sonnet', effort: 'low', packs: [] },
+}
+const inline = args?.inlineAgents === true
+const agentsDir = args?.agentsDir
+const skillsDir = args?.skillsDir
+// One call shape for registered and inline agents.
+const call = (name, prompt, opts) => {
+  const def = AGENTS[name]
+  if (!inline) return agent(prompt, { ...opts, agentType: name })
+  const packs = def.packs.map(p => `${skillsDir}/${p}/SKILL.md`)
+  return agent(`Your instructions are the file ${agentsDir}/${name}.md (read it first and follow it; its frontmatter's model and effort are already applied).${packs.length ? `
+Read these knowledge packs before you work: ${packs.join(', ')}` : ''}
+
+${prompt}`, { ...opts, model: def.model, effort: def.effort })
+}
+if (inline && (!agentsDir || !skillsDir)) log('inlineAgents without agentsDir or skillsDir — the agents cannot find their definitions or packs')
 
 const ALL_LENSES = [
   'plan-reviewer-coverage',
@@ -164,12 +202,15 @@ if (!allBriefs.length) log('no briefs passed in args — the blind reads are ski
 if (delta) log(`delta round: briefs ${delta.briefs.join(', ') || '(none)'} · ${fixes.length} fix(es) applied · lenses ${LENSES.join(', ') || '(none)'}`)
 
 const docInputs = `Round ${round}, ${mode}.
-The cut, as the user approved it (the foundation, the entries, the edges, the cap): ${args.planDir}/plan.md
-The briefs, one per entry and F for the foundation:
+The plan the conductor drew (the foundation, the nodes, the edges, the ownership, the gate): ${args.planDir}/plan.md
+The graph in machine form: ${args.graphPath ?? `${args.planDir}/plan.graph.json`}
+The checker's output (waves, width, depth, critical path, warnings; it ran green — do not re-report what it settles): ${args.graphReport ?? `${args.planDir}/graph.json`}
+The pre-flight: ${args.planDir}/preflight.md
+The briefs, one per node (F the foundation, F-x<n> the lanes, E-<nn> the slices, E-int the integration node):
 ${allBriefs.map(b => `  - ${b.id}: ${b.path}`).join('\n')}
-The recon, what exists in each area today: ${args.reconDir}
-The design (the law; notes.md inside): ${args.designDir}
-The demand it must satisfy: ${args.discoveryDir}/pr-faq.md and ${args.discoveryDir}/user-stories.md
+The recon, what exists in each area today and the other fronts (fronts.md): ${args.reconDir}
+The design (sizing.md is the final design; notes.md is the law): ${args.designDir}
+The demand it must satisfy: ${args.discoveryDir}/stories.md (AC ids <journey>.<step>.<n>), ${args.discoveryDir}/journeys/, ${args.discoveryDir}/pr-faq.md
 The codebase: ${args.root ?? '(not given)'}
 The round audit so far: ${args.planDir}/reviews.md
 Language of the briefs: ${language}${delta ? `
@@ -214,9 +255,8 @@ The design folder, for looking up a route, a field, a table or a screen the brie
 The keys your reading must carry: ${KEYS.join(', ')}`
 
 const readBlind = async (b, n) => {
-  const dispatch = () => agent(briefInputs(b), {
-    label: `${b.id}·read${n}·r${round}`, phase: 'Blind reads',
-    agentType: READER, schema: READING,
+  const dispatch = () => call(READER, briefInputs(b), {
+    label: `${b.id}·read${n}·r${round}`, phase: 'Blind reads', schema: READING,
   })
   let r = await dispatch()
   let problems = readingProblems(r)
@@ -230,15 +270,14 @@ const readBlind = async (b, n) => {
 }
 
 const referee = async (b, readings) => {
-  const r = await reviewed(() => agent(`${briefInputs(b)}
+  const r = await reviewed(() => call(REFEREE, `${briefInputs(b)}
 
 READING 1:
 ${JSON.stringify(readings[0].builds, null, 2)}
 
 READING 2:
 ${JSON.stringify(readings[1].builds, null, 2)}`, {
-    label: `${b.id}·referee·r${round}`, phase: 'Blind reads',
-    agentType: REFEREE, schema: REFEREE_REVIEW,
+    label: `${b.id}·referee·r${round}`, phase: 'Blind reads', schema: REFEREE_REVIEW,
   }), `${b.id} referee`)
   return { brief: b.id, ...r }
 }
@@ -251,7 +290,7 @@ log(`round ${round} (${mode}): ${LENSES.length} lenses · ${briefs.length} brief
 const [lensResults, briefResults] = await parallel([
   () => parallel(LENSES.map(name => () =>
     reviewed(() =>
-      agent(docInputs, { label: `${name}·r${round}`, phase: 'Lenses', agentType: name, schema: REVIEW }),
+      call(name, docInputs, { label: `${name}·r${round}`, phase: 'Lenses', schema: REVIEW }),
       name).then(r => ({ lens: name, ...r }))
   )),
   () => pipeline(

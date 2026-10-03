@@ -1,0 +1,210 @@
+{
+  "workstream": "example-bakery-orders",
+  "target": {
+    "depth": 2,
+    "sizeCap": "L",
+    "maxAcs": 8
+  },
+  "weights": {
+    "S": 1,
+    "M": 2,
+    "L": 3
+  },
+  "acs": [
+    "J01.s1.1",
+    "J01.s2.1",
+    "J01.s2.2",
+    "J01.s3.1",
+    "J02.s1.1",
+    "J02.s1.2",
+    "J03.s1.1",
+    "J03.s2.1",
+    "J03.s2.2",
+    "J03.s3.1"
+  ],
+  "shared": [
+    "api/openapi/**",
+    "db/migrations/**",
+    "internal/gen/**",
+    "cmd/server/registry.go"
+  ],
+  "nodes": [
+    {
+      "id": "F",
+      "kind": "foundation",
+      "name": "Contract and seams",
+      "size": "M",
+      "after": [],
+      "acs": [],
+      "owns": [
+        "api/openapi/**",
+        "db/migrations/**",
+        "internal/gen/**",
+        "cmd/server/registry.go",
+        "internal/orders/events.go",
+        "internal/orders/eventsfake/**",
+        "internal/testkit/factory/**",
+        "internal/menu/module.go",
+        "web/src/pages/_exemplar/**"
+      ],
+      "extends": [],
+      "provides": [
+        "POST /orders",
+        "GET /menu",
+        "GET /orders/today",
+        "POST /orders/{id}/ready",
+        "orders.ReadyEvents",
+        "eventsfake.ReadyEvents",
+        "factory.Order",
+        "factory.Bread",
+        "actors.Baker",
+        "actors.Customer"
+      ],
+      "uses": []
+    },
+    {
+      "id": "F-x1",
+      "kind": "lane",
+      "name": "Deploy skeleton",
+      "size": "S",
+      "after": [],
+      "acs": [],
+      "owns": [
+        "deploy/orders/**",
+        "docs/features/orders/**"
+      ],
+      "extends": [],
+      "provides": [],
+      "uses": []
+    },
+    {
+      "id": "E-01",
+      "kind": "slice",
+      "name": "Place an order",
+      "size": "M",
+      "after": [],
+      "acs": [
+        "J01.s1.1",
+        "J01.s2.1",
+        "J01.s2.2",
+        "J01.s3.1"
+      ],
+      "owns": [
+        "internal/orders/place/**",
+        "web/src/pages/orders/new/**",
+        "e2e/journeys/j01-place-order.spec.ts"
+      ],
+      "extends": [
+        "web/src/tokens.css"
+      ],
+      "provides": [],
+      "uses": [
+        "POST /orders",
+        "GET /menu",
+        "factory.Bread",
+        "actors.Customer"
+      ]
+    },
+    {
+      "id": "E-02",
+      "kind": "slice",
+      "name": "The menu",
+      "size": "S",
+      "after": [],
+      "acs": [
+        "J02.s1.1",
+        "J02.s1.2"
+      ],
+      "owns": [
+        "internal/menu/list/**",
+        "web/src/pages/menu/**",
+        "e2e/journeys/j02-menu.spec.ts"
+      ],
+      "extends": [],
+      "provides": [],
+      "uses": [
+        "GET /menu",
+        "factory.Bread",
+        "actors.Customer"
+      ]
+    },
+    {
+      "id": "E-03",
+      "kind": "slice",
+      "name": "Baker's panel",
+      "size": "M",
+      "after": [],
+      "acs": [
+        "J03.s1.1",
+        "J03.s2.1"
+      ],
+      "owns": [
+        "internal/orders/panel/**",
+        "web/src/pages/panel/**",
+        "e2e/journeys/j03-panel.spec.ts"
+      ],
+      "extends": [],
+      "provides": [],
+      "uses": [
+        "GET /orders/today",
+        "POST /orders/{id}/ready",
+        "orders.ReadyEvents",
+        "factory.Order",
+        "actors.Baker"
+      ]
+    },
+    {
+      "id": "E-04",
+      "kind": "slice",
+      "name": "Ready e-mail",
+      "size": "S",
+      "after": [],
+      "acs": [
+        "J03.s2.2"
+      ],
+      "owns": [
+        "internal/notify/ready/**"
+      ],
+      "extends": [],
+      "provides": [],
+      "uses": [
+        "orders.ReadyEvents",
+        "eventsfake.ReadyEvents",
+        "factory.Order"
+      ]
+    },
+    {
+      "id": "E-int",
+      "kind": "integration",
+      "name": "Order to e-mail",
+      "size": "S",
+      "after": [
+        {
+          "id": "E-03",
+          "class": "ui",
+          "need": "the journey clicks 'Mark ready', which E-03 builds",
+          "stacked": true
+        },
+        {
+          "id": "E-04",
+          "class": "side-effect",
+          "need": "the check reads the real ready e-mail E-04 sends",
+          "stacked": true
+        }
+      ],
+      "acs": [
+        "J03.s3.1"
+      ],
+      "owns": [
+        "e2e/journeys/j03-order-to-email.spec.ts"
+      ],
+      "extends": [],
+      "provides": [],
+      "uses": [
+        "actors.Baker",
+        "actors.Customer",
+        "factory.Order"
+      ]
+    }
+  ]
+}

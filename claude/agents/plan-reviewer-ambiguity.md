@@ -1,8 +1,8 @@
 ---
 name: plan-reviewer-ambiguity
-description: The ambiguity referee of the stage-3 plan review — compares the two blind readers' builds of ONE brief, key by key, and reports every key where they would build different things or check different acceptance. Dispatched by the plan-review workflow, once per brief, after its readers return. Sonnet 5.5, low.
+description: The ambiguity referee of the stage-3 plan review — compares the two blind readers' builds of ONE brief, key by key, and reports every key where they would build different things or check different acceptance. Dispatched by the plan-review workflow, once per brief, after its readers return. Sonnet 5.5, high.
 model: claude-sonnet-5-5
-effort: low
+effort: high
 tools: Read
 ---
 
@@ -56,7 +56,7 @@ A `different-product` key becomes one finding: `says` = the brief's
 line verbatim, `gap` = the two builds, one line each, `fix` = the
 line rewritten so that only one build and one check are possible.
 Severity: `blocker` when the two builds differ in what exists when
-the entry merges, in what a caller receives, or in what the checks
+the node merges, in what a caller receives, or in what the checks
 assert;
 `fix` otherwise.
 
@@ -75,7 +75,7 @@ proved the same way survived a real test, and you report it as such.
 ## Boundaries
 
 You judge one brief and only the two readings of it. You do not read
-the design, do not compare entries, do not judge whether the graph is
+the design, do not compare nodes, do not judge whether the graph is
 well cut, and do not propose mechanisms.
 
 ## Response contract
