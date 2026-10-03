@@ -4,6 +4,22 @@ Rules that cross every stage. Stage skills point here instead of
 repeating them; a consuming project loads these rules alongside the
 skills.
 
+## Six stages, and what each asks of him
+
+He is asked only what is his. What needs him in person (a key, an
+account, a DNS record) is gathered up front in one pre-flight message;
+everything else is decided, recorded in `rulings.md` and shown to him
+afterwards for a veto.
+
+| Stage | Mode | Where he is in the loop |
+|---|---|---|
+| 1 discovery | **interview + mock + lock** | he talks; a clickable mock is built and iterated in front of him; he validates through it and locks it. The text (journeys, stories, PR-FAQ) is derived from the locked mock |
+| 2 design | **autonomous + one short call** | one deck with three tiers per part and at most one question call (four questions, only cost, scope, security posture and one-way doors); the stage closes on his approval of the report |
+| 3 plan | **autonomous** | nowhere: the conductor rules everything and lists its choices at the report for his veto |
+| 4 execute | **pre-flight, then play** | he hands over the pre-flight and pastes one goal; he is called once, at the end, when everything is merged, green, verified and reported. The triage of findings is mechanical |
+| 5 release | **his play authorizes the head** | the play (`merge-from <audited head>` in the guard's allow file) is his "go"; the session merges, deploys, verifies and rolls back on its own, under the guard; it stops only on its written list |
+| 6 close | **retro + launch video** | the retro is a file for the weekly; for the people, a launch video and a "what's new" text he forwards |
+
 ## Stage transitions: `/clear`, never `/compact`
 
 When a stage closes and the next one begins, suggest the user runs
@@ -31,10 +47,28 @@ own frictions as they happen — both feed the same file.
 
 In every skill, agent table, README paragraph and message that names
 an agent, the name carries the model and the effort in parentheses:
-`disc-author-stories (Sonnet 5.5, high)`, `the conductor (Opus 5.5,
-medium)`, `disc-blind-reader (Sonnet 5.5, low)`. Model and effort live
+`journey-scribe (Sonnet 5.5, high)`, `the conductor (Opus 5.5,
+high)`, `disc-blind-reader (Sonnet 5.5, low)`. Model and effort live
 in the agent's frontmatter (`model:`, `effort:`); the parentheses are
-how the reader sees the cost of a step without opening the file.
+how the reader sees the cost of a step without opening the file. Only
+Opus 5.5 and Sonnet 5.5 are used. The one table of every agent, with
+the evidence for each pick, is [docs/models.md](docs/models.md);
+`node scripts/check-models.mjs` fails when a frontmatter, a workflow
+or the table disagree.
+
+## Knowledge packs
+
+Each specialist reads the packs of its craft before it works:
+`claude/skills/pack-<name>/` (design taste, motion and 3D, interview
+and journeys, right-sizing, parallel planning and local CI, Go
+backend, React frontend, ops, release, launch video, model
+selection). A pack is a checklist plus recipes, never an essay. Packs
+set `user-invocable: false`: they stay out of the `/` menu and can
+still be preloaded. A registered agent preloads them through `skills:`
+in its frontmatter; an agent run inline by a workflow gets each pack's
+`SKILL.md` path in its prompt and reads it first; a session loads one
+with the Skill tool when it needs it. A pack cites itself by section
+(`§3 C1`, `§5 R2`), and agents cite those numbers: keep them.
 
 ## The session never reads to look something up; it sends a scout
 
@@ -82,63 +116,62 @@ conductor writes.
 
 ## The user's rulings are the record
 
-At discovery, at design and at plan the conductor judges every
-finding by the stage's `references/judging.md`; there is no judge
-agent. The ruling names the owner of each sustained finding: wording
-goes to the author (at design and plan: the document's or the goal's
-writer) without a question; product, scope, cost, data format,
-contract shape, security posture, the sequence and confirmed
-decisions go to him; at design a real observation that is declared
-latitude goes to the implementer, as one line in the document's "The
-implementer decides" section, and at plan to the worker, as one line
-in the goal's "The worker decides" section. He rules what is his,
-except at plan: there the conductor rules the user-owned findings
-against the cut he approved when the wave's walk and required rows
-stay as they are (marked `ruled: conductor` in `rulings.md`) and
-lists them at the close for veto; only a finding that would change
-what a wave accepts reaches him as a question. The budget at
-discovery is three rounds at most, the user asked after each; at
-design, round 1 is whole and automatic and rounds 2 and 3 run only on
-his word and only over the delta, three at most; at plan, round 1 is
-whole and automatic, round 2 runs automatically over the delta, and a
-third only on his explicit call. His validation of every story
-(confirm / reduce / adjust / cut) is a ruling too, recorded the same
-way.
-**The rulings are asked through the question tool, always**, in the
-house shape: one question per **decision** at every stage (findings
-that resolve by the same choice are one question); the context in
-the question itself (source, severity, quote, gap, fix, the
-conductor's reason), the rulings as the answers with the conductor's
-pick first and marked as his, four to a call. Wording fixes are applied without a question and without a
-veto: the user reads the blueprint at the approval and reports there
-whatever he wants changed. At execution there is no judge: the
-triage is mechanical, by the execute stage's `judging.md`. A finding
-blocks when it carries a reproduction or names a written rule it
-violates, and the entry is fixed before it merges; the rest goes to
-`deferred.md`, built in batch before the audit, and the details go to
-the learn log, which the retro reads. What is his (an entry still
-blocked after its one fix, what needs him in person, the builders'
-conservative calls in his classes) is parked, never asked, and the
-user rules it with the builders' choices at the audit that closes
-stage 4; a ruling he gives there is a ruling too.
-At release his one ruling is his answer to "go?" on the release PR,
-recorded verbatim in the trace and in `rulings.md`; a fix built during
-the release is an entry through the stage-4 pipeline, triaged there
-the same way. At the close nothing is ruled: the retro records what
-went wrong and the ideas it suggests, and his comments go in verbatim.
-The pipeline changes only at the weekly retro, where he rules each
-group of ideas gathered across the week's workstreams (apply, park,
-drop).
+The conductor judges every finding by the stage's
+`references/judging.md`; there is no judge agent, and at execution
+no judge at all.
+
+- **Discovery.** One round plus a delta. Wording goes to the author
+  without a question; product, scope and confirmed decisions go to him,
+  one question per decision, in one batch.
+- **Design.** Round 1 whole and round 2 over the delta, both
+  automatic, then stop: there is no third round. He is asked only at
+  the call (one deck, at most one question call). After it, a finding
+  of his class is ruled by the conductor conservatively, marked
+  `ruled: conductor`, and listed for his veto in the report; a real
+  observation that is declared latitude goes to the implementer, as one
+  line in the document's "The implementer decides".
+- **Plan.** Round 1 whole and round 2 over the delta, both automatic.
+  The conductor rules everything, his classes included (`ruled:
+  conductor`); execution latitude goes to the builder as a line in the
+  brief. Nothing reaches him as a question; the report lists every
+  choice for his veto.
+- **Execution.** The triage is mechanical, by the execute stage's
+  `judging.md`. A finding blocks when it carries a reproduction or
+  names a written rule it violates, and the entry is fixed before it
+  merges; the rest goes to `deferred.md`, built in batch before the
+  audit, and the details go to the learn log, which the retro reads.
+  What is his (an entry still blocked after its fix, what needs him in
+  person, the builders' conservative calls in his classes) is parked,
+  never asked, and he rules it at the audit that closes stage 4.
+- **Release.** His ruling is **the play**: the pre-flight message and
+  the play line, recorded verbatim in the trace and in `rulings.md`.
+  An answer to a question on the stop list is a ruling too. A fix
+  built during the release is an entry through the stage-4 pipeline,
+  triaged there the same way.
+- **Close.** Nothing is ruled: the retro records what went wrong and
+  the ideas it suggests, and his comments go in verbatim. The pipeline
+  changes only at the weekly retro, where he rules each group of ideas
+  gathered across the week's workstreams (apply, park, drop).
+
+When a ruling is asked, it goes **through the question tool**, in the
+house shape: one question per **decision** (findings that resolve by
+the same choice are one question); the context in the question itself
+(source, severity, quote, gap, fix, the conductor's reason), the
+rulings as the answers with the conductor's pick first and marked as
+his, four to a call. Wording fixes are applied without a question and
+without a veto.
+
 Every ruling is appended, as it happens, to the workstream's
 **`rulings.md`** (workstream root; created on the first ruling), one
 line each:
 
 ```
-2025-11-04 · design r3 · design-reviewer-infra#2 · judge: dismissed · ruled: sustained · "the cost line encodes the SLA, it stays"
+2025-11-04 · design r2 · design-reviewer-infra#2 · proposed: dismissed · ruled: sustained · "the cost line encodes the SLA, it stays"
 ```
 
-Date · stage and round (or the PR at stage 4) · the finding id · what
-the judge proposed · what he ruled · his reason, verbatim where he
+Date · stage and round (or the entry at stage 4) · the finding id ·
+what the conductor proposed · what was ruled (`ruled: conductor` when
+the conductor ruled in his place) · the reason, his verbatim where he
 gave one.
 The stage's own audit (`reviews.md`, the lane trace) keeps the detail;
 `rulings.md` is the index the retro reads first, next to
@@ -241,4 +274,30 @@ normal day he watches and reads; the blueprint is for when he needs
 it. The stage's close message names the three in that order, nothing
 before them. The procedure — `video-scribe (Sonnet 5.5, high)`,
 `slides-scribe (Sonnet 5.5, high)`, the publishing and the links both
-ways — is [docs/stage-report.md](docs/stage-report.md).
+ways — is [docs/stage-report.md](docs/stage-report.md). The close adds
+a different video, for other readers: the **launch video**, made for
+the product's users and the team from the real app, portfolio-grade,
+with a step-by-step tutorial per feature.
+
+## The CI is local
+
+The gate runs on this machine, never on a hosted queue. In execute the
+session is the queue host and the only process that merges into
+`feat/<workstream>`: per ready entry, the base comes in by a merge
+(never a rebase), the merged tree passes the path guard (the node's
+Owns and Extends) and the affected gate, it merges, and the signoff
+posts `local-ci/affected` on the merged head. The whole gate runs once
+at the end, in a fresh worktree, and only it posts **`local-ci`**, the
+one context `main` requires. No agent posts a status; the guard denies
+it. Hosted CI keeps the deploy, the environments and the attestations.
+
+## One guard for what cannot be undone
+
+`claude/hooks/guard-irreversible.sh` is the only guard;
+`/pipeline-setup` installs it in the project on Bash and every file
+tool. It denies the irreversible (destroying infrastructure, deleting
+data, force-push, a forged status, edits to itself or the settings),
+asks before a secret's value is read or written, and asks before a
+merge into a protected branch whose head his play did not authorize.
+The merge and the production deploy sit in `allow` because the guard
+holds them.
