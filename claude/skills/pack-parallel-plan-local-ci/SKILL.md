@@ -74,8 +74,13 @@ and `test-affected` here are illustrations.
    least as wide as the measured cap (inference).
 5. The critical path is marked, and it is at most F + 2 × L.
 6. Each entry is at most L: one screen with its states, one server
-   flow, at most 8 ACs, about 2,500 changed lines (inference; the
-   project's doctrine may set its own ceiling).
+   flow, about 2,500 changed lines (inference; the project's doctrine
+   may set its own ceiling). The AC count is a warning, not a cap:
+   about 8 ACs when the discovery writes one AC per journey step,
+   scaled by its grain (ACs per journey step or frame state). A node
+   over the guide is sized by its screens, flows and lines, and split
+   only when those say it is over L (the plan's checker,
+   `plan-graph.mjs`, prints the guide and warns).
 7. Each entry declares `Owns`, the globs it creates or edits. Two
    entries with no edge between them own disjoint paths. Shared
    additions go only to append-safe files, listed under `Extends`.
