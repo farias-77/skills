@@ -36,13 +36,28 @@
  *     round:        1,                 // 1 or 2
  *     mode:         'whole',           // 'whole' (round 1) or 'delta' (round 2)
  *     language:     'pt-BR',           // the documents' language
- *     vocabulary:   '<the vocabulary block of stories.md, verbatim>',
- *     stories: [ { id: 'S-001', text: '## S-001 — ...' } ],   // delta: only the changed ones
+ *     storiesDir:   'absolute path to 00-discovery/reviews/r<N>/stories',   // written by `proto.mjs split`
+ *     only:    ['S-002'],              // delta: the stories whose text changed (default: all)
  *     verify:  [ { id: 'disc-reviewer-acceptance#3', title, fix } ],   // delta: round-1 sustained, to confirm closed
  *     lenses:  ['disc-reviewer-acceptance', 'disc-reviewer-boundary'], // optional; delta may run fewer
  *   }})
  *
- * Returns { round, mode, valid, findings, lenses, walks, unread }:
+ * The stories never travel inline. Before the round the conductor runs
+ *   node proto.mjs split 00-discovery/stories.md 00-discovery/reviews/r<N>/stories
+ * which writes one S-NNN.md per story block, vocabulary.md and index.json (each
+ * story's file, the AC ids it defines, and its [build] ACs). A script cannot
+ * read files, so the first phase sends a scout (Sonnet 5.5, low) to quote
+ * index.json; the AC ids it returns are checked against their own shape, and
+ * the blind readers read their story file and the vocabulary file themselves.
+ * An AC marked [build] is proved by the build, not by the mock: no blind
+ * reader judges it. (The v9-draft args `stories: [{id, text}]` and
+ * `vocabulary` still run, for a conductor that has the text at hand.)
+ *
+ * Where the return lives: the Workflow result (and the task's output file)
+ * is an envelope { summary, logs, result, … }; what this script returns is
+ * its `.result`. Save `.result` as reviews/round-N.json.
+ *
+ * Returns { round, mode, valid, findings, lenses, walks, unread, skippedBuild }:
  * findings carry id, lens, story (for blind walks), ac, severity, title,
  * says, gap, fix; walks is the blind readers' per-AC verdicts; unread
  * lists the stories whose reading did not survive; valid is false when
@@ -53,6 +68,7 @@ export const meta = {
   name: 'discovery-review',
   description: 'Stage-1 review of the documents derived from the locked mock: acceptance and boundary lenses, and one blind reader per story walking the mock AC by AC; round 1 whole, round 2 the delta; returns every finding for the conductor to judge',
   phases: [
+    { title: 'Index', detail: 'a scout quotes the split stories index (storiesDir)' },
     { title: 'Lenses', detail: 'acceptance, boundary' },
     { title: 'Blind walks', detail: 'per story: one reader walks the locked mock with that story only' },
   ],
@@ -84,6 +100,26 @@ const REVIEW = {
   },
 }
 
+const INDEX = {
+  type: 'object', additionalProperties: false,
+  required: ['vocabulary', 'stories'],
+  properties: {
+    vocabulary: { type: ['string', 'null'], description: 'index.json "vocabulary", verbatim' },
+    stories: {
+      type: 'array',
+      items: {
+        type: 'object', additionalProperties: false,
+        required: ['id', 'file', 'acs', 'build'],
+        properties: {
+          id: { type: 'string' }, file: { type: 'string' },
+          acs: { type: 'array', items: { type: 'string' } },
+          build: { type: 'array', items: { type: 'string' } },
+        },
+      },
+    },
+  },
+}
+
 const WALK = {
   type: 'object', additionalProperties: false,
   required: ['story', 'checks'],
@@ -108,35 +144,77 @@ const WALK = {
 const round = args?.round ?? 1
 const mode = args?.mode === 'delta' ? 'delta' : 'whole'
 const language = args?.language ?? 'the language of the documents'
-const stories = Array.isArray(args?.stories) ? args.stories.filter(s => s && s.id && s.text) : []
-const vocabulary = args?.vocabulary ?? ''
 const verify = Array.isArray(args?.verify) ? args.verify : []
 const lensNames = Array.isArray(args?.lenses) && args.lenses.length ? args.lenses.filter(l => ALL_LENSES.includes(l)) : ALL_LENSES
+const only = Array.isArray(args?.only) && args.only.length ? new Set(args.only) : null
 if (!args?.mock || !args?.proto) log('mock or proto missing in args: the blind walks and the lenses cannot drive the mock')
-if (!stories.length) log('no stories passed in args: the blind walks are skipped this round')
 if (mode === 'delta' && !verify.length) log('delta round with no findings to verify: the lenses read only the changed stories')
+
+// ---------- the stories: from storiesDir (proto.mjs split), or inline ----------
+
+const AC_ID = /^(J\d+\.s\d+\.\d+|frame:[A-Za-z0-9_.-]+\.\d+)$/
+const SD = typeof args?.storiesDir === 'string' ? args.storiesDir.replace(/\/+$/, '') : null
+let stories = []          // { id, file?, text?, acs: Set, build: [] }
+let vocabulary = args?.vocabulary ?? ''
+let vocabularyFile = null
+let indexBroken = false
+if (SD) {
+  phase('Index')
+  const indexProblems = (x) => {
+    if (!x || !Array.isArray(x.stories) || !x.stories.length) return ['no stories in index.json']
+    const p = []
+    for (const s of x.stories) {
+      if (!/^S-\d+$/.test(s.id)) p.push(`story id "${s.id}"`)
+      if (!s.file.startsWith(SD + '/') || !s.file.endsWith('.md')) p.push(`${s.id}: file ${s.file} is not under ${SD}`)
+      for (const a of [...s.acs, ...s.build]) if (!AC_ID.test(a)) p.push(`${s.id}: "${a}" is not an AC id`)
+    }
+    return p
+  }
+  const quote = () => agent(`Quote one file, whole and literally, as structured output: ${SD}/index.json (written by proto.mjs split). Copy every story's id, file, acs and build exactly as the file has them, in the file's order, and its "vocabulary" value. Read nothing else.`,
+    { label: `index·r${round}`, phase: 'Index', agentType: 'scout', schema: INDEX })
+  let ix = await quote()
+  let bad = indexProblems(ix)
+  if (bad.length) { log(`index.json quote invalid (${bad.slice(0, 3).join('; ')}), asking again`); ix = await quote(); bad = indexProblems(ix) }
+  if (bad.length) { log(`index.json still unreadable (${bad.slice(0, 3).join('; ')}): no blind walks this round`); indexBroken = true }
+  else {
+    vocabularyFile = ix.vocabulary
+    stories = ix.stories.map(s => ({ id: s.id, file: s.file, acs: new Set(s.acs), build: s.build }))
+  }
+} else if (Array.isArray(args?.stories)) {
+  stories = args.stories.filter(s => s && s.id && s.text).map(s => ({ id: s.id, text: s.text, ...acIdsInline(s.text) }))
+}
+if (only) stories = stories.filter(s => only.has(s.id))
+if (!stories.length && !indexBroken) log('no stories to walk: the blind walks are skipped this round')
+const skippedBuild = stories.flatMap(s => s.build.map(ac => `${s.id} ${ac}`))
+if (skippedBuild.length) log(`${skippedBuild.length} AC(s) marked [build]: proved by the build, not walked blind`)
 
 const D = args.discoveryDir
 const docInputs = `Round ${round} · ${mode}.
 The documents: ${D}/stories.md · ${D}/pr-faq.md · ${D}/journeys/ · ${D}/notes.md (its Rules and Out blocks)
 The locked mock: ${args.mock}
 The tool: node ${args.proto}
-The round audit so far: ${D}/reviews.md${mode === 'delta' ? `
+The round audit so far: ${D}/reviews.md
+An AC marked [build] after its rule ids is proved by the build, not by the mock.${mode === 'delta' ? `
 Changed stories (read only these, plus the findings below): ${stories.map(s => s.id).join(', ') || 'none'}
 Round-1 findings to confirm closed, each with its fix:
 ${verify.map(f => `- ${f.id}: ${f.title}${f.fix ? ' — fix: ' + f.fix : ''}`).join('\n') || '- none'}` : ''}`
 
 // ---------- mechanical checks on a blind walk ----------
 
-// The keys a story defines: every AC id in it (J1.s2.1, frame:<token>.1).
-const acIds = (text) => {
-  const ids = new Set()
-  for (const m of text.matchAll(/\b(J\d+\.s\d+\.\d+)\b/g)) ids.add(m[1])
-  for (const m of text.matchAll(/\b(frame:[A-Za-z0-9_.-]+\.\d+)\b/g)) ids.add(m[1])
-  return ids
+// Inline stories only: the keys a story defines are the AC ids that open a list item
+// (- **`J1.s2.1`** [RULE] …), never an id it merely mentions; [build] ones go apart.
+function acIdsInline(text) {
+  const acs = new Set(), build = []
+  for (const m of text.matchAll(/^\s*-\s+\*\*`?(J\d+\.s\d+\.\d+|frame:[A-Za-z0-9_.-]+\.\d+)`?\*\*\s*\[([^\]]*)\](\s*\[build\])?/gm)) {
+    if (m[3] || m[2].split(',').map(x => x.trim()).includes('build')) build.push(m[1]); else acs.add(m[1])
+  }
+  return { acs, build }
 }
-// The AC's own text, for the finding's `says`: from its id to the next list item.
-const acText = (text, id) => {
+// The AC's own text, for the finding's `says`: from its id to the next list item
+// (from storiesDir the text is not here: the id and the story file stand for it).
+const acText = (s, id) => {
+  if (!s.text) return `${id} (${s.file})`
+  const text = s.text
   const i = text.indexOf(id)
   if (i < 0) return id
   const rest = text.slice(i)
@@ -167,9 +245,17 @@ const reviewed = async (dispatch, name) => {
     : { verdict: 'fail', verified: [], quote: '', findings: [], invalid: true }
 }
 
-const storyInputs = (s) => `Round ${round}. Story ${s.id}. Language of the documents: ${language}.
+const storyInputs = (s) => s.file ? `Round ${round}. Story ${s.id}. Language of the documents: ${language}.
 The locked mock: ${args.mock}
 The tool: node ${args.proto}
+The story (read this file): ${s.file}
+The vocabulary (read this file): ${vocabularyFile || 'none'}
+The AC ids to judge, one entry each: ${[...s.acs].join(', ')}
+${s.build.length ? `Marked [build], not yours (no entry): ${s.build.join(', ')}` : ''}` : `Round ${round}. Story ${s.id}. Language of the documents: ${language}.
+The locked mock: ${args.mock}
+The tool: node ${args.proto}
+The AC ids to judge, one entry each: ${[...s.acs].join(', ')}
+${s.build.length ? `Marked [build], not yours (no entry): ${s.build.join(', ')}` : ''}
 
 VOCABULARY:
 ${vocabulary}
@@ -178,8 +264,9 @@ STORY:
 ${s.text}`
 
 const walkBlind = async (s) => {
-  const expected = acIds(s.text)
-  if (!expected.size) { log(`${s.id}: no AC ids found in the story text`); return { story: s.id, unread: true } }
+  const expected = s.acs
+  if (!expected.size && s.build.length) { log(`${s.id}: every AC is [build]; nothing to walk`); return { story: s.id, checks: [], findings: [], unread: false } }
+  if (!expected.size) { log(`${s.id}: no AC ids found in the story`); return { story: s.id, unread: true } }
   const dispatch = () => agent(storyInputs(s), {
     label: `${s.id}·walk·r${round}`, phase: 'Blind walks', agentType: READER, schema: WALK,
   })
@@ -193,8 +280,8 @@ const walkBlind = async (s) => {
   if (problems.length) { log(`${s.id} reader: still invalid (${problems.join(', ')}), dropped`); return { story: s.id, unread: true } }
   const checks = r.checks.map(c => ({ ...c, ac: c.ac.replace(/[`*\s]/g, '') })).filter(c => expected.has(c.ac))
   const findings = checks.filter(c => c.verdict !== 'pass').map(c => c.verdict === 'fail'
-    ? { severity: 'blocker', title: `${c.ac}: the locked mock does otherwise`, says: acText(s.text, c.ac), gap: `walked blind: ${c.saw} (ran: ${c.how})`, fix: 'write the AC to what the locked mock does; if the mock is what is wrong, that is an amendment for the user', ac: c.ac }
-    : { severity: 'fix', title: `${c.ac}: a stranger cannot judge it from the story`, says: acText(s.text, c.ac), gap: `walked blind: ${c.saw} (ran: ${c.how})`, fix: 'name the GIVEN state, the one event, and where each outcome is observed, with concrete values', ac: c.ac })
+    ? { severity: 'blocker', title: `${c.ac}: the locked mock does otherwise`, says: acText(s, c.ac), gap: `walked blind: ${c.saw} (ran: ${c.how})`, fix: 'write the AC to what the locked mock does; if the mock is what is wrong, that is an amendment for the user', ac: c.ac }
+    : { severity: 'fix', title: `${c.ac}: a stranger cannot judge it from the story`, says: acText(s, c.ac), gap: `walked blind: ${c.saw} (ran: ${c.how})`, fix: 'name the GIVEN state, the one event, and where each outcome is observed, with concrete values', ac: c.ac })
   return { story: s.id, checks, findings, unread: false }
 }
 
@@ -226,9 +313,9 @@ const blind = {
   verified: read.flatMap(w => w.checks.map(c => `${w.story} ${c.ac}: ${c.verdict}`)),
   quote: read[0]?.checks[0]?.saw ?? '',
   findings: read.flatMap(w => w.findings.map(f => ({ ...f, story: w.story }))),
-  invalid: stories.length > 0 && read.length === 0,
+  invalid: indexBroken || (stories.length > 0 && read.length === 0),
 }
-const lenses = [...(lensResults ?? []).filter(Boolean), ...(stories.length ? [blind] : [])]
+const lenses = [...(lensResults ?? []).filter(Boolean), ...(stories.length || indexBroken ? [blind] : [])]
 
 const findings = []
 for (const r of lenses) r.findings.forEach((f, i) => {
@@ -244,5 +331,5 @@ log(`round ${round} (${mode}): ${findings.length} finding(s) from ${lenses.lengt
 return {
   round, mode, valid, findings, lenses,
   walks: read.map(w => ({ story: w.story, checks: w.checks })),
-  unread,
+  unread, skippedBuild,
 }
