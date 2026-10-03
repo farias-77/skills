@@ -40,7 +40,7 @@ whole: Vocabulary, Rules, Journeys, Themes (Confirmed, Out), Bets.
 **2 · Observe each step.** For each step of each journey, run it on the
 mock and read what the screen shows:
 `node <proto.mjs> look <mock> <start> --fill '<sel>::<value>' --click '<target>' … --net <net> --fill … --click …`
-(the journey's earlier steps first, then this one; `--net`, `--fill` and `--click` run in the order given). Its `text`, `fields` and
+(the journey's earlier steps first, then this one; `--net`, `--fill`, `--click`, `--as <actor>` and `--clock <advance>` run in the order given). Its `text`, `fields` and
 `effects` are what the step's `expect.see`, `effects` and `must_not`
 are written from. Open the step's PNG
 (`frames/journeys/J<n>.s<k>.png`) when the layout matters to an
@@ -48,7 +48,9 @@ outcome.
 
 **3 · The journeys.** One YAML per journey, in the template's shape and
 indentation. `id`, `start` and each step's `id`, `target`, `fill`,
-`net` and `expect.frame` are copied from the mock, never edited. You
+`as`, `clock`, `net` and `expect.frame` are copied from the mock, never
+edited (a step that switches actor or moves the clock has `as` or
+`clock` in place of `target` and `fill`). You
 add: `given` (the state before step 1, fixtures named), `variants`
 (languages and widths from the notes), per step `expect.see` (role and
 accessible name, or the copy key, with the value where it matters),
@@ -84,16 +86,30 @@ because a blind reader reads one story alone).
   the mock does not show goes to Open, never invented.
 - A behavior only a debug-only frame shows (an error with retry, a
   loading state) gets a `frame:<token>.<n>` AC.
+- A rule the notes' Rules table marks `[build]` (its Proof column) gets
+  its ACs marked `[build]` right after the rule ids:
+  `**\`frame:<token>.<n>\`** [<RULE-ID>] [build] GIVEN …`, anchored on
+  the step or frame closest to it, observed where the built product
+  shows it. Never write such an AC as if the mock showed it, and never
+  mark `[build]` an AC the mock can show.
+- **A story cites only its own AC ids.** Another story's criterion is
+  named in words ("the publish criterion of S-001"), never by its id: a
+  blind reader reads one story alone and takes every id in it for one
+  of its own. `trace` refuses a cross-citation.
+- The backstage effects are the whole write unless one says
+  `partial: true`; quote the fields the AC checks from them.
 
 **6 · The rest of `stories.md`.** The header line with the locked
 version, personas, the vocabulary copied from the notes (not
-rewritten), the Rules table copied from the notes.
+rewritten) under the heading `## Vocabulary` exactly (the review cuts
+it out by that heading), the Rules table copied from the notes.
+Personal names are the mock's fixtures (`meta.fixtures`): invented.
 
 **7 · Prove it.** Run
 `node <proto.mjs> trace <mock> 00-discovery/journeys 00-discovery/stories.md --notes 00-discovery/notes.md`
 and fix until it passes: every journey has its YAML with the mock's
 steps and frames, every step has an AC, every AC resolves to a step,
-every rule has an AC.
+every rule has an AC, no story cites another's AC id.
 
 **8 · The blueprint JSON.** `blueprint/stories.json` in the shape the
 schema fixes: personas, vocabulary, one entry per story (its name, as,

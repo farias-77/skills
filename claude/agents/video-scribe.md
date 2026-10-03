@@ -86,6 +86,11 @@ Paths, and what the video is:
   judge decided"). A risk accepted carries one too. Decisions he took
   himself may be shown as his ("you decided"); never present one of
   his as the agents', or the reverse.
+- **Fixtures are not personal data.** The names a discovery mock
+  shows are invented; the session passes them (the mock's
+  `meta.fixtures`). Never cut or blur a scene for a name on that list.
+  A name that is not on it and looks like a real person's is asked
+  about in your return, not silently cut.
 - **Honest.** A failure is shown as a failure (`tone: "fail"`): a
   red check, a blocking review, a parked round, a gate that went red,
   a rejected fix. A video that only shows green when the record has

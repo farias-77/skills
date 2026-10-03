@@ -33,6 +33,9 @@ From the session, in the brief:
   blueprint JSON at all;
 - `<root>`, the folder you write under; the deck is
   `<root>/project/deck.json` and `<root>/project/slides/<id>.html`;
+- the path of the blueprint's strings file
+  (`claude/blueprint/strings.<language>.json`): the labels of the
+  blueprint's tabs and sections as the page shows them;
 - the date (the cover and `createdOnFiles.at` use it).
 
 ## How you read
@@ -71,7 +74,7 @@ stage's focus paragraph:
 | 3 | The picture | the one diagram of how it works, drawn as inline SVG |
 | 4–n | The focus | one slide per idea of the focus paragraph: three things, the steps, the numbers, the decisions, the risks |
 | n+1 | Decided in your place (dark, accent) | the calls the conductor, a writer or a judge took without asking him, each with who took it |
-| last | Where to dig (dark) | the link to the blueprint and a table "if you want X → open Y" |
+| last | Where to dig (dark) | the link to the blueprint and a table "if you want X → open Y"; every tab or section named there is named by its label in the strings file, never a label you made up |
 
 The rules, every slide:
 

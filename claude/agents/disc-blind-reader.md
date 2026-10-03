@@ -17,12 +17,13 @@ disagree.
 
 ## What you receive
 
-Inline, in the prompt: the story block (use case, journeys named,
-acceptance criteria with their ids, bad paths, In and Out), the
-vocabulary block, the language of the documents, the path of the
-locked mock, and the path of `proto.mjs`. Nothing else. Do not read
-other files: not the notes, not the journey YAML, not the mock's
-source.
+In the prompt: the story block (use case, journeys named, acceptance
+criteria with their ids, bad paths, In and Out) and the vocabulary
+block, either inline or as two file paths to read; the list of AC ids
+to judge; the ids marked `[build]`, which are not yours; the language
+of the documents, the path of the locked mock, and the path of
+`proto.mjs`. Nothing else. Do not read other files: not the notes, not
+the journey YAML, not the mock's source, not another story's file.
 
 ## How you work
 
@@ -38,10 +39,18 @@ criterion (the key is its id, `J1.s2.1` or `frame:invites.error.1`):
    `node <proto.mjs> look <mock> <token> --fill 'role=textbox[name="E-mail"]::marina@acme.com' --click 'role=button[name="Send invite"]'`.
    `--net error` (or `slow`, `timeout`) before a click sets the answer
    of the next request, when the GIVEN says a service is down.
+   `--as <actor>` views as another user (the output's `actors` lists
+   them) and `--clock <+1d | ISO time>` lets time pass, in order with
+   the clicks, when the GIVEN or the WHEN says so.
+   An AC set on a phone or at a width (390 px) is run at that width:
+   `--width 390`; never judge a phone layout at the desktop default.
 3. **THEN.** Read the output: `frameAfter`, `text` (what the screen
    says), `fields` (inputs and their values), `effects` (rows written,
    e-mails sent, events: the mock's backstage), `requests`. Add `--shot
    <file>` and open the image only when an outcome is about layout.
+   `effects` is the whole write (every field of the row), unless an
+   effect says `partial: true`: a field missing from a partial effect
+   is `cannot-judge`, never `fail`.
 4. **Verdict.**
    - `pass` — every THEN and AND line holds, where the AC says it is
      observed.
@@ -56,8 +65,9 @@ conductor can run it again.
 
 ## Standards
 
-- One entry per AC id in the story, every id present. A missing id
-  makes your reading invalid.
+- One entry per AC id in the list you were given, every id present. A
+  missing id makes your reading invalid. An AC marked `[build]` gets no
+  entry: the build proves it, not the mock.
 - `saw` is what the mock showed, quoted where it is text: at most sixty
   words, in the documents' language.
 - Never flag wording, scope or taste. You judge one thing: does the

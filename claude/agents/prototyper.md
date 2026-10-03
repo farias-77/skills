@@ -30,7 +30,8 @@ project's design system, then the packs.
   exported tokens (CSS, JSON) and components list, or "none"; the shell
   (`claude/skills/stage-discovery/templates/prototype-shell.html`); the
   output path (`00-discovery/prototype/index.html`); the version number;
-  the languages; the path of `proto.mjs`.
+  the languages; the path of `proto.mjs`; the actors he named and
+  whether time matters to the product.
 - **change** (v2 on): the same paths and a change list, one line per
   item: id, source (a step verdict, a comment, chat), the change in his
   words, the conductor's restatement. When you were dispatched fresh,
@@ -79,7 +80,7 @@ The product block is one `P.define({...})` call:
 
 | Key | What it holds |
 |---|---|
-| `meta` | `name`, `version` (bump it every build), `languages`, `clock` (the fixed "now"), `currency` |
+| `meta` | `name`, `version` (bump it every build), `languages`, `clock` (the fixed "now"), `currency`, `fixtures` (every person's name in the seed, all invented) |
 | `copy` | `{ <lang>: { key: string, or { one, other } for plurals } }` — every visible string, in every language |
 | `seed()` | returns a FRESH store: `{ screen, view: { <screen>: { state, fields } }, db: { <table>: [rows] } }` |
 | `screens` | `{ <name>: { render(s, P) } }` — pure: reads `s`, returns `P.html\`…\``, starts nothing |
@@ -87,6 +88,8 @@ The product block is one `P.define({...})` call:
 | `actions` | `{ <name>: (s, ctx, P) => … }` — named by `data-act`; may be `async` and `await P.request` |
 | `journeys` | `[{ id: 'J1', title, actor, job, rules, start, steps: [{ id: 's1', do, target, fill, net, expect, see, effects, rules }] }]` |
 | `variants` | optional, at most three names; `P.variant()` picks the rendering |
+| `actors` | when more than one kind of user sees the product: `[{ id, title, home: '<screen>.<state>' }]` (or `enter(s, P)` in place of `home`) — the debug bar's "View as" |
+| `clock` | when time changes what is shown (an expiry, a deadline, a reminder): `{ marks: [{ label, at }], onAdvance(s, P) }` — the debug bar's "Clock" |
 
 The helpers: `P.html` (escapes every value; `P.raw` for trusted
 markup), `P.t(key, vars)`, `P.fmt.number/money/date/time/relative`
@@ -94,7 +97,20 @@ markup), `P.t(key, vars)`, `P.fmt.number/money/date/time/relative`
 `P.view()`, `P.request(name, fn)` (the fake network: `fn` does the
 write only when the answer is ok or slow; error and timeout reject),
 `P.effect(kind, data)` (a row, an e-mail, an event, a job, an alarm),
-`P.toast(text)` (transient only), `P.now()`, `P.render()`.
+`P.toast(text)` (transient only), `P.now()`, `P.actor()`, `P.render()`.
+
+**Who is looking and what time it is are mock controls, never
+product.** Never draw a "view as" switch, a clock or a "Mock" strip
+inside `#screen`: everything there is in every reference frame the
+later stages compare the real screens with. Declare `actors` and
+`clock` and the shell puts them in its debug bar. "View as" keeps the
+store (what the admin published, the leader then sees) and goes to the
+actor's `home`; the clock moves `s.clock`, which `P.now()` reads, and
+`onAdvance` runs what time triggers. A frame's `setup` may set
+`s.actor` and `s.clock`. A journey that changes who is looking or lets
+time pass does it as a step: `{ id, do, as: '<actor id>', expect, … }`
+or `{ id, do, clock: '+1d' | '<ISO time with offset>', expect, … }`,
+in place of `target` and `fill`.
 
 Rules the walk enforces:
 
@@ -112,6 +128,13 @@ Rules the walk enforces:
   kind and fields; an effect not declared fails the step). A step that
   must produce nothing says `effects: []`. `net` sets the answer of the
   next request (`error`, `timeout`, `slow`).
+- **`P.effect` records the whole write**: every field the row, the
+  e-mail or the event carries (`P.effect('db', { table, op, ...row })`),
+  never a chosen subset. The backstage is what the blind readers and
+  the scribes read as "what was written"; a field missing there is read
+  as not written. When a field cannot be known in a mock, add
+  `partial: true` to the effect. The step's declared `effects` stay a
+  partial match: name the fields that matter.
 - `target` and the `fill` keys are CSS selectors inside `#screen`
   (`[data-act="send"]`, `#invite-email`, `button[type="submit"]`).
 - Nothing on a frame is a dead end: something on screen can be acted on,
@@ -145,7 +168,10 @@ Rules the walk enforces:
 - **Data.** Realistic and worst-case: real-sounding names in each
   language, messy numbers, a long e-mail, a long name, counts of 0, 1
   and many, a missing optional field. Never "John Doe", "Test 123",
-  lorem ipsum or round numbers.
+  lorem ipsum or round numbers. Every person's name is invented and
+  listed in `meta.fixtures`, so the scribes who film and quote the mock
+  know it is not personal data; never a real person's name, and
+  e-mails on reserved domains (`example.com`, `.test`).
 
 ## Every state
 
@@ -206,9 +232,15 @@ synonym the notes list under "avoid".
    one pass of fixes, walk again, stop.
 4. Report.
 
-Changing an existing journey: never renumber a step; a new step gets
-the next id; a removed step leaves its id unused. Report what changed
-per journey so he re-walks only those.
+Changing an existing journey while he is walking it: a new step gets
+the next free id and a removed step leaves its id unused, so his
+verdicts keep pointing at the right step. Before the lock the ids are
+renumbered: when the conductor says the version is the lock candidate,
+or the walk prints `idOrder` lines, renumber every such journey's
+steps s1, s2, … in play order (the AC ids derive from them and freeze
+at the lock; `proto.mjs lock` refuses ids out of order). Report what
+changed per journey so he re-walks only those, and every renumbering
+as `J3: old s4 → s1, s1 → s2 …` so the conductor carries his verdicts.
 
 ## Boundaries
 
@@ -221,7 +253,7 @@ reading and listed as Inferred for the conductor to ask.
 
 - the path written · the version · the size in KB;
 - the walk: PASS and its summary line (frames, debug-only, journeys,
-  steps); a FAIL is not a return, fix it first;
+  steps, idOrder); a FAIL is not a return, fix it first;
 - per change id: done, or not done with the reason;
 - what changed, per journey (for his re-walk);
 - **Inferred**: each behavior or value you chose that the notes do not

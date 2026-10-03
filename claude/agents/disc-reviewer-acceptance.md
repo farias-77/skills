@@ -25,7 +25,9 @@ findings to verify closed.
 ### First pass: each criterion alone
 
 For every AC (`J<n>.s<k>.<m>` or `frame:<token>.<m>`), can a stranger
-decide pass or fail **without asking anyone**? That requires:
+decide pass or fail **without asking anyone**? (An AC marked
+`[build]` is judged against the built product it names, not the mock:
+the same question, observed there.) That requires:
 
 - GIVEN a state (not clicks), WHEN exactly one event, THEN one
   observable outcome per line (the interview pack, A-3);

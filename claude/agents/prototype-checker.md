@@ -17,9 +17,12 @@ wrong, where, with the evidence.
 
 The path of the mock (`00-discovery/prototype/index.html`), its
 version, `notes.md`, the path of `proto.mjs`, his step verdicts on this
-version (rows inline: journey, step, verdict, note, version), the
-unanswered comments (inline), and the output path
-(`00-discovery/prototype/gate-v<N>.md`).
+version (rows inline: journey, step, verdict, note, version; or, when
+the mock is not published, the path of `walks/verdicts.json`, the same
+rows written by the conductor from his chat answers, each with his
+words), the unanswered comments (inline), and the output path
+(`00-discovery/prototype/gate-v<N>.md`). You may be dispatched while
+he is still walking this version; judge the version you were given.
 
 ## The checks, in order
 
@@ -27,7 +30,9 @@ unanswered comments (inline), and the output path
 `node <proto.mjs> walk <index.html> --out <dir>/walk-gate.json`.
 It drives every journey through the real UI and renders every frame in
 every language and both themes. Every entry in `fails` is a gate
-failure, quoted as the walk wrote it. The `taste` entries go to check 5.
+failure, quoted as the walk wrote it. Every `idOrder` line is a failure
+for the prototyper (step ids must run s1, s2, … in play order before
+the lock). The `taste` entries go to check 5.
 
 **2 · The model against the notes.**
 `node <proto.mjs> model <index.html>` gives the frames, journeys, copy
@@ -35,7 +40,16 @@ and actions as data. Check:
 
 - every rule id in the notes' Rules table appears in some journey
   step's `rules`, and the step's behavior shows the rule's number (the
-  expiry date, the limit message);
+  expiry date, the limit message) — except a rule whose Proof column
+  says `[build]`: it is covered by the build, listed in the report as
+  such, never a failure. A rule no step exercises and that a one-file
+  mock cannot show (real time, a server's refusal, a reload, a second
+  session) is a failure **for him**, with the proposal to mark it
+  `[build]`;
+- who is looking and what time it is live in the debug bar (the
+  model's `actors` and `clock`), never inside `#screen`: a "view as"
+  switch, a clock control or a "Mock" strip drawn in the product block
+  is a failure for the prototyper (it lands in every reference frame);
 - every journey in the notes' Journeys block exists in the mock, with
   the notes' actor and end;
 - per screen, the states inventory (the interview pack, J-4): ideal,
@@ -57,9 +71,11 @@ sure", "inválido", "o usuário", "Ocorreu um erro", Title Case in
 Portuguese). Each failure quotes the key and the string.
 
 **4 · His walk.**
-Every step of every journey has a verdict "ok" on this version. A step
-with no verdict, a verdict on an older version, or a "change" verdict
-is a failure, listed with its journey and step. Every unanswered
+Every step of every journey has a verdict "ok" on this version, from
+the artifact's rows or, when the mock is not published, from
+`walks/verdicts.json` (a row there counts like an artifact row; quote
+his words). A step with no verdict, a verdict on an older version, or
+a "change" verdict is a failure, listed with its journey and step. Every unanswered
 comment is a failure. The notes' Open and Inferred blocks are empty.
 
 **5 · Taste, on screenshots (the design-taste pack).**
