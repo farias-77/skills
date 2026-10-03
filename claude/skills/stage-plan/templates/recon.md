@@ -8,7 +8,14 @@
   cut; the writers copy its commands, targets, paths, seams and golden
   paths into the briefs. The area `fronts` uses the second template at
   the bottom of this file.
+
+  Write these headings, in this order. A question the conductor added
+  is answered under the heading it belongs to, or under "The
+  conductor's questions" at the end; never instead of the template.
+  These comments are instructions to you: none of them reaches the file.
 -->
+
+**Base:** `<repo>@<branch> <sha>` (the head of the base branch when you read it)
 
 ## In one paragraph
 
@@ -26,6 +33,24 @@
 | focused tests (one module, one spec) | | |
 | journeys | | |
 | stack up · env · down | | |
+
+## Gate rules that bite a plan
+
+<!-- The rules of the gate commands and the test env that decide how a
+     foundation and its stubs can pass: a linter that rejects unused
+     code (tests included?), a coverage floor and the command that
+     measures it, a file-size or structure limit, a test clock (shared?
+     forward-only?), the lifetime of fake tokens or sessions against
+     that clock, what the per-change gate runs that the whole gate does
+     not. Each with the config line that sets it. -->
+
+| Rule | Where it bites | Read at |
+|---|---|---|
+| <`unused` runs on test files too> | <a helper with no caller fails the gate> | <`.golangci.yml:12`> |
+| <coverage ≥ 100 % combined, only in the whole gate> | <stubs uncovered until filled> | |
+| <a file over 681 lines fails the structure check> | <one journey file per screen state> | |
+| <the test clock only moves forward, one per package> | <cases pinned to instants depend on order> | |
+| <fake identity tokens expire 1 h after issue, on that clock> | <a case that moves the clock days ahead gets 401> | |
 
 ## Tests today
 
@@ -127,7 +152,18 @@ main...<branch>`). Facts only, each with where it was read.
 
 <what this design calls that a running front is building and main does not have yet, with where the design says it; "none">
 
+## Unmerged branches
+
+<!-- Every branch not merged into the base that changed in the last 30
+     days (`git branch -a --no-merged <base> --sort=-committerdate`),
+     with or without a workstream folder; per branch, the shared files
+     it changes (the next migration number above all). -->
+
+| Branch | Last commit | Shared files it changes | Read at |
+|---|---|---|---|
+| `<origin/feat/slug>` | <date> | <`db/migrations/00005_…`> | `git diff --stat <base>...<branch>` |
+
 ## Coordination notes
 
-<the lines of `_coordination.md` that name an area, a file or a window this design touches, quoted with their line; "none">
+<the lines of `_coordination.md` that name an area, a file or a window this design touches, quoted with their line; "none"; a base it names that is older than the base branch's head, quoted as such>
 -->

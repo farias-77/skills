@@ -23,6 +23,9 @@
   - blocks: the nodes stage 4 parks while it is missing (the rest go on).
 
   "Nothing" is a complete pre-flight.
+
+  These comments are instructions to you: none of them reaches
+  preflight.md (the plan's checker refuses an HTML comment).
 -->
 
 **Items:** <n> · **Time for him:** <about n minutes> · **Blocks if missing:** <F | E-04 | nothing>

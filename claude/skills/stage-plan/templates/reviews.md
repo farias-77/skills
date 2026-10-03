@@ -17,6 +17,9 @@
   applied without re-review and written as residue. Nobody is asked:
   every ruling is the conductor's, and those that change the cut are
   listed for his veto.
+
+  These comments are instructions to you: none of them reaches
+  reviews.md (the plan's checker refuses an HTML comment).
 -->
 
 ## Round <N> — <date> · run <id> · whole | delta over <briefs>

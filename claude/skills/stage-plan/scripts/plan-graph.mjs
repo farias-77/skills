@@ -16,10 +16,16 @@
  *         foundation · a shared file with no foundation owner · an extended
  *         file whose owner builds it in parallel · a used name nothing
  *         provides, or provided by a node with no path to the user · a size
- *         over the cap · a slice over the AC cap · a slice or integration
- *         node that carries no AC · with --briefs, a brief whose Owns,
- *         Extends, Uses, Provides or Acceptance disagree with the graph.
- *   WARN  a file extended by two or more nodes (a hot file: make it cold) ·
+ *         over the cap · a node name over 8 words (the blueprint's cap) ·
+ *         a slice or integration node that carries no AC · an HTML comment
+ *         in a plan file (plan.md, preflight.md, reviews.md, a brief) ·
+ *         with --briefs, a brief whose Owns, Extends, Uses, Provides or
+ *         Acceptance disagree with the graph, or whose Uses table names a
+ *         producer other than the graph's.
+ *   WARN  a file extended by two or more nodes (a hot file: make it cold,
+ *         or declare it in `appendSafe` with why the additions never meet) ·
+ *         a slice over the AC guide (target.maxAcs, or 8 scaled by the
+ *         discovery's grain: ACs per journey step or frame state) ·
  *         a lane that is not a leaf · an integration node that is not last.
  *
  *   REPORT the waves (levels after the foundation), the width (widest wave),
@@ -31,8 +37,8 @@
  * No dependencies; Node 18+.
  */
 
-import { readFileSync, writeFileSync, existsSync } from 'node:fs'
-import { join } from 'node:path'
+import { readFileSync, writeFileSync, existsSync, readdirSync } from 'node:fs'
+import { join, dirname } from 'node:path'
 
 // ---------- arguments ----------
 
@@ -49,11 +55,18 @@ const fails = [], warns = []
 const fail = (code, msg) => fails.push({ code, msg })
 const warn = (code, msg) => warns.push({ code, msg })
 
-const target = { depth: 2, sizeCap: 'L', maxAcs: 8, ...(G.target || {}) }
+const target = { depth: 2, sizeCap: 'L', ...(G.target || {}) }
 const weights = { S: 1, M: 2, L: 3, ...(G.weights || {}) }
 const SIZES = Object.keys(weights)
 const capRank = SIZES.indexOf(target.sizeCap)
 const universe = new Set(G.acs || [])
+// The pack's 8 ACs per slice assume one AC per journey step. A discovery
+// that writes several per step, or one per frame state, scales the guide
+// by its grain: ACs ÷ distinct stems (the id without its trailing .<n>).
+const stems = new Set([...universe].map(a => String(a).replace(/\.\d+$/, '')))
+const grain = stems.size ? universe.size / stems.size : 1
+if (target.maxAcs == null) target.maxAcs = Math.ceil(8 * grain)
+const appendSafe = G.appendSafe || {}
 const shared = G.shared || []
 const nodes = Array.isArray(G.nodes) ? G.nodes : []
 const KINDS = ['foundation', 'lane', 'slice', 'integration']
@@ -70,6 +83,9 @@ for (const n of nodes) {
   if (!KINDS.includes(n.kind)) fail('shape', `${n.id}: kind "${n.kind}" is not one of ${KINDS.join(', ')}`)
   n.after = list(n.after).map(e => typeof e === 'string' ? { id: e } : e)
   for (const k of ['acs', 'owns', 'extends', 'provides', 'uses']) n[k] = list(n[k])
+  const words = String(n.name || '').trim().split(/\s+/).filter(Boolean).length
+  if (!words) fail('shape', `${n.id}: no name`)
+  else if (words > 8) fail('shape', `${n.id}: name "${n.name}" has ${words} words; the blueprint caps entries[].name at 8 — one short name, the same in plan.md, the brief and the blueprint`)
 }
 const isF = (n) => n && n.kind === 'foundation'
 const foundation = nodes.filter(isF)
@@ -169,7 +185,7 @@ for (const n of nodes) {
   const r = SIZES.indexOf(n.size)
   if (r < 0) fail('size', `${n.id}: size "${n.size}" is not one of ${SIZES.join(', ')}`)
   else if (r > capRank) fail('size', `${n.id}: size ${n.size} is over the cap ${target.sizeCap} — split it into thinner vertical slices`)
-  if (n.kind === 'slice' && n.acs.length > target.maxAcs) fail('size', `${n.id}: carries ${n.acs.length} ACs, cap ${target.maxAcs} — split it`)
+  if (n.kind === 'slice' && n.acs.length > target.maxAcs) warn('acs', `${n.id}: carries ${n.acs.length} ACs, over the guide ${target.maxAcs}: check its size by screens, server flows and lines, and split it if it is over ${target.sizeCap}`)
   if ((n.kind === 'slice' || n.kind === 'integration') && !n.acs.length) fail('ac', `${n.id}: a ${n.kind} that carries no acceptance criterion builds what nothing forces`)
 }
 
@@ -235,7 +251,8 @@ for (const n of nodes) for (const p of n.extends) {
   if (own && own.node.id === n.id) fail('extends', `${n.id} both owns and extends \`${p}\``)
   extenders.set(norm(p), [...(extenders.get(norm(p)) || []), n.id])
 }
-for (const [p, ids] of extenders) if (ids.length > 1) warn('hot', `\`${p}\` is extended by ${ids.join(', ')}: a hot file — split it into one file per thing plus a generated aggregate, or keep the additions append-only`)
+const declaredSafe = (p) => Object.keys(appendSafe).some(s => overlap(s, p))
+for (const [p, ids] of extenders) if (ids.length > 1 && !declaredSafe(p)) warn('hot', `\`${p}\` is extended by ${ids.join(', ')}: a hot file — split it into one file per thing plus a generated aggregate, or keep the additions append-only`)
 
 // ---------- uses → provides ----------
 
@@ -262,7 +279,7 @@ const section = (md, title) => {
   const lines = md.split('\n'), out = []
   let on = false
   for (const l of lines) {
-    if (/^## /.test(l)) { on = l.replace(/^## /, '').trim().toLowerCase().startsWith(title.toLowerCase()); continue }
+    if (/^## /.test(l)) { on = l.replace(/^## /, '').trim().toLowerCase() === title.toLowerCase(); continue }
     if (on) out.push(l)
   }
   return out.join('\n').replace(/<!--[\s\S]*?-->/g, '')
@@ -278,6 +295,25 @@ const firstColumn = (text) => text.split('\n').map(l => l.trim()).flatMap(l => {
   if (/^[-*] /.test(l)) { const m = l.match(/`([^`]+)`/); return m ? [m[1]] : [] }
   return []
 })
+// The Uses table's Producer column names the graph's producer: a stale
+// owner after a graph change shows here before any lens reads it.
+const NODE_ID = /\b(F(?:-b|-x\d+)?|E-(?:\d+|int))\b/
+const producers = (n, text) => {
+  const rows = text.split('\n').map(l => l.trim()).filter(l => l.startsWith('|'))
+  if (!rows.length) return
+  const cells = (l) => l.split('|').slice(1, -1).map(c => c.trim())
+  const col = cells(rows[0]).findIndex(c => /^(produc|produt)/i.test(c))
+  if (col < 0) return
+  for (const l of rows.slice(1)) {
+    const c = cells(l)
+    if (!c[0] || /^:?-+:?$/.test(c[0])) continue
+    const said = (c[col] || '').match(NODE_ID)?.[1]
+    for (const name of [...c[0].matchAll(/`([^`]+)`/g)].map(m => m[1])) {
+      const real = (providers.get(name) || []).find(p => p.id !== n.id && before(p, n))?.id
+      if (real && said && said !== real) fail('brief', `${n.id}.md §Uses: \`${name}\` names producer ${said}; the graph's producer is ${real}`)
+    }
+  }
+}
 const same = (id, what, graphList, briefList, filter = () => true) => {
   const g = new Set(graphList), b = new Set(briefList.filter(filter))
   const missing = [...g].filter(x => !b.has(x)), extra = [...b].filter(x => !g.has(x))
@@ -291,8 +327,26 @@ if (briefsDir) for (const n of nodes) {
   same(n.id, '§Owns', n.owns, firstColumn(section(md, 'Owns')))
   same(n.id, '§Extends', n.extends, firstColumn(section(md, 'Extends')))
   if (isF(n) || n.kind === 'lane') same(n.id, '§Provides', n.provides, firstColumn(section(md, 'Provides')).filter(x => !/^name$/i.test(x)))
-  if (!isF(n)) same(n.id, '§Uses', n.uses, firstColumn(section(md, 'Uses')).filter(x => !/^name/i.test(x)))
+  if (!isF(n)) {
+    const uses = section(md, 'Uses from the foundation')
+    same(n.id, '§Uses', n.uses, firstColumn(uses).filter(x => !/^name/i.test(x)))
+    producers(n, uses)
+  }
   same(n.id, '§Acceptance', n.acs, firstColumn(section(md, 'Acceptance')), x => universe.has(x))
+}
+
+// ---------- no HTML comment in an output ----------
+
+// A template's comments are instructions to its author; none reaches a plan file.
+const planDir = dirname(graphPath)
+const mdIn = (d) => existsSync(d) ? readdirSync(d).filter(f => f.endsWith('.md')).map(f => join(d, f)) : []
+for (const file of [...mdIn(planDir), ...(briefsDir ? mdIn(briefsDir) : [])]) {
+  let fence = false
+  const at = readFileSync(file, 'utf8').split('\n').findIndex(l => {
+    if (/^\s*(```|~~~)/.test(l)) { fence = !fence; return false }
+    return !fence && l.replace(/`[^`]*`/g, '').includes('<!--')
+  })
+  if (at >= 0) fail('comment', `${file}:${at + 1}: an HTML comment — a template's comments are instructions, never output; delete it`)
 }
 
 // ---------- mermaid ----------
@@ -339,7 +393,7 @@ if (!quiet) {
   if (acyclic) {
     p(`  foundation ${summary.foundation.join(' → ') || '—'}`)
     waves.forEach((wv, i) => p(`  wave ${i + 1}     ${wv.join(' · ')}`))
-    p(`  width ${width} · depth ${depth} (target ≤ ${target.depth}) · ACs ${summary.acs.carried}/${summary.acs.total}`)
+    p(`  width ${width} · depth ${depth} (target ≤ ${target.depth}) · ACs ${summary.acs.carried}/${summary.acs.total} · AC guide per slice ${target.maxAcs}${G.target?.maxAcs == null ? ` (8 × grain ${Math.round(grain * 100) / 100})` : ''}`)
     p(`  critical   ${critical.join(' → ')}  (weight ${criticalWeight} of ${totalWeight}; parallelism ×${summary.parallelism})`)
     p(`  start      ${startOrder.join(', ')}`)
   }

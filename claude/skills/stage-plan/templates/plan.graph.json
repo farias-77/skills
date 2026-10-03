@@ -4,17 +4,21 @@
     "acs: every AC id of 00-discovery/stories.md (<journey>.<step>.<n>), exactly as written there. Every one is carried by exactly one node.",
     "shared: the doctrine's shared files (migrations, the contract, the generated code, the module registry) as globs. Only a foundation node owns them; no other node owns or extends them.",
     "nodes[].kind: foundation (F, the thin serial head; F-b only when F splits) · lane (F-x<n>: foundation work nobody waits for, run beside the slices) · slice (E-<nn>: one vertical slice, one builder) · integration (E-int: the journeys that cross three or more slices, size S, merges last).",
-    "nodes[].after: only real behaviour. class 'ui' = a journey drives the other node's UI; class 'side-effect' = a check reads that node's real side effect. Data is a factory and an interface is a fake: neither is an edge. stacked: true = the node starts on the other's branch as soon as it is ready.",
-    "nodes[].owns: the paths the node creates or edits (literal paths or dir/** globs; no two nodes overlap). extends: append-only additions to a file the foundation or an ancestor created, or to an existing append-safe file.",
+    "nodes[].after: only real behaviour. class 'ui' = a journey drives the other node's UI; class 'side-effect' = a check reads that node's real side effect. Data is a factory and an interface is a fake: neither is an edge. stacked: true = the node may start on the other's branch as soon as it is ready. Stage 4 stacks a node on one parent only: with two or more edges, it starts when all but one have merged.",
+    "nodes[].owns: the paths the node creates or edits (literal paths or dir/** globs; no two nodes overlap). extends: append-only additions to a file the foundation or an ancestor created, or to an existing append-safe file; the one replacement allowed is filling a stub F left, by exactly one node.",
+    "appendSafe: optional, the files several nodes extend on lines that never meet (one row per node in a feature map), each with why; the checker does not warn on them.",
     "nodes[].provides / uses: the names that cross a node boundary, exactly as code imports or calls them. Every used name has one producer: the foundation, or an ancestor behind an edge.",
     "nodes[].needs: optional, the P2 classification kept for the audit: {name, class: shared|data|interface|ui|side-effect|e2e, resolved: F | factory | fake | edge:<id> | E-int}.",
-    "size: S · M · L, and L is the cap (one screen with its states and one server flow, <= 8 ACs, about 2,500 changed lines with tests). weights turn sizes into the critical path's length."
+    "size: S · M · L, and L is the cap (one screen with its states and one server flow, about 2,500 changed lines with tests). weights turn sizes into the critical path's length.",
+    "name: at most 8 words (the blueprint's cap), the same in plan.md, the brief and the blueprint.",
+    "target.maxAcs: optional. Omitted, the checker's AC guide per slice is 8 scaled by the discovery's grain (ACs per journey step or frame state); over it is a warning: size the node by screens, flows and lines."
   ],
   "workstream": "<workstream-slug>",
-  "target": { "depth": 2, "sizeCap": "L", "maxAcs": 8 },
+  "target": { "depth": 2, "sizeCap": "L" },
   "weights": { "S": 1, "M": 2, "L": 3 },
   "acs": ["<J01.s1.1>", "<J01.s2.1>"],
   "shared": ["<api/openapi/**>", "<db/migrations/**>", "<internal/gen/**>", "<cmd/server/registry.go>"],
+  "appendSafe": { "<docs/features/orders.md>": "<one row per node: E-01 rows ORD-1..2, E-03 row ORD-3>" },
   "nodes": [
     {
       "id": "F", "kind": "foundation", "name": "<Contract and seams>", "size": "M",

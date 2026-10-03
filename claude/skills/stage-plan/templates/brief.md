@@ -17,7 +17,13 @@
   Acceptance are read by scripts/plan-graph.mjs --briefs: their FIRST
   COLUMN (a table) or their first `code` (a bullet) must equal the
   node's lists in plan.graph.json, item for item. Write each item in
-  backticks, exactly as the graph has it.
+  backticks, exactly as the graph has it. The checker finds a section
+  by its whole heading: keep these five headings as written here, and
+  give any extra section a heading of its own. The Producer column of
+  Uses starts with the graph's producer id.
+
+  These comments are instructions to you: none of them reaches the
+  brief.
 
   Must-haves: every Acceptance line carries an AC id from stories.md (or
   a contract case name from acceptance.md) and names what is observed
@@ -34,7 +40,7 @@
 
 **Kind:** <foundation | lane | slice | integration> · **Size:** <S | M | L> · **Wave:** <1 | 2> · **Critical path:** <yes | no>
 **After:** <— | E-nn (class ui: the journey clicks <the button E-nn builds>) · stacked>
-**Starts from:** the top of `feat/<workstream>` with F merged<; or E-nn's branch the moment E-nn is `ready` (stacked)>
+**Starts from:** the top of `feat/<workstream>` with F merged<; or E-nn's branch the moment E-nn is `ready` (stacked); with several edges, the last unmerged one's branch once all the others have merged>
 
 ## What this delivers
 
@@ -69,7 +75,10 @@
      - the check it becomes: the journey spec or the integration test, the case name from acceptance.md.
      Each route and each permission has a bad path. A screen line names
      both themes and 390 px. A line that needs a deployed environment or a
-     person is a question, never a softer sentence. -->
+     person is a question, never a softer sentence. Each line is red on
+     this node's base for the right reason: a clause asserting that an
+     element another node builds is absent passes there vacuously; name
+     it as proved by the whole gate, or it is a question. -->
 
 | AC | Step | Actor does | Observes | Side effect read back | Check |
 |---|---|---|---|---|---|
@@ -121,13 +130,14 @@ The behaviour consumed behind an edge is not a row here: it is the
 <!-- Append-only additions to a file F or an ancestor created, or to an
      existing append-safe file: a token, an optional prop, a fake's mode,
      an enum value beside its siblings. Never a frozen file, never a
-     rename or a removal. "none" when empty. -->
+     rename or a removal. The one replacement: filling a stub F left for
+     this node ("fills `<the stub>`"). "none" when empty. -->
 
 - `<web/src/tokens.css>` — <adds `--color-ready`>
 
 ## Size
 
-<S · M · L> — <the ACs carried, the screens and server flows, an estimate of the changed lines with tests>. The cap is L: one screen with its states and one server flow, ≤ 8 ACs, about ≤ 2,500 changed lines with tests.
+<S · M · L> — <the ACs carried, the screens and server flows, an estimate of the changed lines with tests>. The cap is L: one screen with its states and one server flow, about ≤ 2,500 changed lines with tests.
 
 ## Gate
 

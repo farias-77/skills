@@ -29,6 +29,8 @@
 
   Nobody was asked. Every choice below is the conductor's, recorded
   under "Decided in his place" for his veto.
+
+  These comments are instructions to you: none of them reaches plan.md.
 -->
 
 ## From A to B
@@ -54,7 +56,7 @@
 |---|---|---|
 | 0 | F | play |
 | 1 | <F-x1 · E-01 · E-02 · E-03 · E-04> | F is merged |
-| 2 | <E-int> | <E-03 and E-04 are ready (stacked)> |
+| 2 | <E-int> | <E-03 merged and E-04 ready (stacked on E-04): one parent stacks, the others merge first> |
 
 ## The foundation — `F`
 
@@ -147,9 +149,8 @@ The whole gate (`<make -k verify>`) runs once, at the end of stage 4, on the top
 
 ## Status
 
-<!-- stage 4 fills: date · node · sha · proof line -->
+Stage 4 fills this, one line per merged node: date · node · sha · proof line.
 
 ## Amendments
 
-<!-- dated: what changed, why, who ruled; plan.graph.json changed in the
-     same pass and plan-graph.mjs green after it. -->
+One dated line per change: what changed, why, who ruled, and the checker's line after it (plan.graph.json changed in the same pass).
