@@ -30,7 +30,11 @@ await page.mouse.down(); await page.mouse.up();
   frames at ~8 fps. Slow the page with CDP
   `Animation.setPlaybackRate({playbackRate: 0.25})` (measured: CSS ran
   at 0.254×), then `playbackRate={4}` in post. JS timers are not
-  slowed: CSS-driven UI only.
+  slowed: CSS-driven UI only. The kit's `record.mjs --slow 0.25` does
+  this at 1080p too, for smooth motion on a loaded machine: it stretches
+  its own beats by 4 and compresses the log and the frames back, so the
+  footage needs no speed change in post (measured on a test app: 28
+  frames a second while the screen moved at real speed, 65 slowed).
 - **Stills.** For static holds, a `page.screenshot` at device scale
   factor 2 is 3840×2160 and costs 0.3–0.6 s.
 

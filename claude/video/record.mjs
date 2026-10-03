@@ -3,7 +3,7 @@
 // click and keystroke logged on the same clock. The cursor is NOT baked in:
 // the launch render draws it from the log, eased, with a ripple per click.
 //
-//   node claude/video/record.mjs <shots.json> <out-dir> [--journey <id>]
+//   node claude/video/record.mjs <shots.json> <out-dir> [--journey <id>] [--slow <rate>]
 //
 // Writes, per journey, <out-dir>/<id>/footage.mp4 (H.264, 30 fps CFR) and
 // <out-dir>/<id>/log.json (schema.md, "The footage log"). Exit 1 names the
@@ -12,6 +12,17 @@
 // Safety: "mode": "read-only" aborts every request that is not GET, HEAD or
 // OPTIONS (the count lands in the log as blockedWrites); "mask" blurs the
 // selectors it lists on every page (personal data on production).
+//
+// Slow capture (--slow 0.25, or "slow": 0.25 in shots.json): on a loaded
+// machine the screencast gets 4-8 frames a second and a 400 ms transition
+// lands on two of them. With --slow the page's CSS and Web Animations run at
+// <rate> (CDP Animation.setPlaybackRate), every beat of the script (glides,
+// holds, typing) is stretched by 1/<rate>, and the log and the frames are
+// compressed back by <rate> at the end: the footage plays at real speed with
+// 1/<rate> times the frames. JS timers in the app are NOT slowed (a toast
+// that hides itself after 3 s shows for 3 s of capture, so <rate> x 3 s of
+// footage): use it for CSS-driven UI, and hold a JS-timed result with
+// "waitFor" + a short "hold".
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
@@ -20,9 +31,10 @@ import {chromium} from 'playwright-core';
 
 const args = process.argv.slice(2);
 const only = args.includes('--journey') ? args[args.indexOf('--journey') + 1] : null;
-const [shotsPath, outDir] = args.filter((a, i) => !a.startsWith('--') && args[i - 1] !== '--journey');
+const slowArg = args.includes('--slow') ? args[args.indexOf('--slow') + 1] : null;
+const [shotsPath, outDir] = args.filter((a, i) => !a.startsWith('--') && !['--journey', '--slow'].includes(args[i - 1]));
 if (!shotsPath || !outDir) {
-  console.error('usage: node record.mjs <shots.json> <out-dir> [--journey <id>]');
+  console.error('usage: node record.mjs <shots.json> <out-dir> [--journey <id>] [--slow <rate>]');
   process.exit(2);
 }
 
@@ -58,6 +70,12 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 // The house cursor path: an eased glide, never a teleport. 25+ intermediate
 // moves so hover states fire on the way.
 const glideSteps = (dx, dy) => Math.max(25, Math.round(Math.hypot(dx, dy) / 22));
+
+// the page's animation rate while capturing; 1 = real time (see the header)
+const SLOW = slowArg !== null ? Number(slowArg) : shots.slow ?? 1;
+if (typeof SLOW !== 'number' || !(SLOW >= 0.1 && SLOW <= 1)) die('--slow (or shots.slow) must be a number from 0.1 to 1');
+// a beat of the script, in footage time: stretched while the page runs slow
+const beat = (ms) => sleep(ms / SLOW);
 
 const UI = shots.uiScale ?? 1;
 if (typeof UI !== 'number' || UI < 1 || UI > 1.5) die('shots.uiScale must be a number from 1 to 1.5');
@@ -97,6 +115,15 @@ async function recordJourney(browser, j) {
   if (shots.fixedTime) await ctx.clock.setFixedTime(new Date(shots.fixedTime));
   const page = await ctx.newPage();
   page.setDefaultTimeout(10000);
+  if (SLOW < 1) {
+    // CSS transitions and animations, and the Web Animations API, run at SLOW; set again on every document
+    const cdp = await ctx.newCDPSession(page);
+    await cdp.send('Animation.enable');
+    const slow = () => cdp.send('Animation.setPlaybackRate', {playbackRate: SLOW}).catch(() => {});
+    await slow();
+    page.on('domcontentloaded', slow);
+    page.on('load', slow);
+  }
   const url = new URL(j.start || '', shots.baseUrl).href;
   await page.goto(url, {waitUntil: 'load'});
   await page.waitForLoadState('networkidle', {timeout: 5000}).catch(() => {});
@@ -130,7 +157,7 @@ async function recordJourney(browser, j) {
   const clicks = [];
   const typing = [];
   const steps = [];
-  await sleep(j.leadIn ?? 900); // the wide establishing beat
+  await beat(j.leadIn ?? 900); // the wide establishing beat
 
   for (const [k, s] of j.steps.entries()) {
     const startMs = now();
@@ -147,24 +174,34 @@ async function recordJourney(browser, j) {
         const tx = b.x + Math.min(b.width / 2, s.do === 'fill' ? 40 : b.width / 2);
         const ty = b.y + b.height / 2;
         const t = now();
-        await page.mouse.move(tx, ty, {steps: glideSteps(tx - cx, ty - cy)});
+        if (SLOW < 1) {
+          // paced: the hand's speed in footage time stays human while the page runs slow
+          const n = glideSteps(tx - cx, ty - cy);
+          const ms = Math.min(900, Math.max(350, Math.hypot(tx - cx, ty - cy) * 0.9));
+          for (let i = 1; i <= n; i++) {
+            await page.mouse.move(cx + ((tx - cx) * i) / n, cy + ((ty - cy) * i) / n);
+            await beat(ms / n);
+          }
+        } else {
+          await page.mouse.move(tx, ty, {steps: glideSteps(tx - cx, ty - cy)});
+        }
         cursor.push({t, until: now(), x0: px(cx), y0: px(cy), x: px(tx), y: px(ty)});
         cx = tx;
         cy = ty;
-        await sleep(300); // the cursor arrives before the click: anticipation
+        await beat(300); // the cursor arrives before the click: anticipation
       }
       actionMs = now();
       if (s.do === 'click') {
         clicks.push({t: actionMs, x: px(cx), y: px(cy)});
         await page.mouse.down();
-        await sleep(70);
+        await beat(70);
         await page.mouse.up();
       } else if (s.do === 'fill') {
         clicks.push({t: actionMs, x: px(cx), y: px(cy)});
         await page.mouse.click(cx, cy);
-        await sleep(160);
+        await beat(160);
         const tt = now();
-        await page.keyboard.type(String(s.value), {delay: s.typeDelay ?? 55});
+        await page.keyboard.type(String(s.value), {delay: (s.typeDelay ?? 55) / SLOW});
         typing.push({t: tt, until: now(), text: String(s.value)});
       } else if (s.do === 'select') {
         clicks.push({t: actionMs, x: px(cx), y: px(cy)});
@@ -175,7 +212,7 @@ async function recordJourney(browser, j) {
       } else if (s.do === 'scroll') {
         await page.mouse.wheel(0, s.dy ?? 600);
       } else if (s.do === 'wait') {
-        await sleep(s.ms ?? 1000);
+        await beat(s.ms ?? 1000);
       } else if (s.do === 'goto') {
         await page.goto(new URL(String(s.value), shots.baseUrl).href, {waitUntil: 'load'});
       }
@@ -183,13 +220,13 @@ async function recordJourney(browser, j) {
       await page.waitForLoadState('networkidle', {timeout: 3000}).catch(() => {});
       if (s.result) {
         // where the result shows up: the camera goes there after the click
-        await sleep(450); // let the transition settle before measuring
+        await beat(450); // let the transition settle before measuring
         const loc2 = page.locator(s.result).first();
         await loc2.waitFor({state: 'visible'});
         const b = await loc2.boundingBox();
         result = {x: r(px(b.x)), y: r(px(b.y)), width: r(px(b.width)), height: r(px(b.height)), at: now()};
       }
-      await sleep(Math.round((s.hold ?? 1.5) * 1000)); // the result, held so it can be read
+      await beat(Math.round((s.hold ?? 1.5) * 1000)); // the result, held so it can be read
     } catch (e) {
       await page.screencast.stop().catch(() => {});
       await ctx.close();
@@ -198,15 +235,15 @@ async function recordJourney(browser, j) {
     }
     steps.push({n: k + 1, label: s.label, do: s.do, startMs, actionMs, endMs: now(), x: r(px(cx)), y: r(px(cy)), rect, result});
   }
-  await sleep(j.tail ?? 600);
+  await beat(j.tail ?? 600);
   await page.screencast.stop();
   await ctx.close();
 
-  // in capture order; everything relative to the first frame
+  // in capture order; everything relative to the first frame, and back to real speed when slowed
   frames.sort((a, b) => a.t - b.t);
   const T0 = frames[0].t;
-  for (const fr of frames) fr.t -= T0;
-  const rel = (v) => Math.round(v - T0);
+  for (const fr of frames) fr.t = (fr.t - T0) * SLOW;
+  const rel = (v) => Math.round((v - T0) * SLOW);
   for (const c of cursor) Object.assign(c, {t: rel(c.t), until: rel(c.until)});
   cursor[0].t = cursor[0].until = 0;
   for (const c of clicks) c.t = rel(c.t);
@@ -230,6 +267,17 @@ async function recordJourney(browser, j) {
   execFileSync('nice', ['-n', '10', 'ffmpeg', '-y', '-v', 'error', '-f', 'concat', '-safe', '0', '-i', path.join(tmp, 'frames.txt'),
     '-vf', 'fps=30,format=yuv420p', '-c:v', 'libx264', '-crf', '14', '-preset', 'medium', '-g', '30', '-movflags', '+faststart', mp4]);
   fs.rmSync(tmp, {recursive: true, force: true});
+  // frames arrive on repaint: the rate while the screen moves is the one that says whether motion stutters
+  let busy = 0;
+  let busyMs = 0;
+  for (let i = 1; i < frames.length; i++) {
+    const d = frames[i].t - frames[i - 1].t;
+    if (d > 0 && d <= 200) {
+      busy += 1;
+      busyMs += d;
+    }
+  }
+  const motionFps = busyMs ? Math.round((busy / busyMs) * 10000) / 10 : null;
   const durationMs = Math.round(Number(execFileSync('ffprobe', ['-v', 'error', '-show_entries', 'format=duration', '-of', 'csv=p=0', mp4]).toString()) * 1000);
   const log = {
     journey: j.id,
@@ -241,9 +289,11 @@ async function recordJourney(browser, j) {
     width: W,
     height: H,
     uiScale: UI,
+    slow: SLOW,
     fps: 30,
     durationMs,
     frames: frames.length,
+    motionFps,
     steps,
     cursor,
     clicks,
@@ -252,7 +302,7 @@ async function recordJourney(browser, j) {
   };
   fs.writeFileSync(path.join(dir, 'log.json'), JSON.stringify(log, null, 1));
   const fps = (frames.length / (durationMs / 1000)).toFixed(1);
-  console.log(`${dir}\t${(durationMs / 1000).toFixed(1)} s\t${steps.length} steps\t${fps} captured fps\t${blockedWrites} blocked writes`);
+  console.log(`${dir}\t${(durationMs / 1000).toFixed(1)} s\t${steps.length} steps\t${fps} captured fps\t${motionFps ?? '-'} motion fps${SLOW < 1 ? ` (slow ${SLOW})` : ''}\t${blockedWrites} blocked writes`);
 }
 
 const browser = await chromium.launch({

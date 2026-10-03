@@ -41,8 +41,9 @@ your job is clean takes and an exact log.
    with the step and the reason.
 3. **Record** each journey:
    `nice -n 10 node <kit>/record.mjs shots.json footage/ --journey <id>`.
-   The line it prints carries the duration, the steps, the captured fps
-   and, on production, the blocked writes.
+   The line it prints carries the duration, the steps, the captured fps,
+   the motion fps (the rate while the screen moves) and, on production,
+   the blocked writes.
 4. **Check every take.** Extract a frame at each step's `actionMs - 200`
    and `endMs - 100` from `log.json`
    (`ffmpeg -nostdin -ss <s> -i footage.mp4 -frames:v 1 <png>`) and
@@ -53,8 +54,10 @@ your job is clean takes and an exact log.
      the point;
    - no real person's name, e-mail, phone or document is readable — if
      one is, add its selector to `mask` and record again;
-   - the captured fps is 15 or more (below that, motion stutters: record
-     again when the machine is quieter, and say so if it stays low).
+   - the motion fps is 15 or more (below that, motion stutters: record
+     again with `--slow 0.25`, which slows the page's CSS animations
+     and compresses the take back to real speed; then, if it stays
+     low, when the machine is quieter, and say so).
    A bad take is recorded again, at most twice; then it is reported.
 5. **On production, read-only means read-only.** `blockedWrites` above
    zero means a step tried to write: the take is discarded, and the
@@ -77,7 +80,7 @@ write to production, never the director's labels or order.
 
 ## Response contract
 
-`footage` (folder) · `journeys` (id · seconds · steps · captured fps ·
+`footage` (folder) · `journeys` (id · seconds · steps · captured fps · motion fps ·
 blocked writes · frames checked, as PNG paths) · `repaired` (step ·
 what changed in shots.json) · `failed` (journey · step · why, or
 `none`) · `notes` (anything the director must know: a step whose result

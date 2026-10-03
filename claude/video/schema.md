@@ -215,15 +215,20 @@ cursor is not baked in: the render draws it from the log.
 | `steps[].label` | the caption, ≤42 chars, 3–6 words, one action |
 | `steps[].result` | where the result appears: the camera goes there after the click (a result bigger than a close-up is shown wide) |
 | `steps[].hold` | seconds the result is held (default 1.5; at least 1.3 on screen) |
+| `slow` | 0.1 to 1 (default 1), or `--slow <rate>` on the command line: the page's CSS and Web Animations run at that rate while every beat of the script is stretched to match, and the log and frames are compressed back at the end, so the footage plays at real speed with 1/rate times the frames. CSS-driven UI only: the app's JS timers are not slowed |
 
 The glide is eased with ≥25 intermediate moves (hover states fire), the
 cursor arrives 0.3 s before each click, every time is logged on the
 frames' clock. `log.json` carries `steps[]` (`startMs`, `actionMs`,
 `endMs`, the target `rect`, the `result` rect), `cursor[]`, `clicks[]`,
-`typing[]`, the `durationMs` and the captured fps. Record on a quiet
-machine: frames arrive on repaint, and under load an animation can drop
-to a few frames a second (the printed `captured fps`; re-record a
-journey whose motion matters below ~15).
+`typing[]`, the `durationMs`, `slow` and `motionFps`. Frames arrive on
+repaint, so the whole-take `captured fps` is low whenever the screen
+holds still; `motionFps` is the rate while it moves (frames less than
+200 ms apart), and it is the one that says whether motion stutters.
+Under load it can drop to a few frames a second: below ~15 on a journey
+whose motion matters, record it again with `--slow 0.25` (measured on
+the self-test app: 28 motion fps at real speed, 65 slowed), then on a
+quieter machine.
 
 ### The launch file
 

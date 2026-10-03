@@ -50,7 +50,7 @@ mode and `05-close/launch/footage/`. The recorder runs
 | a selector repaired | nothing; the shot list carries the fix |
 | a journey failed (the step, why) | back to the director once: re-plan the journey or cut it |
 | `blockedWrites` > 0 on production | the take is void; the journey is recorded on a demo account or cut |
-| captured fps under 15 | one re-record when the machine is quieter; then the film is made with what exists and the flaw is noted |
+| motion fps under 15 | the recorder has already re-recorded with `--slow 0.25`; one more when the machine is quieter, then the film is made with what exists and the flaw is noted |
 
 ## L3 · film
 
