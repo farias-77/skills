@@ -503,6 +503,19 @@ with `acceptanceRevision`. A deferred line whose fix touches a shared
 file becomes an amendment the same way, at its triage (step 6), never
 an edit inside a batch slice.
 
+**The foundation's own amendment.** When the foundation entry (`F`,
+`F-b`) returns `needs-amendment` for its **own** Owns (files its own
+generators write, or files its own change touches that its node does
+not list), not for a shared file another entry asks for, there is no
+separate `F.<n>` run. Write `amendments/F.<n>.md` as above, widen the
+node's `owns` in `plan.graph.json` and in its brief (the plan's checker
+green after it), record it in `rulings.md`, and restart the foundation
+from its branch with its `acceptance` kept: the same `acceptance`
+(`commit` and `files`), no `acceptanceRevision`, so no check is
+authored again. The restart's `closedAmendments` carries `F.<n>` as
+closed, with the paths it added, so the builder sees them as its own
+and a second ask for them returns `repeats closed F.<n>`.
+
 **The plan's checker is pinned.** This stage never re-judges a closed
 plan with a newer checker. `plan.graph.json`'s `checker.blob` is the
 git blob of the `plan-graph.mjs` whose green closed the plan. When an
