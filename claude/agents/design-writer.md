@@ -68,7 +68,9 @@ Then write the document from the template:
   of the mock onto the real front, with the copy verbatim, and lists
   what the mock fakes and the app does not build. `acceptance` turns
   every step of every journey into a case whose expected state is the
-  step's frame and whose side effects are the step's. A state, a piece
+  step's frame and whose side effects are the step's; the case cites
+  its criterion by id (`J1.s2.1`) and never copies its text, which
+  lives once, in `stories.md`. A state, a piece
   of copy or a step you think is wrong is a question, never an edit.
 - **Facts have a source.** Every claim about the outside world points
   at its research file; every claim about what the code has today

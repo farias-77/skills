@@ -345,7 +345,8 @@ Every document opens with `## Size and evolution`: the rows of
 line ends with `(req: …)`. Each builds its parts at the tier picked,
 nothing above it. `ui` maps every screen and frame of the mock onto
 the real front and lists what the mock fakes; `acceptance` turns every
-journey step into a case.
+journey step into a case that cites its criterion by id (`J1.s2.1`)
+and never copies the criterion's text.
 
 **The writers' questions.** Answer from `sizing.md`, the tier files
 and the notes what they settle. A question of his class is not asked:
@@ -380,6 +381,12 @@ embedded, and snapshots every document for round 2. Run that copy by
 `scriptPath` with `designDir`, `discoveryDir`, `doctrineDir`, `repos`,
 `packsDir`, `agentsDir`, `inlineAgents`, `round: 1`, `language` and
 the glossary block; the args carry no flows.
+
+The script also weighs the documents: one over 40 KB, or the set over
+320 KB, prints a warning (`--doc-budget-kb`, `--total-budget-kb`
+change the defaults for a bigger pick). A warning never stops the
+round; a document over budget usually copies what another source
+holds, and the warning goes to the dreaming notes.
 
 The lenses report only four kinds of finding: **correctness, coverage
 of the lock, contradictions, one-way doors**. The size was decided at

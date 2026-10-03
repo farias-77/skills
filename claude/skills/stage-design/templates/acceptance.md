@@ -16,6 +16,12 @@
     mapped to a case: the expected state is the step's frame, the side
     effects are the step's side effects, checked directly in the store
     (never through a read endpoint);
+  - every journey case cites its acceptance criterion by id (`J1.s2.1`,
+    `frame:<token>.<n>`), never copies its text: the GIVEN / WHEN /
+    THEN live once, in 00-discovery/stories.md, and stage 3 copies
+    them from there. The row carries only what the test adds to the
+    criterion: the layer, the fixture, the frame file, the row read
+    back in the store, the cleanup;
   - per endpoint: the success case plus one per declared error that the
     sizing pick keeps (the contracts lens audits the mirror);
   - every case cleans up what it created;
@@ -31,9 +37,12 @@
 
 ### J<n> — <journey name> (covers S-00N)
 
-| Case | Step | Layer | Given / action | Expect (state · frame) | Side effect (store) | Cleanup |
-|---|---|---|---|---|---|---|
-| `J<n>.s1.1` | s1 | browser journey | <the step's action, the fixture> | <the state · `prototype/frames/<file>`> | <the row, e-mail or event the step promises> | <delete what was created> |
+<!-- The criterion's text is stories.md's: the row names it by id and
+     adds only the test's side of it. -->
+
+| Case (AC id) | Layer | Setup beyond the AC | Frame | Side effect (store) | Cleanup |
+|---|---|---|---|---|---|
+| `J<n>.s1.1` | browser journey | <what the criterion leaves open: the actor, the data the world needs> | `prototype/frames/<file>` | <the row, e-mail or event the step promises, read back in the store> | <delete what was created> |
 
 ## Contract cases
 

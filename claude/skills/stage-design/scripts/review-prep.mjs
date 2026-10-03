@@ -5,6 +5,7 @@
  *   node review-prep.mjs <workstream> --round 1
  *   node review-prep.mjs <workstream> --round 2 --fixes <fixes.json>
  *        [--workflow <path to design-review.js>]   (default: the pipeline's claude/workflows/design-review.js)
+ *        [--doc-budget-kb <n>] [--total-budget-kb <n>]   (defaults: 40 and 320)
  *
  * A workflow script cannot read files, and the round needs text: every
  * flow of architecture.md, and in round 2 the fixes, the documents and
@@ -31,9 +32,18 @@
  *          `lenses` = the lenses of the fixes whose severity is blocker
  *          or fix, plus design-reviewer-consistency.
  *
+ * size     every round weighs the documents the round reviews (notes.md
+ *          aside: it is the conductor's record): one document over
+ *          --doc-budget-kb (default 40 KB) or the set over
+ *          --total-budget-kb (default 320 KB) is a warning on stderr and
+ *          in `sizeWarnings`, never a failure. The defaults fit a build
+ *          of about a working week; a bigger pick passes bigger numbers.
+ *          A document over budget usually copies what another source
+ *          holds (an AC's text, a table of another document).
+ *
  * Prints one JSON line: the copy's path, the source's sha256, the flow
- * ids, and in round 2 changed, lenses and the fix count. Exit 1 on a
- * missing input.
+ * ids, the size warnings, and in round 2 changed, lenses and the fix
+ * count. Exit 1 on a missing input.
  */
 
 import { createHash } from 'node:crypto'
@@ -87,6 +97,25 @@ const snapshot = {
   docs: Object.fromEntries(DOCS.map(n => [basename(n, '.md'), sha(readFileSync(join(designDir, n), 'utf8'))])),
   flows: Object.fromEntries(flows.map(f => [f.id, sha(f.text)])),
 }
+// ---------- the size budget (a warning, never a failure) ----------
+
+const KB = 1024
+const budgetOf = (name, fallback) => {
+  const v = opt(name)
+  if (v === undefined) return fallback
+  const n = Number(v)
+  if (!(n > 0)) die(`--${name} ${v}: a positive number of KB`)
+  return n
+}
+const docBudget = budgetOf('doc-budget-kb', 40)
+const totalBudget = budgetOf('total-budget-kb', 320)
+const sizes = DOCS.filter(n => n !== 'notes.md').map(n => [n, readFileSync(join(designDir, n)).length])
+const sizeWarnings = sizes.filter(([, b]) => b > docBudget * KB)
+  .map(([n, b]) => `${n}: ${Math.round(b / KB)} KB, over the ${docBudget} KB budget of one document`)
+const total = sizes.reduce((sum, [, b]) => sum + b, 0)
+if (total > totalBudget * KB) sizeWarnings.push(`the design set: ${Math.round(total / KB)} KB, over the ${totalBudget} KB budget of the whole set`)
+sizeWarnings.forEach(w => console.error(`review-prep: warning: ${w}`))
+
 mkdirSync(runDir, { recursive: true })
 writeFileSync(join(runDir, `review-r${round}-snapshot.json`), JSON.stringify(snapshot, null, 2))
 
@@ -135,5 +164,6 @@ console.log(JSON.stringify({
   sourceSha256: sha(src),
   round,
   flows: flows.map(f => f.id),
+  sizeWarnings,
   ...(round === 2 ? { changed: embedded.changed, lenses: embedded.lenses, fixes: embedded.fixes.length } : {}),
 }))

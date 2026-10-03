@@ -148,7 +148,12 @@ the names, the other seven copy them. `data-model` and `contracts` own
 the names of the data and the wire; `code` owns the names of the code:
 files, modules, components, exported functions, the test files. A test
 case is named only in `acceptance.md`: another document says what the
-case proves and points there, and never coins a case name. So every
+case proves and points there, and never coins a case name. An
+acceptance criterion's text lives only in `stories.md`: `acceptance.md`
+cites it by id (`J1.s2.1`) and never copies its GIVEN / WHEN / THEN;
+the case row carries only what the test adds to it (the layer, the
+setup the criterion leaves open, the frame, the row read back, the
+cleanup). So every
 document names the thing the way its owner names it, takes every value
 from the sources (never from memory), and says where the exact form
 lives when it is another document's ("the whole shape is in
