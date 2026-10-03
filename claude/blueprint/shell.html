@@ -489,7 +489,7 @@
   const LK = D.review?.lock, SK = S.lock || {};
   const gapText = g => typeof g === 'string' ? md(g) : `${g.where ? `<code>${esc(g.where)}</code> ` : ''}${md(g.what || '')}`;
   (LK?.gaps || []).forEach(g => eye.push(`<b>${SK.gap}</b> — ${gapText(g)}`));
-  const lockLine = LK ? `<div class="meta"><span class="pill acc">${SK.locked.replace('{v}', esc(LK.version))}</span><span>${esc(LK.at)}</span><span><i>“${esc(LK.words)}”</i></span>${(LK.gaps || []).length ? `<span class="pill warn">${SK.gaps.replace('{n}', LK.gaps.length)}</span>` : ''}${LK.override ? `<span>${SK.override} <i>“${esc(LK.override)}”</i></span>` : ''}${LK.url ? `<a href="${esc(LK.url)}" target="_blank" rel="noopener">${SK.open} ↗</a>` : ''}</div>` : '';
+  const lockLine = LK ? `<div class="meta"><span class="pill acc">${SK.locked.replace('{v}', esc(LK.version))}</span><span>${esc(LK.at)}</span><span><i>“${esc(LK.words)}”</i></span>${(LK.gaps || []).length ? `<span class="pill warn">${SK.gaps.replace('{n}', LK.gaps.length)}</span>` : ''}${LK.override ? `<span>${SK.override} <i>“${esc(LK.override)}”</i></span>` : ''}${LK.url === 'local' ? `<span>${SK.local || 'mock kept local'}</span>` : LK.url ? `<a href="${esc(LK.url)}" target="_blank" rel="noopener">${SK.open} ↗</a>` : ''}</div>` : '';
   if (D.review?.dismissed?.length) eye.push(`<b>${S.eye.dismissed}</b> — ${D.review.dismissed.length} ${S.eye.dismissedTail} <a href="#review">${S.eye.seeReview}</a>`);
   sec('what', S.sec.what, null, `
     <div class="hero">
@@ -518,7 +518,7 @@
     const SM = S.mock || {};
     const jour = D.mock.journeys.map(j => `<article class="flow" id="journey-${esc(j.id)}"><div class="hd"><h3><code>${esc(j.id)}</code> · ${md(j.title)}</h3></div>
       <ol class="jsteps">${j.steps.map(st => `<li><span class="k">${esc(st.id)}</span><div><p>${md(st.do)}</p>${st.frame ? `<span class="rid">${esc(st.frame)}</span>` : ''}${st.png ? `<img loading="lazy" src="${esc(st.png)}" alt="${esc(`${j.id}.${st.id}`)}">` : ''}</div></li>`).join('')}</ol></article>`).join('');
-    sec('journeys', S.sec.journeys || 'Journeys', `${SM.lede ? SM.lede.replace('{v}', esc(D.mock.version)) : ''}${D.mock.url ? ` <a href="${esc(D.mock.url)}" target="_blank" rel="noopener">${SM.open} ↗</a>` : ''}`, `<div>${jour}</div>`);
+    sec('journeys', S.sec.journeys || 'Journeys', `${SM.lede ? SM.lede.replace('{v}', esc(D.mock.version)) : ''}${D.mock.url === 'local' ? ` ${SM.local || ''}` : D.mock.url ? ` <a href="${esc(D.mock.url)}" target="_blank" rel="noopener">${SM.open} ↗</a>` : ''}`, `<div>${jour}</div>`);
   }
 
   // ---- 3. FAQ ----
@@ -568,7 +568,7 @@
   const tot = k => R.rounds.reduce((a, r) => a + (r[k] || 0), 0);
   const cells = [[R.rounds.length, S.rev.round], [tot('findings'), S.rev.findings], [(R.decisions||[]).length, S.rev.toUser], [(R.authorFixes||[]).length, S.rev.toAuthor], [(R.forDesign||[]).length, S.rev.forDesign], [(R.dismissed||[]).length, S.rev.dismissed]];
   const dec = (R.decisions || []).map(x => { const pl = RP.decisions?.[`${x.round}:${x.id}`]; return `<div class="dec"><span class="k">${x.round}</span><p class="pl">${md(pl || x.ruling)}</p><span class="src">${esc(x.id)} · ${md(x.title)}</span></div>`; }).join('');
-  const fDes = x => `<div class="fnd"><div class="h"><span class="id">${esc(x.id)}</span><b>${md(x.title)}</b>${x.story ? `<a class="chip" href="#${x.story}">${x.story}</a>` : ''}</div><div class="why">${md(x.why)}</div></div>`;
+  const fDes = x => `<div class="fnd"><div class="h"><span class="id">${esc(x.id)}</span><b>${md(x.title)}</b>${x.story === 'all' ? `<span class="chip">${S.rev.allStories || 'all stories'}</span>` : x.story ? (Array.isArray(x.story) ? x.story : [x.story]).map(v => `<a class="chip" href="#${esc(v)}">${esc(v)}</a>`).join('') : ''}</div><div class="why">${md(x.why)}</div></div>`;
   const fDis = x => `<div class="fnd"><div class="h"><span class="id">${esc(x.id)}</span><b>${md(x.title)}</b><span class="pill mute">${esc(x.lens)}</span></div><div class="why">${md(x.why)}</div></div>`;
   const fAut = x => `<div class="fnd"><div class="h"><span class="id">${esc(x.id)}</span><span>${md(x.title)}</span></div></div>`;
   const rounds = `<div class="tbl-wrap"><table><thead><tr><th>${S.rev.round}</th><th class="num">${S.rev.findings}</th><th class="num">${S.rev.toAuthor}</th><th class="num">${S.rev.toUser}</th><th class="num">${S.rev.deferred}</th><th class="num">${S.rev.dismissed}</th><th>${S.rev.unread}</th><th>${S.rev.changed}</th></tr></thead>

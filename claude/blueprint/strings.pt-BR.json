@@ -47,10 +47,12 @@
   "gap": "Lacuna aceita no travamento",
   "gaps": "{n} lacunas aceitas",
   "override": "por cima da caminhada:",
+  "local": "mock mantido local, sem publicação",
   "open": "abrir o mock"
  },
  "mock": {
   "lede": "O mock travado, versão {v}: cada jornada passo a passo, como foi caminhada.",
+  "local": "O mock ficou local: os quadros estão na frente de trabalho.",
   "open": "abrir o mock"
  },
  "problem": "O problema",
@@ -117,6 +119,7 @@
   "validation": "Sua validação das histórias",
   "decisions": "As suas decisões, em linguagem simples",
   "forDesign": "Para o design",
+  "allStories": "todas as histórias",
   "authorFixes": "Corrigido pelo autor sem perguntar",
   "dismissedList": "Descartados, com a frase que fecha cada um",
   "residue": "Ainda em aberto",

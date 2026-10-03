@@ -47,10 +47,12 @@
   "gap": "Gap accepted at the lock",
   "gaps": "{n} gaps accepted",
   "override": "over the walk:",
+  "local": "mock kept local, never published",
   "open": "open the mock"
  },
  "mock": {
   "lede": "The locked mock, version {v}: every journey step by step, as it was walked.",
+  "local": "The mock was kept local: its frames are in the workstream.",
   "open": "open the mock"
  },
  "problem": "The problem",
@@ -117,6 +119,7 @@
   "validation": "Your validation of the stories",
   "decisions": "Your decisions, in plain words",
   "forDesign": "For the design",
+  "allStories": "all stories",
   "authorFixes": "Fixed by the author without asking",
   "dismissedList": "Dismissed, with the sentence that closes each",
   "residue": "Still open",

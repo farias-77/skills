@@ -62,7 +62,13 @@ stories.stories.forEach(s => {
   if (!report.stories[s.id]) problems.push(`report.json: story ${s.id} has no plain sentence`);
 });
 if (report.threeThings.length !== 3) problems.push('report.json: threeThings must have exactly three items');
-(review.forDesign || []).forEach(x => { if (x.story && !ids.has(x.story)) problems.push(`forDesign ${x.id}: story ${x.story} does not exist`); });
+// forDesign.story: one story id, a list of them, or "all" (a finding that crosses every story)
+(review.forDesign || []).forEach(x => {
+  if (x.story == null || x.story === 'all') return;
+  const list = Array.isArray(x.story) ? x.story : [x.story];
+  if (!list.length || list.some(v => typeof v !== 'string')) { problems.push(`forDesign ${x.id}: story must be a story id, a list of them, or "all"`); return; }
+  list.filter(v => !ids.has(v)).forEach(v => problems.push(`forDesign ${x.id}: story ${v} does not exist`));
+});
 (review.decisions || []).forEach(x => { if (!report.decisions?.[`${x.round}:${x.id}`]) problems.push(`report.json: decision ${x.round}:${x.id} has no plain sentence`); });
 // the lock (optional, v9): the mock's LOCK.json as he locked it — version, when, his words, an override and the gaps it accepted, the mock's link
 if (review.lock != null) {
@@ -74,7 +80,7 @@ if (review.lock != null) {
     if ('override' in K && K.override !== null && typeof K.override !== 'string') problems.push(`${w}: override must be his words or null`);
     if (K.gaps !== undefined && !Array.isArray(K.gaps)) problems.push(`${w}: gaps must be a list (empty when the walk passed)`);
     if (Array.isArray(K.gaps) && K.gaps.length && !K.override) problems.push(`${w}: gaps were accepted, so override carries his words`);
-    if (K.url != null && !/^https:\/\//.test(String(K.url))) problems.push(`${w}: url "${K.url}" must be the mock's https link`);
+    if (K.url != null && K.url !== 'local' && !/^https:\/\//.test(String(K.url))) problems.push(`${w}: url "${K.url}" must be the mock's https link, or "local" when the mock was never published`);
   }
 }
 // the mock (optional, v9): the locked journeys step by step, each step's picture published beside the page like the video
@@ -82,6 +88,7 @@ const mock = opt('mock.json');
 if (mock) {
   const w = 'mock.json';
   need(mock, ['version', 'journeys'], w);
+  if (mock.url != null && mock.url !== 'local' && !/^https:\/\//.test(String(mock.url))) problems.push(`${w}: url "${mock.url}" must be the mock's https link, or "local"`);
   if (mock.journeys !== undefined && !Array.isArray(mock.journeys)) problems.push(`${w}: journeys must be a list`);
   (Array.isArray(mock.journeys) ? mock.journeys : []).forEach((j, i) => {
     const wj = `${w} journeys[${i + 1}]${j.id ? ` (${j.id})` : ''}`;
@@ -776,7 +783,10 @@ if (existsSync(layersPath)) {
       else if (!existsSync(join(ws, v.video))) problems.push(`${w}: video ${v.video} not found in the workstream (the page plays it from that same path)`);
       else { const mb = statSync(join(ws, v.video)).size / 1048576; if (mb > 10) problems.push(`${w}: video ${v.video} is ${mb.toFixed(1)} MB; the stage report caps it at 10 MB`); }
     }
-    if (v.slides != null && (typeof v.slides !== 'string' || !/^https:\/\/claude\.ai\/(code\/)?artifact\/[\w-]+$/.test(v.slides))) problems.push(`${w}: slides "${v.slides}" must be the deck's claude.ai artifact link`);
+    // slides: the deck's claude.ai link; without the Artifact tools (local mode) the deck's first slide, a relative .html path inside the workstream
+    const localDeck = typeof v.slides === 'string' && /^(?![/\\])(?!.*\.\.)(?![a-z]+:)[\w./-]+\.html$/i.test(v.slides);
+    if (v.slides != null && (typeof v.slides !== 'string' || !(localDeck || /^https:\/\/claude\.ai\/(code\/)?artifact\/[\w-]+$/.test(v.slides)))) problems.push(`${w}: slides "${v.slides}" must be the deck's claude.ai artifact link, or (local mode) a relative .html path inside the workstream`);
+    else if (localDeck && !existsSync(join(ws, v.slides))) problems.push(`${w}: slides ${v.slides} not found in the workstream`);
   });
   if (problems.length) { console.error('blueprint data problems:\n  ' + problems.join('\n  ')); process.exit(1); }
   layers = Lr;

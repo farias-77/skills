@@ -90,9 +90,14 @@ Mermaid renders natively in the published page. An `svg` field
 - `lock` (optional) is the mock's `LOCK.json` as he locked it:
   `version`, `at` (its `date`), `words` (his, verbatim), `override`
   (his words when he locked over a failing walk, else `null`), `gaps`
-  (the walk's failures he accepted, `{where, what}` or one line each;
-  every gap shows under "What needs your eye") and `url` (the mock's
-  link). Gaps need an override.
+  (every gap he accepted, as `LOCK.json` lists them: the walk's
+  failures and the gate's gaps, `{source, where, what}`, or one line
+  each; every gap shows under "What needs your eye") and `url` (the
+  mock's https link, or `"local"` when the mock was never published:
+  the page then says so instead of linking). Gaps need an override.
+- `forDesign[].story` is one story id, a list of them
+  (`["S-001", "S-003"]`), or `"all"` for a finding that crosses every
+  story.
 - `validation` (one ruling per story, v8) is optional; nothing reads it.
 
 ## mock.json (optional)
@@ -105,7 +110,7 @@ Mermaid renders natively in the published page. An `svg` field
 ```
 
 The Discovery tab shows each journey step by step, after "How it
-works". `png` is optional, a path inside the workstream; the picture
+works". `url` is the mock's https link, or `"local"`. `png` is optional, a path inside the workstream; the picture
 is published beside the page at that same path (like the stage
 report's video), and the build refuses one that is not there.
 
