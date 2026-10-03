@@ -665,7 +665,7 @@
       const above = Z.picks.filter(p => p.tier !== 'lean').length;
       sec('design-size', SD.sec.size, SZ.lede, `<p class="plain">${md(Z.plain)}</p>
         <div class="cells">
-          <div class="cell"><span class="v">${esc(ap.pick)} h</span><span class="l">${SZ.cells.pick}</span><span class="s">${SZ.cells.pickTail.replace('{a}', esc(ap.hours))}</span></div>
+          <div class="cell"><span class="v">${esc(ap.pick)} h</span><span class="l">${SZ.cells.pick}</span><span class="s">${SZ.cells.pickTail.replace('{a}', esc(ap.hours))}${ap.accepted !== undefined ? ` · ${SZ.cells.acceptedTail.replace('{b}', esc(ap.accepted))}` : ''}</span></div>
           <div class="cell"><span class="v">${money(ap.runCost)}</span><span class="l">${SZ.cells.runCost}</span><span class="s">${esc(ap.unit)}</span></div>
           <div class="cell"><span class="v">${above}/${Z.picks.length}</span><span class="l">${SZ.cells.above}</span><span class="s">${SZ.cells.aboveTail}</span></div>
           <div class="cell"><span class="v">${Z.doors.length}</span><span class="l">${SZ.cells.doors}</span><span class="s">${SZ.cells.doorsTail.replace('{n}', Z.doors.filter(d => d.his).length)}</span></div>

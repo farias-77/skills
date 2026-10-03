@@ -185,8 +185,10 @@ if (existsSync(designDir)) {
     const ap = sizing.appetite && typeof sizing.appetite === 'object' ? sizing.appetite : {};
     if (sizing.appetite !== undefined) {
       need(ap, ['hours', 'pick', 'runCost', 'unit'], `${W} appetite`);
-      ['hours', 'pick', 'runCost'].forEach(k => { if (ap[k] !== undefined && !num(ap[k])) problems.push(`${W}: appetite.${k} must be a number`); });
-      if (num(ap.hours) && num(ap.pick) && ap.pick > ap.hours) problems.push(`${W}: appetite.pick ${ap.pick} h is over appetite.hours ${ap.hours} h (over the appetite the scope is cut, never the floor)`);
+      ['hours', 'pick', 'runCost', 'accepted'].forEach(k => { if (ap[k] !== undefined && !num(ap[k])) problems.push(`${W}: appetite.${k} must be a number`); });
+      if (num(ap.accepted) && num(ap.hours) && ap.accepted < ap.hours) problems.push(`${W}: appetite.accepted ${ap.accepted} h is under appetite.hours ${ap.hours} h (accepted is the overrun the user accepted, never a cut)`);
+      const ceiling = num(ap.accepted) ? ap.accepted : ap.hours;
+      if (num(ceiling) && num(ap.pick) && ap.pick > ceiling) problems.push(`${W}: appetite.pick ${ap.pick} h is over ${num(ap.accepted) ? `appetite.accepted ${ap.accepted}` : `appetite.hours ${ap.hours}`} h (over the appetite the scope is cut or the user accepts the hours, never the floor)`);
     }
     const tiers = lst(sizing.tiers, 'tiers');
     if (sizing.tiers !== undefined && (tiers.length !== 3 || tiers.some((t, i) => t?.tier !== TIERS[i]))) problems.push(`${W}: tiers must be exactly three, in order: ${TIERS.join(', ')}`);

@@ -273,12 +273,16 @@ builds; the section is then absent.
   watches it, the next step and its cost. Every **lean** pick with
   R ≥ 2 has a row (by its name or its part's).
 - `appetite.pick` is the pick's build hours; it never exceeds
-  `appetite.hours` (over the appetite the scope is cut).
+  `appetite.hours` (over the appetite the scope is cut), unless the
+  user accepted the overrun (at his call or at the close's veto):
+  `appetite.accepted` (optional) is then the hours he accepted, at
+  least `appetite.hours`, and the pick never exceeds it. The hours of
+  the frame stay in `hours`.
 
 The build refuses with the field named: tiers not three or out of
 order, a pick for an unknown part, a score outside 1–3, a part with no
 pick, a lean pick with R ≥ 2 and no evolution row, a pick over the
-appetite, **a text over its word cap**.
+appetite (or over `appetite.accepted` when he accepted more), **a text over its word cap**.
 
 ### design-review.json — like discovery's review.json
 

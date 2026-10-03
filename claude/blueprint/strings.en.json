@@ -320,6 +320,7 @@
    "cells": {
     "pick": "the pick, in build hours",
     "pickTail": "against an appetite of {a} h",
+    "acceptedTail": "{b} h accepted by the user",
     "runCost": "run cost a month",
     "above": "parts above lean",
     "aboveTail": "each one cites the score that forced it",

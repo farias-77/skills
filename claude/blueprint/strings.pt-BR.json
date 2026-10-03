@@ -320,6 +320,7 @@
    "cells": {
     "pick": "a escolha, em horas de construção",
     "pickTail": "contra um apetite de {a} h",
+    "acceptedTail": "{b} h aceitas pelo usuário",
     "runCost": "custo de operação por mês",
     "above": "partes acima do enxuto",
     "aboveTail": "cada uma cita a nota que a forçou",
