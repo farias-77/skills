@@ -118,6 +118,22 @@ Factories and fixtures that exist: <one line each, with the path>
 
 <the files the doctrine marks as shared (migrations, the API contract, the generated code, the module registry): the paths an entry must not edit after the foundation>
 
+## What the generators write
+
+<!-- Every generator command of this area (the contract's, the
+     database queries', mocks, any `gen` target), run once at the base
+     sha in a scratch worktree: `git worktree add --detach <tmp> <sha>`,
+     `touch <tmp>/.gen-mark`, the command, then `find <tmp> -type f
+     -newer <tmp>/.gen-mark -not -path '*/.git/*'` (every file it
+     wrote, changed or not) and `git -C <tmp> status --porcelain` (the
+     drift on the base), then `git worktree remove --force <tmp>`. Every
+     path it writes goes in F's Owns. "none" when the area has no
+     generator; "did not run" with the error when it failed. -->
+
+| Command | Writes (paths, globs when one directory holds them all) | Drift on the base | Read at |
+|---|---|---|---|
+| `<make gen>` | `<api/gen/*.go>`, `<web/src/api/schema.d.ts>` | <none / the files git status lists> | <scratch worktree at <sha>> |
+
 ## Not verified
 
 <what the docs say and the code does not show, or the reverse; one line each>

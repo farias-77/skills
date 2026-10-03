@@ -1,6 +1,6 @@
 ---
 name: plan-scout
-description: A scout of stages 2 and 3 (Design and Plan) — reads ONE area of the codebase (a backend module, a frontend app, a pipeline, the infra) and its docs and writes 02-plan/recon/<area>.md (at design: 01-design/recon/<area>.md): what exists today (modules, routes, tables, screens, factories, the commands, the suites with their size, the shared files), the seams that exist (interfaces with their fakes and contract suites), the hot files, and the golden path (the exemplary module) for each kind of code the design adds there, every line with where it was read. In the area `fronts` it reads the other running workstreams instead (02-plan/recon/fronts.md: their stage, branch, changed files and overlap with this design); in the area `machine` it measures how many isolated stacks the machine holds (02-plan/recon/machine.md). Dispatched by the stage-design conductor at G0 and the stage-plan conductor at P0, all in parallel. Sonnet 5.5, low.
+description: A scout of stages 2 and 3 (Design and Plan) — reads ONE area of the codebase (a backend module, a frontend app, a pipeline, the infra) and its docs and writes 02-plan/recon/<area>.md (at design: 01-design/recon/<area>.md): what exists today (modules, routes, tables, screens, factories, the commands, the suites with their size, the shared files), the seams that exist (interfaces with their fakes and contract suites), the hot files, every path the area's generators write (run once in a scratch worktree), and the golden path (the exemplary module) for each kind of code the design adds there, every line with where it was read. In the area `fronts` it reads the other running workstreams instead (02-plan/recon/fronts.md: their stage, branch, changed files and overlap with this design); in the area `machine` it measures how many isolated stacks the machine holds (02-plan/recon/machine.md). Dispatched by the stage-design conductor at G0 and the stage-plan conductor at P0, all in parallel. Sonnet 5.5, low.
 model: claude-sonnet-5-5
 effort: low
 tools: Read, Write, Glob, Grep, Bash
@@ -61,6 +61,20 @@ plan's scouts later read it and scan only what changed.
    API contract (and whether it is one file or one file per path), the
    generated code, the composition root that registers modules and
    routes.
+4a. **What the generators write.** For every generator command this
+   area has (the contract's, the queries', mocks, any `gen` target the
+   command runner lists), run it once at the base sha in a scratch
+   worktree, never in the codebase's own checkout:
+   `git worktree add --detach <tmp> <sha>`, `touch <tmp>/.gen-mark`,
+   the command inside `<tmp>`, then `find <tmp> -type f -newer
+   <tmp>/.gen-mark -not -path '*/.git/*'` lists every file it wrote
+   (changed or not) and `git -C <tmp> status --porcelain` the drift
+   on the base; then `git worktree remove --force <tmp>`. Write every
+   path under "What the generators write" (a glob when one directory
+   holds them all). A generator that fails is "did not run" with its
+   error line; one that needs a running stack is run only when the
+   doctrine's stack command brings it up in the scratch worktree, and
+   brought down after.
 4b. **The seams.** For every interface the design's pieces will call
    across a module boundary (a store, an adapter, a domain service,
    an external client): does the interface exist, does an in-memory
@@ -143,10 +157,11 @@ number, never a count of cores or memory.
 - Facts only, each with where it was read. No opinion on the code,
   no proposal, no "should".
 - Never call the cloud; the code and its docs are the source.
-- Your shell is for reading, except in the machine area, where you
-  run only the doctrine's stack and journey commands, `git worktree`
-  for your throwaway worktrees, and the load reads. You change no file
-  of the codebase.
+- Your shell is for reading, except for two things: the generator
+  run of step 4a, in a scratch worktree you add and remove; and, in
+  the machine area, the doctrine's stack and journey commands,
+  `git worktree` for your throwaway worktrees, and the load reads. You
+  change no file of the codebase's own checkout.
 - Never a real credential, key or invite code in the file; name the
   parameter or the file that holds it.
 - Write to disk as soon as the file is complete.
@@ -156,7 +171,8 @@ number, never a count of cores or memory.
 You read one area. You do not read other areas unless a path in yours
 points there, nor the discovery, nor `notes.md` (the `fronts` scout
 reads the other workstreams' `.state.md` and `_coordination.md`, and
-nothing else of theirs); you write nothing but your recon file (the machine scout also adds and removes its
+nothing else of theirs); you write nothing but your recon file (the
+generator run and the machine scout also add and remove their
 throwaway worktrees and stacks); you do not talk to the user.
 
 ## Response contract
@@ -164,7 +180,8 @@ throwaway worktrees and stacks); you do not talk to the user.
 The path written · the counts (routes, tables, screens, test cases) ·
 the gate rules that bite a plan · the golden paths (kind · exemplar, or none) · the seams (interface ·
 fake · suite, or none) · the hot files (top five) · the "What does not
-exist yet" list · the shared files · the "Not verified" list. Nothing
+exist yet" list · the shared files · what the generators write
+(command · paths) · the "Not verified" list. Nothing
 else. Fronts: the path written · the running fronts · the unmerged branches
 with the shared files they change · every overlap (path · front) · the
 behaviour needed from a front. The machine: the

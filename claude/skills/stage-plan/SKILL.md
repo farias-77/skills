@@ -180,7 +180,9 @@ message**, each with the area's path, the codebase root, the design
 folder, the template ([templates/recon.md](templates/recon.md)) and
 the language, and the design's recon of the same area
 (`01-design/recon/<area>.md`) when it exists, so the scout reads what
-changed since. More areas is cheaper than a scout that reads two. A
+changed since. A scout whose area has a generator runs it once in a
+scratch worktree at the base and lists every path it writes (F owns
+them all, P1). More areas is cheaper than a scout that reads two. A
 question of your own goes after the template's sections, never
 instead of them. In the
 same message, one `plan-scout` with the area **`fronts`**: the
@@ -215,6 +217,10 @@ pack's "F0, in order"):
 2. **The contract**: every route or operation of `contracts.md`, with
    every input and output field, one file per path, then the
    generator. Handlers answer "not implemented"; no test asserts it.
+   **F owns every file the generators write**, not only their inputs:
+   the recon's "What the generators write" lists them, from a run in
+   a scratch worktree. A generated file outside F's Owns turns F's own
+   proof ("the generator leaves no diff") into an amendment to F.
 3. **Wiring**: the new modules registered, config loaded, every secret
    faked in the test env.
 4. **Seams**: for each need that P2 classifies `interface`, the
