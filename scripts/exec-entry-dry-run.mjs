@@ -20,6 +20,7 @@ const T = (n) => ({ started: `2026-10-04T10:${String(n).padStart(2, '0')}:00Z`, 
 const API = { api: true, screen: false, runtime: false, paths: ['server/orders/create.go'] };
 const SCREEN = { api: false, screen: true, runtime: false, paths: ['web/src/orders/OrderList.tsx'] };
 const BOTH = { api: true, screen: true, runtime: false, paths: ['server/orders/create.go', 'web/src/orders/OrderList.tsx'] };
+const AUTH = { api: true, screen: false, runtime: false, sensitive: true, paths: ['server/auth/session.go'] };
 const CODE = { check: 'journey', where: 'e2e/orders.spec.ts:40', output: 'Expected "Order received", received "Error"', cause: 'code', side: 'front', load: '' };
 const MACHINE = { check: 'journey', where: 'e2e/orders.spec.ts:12', output: 'TimeoutError: locator.waitFor: Timeout 5000ms exceeded', cause: 'machine', side: 'front', load: '34.2 · nproc 8' };
 
@@ -62,15 +63,25 @@ const scenarios = [
     gate: seq('conflict', 'green'), expect: ['ready', 1] },
   { title: 'resume after a machine park before the check → gate → whole check → ready', surface: API,
     args: { mode: 'resume', resume: { head: 'h3', passesUsed: 1, check: 'whole' } }, expect: ['ready', 1] },
+  { title: 'adjust: his request on screen → builder → gate → ready, no reviewer, no QA', surface: SCREEN, args: { mode: 'adjust', entry: 'A.1' },
+    expect: ['ready', 1], calls: ['builder', 'exec-gate'] },
+  { title: 'adjust: a code red → one gate fix → green → ready, still no review', surface: SCREEN, args: { mode: 'adjust', entry: 'A.2' },
+    gate: seq('code', 'green'), expect: ['ready', 2], calls: ['builder', 'exec-gate', 'builder', 'exec-gate'] },
+  { title: 'adjust: the gate sees auth touched → the reviewer reads it → ready', surface: AUTH, args: { mode: 'adjust', entry: 'A.3' },
+    expect: ['ready', 1], calls: ['builder', 'exec-gate', 'reviewer'] },
+  { title: 'adjust: marked security by the session, a blocking hole → one fix → delta by the reviewer → ready', surface: SCREEN, args: { mode: 'adjust', entry: 'A.4', security: true },
+    reviewer: (n) => n === 1 ? review([{ ...BUG, basis: 'security', title: 'another user\'s order readable by id' }]) : review([], ['reviewer#r1.1']), expect: ['ready', 2],
+    calls: ['builder', 'exec-gate', 'reviewer', 'builder', 'exec-gate', 'reviewer'] },
 ];
 
 let bad = 0;
 for (const sc of scenarios) {
-  const counts = {}, calls = [], logs = [];
+  const counts = {}, calls = [], names = [], logs = [];
   const agent = async (prompt, o) => {
     const name = nameOf(prompt, o);
     const n = counts[name] = (counts[name] ?? 0) + 1;
     calls.push(o.label);
+    names.push(name);
     if (name === 'builder') return sc.build ? sc.build(n) : build(n);
     if (name === 'exec-gate') return gate(sc.gate ? sc.gate(n) : 'green', sc.surface, n);
     if (name === 'reviewer') return (sc.reviewer ?? (() => review()))(n);
@@ -82,10 +93,11 @@ for (const sc of scenarios) {
     gateCommands: ['make check', 'make test-affected base=feat/x'], fastChecks: ['make check'], inlineAgents: true, ...(sc.args ?? {}) },
   agent, async (th) => Promise.all(th.map(t => t())), (m) => logs.push(m), () => {});
   const [status, passes, reason] = sc.expect;
-  const ok = r.status === status && r.passes === passes && (reason === undefined || r.reason === reason);
+  const ok = r.status === status && r.passes === passes && (reason === undefined || r.reason === reason)
+    && (!sc.calls || sc.calls.join() === names.join());
   if (!ok) bad++;
   const mins = r.steps.reduce((a, s) => a + (s.minutes ?? 0), 0);
-  console.log(`${ok ? 'ok  ' : 'FAIL'} ${sc.title}\n     status=${r.status}${r.reason ? ` (${r.reason})` : ''} passes=${r.passes} rounds=${r.rounds.length} notes=${r.notes.length} steps=${r.steps.length} (${mins} min)${ok ? '' : ` — expected ${status} passes=${passes}${reason ? ` (${reason})` : ''}`}`);
+  console.log(`${ok ? 'ok  ' : 'FAIL'} ${sc.title}\n     status=${r.status}${r.reason ? ` (${r.reason})` : ''} passes=${r.passes} rounds=${r.rounds.length} notes=${r.notes.length} steps=${r.steps.length} (${mins} min)${ok ? '' : ` — expected ${status} passes=${passes}${reason ? ` (${reason})` : ''}${sc.calls ? ` calls ${sc.calls.join(' → ')}` : ''}`}`);
   console.log(`     calls: ${calls.join(' → ')}`);
   if (verbose) console.log(logs.map(l => `       ${l}`).join('\n'));
 }

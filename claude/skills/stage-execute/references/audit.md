@@ -28,9 +28,10 @@ Each decided and choice item carries: where (entry, `file:line`), the
 nearest sentence of the documents, what was built, the recommendation
 (keep, fix) and why.
 
-Then the stage report, with the screens beside the locked mock, and the
-PushNotification. He rules parked items, choices and any screen that
-drifts from the mock through the question tool, four per call, parked
-first; each ruling goes next to its item and to `rulings.md`. A "fix"
-becomes one fix entry `X.<n>` run through exec-entry and merged. When
-he approves, the stage closes.
+It is written before his hands-on, so he has it while he uses the
+app. He rules parked items and choices through the question tool, four
+per call, parked first; each ruling goes next to its item and to
+`rulings.md`. A "fix" becomes one fix entry `X.<n>` run through
+exec-entry and merged. The adjustments of his hands-on (`A.<n>`) are
+listed after it, each with his words and its merge sha. When he
+approves, the stage closes.

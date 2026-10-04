@@ -42,9 +42,10 @@
 
 - <entry> · `<path>` — <the builder's reason, or "unlisted">
 
-## The screens against the locked mock
+## His hands-on
 
-In the stage report: each frame beside the real screen. **Drifts he names:** — <none yet>
+- A.<n> · "<his words>" · <merged sha | parked: reason> · <minutes>
+- **ok:** <date> — <his words>
 
 ## The tally per agent
 

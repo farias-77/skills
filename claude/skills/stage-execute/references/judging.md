@@ -29,8 +29,8 @@ note     everything else
 - A finding marked `blocking` without a blocking basis or a proof is a
   note; the workflow logs it and counts it (`downgraded`).
 
-The visual comparison with the locked mock is not a finding of any
-agent: he makes it once, in the stage report.
+The visual check is not a finding of any agent: he makes it himself,
+using the app at the hands-on that ends the stage.
 
 ## What the builder decides, and what parks
 

@@ -92,7 +92,7 @@ high)` writes one brief per entry, all at once; one review round
 lists its choices for veto; the pre-flight lists what only he can hand
 over, each item with a ready command. Stage 4 waits for his play.
 
-**4 · Execute — play, and come back when it is done.** He hands over
+**4 · Execute — play, and come back to use it.** He hands over
 the pre-flight and pastes one goal; he is called once, at the end.
 Done means the plan's ACs met and the gate green; nothing else blocks.
 Per node: one `builder (Opus 5.5, medium)` writes the code and a test
@@ -104,8 +104,11 @@ none of whom wrote the code. A finding blocks only on an AC not met, a
 reproduced bug, a security hole or a written rule broken; the rest are
 notes on the PR. One fix pass at most, then the entry merges or parks.
 The session is the **local CI**: a serial queue tests each merged tree
-and signs it off; the whole gate runs once at the end. He checks the
-screens against the locked mock once, in the stage report.
+and signs it off; the whole gate runs once at the end. Then his
+hands-on: the session runs the environment, he uses the app and says
+what to change in plain words, and each adjustment is built on the
+spot (builder, gate, merge; the reviewer only when it touches auth,
+permissions or personal data) until he says ok.
 
 **5 · Release — autonomous, responsible.** His play is his "go": one
 message carries the pre-flight and the play line that authorizes the

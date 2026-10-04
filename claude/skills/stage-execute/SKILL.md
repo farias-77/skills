@@ -1,6 +1,6 @@
 ---
 name: stage-execute
-description: Conducts stage 4 (Execute) — turns a closed plan into merged code on the feature branch, from one "play" to one call. Step 0 shows the plan's pre-flight once, waits until every item is handed over, and gives the user the /goal text to paste; from then on nobody asks him anything. One session (Opus 5.5, high) orchestrates without writing code: the foundation first, then every node of plan.graph.json whose edges are merged or ready, in the graph's start order, in parallel up to the cap, each through the exec-entry workflow — builder (Opus 5.5, medium) writes the code and the tests for the entry's ACs, running only the fast checks (two builders, back and front in parallel, when the brief carries a Contract); exec-gate (Sonnet 5.5, low) runs the gate once, the only place the suites run; then, in parallel, reviewer (Opus 5.5, high) with a closed scope, qa-frontend (Opus 5.5, medium) on screens and qa-backend (Opus 5.5, medium) on the API and data; a mechanical triage (blocking only on an AC not met, a reproduced bug, a security hole or a written rule broken; the rest are notes on the PR); at most one review fix pass (a gate-fix pass on a code red is apart, two at most) and a delta by the agents that blocked, then ready or parked. Done = the plan's ACs met and the gate green. The session is the local CI: its serial queue merges the base into each ready entry, tests the merged tree, merges, and signs off; the whole gate runs once at the end. It closes with the stage report, where the user checks the screens against the locked mock once, and calls him once, when everything is merged, green and reported. Use when a workstream's .state.md says stage execute, or to resume an execution in progress.
+description: Conducts stage 4 (Execute) — turns a closed plan into merged code on the feature branch, from one "play" to one call. Step 0 shows the plan's pre-flight once, waits until every item is handed over, and gives the user the /goal text to paste; from then on nobody asks him anything. One session (Opus 5.5, high) orchestrates without writing code: the foundation first, then every node of plan.graph.json whose edges are merged or ready, in the graph's start order, in parallel up to the cap, each through the exec-entry workflow — builder (Opus 5.5, medium) writes the code and the tests for the entry's ACs, running only the fast checks (two builders, back and front in parallel, when the brief carries a Contract); exec-gate (Sonnet 5.5, low) runs the gate once, the only place the suites run; then, in parallel, reviewer (Opus 5.5, high) with a closed scope, qa-frontend (Opus 5.5, medium) on screens and qa-backend (Opus 5.5, medium) on the API and data; a mechanical triage (blocking only on an AC not met, a reproduced bug, a security hole or a written rule broken; the rest are notes on the PR); at most one review fix pass (a gate-fix pass on a code red is apart, two at most) and a delta by the agents that blocked, then ready or parked. Done = the plan's ACs met and the gate green. The session is the local CI: its serial queue merges the base into each ready entry, tests the merged tree, merges, and signs off; the whole gate runs once at the end. Then it calls him once, for his hands-on: it runs the environment, he uses the app and sends adjustments in plain words, each built as a small entry A.<n> (builder → gate → merge; the reviewer only on auth, permissions or personal data) until he says ok. Then the stage report. Use when a workstream's .state.md says stage execute, or to resume an execution in progress.
 disable-model-invocation: false
 argument-hint: "<workstream-slug>"
 allowed-tools: Read, Write, Edit, Glob, Grep, Agent, Workflow, AskUserQuestion, Artifact, PushNotification, Bash
@@ -32,7 +32,8 @@ each merged head off and the whole gate signs off the top once.
 The session is the orchestrator, **Opus 5.5 at high effort**. It does
 not write product code and does not review it. The user hands over the
 pre-flight, pastes one goal and leaves; the session calls him once, at
-the end.
+the end, to use the app himself. **Stage 5 assumes everything is
+implemented and working**: what he wants changed is built here.
 
 ## The pipeline of one entry
 
@@ -59,7 +60,7 @@ line per agent with its minutes, and the session keeps them.
 
 | Agent | Model, effort | Does |
 |---|---|---|
-| the session | Opus 5.5, high | pre-flight, the goal, worktrees, runs, the machine's load, the merge queue, its migration ordering and its signoff, the record, the stage report |
+| the session | Opus 5.5, high | pre-flight, the goal, worktrees, runs, the machine's load, the merge queue, its migration ordering and its signoff, the environment for his hands-on and its adjustments, the record, the stage report |
 | `builder` | Opus 5.5, medium | the code and the tests of an entry, back and front or one side against the Contract; the fix pass |
 | `exec-gate` | Sonnet 5.5, low | the gate commands once, code or machine, the surface, the stack |
 | `reviewer` | Opus 5.5, high | the ACs implemented, bugs and races, the security checklist, operations, a written rule broken |
@@ -104,6 +105,7 @@ designs-root/<workstream>/
 | `E-<nn>` | a slice | by its edges, in the start order |
 | `E-int` | the integration node | when its edges are `ready` (stacked); merges last |
 | `X.<n>` | a fix entry of this stage: the whole gate red at the end, or a "fix" he rules at the audit | at the end |
+| `A.<n>` | an adjustment he asks for at the hands-on (Step 6) | while he uses the app |
 
 ## Step 0 — pre-flight, then play
 
@@ -128,14 +130,14 @@ from the start; everything else goes on.
 
 ```
 /goal Build the whole plan of <workstream> with the stage-execute skill,
-from the foundation to the stage report, without asking me anything.
+from the foundation to my hands-on, without asking me anything.
 Done means, each shown in this conversation: board.md has every entry
 merged into feat/<workstream>, or parked with its reason and evidence;
 the whole gate ran once on the top of feat/<workstream> in a fresh
 worktree and exited 0, and the signoff posted local-ci = success on
-that sha (paste its line); audit.md is written; the stage report is
-published with the screens beside the locked mock for my check (paste
-the links). Decide what is mine conservatively and list it in the
+that sha (paste its line); audit.md is written; the environment is up
+on that sha with the local URLs and the test actors' logins pasted for
+my hands-on. Decide what is mine conservatively and list it in the
 audit for my veto. Then notify me.
 ```
 
@@ -289,7 +291,7 @@ once, at the end (Step 5)
    · the signoff's line. `board.md` to `merged`. Start what it
    unblocked.
 
-## Step 5 — the end
+## Step 5 — the whole gate
 
 When every entry is merged or parked:
 
@@ -300,33 +302,68 @@ When every entry is merged or parked:
    entry `X.<n>`, its brief written by the session with the log's path
    and its failing lines, run through exec-entry, merged through the
    queue; then the whole gate again.
-2. `explain.md` from [templates/explain.md](templates/explain.md).
-3. `audit.md` by [references/audit.md](references/audit.md).
-4. **The stage's video**: `video-scribe (Sonnet 5.5, medium)` once more,
+2. `audit.md` by [references/audit.md](references/audit.md).
+
+## Step 6 — his hands-on
+
+Every entry merged or parked and the whole gate green: he uses the
+app himself. This is the stage's visual check, live: no agent compares
+the screens with the mock; he does, on the real thing.
+
+```
+up ─► he uses it ─► "make the button say Save" ─► A.1 builder → gate → merge ─┐
+         ▲                                                                     │
+         └──────────────── the environment again on the new top ◄─────────────┘
+he says ok ─► Step 7
+```
+
+1. **The environment.** In a fresh worktree on the top of
+   `feat/<workstream>`, the project's stack-up command (the project
+   contract's item 5: app, API and local data with the seed), then its
+   env command. **PushNotification** to him, and the same in the
+   conversation: the local URL(s), the test actors' logins the way the
+   project provides them (the env command's output, or where the
+   project keeps them; never a secret pasted), what merged, what
+   parked, and `audit.md`'s path. The first call since the pre-flight.
+2. **He uses it** and sends adjustments in plain words. He may also
+   rule the audit here (Step 8 records it).
+3. **Each adjustment is an entry `A.<n>`.** The session writes its
+   brief under `03-execution/entries/A.<n>/brief.md`: his words quoted,
+   one AC written from them, the files it expects to touch. Then
+   exec-entry with `mode: 'adjust'` (Step 2's arguments; `security:
+   true` when the request touches authentication, permissions or
+   personal data): builder, gate, and the reviewer only on that
+   surface (the gate also reports it). No QA: it is his request and he
+   is looking at it. `ready` goes through the merge queue (Step 4);
+   anything else, the session tells him what blocked and asks how to
+   go on. Adjustments whose files do not overlap run in parallel.
+4. **The environment follows the top.** After each merge, bring the
+   stack up again on the new top of `feat/<workstream>` and tell him
+   it is there.
+5. **He says ok** (or words to that effect): the hands-on closes. One
+   line in `rulings.md` (`execute hands-on · ok · <the A.<n> merged>`),
+   and the whole gate once more on the top when any `A.<n>` merged.
+
+## Step 7 — the stage report
+
+1. `explain.md` from [templates/explain.md](templates/explain.md).
+2. `audit.md` brought up to date with the `A.<n>` entries.
+3. **The stage's video**: `video-scribe (Sonnet 5.5, medium)` once more,
    with every `run-*.json`.
-5. `blueprint/execution/execution.json` (schema:
+4. `blueprint/execution/execution.json` (schema:
    `${CLAUDE_SKILL_DIR}/../../blueprint/schema/execution.md`).
-6. **The stage report**: follow
+5. **The stage report**: follow
    `${CLAUDE_SKILL_DIR}/../../docs/stage-report.md` (video, slides,
-   blueprint), with one more section, **the screens against the locked
-   mock**: for every frame in `00-discovery/prototype/frames/`, the
-   real screen in the same state (the whole gate's journey screenshot,
-   or one the session takes on the top of the branch) beside it. This
-   is the only visual check of the stage, and it is his: no agent
-   compares the screens with the mock.
-7. **PushNotification** to him: what merged, what parked, the report's
-   links, and the audit and the screens waiting. The first call since
-   the pre-flight.
+   blueprint).
 
-## Step 6 — the audit
+## Step 8 — the audit
 
-He reads the audit and the stage report, rules the parked entries and
-anything he wants changed, and names any screen that drifts from the
-mock. Each ruling goes next to its item in `audit.md`, in
-`execution.json` and in `rulings.md`. A "fix" becomes one fix entry
-`X.<n>` through exec-entry, like any other code. When he approves:
-`.state.md` to `stage: release`, the close commit of the workstream
-folder, and suggest `/clear` before stage 5.
+He rules the parked entries and anything in the audit he wants
+changed, if he has not at the hands-on. Each ruling goes next to its
+item in `audit.md`, in `execution.json` and in `rulings.md`. A "fix"
+becomes one fix entry `X.<n>` through exec-entry, like any other code.
+When he approves: `.state.md` to `stage: release`, the close commit of
+the workstream folder, and suggest `/clear` before stage 5.
 
 ## Resuming
 
@@ -337,7 +374,8 @@ no live run restarts from its branch with `mode: 'resume'`, `check:
 
 ## Boundaries
 
-The session writes no product code and reviews none. No deploy. No
+The session writes no product code and reviews none, not even an
+adjustment's. No deploy. No
 merge of anything that did not come back `ready` and pass the
 merged-tree test. No commit status posted by anything but the signoff
 command, run by the session. No re-decision of the design or the plan.

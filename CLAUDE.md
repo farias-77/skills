@@ -16,7 +16,7 @@ afterwards for a veto.
 | 1 discovery | **interview + mock + lock** | he talks; a clickable mock is built and iterated in front of him; he validates through it and locks it. The text (journeys, stories, PR-FAQ) is derived from the locked mock |
 | 2 design | **the talk + the debate** | he says what he has in mind; one proposal is presented as a video and slides and debated with him until he says it is closed, which is his approval; the four documents and the review run without him |
 | 3 plan | **autonomous** | nowhere: the conductor rules everything, lists its choices at the report for his veto, and gathers what only he can hand over into the pre-flight |
-| 4 execute | **pre-flight, then play** | he hands over the pre-flight and pastes one goal; he is called once, at the end, when everything is merged, green and reported, and checks the screens against the locked mock there. One blocking rule, in code |
+| 4 execute | **pre-flight, then play, then his hands-on** | he hands over the pre-flight and pastes one goal; he is called once, at the end, when everything is merged and green: the session runs the environment, he uses the app and sends adjustments, built in the stage until he says ok. One blocking rule, in code |
 | 5 release | **his play authorizes the head** | the play (`merge-from <audited head>` in the guard's allow file) is his "go"; the session merges, deploys, verifies and rolls back on its own, under the guard; it stops only on its written list |
 | 6 close | **retro + launch video** | the retro is a file for the weekly; for the people, a launch video and a "what's new" text he forwards |
 
@@ -151,9 +151,10 @@ no judge at all.
   with its proof; the entry gets one fix pass. The rest are notes on
   the PR and open no work. What is his (an entry still blocking after
   its fix pass, what needs him in person, the builders' conservative
-  calls in his classes, the screens against the locked mock) is
-  parked or listed, never asked, and he rules it at the audit that
-  closes stage 4.
+  calls in his classes) is parked or listed, never asked, and he rules
+  it at the audit that closes stage 4. At the hands-on before it he
+  uses the app; each adjustment he asks for is built as an entry
+  `A.<n>`, and his "ok" closes the hands-on, recorded in `rulings.md`.
 - **Release.** His ruling is **the play**: the pre-flight message and
   the play line, recorded verbatim in the trace and in `rulings.md`.
   An answer to a question on the stop list is a ruling too. A fix

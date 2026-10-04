@@ -53,6 +53,9 @@ env commands).
    `runtime`: infra, deploy, config, alarms or migrations changed. Tests,
    tooling, build files and docs count for none. A path you cannot
    place counts as product code of its side.
+   `sensitive`: the diff touches authentication, permissions or
+   personal data (a login, a role check, a scope on a query, a field
+   that names or reaches a person). When unsure, `true`.
 5. **The stack**, only when green and the surface has `api` or
    `screen`: the doctrine's stack-up command on this head (rebuilt when
    the head changed), then its env command; report the URLs and the
@@ -74,6 +77,6 @@ env commands).
 `green` · `head` · `summary` · `checks` (one per command, green or not,
 with its last line) · `failures` (each with `check`, `where`, `output`,
 `cause`, `side`, `load`) · `load` · `stack` (the URLs and actors, or
-"down") · `conflicts` · `surface` (`api`, `screen`, `runtime` and the
+"down") · `conflicts` · `surface` (`api`, `screen`, `runtime`, `sensitive` and the
 paths behind each) · `started` and `ended` (UTC, from `date -u
 +%FT%TZ`).

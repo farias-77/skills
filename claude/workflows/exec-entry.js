@@ -72,6 +72,16 @@
  * 'delta' (resume.items, the parked run's blocking items, re-checked by
  * the agents that raised them) or 'none'.
  *
+ * THE FLOW (mode 'adjust'): an adjustment the user asked for at the
+ * hands-on that closes stage 4 (entry A.<n>). The fast path: builder →
+ * gate → ready; the session merges it through its queue. No QA and no
+ * reviewer, because it is his own request on a screen he is looking at.
+ * The security checklist still applies: when the session marks the
+ * request `security: true`, or the gate reports the diff touches auth,
+ * permissions or personal data (surface.sensitive), the reviewer
+ * (Opus 5.5, high) reads it, with the same triage, one review fix pass
+ * and delta as an entry. Gate-fix passes as in 'build'.
+ *
  * TIMES. A workflow has no clock: every agent stamps `started` and `ended`
  * (UTC, from `date -u`), and the run returns `steps`, one line per agent
  * call with its minutes. The target is 30–60 minutes per entry.
@@ -95,10 +105,11 @@
  *
  * Invoked by the stage-execute session:
  *   Workflow({ scriptPath: '<...>/workflows/exec-entry.js', args: {
- *     mode:            'build' | 'update' | 'resume',
+ *     mode:            'build' | 'update' | 'resume' | 'adjust',
  *     entry:           'E-03',
  *     briefPath:       '/abs/.../02-plan/briefs/E-03.md',
  *     contract:        true,                               // the brief carries a Contract section: two builders
+ *     security:        false,                              // 'adjust' only: the request touches auth, permissions or personal data
  *     designDir:       '/abs/.../01-design',
  *     discoveryDir:    '/abs/.../00-discovery',            // the locked mock's journeys
  *     reconDir:        '/abs/.../02-plan/recon',
@@ -132,7 +143,7 @@
 
 export const meta = {
   name: 'exec-entry',
-  description: 'Stage-4 entry: one builder (two in parallel when the brief fixes the contract), the gate as the only place the suites run, the reviewer in parallel with the QAs of the surface, a mechanical triage, at most one review fix pass (gate-fix passes apart, two at most) and a delta by the agents that blocked',
+  description: 'Stage-4 entry: one builder (two in parallel when the brief fixes the contract), the gate as the only place the suites run, the reviewer in parallel with the QAs of the surface, a mechanical triage, at most one review fix pass (gate-fix passes apart, two at most) and a delta by the agents that blocked; an adjustment of the user\'s hands-on (mode adjust) runs builder → gate, the reviewer only when it touches auth, permissions or personal data',
   phases: [
     { title: 'Build', detail: 'builder (Opus 5.5, medium): the code and the tests for the ACs, fast checks only; back ∥ front when the brief carries a Contract', model: 'opus' },
     { title: 'Gate', detail: 'exec-gate (Sonnet 5.5, low): the gate commands once, each failure code or machine; a machine red runs again after a load wait', model: 'sonnet' },
@@ -200,7 +211,7 @@ const GATE_REPORT = obj({
   load: { type: 'string', description: 'nproc and the 1-min load when the gate started and ended; the wait line when a load wait was asked' },
   stack: { type: 'string', description: 'the URLs and actors when the stack is up, never a token; "down" otherwise' },
   conflicts: strs,
-  surface: obj({ api: { type: 'boolean' }, screen: { type: 'boolean' }, runtime: { type: 'boolean' }, paths: strs }),
+  surface: obj({ api: { type: 'boolean' }, screen: { type: 'boolean' }, runtime: { type: 'boolean' }, sensitive: { type: 'boolean', description: 'the diff touches authentication, permissions or personal data' }, paths: strs }),
   ...STAMP,
 })
 
@@ -224,7 +235,7 @@ const REVIEW = obj({
 
 // ---------- the run's state ----------
 
-const mode = ['update', 'rebase'].includes(args?.mode) ? 'update' : args?.mode === 'resume' ? 'resume' : 'build'
+const mode = ['update', 'rebase'].includes(args?.mode) ? 'update' : ['resume', 'adjust'].includes(args?.mode) ? args.mode : 'build'
 const resume = mode === 'resume' ? args?.resume ?? {} : null
 const entry = args?.entry ?? '?'
 const maxPasses = Math.max(1, args?.maxPasses ?? 2)
@@ -357,7 +368,7 @@ ${where}
 The gate commands, in order, each run once:
 ${gateCommands.map((c, i) => `${i + 1}. ${c}`).join('\n') || '(none given)'}${loadThreshold ? `
 Load threshold (a timeout at or above it reads as the machine): ${loadThreshold}` : ''}
-When green and the surface has api or screen, bring the stack up on this head (rebuilt when the head changed) and leave it up for the QAs.
+${mode === 'adjust' ? 'Never bring the stack up: no QA reads an adjustment, and the user is using the environment the session runs.' : 'When green and the surface has api or screen, bring the stack up on this head (rebuilt when the head changed) and leave it up for the QAs.'}
 Doctrine (its local-development document names the stack and env commands): ${args?.doctrineDir}`, { label: `${GATE}·${entry}·${label}`, phase: 'Gate', schema: GATE_REPORT })
 
 // The gate once, with the machine re-runs. Returns the report, or { stop }.
@@ -502,6 +513,17 @@ if (mode === 'resume') {
     return await checkAndFix({ kind: 'delta', seats: seats.length ? seats : [REVIEWER], since: resume.head, own })
   }
   return await checkAndFix({ kind: 'whole', seats: seatsFor(gr.g.surface), since: args?.base, own: {} })
+}
+
+if (mode === 'adjust') {
+  const stop = await pass(`Mode: build. Entry ${entry}: an adjustment the user asked for while using the app; the brief quotes his words and the AC written from them. The smallest change that does what he asked, and a test when the AC is behaviour.`, [], 'build')
+  if (stop) return stop
+  const ga = await gateGreen('Run the gate on the entry branch.')
+  if (ga.stop) return ga.stop
+  const sensitive = args?.security === true || ga.g.surface?.sensitive === true
+  if (!sensitive) { log(`${entry}: an adjustment, no auth, permissions or personal data — no review`); return ready() }
+  log(`${entry}: an adjustment that touches auth, permissions or personal data — the reviewer reads it`)
+  return await checkAndFix({ kind: 'whole', seats: [REVIEWER], since: args?.base, own: {} })
 }
 
 // mode 'build'
