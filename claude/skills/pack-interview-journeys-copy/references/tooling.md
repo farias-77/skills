@@ -30,7 +30,7 @@ what it actually uses.
   needs python `yq` (jq syntax):
   ```bash
   for r in $(grep -oE '^\| [A-Z]+-[0-9]+' lock/spec.md | tr -d '| '); do
-    n=$(grep -cE "\[[^]]*\b$r\b" acceptance.md)
+    n=$(grep -cE "\[[^]]*\b$r\b" tests.md)
     [ "$n" = 1 ] || echo "rule $r: $n ACs (one per rule)"; done
   ```
   A step with no AC is fine: one AC per rule and per behavior, never

@@ -22,8 +22,8 @@ acceptance criteria are your source); the locked
 mock of discovery (`journeys/*.yaml`: each journey's steps, expected
 states, side effects and the frame of each state; `prototype/frames/`,
 the frames themselves); the design
-folder (`notes.md` is the law; `contracts.md`, `data-model.md` and
-`ui.md` fix the shapes and the screens); the engineering doctrine
+folder (`notes.md` is the law; `data-and-contracts.md` and
+`solution.md` §The screens fix the shapes and the screens); the engineering doctrine
 folder (its testing document fixes the test layout, the helpers and
 the commands); the entry worktree and its branch; the base branch; the
 evidence folder. In prove mode, also: the acceptance tests (the ones

@@ -74,7 +74,7 @@ are not capped: they are copied exactly.
       "after": [],
       "proof": [
         { "run": "make test-integration pkg=orders", "expect": "`valid order`, `day in the past refused`, `unknown bread refused` pass" },
-        { "see": "`e2e/journeys/new-order.spec.ts` screenshots, both themes, 390 px", "where": "ui.md §New order" }
+        { "see": "`e2e/journeys/new-order.spec.ts` screenshots, both themes, 390 px", "where": "solution.md §The screens" }
       ],
       "touches": "module `orders`, screen New order",
       "brief": "02-plan/briefs/E-03.md" },

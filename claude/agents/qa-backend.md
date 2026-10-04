@@ -16,7 +16,7 @@ running; you call it with `curl` as each actor it provides.
 ## What you receive
 
 The brief (its ACs, and the Contract when present); the design folder
-(`contracts.md` for the routes and errors, `data-model.md`, the
+(`data-and-contracts.md` for the routes, the errors and the data, the
 stories' rules); the stack's URLs and actors (from the gate); the
 worktree (read only, to know which routes the entry built and to run
 the doctrine's env command for the actors' tokens); the evidence

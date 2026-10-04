@@ -123,7 +123,7 @@ sends traffic to the latest revision explicitly.
 
 ## The alarms (step 6)
 
-After the bake, read each alarm the design's observability document
+After the bake, read each alarm the design's `operations.md`
 names, plus each existing alarm on a resource the release touched.
 Write its state exactly as read:
 

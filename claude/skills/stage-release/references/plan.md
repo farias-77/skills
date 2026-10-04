@@ -16,11 +16,11 @@ pre-flight, the play and the stop list.
 | What ships | `03-execution/audit.md` and `blueprint/execution/execution.json`: the entries merged, the amendments, the residue he accepted |
 | Versioned artifacts | the doctrine's delivery standard: what is versioned and released (one repo, or several deployables in one) |
 | Permissions | the checks of `permissions.md`: the guard, the allow rules the steps need, branch protection |
-| Pre-flight | the design's `rollout.md`: every step that needs him, the plan's open pre-flight items, anything the audit left "with the user", every step the classifier reserves for him (below), and the guard's verbatim lines |
+| Pre-flight | the design's `operations.md`: every step that needs him, the plan's open pre-flight items, anything the audit left "with the user", every step the classifier reserves for him (below), and the guard's verbatim lines |
 | Steps | the doctrine's delivery standard: what deploys staging and production, the read-only check of each, the production diff command; then the verifier on staging |
 | Rollout mode | `rollout.md` of this skill and the doctrine's role 19: progressive where the platform has it, straight otherwise |
-| Rollback triggers | `rollout.md` defaults, overridden by the doctrine's values and the design's observability document |
-| Migrations | `data-model.md` and the migrations in the diff: each classified expand or contract |
+| Rollback triggers | `rollout.md` defaults, overridden by the doctrine's values and the design's `operations.md` |
+| Migrations | `data-and-contracts.md` and the migrations in the diff: each classified expand or contract |
 | Toggles | the design's rollout: each release toggle and ops kill switch |
 | The watch | the audit's residue deferred to production with its own hour (first scheduled run, first real data) |
 | The stop list | SKILL.md, plus anything this release adds (a rollback not safe for data, named) |

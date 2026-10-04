@@ -63,7 +63,7 @@ Every scene has a `type` and may carry:
 | `seconds` | 2–30 | The scene's length. Omitted, it is computed (below). |
 | `kicker` | 32 chars | A small red line above the title, upper case: the chapter. |
 | `title` | 48 chars | The scene's heading (not on `title` and `end`, which have their own). |
-| `cite` | 70 chars | The source line at the bottom left: `architecture.md:152-157`. Every number on screen is cited. |
+| `cite` | 70 chars | The source line at the bottom left: `solution.md:152-157`. Every number on screen is cited. |
 | `badge` | 22 chars | A red rubber stamp at the top right: a decision taken in the reader's place, a risk accepted, a failure. |
 
 Tones, where a type takes them: `ok` (green, ✓), `fail` (red, ✕), `warn`
@@ -130,7 +130,7 @@ scene shows more than 12 words at once, when the total is outside
                {"id": "d", "label": "Postgres"}],
      "edges": [{"from": "b", "to": "h", "label": "POST"}, {"from": "h", "to": "a", "label": "rewrite"},
                {"from": "a", "to": "d", "label": "limite"}]},
-    {"type": "numbers", "title": "Os limites", "cite": "architecture.md:156",
+    {"type": "numbers", "title": "Os limites", "cite": "solution.md:156",
      "items": [{"value": "1", "label": "pedido por e-mail em 24 h"}, {"value": "5", "label": "pedidos por IP em 24 h"}]},
     {"type": "statement", "title": "IP forjado", "badge": "decidido",
      "text": "Aceitamos o risco: o robô esgota a cota.", "emphasis": "Aceitamos o risco"},

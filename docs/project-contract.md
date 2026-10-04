@@ -51,7 +51,7 @@ says so ([the skill](../claude/skills/pipeline-setup/SKILL.md)).
 | 14 | The verify map inside each feature map | recommended | execute, release, close |
 | 15 | Design tokens and components, exported | recommended | discovery, execute |
 | 16 | Observability as code: log metrics, alarms, runbooks | recommended | design, execute, release |
-| 17 | Parallelism capacity, measured | recommended | plan, execute |
+| 17 | Parallelism capacity, measured | recommended | execute |
 | 18 | Autonomous release permissions | full experience | release |
 | 19 | Progressive delivery | full experience | release |
 | 20 | A cloud runner for parallel width | full experience | execute |
@@ -101,9 +101,10 @@ Template: [golden-paths.md](../claude/skills/pipeline-setup/templates/golden-pat
 **Why.** Parallel builders converge on one shape only when one shape is
 named. Without it, five entries of the same kind write five shapes.
 
-**How the stages use it.** Design reads it in recon. `plan-scout
-(Sonnet 5.5, low)` copies the right line into each area's recon and
-every brief names the golden path of each kind it adds. `builder (Opus
+**How the stages use it.** Design reads it in recon. The plan's scouts
+(`scout (Sonnet 5.5, low)`) quote the commands, the generators' output
+paths and the golden path of each kind into the recon, and every brief
+names the golden path of each kind it adds. `builder (Opus
 5.5, medium)` starts a new unit from it; `reviewer (Opus 5.5, high)`
 blocks on a departure only where it is written as a rule. Stage 4
 halts at its pre-flight without it.
@@ -159,8 +160,7 @@ port, or a `down` that removes a neighbour's database, turn a parallel
 run into a flaky one.
 
 **How the stages use it.** Discovery's recon screenshots the current
-screens as an actor; plan's scout reads the commands and the machine
-scout measures how many stacks fit; `qa-frontend (Opus 5.5, medium)`
+screens as an actor; plan's scouts quote the commands; `qa-frontend (Opus 5.5, medium)`
 and `qa-backend (Opus 5.5, medium)` use each entry on its own stack as
 the actors; release asks the doctrine for the staging
 actors (never a production actor).
@@ -391,8 +391,9 @@ common system paths, then Playwright's own browser). Install once:
 state reached, every frame rendered headless before he can lock it.
 Without a browser the lock gate cannot run.
 
-**How the stages use it.** `prototyper` and `prototype-checker` walk
-the mock and render its frames; the lock freezes the frames; the
+**How the stages use it.** `prototyper (Opus 5.5, medium)` and `proto.mjs`
+walk the mock and render its frames; the lock (his word, then the
+`proto.mjs lock` walk) freezes the frames; the
 recon screenshots the current app's screens (role 10) with
 `proto.mjs look`.
 
@@ -447,7 +448,7 @@ reader is cut, and an alarm without a runbook wakes someone for
 nothing. Release reads each alarm's first evaluation, which only
 works when the alarm is code with a name.
 
-**How the stages use it.** Design writes the observability document
+**How the stages use it.** Design writes the alarms into `operations.md`
 from what exists; `reviewer (Opus 5.5, high)` checks every diff for
 errors logged and no silent failure; release reads the alarms once at the end of
 production.
@@ -464,10 +465,9 @@ resources written down (cores, memory, disk pressure).
 every run gets slower and the stage does not finish sooner.
 
 **How the stages use it.** The plan draws the widest graph the work
-allows and does not measure the machine by default; its machine scout
-runs only when the conductor asks for it. The execute session starts
-runs up to the measured cap, or the plan's widest wave, and watches
-the load.
+allows and never measures the machine: compute is infinite there. The
+execute session starts runs up to the plan's widest wave and holds the
+cap by the machine's load.
 
 ## For the full experience
 

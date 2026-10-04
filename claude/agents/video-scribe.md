@@ -75,7 +75,7 @@ Paths, and what the video is:
   Technical names only when they are the name of the thing.
 - **Numbers exact and cited.** Every number on screen is the number
   in the source, written as it is written there, and its scene has a
-  `cite` (`architecture.md:152-157`). No rounding, no estimate you
+  `cite` (`solution.md:152-157`). No rounding, no estimate you
   computed, no number from memory. A count you made yourself (five
   cards that change the doctrine) cites what you counted.
 - **Decisions taken in his place are stamped.** A decision the agents

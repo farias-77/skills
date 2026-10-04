@@ -304,12 +304,6 @@
   .dcard .opt.pick { border: 2px solid var(--ink); background: var(--accent-bg); color: var(--ink); }
   .dcard .opt.pick .k { color: var(--ink); }
   .dcard .why { text-align: center; color: var(--ink-2); font-size: 16.5px; line-height: 1.65; max-width: 90ch; margin: 0 auto; }
-  /* the artboard modal */
-  .modal { position: fixed; inset: 0; background: rgba(0, 0, 0, .72); display: flex; align-items: center; justify-content: center; padding: 24px; z-index: 50; }
-  .modal .box { width: min(1520px, 100%); height: calc(100vh - 48px); background: var(--surface); border-radius: 14px; display: flex; flex-direction: column; overflow: hidden; border: 1px solid var(--line-2); }
-  .modal .bar { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 10px 16px; border-bottom: 1px solid var(--line); }
-  .modal .bar b { font-family: var(--f-display); font-size: 18px; font-weight: 500; }
-  .modal iframe { flex: 1; border: 0; background: #141414; width: 100%; }
   .tree { background: var(--surface-2); border-radius: 8px; padding: 12px 14px; overflow-x: auto; font: 13.5px/1.5 var(--f-mono); margin: 0; white-space: pre; }
   .repo { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 16px 18px; display: flex; flex-direction: column; gap: 8px; }
   .repo .hd { display: flex; gap: 10px; align-items: baseline; flex-wrap: wrap; }
@@ -450,7 +444,6 @@
   <main class="col" id="col"></main>
 </div>
 <footer class="foot" id="foot"></footer>
-<div class="modal" id="modal" hidden><div class="box"><div class="bar"><b id="modal-title"></b><button class="btn" id="modal-close" type="button"></button></div><iframe id="modal-frame" title="" sandbox=""></iframe></div></div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/mermaid/11.12.0/mermaid.min.js"></script>
 <script>
@@ -1188,13 +1181,6 @@
   };
   route();
   window.addEventListener('hashchange', route);
-  // the artboard modal: the page dims, the screen opens large; Esc, the button or the backdrop close it
-  const modal = document.getElementById('modal'), frame = document.getElementById('modal-frame');
-  document.getElementById('modal-close').textContent = S.modalClose || 'Fechar';
-  const closeModal = () => { modal.hidden = true; frame.removeAttribute('srcdoc'); };
-  document.addEventListener('click', e => { const b = e.target.closest('.artbtn'); if (b) { document.getElementById('modal-title').textContent = b.dataset.name; frame.title = b.dataset.name; frame.srcdoc = D.design.artboards[b.dataset.file]; modal.hidden = false; }
-    else if (e.target === modal || e.target.closest('#modal-close')) closeModal(); });
-  document.addEventListener('keydown', e => { if (e.key === 'Escape' && !modal.hidden) closeModal(); });
   // theme: system → light → dark, remembered per viewer
   const root = document.documentElement, order = ['system', 'light', 'dark'];
   let theme = 'system'; try { theme = localStorage.getItem('bp-theme') || 'system'; } catch (e) {}

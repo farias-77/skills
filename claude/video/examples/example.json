@@ -5,7 +5,7 @@
   "lang": "pt-BR",
   "scenes": [
     {"type": "title", "kicker": "design · arquitetura", "title": "Um formulário, uma rota", "subtitle": "Como o pedido de amostra chega ao time."},
-    {"type": "statement", "text": "A página é estática; a única chamada ao servidor é o pedido.", "emphasis": "a única chamada", "cite": "architecture.md:7"},
+    {"type": "statement", "text": "A página é estática; a única chamada ao servidor é o pedido.", "emphasis": "a única chamada", "cite": "solution.md:7"},
     {"type": "flow", "kicker": "o caminho", "title": "Quem chama quem", "nodes": [
       {"id": "b", "label": "Navegador"},
       {"id": "h", "label": "Hosting", "sub": "arquivos estáticos"},
@@ -19,13 +19,13 @@
       {"from": "a", "to": "r", "label": "e-mail"}
     ]},
     {"type": "bullets", "title": "O que nasce", "items": ["Um módulo na API", "Uma tabela", "Uma rota pública", "Nenhum serviço, fila ou segredo novo"], "highlight": 3},
-    {"type": "numbers", "title": "Os limites", "items": [{"value": "1", "label": "pedido por e-mail em 24 h"}, {"value": "5", "label": "pedidos por IP em 24 h"}, {"value": "15 s", "label": "de espera no navegador"}], "cite": "architecture.md:156"},
+    {"type": "numbers", "title": "Os limites", "items": [{"value": "1", "label": "pedido por e-mail em 24 h"}, {"value": "5", "label": "pedidos por IP em 24 h"}, {"value": "15 s", "label": "de espera no navegador"}], "cite": "solution.md:156"},
     {"type": "table", "title": "Quando falha", "columns": ["Falha", "Resposta", "O visitante vê"], "rows": [
       ["Já pediu hoje", "429", "“já recebemos”"],
       ["Resend fora", {"text": "503", "tone": "fail"}, "problema do nosso lado"],
       ["Sem IP", {"text": "503", "tone": "fail"}, "problema do nosso lado"]
     ], "highlight": 1},
-    {"type": "statement", "kicker": "decisão", "title": "IP forjado", "text": "Aceitamos o risco: o robô esgota a cota.", "emphasis": "Aceitamos o risco", "badge": "decidido", "cite": "architecture.md:209"},
+    {"type": "statement", "kicker": "decisão", "title": "IP forjado", "text": "Aceitamos o risco: o robô esgota a cota.", "emphasis": "Aceitamos o risco", "badge": "decidido", "cite": "solution.md:209"},
     {"type": "code", "title": "A ordem das respostas", "language": "text", "code": "valida            -> 422\nIP resolvido      -> senão 503\napaga as vencidas\nlimite            -> 429\nenvio             -> 204 ou 503", "highlight": [4]},
     {"type": "image", "title": "A prova", "src": "screenshot.png", "caption": "Uma captura de tela do formulário, com a confirmação."},
     {"type": "timeline", "title": "A entrega", "events": [

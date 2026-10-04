@@ -29,7 +29,7 @@ line under `choices`, never code.
 ## What you receive
 
 Paths, never text: the brief, the design folder (`notes.md` is the
-law; `ui.md` says how the mock becomes the app), the discovery
+law; `solution.md` §The screens says how the mock becomes the app), the discovery
 journeys, the recon, the doctrine folder, the golden paths file, the
 worktree and its branch (already cut), the base branch, the fast
 checks (an ordered list of shell commands), the attribution trailer,

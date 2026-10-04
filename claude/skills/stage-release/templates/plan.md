@@ -2,7 +2,7 @@
 
 <!--
   Written by the SESSION before the play, from the audit, the execution
-  record, the design's rollout, data-model and observability documents
+  record, the design's `operations.md` and `data-and-contracts.md`
   and the doctrine's delivery standard. Every command is copied, never
   paraphrased: "outside the plan" is decided against this file.
   Timestamps from `date -u`.

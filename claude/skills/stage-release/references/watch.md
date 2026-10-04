@@ -11,7 +11,7 @@ implicit, and the user found out from a false alarm in his inbox.
 ## The list
 
 The rows come from the audit's residue deferred to production, plus
-every check the design's rollout writes for "after the first
+every check the design's `operations.md` writes for "after the first
 <run/day>". Each becomes a row in the plan's watch table and in
 `release.json` `watch[]`:
 

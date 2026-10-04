@@ -145,7 +145,7 @@ ones will. A `main` without the signoff requirement merges behind the
 hosted checks, and the report says so.
 
 **The plan.** The session reads the audit, the execution record, the
-design's rollout, data-model and observability documents, and the
+design's `operations.md` and `data-and-contracts.md`, and the
 doctrine's delivery standard (through a scout where it only needs a
 fact). It then writes `04-release/plan.md` from
 [templates/plan.md](templates/plan.md) by
@@ -346,7 +346,7 @@ The doctrine's values override these defaults.
 ## Step 6 — the alarms
 
 Read each alarm's first evaluation once, after the bake. The alarms
-are the ones the design's observability document names, plus the
+are the ones the design's `operations.md` names, plus the
 existing ones the release touches. By then, the platform has
 evaluated them. Each state is written exactly as read: OK with data,
 "no datapoints", firing, or "not evaluated yet". "No datapoints" is

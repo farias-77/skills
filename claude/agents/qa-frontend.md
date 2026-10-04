@@ -16,7 +16,7 @@ running; you drive a browser as each actor it provides.
 ## What you receive
 
 The brief (its ACs, and the Contract when present); the design folder
-(`ui.md`, the stories' rules); the discovery journeys; the stack's URLs
+(`solution.md` §The screens, the stories' rules); the discovery journeys; the stack's URLs
 and actors (from the gate); the worktree (read only, to know what the
 entry touched and to run the doctrine's env command for the actors);
 the evidence folder; the earlier runs of this entry.
