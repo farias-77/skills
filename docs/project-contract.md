@@ -527,7 +527,8 @@ end would have missed.
 **How the stages use it.** Plan copies the per-entry gate and the
 whole gate into `plan.md`; `exec-gate (Sonnet 5.5, low)` runs the
 per-entry gate once per builder pass, and the merge queue's affected
-signoff runs the same; the
+signoff runs the same (skipped when the feature branch has not moved
+since the entry's green gate: the merged tree is the tested tree); the
 execute session runs the whole gate once
 on the top of the feature branch. A project that does not meet this
 yet still works: every pass pays for the full width, the evidence and

@@ -1,6 +1,6 @@
 ---
 name: stage-execute
-description: Conducts stage 4 (Execute) — turns a closed plan into merged code on the feature branch, from one "play" to one call. Step 0 shows the plan's pre-flight once, waits until every item is handed over, and gives the user the /goal text to paste; from then on nobody asks him anything. One session (Opus 5.5, high) orchestrates without writing code: the foundation first, then every node of plan.graph.json whose edges are merged or ready, in the graph's start order, in parallel up to the cap, each through the exec-entry workflow — builder (Opus 5.5, medium) writes the code and the tests for the entry's ACs, running only the fast checks and trying a changed screen or endpoint once against the local stack (two builders, back and front in parallel, when the brief carries a Contract); exec-gate (Sonnet 5.5, low) runs the gate once, the only place the suites run; then, in parallel, reviewer (Opus 5.5, high) with a closed scope, the QAs that make sense for the change, trying to break it: qa-frontend (Opus 5.5, medium) when screen behaviour changed (not for a pure visual, copy or asset tweak) and qa-backend (Opus 5.5, medium) when the API, data or permissions changed; a mechanical triage (blocking only on an AC not met, a reproduced bug, a security hole or a written rule broken; the rest are notes on the PR); at most one review fix pass (a gate-fix pass on a code red is apart, two at most) and a delta by the agents that blocked, then ready or parked. Done = the plan's ACs met and the gate green. The session is the local CI: its serial queue merges the base into each ready entry, tests the merged tree, merges, and signs off; the whole gate runs once at the end. Then it calls him once, for his hands-on: it runs the environment, he uses the app and sends adjustments in plain words, each built as a small entry A.<n> (builder → gate → merge; the reviewer only on auth, permissions or personal data) until he says ok. Then the stage report. Use when a workstream's .state.md says stage execute, or to resume an execution in progress.
+description: Conducts stage 4 (Execute) — turns a closed plan into merged code on the feature branch, from one "play" to one call. Step 0 shows the plan's pre-flight once, waits until every item is handed over, and gives the user the /goal text to paste; from then on nobody asks him anything. One session (Opus 5.5, high) orchestrates without writing code: the foundation first, then every node of plan.graph.json whose edges are merged or ready, in the graph's start order, in parallel up to the cap, each through the exec-entry workflow — builder (Opus 5.5, medium) writes the code and the tests for the entry's ACs, running only the fast checks and trying a changed screen or endpoint once against the local stack (two builders, back and front in parallel, when the brief carries a Contract); exec-gate (Sonnet 5.5, low) runs the gate once, the only place the suites run; then, in parallel, reviewer (Opus 5.5, high) with a closed scope, the QAs that make sense for the change, trying to break it: qa-frontend (Opus 5.5, medium) when screen behaviour changed (not for a pure visual, copy or asset tweak) and qa-backend (Opus 5.5, medium) when the API, data or permissions changed; a mechanical triage (blocking only on an AC not met, a reproduced bug, a security hole or a written rule broken; the rest are notes on the PR); at most one review fix pass (a gate-fix pass on a code red is apart, two at most) and a delta by the agents that blocked, then ready or parked. Done = the plan's ACs met and the gate green. The session is the local CI: its serial queue merges the base into each ready entry, tests the merged tree (skipped when the base has not moved since the entry's green gate), merges, and signs off; the whole gate runs once at the end. Then it calls him once, for his hands-on: it runs the environment, he uses the app and sends adjustments in plain words, each built as a small entry A.<n> (builder → gate → merge; the reviewer only on auth, permissions or personal data) until he says ok. Then the stage report. Use when a workstream's .state.md says stage execute, or to resume an execution in progress.
 disable-model-invocation: false
 argument-hint: "<workstream-slug>"
 allowed-tools: Read, Write, Edit, Glob, Grep, Agent, Workflow, AskUserQuestion, Artifact, PushNotification, Bash
@@ -281,6 +281,7 @@ merge path.
 for each ready entry, one at a time (the critical path first, then in the order they came back)
   1 base in        feat moved? merge it into the entry branch (never a rebase); a conflict → exec-entry 'update'
   2 merged tree    the paths outside Owns ∪ Extends listed; signoff, the affected gate, on the entry head; red → parked gate-red
+                   (feat unmoved since the entry's green gate → skipped: "gate skipped: base unchanged since <sha>")
   2b migrations    the entry's migrations against feat's; a number or order clash → renumbered on the entry branch, merge-prep commit, the gate again
   3 merge          git merge --no-ff into feat/<workstream>, the notes in the body, push; the entry's stack down, its worktree removed
   4 sign off       signoff, the same gate, on the new feat head — same tree, its record reused, status posted
@@ -302,6 +303,16 @@ once, at the end (Step 5)
    (`local-ci/affected`, or the one the project names): that head holds
    the base, so its tree is the tree the merge will make. Red → the
    entry is parked `gate-red` with the log's path and failing lines.
+   **The base has not moved: skip it.** When the entry's head is the
+   head its green gate ran on (`gate.head` in its last `run-<n>.json`)
+   and that head already contains the top of `feat/<workstream>` (`git
+   merge-base --is-ancestor feat/<workstream> <head>`), nothing merged
+   in step 1 and the merged tree is the tested tree: the result would be
+   identical. Skip the affected signoff and merge, and record "gate
+   skipped: base unchanged since <feat sha>" where the signoff's line
+   would go; no per-merge status is posted for it. A merge in step 1, a
+   migration renumbered or any other commit moves the head, and the
+   gate runs as above.
    **Migrations are the session's.** Entries run in parallel and each
    may add a migration; two can take the same number, which is no text
    conflict, so nothing above catches it. Before the merge, list the
@@ -316,9 +327,11 @@ once, at the end (Step 5)
    push, bring the entry's stack down (the doctrine's stack-down
    command) and remove its worktree.
 4. **Sign off** the merged head: same gate and context on the new top
-   of `feat/<workstream>`; the record is reused, the status posted.
+   of `feat/<workstream>`; the record is reused, the status posted
+   (after a skipped gate, the skip line is the record and no status is
+   posted; the whole gate signs the top at the end, as always).
 5. **Record.** `plan.md` Status: date · entry · sha · passes · minutes
-   · the signoff's line. `board.md` to `merged`. Start what it
+   · the signoff's line (or the skip line). `board.md` to `merged`. Start what it
    unblocked.
 
 ## Step 5 — the whole gate

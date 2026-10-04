@@ -74,6 +74,11 @@
  * merge (never a rebase); a clean merge runs the gate and returns. A
  * conflict is resolved by the builder (one pass), the gate runs, and the
  * reviewer reads the resolution; one review fix pass at most, as above.
+ * With args.unmoved ({ base, head }: the session checked that the entry
+ * head is the head of its last green gate and already contains the top
+ * of the base, `base`), the base has not moved since that gate: the
+ * merged tree is the tested tree, so no merge and no gate run; ready,
+ * with gateSkipped "gate skipped: base unchanged since <base>".
  *
  * THE FLOW (mode 'resume'): a parked run continues. args.resume names the
  * parked head, the passes the run already used (passesUsed, and the
@@ -122,6 +127,7 @@
  *     briefPath:       '/abs/.../02-plan/briefs/E-03.md',
  *     contract:        true,                               // the brief carries a Contract section: two builders
  *     qa:              { frontend: 'run' | 'skipped', backend: 'run' | 'skipped', why: '...' },   // optional: the session's call, overrides the workflow's
+ *     unmoved:         { base: '<feat sha>', head: '<entry head>' },  // 'update' only: the base has not moved since the entry's green gate
  *     security:        false,                              // 'adjust' only: the request touches auth, permissions or personal data
  *     designDir:       '/abs/.../01-design',
  *     discoveryDir:    '/abs/.../00-discovery',            // the locked mock's journeys
@@ -147,7 +153,7 @@
  *   }})
  *
  * Returns { entry, mode, status, reason, head, passes, reviewFixes,
- * gateFixes, steps, rounds, qa, tried,
+ * gateFixes, steps, rounds, qa, tried, gateSkipped,
  * tally, notes, outsideOwns, decided, choices, questions, blocked, gate,
  * stack } — status is 'ready' | 'parked' | 'blocked' | 'interrupted' (an
  * agent returned nothing: the session relaunches by the run id); reason,
@@ -270,7 +276,7 @@ const result = {
   // The review fix passes and the gate-fix passes used; a resume without them reads the old count (one pass past the build = the fix used).
   reviewFixes: resume ? Number(resume.reviewFixes ?? Math.min(1, Math.max(0, (Number(resume.passesUsed) || 0) - 1))) || 0 : 0,
   gateFixes: resume ? Number(resume.gateFixes) || 0 : 0,
-  steps: [], rounds: [], qa: null, tried: [], tally: {}, notes: [], outsideOwns: [], decided: [], choices: [], questions: [], blocked: null, gate: null, stack: null,
+  steps: [], rounds: [], qa: null, tried: [], gateSkipped: null, tally: {}, notes: [], outsideOwns: [], decided: [], choices: [], questions: [], blocked: null, gate: null, stack: null,
 }
 
 const interrupted = (what) => { result.status = 'interrupted'; result.reason = 'interrupted'; log(`${entry}: ${what} returned nothing — interrupted; relaunch by resumeFromRunId`); return result }
@@ -522,6 +528,13 @@ const seatsFor = (surface) => {
 
 if (mode === 'update') {
   result.qa = { frontend: 'skipped', backend: 'skipped', why: 'an update: the reviewer reads a conflict resolution only' }
+  const u = args?.unmoved
+  if (u?.base && u?.head) {
+    result.head = u.head
+    result.gateSkipped = `gate skipped: base unchanged since ${u.base}`
+    log(`${entry}: ${result.gateSkipped} (the entry head ${u.head} is the head of its green gate and contains it)`)
+    return ready()
+  }
   const r = await gateOnce(`Update ${args?.branch} with ${args?.base}: \`git merge --no-ff ${args?.base}\` on the entry branch, never a rebase, then push. On a conflict, \`git merge --abort\` and report the files. On a clean merge, run the gate.`)
   if (r.stop) return r.stop
   if (!r.g.conflicts.length) {

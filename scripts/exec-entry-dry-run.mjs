@@ -72,6 +72,8 @@ const scenarios = [
   { title: 'a style-only change, the session calls qa-frontend anyway → it runs', surface: STYLE, args: { qa: { frontend: 'run', why: 'the layout hides an action at phone width' } },
     build: (n) => build(n, { screenChange: 'visual' }),
     expect: ['ready', 1], calls: ['builder', 'exec-gate', 'reviewer', 'qa-frontend'], qa: ['run', 'skipped'] },
+  { title: 'update: the base has not moved since the entry\'s green gate → gate skipped, no agent → ready', surface: API,
+    args: { mode: 'update', unmoved: { base: 'f7', head: 'h3' } }, expect: ['ready', 0], calls: [], gateSkipped: 'gate skipped: base unchanged since f7' },
   { title: 'adjust: his request on screen → builder → gate → ready, no reviewer, no QA', surface: SCREEN, args: { mode: 'adjust', entry: 'A.1' },
     expect: ['ready', 1], calls: ['builder', 'exec-gate'] },
   { title: 'adjust: a code red → one gate fix → green → ready, still no review', surface: SCREEN, args: { mode: 'adjust', entry: 'A.2' },
@@ -104,11 +106,12 @@ for (const sc of scenarios) {
   const [status, passes, reason] = sc.expect;
   const ok = r.status === status && r.passes === passes && (reason === undefined || r.reason === reason)
     && (!sc.calls || sc.calls.join() === names.join())
-    && (!sc.qa || (r.qa?.frontend === sc.qa[0] && r.qa?.backend === sc.qa[1]));
+    && (!sc.qa || (r.qa?.frontend === sc.qa[0] && r.qa?.backend === sc.qa[1]))
+    && (sc.gateSkipped === undefined || r.gateSkipped === sc.gateSkipped);
   if (!ok) bad++;
   const mins = r.steps.reduce((a, s) => a + (s.minutes ?? 0), 0);
   console.log(`${ok ? 'ok  ' : 'FAIL'} ${sc.title}\n     status=${r.status}${r.reason ? ` (${r.reason})` : ''} passes=${r.passes} rounds=${r.rounds.length} notes=${r.notes.length} steps=${r.steps.length} (${mins} min)${ok ? '' : ` — expected ${status} passes=${passes}${reason ? ` (${reason})` : ''}${sc.calls ? ` calls ${sc.calls.join(' → ')}` : ''}`}`);
-  console.log(`     calls: ${calls.join(' → ') || '(none)'}${r.qa ? ` · qa front ${r.qa.frontend}, back ${r.qa.backend}` : ''}`);
+  console.log(`     calls: ${calls.join(' → ') || '(none)'}${r.qa ? ` · qa front ${r.qa.frontend}, back ${r.qa.backend}` : ''}${r.gateSkipped ? ` · ${r.gateSkipped}` : ''}`);
   if (verbose) console.log(logs.map(l => `       ${l}`).join('\n'));
 }
 console.log(bad ? `exec-entry dry run: ${bad} scenario(s) failed` : `exec-entry dry run: all ${scenarios.length} scenarios as expected`);
