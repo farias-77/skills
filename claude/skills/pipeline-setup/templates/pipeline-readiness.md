@@ -57,7 +57,7 @@ gap that halts one>.
 |---|---|---|---|---|
 | 18 | Autonomous release permissions | | | |
 | 19 | Progressive delivery | | | |
-| 20 | Cloud runner | | | |
+| 20 | Cloud environment for entries: setup script under ~5 min, SessionStart stack-up on `CLAUDE_CODE_REMOTE`, test-only env vars, permissions, network allowlist, browsers, the pipeline vendored | | | |
 | 21 | Video toolchain (station) | | `<probe output>` | |
 
 ## Probes

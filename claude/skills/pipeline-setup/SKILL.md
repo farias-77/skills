@@ -146,7 +146,7 @@ paths (#2), whose size line quotes the p95/p99 the calibration writes.
 |---|---|---|
 | **S** | a template copied and filled from what the audit found; under an hour | setup, in Step 3 |
 | **M** | a template adapted to the stack (a calibration run, an export script, sections filled from existing journeys); a few hours | setup, in Step 3 |
-| **L** | engineering on the product: an isolated stack, an affected-tests selector, observability as code, progressive delivery, a cloud runner | a demand of its own through the pipeline, starting at discovery; setup writes its one-paragraph brief and its acceptance |
+| **L** | engineering on the product: an isolated stack, an affected-tests selector, observability as code, progressive delivery | a demand of its own through the pipeline, starting at discovery; setup writes its one-paragraph brief and its acceptance |
 
 What each gap becomes:
 
@@ -161,8 +161,9 @@ What each gap becomes:
 | 2 | golden paths | one exemplar per kind, picked by a written rule, present at the sha and under p95; after #7 | M | [golden-paths.md](templates/golden-paths.md) |
 | 14 | verify map | a section per feature map with something built to drive, filled from its existing journeys, in the maps' language | M | [verify-map.md](templates/verify-map.md) |
 | 15 | design tokens | the export, in the repo's own tooling language, and the components list; the per-state screenshots are M with a component catalogue, **L without one** (a demand) | M (export) · L (samples) | [design-tokens-export.md](templates/design-tokens-export.md) |
-| 3, 4, 5, 6, 10, 11, 16, 19, 20 | gate, commands, stack, evidence, browser, release, observability, progressive delivery, runner | engineering | L, or M when the pieces exist and only need a command that names them | — |
+| 3, 4, 5, 6, 10, 11, 16, 19 | gate, commands, stack, evidence, browser, release, observability, progressive delivery | engineering | L, or M when the pieces exist and only need a command that names them | — |
 | 24 | sized gate | per missing part: the per-entry gate passes the primary project and the width tag (`--project=desktop` plus `--grep @phone` on the phone project), evidence behind a flag (`EVIDENCE=1`), the affected step stops re-running the server suites the check ran, the selector maps non-UI files to no screen tests and the lockfile to the whole suite only on a runtime or test-runner dependency; the whole gate keeps every width, visual, the full server suites and evidence; the doctrine's testing document names the width, the tag and the flag | S per flag or mapping · M for the import-graph selector | — |
+| 20 | cloud environment | the four templates filled from the audit: `cloud-setup.sh` (toolchains at the pinned versions, the lockfile caches, the stack's images, the browsers; each step timed) in the doctrine's tooling folder; `cloud-session-start.sh` in `.claude/hooks/` and the `cloud-settings.json` fragment merged into `.claude/settings.json` (the `SessionStart` hook and the allow rules); `cloud-env.md` beside the doctrine (the env var names with test-only values, the allowlist with a reason per host); the pipeline vendored under `.claude/pipeline/` at a tag, with `VERSION`. Creating the environment at claude.ai/code (pasting the script, the env vars, the network) is his | M · L when the stack does not run in one repository or the gate needs a real secret | [cloud-setup.sh](templates/cloud-setup.sh), [cloud-session-start.sh](templates/cloud-session-start.sh), [cloud-settings.json](templates/cloud-settings.json), [cloud-env.md](templates/cloud-env.md) |
 | 17 | capacity | measured by the plan stage's machine scout on its first run | — | — |
 | 18 | autonomous release | after 12 and 13: the template already allows the merge and the prod deploy; the guard asks on any merge whose head the play did not authorize; the signoff required on `main` is his | S, his call | [permissions.md](templates/permissions.md) |
 | 21 | video toolchain | install Node LTS and ffmpeg on the station | S, his machine | — |
@@ -171,7 +172,9 @@ What each gap becomes:
 
 Some steps are the user's alone: requiring the signoff on `main`
 (branch protection is a security posture), moving release to the
-autonomous posture, installing on his machine, anything with a secret.
+autonomous posture, installing on his machine, anything with a secret,
+creating the cloud environment at claude.ai/code (its env vars are
+visible to everyone who uses it).
 List them under "What only the user can do", each with its ready `!`
 command, and never run them.
 
@@ -241,6 +244,7 @@ Then, per approved step, in plan order:
    | golden paths | every exemplar listed at the audited sha (`git ls-tree -r --name-only <sha> -- <path>`), not at a research note's or another branch's, and `structure-check.sh --measure <repo> <sha> <paths>` exits 0; an exemplar over p95 is replaced by the next one the rule picks |
    | verify map, doctrine sections | every path and command they name exists; the verify map is in the maps' language |
    | design tokens | the export command runs and `tokens.css` holds every token of `tokens.json` |
+   | cloud environment | `bash -n` on both scripts; `jq . .claude/settings.json`; `CLAUDE_CODE_REMOTE= .claude/hooks/cloud-session-start.sh` exits 0 at once (local sessions untouched); the setup script run once in a throwaway container of the base image (`docker run --rm -v <repo>:/repo ubuntu:24.04 bash /repo/<path>/cloud-setup.sh`) when Docker is here, its per-step seconds quoted; `.claude/pipeline/VERSION` names a tag that exists. The first real cloud run is his, after he creates the environment |
 
 4. **Commit** that step alone: `git add <its paths>` and
    `git commit -m "pipeline-setup: <role> (#<n>)" -- <its paths>`. One

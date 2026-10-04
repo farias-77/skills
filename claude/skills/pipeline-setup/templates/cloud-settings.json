@@ -1,0 +1,36 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(<fast-check> *)",
+      "Bash(<fast-check>)",
+      "Bash(<gate-command> *)",
+      "Bash(<affected-command> *)",
+      "Bash(<stack-up> *)",
+      "Bash(<stack-env> *)",
+      "Bash(<stack-down> *)",
+      "Bash(git fetch *)",
+      "Bash(git ls-remote *)",
+      "Bash(git worktree *)",
+      "Bash(git add *)",
+      "Bash(git commit *)",
+      "Bash(git push origin story/*)",
+      "Bash(git push -u origin story/*)",
+      "Bash(git push origin evidence/*)",
+      "Bash(git push -u origin evidence/*)"
+    ]
+  },
+  "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "startup|resume",
+        "hooks": [
+          {
+            "type": "command",
+            "timeout": 600,
+            "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/cloud-session-start.sh"
+          }
+        ]
+      }
+    ]
+  }
+}

@@ -103,8 +103,12 @@ of the surface (`qa-frontend`, `qa-backend`, both Opus 5.5, medium),
 none of whom wrote the code. A finding blocks only on an AC not met, a
 reproduced bug, a security hole or a written rule broken; the rest are
 notes on the PR. One fix pass at most, then the entry merges or parks.
-The session is the **local CI**: a serial queue tests each merged tree
-and signs it off; the whole gate runs once at the end. Then his
+When the project has a cloud environment, each entry runs in its own
+Claude Code cloud session, as many at once as are ready, and comes back
+as pushed branches the session watches with a git loop; without one, or
+when a cloud run fails twice, entries run locally up to the measured
+cap. The session is the **local CI**: a serial queue tests each merged
+tree and signs it off; the whole gate runs once at the end. Then his
 hands-on: the session runs the environment, he uses the app and says
 what to change in plain words, and each adjustment is built on the
 spot (builder, gate, merge; the reviewer only when it touches auth,
@@ -248,7 +252,7 @@ worktree, the structure check, the release roles, the permissions and
 the guard, the local-CI signoff, the mock toolchain, the release's
 smoke), recommended, and
 for the full experience (autonomous release, progressive delivery, a
-cloud runner, the video toolchain).
+cloud environment for entries, the video toolchain).
 
 Run **`/pipeline-setup <path-to-project>`** first. It audits the
 project against the bar with scouts reading a detached worktree at the

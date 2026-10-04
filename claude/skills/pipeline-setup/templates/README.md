@@ -82,3 +82,26 @@ read it to reach and drive the feature without rediscovering the path.
 - Keep it to what a machine needs: where, who, the steps, what to read
   back. It is updated in the same diff that changes the feature.
 - Every route, command and test it names exists at the sha.
+
+## The cloud environment (role 20)
+
+In the two scripts each placeholder sits on a no-op line (`: '<…>'`)
+so the template passes `bash -n`; filling it replaces the whole line
+with the commands. Four pieces, filled from what the audit found (the toolchain versions
+the repository pins, its lockfiles, its stack-up command, the images
+its compose file and its browser tool use):
+
+| Template | Goes to | Fill |
+|---|---|---|
+| `cloud-setup.sh` | the doctrine's tooling folder (pasted into the environment's setup script) | `<toolchain-installs>`: only what the base image lacks or has at another version; `<marker-file>`: a file only this repository has; `<dependency-warmup>`: the lockfile installs (`go mod download`, `pnpm fetch`); `<image-warmup>`: the stack's pulls and builds; `<browser-install>`: the browser tool's install at its pinned version, or the pull of the pinned browser image |
+| `cloud-session-start.sh` | `.claude/hooks/` | `<default-branch>`; `<dependency-install>`: the offline-first installs from the warm caches; `<stack-up>` and `<stack-env-summary>`: the doctrine's stack-up and env commands |
+| `cloud-settings.json` | merged into `.claude/settings.json` (lists unioned, never overwritten) | the doctrine's commands in place of each `<…>` |
+| `cloud-env.md` | beside the doctrine | the environment's fields, the env var names with their test-only values, the allowlist with a reason per host, the checks with their output |
+
+Measure the setup script once, uncached: each step prints its elapsed
+seconds. Over about five minutes the snapshot is not cached and every
+session pays it; move the slowest step to the hook only if it is per
+branch, otherwise trim it (fewer images, one browser). The pipeline is
+vendored with it: `.claude/pipeline/` holds `workflows/`, `agents/` and
+the `skills/pack-*` folders the agents read, copied from a tag of the
+pipeline repository, with a `VERSION` file naming the tag and its sha.

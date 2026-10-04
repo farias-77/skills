@@ -56,7 +56,7 @@ says so ([the skill](../claude/skills/pipeline-setup/SKILL.md)).
 | 24 | A gate sized to the change | recommended | plan, execute |
 | 18 | Autonomous release permissions | full experience | release |
 | 19 | Progressive delivery | full experience | release |
-| 20 | A cloud runner for parallel width | full experience | execute |
+| 20 | A cloud environment for entries | full experience | execute |
 | 21 | The video toolchain | full experience | the discovery, design and plan reports, close |
 
 ---
@@ -568,21 +568,38 @@ of all of them.
 platform allows it, reads the smoke run and the alarms, and promotes
 or rolls back; otherwise it deploys straight and runs the smoke.
 
-### 20 · A cloud runner for parallel width
+### 20 · A cloud environment for entries
 
-**What it is.** A way to run one entry in a cloud session or a remote
-runner: a setup script that installs the toolchain and brings the
-stack up in a few minutes, the secrets the stack needs for tests only,
-and a way for the evidence to come back.
+**What it is.** A Claude Code cloud environment (configured at
+claude.ai/code) in which one stage-4 entry runs end to end in a fresh
+VM, from the project's GitHub repository alone, with no person to
+answer a prompt. One repository: a multi-repository session does not
+load `.claude/settings.json`, so the hooks and permissions below would
+be inert.
 
-**Why.** One machine caps the width; the plan's widest wave may be
-wider.
+| Part | What good looks like |
+|---|---|
+| **the setup script** | installs what the base image lacks (the language toolchains at the versions the project pins, the browsers, the package manager), warms the dependency caches from the lockfiles, pulls or builds the stack's images; exits 0 and finishes in about five minutes so the snapshot caches it; kept in the repository (`/pipeline-setup` writes it from its `cloud-setup.sh` template) and pasted into the environment |
+| **the stack up** | a `SessionStart` hook in the repository's `.claude/settings.json`, on startup and resume, that runs the doctrine's stack-up only when `CLAUDE_CODE_REMOTE` is `true`, so local sessions are untouched; the snapshot keeps files, never processes |
+| **test values** | the environment's env vars, in `.env` format: test-only values the stack and the gate need (fakes, local URLs, a test project id), plus `BASH_DEFAULT_TIMEOUT_MS` and `BASH_MAX_TIMEOUT_MS` raised for the gate. Anyone who uses the environment reads them: never a production secret or a real third-party key |
+| **permissions** | the repository's allow list covers the gate, the fast checks, the stack, `git fetch`, `git ls-remote` and `git push` of `story/*` and `evidence/*`; the guard hook (role 12) is committed and loads with it |
+| **network** | Custom: the Trusted defaults plus each host the setup and the stack reach (the toolchain's downloads, the browser and image registries); Full only when nothing narrower works |
+| **browsers** | installed by the setup script, at the version the browser tool pins, or the pinned browser image pulled when the journeys run in a container |
+| **the pipeline** | vendored under `.claude/pipeline/` at a tag of the pipeline repository, by `/pipeline-setup`; never a symlink, which the VM cannot follow |
 
-**How the stages use it.** The execute session sends the entries past
-the local cap to the runner and merges what comes back through the
-same queue; how one entry runs in a cloud session, what it needs and
-how its evidence comes back is in
+**Why.** One machine caps the width: past its measured cap every run
+gets slower. With a cloud environment every entry runs in its own VM,
+the stage's width is the plan's, and the station keeps only the queue,
+the signoffs, the whole gate and the hands-on.
+
+**How the stages use it.** When the doctrine names it, the execute
+session runs every entry in a cloud session by default and falls back
+to local entry by entry; it sends each run's inputs on an evidence
+branch, watches the pushed branches with a git loop, and merges what
+comes back through the same local queue. How one entry runs, the
+return channel and the fallback are in
 [stage-execute/references/cloud.md](../claude/skills/stage-execute/references/cloud.md).
+Without it, entries run locally up to the measured cap (role 17).
 
 ### 21 · The video toolchain
 

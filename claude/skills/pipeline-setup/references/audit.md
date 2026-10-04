@@ -69,12 +69,12 @@ the reason.
 | 15 tokens | tokens file, Tailwind config or `@theme`, global CSS custom properties, theme objects; an export folder; a component catalogue (Storybook) | an export the prototype can inline, plus the components list | tokens centralized but not exported, or no components list |
 | 16 observability | a structured logger and stable event names; log-based metrics in IaC; alarm definitions in IaC; a runbooks folder linked from the alarms, or runbook text inline in the alarm (its documentation field) | metrics, alarms and runbooks all in the repo; an inline runbook counts when it states the action to take and the first command to run | alarms exist only in a console, no runbooks, or inline text that only restates the alarm |
 
-## Group F — capacity and runner (roles 17, 20)
+## Group F — capacity and the cloud environment (roles 17, 20)
 
 | Role | Look for | ✓ when | ~ when |
 |---|---|---|---|
 | 17 capacity | a recorded measurement (a `machine.md`, a doctrine line "N stacks at once"), the stack's footprint | measured, with its load | a guess with no measurement |
-| 20 cloud runner | `.claude/` cloud setup, a devcontainer, a CI runner config for agent sessions; a setup script under ~5 minutes | an entry can run remotely and its evidence returns | a devcontainer exists but nothing runs an entry there |
+| 20 cloud environment | a cloud setup script (`cloud-setup.sh` or the doctrine's name for it) and the per-step timings it printed; a `SessionStart` hook in `.claude/settings.json` gated on `CLAUDE_CODE_REMOTE`; a document naming the environment, its env vars (names, and whether each value is test-only) and its network allowlist; allow rules for the gate, the stack, `git ls-remote` and pushes of `story/*` and `evidence/*`; the pipeline vendored under `.claude/pipeline/` with its `VERSION`, or symlinks there (which the VM cannot follow); the pinned browser version and how it is installed; the toolchain versions the repository pins against what the setup installs; whether the sessions open in this one repository | all of these in the product repository, the setup measured under ~5 minutes, no env var holding a real secret, the pipeline vendored at a tag, a recorded cloud run of the per-entry gate | some pieces missing — say which; the setup unmeasured or over ~5 minutes; the pipeline reached by symlink; the sessions opening in a root above the product (a multi-repository session loads no hooks or permissions) |
 
 ## Probes the session runs itself
 
