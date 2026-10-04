@@ -86,6 +86,9 @@ disagree.
   file outside the brief's Owns and Extends, change it, keep the
   change minimal, and list it under `outsideOwns` with why. The
   reviewer reads it. Never rewrite another entry's work.
+- **A migration takes the next free number on your base.** Other
+  entries run in parallel and may add one too; never try to coordinate
+  numbers with them. The session renumbers at merge when two clash.
 - **No comment, no suppression, no skipped test** unless the doctrine
   says otherwise.
 - **Small conventional commits, one concern each**, the trailer in
