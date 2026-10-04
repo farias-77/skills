@@ -16,7 +16,7 @@
 //        closed release
 //        <workstream-dir>/blueprint/design/*.json when stage 2 ran (one per document: solution, data-and-contracts, tests,
 //        operations; plus proposal, decisions, design-report, design-review; the documents are embedded from 01-design/)
-//        <workstream-dir>/blueprint/stage-report.json when a stage closed with its video and slides (docs/stage-report.md):
+//        <workstream-dir>/blueprint/stage-report.json when a stage closed with its report (docs/stage-report.md):
 //        per tab, the video's path (relative to the workstream, published beside the page) and the slides' link
 // writes <workstream-dir>/blueprint.html
 //

@@ -46,7 +46,7 @@ open. When the wakeup fires, the session:
    `.state.md` to `stage: close`.
 
 The stage report was already sent at step 7. A later proof changes the
-blueprint, not the video or the slides. A wakeup that did not fire
+blueprint, not the slides. A wakeup that did not fire
 (the session was resumed later) is read as soon as the session is
 back, because the evidence is still there.
 

@@ -1114,14 +1114,17 @@
   // ---- mount: every tab is in the DOM (mermaid renders once); the inactive ones are hidden ----
   // the stage report (docs/stage-report.md): the video first, then the slides, then this page — one bar above the tab's first section
   const SY = S.layers || {};
+  // execute and release make no video (docs/stage-report.md): their bar has no Watch step, unless an older record carries one
+  const NO_VIDEO = ['execution', 'release'];
   const layerBar = t => { const L = D.layers?.[t]; if (!L) return '';
-    return `<section class="sec layers" id="layers-${t}" data-tab="${t}" aria-label="${esc(SY.kicker)}"><span class="kicker">${SY.kicker}</span>
+    const watch = !!L.video || !NO_VIDEO.includes(t), kicker = watch ? SY.kicker : (SY.kickerNoVideo || SY.kicker);
+    return `<section class="sec layers" id="layers-${t}" data-tab="${t}" aria-label="${esc(kicker)}"><span class="kicker">${kicker}</span>
       <div class="lgrid ${L.video ? '' : 'novideo'}">
         ${L.video ? `<div class="lvid"><video controls preload="metadata" playsinline src="${esc(L.video)}" aria-label="${esc(SY.videoLabel)}">${SY.noVideo}</video></div>` : ''}
         <ol class="lsteps">
-          <li class="${L.video ? '' : 'off'}"><span class="k">1</span><div><b>${SY.watch}</b><p>${L.video ? SY.watchSub : SY.watchNone}</p></div></li>
-          <li class="${L.slides ? '' : 'off'}"><span class="k">2</span><div><b>${SY.read}</b><p>${L.slides ? SY.readSub : SY.readNone}</p>${L.slides ? `<a class="lbtn" href="${esc(L.slides)}" target="_blank" rel="noopener">${SY.readLink} ↗</a>` : ''}</div></li>
-          <li><span class="k">3</span><div><b>${SY.dig}</b><p>${SY.digSub}</p></div></li>
+          ${watch ? `<li class="${L.video ? '' : 'off'}"><span class="k">1</span><div><b>${SY.watch}</b><p>${L.video ? SY.watchSub : SY.watchNone}</p></div></li>` : ''}
+          <li class="${L.slides ? '' : 'off'}"><span class="k">${watch ? 2 : 1}</span><div><b>${SY.read}</b><p>${L.slides ? SY.readSub : SY.readNone}</p>${L.slides ? `<a class="lbtn" href="${esc(L.slides)}" target="_blank" rel="noopener">${SY.readLink} ↗</a>` : ''}</div></li>
+          <li><span class="k">${watch ? 3 : 2}</span><div><b>${SY.dig}</b><p>${SY.digSub}</p></div></li>
         </ol></div></section>`; };
   document.getElementById('col').innerHTML = tabs.map(layerBar).join('') + sections.map(s => s.html).join('');
   const rail = document.getElementById('rail');

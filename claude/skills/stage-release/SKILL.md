@@ -59,7 +59,7 @@ It never deploys by hand what the doctrine says the CI deploys.
 | `release-scribe (Sonnet 5.5, medium)` | one per versioned artifact: the version, the notes, the reverts |
 | the stage-4 pipeline | an `R.n` fix: `builder (Opus 5.5, medium)`, `exec-gate (Sonnet 5.5, low)`, `reviewer (Opus 5.5, high)`, and `qa-frontend (Opus 5.5, medium)` or `qa-backend (Opus 5.5, medium)` by its surface |
 | `scout (Sonnet 5.5, low)` | whatever the session needs to look up, by the house rule |
-| `video-scribe (Sonnet 5.5, medium)`, `slides-scribe (Sonnet 5.5, high)` | the stage report |
+| `slides-scribe (Sonnet 5.5, high)` | the stage report's slides (no video at this stage) |
 
 **Packs.** At step 0 the session loads `pack-release` and `pack-ops`
 with the Skill tool. They hold the checklists and recipes this skill
@@ -93,7 +93,7 @@ sized to it. It never loops to check early.
             a red smoke or a rollback → ONE fix R.n through exec-entry → main → 3 again
             a second red → stop and report
 6 done      tags + releases on the released sha · release.json · .state.md · PushNotification
-7 report    claude/docs/stage-report.md: video → slides → blueprint
+7 report    claude/docs/stage-report.md: slides → blueprint (no video)
 ```
 
 **When a merge into `main` deploys production by itself** (the
@@ -366,10 +366,10 @@ before anything: the failing case, its log, the environment.
 
 ## Step 7 — the stage report
 
-Follow `claude/docs/stage-report.md`: video, then slides, then the
-blueprint, in one message by [templates/report.md](templates/report.md).
-A later proof read after the report updates `release.json` and the
-blueprint. The video and the slides are not redone.
+Follow `claude/docs/stage-report.md`: slides, then the blueprint, in
+one message by [templates/report.md](templates/report.md). This stage
+makes no video. A later proof read after the report updates
+`release.json` and the blueprint. The slides are not redone.
 
 ## Migrations: expand in this release, contract in a later one
 

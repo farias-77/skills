@@ -26,8 +26,8 @@ To change a pick, change the row and the agent's frontmatter together.
 | Agent | Stage | Model | Effort | Evidence |
 |---|---|---|---|---|
 | `scout` | all | Sonnet 5.5 | low | Lookups, not writing: literal, fast, < $0.4 a task |
-| `video-scribe` | all | Sonnet 5.5 | medium | Templated storyboards from a fixed source; medium holds the template at lower cost |
-| `slides-scribe` | all | Sonnet 5.5 | high | Follows slide templates with minimal editing; same cost as Opus medium |
+| `video-scribe` | discovery, design, plan | Sonnet 5.5 | medium | Templated storyboards from a fixed source; medium holds the template at lower cost |
+| `slides-scribe` | discovery to release | Sonnet 5.5 | high | Follows slide templates with minimal editing; same cost as Opus medium |
 | `prototyper` | discovery | Opus 5.5 | medium | Best on graphics and polish; leads CursorBench at every cost; `/effort low` on comment rounds |
 | `journey-scribe` | discovery | Sonnet 5.5 | high | Derives text from a locked source: templated writing |
 | `disc-author-prfaq` | discovery | Sonnet 5.5 | high | One page from a template |

@@ -18,15 +18,16 @@ The rules that hold at every stage in v9: proof over opinion (whatever
 can be checked by running something is checked that way); right size
 (every review asks "does this need to exist?" before "is this
 complete?"); specialists read knowledge packs of their craft; the user
-is asked only what is his; every stage closes with video, slides,
-blueprint; the pipeline measures itself.
+is asked only what is his; every stage closes with a report in layers
+(slides and the blueprint, a short video where it shows what slides
+cannot); the pipeline measures itself.
 
 ## Across the stages
 
 | Change | Mechanism | Why |
 |---|---|---|
-| **The stage report** | every stage closes with three layers read in order: a 1–2 minute video, 8–15 slides, the blueprint (`docs/stage-report.md`) | the reader goes up one layer only when he wants more detail; each layer is whole at its altitude |
-| **The video kit** | `claude/video/`: a storyboard JSON rendered to MP4 with no code per video; `video-scribe (Sonnet 5.5, high)` writes the storyboards; renders queue on one lock | a video per design document, per entry and per stage costs one cheap read and CPU time, off the critical path |
+| **The stage report** | every stage closes with layers read in order: a short video (discovery, design and plan only), 8–15 slides, the blueprint; the close has the launch film and the Retro tab (`docs/stage-report.md`) | the reader goes up one layer only when he wants more detail; each layer is whole at its altitude |
+| **The video kit** | `claude/video/`: a storyboard JSON rendered to MP4 with no code per video; `video-scribe (Sonnet 5.5, medium)` writes the storyboards; renders queue on one lock | a video of the mock, the proposal and the graph costs one cheap read and CPU time |
 | **Knowledge packs** | reference-only skills (`pack-<craft>`) that agents load before they work: a checklist plus recipes per craft | the bar of each craft is written once and read by every agent of that craft |
 | **The bar** | `docs/project-contract.md` rewritten as 22 roles in three levels (required, recommended, full experience), each with what it is, why, and how a stage uses it | a project knows what to provide before the first run instead of finding out at a pre-flight |
 | **`/pipeline-setup`** | audits a project against the bar with six scouts, writes `pipeline-readiness.md` with evidence, proposes the cheapest order to close the gaps, applies the generic pieces on a branch | adoption becomes a checklist with templates, not a week of discovery |
@@ -236,6 +237,16 @@ retros get short.
 | A red smoke or a rollback gets one fix, `R.n`, through the stage-4 pipeline, under the same play; a second red stops and reports | no loop and no question for a fix the pipeline already reviewed |
 | The session asks only before what cannot be undone (a contract migration, a rollback not safe for data, a stateful delete, the guard, anything outside the plan); a failed migration, the second red and a missing pre-flight item stop and report | the stop list is the irreversible list |
 | Removed: `verifier` | nothing else used it |
+
+### The stage reports
+
+| Change | Why |
+|---|---|
+| Execute makes no video: no video per entry and none for the stage; his hands-on with the running app is the validation, and nothing is recorded while he uses it; slides and blueprint stay | a video of what he has just used himself tells him nothing |
+| Release makes no video; slides and blueprint stay | the record and the slides say what went live |
+| The videos that stay: discovery (the mock in use, 60–90 s), design (the proposal, at the start of the debate and at the end), plan (the graph, 60–90 s); the close keeps the launch film and the Retro tab | each shows what the slides cannot |
+| A stage with a video waits for its render before it closes | the video is made only when the stage is really done |
+| `video-scribe` loses its execute-entry and stage-record modes; the blueprint's bar has no Watch step on the Execution and Release tabs (an older record with a video still builds and plays it) | — |
 
 ### Close and the weekly retro
 

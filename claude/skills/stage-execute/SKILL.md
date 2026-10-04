@@ -66,7 +66,7 @@ line per agent with its minutes, and the session keeps them.
 | `reviewer` | Opus 5.5, high | the ACs implemented, bugs and races, the security checklist, operations, a written rule broken |
 | `qa-frontend` | Opus 5.5, medium | the screens used like a person: the ACs' journeys, the states, mobile width |
 | `qa-backend` | Opus 5.5, medium | the API called like a client, the data read back, and "try to break it" |
-| `video-scribe` | Sonnet 5.5, medium | a short video of what the agents did, per entry and once for the stage |
+| `slides-scribe` | Sonnet 5.5, high | the stage report's slides (no video at this stage: his hands-on is the validation) |
 
 ## Preconditions
 
@@ -90,7 +90,7 @@ designs-root/<workstream>/
 └── 03-execution/
     ├── board.md               # one line per entry: state, sha, passes, minutes, the run id
     ├── parked.md              # what did not merge, with the evidence
-    ├── entries/<id>/          # run-<n>.json (never overwritten), notes.md, the QAs' screenshots, video/
+    ├── entries/<id>/          # run-<n>.json (never overwritten), notes.md, the QAs' screenshots
     ├── explain.md             # at the end: what was built, for the intern
     └── audit.md               # at the end: what was decided in the user's place
 ```
@@ -206,10 +206,7 @@ they go into the merge commit's body and never open work. Its
 the board (the entry's minutes, and the slowest step). Then act on
 `status`:
 
-- **`ready`** → the merge queue (Step 4); in the background, the
-  entry's video: `video-scribe (Sonnet 5.5, medium)` with the run return
-  and the evidence folder, writing under `entries/<id>/video/`. The
-  queue never waits on it.
+- **`ready`** → the merge queue (Step 4).
 - **`interrupted`** → an agent returned nothing (the API, the network,
   the quota). Relaunch the same run with `resumeFromRunId`; if it fails
   again at once, wait until the reset the limit message names (or 30
@@ -348,13 +345,12 @@ he says ok ─► Step 7
 
 1. `explain.md` from [templates/explain.md](templates/explain.md).
 2. `audit.md` brought up to date with the `A.<n>` entries.
-3. **The stage's video**: `video-scribe (Sonnet 5.5, medium)` once more,
-   with every `run-*.json`.
-4. `blueprint/execution/execution.json` (schema:
+3. `blueprint/execution/execution.json` (schema:
    `${CLAUDE_SKILL_DIR}/../../blueprint/schema/execution.md`).
-5. **The stage report**: follow
-   `${CLAUDE_SKILL_DIR}/../../docs/stage-report.md` (video, slides,
-   blueprint).
+4. **The stage report**: follow
+   `${CLAUDE_SKILL_DIR}/../../docs/stage-report.md`: slides, then the
+   blueprint. No video: his hands-on with the running app is the
+   validation, and nothing is recorded while he uses it.
 
 ## Step 8 — the audit
 

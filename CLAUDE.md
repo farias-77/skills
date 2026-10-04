@@ -278,22 +278,33 @@ their frames whole, because they are the demand itself and the user
 approved them there; whole behind the
 click, with the plain sentence in front.
 
-## Every stage closes with video, slides, blueprint
+## Every stage closes with its report in layers
 
-Three layers of one report, read in this order: the **video** says how
-it works in one or two minutes, the **slides** give the details one
-idea at a time, the **blueprint** holds everything. He goes up one
-layer only when he wants more detail, so each layer is whole at its
-altitude and never sends him up for what it should have shown. On a
-normal day he watches and reads; the blueprint is for when he needs
-it. The stage's close message names the three in that order, nothing
-before them. The procedure — `video-scribe (Sonnet 5.5, medium)`,
+Layers of one report, read in this order: the **video** says how it
+works in a minute or two, the **slides** give the details one idea at
+a time, the **blueprint** holds everything. He goes up one layer only
+when he wants more detail, so each layer is whole at its altitude and
+never sends him up for what it should have shown. Not every stage has
+every layer:
+
+| Stage | Video | Slides | Blueprint |
+|---|---|---|---|
+| discovery | the locked mock in use, 60–90 s | yes | yes |
+| design | the proposal, at the start of the debate and at the end | yes, re-rendered each round | yes |
+| plan | the graph, 60–90 s | yes | yes |
+| execute | none: his hands-on with the running app is the validation; nothing is recorded while he uses it | yes | yes |
+| release | none | yes | yes |
+| close | the launch film, 16:9 only | none | the Retro tab |
+
+A stage with a video waits for its render before it closes. The
+stage's close message names its layers in that order, nothing before
+them. The procedure — `video-scribe (Sonnet 5.5, medium)`,
 `slides-scribe (Sonnet 5.5, high)`, the publishing and the links both
-ways — is [docs/stage-report.md](docs/stage-report.md). The close is
-the exception: no review video and no slides. Its layers are the
-**launch film**, made for the product's users and the team from the
+ways — is [docs/stage-report.md](docs/stage-report.md). The close's
+**launch film** is made for the product's users and the team from the
 real app, portfolio-grade, with a step-by-step tutorial per feature,
-delivered on its own launch page; and the retro tab of the blueprint.
+delivered on its own launch page; its other layer is the Retro tab of
+the blueprint.
 
 ## Every stage measures itself, in one shape
 

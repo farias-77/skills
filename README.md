@@ -24,7 +24,7 @@ with a launch video at the end. Six rules hold at every stage:
 | **Right size, always** | one proposal at the "basics done well" bar, a critic whose only job is to cut, and an evolution path for what was relaxed; every mechanism names the AC or the risk that forces it |
 | **Specialists with knowledge packs** | each agent reads the packs of its craft before it works |
 | **He is asked only what is his** | he is in the loop at discovery and in the design debate; plan, execute and release run from play to done. What needs him in person is gathered up front, in one pre-flight message |
-| **Three layers per stage** | every stage reports as a video, then slides, then the blueprint |
+| **A report in layers** | every stage reports as slides, then the blueprint; discovery, design and plan open with a short video, and the close with the launch film |
 | **The pipeline measures itself** | each stage records its time, his minutes, agent hours, tokens, rounds and findings; the retro records where it got stuck, and the weekly retro turns what repeats into pipeline changes he rules |
 
 One demand becomes a **workstream**: one folder, one conducting Claude
@@ -153,8 +153,8 @@ an agent's frontmatter disagrees.
 | Stage | Agent | Model, effort |
 |---|---|---|
 | all | `scout` | Sonnet 5.5, low |
-|  | `video-scribe` | Sonnet 5.5, medium |
-|  | `slides-scribe` | Sonnet 5.5, high |
+| discovery, design, plan | `video-scribe` | Sonnet 5.5, medium |
+| discovery to release | `slides-scribe` | Sonnet 5.5, high |
 | discovery | `prototyper` | Opus 5.5, medium |
 |  | `journey-scribe` | Sonnet 5.5, high |
 |  | `disc-author-prfaq` | Sonnet 5.5, high |
@@ -201,16 +201,25 @@ path in the prompt; a session loads one with the Skill tool.
 | `launch-video` | launch-director (Opus 5.5, high), footage-recorder (Sonnet 5.5, medium), the video kit's launch mode |
 | `model-selection` | whoever picks a model: the evidence behind `docs/models.md` |
 
-## Three layers per stage
+## A report in layers
 
-Every stage closes with one report in three layers, read in order: a
-**video** of one or two minutes on how the result works, **slides**
-with the details one idea at a time, and the **blueprint** with
-everything. He goes up one layer only when he wants more. The video kit
-(`claude/video/`) renders a storyboard JSON to MP4 with no code per
+Every stage closes with one report in layers, read in order: a
+**video** on how the result works, **slides** with the details one
+idea at a time, and the **blueprint** with everything. He goes up one
+layer only when he wants more.
+
+| Stage | Video | Slides | Blueprint |
+|---|---|---|---|
+| Discovery | the locked mock in use, 60–90 s | yes | yes |
+| Design | the proposal, at the start of the debate and at the end | yes, re-rendered each round | yes |
+| Plan | the graph, 60–90 s | yes | yes |
+| Execute | none: his hands-on with the running app is the validation | yes | yes |
+| Release | none | yes | yes |
+| Close | the launch film, 16:9 only, for the people who use the product | none | the Retro tab |
+
+A stage with a video waits for its render before it closes. The video
+kit (`claude/video/`) renders a storyboard JSON to MP4 with no code per
 video; the procedure is [docs/stage-report.md](docs/stage-report.md).
-The close adds a different film: the launch video, for the people who
-use the product.
 
 ## Local CI and the guard
 

@@ -2,12 +2,11 @@
 
 <!--
   Sent by the SESSION as the stage report's message (claude/docs/stage-report.md):
-  the three layers first, then this. In the workstream's language,
+  the slides and the blueprint first (no video at this stage), then this. In the workstream's language,
   built to be followed at a glance. Everything here is also in
   release.json and the Release tab.
 -->
 
-▶ Vídeo      <blueprint URL>#layers-release   1–2 min · comece por aqui
 ▤ Slides     <deck URL>                       <n> slides · os detalhes
 ◧ Blueprint  <blueprint URL>                  tudo · só se precisar
 

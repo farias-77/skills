@@ -812,6 +812,7 @@
  },
  "layers": {
   "kicker": "Assista · Leia · Aprofunde",
+  "kickerNoVideo": "Leia · Aprofunde",
   "watch": "Assista",
   "watchSub": "Como funciona, em um ou dois minutos. Comece por aqui.",
   "watchNone": "Este estágio fechou sem vídeo.",

@@ -812,6 +812,7 @@
  },
  "layers": {
   "kicker": "Watch · Read · Dig deeper",
+  "kickerNoVideo": "Read · Dig deeper",
   "watch": "Watch",
   "watchSub": "How it works, in one or two minutes. Start here.",
   "watchNone": "This stage closed without a video.",

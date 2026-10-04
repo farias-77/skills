@@ -55,7 +55,7 @@ says so ([the skill](../claude/skills/pipeline-setup/SKILL.md)).
 | 18 | Autonomous release permissions | full experience | release |
 | 19 | Progressive delivery | full experience | release |
 | 20 | A cloud runner for parallel width | full experience | execute |
-| 21 | The video toolchain | full experience | every stage report, close |
+| 21 | The video toolchain | full experience | the discovery, design and plan reports, close |
 
 ---
 
@@ -525,11 +525,12 @@ current LTS), `ffmpeg`, and the video kit's dependencies installed once
 or production with an actor, and the browser tool able to record at
 1920×1080.
 
-**Why.** Every stage report opens with a video, and the close's launch
-video is recorded from the real app.
+**Why.** The discovery, design and plan reports open with a video,
+and the close's launch video is recorded from the real app. Execute
+and release make none.
 
 **How the stages use it.** `video-scribe (Sonnet 5.5, medium)` renders
-each stage's video; `footage-recorder (Sonnet 5.5, medium)` records
+the discovery, design and plan videos; `footage-recorder (Sonnet 5.5, medium)` records
 the journeys; the kit renders the launch video. Without the toolchain,
 the stage report has slides and the blueprint only, and says so.
 
