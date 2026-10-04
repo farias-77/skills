@@ -1,8 +1,10 @@
 # Judging the review round
 
-The conductor judges. The reviewers report at the maximum bar: told to
-find problems, they always find problems. That is by design, and it is
-why the round does not close on their word. It closes on yours. You
+The conductor judges. The reviewer reports at the maximum bar: told to
+find problems, it always finds problems. That is by design, and it is
+why the round does not close on its word. The blind readers report
+less: only an AC they could not decide, or one the mock contradicts;
+everything else was filtered before it reached you. It closes on yours. You
 have what no agent has: the interview, his words, what he locked. Use
 it, and never rule on a finding's text alone: open the sentence it
 quotes, and when it is about behavior, open the frame.
@@ -15,7 +17,7 @@ the locked mock do?** Answer it with `proto.mjs look` on the locked
 version, never from memory.
 
 - The documents say what the mock does → the documents are right; a
-  lens that wants other behavior is asking for an amendment, which is
+  finding that wants other behavior is asking for an amendment, which is
   his (owner `user`), or is wrong.
 - The documents say something the mock does not do → the derivation is
   wrong; owner `author`, the fix is to say what the mock does.
@@ -25,12 +27,12 @@ version, never from memory.
 
 ## Merge first
 
-Two lenses and a reader per story read the same documents and the same
-mock, so one defect arrives as several findings. Before ruling, group
+The reviewer and a reader per story read the same documents and the
+same mock, so one defect arrives as several findings. Before ruling, group
 the findings whose fix is the same edit (the same AC, value, Out item,
 or the same missing state) and rule the group once: one ruling, one
 owner, the merged ids listed in the reason. He answers one question
-per decision, never one per lens.
+per decision, never one per finding.
 
 ## The ruler
 
@@ -41,8 +43,9 @@ preference.
 
 Some defects always proceed: an AC that disagrees with the locked mock ·
 an AC a stranger could not judge · a capability neither In nor Out · a
-contradiction between the PR-FAQ and the stories · money, legal, or a
-stated constraint violated.
+rule or a behavior with no AC, or with several · a contradiction
+between the PR-FAQ and the stories · money, legal, or a stated
+constraint violated.
 
 ## The four rulings
 
@@ -75,7 +78,7 @@ not apply. Rule `sustained`, owner `user`, or at most `deferred`, never
 - **money**: anything that changes a bill or a price;
 - **legal** and stated constraints;
 - **security posture**: a secret's home, who holds a credential;
-- **a confirmed fact contested** by a lens with a contradiction;
+- **a confirmed fact contested** by a finding with a contradiction;
 - **a contradiction between the PR-FAQ and the stories**, or between a
   document and the locked mock.
 
@@ -100,41 +103,45 @@ not apply. Rule `sustained`, owner `user`, or at most `deferred`, never
   "observed" place, a value the mock shows added, an Out item the
   notes already settle. The file's author applies it (journey-scribe
   for journeys and stories, disc-author-prfaq for the PR-FAQ); he is
-  not asked.
+  not asked. Merging two ACs that check one rule is the author's.
 - **`user`** — the fix changes what the mock does or would have to do
   (an amendment), adds or removes scope, changes cost, touches personal
   data, or contests something he confirmed. He rules it, grouped by
-  decision, in the one batch of the round.
+  decision, in the one batch.
 
 In doubt between `author` and `user`, `user`: a wrong `user` costs one
 question; a wrong `author` is a product decision nobody took.
 
 ## Calibrations
 
-- **A blind reader's `fail` is evidence, not a verdict.** Run the
-  reader's `how` yourself with `proto.mjs look`. If the mock does what
-  the AC says and the reader drove it wrong, dismiss with the frame and
-  the actions quoted. If the mock does something else, the AC is wrong:
-  owner `author`, fix it to the mock.
-- **A blind reader's `cannot-judge` usually means the AC lacks its
-  "observed" place or a concrete value.** Owner `author`. When the
-  reader could not reach the state at all from the story's words, the
-  story is missing its GIVEN; same owner.
-- **Mechanics are not behavior.** A lens that wants a lock, a retry
-  count or a status code named found nothing for discovery; that is for
-  the design.
-- **Round 2 reads only the delta.** A finding raised in round 2 on text
-  no fix touched gets the razor at full strength: round 1 read it and
-  passed it.
-- **Name a recurrence.** When `reviews.md` shows the same class
-  sustained in round 1 and the fix did not move the document, say so,
-  and take it to him instead of the author.
+- **A blind reader's `contradicts` is evidence, not a verdict.** Run
+  the reader's `how` yourself with `proto.mjs look`. If the mock does
+  what the AC says and the reader drove it wrong, dismiss with the
+  frame and the actions quoted. If the mock does something else, the
+  AC is wrong: owner `author`, fix it to the mock.
+- **A blind reader's `undecidable` usually means the AC lacks its
+  "observed" place or a concrete value**, and its `missing` says which.
+  Owner `author`. When the reader could not reach the state at all from
+  the story's words, the story is missing its GIVEN; same owner.
+- **Mechanics are not behavior.** A finding that wants a lock, a retry
+  count or a status code named found nothing for discovery; that is
+  for the design.
+- **An AC per detail is a defect.** A finding that asks for a new AC
+  for a state, a label or a copy string is dismissed: the locked frames
+  cover it. A finding that two ACs check one rule is sustained, owner
+  `author`: merge them.
+- **There is no second round.** After the authors apply the fixes, read
+  each changed line yourself against its finding and its ruling, and
+  rerun `proto.mjs trace`. A fix that did not land goes back to its
+  author once; what is still wrong after that is residue, his at the
+  approval.
 
 ## What you write
 
 In `reviews.md`, before any fix is sent: per finding (or merged group)
-the id, lens, severity, title, ruling, owner, and the reason with the
-quote or the frame. Then the round's lists: to the authors (by file),
-to the user (by decision), for the design, dismissed. The blueprint's
-review block is filled from this file at the close, so he can read
-every dismissal there and reopen any at the approval.
+the id, source (the reviewer or a blind reader), severity, title,
+ruling, owner, and the reason with the quote or the frame. Then the
+round's lists: to the authors (by file), to the user (by decision), for
+the design, dismissed; and, once the fixes are in, what you verified.
+The blueprint's review block is filled from this file at the close, so
+he can read every dismissal there and reopen any at the approval.

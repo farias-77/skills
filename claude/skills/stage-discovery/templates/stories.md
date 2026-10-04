@@ -3,23 +3,29 @@
 <!--
   Derived from the LOCKED mock by journey-scribe. Nothing here is new: every
   use case is a family of locked journeys, every acceptance criterion is a
-  locked step, every value is one the mock shows or the notes confirmed.
+  rule or a behavior the mock shows, every value is one the mock shows or
+  the notes confirmed.
   What the scribe had to guess goes to Inferred; what it could not settle
   goes to Open. Both MUST be empty to close the stage.
 
   IDs:
   - A story is a use case: S-001, S-002…, one per job, with its journeys.
-  - An AC is a step of a locked journey: <journey>.<step>.<n> (J1.s2.1).
-    It never changes after the lock; later stages cite it.
+  - One AC per rule and one per behavior he said, never one per step, per
+    state or per copy string: the locked frames cover the states, the
+    layout and the copy. A step with no rule or behavior of its own has no
+    AC. A rule id sits in one AC only.
+  - An AC id anchors on the locked step where the behavior shows first:
+    <journey>.<step>.<n> (J1.s2.1). It never changes after the lock; later
+    stages cite it.
   - In [ ] after the id: the rule ids the AC checks (the notes' Rules
     table), or the story id when it checks behavior no numbered rule covers.
-  - An AC on a state no journey visits (a debug-only frame) is
-    frame:<token>.<n> (frame:invites.error.1).
+  - An AC on a behavior only a debug-only frame shows (an error with a
+    retry he asked for) is frame:<token>.<n> (frame:invites.error.1). A
+    state alone (loading, empty) gets no AC.
   - [build] after the rule ids marks an AC only the build can prove (a
     rule the notes' Rules table marks [build]: real time, a server's
     refusal, a count that changes on reload). It keeps the shape and says
-    where it is observed in the built product; the blind readers skip it,
-    the lock gate counts its rule as covered by the build.
+    where it is observed in the built product; the blind readers skip it.
   - A story block cites only its own AC ids. Another story's criterion is
     named in words ("the publish criterion of S-001"), never by id: a
     blind reader reads one block and would take the id for its own.
@@ -27,15 +33,15 @@
   An AC (the format `proto.mjs trace` reads):
   - **`J1.s2.1`** [INV-1] GIVEN <the state before the step, no clicks>
     WHEN <exactly one event, declarative>
-    THEN <one observable outcome> (observed: <where>)
+    THEN <an outcome that makes the behavior> (observed: <where>)
     AND <one more outcome per line> (observed: <where>)
   "observed" is one of: screen (role + accessible name, or the copy key
   with both strings) · inbox · row read back · event · log · alarm · file.
-  Values are concrete: fixture names, numbers with their units, copy keys.
-  No selectors, no internals, no "quickly" or "correctly". Effects that
-  must not happen are stated ("the inbox still holds 1 e-mail").
-  A rule with a number gets its boundary ACs: at the limit, just below,
-  just above.
+  Values are concrete: fixture names, numbers with their units, copy keys
+  where the copy is the point. No selectors, no internals, no "quickly" or
+  "correctly". Effects that must not happen are stated ("the inbox still
+  holds 1 e-mail"). A rule with a number gets ONE AC at the boundary the
+  mock shows (the 11th refused, the 10th kept).
 
   Each story block stands alone: a blind reader gets ONE block plus the
   vocabulary and must be able to judge every AC against the mock.
@@ -77,18 +83,18 @@ Personas: **<persona>** (<who, in one line>), …
 
 ### Acceptance criteria
 
-- **`J1.s1.1`** [S-001] GIVEN <state>
-  WHEN <event>
-  THEN <outcome> (observed: screen)
-- **`J1.s2.1`** [<RULE-ID>] GIVEN <state>
+- **`J1.s2.1`** [<RULE-1>] GIVEN <state>
   WHEN <event>
   THEN <outcome> (observed: screen)
   AND <outcome> (observed: row read back)
   AND <outcome> (observed: inbox)
-- **`frame:<token>.1`** [S-001] GIVEN <the state forced from the debug bar>
+- **`J2.s2.1`** [S-001] GIVEN <state>
   WHEN <event>
-  THEN <outcome> (observed: screen)
-- **`frame:<token>.2`** [<RULE-ID>] [build] GIVEN <state>
+  THEN <the behavior he said, with no numbered rule> (observed: screen)
+- **`frame:<token>.1`** [<RULE-2>] GIVEN <the state forced from the debug bar>
+  WHEN <event>
+  THEN <the behavior only that frame shows> (observed: screen)
+- **`frame:<token>.2`** [<RULE-3>] [build] GIVEN <state>
   WHEN <event the mock cannot play: a reload, a second user, the server>
   THEN <outcome> (observed: <where, in the built product>)
 

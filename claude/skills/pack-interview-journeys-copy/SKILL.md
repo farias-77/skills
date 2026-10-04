@@ -46,8 +46,12 @@ gives the shape every one of them fills.
 8. **Write every locale together, each one native.** Translations run
    longer and have their own idiom; localization style guides ask for
    clarity and economy, not word-for-word translation.
-9. **Derive ACs; never invent them.** Each AC cites one locked step and
-   the rule it checks. An AC without a step is scope he never walked.
+9. **Derive ACs; never invent them. One per rule, one per behavior.**
+   Each AC checks one rule or one behavior he said, anchored on the
+   locked step where it shows first. An AC without a step is scope he
+   never walked. States, layout and copy are covered by the locked
+   frames, not by ACs of their own: every AC becomes a test and a check
+   downstream, so one per detail multiplies the work, not the proof.
 10. **THEN means what an outsider can observe.** The screen, the fake
     inbox, a row read back, a log event or an alarm, never a function
     call. Gherkin wants "observable output"; test only external
@@ -135,11 +139,13 @@ gives the shape every one of them fills.
   no truncation.
 
 **Acceptance criteria (from the lock)**
-- [ ] A-1 Every AC has an id `<journey>.<step>.<n>` and at least one
-  rule ID, and both resolve in the lock.
-- [ ] A-2 Every locked step that has an `expect` or `effects` has at
-  least one AC, and every rule ID has at least one AC.
-- [ ] A-3 GIVEN is the state before the step, with no user action.
+- [ ] A-1 Every AC has an id `<journey>.<step>.<n>` (the step where its
+  behavior shows first) and at least one rule ID or the story ID, and
+  both resolve in the lock.
+- [ ] A-2 Every rule ID and every behavior he said has exactly one AC.
+  No AC per step, per state or per copy string: the locked frames
+  cover those.
+- [ ] A-3 GIVEN is the state before the event, with no user action.
   WHEN is exactly one event. THEN states one observable outcome per
   line.
 - [ ] A-4 Each THEN says where it is observed: the screen (role +
@@ -150,8 +156,8 @@ gives the shape every one of them fills.
   can mark the AC pass or fail without asking.
 - [ ] A-6 ACs are declarative: no selectors, no "click #submit". The
   wording survives a re-implementation.
-- [ ] A-7 Each numeric rule has boundary ACs: at the limit, just below
-  it and just above it.
+- [ ] A-7 Each numeric rule has one AC at the boundary the mock shows
+  (the 11th refused while the 10th stays), not one AC per side.
 - [ ] A-8 Effects that must not happen are stated: the count stays 1,
   no e-mail is sent, no row is written.
 
@@ -193,6 +199,8 @@ gives the shape every one of them fills.
   - Internals: "Then `sendEmail` is called once".
   - An AC that cites no step.
   - A 40-row Scenario Outline, Gojko Adzic's "illusion of precision".
+  - One AC per step, per state or per copy string: a small board with a
+    hundred ACs, each one a test and a check to keep.
   - A duplicate submit checked on screen but not in the inbox.
 
 ## Core recipes
@@ -221,17 +229,21 @@ action send-invite:  idle | submitting | success | refused.duplicate | refused.l
 frame id = <screen>.<state>  →  ?frame=invites-list.empty.first-use&lang=<locale>&vp=phone
 ```
 
-**AC derivation, one AC per step of every locked journey**
-1. **GIVEN** is the end state of the previous step, or the journey's
+**AC derivation, one AC per rule and per behavior**
+1. **List** the rules (the Rules table) and the behaviors he said (what
+   the product writes, sends, refuses, keeps, must not do). Each gets
+   one AC, anchored on the locked step where it shows first.
+2. **GIVEN** is the state before that step, or the journey's
    `given/data`. Write the state, not the clicks.
-2. **WHEN** is the step's `do`, written declaratively.
-3. **THEN** gets one line per `expect` key and one per `effects` key. A
-   count that must stay the same gets a line too.
-4. **Tags** are the step id plus the `rules:` this step exercises.
-5. **Uncovered boundaries.** A boundary example no journey covers
-   becomes an AC on a `debug-only` frame, tagged `frame:`, flagged to
-   the conductor as not walked.
-6. **Use cases** (inference), one per journey family: actor and job
+3. **WHEN** is the step's `do`, written declaratively.
+4. **THEN** carries the outcomes that make the behavior: the effect
+   read back, the refusal shown, a count that must stay the same.
+   Copy only when it is the point.
+5. **Tags** are the rules the AC checks, or the story ID.
+6. **Uncovered boundaries.** A boundary no journey covers becomes an AC
+   on a `debug-only` frame, tagged `frame:`, flagged to the conductor
+   as not walked.
+7. **Use cases** (inference), one per journey family: actor and job
    story → header; happy journey → main flow; each bad-path journey →
    an extension at the step where it branches.
 

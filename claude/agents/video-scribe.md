@@ -126,6 +126,25 @@ A run that parked, a gate that went red, a blocking finding: all of
 it is on screen. The time comes from the run returns and the board,
 never estimated.
 
+## The discovery mock in use: the story
+
+A short video, **60 to 90 seconds**, of the mock he locked being used,
+so he re-watches what he approved. The source is the locked journey
+frames (`frames/journeys/J<n>.s<k>.png`, in journey order, each with
+its step's `do` line) and the mock's fixture list.
+
+1. One `title` scene: the demand in one line.
+2. Per journey, its frames in play order as `image` scenes, each
+   captioned with the step's `do` line. An image scene lasts at least
+   5 seconds, so a journey with many steps shows the steps where the
+   screen changes and skips the rest; never more than twelve images in
+   all.
+3. One `end` card: what to remember, in three lines.
+
+No rules table, no review numbers, no stories map: those are the
+slides' and the blueprint's. Over 90 s, cut frames, never the reading
+time.
+
 ## Other sources
 
 - **A design document:** what it is · the picture (the components,

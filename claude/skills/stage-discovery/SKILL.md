@@ -1,6 +1,6 @@
 ---
 name: stage-discovery
-description: Conducts stage 1 (Discovery) — an interview in which the user says what to build while a clickable mock of it is built and iterated in front of him. The mock is exact in look and behavior, every state reachable, fully faked and never fragile; he validates through it and locks it ("lock it", in his words). From the locked mock, journeys, use cases and acceptance criteria (given/when/then, tied to a journey step and a rule) are derived, a one-page PR-FAQ is written, one review round plus a delta runs, and the stage closes with video, slides and blueprint. The conductor is Opus 5.5 (medium; high on the turns that rule). Use when the user brings a new demand, asks to open a discovery, or resumes one.
+description: Conducts stage 1 (Discovery) — an interview in which the user says what to build while a clickable mock of it is built and iterated in front of him. The mock is exact in look and behavior, every state reachable, fully faked and never fragile; he validates through it and locks it ("lock it", in his words). From the locked mock, journeys, use cases and acceptance criteria (given/when/then, one per rule and one per behavior) are derived, a one-page PR-FAQ is written, one review round runs, and the stage closes with a short video of the mock in use, slides and blueprint. The conductor is Opus 5.5 (medium; high on the turns that rule). Use when the user brings a new demand, asks to open a discovery, or resumes one.
 disable-model-invocation: false
 argument-hint: "[slug]"
 allowed-tools: Read, Write, Edit, Glob, Grep, Agent, SendMessage, Workflow, AskUserQuestion, Artifact, ArtifactData, ArtifactComments, Skill, WebSearch, WebFetch, Bash(mkdir *), Bash(date *), Bash(ls *), Bash(cat *), Bash(cp *), Bash(rm *), Bash(git *), Bash(node *), Bash(sha256sum *), Bash(realpath *)
@@ -21,8 +21,7 @@ It does not decide how it is built: no architecture, no data model, no
 technology. Stage 2 makes the mock real.
 
 The conductor is **Opus 5.5 at medium effort**, raised with `/effort
-high` for the turns where it rules (the lock gate, judging the
-review). If the session runs another model, ask him to switch
+high` for the turns where it rules (judging the review). If the session runs another model, ask him to switch
 (`/model`) before the first question and wait. A non-interactive run
 cannot switch: continue on the session's model and effort and write
 one line in `dreaming-notes.md`.
@@ -32,15 +31,14 @@ the bar this stage is held to.
 
 ## Two modes, declared
 
-**Interview mode** — D1, the conversation side of D2, the lock gate's
-summary (D3), the lock (D4), and the one batch of questions in D6. He
-is in the room; questions are the work. Never run ahead of his answers,
-never decide in his place, never put in the mock a rule he did not say
-or confirm (a guess goes to the notes' Inferred block and is asked
-before the lock).
+**Interview mode** — D1, the conversation side of D2, the lock (D3),
+and the one batch of questions in D5. He is in the room; questions are
+the work. Never run ahead of his answers, never decide in his place,
+never put in the mock a rule he did not say or confirm (a guess goes to
+the notes' Inferred block and is asked before the lock).
 
-**Autonomous mode** — D0, every prototyper build, D5, D6 except its
-question batch, and the file work of D7. He is waiting, not answering.
+**Autonomous mode** — D0, every prototyper build, D4, D5 except its
+question batch, and the file work of D6. He is waiting, not answering.
 Dispatch, run, judge, write, publish, without asking permission. Say in
 one line what you are about to do; close with a recap that stands on
 its own. Never end a turn on a plan or a promise.
@@ -55,19 +53,19 @@ D2 mock loop    one journey clear → prototyper (Opus 5.5, medium) builds v1 in
                 walk → publish (local mode: shots) → he clicks, gives step verdicts, comments,
                 talks → v2, v3 …
                 D1 and D2 run together until no question passes the razor
-D3 lock gate    prototype-checker (Sonnet 5.5, high): the mechanical walk of every journey and
-                every state, the taste checklist on screenshots, his verdicts on this version;
-                may run beside his last round of feedback
-D4 lock         he says "lock it" → proto.mjs lock → LOCK.json, versions/vN.html, frames/
-D5 derivation   journey-scribe (Sonnet 5.5, high) ∥ disc-author-prfaq (Sonnet 5.5, high)
-                → journeys/*.yaml, stories.md, pr-faq.md, their JSON → proto.mjs trace
-D6 review       discovery-review: round 1 whole, round 2 delta. You judge; his questions go
-                out in one batch
-D7 report       blueprint JSON → build → video (the mock in use) → slides → approval → /clear
+D3 lock         he says "lock it" (his word is the gate) → proto.mjs lock walks every journey
+                and every state once more → LOCK.json, versions/vN.html, frames/
+D4 derivation   journey-scribe (Sonnet 5.5, high) ∥ disc-author-prfaq (Sonnet 5.5, high)
+                → journeys/*.yaml, stories.md (one AC per rule and per behavior), pr-faq.md,
+                their JSON → proto.mjs trace
+D5 review       discovery-review, one round: disc-reviewer (Sonnet 5.5, medium) ∥ one
+                disc-blind-reader (Sonnet 5.5, low) per story. You judge, fix, verify by
+                reading; his questions go out in one batch
+D6 report       blueprint JSON → build → video (the mock in use, 60–90 s) → slides → approval → /clear
 ```
 
 He is in the loop at four points: the interview with the mock (D1–D2),
-the lock (D4), the one batch of questions (D6) and the approval (D7).
+the lock (D3), the one batch of questions (D5) and the approval (D6).
 
 ## The team
 
@@ -76,19 +74,18 @@ the lock (D4), the one batch of questions (D6) and the approval (D7).
 | the conductor (this session) | Opus 5.5, medium; high on the turns that rule | interviews, relays feedback, publishes, judges, asks |
 | `scout` | Sonnet 5.5, low | recon: quotes the feature maps, the tokens export, other fronts |
 | `prototyper` | Opus 5.5, medium | builds and iterates the mock from the shell, the notes and the recon |
-| `prototype-checker` | Sonnet 5.5, high | the lock gate: mechanical walk plus the design-taste checklist |
-| `journey-scribe` | Sonnet 5.5, high | derives journeys, stories and AC from the locked mock and the notes |
+| `journey-scribe` | Sonnet 5.5, high | derives journeys, stories and ACs (one per rule, one per behavior) from the locked mock and the notes |
 | `disc-author-prfaq` | Sonnet 5.5, high | the one-page PR-FAQ from the locked mock and the notes |
-| `disc-reviewer-acceptance` | Sonnet 5.5, medium | can a stranger judge each AC; does the set cover the mock? |
-| `disc-reviewer-boundary` | Sonnet 5.5, medium | is every capability In or Out, nothing in limbo? |
-| `disc-blind-reader` | Sonnet 5.5, low | walks the mock with one story only, AC by AC |
-| `video-scribe`, `slides-scribe` | Sonnet 5.5, medium · Sonnet 5.5, high | the stage report (D7) |
+| `disc-reviewer` | Sonnet 5.5, medium | can a stranger judge each AC; is every capability In or Out; does every rule and behavior of the mock have its one AC? |
+| `disc-blind-reader` | Sonnet 5.5, low | walks the mock with one story only; reports an AC only when undecidable or contradicted |
+| `video-scribe` | Sonnet 5.5, high | the stage report's video: the mock in use, 60–90 s (D6) |
+| `slides-scribe` | Sonnet 5.5, high | the stage report's slides (D6) |
 
 ## Files
 
 ```
 designs-root/<slug>/
-├── .state.md                 # stage, step (D0–D7), kit (resolved), mode (artifact | local), mock URL and version, locked version, round
+├── .state.md                 # stage, step (D0–D6), kit (resolved), mode (artifact | local), mock URL and version, locked version
 ├── .gitignore                # **/.remotion/ and _run/: never committed
 ├── rulings.md · taste-notes.md · dreaming-notes.md      # house files, created on first use
 ├── blueprint/                # workstream.json, prfaq.json, stories.json, review.json, report.json, figures.json
@@ -104,20 +101,19 @@ designs-root/<slug>/
     │   ├── walks/vN.json     # the walk of each version
     │   ├── walks/verdicts.json  # local mode only: his step verdicts, written by you from the chat
     │   ├── shots/vN/         # local mode only: the pictures he looked at (proto.mjs shots)
-    │   ├── gate-vN.md        # the checker's report at D3
     │   ├── frames/           # at the lock: <screen>.<state>.png (the reference), every state × theme × language × width (gitignored),
     │   │                     # journeys/J<n>.s<k>.png (every step), manifest.json
     │   └── LOCK.json         # version, date, his words, sha256 of the source and of the frames
     ├── journeys/J<n>-<name>.yaml
     ├── stories.md            # use cases + acceptance criteria
     ├── pr-faq.md             # one page
-    ├── reviews/round-N.json  # the workflow's return (its `.result`), as is
-    ├── reviews/rN/stories/   # stories.md cut for round N (proto.mjs split)
+    ├── reviews/round-1.json  # the workflow's return (its `.result`), as is
+    ├── reviews/stories/      # stories.md cut for the round (proto.mjs split)
     └── reviews.md            # the judging audit
 ```
 
 (`_run/`, at the workstream root, is not committed: the review
-workflow's copy when the host refuses its path, D6.)
+workflow's copy when the host refuses its path, D5.)
 
 The tool behind the mechanical steps is
 `node ${CLAUDE_SKILL_DIR}/scripts/proto.mjs` (written `proto.mjs`
@@ -148,7 +144,7 @@ has; say in one line what is missing and run on:
 |---|---|
 | `Artifact`, `ArtifactData`, `ArtifactComments` (a headless or cloud run, a host without claude.ai artifacts) | **local mode** (below); `.state.md` gets `mode: local` |
 | the question tool | the batches go as text, same shape (D1) |
-| `Workflow` accepting the review's `scriptPath` (the kit is a symlink that resolves outside the working directories) | copy it into the workstream, sha checked (D6) |
+| `Workflow` accepting the review's `scriptPath` (the kit is a symlink that resolves outside the working directories) | copy it into the workstream, sha checked (D5) |
 
 **Local mode.** The mock is never published; everything else holds.
 
@@ -157,9 +153,9 @@ has; say in one line what is missing and run on:
 | D2, each version | publish `index.html` | `node proto.mjs shots 00-discovery/prototype/index.html <the changed states and journeys>` writes `prototype/shots/v<N>/`; the message gives the PNG paths (attached when the host shows images) and the path of `index.html` |
 | his step verdicts | the `walks` collection, read with `ArtifactData` | he answers in chat per journey or step ("J2 as it should", "J3.s2 change: …"); you write each answer as a row of `prototype/walks/verdicts.json`: `{journey, step, verdict: "ok" or "change", note, version, source: "chat", words}`; an answer that covers a whole version ("all of v4 as it should") becomes one row per step, each with his words |
 | comments | `ArtifactComments` | chat only |
-| D3, check 6 | the verdict rows from `ArtifactData` | the rows of `walks/verdicts.json` |
-| D7, blueprint | `lock.url`: the mock's link | `lock.url: "local"` (and `"local"` in `mock.json`) |
-| D7, stage report | deck and blueprint published, placeholders filled with their URLs | the video and the deck stay in `report/discovery/`; in each slide file replace `__VIDEO_URL__` with the relative path to `video.mp4` and `__BLUEPRINT_URL__` with the relative path to `blueprint.html`; `stage-report.json` names the video and, as `slides`, the deck's first slide (`report/discovery/project/slides/<id>.html`); the message gives the local paths |
+| D3, before the lock | the verdict rows from `ArtifactData` | the rows of `walks/verdicts.json` |
+| D6, blueprint | `lock.url`: the mock's link | `lock.url: "local"` (and `"local"` in `mock.json`) |
+| D6, stage report | deck and blueprint published, placeholders filled with their URLs | the video and the deck stay in `report/discovery/`; in each slide file replace `__VIDEO_URL__` with the relative path to `video.mp4` and `__BLUEPRINT_URL__` with the relative path to `blueprint.html`; `stage-report.json` names the video and, as `slides`, the deck's first slide (`report/discovery/project/slides/<id>.html`); the message gives the local paths |
 
 A run with no human in the room (a test harness, a print-mode
 session) has more limits of its own; see
@@ -388,86 +384,66 @@ in v4").
 within the day. Past v8 or past one day, propose locking the behavior
 now and parking the visual polish as a named follow-up; he decides.
 
-## D3 — the lock gate
+## D3 — the lock
 
-When no question passes the razor and he says the mock is right, or he
-says "lock it" before the gate ran, dispatch
-`prototype-checker (Sonnet 5.5, high)` with `index.html`, `notes.md`,
-the walk of this version, the verdict rows of this version (from
-`ArtifactData`, passed inline; in local mode the path of
-`walks/verdicts.json`), the unanswered comments, and the output path
-`00-discovery/prototype/gate-v<N>.md`.
+His "lock it" (or its equivalent in his language) is the gate. There
+is no checker agent: the mechanical proof is the walk, which the
+prototyper runs on every version and `proto.mjs lock` runs once more.
 
-The gate may run beside his last round of feedback: when the version
-he is walking is likely the last, dispatch the checker on it at once
-instead of waiting for his "it is right"; the gate's minutes overlap
-his. If his feedback then changes the mock, run the gate again on the
-new version. The gate passes when:
+**When the version is likely the last**, tell the prototyper it is the
+lock candidate: it renumbers the step ids s1, s2, … in play order (the
+AC ids derive from them and freeze at the lock), and its report maps
+the old ids to the new so his verdicts move with them.
 
-1. **Every journey plays end to end** through the real UI (the walk):
-   each step lands on its declared state, shows its copy, and produces
-   exactly its declared side effects, no more. Step ids run s1, s2, …
-   in play order (the walk's `idOrder` is empty): the AC ids derive
-   from them and freeze at the lock, so the prototyper renumbers
-   before it; its report maps the old ids to the new, and his verdicts
-   move with them.
-2. **Every state exists and is reachable**: every frame renders as
-   itself, in every language and both themes, with no console error,
-   no missing copy, no sideways scroll at 390 and 1280 px, no dead end;
-   every frame is visited by a journey or marked debug-only; each
-   screen has its empty, loading, error, permission and success states,
-   or the notes say why not.
-3. **The copy is final** in each language: no placeholder, each
-   language native (the pack's copy checklist).
-4. **Every rule in the notes' Rules table is exercised** by at least
-   one journey step, or is marked `[build]` in the table's Proof column:
-   a rule a one-file mock cannot show (real time, a server's refusal, a
-   reload, a second session), which he confirmed is proved by the build.
-   A `[build]` rule counts as covered; the gate lists it as such.
-5. **The design-taste checklist** passes on the screenshots and the
-   DOM audit; a failure names its frame.
-6. **He walked it**: every journey step on this version has "As it
-   should" (from `ArtifactData`, or in local mode from
-   `walks/verdicts.json`), no "Change…" is open, no comment is
-   unanswered, the notes' Open and Inferred blocks are empty.
+**When he says "lock it"**, check in one pass, from what you already
+hold, that nothing is open:
 
-Show him the gate in one short table (check · result · the gaps). Gaps
-the prototyper can close go back to it; a gap that is his (an Inferred
-line, a journey he did not walk) becomes a question. He may lock over
-the gaps ("lock it as it is"): that is an override, recorded in `rulings.md`
-with the gaps listed; each gap he accepted goes to `proto.mjs lock` as a
+- his step verdicts on this version: every step "As it should", no
+  "Change…" open (from `ArtifactData`; in local mode
+  `walks/verdicts.json`);
+- no comment unanswered;
+- the notes' Open and Inferred blocks empty;
+- every rule in the notes' Rules table shown by a journey step, or
+  marked `[build]` in its Proof column (a rule a one-file mock cannot
+  show: real time, a server's refusal, a reload, a second session),
+  which he confirmed.
+
+Nothing open: lock. Something open: say it in one short table (item ·
+where) and ask once whether he answers it or locks over it. Locking
+over it ("lock it as it is") is an override, recorded in `rulings.md`
+with the items listed; each item goes to `proto.mjs lock` as a
 `--gap`, so `LOCK.json` carries it in `gaps[]` and it travels to the
 blueprint.
 
-## D4 — the lock
-
-He says "lock it" (or its equivalent in his language). Then:
-
 ```
 node proto.mjs lock 00-discovery/prototype --words "<his words, verbatim>" \
-  [--override "<his words>" --gap "<check · where>::<what>" …]
+  [--override "<his words>" --gap "<item · where>::<what>" …]
 ```
 
-It walks the mock once more, refuses step ids out of order always and
-a failure unless overridden, records in `gaps[]` the walk's failures
-and every `--gap` (`{source, where, what}`),
+It walks the mock once more (every journey through the real UI, every
+state in every language, theme and width), refuses step ids out of
+order always and a failing walk unless overridden, records in `gaps[]`
+the walk's failures and every `--gap` (`{source, where, what}`),
 writes `versions/v<N>.html`, renders `frames/` (one reference picture
 per state, `<screen>.<state>.png`; every state × light and dark × each
-language × 390 and 1280 px; every journey step) with `manifest.json`, and writes `LOCK.json` with the sha256 of each. Only the
-reference per state, the journey steps and the manifest are committed:
-the full matrix is gitignored (a `.gitignore` the lock writes in
-`frames/`) and regenerated on demand with `proto.mjs frames`, its
-hashes kept in the manifest. Write
-the notes' Lock block, a line in `rulings.md`
-(`<date> · discovery D4 · lock v<N> · ruled: locked · "<his words>"`)
-and `.state.md` (`step: D5`, `locked: v<N>`). Commit the workstream
+language × 390 and 1280 px; every journey step) with `manifest.json`,
+and writes `LOCK.json` with the sha256 of each. Only the reference per
+state, the journey steps and the manifest are committed: the full
+matrix is gitignored (a `.gitignore` the lock writes in `frames/`) and
+regenerated on demand with `proto.mjs frames`, its hashes kept in the
+manifest. A walk that fails is fixed by the prototyper and the lock
+runs again; only his explicit words lock over it.
+
+Write the notes' Lock block, a line in `rulings.md`
+(`<date> · discovery D3 · lock v<N> · ruled: locked · "<his words>"`)
+and `.state.md` (`step: D4`, `locked: v<N>`). Commit the workstream
 folder.
 
 **After the lock the mock does not change.** A change he asks for
-later is an amendment: a new version, the gate again on what it
-touches, a new lock, and D5 re-derives only the journeys that changed.
+later is an amendment: a new version, the walk again, a new lock, and
+D4 re-derives only the journeys that changed.
 
-## D5 — the derivation
+## D4 — the derivation
 
 Autonomous. Two dispatches in parallel:
 
@@ -485,7 +461,11 @@ Autonomous. Two dispatches in parallel:
 Both briefs include, verbatim: *"The locked mock is the source. Where
 the mock and the notes are silent, write the reading the mock most
 directly supports, list it in the Inferred list, and do not write for
-the other readings as well."*
+the other readings as well."* The scribe's brief adds, verbatim: *"One
+AC per rule and one per behavior the user said, never one per step,
+per state or per copy string: the locked frames cover the states and
+the copy."* Every AC becomes a test and a check in stage 4; the count
+is the cost.
 
 When both return, run the mechanical check:
 
@@ -493,28 +473,30 @@ When both return, run the mechanical check:
 node proto.mjs trace 00-discovery/prototype/versions/v<N>.html 00-discovery/journeys 00-discovery/stories.md --notes 00-discovery/notes.md
 ```
 
-Every failure goes back to the scribe in one message; rerun until it
-passes. Then check by reading: every story names its journeys; the
-PR-FAQ's "not building" matches the notes' Out blocks; the two JSON
-files match their documents. The authors' Inferred lists are asked in
-the D6 batch.
+It proves every journey has its YAML with the mock's steps and frames,
+every AC resolves to a step or a frame, every rule has exactly one AC,
+and no story cites another's AC id. Every failure goes back to the
+scribe in one message; rerun until it passes. Then check by reading:
+every story names its journeys; no story carries ACs that check one
+behavior twice; the PR-FAQ's "not building" matches the notes' Out
+blocks; the two JSON files match their documents. The authors'
+Inferred lists are asked in the D5 batch.
 
-## D6 — the review: one round, then the delta
+## D5 — the review: one round
 
-Autonomous. First cut the stories for the round (the stories never
-travel inline):
+Autonomous. First cut the stories (they never travel inline):
 
 ```
-node proto.mjs split 00-discovery/stories.md 00-discovery/reviews/r<N>/stories
+node proto.mjs split 00-discovery/stories.md 00-discovery/reviews/stories
 ```
 
 Then run the `discovery-review` workflow by `scriptPath`, never by
 name: `<kit>/workflows/discovery-review.js`, with `discoveryDir`,
 `mock` (the locked `versions/v<N>.html`, absolute), `proto` (the
-absolute path of `proto.mjs`), `round`, `mode`, `language` and
-`storiesDir` (the split folder, absolute). The workflow reads the AC
-ids from the split's `index.json` and gives each blind reader its
-story file and the vocabulary file.
+absolute path of `proto.mjs`), `language` and `storiesDir` (the split
+folder, absolute). The workflow reads the AC ids from the split's
+`index.json` and gives each blind reader its story file and the
+vocabulary file.
 
 When the Workflow tool refuses the path (the kit is a symlink that
 resolves outside the session's working directories), copy the script
@@ -532,14 +514,21 @@ with `--add-dir <the pipeline root>` needs no copy.)
 The workflow's result arrives in an envelope (`summary`, `logs`,
 `result`, …): the return is its `.result`.
 
-**Round 1 is whole:** the acceptance and boundary lenses over the two
-documents, and one `disc-blind-reader (Sonnet 5.5, low)` per story,
-who walks the mock with that story only and marks every AC pass, fail
-or cannot-judge. A blind `fail` means the derivation and the locked
-mock disagree; `cannot-judge` means the AC does not say how to observe
-its outcome. An AC marked `[build]` is not walked blind (the return
-lists it under `skippedBuild`). Save the return (`.result`) as
-`reviews/round-1.json`. A round the
+**The round, whole, once:**
+
+- `disc-reviewer (Sonnet 5.5, medium)` reads the documents and the
+  mock: can a stranger judge each AC; is every capability In or Out,
+  nothing in limbo; does every rule and every behavior the mock shows
+  have its one AC (and none two)?
+- one `disc-blind-reader (Sonnet 5.5, low)` per story walks the mock
+  with that story only. It reports an AC only as `undecidable` (it
+  could not decide pass or fail, and says what was missing) or
+  `contradicts` (the mock does otherwise; it quotes both). Wording,
+  style and suggestions are never reported, and the workflow drops any
+  finding without its kind and its quotes (the return lists them under
+  `dropped`). An AC marked `[build]` is not walked (`skippedBuild`).
+
+Save the return (`.result`) as `reviews/round-1.json`. A round the
 workflow marks invalid is fixed at its cause and run again before
 anything is judged.
 
@@ -561,21 +550,21 @@ Merge first. Then:
   it.
 
 An answer of his that changes behavior the mock shows is an amendment
-(see D4), never a text-only fix: the stories never say something the
+(see D3), never a text-only fix: the stories never say something the
 locked mock does not show.
 
-**Round 2 is the delta**, automatic once the fixes are applied:
-split again into `reviews/r2/stories`, `mode: "delta"`, `only`: the ids
-of the stories that changed, and `verify`:
-the round-1 sustained findings with their fixes, which the lenses
-confirm closed. Judge it the same way. There is no round 3: what is
-still sustained goes to the blueprint's review block as residue with
-your reason, and he rules it at the approval.
+**Verify by reading. There is no second round and no delta.** When the
+authors return, read each changed line against its finding and its
+ruling, and rerun `proto.mjs trace`. Write each in `reviews.md`'s
+"Fixes verified" table. A fix that did not land goes back to its
+author once; what is still wrong after that goes to the blueprint's
+review block as residue with your reason, and he rules it at the
+approval.
 
-## D7 — the report and the close
+## D6 — the report and the close
 
 The blueprint is built, never edited (house rule). Write the files that
-are yours: `blueprint/review.json` (rounds, his decisions, author
+are yours: `blueprint/review.json` (the round, his decisions, author
 fixes, for-the-design, dismissed, residue, and `lock` from `LOCK.json`:
 its `date` as `at`, his words, the override and gaps; from `reviews.md`
 and `rulings.md`) and `blueprint/report.json`, the plain layer: one
@@ -591,15 +580,17 @@ the data, never the HTML.
 
 Then the stage report: follow
 [claude/docs/stage-report.md](../../docs/stage-report.md) (video,
-slides, blueprint). For discovery, the video **shows the mock being
-used**: give `video-scribe (Sonnet 5.5, medium)` the locked journey
-frames (`frames/journeys/J<n>.s<k>.png`, in journey order, each with
-its step's `do` line) so he re-watches what he approved, and the mock's
-fixture list (`meta.fixtures` from `proto.mjs model`): those names are
-invented, not personal data. The slides carry the journeys, the rules,
-what stays out and his decisions; give `slides-scribe (Sonnet 5.5,
-high)` the path of the blueprint's strings file
-(`<kit>/blueprint/strings.<language>.json`) so the deck names the
+slides, blueprint). For discovery, the video is **short: 60 to 90
+seconds of the mock being used**. Give `video-scribe (Sonnet 5.5,
+high)` the locked journey frames (`frames/journeys/J<n>.s<k>.png`, in
+journey order, each with its step's `do` line) so he re-watches what he
+approved, the mock's fixture list (`meta.fixtures` from `proto.mjs
+model`: those names are invented, not personal data), and the cap in
+its brief: *"The discovery mock in use: 60 to 90 seconds, the locked
+journey frames in order, nothing else."* The slides carry the
+journeys, the rules, what stays out and his decisions; give
+`slides-scribe (Sonnet 5.5, high)` the path of the blueprint's strings
+file (`<kit>/blueprint/strings.<language>.json`) so the deck names the
 blueprint's tabs and sections by their real labels. In local mode the
 report stays local (see Prerequisites).
 
@@ -615,13 +606,14 @@ stage 2 (house rule). The close commit is the last act.
 
 `00-discovery/telemetry.json`, in the shape every stage shares
 ([claude/docs/telemetry.md](../../docs/telemetry.md)), filled as the
-stage runs: a step row as each of D0–D7 ends (the interview and the
+stage runs: a step row as each of D0–D6 ends (the interview and the
 mock loop are where `hisMin` lives), the agents with their model and
-effort, the review rounds and the findings by class (the classes
-`judging.md` names). The counts only discovery has (versions
-published, his question calls and questions, gate overrides, the
-times of the first mock and of the lock) go in a `discovery` object
-beside the shared fields. The close's harvester reads the file.
+effort, the review round (`rounds: 1`) and the findings by class (the
+classes `judging.md` names). The counts only discovery has (versions
+published, his question calls and questions, lock overrides, ACs and
+ACs per story, blind findings dropped by the filter, the times of the
+first mock and of the lock) go in a `discovery` object beside the
+shared fields. The close's harvester reads the file.
 
 ## How to write, in every file and every question
 
@@ -637,5 +629,8 @@ Everything is in files. Read `.state.md` (its step says where the
 stage stopped, its `kit:` and `mode:`), then `notes.md` (Coverage map,
 Journeys, Mock log, Open), then the newest `walks/v<N>.json`. If a mock
 is published, read the verdicts of its version and the unanswered
-comments before saying anything; in local mode, `walks/verdicts.json`. Continue from the step `.state.md` names, never from memory
-of an earlier session.
+comments before saying anything; in local mode, `walks/verdicts.json`.
+At D5, a saved `reviews/round-1.json` is never run again: continue from
+`reviews.md` (the rulings written, the fixes sent, the "Fixes verified"
+table). Continue from the step `.state.md` names, never from memory of
+an earlier session.

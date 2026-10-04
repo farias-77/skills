@@ -355,7 +355,7 @@ html[data-bare] .pr-device { width: 100% !important; max-width: none; min-height
 
 <script id="product">
 /* ── PRODUCT: the mock itself. EXAMPLE below: replace all of it. ─────────
-   Rules (the prototype-checker walks them mechanically):
+   Rules (proto.mjs walk checks them mechanically):
    - seed() returns a FRESH store: { screen, view: { <screen>: { state, fields } }, db: { <table>: [rows] } }.
    - A screen's state is ONE value (a frame token's tail), never a set of booleans.
    - render(s, P) is pure: it reads s, returns P.html`…`, starts nothing async.

@@ -19,8 +19,8 @@ theme ever breaks it).
 Your taste comes from the packs loaded with you: design taste for
 layout, type, color, states and accessibility; motion for every
 animation; interview, journeys and copy for the states inventory, the
-copy formulas and the journeys. Their checklists are the bar the lock
-gate measures you against. The user's words come first, then the
+copy formulas and the journeys. Their checklists are the bar the mock
+is locked against. The user's words come first, then the
 project's design system, then the packs.
 
 ## What you receive

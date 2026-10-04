@@ -9,7 +9,7 @@
  *                         [--shot out.png] [--width 390] [--theme dark] [--lang pt-BR] [--page] [--env-cmd "cmd"]
  *   node proto.mjs shots  <index.html> <token|J<n>> … [--out dir] [--width 1280] [--theme light] [--lang pt-BR]
  *   node proto.mjs lock   <prototype-dir> --words "his words" [--override "his words, gaps accepted"]
- *                         [--gap "<where>::<what>"] … (one per gap of the gate he accepted)
+ *                         [--gap "<where>::<what>"] … (one per open item he locked over)
  *   node proto.mjs trace  <index.html> <journeys-dir> <stories.md> [--notes notes.md]
  *   node proto.mjs split  <stories.md> <out-dir>
  *   node proto.mjs model  <index.html>
@@ -39,13 +39,14 @@
  *         (a .gitignore there keeps the matrix out of git: the reference per state, the journey steps
  *         and manifest.json are committed; `frames` regenerates the matrix on demand),
  *         write LOCK.json (version, date, his words, sha256 of the source and of the frames manifest, and
- *         gaps[]: the walk's failures and every --gap of the gate he accepted, {source, where, what}).
+ *         gaps[]: the walk's failures and every --gap he locked over, {source, where, what}).
  * model   the mock as data: meta, frames, journeys (with targets, fills, effects), copy, actions.
  * trace   the derivation against the locked mock: one YAML per journey with the same steps and
- *         frames; every step with an expectation has an AC; every AC id resolves; every rule id
- *         (journeys, and the notes' Rules table with --notes) has an AC; no story block cites an AC id
- *         another story defines. An AC marked [build] after its rule ids is proved by the build, not
- *         the mock: counted apart (buildAcs).
+ *         frames; every AC id resolves to a step or a frame of the mock; every rule id (journeys, and
+ *         the notes' Rules table with --notes) has exactly one AC; no story block cites an AC id
+ *         another story defines. An AC is one rule or one behavior, never one per step or per state:
+ *         a step with no AC is fine (its frame, locked, covers it). An AC marked [build] after its rule
+ *         ids is proved by the build, not the mock: counted apart (buildAcs).
  * split   stories.md cut for the review: vocabulary.md (the `## Vocabulary` section), one S-NNN.md
  *         per story block, and index.json { vocabulary, stories: [{ id, file, acs, build }] }: the AC
  *         ids each block defines (the blind reader's keys) and its [build] ACs (skipped by the reader).
@@ -450,8 +451,8 @@ async function lock(dir, opts) {
   if (!opts.words) die('lock needs --words "<his words when he locked>"');
   const index = path.join(dir, 'index.html');
   if (!fs.existsSync(index)) die(`${index} not found`);
-  const gateGaps = (opts.gap || []).map(g => { const i = String(g).indexOf('::'); return i < 0 ? { source: 'gate', where: 'gate', what: String(g) } : { source: 'gate', where: g.slice(0, i).trim(), what: g.slice(i + 2).trim() }; });
-  if (gateGaps.length && !opts.override) die('gaps accepted (--gap) need his words: --override "<his words>"');
+  const openGaps = (opts.gap || []).map(g => { const i = String(g).indexOf('::'); return i < 0 ? { source: 'lock', where: 'lock', what: String(g) } : { source: 'lock', where: g.slice(0, i).trim(), what: g.slice(i + 2).trim() }; });
+  if (openGaps.length && !opts.override) die('gaps accepted (--gap) need his words: --override "<his words>"');
   const report = await walk(index);
   fs.writeFileSync(path.join(dir, 'walk-lock.json'), JSON.stringify(report, null, 2));
   if (report.idOrder.length) die(`step ids out of order (the AC ids derive from them and freeze now): renumber, walk again, lock.\n  ${report.idOrder.join('\n  ')}`, 1);
@@ -470,7 +471,7 @@ async function lock(dir, opts) {
   fs.writeFileSync(path.join(fdir, '.gitignore'), '*~*.png\n');
   const LOCK = {
     version: v, date: new Date().toISOString(), words: opts.words, override: opts.override || null,
-    gaps: [...(report.ok ? [] : report.fails.map(f => ({ source: 'walk', ...f }))), ...gateGaps],
+    gaps: [...(report.ok ? [] : report.fails.map(f => ({ source: 'walk', ...f }))), ...openGaps],
     sha256: { 'index.html': sha(src), [`versions/v${v}.html`]: sha(src), 'frames/manifest.json': sha(fs.readFileSync(path.join(fdir, 'manifest.json'))) },
     walk: report.summary, frames: manifest.files.length,
   };
@@ -532,7 +533,10 @@ async function trace(file, jdir, storiesFile, opts = {}) {
     if (!j || !j.steps.some(s => s.id === a.s)) fails.push(`AC ${a.id}: no step ${a.j}.${a.s} in the locked mock`);
     if (!a.rules.length) fails.push(`AC ${a.id}: no rule id in [ ]`);
   }
-  for (const j of journeys) for (const st of j.steps) if (!acs.some(a => a.j === j.id && a.s === st.id)) fails.push(`step ${j.id}.${st.id}: no AC`);
+  // one AC per rule: a rule carried by several ACs is one AC written per detail (merge them)
+  const perRule = new Map();
+  for (const a of [...acs, ...frameAcs]) for (const r of new Set(a.rules)) if (!/^S-\d+$/.test(r)) perRule.set(r, [...(perRule.get(r) || []), a.id]);
+  for (const [r, ids] of perRule) if (ids.length > 1) fails.push(`rule ${r}: ${ids.length} ACs (${ids.join(', ')}); one AC per rule: merge them into one`);
   const acRules = new Set([...acs, ...frameAcs].flatMap(a => a.rules));
   const ruleIds = new Set(Object.values(parsed).flatMap(y => [...y.rules, ...y.steps.flatMap(s => s.rules)]));
   if (opts.notes) {

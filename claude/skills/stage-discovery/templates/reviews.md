@@ -2,10 +2,9 @@
 
 <!--
   Written by the CONDUCTOR, who is the judge. The workflow's return value is
-  saved as is in 00-discovery/reviews/round-N.json (the authority); this file
-  is the index written from it before any fix is sent. Two rounds: round 1
-  whole, round 2 the delta (the stories and lenses the fixes touched). No
-  third round.
+  saved as is in 00-discovery/reviews/round-1.json (the authority); this file
+  is the index written from it before any fix is sent. One round, whole: no
+  delta. The conductor verifies the fixes by reading them.
 -->
 
 ## Mechanical checks before the round
@@ -13,25 +12,26 @@
 | Check | Result |
 |---|---|
 | `proto.mjs walk` on the locked mock | <PASS · or the gaps he accepted at the lock> |
-| `proto.mjs trace` (journeys ↔ mock, steps ↔ ACs, rules ↔ ACs) | <PASS · fails listed and sent to the scribe> |
+| `proto.mjs trace` (journeys ↔ mock, ACs ↔ steps and frames, one AC per rule) | <PASS · fails listed and sent to the scribe> · <ACs: N, per story: …> |
 
-## Round <N> — <date> · run <id> · <whole | delta>
+## The round — <date> · run <id>
 
-| Lens | Verdict | Findings |
+| Source | Verdict | Findings |
 |---|---|---|
-| disc-reviewer-acceptance | | |
-| disc-reviewer-boundary | | |
+| disc-reviewer | | |
 | disc-blind-reader (per story) | | |
 
 ### Blind walks
 
-| Story | ACs | pass | fail (mock disagrees) | cannot judge | Unread |
-|---|---|---|---|---|---|
-| S-001 | <n> | <n> | <ids> | <ids> | <yes when the reading was dropped> |
+| Story | ACs judged | contradicts (mock disagrees) | undecidable | Unread |
+|---|---|---|---|---|
+| S-001 | <n> | <ids> | <ids> | <yes when the reading was dropped> |
+
+Dropped by the filter: <n, with the reasons from `dropped`>
 
 ### Findings and rulings
 
-#### [<severity>] <lens>#<n> — <title>  <(merged with <ids>)>
+#### [<severity>] <source>#<n> — <title>  <(merged with <ids>)>
 
 - **Finding:** <gap>
 - **Ruling:** sustained · owner <author / user> | deferred | for the design | dismissed — <the reason; the sentence or the frame that decides it>
@@ -49,11 +49,17 @@
 
 <findings N · to the authors N · to the user N (as N decisions) · deferred N · for the design N · dismissed N>
 
+### Fixes verified
+
+| Finding | Changed line (file:line) | Closed |
+|---|---|---|
+| <id> | <the line as it now reads> | <yes · no: back to the author once · residue> |
+
 ## Close
 
-### Precision per lens
+### Precision per source
 
-| Lens | Findings | Sustained | Deferred | For the design | Dismissed |
+| Source | Findings | Sustained | Deferred | For the design | Dismissed |
 |---|---|---|---|---|---|
 
 ### For the design
@@ -62,7 +68,7 @@
 
 ### Residue
 
-<what was still sustained after round 2, with the reason; what he decided about it>
+<what was still wrong after the fixes were verified, with the reason; what he decided about it>
 
 ### Taste notes added
 

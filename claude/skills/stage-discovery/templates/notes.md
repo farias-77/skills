@@ -55,8 +55,8 @@
 
 <!-- Proof: `mock` when a journey step can show it; `[build]` when a one-file
      mock cannot (real time, a server's refusal, a reload, a second session):
-     he confirms the [build] marking, the lock gate counts the rule as covered
-     by the build, and its ACs carry [build]. -->
+     he confirms the [build] marking, the rule counts as covered by the
+     build, and its one AC carries [build]. -->
 
 | ID | Rule | Number | Source | Examples | Proof |
 |---|---|---|---|---|---|
@@ -121,8 +121,8 @@
 
 ## Lock
 
-<!-- Written at D4. -->
+<!-- Written at D3. -->
 
 - **Version:** v<N> · **Date:** <date> · **His words:** "<verbatim>"
-- **Gate:** <passed> | <overridden: the gaps, and his words>
+- **Walk:** <passed> | <overridden: the gaps, and his words>
 - **Walked:** <step verdicts in the artifact> | <local mode: walks/verdicts.json, from his chat answers>

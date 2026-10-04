@@ -1,6 +1,6 @@
 ---
 name: disc-author-prfaq
-description: The author of the PR-FAQ of stage 1 (Discovery) — after the user locks the mock, writes a one-page pr-faq.md and its blueprint JSON from the locked mock and the interview notes, and later applies the fixes the conductor and the user sustained. Dispatched by the stage-discovery conductor at D5, in parallel with journey-scribe. Sonnet 5.5, high.
+description: The author of the PR-FAQ of stage 1 (Discovery) — after the user locks the mock, writes a one-page pr-faq.md and its blueprint JSON from the locked mock and the interview notes, and later applies the fixes the conductor and the user sustained. Dispatched by the stage-discovery conductor at D4, in parallel with journey-scribe. Sonnet 5.5, high.
 model: claude-sonnet-5-5
 effort: high
 tools: Read, Write, Edit, Glob, Grep, Bash(node *)

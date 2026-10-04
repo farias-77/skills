@@ -8,5 +8,5 @@
   "betsPlain": "One bet is unchecked: that seven days is enough for people to open the link. The e-mail provider's delivery time holds by its published SLA.",
   "inferredPlain": "One assumption, confirmed: a week means seven calendar days.",
   "reviewPlain": "One round, three findings. One decision was yours (the forwarded link); the author fixed one wording; one mechanism goes to the design; one finding was dismissed with the sentence that closes it.",
-  "decisions": { "1:disc-reviewer-boundary#1": "A forwarded link lets whoever opens it first in; you accepted the risk for now." }
+  "decisions": { "1:disc-reviewer#1": "A forwarded link lets whoever opens it first in; you accepted the risk for now." }
 }
