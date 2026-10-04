@@ -25,18 +25,19 @@ Report against the lock, the requirement and the floor the project's
 doctrine sets — not against the most hardened version imaginable. A
 mechanism no requirement names is itself a finding (`pack-right-sizing`,
 list C); a fix that adds a mechanism names its requirement (`req:`) and
-passes the same list. A stage may narrow the classes its lenses report:
-design reports only correctness, coverage of the lock, contradictions
-between documents and one-way doors.
+passes the same list. A stage may narrow the classes its reviewer reports:
+design reports only AC coverage, contradictions (between the
+documents, or with the proposal and the locked mock) and the security
+posture, and only what blocks.
 
 Severity says how bad the finding is IF real; whether it proceeds is
 not the reviewer's call. Who rules, per stage:
 
 | Stage | Who rules | How |
 |---|---|---|
-| discovery | the conductor, by `references/judging.md` | his product questions go out in one batch |
-| design | the conductor | the owner is the writer, the implementer (declared latitude) or his class; after his one call, his class is ruled conservatively (`ruled: conductor`) and listed for his veto |
-| plan | the conductor, every finding | owners: writer, conductor, builder; listed for his veto at the report |
+| discovery | the conductor, by `references/judging.md` | one round (`disc-reviewer (Sonnet 5.5, medium)` and the filtered blind readers), verified by reading; his product questions go out in one batch |
+| design | the conductor, by `references/judging.md` | one reviewer (`design-reviewer (Opus 5.5, medium)`), one round, blocking findings only; the owner is the conductor (a one- or two-line fix), the writer, or the implementer (declared latitude); a finding of his class after he closed the proposal is ruled conservatively (`ruled: conductor`) and listed for his veto |
+| plan | the conductor, every finding, by `references/judging.md` | one round (`plan-reviewer (Opus 5.5, medium)` and the filtered blind readers); owners: the planner (the cut) or the writer (a brief); every choice listed for his veto at the report |
 | execute | no judge: one blocking rule in code, by `stage-execute/references/judging.md` | a finding is `blocking` or a `note`; it blocks only on an AC not met, a reproduced bug, a security hole or a written rule broken, with its proof; notes go to the PR and open no work |
 | release | a fix row goes through the execute pipeline | the same triage |
 | close | no reviewers | the harvesters report every friction with its evidence |
@@ -55,8 +56,8 @@ simplest form that meets the house standard**: it names the concrete
 change, and when it adds a mechanism it names what forces it (an AC,
 a decision, a standard rule). A fix that adds a mechanism nothing
 forces is overengineering wearing a finding; the judge dismisses it,
-and the coverage lens reports it if it ever lands. The goal of the
-panel is the best-built thing that still fits the demand and the
+and the reviewer reports it if it ever lands. The goal of the
+review is the best-built thing that still fits the demand and the
 standards, not the most complete one.
 
 ## The materiality bar
@@ -116,9 +117,9 @@ whatever the section says:
   other side fails;
 - the key, the format and the retention of every stored entity;
 - the shape of every contract, success and every error;
-- every class of the security sweep;
+- who can do what, and where secrets and personal data live;
 - which alarms exist and whom each one wakes;
-- the cost envelope.
+- what the proposal relaxed, and its evolution path.
 
 A hard-class item found in a latitude section is a finding: the
 design left open what the implementer must not decide alone.

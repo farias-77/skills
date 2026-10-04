@@ -40,10 +40,10 @@ duration, where the result carries them).
     {"agent": "design-reviewer", "model": "Opus 5.5", "effort": "medium", "runs": 1, "hours": 0.3, "tokens": 600000}
   ],
   "tokens": {"session": 2400000, "agents": 9800000, "total": 12200000},
-  "rounds": 2,
+  "rounds": 1,
   "findingsByClass": [
-    {"class": "correctness", "found": 9, "sustained": 6},
-    {"class": "coverage", "found": 4, "sustained": 4}
+    {"class": "coverage", "found": 3, "sustained": 3},
+    {"class": "consistency", "found": 2, "sustained": 1}
   ],
   "cost": {"usd": null, "source": null},
   "gaps": ["the session's own tokens: the harness did not report them"]
@@ -55,7 +55,7 @@ duration, where the result carries them).
 | `stage`, `workstream` | the stage's name as `.state.md` writes it; the slug | required |
 | `openedAt`, `closedAt` | ISO 8601 UTC (`date -u +%FT%TZ`) | `closedAt` null while the stage runs |
 | `session` | the conducting session's model and effort | the ones it actually ran on, not the ones the skill asks for |
-| `steps[]` | one row per step of the stage's pattern (discovery D0–D7, design D0–D6, P0–P6, the release's steps, the close's steps; execute: one row per entry, with `step` the entry id) | `wallClockMin` from the two timestamps; `hisMin` the minutes the stage waited on him or talked with him in that step |
+| `steps[]` | one row per step of the stage's pattern (discovery D0–D6, design D0–D6, plan P0–P4, the release's steps, the close's steps; execute: one row per entry, with `step` the entry id) | `wallClockMin` from the two timestamps; `hisMin` the minutes the stage waited on him or talked with him in that step |
 | `wallClockMin`, `hisMin` | the stage's totals | `wallClockMin` from `openedAt` to `closedAt`; `hisMin` the sum of the steps' |
 | `agents[]` | one row per agent name, with its model and effort as the frontmatter fixes them | `runs`, and `hours` and `tokens` summed from the harness's results |
 | `tokens` | the session's, the agents', the total | the session's from the harness when it reports them, else null |

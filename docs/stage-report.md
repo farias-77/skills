@@ -160,13 +160,14 @@ The session passes the stage's paragraph to both scribes. The video
 tells it as a story in one or two minutes; the slides give the detail,
 one idea per slide.
 
-**Discovery — the mock he locked, the stories, the decisions.** What
-is being asked and for whom, in the PR-FAQ's headline; the locked mock
-being used, journey by journey, from its frames, so he re-watches what
-he approved; the stories as a map, one line each, with what each lets
-the persona do; what stays out; and the decisions he took in the
-interview, with the inferences confirmed in his place on their own
-slide.
+**Discovery — the mock he locked, the stories, the decisions.** The
+video is short and alone in its job: 60 to 90 seconds of the locked
+mock being used, from its journey frames in order, so he re-watches
+what he approved, and nothing else. The slides add the rest: what is
+being asked and for whom, in the PR-FAQ's headline; the stories as a
+map, one line each, with what each lets the persona do; the rules;
+what stays out; and the decisions he took in the interview, with the
+inferences confirmed in his place on their own slide.
 
 **Design — how it works, the decisions taken, the risks.** The one
 picture of the system and the flow that matters most, step by step;
@@ -178,18 +179,19 @@ this size**: what is done well, what was relaxed and the evolution path
 as the way it grows, where the architect disagreed with him and how it
 was settled, and what the critic cut.
 
-**Plan — the graph, the width, the foundation.** From A to B in one
-picture; the thin foundation and why it comes first; the build as a
-flow of parallel lanes, the widest wave and the critical path drawn in
-the hot tone; the few edges that force an order and the proof behind
-each; the proof each node must show; what the pre-flight needs from
-him in person; every choice the conductor made in his place, listed
-for veto.
+**Plan — the graph, the width, the foundation.** The graph as one
+flow: the foundation, the entries side by side, the integration entry;
+the critical path drawn in the hot tone and the start order; the few
+edges that force an order and the proof behind each; the entries
+built by two builders, back and front on the design's Contract; the
+prerequisites only he can hand over; every choice the conductor made
+in his place, listed for veto.
 
 **Execute — what was built, the proof, what was decided in his place.**
 What is merged, entry by entry, against the plan's graph; the proof
-that it works, as the commands and results the verifier ran; what
-blocked and how it was fixed; the choices the builders and the session
+that it works: the ACs with their tests, the gate, the reviewer's and
+the QAs' findings; what blocked and how it was fixed; the screens
+beside the locked mock's frames, for his one check; the choices the builders and the session
 made in his place, and what is parked for his ruling at the audit.
 
 **Release — what went live, the gates.** What is in production, with
