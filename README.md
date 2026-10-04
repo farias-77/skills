@@ -9,7 +9,7 @@ company and published as-is.
 public because the ideas travel even where the specifics don't. It is
 deliberately opinionated: read it, steal what fits, and shape your own.
 The best way to use it is to **fork it and keep editing** — the
-closing stage exists precisely to keep rewriting these files as
+weekly retro exists precisely to keep rewriting these files as
 reality pushes back.
 
 ## What it is
@@ -307,7 +307,7 @@ claude/
   blueprint/            the blueprint shell, its build, strings per language, the JSON schemas
   video/                the video kit (Remotion): storyboard JSON → MP4, launch mode
 docs/                   the bar, models.md, the stage report, the reviewer contract
-scripts/                check-models.mjs
+scripts/                check-models.mjs; the workflows' dry runs (mocked agents)
 ```
 
 ## On cost
