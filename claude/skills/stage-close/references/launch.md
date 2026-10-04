@@ -1,14 +1,14 @@
 # The launch package — L1 to L4 and its delivery, stage 6
 
 The package is what he forwards to the people who use the product: the
-film (16:9 and 9:16), its captions, a "what's new" text and the
+film (one format, 16:9), its captions, a "what's new" text and the
 changelog lines. The film is recorded from the real app and rendered by
 the video kit in launch mode (`claude/video/schema.md`, "Launch mode").
 
 ```
 L1  launch-director (Opus 5.5, high) · plan  ─┐ dispatched at step 0, background
 L2  footage-recorder (Sonnet 5.5, medium)     │ when L1 returns
-L3  launch-director (Opus 5.5, high) · film   │ when L2 returns, background; render ~1 h per cut loaded
+L3  launch-director (Opus 5.5, high) · film   │ when L2 returns, background; render ~1 h loaded
 L4  the session checks                        ─┘ before the step-5 message
 D   the launch page                            web copies on the Artifact asset store; local files without the tool
 ```
@@ -57,10 +57,9 @@ mode and `05-close/launch/footage/`. The recorder runs
 
 Dispatch `launch-director` with `mode: film`, the footage folder and the
 recorder's report, in the background. It writes
-`launch.storyboard.json` from the logs, validates it, checks the stills
-at both shapes, renders with `render-launch.sh` (queued on the
-machine's render lock with the stage videos), checks six frames and two
-vertical ones, fixes once, and returns the paths, the sizes and what is
+`launch.storyboard.json` from the logs, validates it, checks the
+stills, renders with `render-launch.sh` (queued on the machine's
+render lock with the stage videos), checks six frames, fixes once, and returns the paths, the sizes and what is
 still wrong. The session never polls the render: the director's return
 is the notification.
 
@@ -75,9 +74,8 @@ them) and `whats-new.md`, and checks:
   cut list;
 - `whats-new.md` names each feature and where it lives, under 120
   words, nothing the release did not ship;
-- the sizes are inside the budgets (the film ~50 MB, the vertical ~25
-  MB) and both files play (`ffprobe` shows video and, with music,
-  audio).
+- the size is inside the budget (~50 MB) and the file plays
+  (`ffprobe` shows video and, with music, audio).
 
 One more director pass at most; what remains goes in the step-5
 message as a known flaw.
@@ -90,12 +88,11 @@ can forward inside his organization, with the masters as local files
 beside it:
 
 ```
-D1  web copies   scripts/web-copy.sh launch.mp4 web/launch.mp4    (≤ 19 MB each; the asset cap is 20 MiB)
-                 scripts/web-copy.sh launch-vertical.mp4 web/launch-vertical.mp4
+D1  web copy     scripts/web-copy.sh launch.mp4 web/launch.mp4    (≤ 19 MB; the asset cap is 20 MiB)
 D2  the page     templates/launch-page.html → web/index.html, placeholders filled,
                  published with capabilities {assets: {}}
-D3  upload       Artifact publish, url = the page, asset: true, file_paths = the two web copies → their urls
-D4  republish    __FILM_URL__ and __VERTICAL_URL__ ← those urls, exactly as returned; the same file again
+D3  upload       Artifact publish, url = the page, asset: true, file_path = the web copy → its url
+D4  republish    __FILM_URL__ ← that url, exactly as returned; the same file again
 ```
 
 - **D1.** `web-copy.sh` copies a file already under the cap; otherwise
@@ -106,23 +103,22 @@ D4  republish    __FILM_URL__ and __VERTICAL_URL__ ← those urls, exactly as re
 - **D2.** The session writes `05-close/launch/web/index.html` from the
   template and fills every `__PLACEHOLDER__`: the title and a one-line
   subtitle (the release's name and date), the language, the headings
-  and the vertical cut's label in the workstream's language,
+  in the workstream's language,
   `whats-new.md` as the text (HTML-escaped) and one `<li>` per
   changelog line. The first publish passes `icon: "video"` and
-  `capabilities: {"assets": {}}`; the players stay hidden while their
+  `capabilities: {"assets": {}}`; the player stays hidden while its
   URL is still a placeholder. A page that declares `assets` is visible
   inside his organization only, never public: the message says so.
-- **D3.** One upload call with both web copies. The result gives each
-  file's `url`; the page uses it exactly as given.
-- **D4.** Fill the two URLs and publish the same file again (same URL).
-  No vertical cut: leave `__VERTICAL_URL__`, its player stays hidden.
+- **D3.** One upload call with the web copy. The result gives its
+  `url`; the page uses it exactly as given.
+- **D4.** Fill the URL and publish the same file again (same URL).
   The page's URL goes in `trace.md`, so a later round of his notes
   republishes it instead of making a new one. The session does not
   render or screenshot the page afterwards.
 
 **No Artifact tool** (a headless run, a host without it), or a publish
-or an upload refused: the delivery is the local files (the master, the
-vertical cut, the captions, each with its absolute path and size), and
+or an upload refused: the delivery is the local files (the master and
+the captions, each with its absolute path and size), and
 the message says why the film has no link. The close never waits on
 it. The web copies and `index.html` are committed with the workstream;
 the masters follow the footage rule of step 6.
@@ -132,7 +128,7 @@ the masters follow the footage rule of step 6.
 No browser-drivable app, no environment, no toolchain, or every journey
 failed: the package is the text alone (`whats-new.md`, `changelog.md`),
 the message says why there is no film, and the retro records it as a
-`W-` friction against the project's contract. The close does not wait.
+place it got stuck, against the project's contract. The close does not wait.
 
 ## Licences
 

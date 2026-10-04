@@ -63,7 +63,7 @@ The record (`03-execution/`) is named as the authority, never copied.
 
 - `entries[].id` is the foundation `F`, an entry of `plan.json`, or a
   fix entry `X.<n>` (the whole gate red at the end, or a fix he ruled
-  at the audit); every entry of `plan.json` and `F` appear exactly
+  at the audit), or an adjustment `A.<n>` of his hands-on; every entry of `plan.json` and `F` appear exactly
   once. `rounds` counts the checks (the whole one and the delta);
   `found` and `sustained` count the findings and the blocking ones. `status` is `waiting`, `building`,
   `merged` or `parked`; a merged entry has its `sha`; a parked one

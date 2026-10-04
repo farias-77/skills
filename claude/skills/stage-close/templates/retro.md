@@ -1,78 +1,52 @@
 # Retro — <workstream>
 
 <!--
-  Written by the SESSION at stage 6 from the harvest. The same content
-  goes to blueprint/close/retro.json in the fixed shape the weekly
-  retro reads. Nothing here is a decision.
+  Written by the SESSION at stage 6, in this fixed format and nothing
+  more. The numbers come from 05-close/metrics.json (every stage's
+  telemetry.json); the rest from 05-close/harvest.json. The same
+  content goes to blueprint/close/retro.json. Nothing here is a
+  decision, and nothing is opened anywhere: this file is the record.
 -->
 
 **In one sentence:** <what this workstream delivered and how it went>
 
-## In numbers
+## Numbers
 
-| Days | Stories | Entries | Amendments | Rounds (disc · design · plan · exec) | Found → sustained | Parked | Staging reds | Fixes | Rollbacks | Hotfixes |
-|---|---|---|---|---|---|---|---|---|---|---|
-| | | | | | | | | | | |
+| Stage | Wall-clock (h) | His (h) | Agents (h) | Tokens (M) | Cost | Rounds | Findings (found → sustained) |
+|---|---|---|---|---|---|---|---|
+| discovery | | | | | | | |
+| … | | | | | | | |
+| **total** | | | | | | | |
+| previous: `<workstream>` \| first workstream | | | | | | | |
 
-## Delivery metrics
+Entries: <n> (previous <n>) · structure of main: <duplication, complexity, boundary violations, gate runtime: before → after> | not measured
 
-| Lead time | His hours | Agent hours | Tokens (M) | Revert rate | Change failure rate |
-|---|---|---|---|---|---|
-| <days> | <h> | <h> | <M> | <n/m> | <n/m> |
+## Went well
 
-| Stage | Wall-clock (h) | His (h) | Agents (h) | Tokens (M) | Rounds | Findings by class (found → sustained) |
-|---|---|---|---|---|---|---|
+1. <what> — <evidence: `file:line` or a number>
+2. <what> — <evidence>
+3. <what> — <evidence>
 
-(`metrics.json`; `null` where the stage did not record it)
+## Got stuck
 
-## Structure of main
+### S-1 · <title>
 
-| Measure | Before (`<merge-base sha>`) | After (`<release merge sha>`) | Past the threshold |
-|---|---|---|---|
-| Duplication | | | no \| **yes → W-n** |
-| Complexity | | | |
-| Boundary violations | | | |
-| Gate runtime | | | |
-| Reverts | — | <n> | |
+- **Stage:** <stage> · **Where the time went:** <step> · <h> h
+- **Evidence:** `<file:line>` — "<quote, verbatim>"
 
-<the files the check names when a measure worsened> | not measured: the project has no structure check (→ I-n, doctrine)
+### S-2 · <title>
 
-## Precision per reviewer
+### S-3 · <title>
 
-| Stage | Reviewer | Found | Sustained | Deferred | Latitude | Dismissed |
-|---|---|---|---|---|---|---|
-
-## What worked
-
-- <what> — <evidence>
-
-## What went wrong
-
-### W-1 · <title>
-
-- **Stage:** <stage> · **Where:** `<file:line>`
-- **Quote:** "<verbatim>"
-- **Cost:** <a round, a stop, a red, a day, a question>
-
-## Ideas for the pipeline
+## Ideas
 
 ### I-1 · <title>
 
-- **Stage:** <stage> · **Lands:** pipeline | doctrine | venture · **Target:** `<pipeline file>`
+- **Stage:** <stage> · **Would touch:** `<file>`
 - **Change:** <one or two sentences>
-- **Why:** <the cost it removes>
-- **Evidence:** W-1, W-3
+- **Why:** <the time it gives back>
+- **Behind it:** S-1
 
-## The user's notes
+## His notes
 
-- "<his words, verbatim>" — on <I-n | W-n | general>
-
-## Launch package
-
-- Film: `05-close/launch/launch.mp4` · <m:ss> · <MB> MB · vertical <MB> MB | not made: <why>
-- Features in the film: <n> · cut: <feature — why>
-- Known flaws: <what> | none
-
-## Sweep
-
-- <what was cleaned> | <what is left, and the command that removes it>
+- "<his words, verbatim>" — on <I-n | S-n | general>

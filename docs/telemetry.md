@@ -74,8 +74,8 @@ friction the close records ("the stage did not measure itself").
 
 ## Who reads it
 
-`stage-close` sums the six files into `05-close/metrics.json`
-(`references/metrics.md`): the close-harvester of the `telemetry`
-source reads them and returns one row per stage with its `file:line`.
-The weekly retro compares `metrics.json` across workstreams. The
+`stage-close` sums the six files into `05-close/metrics.json` with
+`scripts/telemetry-sum.mjs` (`references/metrics.md`); the retro's
+numbers and its "where the time went" come from there, never from a
+reading. The weekly retro compares `metrics.json` across workstreams. The
 stage's own report quotes it for the message's telemetry line.

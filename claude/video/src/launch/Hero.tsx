@@ -67,7 +67,7 @@ const useTextures = (srcs: (string | undefined)[]) => {
   }, []);
 };
 
-const Cards: React.FC<{n: number; textures: (THREE.Texture | null)[]; accent: string; len: number; vertical: boolean}> = ({n, textures, accent, len, vertical}) => {
+const Cards: React.FC<{n: number; textures: (THREE.Texture | null)[]; accent: string; len: number}> = ({n, textures, accent, len}) => {
   const f = useCurrentFrame();
   const sp = useSpring();
   const body = useMemo(() => {
@@ -78,10 +78,7 @@ const Cards: React.FC<{n: number; textures: (THREE.Texture | null)[]; accent: st
   const face = useMemo(faceGeometry, []);
   const out = ease(f, len - 14, len, 0, 1, EXIT);
   const drift = f / len;
-  const group = vertical
-    ? // a phone frame is ~2.4 world units wide at the dolly's distance: a smaller, flatter stack stays inside it
-      {pos: [0, 0.8, 0] as const, rot: [0.1, -0.22 + 0.08 * drift, 0.03] as const, scale: 0.44}
-    : {pos: [1.3, 0.05, 0] as const, rot: [0.08, -0.42 + 0.12 * drift, 0.035] as const, scale: 0.9};
+  const group = {pos: [1.3, 0.05, 0] as const, rot: [0.08, -0.42 + 0.12 * drift, 0.035] as const, scale: 0.9};
   return (
     <group position={group.pos as any} rotation={group.rot as any} scale={group.scale}>
       {Array.from({length: n}, (_, i) => {
@@ -89,8 +86,8 @@ const Cards: React.FC<{n: number; textures: (THREE.Texture | null)[]; accent: st
         const k = n - 1 - i;
         const p = sp(f, 4 + i * 7, {damping: 200}, 42);
         const land = 1 - p;
-        const x = (k * 0.62 - (n - 1) * 0.31) * (vertical ? 0.4 : 1);
-        const y = k * (vertical ? 0.42 : 0.3) - (n - 1) * 0.15;
+        const x = k * 0.62 - (n - 1) * 0.31;
+        const y = k * 0.3 - (n - 1) * 0.15;
         const z = -k * 0.75 - land * 6 - out * 3;
         const tex = textures[i];
         return (
@@ -121,9 +118,9 @@ export const HeroScene: React.FC<{s: any; len: number; story: any}> = ({s, len, 
   const out = len - 14;
   // 16:9: the longest word must end before the stack (the front card starts near x 820)
   const longest = Math.max(1, ...String(s.title).split(/\s+/).map((w) => [...w].length));
-  const titleSize = g.vertical ? fitSize(s.title, 940, 132, 84, 0.5, 2) : Math.max(84, Math.min(fitSize(s.title, 820, 132, 84, 0.5, 2), Math.floor(660 / (longest * 0.56))));
+  const titleSize = Math.max(84, Math.min(fitSize(s.title, 820, 132, 84, 0.5, 2), Math.floor(660 / (longest * 0.56))));
   // the subtitle keeps to two lines and to the left of the stack (16:9: the front card starts near x 820)
-  const subSize = g.vertical ? fitSize(s.subtitle || '', 936, 58, 42, 0.42, 2) : fitSize(s.subtitle || '', 640, 50, 36, 0.42, 2);
+  const subSize = fitSize(s.subtitle || '', 640, 50, 36, 0.42, 2);
   const dolly = ease(f, 0, len, 7.4, 6.7);
   return (
     <AbsoluteFill>
@@ -131,9 +128,9 @@ export const HeroScene: React.FC<{s: any; len: number; story: any}> = ({s, len, 
       <div
         style={{
           position: 'absolute',
-          left: g.vertical ? '10%' : '48%',
-          top: g.vertical ? '44%' : '62%',
-          width: g.vertical ? '80%' : '46%',
+          left: '48%',
+          top: '62%',
+          width: '46%',
           height: 220,
           background: `radial-gradient(closest-side, ${rgba(story.accent, 0.16)}, transparent)`,
           opacity: ease(f, 10, 50, 0, 1) * (1 - ease(f, out, out + 12, 0, 1, EXIT)),
@@ -145,18 +142,18 @@ export const HeroScene: React.FC<{s: any; len: number; story: any}> = ({s, len, 
         <ambientLight intensity={0.55} />
         <directionalLight position={[-3, 4, 6]} intensity={2.4} />
         <pointLight position={[5, -1, 2]} intensity={18} color={story.accent} distance={12} />
-        <Cards n={cards.length} textures={textures} accent={story.accent} len={len} vertical={g.vertical} />
+        <Cards n={cards.length} textures={textures} accent={story.accent} len={len} />
       </ThreeCanvas>
-      <div style={g.vertical ? {position: 'absolute', left: g.mx, right: g.mx, top: 1130} : {position: 'absolute', left: g.mx, top: height / 2 - titleSize * 1.15, width: 740}}>
+      <div style={{position: 'absolute', left: g.mx, top: height / 2 - titleSize * 1.15, width: 740}}>
         <Fade at={14} out={out}>
-          <Kicker text={s.kicker} accent={story.accent} size={g.vertical ? 30 : 24} />
+          <Kicker text={s.kicker} accent={story.accent} size={24} />
         </Fade>
         <Rise at={20} out={out} style={{marginTop: 28}}>
           <div style={{fontFamily: SANS, fontWeight: 700, fontSize: titleSize, lineHeight: 0.98, letterSpacing: -titleSize * 0.04, color: L.ink}}>{s.title}</div>
         </Rise>
         {s.subtitle ? (
           <Rise at={30} out={out} style={{marginTop: 26}}>
-            <div style={{fontFamily: SERIF, fontStyle: 'italic', fontSize: subSize, lineHeight: 1.15, color: L.ink2, maxWidth: g.vertical ? undefined : 640}}>{s.subtitle}</div>
+            <div style={{fontFamily: SERIF, fontStyle: 'italic', fontSize: subSize, lineHeight: 1.15, color: L.ink2, maxWidth: 640}}>{s.subtitle}</div>
           </Rise>
         ) : null}
       </div>

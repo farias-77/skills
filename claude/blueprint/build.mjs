@@ -11,8 +11,8 @@
 //        the precision per reviewer, the report, the audit)
 //        <workstream-dir>/blueprint/release/release.json when stage 5 ran (one file by the session: the staging runs, the fixes,
 //        the ask, production, the versions, what is in production, the watch), read against the plan and the execution record
-//        <workstream-dir>/blueprint/close/retro.json when stage 6 ran (one file by the session: the numbers, the precision per
-//        reviewer, what worked, what went wrong, the ideas with their evidence, the user's notes, the sweep), read only against a
+//        <workstream-dir>/blueprint/close/retro.json when stage 6 ran (one file by the session, a fixed short format: the
+//        numbers beside the previous workstream's, went well ×3, got stuck ×3, ideas ≤3, the user's notes), read only against a
 //        closed release
 //        <workstream-dir>/blueprint/design/*.json when stage 2 ran (one per document: solution, data-and-contracts, tests,
 //        operations; plus proposal, decisions, design-report, design-review; the documents are embedded from 01-design/)
@@ -388,7 +388,7 @@ if (existsSync(execDir) && plan) {
     if (X.audit !== undefined) need(A, ['parked', 'choices', 'latitude'], `${W} audit`);
     const aParked = list(A.parked, 'audit.parked'), aChoices = list(A.choices, 'audit.choices'), aLat = list(A.latitude, 'audit.latitude');
     const planIds = new Set(plan.plan.entries.map(e => e.id));
-    const idOk = id => id === 'F' || planIds.has(id) || /^[FX]\.\d+$/.test(String(id));
+    const idOk = id => id === 'F' || planIds.has(id) || /^[FXA]\.\d+$/.test(String(id));
     const count = new Map();
     const STATUS = ['waiting', 'building', 'merged', 'parked'];
     const parkedIds = new Set(aParked.map(p => p.id));
@@ -397,7 +397,7 @@ if (existsSync(execDir) && plan) {
       const w = `${W} entries[${i + 1}]${e.id ? ` (${e.id})` : ''}`;
       need(e, ['id', 'status', 'rounds', 'found', 'sustained', 'summary'], w);
       if (!('sha' in e)) problems.push(`${w}: missing sha (null until merged)`);
-      if (e.id !== undefined && !idOk(e.id)) problems.push(`${w}: id "${e.id}" is neither F, an entry of plan.json, an amendment F.<n> nor a fix entry X.<n>`);
+      if (e.id !== undefined && !idOk(e.id)) problems.push(`${w}: id "${e.id}" is neither F, an entry of plan.json, an amendment F.<n>, a fix entry X.<n> nor an adjustment A.<n>`);
       count.set(e.id, (count.get(e.id) || 0) + 1);
       if (e.status !== undefined && !STATUS.includes(e.status)) problems.push(`${w}: status "${e.status}" must be one of ${STATUS.join(', ')}`);
       if (e.status === 'merged' && !e.sha) problems.push(`${w}: merged without a sha`);
@@ -648,74 +648,63 @@ if (existsSync(releasePath)) {
 const closeDir = join(dataDir, 'close');
 const retroPath = join(closeDir, 'retro.json');
 let retro = null;
-const RETRO_NUMBERS = ['days', 'stories', 'entries', 'amendments', 'roundsDiscovery', 'roundsDesign', 'roundsPlan', 'roundsExecute', 'found', 'sustained', 'deferred', 'latitude', 'dismissed',
-  'parked', 'stagingRuns', 'stagingReds', 'fixes', 'rollbacks', 'hotfixes', 'watchRead', 'watchOwned', 'rulings', 'tokensM'];
+const RETRO_NUMBERS = ['wallClockH', 'hisH', 'agentH', 'tokensM', 'costUSD', 'entries', 'rounds', 'found', 'sustained'];
 if (existsSync(join(closeDir, 'close.json'))) { console.error('blueprint data problems:\n  close/close.json: the retired close (the dreaming board, issues, recurrence); stage 6 writes only close/retro.json — remove close.json'); process.exit(1); }
 if (existsSync(retroPath)) {
   const W = 'close/retro.json';
   const fail = () => { console.error('blueprint data problems:\n  ' + problems.join('\n  ')); process.exit(1); };
   if (!release || !release.closed) { problems.push(`${W}: the retro is read against a closed release; ${release ? 'release/release.json closed is null' : 'blueprint/release/release.json is missing'}`); fail(); }
   const C = JSON.parse(readFileSync(retroPath, 'utf8'));
-  need(C, ['workstream', 'report', 'numbers', 'lenses', 'worked', 'wrong', 'ideas', 'userNotes', 'sweep'], W);
+  ['worked', 'wrong', 'lenses', 'sweep'].forEach(k => { if (k in C) problems.push(`${W}: ${k} is a key of the retired retro; the fixed format is numbers, wentWell, gotStuck, ideas (schema/close.md)`); });
+  need(C, ['workstream', 'report', 'numbers', 'wentWell', 'gotStuck', 'ideas', 'userNotes'], W);
   if (!('closed' in C)) problems.push(`${W}: missing closed (null until the user says it is closed)`);
   if (C.workstream !== undefined && C.workstream !== workstream.slug) problems.push(`${W}: workstream "${C.workstream}" is not this workstream's slug "${workstream.slug}"`);
-  const list = (v, name) => { if (v === undefined) return []; if (!Array.isArray(v)) { problems.push(`${W}: ${name} must be a list`); return []; } return v; };
-  const nat = v => Number.isInteger(v) && v >= 0;
+  const list = (v, name, max) => { if (v === undefined) return []; if (!Array.isArray(v)) { problems.push(`${W}: ${name} must be a list`); return []; } if (max && v.length > max) problems.push(`${W}: ${name} has ${v.length} items, at most ${max} (the fixed format)`); return v; };
   const R = C.report && typeof C.report === 'object' ? C.report : {};
   if (C.report !== undefined) {
     need(R, ['inOneSentence', 'threeThings'], `${W} report`);
     if (!Array.isArray(R.threeThings) || R.threeThings.length !== 3) problems.push(`${W}: report.threeThings must have exactly three items`);
     (Array.isArray(R.threeThings) ? R.threeThings : []).forEach((t, i) => need(t, ['t', 'p'], `${W} report.threeThings[${i + 1}]`));
   }
-  const N = C.numbers && typeof C.numbers === 'object' && !Array.isArray(C.numbers) ? C.numbers : null;
-  if (C.numbers !== undefined && !N) problems.push(`${W}: numbers must be an object`);
-  if (N) {
-    RETRO_NUMBERS.forEach(k => { if (!(k in N)) problems.push(`${W}: numbers.${k} missing (a number, or null when the record does not carry it)`); else if (N[k] !== null && !(typeof N[k] === 'number' && Number.isFinite(N[k]))) problems.push(`${W}: numbers.${k} must be a number or null`); });
-    Object.keys(N).filter(k => !RETRO_NUMBERS.includes(k)).forEach(k => problems.push(`${W}: numbers.${k} is not a key of the schema`));
+  const numbersOk = (N, w, extra) => {
+    if (!N || typeof N !== 'object' || Array.isArray(N)) { problems.push(`${w} must be an object`); return; }
+    RETRO_NUMBERS.forEach(k => { if (!(k in N)) problems.push(`${w}.${k} missing (a number, or null when the record does not carry it)`); else if (N[k] !== null && !(typeof N[k] === 'number' && Number.isFinite(N[k]))) problems.push(`${w}.${k} must be a number or null`); });
+    Object.keys(N).filter(k => !RETRO_NUMBERS.includes(k) && !extra.includes(k)).forEach(k => problems.push(`${w}.${k} is not a key of the schema`));
+  };
+  const N = C.numbers;
+  if (N !== undefined) {
+    numbersOk(N, `${W}: numbers`, ['previous']);
+    if (N && typeof N === 'object' && !('previous' in N)) problems.push(`${W}: numbers.previous missing (null when this is the first workstream)`);
+    if (N && N.previous != null) { numbersOk(N.previous, `${W}: numbers.previous`, ['workstream']); if (typeof N.previous.workstream !== 'string' || !N.previous.workstream) problems.push(`${W}: numbers.previous.workstream must name the previous workstream`); }
   }
-  const STAGES = ['discovery', 'design', 'plan', 'execute', 'release'];
-  const stageOk = (v, w) => { if (v !== undefined && !STAGES.includes(v)) problems.push(`${w}: stage "${v}" must be one of ${STAGES.join(', ')}`); };
-  const LK = ['found', 'sustained', 'deferred', 'latitude', 'dismissed'];
-  list(C.lenses, 'lenses').forEach((l, i) => {
-    const w = `${W} lenses[${i + 1}]${l.lens ? ` (${l.lens})` : ''}`;
-    need(l, ['stage', 'lens', ...LK], w); stageOk(l.stage, w);
-    LK.forEach(k => { if (l[k] !== undefined && !nat(l[k])) problems.push(`${w}: ${k} must be a whole number`); });
+  const STAGES = ['discovery', 'design', 'plan', 'execute', 'release', 'close'];
+  const stageOk = (v, w, house) => { if (v !== undefined && !STAGES.includes(v) && !(house && v === 'house')) problems.push(`${w}: stage "${v}" must be one of ${STAGES.join(', ')}${house ? ' or house' : ''}`); };
+  list(C.wentWell, 'wentWell', 3).forEach((x, i) => need(x, ['what', 'evidence'], `${W} wentWell[${i + 1}]`));
+  const stuckIds = new Set(), ideaIds = new Set();
+  list(C.gotStuck, 'gotStuck', 3).forEach((x, i) => {
+    const w = `${W} gotStuck[${i + 1}]${x.id ? ` (${x.id})` : ''}`;
+    need(x, ['id', 'stage', 'what', 'timeWent', 'where', 'quote'], w); stageOk(x.stage, w);
+    if (!('hours' in x)) problems.push(`${w}: missing hours (null when the record does not carry it)`);
+    else if (x.hours !== null && !(typeof x.hours === 'number' && Number.isFinite(x.hours) && x.hours >= 0)) problems.push(`${w}: hours must be a number or null`);
+    if (x.id !== undefined && !/^S-\d+$/.test(x.id)) problems.push(`${w}: id "${x.id}" must be S-<n>`);
+    if (stuckIds.has(x.id)) problems.push(`${w}: duplicate id`); stuckIds.add(x.id);
   });
-  list(C.worked, 'worked').forEach((x, i) => need(x, ['what', 'evidence'], `${W} worked[${i + 1}]`));
-  const wrongIds = new Set(), ideaIds = new Set();
-  list(C.wrong, 'wrong').forEach((x, i) => {
-    const w = `${W} wrong[${i + 1}]${x.id ? ` (${x.id})` : ''}`;
-    need(x, ['id', 'stage', 'what', 'where', 'quote', 'cost'], w); stageOk(x.stage, w);
-    if (x.id !== undefined && !/^W-\d+$/.test(x.id)) problems.push(`${w}: id "${x.id}" must be W-<n>`);
-    if (wrongIds.has(x.id)) problems.push(`${w}: duplicate id`); wrongIds.add(x.id);
-  });
-  const LANDS = ['pipeline', 'doctrine', 'venture', 'incident'];
-  list(C.ideas, 'ideas').forEach((x, i) => {
+  list(C.ideas, 'ideas', 3).forEach((x, i) => {
     const w = `${W} ideas[${i + 1}]${x.id ? ` (${x.id})` : ''}`;
-    need(x, ['id', 'stage', 'lands', 'change', 'why'], w); stageOk(x.stage, w);
+    need(x, ['id', 'stage', 'change', 'why'], w); stageOk(x.stage, w, true);
+    if (!('target' in x)) problems.push(`${w}: missing target (the file it would touch, or null)`);
     if (x.id !== undefined && !/^I-\d+$/.test(x.id)) problems.push(`${w}: id "${x.id}" must be I-<n>`);
     if (ideaIds.has(x.id)) problems.push(`${w}: duplicate id`); ideaIds.add(x.id);
-    if (x.lands !== undefined && !LANDS.includes(x.lands)) problems.push(`${w}: lands "${x.lands}" must be one of ${LANDS.join(', ')}`);
-    if (x.lands === 'pipeline' && !x.target) problems.push(`${w}: a pipeline idea names its target (the file it would touch)`);
-    if (!Array.isArray(x.evidence) || !x.evidence.length) problems.push(`${w}: evidence must be a non-empty list of W- ids`);
-    (Array.isArray(x.evidence) ? x.evidence : []).forEach(e => { if (!wrongIds.has(e)) problems.push(`${w}: evidence names "${e}", which is not a W- id in wrong`); });
+    if (!Array.isArray(x.evidence) || !x.evidence.length) problems.push(`${w}: evidence must be a non-empty list of S- ids`);
+    (Array.isArray(x.evidence) ? x.evidence : []).forEach(e => { if (!stuckIds.has(e)) problems.push(`${w}: evidence names "${e}", which is not an S- id in gotStuck`); });
   });
   list(C.userNotes, 'userNotes').forEach((x, i) => {
     const w = `${W} userNotes[${i + 1}]`;
     need(x, ['on', 'words'], w);
-    if (x.on !== undefined && x.on !== 'general' && !wrongIds.has(x.on) && !ideaIds.has(x.on)) problems.push(`${w}: on "${x.on}" is neither an I-/W- id of this retro nor "general"`);
-  });
-  list(C.sweep, 'sweep').forEach((x, i) => {
-    const w = `${W} sweep[${i + 1}]`;
-    need(x, ['what'], w);
-    if (typeof x.done !== 'boolean') problems.push(`${w}: done must be true or false`);
-    if ('left' in x && typeof x.left !== 'boolean') problems.push(`${w}: left must be true or false`);
-    if (x.left === true && x.done === true) problems.push(`${w}: a line is done or left, not both`);
-    if (x.left === true && !x.command) problems.push(`${w}: a line left for the user names the command he runs`);
-    if (C.closed && x.done !== true && x.left !== true) problems.push(`${w}: the retro is closed and this sweep line is open (done, or left with the command)`);
+    if (x.on !== undefined && x.on !== 'general' && !stuckIds.has(x.on) && !ideaIds.has(x.on)) problems.push(`${w}: on "${x.on}" is neither an I-/S- id of this retro nor "general"`);
   });
   // word caps (schema/close.md): by exact path; ids, paths, quotes, numbers and words are never capped
-  const CCAPS = { 'report.inOneSentence': 35, 'report.threeThings.p': 35, 'worked.what': 25, 'wrong.what': 25, 'sweep.what': 25, 'wrong.cost': 15, 'ideas.change': 35, 'ideas.why': 20 };
+  const CCAPS = { 'report.inOneSentence': 35, 'report.threeThings.p': 35, 'wentWell.what': 25, 'gotStuck.what': 25, 'gotStuck.timeWent': 15, 'ideas.change': 35, 'ideas.why': 20 };
   const cwords = t => String(t).trim().split(/\s+/).filter(Boolean).length;
   const cwalk = (v, path) => {
     if (Array.isArray(v)) { v.forEach(x => cwalk(x, path)); return; }
@@ -777,7 +766,7 @@ if (existsSync(layersPath)) {
 const data = {
   workstream, strings, figures, review, report, mock, design, plan, execution, release, retro, tabs, layers,
   ...prfaq, ...stories,
-  files: ['00-discovery/pr-faq.md', '00-discovery/stories.md', '00-discovery/journeys/', '00-discovery/prototype/LOCK.json', '00-discovery/prototype/frames/', '00-discovery/reviews.md', 'rulings.md', ...(design ? ['01-design/*.md', '01-design/proposal.md', '01-design/notes.md', '01-design/reviews.md'] : []), ...(plan ? ['02-plan/plan.md', '02-plan/briefs/', '02-plan/recon/', '02-plan/reviews.md'] : []), ...(execution ? ['03-execution/board.md', '03-execution/parked.md', '03-execution/entries/', '03-execution/audit.md', '03-execution/explain.md'] : []), ...(release ? ['04-release/plan.md', '04-release/trace.md', '04-release/notes/', '04-release/entries/', '04-release/proof/'] : []), ...(retro ? ['05-close/retro.md', '05-close/metrics.json', '05-close/harvest/', '05-close/trace.md'] : [])],
+  files: ['00-discovery/pr-faq.md', '00-discovery/stories.md', '00-discovery/journeys/', '00-discovery/prototype/LOCK.json', '00-discovery/prototype/frames/', '00-discovery/reviews.md', 'rulings.md', ...(design ? ['01-design/*.md', '01-design/proposal.md', '01-design/notes.md', '01-design/reviews.md'] : []), ...(plan ? ['02-plan/plan.md', '02-plan/briefs/', '02-plan/recon/', '02-plan/reviews.md'] : []), ...(execution ? ['03-execution/board.md', '03-execution/parked.md', '03-execution/entries/', '03-execution/audit.md', '03-execution/explain.md'] : []), ...(release ? ['04-release/plan.md', '04-release/trace.md', '04-release/notes/', '04-release/entries/', '04-release/proof/'] : []), ...(retro ? ['05-close/retro.md', '05-close/metrics.json', '05-close/harvest.json', '05-close/trace.md'] : [])],
   builtAt: new Date().toISOString().slice(0, 16).replace('T', ' ') + ' UTC',
 };
 // `</script` inside JSON would end the data block early; escape it.
@@ -785,4 +774,4 @@ const json = JSON.stringify(data).replace(/<\/script/gi, '<\\/script');
 const shell = readFileSync(join(here, 'shell.html'), 'utf8');
 // function replacements: a `$&` or `$'` inside the data would otherwise be read as a replacement pattern
 writeFileSync(out, shell.replace('__TITLE__', () => workstream.title.replace(/</g, '&lt;')).replace('__DATA__', () => json));
-console.log(`built ${out}: tabs ${tabs.join(' + ')} · ${stories.stories.length} stories, ${stories.stories.reduce((a, s) => a + s.acs.length, 0)} ACs, ${review.rounds.length} discovery rounds` + (design ? ` · design: ${design.docs.solution.flows.length} flows, ${design.docs['data-and-contracts'].contracts.length} contracts, ${design.docs.tests.proofs.length} proofs, ${design.decisions.length} decisions, ${(design.review.findings || []).length} findings` : '') + (plan ? ` · plan: ${plan.plan.entries.length} entries, ${plan.plan.entries.reduce((a, e) => a + e.stories.length, 0)} stories, concurrency ${plan.plan.concurrency}${plan.plan.criticalPath ? `, critical path ${plan.plan.criticalPath.join(' → ')}` : ''}, ${Object.keys(plan.briefs).length} briefs` : '') + (execution ? (x => { const planned = new Set(['F', ...plan.plan.entries.map(e => e.id)]), req = x.entries.filter(e => planned.has(e.id)); return ` · execution: ${req.filter(e => e.status === 'merged').length}/${req.length} merged, ${x.entries.filter(e => e.status === 'parked').length} parked, ${x.amendments.length} amendments, audit ${x.closed ? 'closed' : 'open'}`; })(execution) : '') + (release ? ` · release: in production ${release.inProduction.length} artifact(s), ${release.staging.length} staging runs, ${release.fixes.length} fixes, ${release.watch.filter(r => r.readAt != null && r.got != null && r.ok != null).length}/${release.watch.length} watched, ${release.closed ? 'closed' : 'open'}` : '') + (retro ? ` · close: ${retro.wrong.length} wrong, ${retro.ideas.length} ideas (${retro.ideas.filter(i => i.lands === 'pipeline').length} pipeline), ${retro.userNotes.length} user notes, ${retro.closed ? 'closed' : 'open'}` : '') + (layers ? ` · stage report: ${Object.keys(layers).join(', ')}` : ''));
+console.log(`built ${out}: tabs ${tabs.join(' + ')} · ${stories.stories.length} stories, ${stories.stories.reduce((a, s) => a + s.acs.length, 0)} ACs, ${review.rounds.length} discovery rounds` + (design ? ` · design: ${design.docs.solution.flows.length} flows, ${design.docs['data-and-contracts'].contracts.length} contracts, ${design.docs.tests.proofs.length} proofs, ${design.decisions.length} decisions, ${(design.review.findings || []).length} findings` : '') + (plan ? ` · plan: ${plan.plan.entries.length} entries, ${plan.plan.entries.reduce((a, e) => a + e.stories.length, 0)} stories, concurrency ${plan.plan.concurrency}${plan.plan.criticalPath ? `, critical path ${plan.plan.criticalPath.join(' → ')}` : ''}, ${Object.keys(plan.briefs).length} briefs` : '') + (execution ? (x => { const planned = new Set(['F', ...plan.plan.entries.map(e => e.id)]), req = x.entries.filter(e => planned.has(e.id)); return ` · execution: ${req.filter(e => e.status === 'merged').length}/${req.length} merged, ${x.entries.filter(e => e.status === 'parked').length} parked, ${x.amendments.length} amendments, audit ${x.closed ? 'closed' : 'open'}`; })(execution) : '') + (release ? ` · release: in production ${release.inProduction.length} artifact(s), ${release.staging.length} staging runs, ${release.fixes.length} fixes, ${release.watch.filter(r => r.readAt != null && r.got != null && r.ok != null).length}/${release.watch.length} watched, ${release.closed ? 'closed' : 'open'}` : '') + (retro ? ` · close: ${retro.wentWell.length} went well, ${retro.gotStuck.length} got stuck, ${retro.ideas.length} ideas, ${retro.userNotes.length} user notes, ${retro.closed ? 'closed' : 'open'}` : '') + (layers ? ` · stage report: ${Object.keys(layers).join(', ')}` : ''));

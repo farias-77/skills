@@ -25,7 +25,7 @@ with a launch video at the end. Six rules hold at every stage:
 | **Specialists with knowledge packs** | each agent reads the packs of its craft before it works |
 | **He is asked only what is his** | he is in the loop at discovery and in the design debate; plan, execute and release run from play to done. What needs him in person is gathered up front, in one pre-flight message |
 | **Three layers per stage** | every stage reports as a video, then slides, then the blueprint |
-| **The pipeline measures itself** | each stage records its time, his minutes, agent hours, tokens, rounds and findings; the retro turns what went wrong into pipeline issues |
+| **The pipeline measures itself** | each stage records its time, his minutes, agent hours, tokens, rounds and findings; the retro records where it got stuck, and the weekly retro turns what repeats into pipeline changes he rules |
 
 One demand becomes a **workstream**: one folder, one conducting Claude
 Code session per stage, one **blueprint** (a single self-contained HTML
@@ -44,7 +44,7 @@ flowchart LR
   PF --> D4["4 · Execute<br/>local CI queue"]
   D4 --> D5["5 · Release<br/>under his play"]
   D5 --> D6["6 · Close<br/>retro + launch video"]
-  D6 -. "pipeline issues" .-> W["Weekly retro"]
+  D6 -. "the retro" .-> W["Weekly retro"]
   W -. "changes the pipeline" .-> D1
 ```
 
@@ -123,13 +123,16 @@ stage-4 pipeline; a second red stops and reports. A guard hook holds
 whatever cannot be undone.
 
 **6 · Close — the retro for the pipeline, the launch for the people.**
-The retro harvests the whole record (what worked, what went wrong, the
-metrics, the structure of `main` before and after) into pipeline
-issues for the weekly retro, the only place the pipeline changes. For
-the product's users and the team, a launch director plans a film, a
+The retro is short and fixed: the numbers from every stage's telemetry
+beside the previous workstream's, three things that went well, three
+where it got stuck and where the time went, at most three ideas. It
+stays in the workstream for the weekly retro, the only place the
+pipeline changes: one `weekly-reader (Opus 5.5, medium)` reads the
+week's closed workstreams and proposes changes he rules. For the
+product's users and the team, a launch director plans a film, a
 recorder captures the real app journey by journey, and the video kit
-renders a portfolio-grade launch video with a tutorial per feature,
-plus a "what's new" text.
+renders one portfolio-grade 16:9 launch video with a tutorial per
+feature, plus a "what's new" text.
 
 ## The roster
 
@@ -175,6 +178,7 @@ an agent's frontmatter disagrees.
 | close | `close-harvester` | Sonnet 5.5, medium |
 |  | `launch-director` | Opus 5.5, high |
 |  | `footage-recorder` | Sonnet 5.5, medium |
+| weekly | `weekly-reader` | Opus 5.5, medium |
 
 ## Knowledge packs
 
@@ -322,7 +326,7 @@ read, and the whole gate runs once more on the top of the branch.
 | **local CI** | the gate run on the station, signed off as a commit status `main` requires |
 | **pack** | a knowledge pack: a checklist plus recipes for one craft |
 | **blind reader** | an agent that reads alone, so what it cannot judge exposes ambiguity |
-| **weekly retro** | the only place the pipeline changes: the week's issues grouped, he rules each group |
+| **weekly retro** | the only place the pipeline changes: the week's closed workstreams read together, he rules each proposal |
 
 ## License
 

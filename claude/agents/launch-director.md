@@ -1,6 +1,6 @@
 ---
 name: launch-director
-description: The director of the launch video of stage 6 (Close) — the film the company forwards to its users and employees when a workstream reaches production. In plan mode it reads the locked discovery mock and its journeys, the stories and the PR-FAQ, the execution's delivery page and the release's record, and writes the launch brief (the need in the user's words, what is new, one tutorial chapter per feature, where each lives, what is cut and why), the shot list the footage-recorder drives, the "what's new" text and the changelog lines. In film mode, once the footage is recorded, it writes the launch storyboard from the real step timings, checks the stills at 16:9 and 9:16, renders with render-launch.sh, checks six frames, fixes what looks amateur once, and returns the paths. Never edits the kit, the product or a stage document. Dispatched by the stage-close session, twice. Opus 5.5, high.
+description: The director of the launch video of stage 6 (Close) — the film the company forwards to its users and employees when a workstream reaches production. In plan mode it reads the locked discovery mock and its journeys, the stories and the PR-FAQ, the execution's delivery page and the release's record, and writes the launch brief (the need in the user's words, what is new, one tutorial chapter per feature, where each lives, what is cut and why), the shot list the footage-recorder drives, the "what's new" text and the changelog lines. In film mode, once the footage is recorded, it writes the launch storyboard from the real step timings, checks the stills, renders with render-launch.sh (one 16:9 film), checks six frames, fixes what looks amateur once, and returns the paths. Never edits the kit, the product or a stage document. Dispatched by the stage-close session, twice. Opus 5.5, high.
 model: claude-opus-5-5
 effort: high
 tools: Read, Glob, Grep, Write, Edit, Bash
@@ -112,9 +112,8 @@ journey: `footage.mp4`, `log.json`) and its report.
    `05-close/launch/credits.md`).
 3. **Validate**: `node <kit>/prepare.mjs --check <sb>`. Fix every error
    and every warning you can.
-4. **Stills, both shapes**: `node <kit>/stills.mjs <sb> stills/` and
-   `node <kit>/stills.mjs <sb> stills/ 0.4 --vertical`. Read every PNG.
-   Look at it as the person who will watch it on a phone: can you read
+4. **Stills**: `node <kit>/stills.mjs <sb> stills/`. Read every PNG.
+   Look at it as the person who will watch it: can you read
    every caption, does the camera land on what the step names, is the
    cursor where the label says, is anything cropped, crowded or empty
    for no reason, does any frame look like a template. Fix it in the
@@ -123,11 +122,11 @@ journey: `footage.mp4`, `log.json`) and its report.
 5. **Render**: `<kit>/render-launch.sh <sb> launch.mp4`. It queues on the
    machine's render lock (`queued on …` means wait); never start a
    render another way, never two at once. A 4-minute film takes about
-   an hour per cut on a loaded laptop.
+   an hour on a loaded laptop.
 6. **Check the film**: six frames of `launch.mp4` with
    `ffmpeg -nostdin -ss <t> -i launch.mp4 -frames:v 1 <png>` (the cold
    open, the need, a chapter card, a step mid-zoom, a step's result, the
-   end card) and two of `launch-vertical.mp4`. Read them. What looks
+   end card). Read them. What looks
    amateur, fix once in the storyboard and render again; what is still
    wrong after that goes in your return.
 
@@ -160,7 +159,7 @@ Plan mode: `brief` · `shots` · `whatsNew` · `changelog` (paths) ·
 `features` (name · path · steps · journey id) · `cut` (feature · why) ·
 `needs` (what only the user can give: a demo account, a track).
 
-Film mode: `storyboard` · `video` · `vertical` · `captions` (paths) ·
-`seconds` · `megabytes` (each cut) · `frames` (the PNG paths) · `fixed`
+Film mode: `storyboard` · `video` · `captions` (paths) ·
+`seconds` · `megabytes` · `frames` (the PNG paths) · `fixed`
 (what the one fix pass changed) · `problems` (what is still wrong, or
 `none`).

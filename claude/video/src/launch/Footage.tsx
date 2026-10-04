@@ -38,7 +38,7 @@ const Window: React.FC<{s: any; story: any; len: number; enter: boolean; exit: b
 
   const {x: wx, y: wy, w, h} = g.win;
   const tilt = s.style === 'tilt';
-  const cam = camera(ft, t, w, h, tilt ? 1 : s.zoom, g.vertical);
+  const cam = camera(ft, t, w, h, tilt ? 1 : s.zoom);
 
   // entrance and exit of the window itself
   const pin = enter ? sp(f, 0, LAND) : 1;
@@ -54,7 +54,7 @@ const Window: React.FC<{s: any; story: any; len: number; enter: boolean; exit: b
   const sx = cam.tx + cur.x * cam.scale;
   const sy = cam.ty + cur.y * cam.scale;
   const zoomed = cam.scale / cam.base;
-  const csize = 30 * Math.sqrt(Math.max(1, zoomed)) * (g.vertical ? 1.15 : 1);
+  const csize = 30 * Math.sqrt(Math.max(1, zoomed));
   const ripples = ft.clicks.filter((c) => t >= c.t - 10 && t - c.t < 650);
   const pressing = ft.clicks.some((c) => t >= c.t && t - c.t < 140) ? 1 : 0;
 
@@ -127,7 +127,7 @@ const StepCaption: React.FC<{s: any; len: number; accent: string; swapOut: boole
   const sp = useSpring();
   const p = sp(f, 4, CALM, 16);
   const o = 1 - ease(f, len - (swapOut ? 8 : 12), len, 0, 1, EXIT);
-  const size = g.vertical ? fitSize(s.label, 860, 62, 44, 0.52, 2) : fitSize(s.label, 1100, 44, 34, 0.5);
+  const size = fitSize(s.label, 1100, 44, 34, 0.5);
   return (
     <div
       style={{
@@ -141,7 +141,7 @@ const StepCaption: React.FC<{s: any; len: number; accent: string; swapOut: boole
         transform: `translateY(${(1 - p) * 22 - (1 - o) * 16}px)`,
       }}
     >
-      <div style={{display: 'flex', alignItems: g.vertical ? 'flex-start' : 'center', gap: 22, maxWidth: g.vertical ? 940 : g.safeW}}>
+      <div style={{display: 'flex', alignItems: 'center', gap: 22, maxWidth: g.safeW}}>
         <div
           style={{
             flex: 'none',
@@ -177,14 +177,14 @@ const Hud: React.FC<{s: any; accent: string; enter: boolean}> = ({s, accent, ent
   const sp = useSpring();
   const p = enter ? sp(f, 6, CALM, 18) : 1;
   if (!s.chapter && !s.of) return null;
-  const left = g.vertical ? g.mx : g.win.x;
-  const right = g.vertical ? g.mx : g.W - g.win.x - g.win.w;
+  const left = g.win.x;
+  const right = g.W - g.win.x - g.win.w;
   return (
     <div style={{position: 'absolute', left, right, top: g.hudY, height: 40, display: 'flex', alignItems: 'center', justifyContent: 'space-between', opacity: p}}>
       {s.chapter ? (
         <div style={{display: 'flex', alignItems: 'baseline', gap: 14, whiteSpace: 'nowrap'}}>
-          <span style={{fontFamily: MONO, fontWeight: 600, fontSize: g.vertical ? 30 : 22, color: accent, letterSpacing: 2}}>{String(s.chapter.index).padStart(2, '0')}</span>
-          <span style={{fontFamily: SANS, fontWeight: 500, fontSize: g.vertical ? 34 : 24, color: L.ink2}}>{s.chapter.title}</span>
+          <span style={{fontFamily: MONO, fontWeight: 600, fontSize: 22, color: accent, letterSpacing: 2}}>{String(s.chapter.index).padStart(2, '0')}</span>
+          <span style={{fontFamily: SANS, fontWeight: 500, fontSize: 24, color: L.ink2}}>{s.chapter.title}</span>
         </div>
       ) : (
         <span />
@@ -196,7 +196,7 @@ const Hud: React.FC<{s: any; accent: string; enter: boolean}> = ({s, accent, ent
             const now = i === s.n - 1;
             const grow = now ? sp(f, 4, CALM, 14) : 1;
             return (
-              <div key={i} style={{width: g.vertical ? 44 : 30, height: 5, borderRadius: 3, background: L.hair, overflow: 'hidden'}}>
+              <div key={i} style={{width: 30, height: 5, borderRadius: 3, background: L.hair, overflow: 'hidden'}}>
                 <div style={{width: `${(done ? 1 : now ? grow : 0) * 100}%`, height: '100%', background: done ? rgba(accent, 0.55) : accent}} />
               </div>
             );
@@ -211,18 +211,18 @@ const Hud: React.FC<{s: any; accent: string; enter: boolean}> = ({s, accent, ent
 const ScreenText: React.FC<{s: any; len: number; accent: string}> = ({s, len, accent}) => {
   const g = useGrid();
   if (s.style === 'tilt' && (s.title || s.kicker)) {
-    const top = g.vertical ? 300 : 330;
+    const top = 330;
     return (
-      <div style={{position: 'absolute', left: g.mx, top, width: g.vertical ? g.safeW : 640}}>
+      <div style={{position: 'absolute', left: g.mx, top, width: 640}}>
         <Fade at={6} out={len - 12}>
-          <Kicker text={s.kicker} accent={accent} size={g.vertical ? 28 : 22} />
+          <Kicker text={s.kicker} accent={accent} size={22} />
         </Fade>
         <Rise at={10} out={len - 12} style={{marginTop: 22}}>
-          <div style={{fontFamily: SANS, fontWeight: 650, fontSize: g.vertical ? 76 : 70, lineHeight: 1.02, letterSpacing: -2.2, color: L.ink}}>{s.title}</div>
+          <div style={{fontFamily: SANS, fontWeight: 650, fontSize: 70, lineHeight: 1.02, letterSpacing: -2.2, color: L.ink}}>{s.title}</div>
         </Rise>
         {s.caption ? (
           <Fade at={18} out={len - 12} style={{marginTop: 22}}>
-            <div style={{fontFamily: SERIF, fontStyle: 'italic', fontSize: g.vertical ? 46 : 40, color: L.ink2, lineHeight: 1.2}}>{s.caption}</div>
+            <div style={{fontFamily: SERIF, fontStyle: 'italic', fontSize: 40, color: L.ink2, lineHeight: 1.2}}>{s.caption}</div>
           </Fade>
         ) : null}
       </div>
@@ -232,7 +232,7 @@ const ScreenText: React.FC<{s: any; len: number; accent: string}> = ({s, len, ac
   return (
     <div style={{position: 'absolute', left: 0, right: 0, top: g.capY + 8, display: 'flex', justifyContent: 'center'}}>
       <Fade at={10} out={len - 12}>
-        <div style={{fontFamily: SANS, fontWeight: 550, fontSize: g.vertical ? 46 : 38, color: L.ink, letterSpacing: -0.3, maxWidth: g.safeW, textAlign: 'center'}}>{s.caption}</div>
+        <div style={{fontFamily: SANS, fontWeight: 550, fontSize: 38, color: L.ink, letterSpacing: -0.3, maxWidth: g.safeW, textAlign: 'center'}}>{s.caption}</div>
       </Fade>
     </div>
   );
@@ -244,7 +244,7 @@ export const FootageScene: React.FC<P> = ({s, len, story, next}) => {
   const enter = !s.continues;
   const nextContinues = !!(next && next.continues);
   // tilted hero shots sit to the right, the title beside them
-  const shift = tilt ? (g.vertical ? {left: 0, top: 230, scale: 0.9} : {left: 400, top: 36, scale: 0.86}) : null;
+  const shift = tilt ? {left: 400, top: 36, scale: 0.86} : null;
   return (
     <AbsoluteFill>
       <div style={{position: 'absolute', inset: 0, transform: shift ? `translate(${shift.left}px, ${shift.top}px) scale(${shift.scale})` : undefined}}>

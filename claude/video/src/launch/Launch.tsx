@@ -1,6 +1,5 @@
-// The launch film: the stage, the scenes in order, the music bed. Works at
-// 16:9 and 9:16 from the same storyboard: every scene lays itself out from
-// useGrid().
+// The launch film: the stage, the scenes in order, the music bed, at 16:9;
+// every scene lays itself out from useGrid().
 import React from 'react';
 import {AbsoluteFill, Sequence, Audio, staticFile, interpolate} from 'remotion';
 import {Stage} from './look';

@@ -18,7 +18,7 @@ afterwards for a veto.
 | 3 plan | **autonomous** | nowhere: the conductor rules everything, lists its choices at the report for his veto, and gathers what only he can hand over into the pre-flight |
 | 4 execute | **pre-flight, then play, then his hands-on** | he hands over the pre-flight and pastes one goal; he is called once, at the end, when everything is merged and green: the session runs the environment, he uses the app and sends adjustments, built in the stage until he says ok. One blocking rule, in code |
 | 5 release | **his play authorizes the head** | the play (`merge-from <audited head>` in the guard's allow file) is his "go"; the feature is not re-tested: the session merges, deploys, smokes, watches production for 15 minutes and rolls back on its own, under the guard; a red gets one fix, a second red stops; it asks only before what cannot be undone |
-| 6 close | **retro + launch video** | the retro is a file for the weekly; for the people, a launch video and a "what's new" text he forwards |
+| 6 close | **retro + launch video** | the retro is a short record in the workstream for the weekly (the numbers, went well ×3, got stuck ×3, ideas ≤3); for the people, one 16:9 launch film and a "what's new" text he forwards |
 
 ## Stage transitions: `/clear`, never `/compact`
 
@@ -160,10 +160,11 @@ no judge at all.
   An answer to a question on the stop list is a ruling too. The one
   fix a red gets during the release is an entry through the stage-4
   pipeline, triaged there the same way.
-- **Close.** Nothing is ruled: the retro records what went wrong and
-  the ideas it suggests, and his comments go in verbatim. The pipeline
-  changes only at the weekly retro, where he rules each group of ideas
-  gathered across the week's workstreams (apply, park, drop).
+- **Close.** Nothing is ruled: the retro records where it got stuck
+  and at most three ideas, kept in the workstream, and his comments go
+  in verbatim. No issue is opened anywhere. The pipeline changes only
+  at the weekly retro, over the workstreams closed that week, where he
+  rules each proposal (apply, park, drop).
 
 When a ruling is asked, it goes **through the question tool**, in the
 house shape: one question per **decision** (findings that resolve by
@@ -302,7 +303,8 @@ effort with their hours and tokens, the rounds, the findings by class,
 the cost when the harness reports it, and the gaps it could not
 measure. The shape is the same at every stage
 ([docs/telemetry.md](docs/telemetry.md)); the close sums the six files
-into `metrics.json` with a script, and the weekly retro compares them.
+into `metrics.json` with a script, the retro's numbers come from there
+beside the previous workstream's, and the weekly retro compares them.
 A value nobody measured is `null`, never estimated.
 
 ## The CI is local

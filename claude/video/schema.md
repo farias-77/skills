@@ -154,27 +154,25 @@ shows what is new, and teaches every new feature step by step on the real
 product. A storyboard with `"mode": "launch"` switches the kit to it: its
 own vocabulary, its own look (a dark stage, the product as the colour, one
 accent), footage recorded from the real app, a 3D cold open, captions from
-the step data, an optional music bed, and a 16:9 film plus a 9:16 cut.
+the step data, an optional music bed, and one 16:9 film.
 
 ```
 node claude/video/record.mjs <shots.json> <footage-dir>              # record the journeys (footage-recorder)
 node claude/video/prepare.mjs --check <storyboard.json>              # validate
-node claude/video/stills.mjs <storyboard.json> <dir> [0.5] [--vertical]   # one PNG per scene
-claude/video/render-launch.sh <storyboard.json> <out.mp4> [--no-vertical | --vertical-only]
-#  → <out>.mp4 (1920x1080) · <out>-vertical.mp4 (1080x1920) · <out>.srt
+node claude/video/stills.mjs <storyboard.json> <dir> [0.5]          # one PNG per scene
+claude/video/render-launch.sh <storyboard.json> <out.mp4>
+#  → <out>.mp4 (1920x1080) · <out>.srt
 ```
 
 `render-launch.sh` takes the same `flock` as `render.sh` (one render at a
-time on the machine) and holds it for both cuts; it renders with
+time on the machine); it renders with
 `--concurrency=2` under `nice`, `--gl=swangle` for the 3D (`VIDEO_GL`
 overrides), keeps the audio (AAC, loudness-normalized to −16 LUFS), and
 waits up to 180 s for a footage frame (a loaded machine needs it),
-writes the `.srt` first and the 9:16 cut last (a failed vertical cut
-exits 3 and leaves the film; `--vertical-only` redoes it), and
-encodes at CRF 18 capped by a budget and by 8 Mbit/s: ~50 MB for the film
-(`LAUNCH_MAX_MB`), ~25 MB for the vertical cut (`LAUNCH_VERTICAL_MAX_MB`).
+writes the `.srt` first, and encodes at CRF 18 capped by a budget and by
+8 Mbit/s: ~50 MB for the film (`LAUNCH_MAX_MB`).
 Measured on a loaded 4-core laptop: footage scenes cost ~0.7 s a frame and
-the 3D opening ~0.8 s, so a 4-minute film is about an hour per cut there,
+the 3D opening ~0.8 s, so a 4-minute film is about an hour there,
 half that on an idle machine. Review the stills first; render once.
 
 ### The shot list and the footage
@@ -306,9 +304,6 @@ Every scene takes `seconds` to override its timing within its range.
   arced), with a press and a ripple per click; the step's target is ringed
   in the accent as the cursor arrives and the ring leaves as the click
   lands.
-- **9:16.** The vertical cut is the same storyboard: the window becomes
-  a 1000×1000 crop that follows the cursor and the zoom; text and 3D lay
-  themselves out for the phone.
 - **Captions.** Every label on screen is also a cue in `<out>.srt`
   (step labels as `n/m · label`), built from the same data.
 
@@ -326,14 +321,14 @@ footage, and when the total is outside 150–360 s (the launch target;
 | Path | What it is |
 |---|---|
 | `render.sh` | The one entry point: install once, validate, queue, render, encode. |
-| `render-launch.sh` | The launch profile: audio, higher quality, a ~50 MB budget, 16:9 + 9:16 + `.srt`, same queue. |
+| `render-launch.sh` | The launch profile: audio, higher quality, a ~50 MB budget, 16:9 + `.srt`, same queue. |
 | `record.mjs` | Records the launch footage from a shot list: Playwright at 1920x1080, footage + log per journey. |
 | `prepare.mjs` | Validates a storyboard and stages one render (fonts and images in a private public dir). |
 | `stills.mjs` | One PNG per scene, for checking before the render. |
 | `src/storyboard.mjs` | The contract: limits, validation, timing. Shared by node and the bundle. |
 | `src/look.tsx` | The identity: proof paper, film-base ink, one grease-pencil red; Big Shoulders and IBM Plex from `public/fonts` (no network). |
 | `src/scenes.tsx` | One component per scene type. |
-| `src/Video.tsx`, `src/Root.tsx` | The compositions `story`, `launch` and `launch-vertical`; their length comes from the storyboard. |
+| `src/Video.tsx`, `src/Root.tsx` | The compositions `story` and `launch`; their length comes from the storyboard. |
 | `src/launch/` | Launch mode: `contract.mjs` (validation, timing, numbering, captions), `look.tsx` (the dark stage, Inter Tight · Instrument Serif · Plex Mono, the motion tokens), `camera.ts` (zoom and cursor from the log), `Footage.tsx` (`screen`, `step`), `Hero.tsx` (`hero3d`, three.js), `cards.tsx` (`chapter`, `statement`, `numbers`, `end`), `Launch.tsx` (the film and the music bed). |
 
 `npx remotion studio src/index.ts` opens the example for work on the

@@ -1,69 +1,61 @@
 # The retro — step 4 of stage 6
 
-The retro is written for two readers: the user now, and the weekly
-retro later, which gathers every workstream of the week and looks for
-what repeats. Both need the same thing: each claim with its evidence,
-each idea with the file it would touch.
+The retro is short and its format is fixed, so every workstream's
+reads the same and the weekly retro can lay them side by side. It is
+written for two readers: the user now, and the weekly retro later,
+which reads every workstream closed that week. It is a record in the
+workstream (`05-close/retro.md`, and `blueprint/close/retro.json` for
+the Close tab); nothing is opened anywhere.
 
-It reads like a sprint retro: the team looks back at everything, what
-went well and what went wrong, and collects what would make the next
-workstream faster, better and smoother. It is the pipeline's file, not
-his report: he gets its link in the close's message, and the weekly
-reads it.
+```
+Numbers        time and cost per stage · entries · rounds · findings · beside the previous workstream
+Went well ×3   the three things that went smoothest, each with its evidence
+Got stuck ×3   the three places that cost the most, each with where the time went
+Ideas ≤3       what could change so a stuck item does not come back
+His notes      his words, verbatim, when he comments
+```
 
-## In numbers
+## Numbers
 
-The retro's numbers (the blueprint schema's keys) and, beside them, the
-delivery metrics of `metrics.json` ([metrics.md](metrics.md)): lead
-time, his hours, agent hours, tokens, rounds per stage, findings by
-class, revert rate, change failure rate. A stage that did not record
-its telemetry is a line in "what went wrong".
+From `05-close/metrics.json` (step 1), never from a reading: per
+stage, the wall-clock hours, his hours, the agent hours, the tokens,
+the cost, the rounds and the findings (found → sustained); the
+entries from `execution.json`; the totals. Beside the totals, the
+previous workstream's, when one exists. A stage that did not measure
+itself is `null` in its row, and one of the places it got stuck when
+nothing costlier fills the three.
 
-## What worked
+## Went well ×3
 
-What the record shows went smoothly and should not be lost when the
-pipeline changes: a stage that closed in one round, a lens that
-sustained most of what it found, a mechanism that caught a real
-defect. Each with the evidence (`file:line` or a number).
+The three things the record shows went smoothest and should not be
+lost when the pipeline changes: a stage that closed in one round, an
+entry that merged on its first pass, a mechanism that caught a real
+defect. Each with its evidence (`file:line` or a number). Three, fewer
+only when the record has fewer.
 
-## What went wrong
+## Got stuck ×3
 
-One entry per friction worth a line, merged when several harvesters
-brought the same thing: what happened, the stage it bit, where
-(`file:line`), the quote, and what it cost (a round, a stop, a red, a
-day, a question the user had to answer). The user's `[user]` notes
-always enter, in his words.
+The three places that cost the most, ranked by the time they cost.
+Each: what happened, the stage it bit, **where the time went** (the
+step and the hours, from the slowest steps or the harvest's minutes),
+and the evidence (`file:line` and the quote). His `[user]` notes about
+a place it got stuck always enter, in his words, even when another
+cost more. The rest of the frictions stay in `harvest.json`; the
+weekly reads them there.
 
-## Ideas for the pipeline
+## Ideas, at most 3
 
-What could change so the friction does not come back. Each idea:
+What could change so a stuck item does not come back. Each: the stage
+(or `house`), the file it would touch (a skill, an agent, a workflow,
+a template, the project's doctrine), the change in one or two
+sentences, why (the time it gives back), and the stuck item behind it.
+An idea is a proposal, not a decision, and it stays in the workstream:
+no issue is opened. A stuck item with no idea (a one-off) stays
+without one.
 
-- **stage** it belongs to (or `house` for a rule that crosses stages);
-- **lands** — `pipeline` (a file of the pipeline repo), `doctrine`
-  (the project's engineering doctrine), `venture` (the business, a
-  process outside the software) or `incident` (a one-off, nothing to
-  change);
-- **target** — the file it would touch, when it lands in the pipeline
-  (a skill, an agent, a workflow, a template, the blueprint);
-- **change** — what would change, in one or two sentences;
-- **why** — the cost it removes;
-- **evidence** — the ids of the frictions behind it.
+## His notes
 
-An idea is a proposal, not a decision: write the change the evidence
-supports and nothing more. A friction with no idea (a one-off) stays
-in "what went wrong" only.
-
-## Precision
-
-The table per stage and reviewer (found · sustained · deferred ·
-latitude · dismissed) goes in as it was counted. A reviewer that
-dismissed most of what it found, or sustained nothing, is a line in
-"what went wrong" with its numbers; the weekly retro decides whether
-it is calibration or chance.
-
-## The user's notes
-
-When the user reads the retro and comments, his words go in verbatim,
-each attached to the idea or friction it refers to when he names one,
+When he reads the retro and comments, his words go in verbatim, each
+attached to the idea or stuck item it refers to when he names one,
 otherwise as a note of its own. They are the input the weekly retro
 weighs most.

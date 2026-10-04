@@ -1,9 +1,10 @@
 #!/usr/bin/env node
 // Sums the six stages' telemetry.json (claude/docs/telemetry.md) into the
 // parts of 05-close/metrics.json that come from telemetry: stages[],
-// totals, findingsByClass, plus the stages that did not measure
-// themselves and every gap they declared. Never estimates: a missing
-// value stays null, and a total is null when any stage's value is.
+// totals, findingsByClass, the ten slowest steps, plus the stages that
+// did not measure themselves and every gap they declared. Never
+// estimates: a missing value stays null, and a total is null when any
+// stage's value is.
 //
 //   node telemetry-sum.mjs <workstream-dir> [--out <file>]
 //
@@ -34,6 +35,7 @@ const r2 = (v) => (v === null ? null : Math.round(v * 100) / 100);
 const problems = [];
 
 const stages = [];
+const steps = [];
 const findingsByClass = [];
 const missing = [];
 const gaps = [];
@@ -58,7 +60,8 @@ for (const [stage, dir] of STAGES) {
   if (!Array.isArray(t.steps)) problems.push(`${rel}: steps must be a list`);
   if (!Array.isArray(t.agents)) problems.push(`${rel}: agents must be a list`);
   if (t.findingsByClass !== undefined && !Array.isArray(t.findingsByClass)) problems.push(`${rel}: findingsByClass must be a list`);
-  const steps = Array.isArray(t.steps) ? t.steps : [];
+  const stageSteps = Array.isArray(t.steps) ? t.steps : [];
+  for (const x of stageSteps) if (num(x.wallClockMin) !== null) steps.push({stage, step: String(x.step), minutes: Math.round(x.wallClockMin)});
   const agents = Array.isArray(t.agents) ? t.agents : [];
   // wall-clock: the stage's total, else open → close, else null
   let wall = num(t.wallClockMin);
@@ -68,7 +71,7 @@ for (const [stage, dir] of STAGES) {
   }
   // his minutes: the total, else the steps' sum when every step carries it
   let his = num(t.hisMin);
-  if (his === null && steps.length && steps.every((s) => num(s.hisMin) !== null)) his = steps.reduce((a, s) => a + s.hisMin, 0);
+  if (his === null && stageSteps.length && stageSteps.every((s) => num(s.hisMin) !== null)) his = stageSteps.reduce((a, s) => a + s.hisMin, 0);
   const agentH = agents.length && agents.every((a) => num(a.hours) !== null) ? agents.reduce((a, x) => a + x.hours, 0) : null;
   let tokens = num(t.tokens?.total);
   if (tokens === null && num(t.tokens?.session) !== null && num(t.tokens?.agents) !== null) tokens = t.tokens.session + t.tokens.agents;
@@ -99,6 +102,7 @@ const result = {
   stages,
   totals: {hisH: total('hisH', r2), agentH: total('agentH', r1), tokensM: total('tokensM', r1), costUSD: total('costUSD', r2)},
   findingsByClass,
+  slowest: steps.sort((a, b) => b.minutes - a.minutes).slice(0, 10),
   missing,
   gaps,
 };

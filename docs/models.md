@@ -48,9 +48,10 @@ To change a pick, change the row and the agent's frontmatter together.
 | `qa-frontend` | execute | Opus 5.5 | medium | Drives the screens in a browser: Opus beats Sonnet on OSWorld at every cost |
 | `qa-backend` | execute | Opus 5.5 | medium | Calls the API and reads the store: judgment on what a customer would hit |
 | `release-scribe` | release | Sonnet 5.5 | medium | Tags and notes from a fixed record |
-| `close-harvester` | close | Sonnet 5.5 | medium | Collects items and numbers from the files |
+| `close-harvester` | close | Sonnet 5.5 | medium | Reads the frictions and his notes from the files; the numbers come from telemetry by script |
 | `launch-director` | close | Opus 5.5 | high | Films as code (Remotion, three.js); best on graphics; reads its own frames |
 | `footage-recorder` | close | Sonnet 5.5 | medium | Drives a scripted recording |
+| `weekly-reader` | weekly | Opus 5.5 | medium | Finds the same cause across a week's workstreams: judgment over many records, at the cost of Sonnet high |
 
 ## The sessions
 

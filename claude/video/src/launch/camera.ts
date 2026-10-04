@@ -103,34 +103,16 @@ export function focusAt(ft: Footage, t: number) {
   return {k: Math.min(1, wsum), x: fx / wsum, y: fy / wsum};
 }
 
-// A slow follow of the cursor for the vertical crop: the average of its last 0.8 s.
-export function followAt(ft: Footage, t: number) {
-  let x = 0;
-  let y = 0;
-  const n = 12;
-  for (let i = 0; i < n; i++) {
-    const c = cursorAt(ft, Math.max(0, t - i * 70));
-    x += c.x;
-    y += c.y;
-  }
-  return {x: x / n, y: y / n};
-}
-
 // The transform that places the footage inside a window of size (w, h).
-// base: the scale at which the footage fits (or covers, on a phone) the window.
+// base: the scale at which the footage fits the window.
 // level: the effective zoom on the source at full k (≤ 1.5, sharpness).
-export function camera(ft: Footage, t: number, w: number, h: number, level: number, vertical: boolean) {
-  const base = vertical ? h / SRC_H : Math.min(w / SRC_W, h / SRC_H);
+export function camera(ft: Footage, t: number, w: number, h: number, level: number) {
+  const base = Math.min(w / SRC_W, h / SRC_H);
   const z = focusAt(ft, t);
   const kMax = Math.max(1, level / base);
   const scale = base * (1 + (kMax - 1) * (level > 1 ? z.k : 0));
-  let px = z.x;
-  let py = z.y;
-  if (vertical) {
-    const fo = followAt(ft, t);
-    px = fo.x + (z.x - fo.x) * z.k;
-    py = fo.y + (z.y - fo.y) * z.k;
-  }
+  const px = z.x;
+  const py = z.y;
   const cw = SRC_W * scale;
   const ch = SRC_H * scale;
   const clamp = (v: number, lo: number, hi: number) => Math.min(hi, Math.max(lo, v));

@@ -382,18 +382,13 @@
   .rel-blocks { display: grid; grid-template-columns: minmax(0, 1fr); gap: 26px; }
   .rel-blocks > div { min-width: 0; }
   .ccells { grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); }
-  .cnums { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; align-items: start; }
   .cnum th { font-size: 11.5px; }
   .cnum td { padding: 7px 14px; line-height: 1.45; }
   .cnum td.num { width: 1%; white-space: nowrap; }
-  .cnum .nil, .cnote { color: var(--ink-3); }
-  .cnote { font-size: 14.5px; margin-top: 8px; max-width: 90ch; }
+  .cnum .nil { color: var(--ink-3); }
   .cprec td:first-child { min-width: 26ch; }
   .cprec td:first-child code { white-space: normal; overflow-wrap: break-word; }
-  .cprec tbody tr.grp td { background: var(--surface-2); font-size: 11.5px; letter-spacing: .05em; text-transform: uppercase; color: var(--ink-3); font-weight: 600; padding-block: 6px; }
-  .cprec tbody tr.low td:first-child { box-shadow: inset 3px 0 0 var(--warn); }
   .cprec tbody tr.tot td { font-weight: 700; border-top: 2px solid var(--line-2); }
-  .lowp { display: inline-block; padding: 0 6px; border-radius: 4px; background: var(--warn-bg); color: var(--warn); border: 1px dashed var(--line-2); font-weight: 600; }
   .rcard { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px; display: flex; flex-direction: column; gap: 8px; scroll-margin-top: 20px; }
   .rcard:target { border-color: var(--ink); }
   .rcard .h { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
@@ -407,8 +402,6 @@
   .unote { margin: 0; background: var(--accent-bg); border-left: 3px solid var(--ink); border-radius: 0 12px 12px 0; padding: 14px 18px; display: flex; flex-direction: column; gap: 6px; scroll-margin-top: 20px; }
   .unote .on { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; font-size: 13px; letter-spacing: .05em; text-transform: uppercase; color: var(--ink-3); }
   .unote p { font-family: var(--f-display); font-size: 21px; line-height: 1.45; color: var(--ink); }
-  .csweep .row.open { border-left: 3px solid var(--bad); }
-  .csweep .row .d code { white-space: normal; overflow-wrap: anywhere; }
 
   /* ---------- the stage report: watch → read → dig, at the top of a tab (docs/stage-report.md) ---------- */
   .layers { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 18px 20px; gap: 12px; }
@@ -1044,8 +1037,10 @@
     const pct = (s, f) => f ? Math.round(100 * s / f) : null;
     const stageChip = s => `<span class="chip">${SC.stages[s] || esc(s)}</span>`;
     const idLink = id => `<a class="chip" href="#cl-${esc(id)}">${esc(id)}</a>`;
-    const pipelineN = C.ideas.filter(i => i.lands === 'pipeline').length;
     const sustainedP = pct(N.sustained, N.found);
+    const P0 = N.previous;
+    const hrs = v => v == null ? '—' : `${esc(v)} h`;
+    const usd6 = v => v == null ? '—' : `$${esc(v)}`;
 
     // ---- 1. what: the workstream in one sentence, three things, the cells ----
     sec('cl-what', SC.sec.what, null, `
@@ -1054,24 +1049,25 @@
         <div class="meta"><span>${SC.closedOn} ${C.closed ? esc(C.closed) : '—'}</span><span>${S.slug} <code>${D.workstream.slug}</code></span></div>
         <div><span class="kicker">${S.threeThings}</span><div class="three">${RP6.threeThings.map(t => `<div class="th"><b>${md(t.t)}</b><p>${md(t.p)}</p></div>`).join('')}</div></div>
         <div class="cells ccells">
-          <div class="cell"><span class="v">${nv(N.days)}</span><span class="l">${SC.cells.days}</span></div>
+          <div class="cell"><span class="v">${hrs(N.wallClockH)}</span><span class="l">${SC.cells.wallClock}</span>${P0 ? `<span class="s">${SC.cells.previousTail.replace('{v}', hrs(P0.wallClockH))}</span>` : ''}</div>
+          <div class="cell"><span class="v">${hrs(N.hisH)}</span><span class="l">${SC.cells.his}</span>${P0 ? `<span class="s">${SC.cells.previousTail.replace('{v}', hrs(P0.hisH))}</span>` : ''}</div>
+          <div class="cell"><span class="v">${usd6(N.costUSD)}</span><span class="l">${SC.cells.cost}</span></div>
           <div class="cell"><span class="v">${nv(N.entries)}</span><span class="l">${SC.cells.entries}</span></div>
           <div class="cell"><span class="v">${nv(N.found)} → ${nv(N.sustained)}</span><span class="l">${SC.cells.findings}</span><span class="s">${sustainedP == null ? '—' : SC.cells.findingsTail.replace('{p}', sustainedP)}</span></div>
-          <div class="cell"><span class="v">${nv(N.parked)}</span><span class="l">${SC.cells.parked}</span></div>
-          <div class="cell"><span class="v">${nv(N.stagingReds)}</span><span class="l">${SC.cells.stagingReds}</span><span class="s">${SC.cells.stagingRedsTail.replace('{n}', nv(N.stagingRuns))}</span></div>
-          <div class="cell"><span class="v">${nv(N.fixes)}</span><span class="l">${SC.cells.fixes}</span></div>
-          <div class="cell"><span class="v">${C.ideas.length}</span><span class="l">${SC.cells.ideas}</span><span class="s">${SC.cells.ideasTail.replace('{n}', pipelineN)}</span></div>
+          <div class="cell"><span class="v">${C.gotStuck.length}</span><span class="l">${SC.cells.stuck}</span></div>
+          <div class="cell"><span class="v">${C.ideas.length}</span><span class="l">${SC.cells.ideas}</span></div>
           <div class="cell"><span class="v">${C.userNotes.length}</span><span class="l">${SC.cells.notes}</span><span class="s">${SC.cells.notesTail}</span></div>
         </div>
       </div>`);
 
-    // ---- 2. the numbers: every key of the schema, "—" where the record does not carry it ----
-    const GROUPS = { size: ['days', 'stories', 'entries', 'amendments', 'parked'], rounds: ['roundsDiscovery', 'roundsDesign', 'roundsPlan', 'roundsExecute'],
-      findings: ['found', 'sustained', 'deferred', 'latitude', 'dismissed'], release: ['stagingRuns', 'stagingReds', 'fixes', 'rollbacks', 'hotfixes', 'watchRead', 'watchOwned'], user: ['rulings', 'tokensM'] };
-    const numTables = Object.entries(GROUPS).map(([g, keys]) => `<div class="tbl-wrap cnum"><table><thead><tr><th colspan="2">${SC.numbers.groups[g]}</th></tr></thead><tbody>${keys.map(k => `<tr><td>${SC.numbers.keys[k]}</td><td class="num">${N[k] == null ? `<span class="nil">—</span>` : `<b>${esc(N[k])}</b>`}</td></tr>`).join('')}</tbody></table></div>`).join('');
-    sec('cl-numbers', SC.sec.numbers, SC.numbers.lede, `<div class="cnums">${numTables}</div>`);
+    // ---- 2. the numbers: this workstream beside the previous one, "—" where the record does not carry it ----
+    const NK = ['wallClockH', 'hisH', 'agentH', 'tokensM', 'costUSD', 'entries', 'rounds', 'found', 'sustained'];
+    const cellN = (k, v) => v == null ? `<span class="nil">—</span>` : k === 'costUSD' ? `<b>$${esc(v)}</b>` : `<b>${esc(v)}</b>`;
+    const numRows = NK.map(k => [SC.numbers.keys[k], cellN(k, N[k]), ...(P0 ? [cellN(k, P0[k])] : [])]);
+    sec('cl-numbers', SC.sec.numbers, P0 ? SC.numbers.lede.replace('{prev}', `<code>${esc(P0.workstream)}</code>`) : SC.numbers.ledeFirst,
+      tbl6(['', SC.numbers.this, ...(P0 ? [SC.numbers.previous] : [])], numRows, 'cnum'));
 
-    // ---- 2b. the delivery metrics (05-close/metrics.json, from every stage's telemetry), when the close wrote them ----
+    // ---- 2b. the numbers per stage (05-close/metrics.json, from every stage's telemetry), when the close wrote them ----
     const MX = C.metrics, SM = SC.metrics;
     if (MX && SM) {
       const pctv = v => v == null ? '—' : `${Math.round(v * 1000) / 10}%`;
@@ -1090,32 +1086,18 @@
         ${MX.stages.length ? tbl6([SM.stage, ...MK.map(k => '#' + SM.keys[k])], [...rows, tot], 'cprec') : none6(SM.none)}`);
     }
 
-    // ---- 3. precision per reviewer, grouped by stage; a reviewer that sustained under a fifth of what it found is marked ----
-    const STG = ['discovery', 'design', 'plan', 'execute', 'release'], LK = ['found', 'sustained', 'deferred', 'latitude', 'dismissed'];
-    const P = SC.precision;
-    const low = l => l.found > 0 && l.sustained / l.found < 0.2;
-    const ratioCell = l => { const p = pct(l.sustained, l.found); return p == null ? '—' : low(l) ? `<span class="lowp" title="${P.low}">${p}%</span>` : `<b>${p}%</b>`; };
-    const sum = ls => Object.fromEntries(LK.map(k => [k, ls.reduce((a, l) => a + l[k], 0)]));
-    const precRows = STG.filter(s => C.lenses.some(l => l.stage === s)).flatMap(s => [{ cls: 'grp', cells: [{ span: 7, html: SC.stages[s] }] },
-      ...C.lenses.filter(l => l.stage === s).map(l => ({ cls: low(l) ? 'low' : '', cells: [`<code>${esc(l.lens)}</code>`, ...LK.map(k => l[k]), ratioCell(l)] }))]);
-    const all = sum(C.lenses);
-    const lowN = C.lenses.filter(low).length;
-    const prec = C.lenses.length ? tbl6([P.lens, ...LK.map(k => '#' + P[k]), '#' + P.ratio], [...precRows, { cls: 'tot', cells: [P.total, ...LK.map(k => all[k]), ratioCell({ ...all })] }], 'cprec')
-      + `<p class="cnote">${lowN ? P.lowNote.replace('{n}', lowN) : P.noLow}</p>` : none6(P.none);
-    sec('cl-precision', SC.sec.precision, P.lede, prec);
-
-    // ---- 4. the retro: what worked, what went wrong, the ideas with their evidence, his notes ----
+    // ---- 3. the retro: went well ×3, got stuck ×3 with where the time went, ideas ≤3, his notes ----
     const R = SC.retro;
     const notesOn = id => C.userNotes.filter(n => n.on === id).length;
     const noteBack = id => notesOn(id) ? `<a class="pill acc" href="#cl-note-${esc(id)}">${R.yourNote}</a>` : '';
-    const worked = C.worked.length ? `<div class="list">${C.worked.map(x => `<div class="row"><span class="t">${md(x.what)}</span><span class="d">${md(x.evidence)}</span></div>`).join('')}</div>` : none6(R.noneWorked);
-    const wrong = C.wrong.length ? `<div class="cards">${C.wrong.map(x => `<article class="rcard" id="cl-${esc(x.id)}">
+    const well = C.wentWell.length ? `<div class="list">${C.wentWell.map(x => `<div class="row"><span class="t">${md(x.what)}</span><span class="d">${md(x.evidence)}</span></div>`).join('')}</div>` : none6(R.noneWell);
+    const stuck = C.gotStuck.length ? `<div class="cards">${C.gotStuck.map(x => `<article class="rcard" id="cl-${esc(x.id)}">
         <div class="h"><span class="chip acc">${esc(x.id)}</span>${stageChip(x.stage)}${noteBack(x.id)}</div>
         <p class="w1">${md(x.what)}</p>
-        <div class="kv"><span>${R.where}</span><span><code>${esc(x.where)}</code></span><span>${R.quote}</span><span class="quote">${esc(x.quote)}</span><span>${R.cost}</span><span>${md(x.cost)}</span></div>
-      </article>`).join('')}</div>` : none6(R.noneWrong);
+        <div class="kv"><span>${R.timeWent}</span><span>${md(x.timeWent)}${x.hours == null ? '' : ` · <b>${esc(x.hours)} h</b>`}</span><span>${R.where}</span><span><code>${esc(x.where)}</code></span><span>${R.quote}</span><span class="quote">${esc(x.quote)}</span></div>
+      </article>`).join('')}</div>` : none6(R.noneStuck);
     const ideas = C.ideas.length ? `<div class="cards">${C.ideas.map(x => `<article class="rcard idea" id="cl-${esc(x.id)}">
-        <div class="h"><span class="chip acc">${esc(x.id)}</span>${stageChip(x.stage)}<span class="pill ${x.lands === 'pipeline' ? 'acc' : 'mute'}">${R.lands[x.lands] || esc(x.lands)}</span>${noteBack(x.id)}</div>
+        <div class="h"><span class="chip acc">${esc(x.id)}</span>${x.stage === 'house' ? `<span class="chip">${R.house}</span>` : stageChip(x.stage)}${noteBack(x.id)}</div>
         <p class="w1">${md(x.change)}</p>
         <div class="kv"><span>${R.why}</span><span>${md(x.why)}</span>${x.target ? `<span>${R.target}</span><span><code>${esc(x.target)}</code></span>` : ''}<span>${R.evidence}</span><span class="chipline">${x.evidence.map(idLink).join('')}</span></div>
       </article>`).join('')}</div>` : none6(R.noneIdeas);
@@ -1123,16 +1105,10 @@
     const notes = C.userNotes.length ? `<div class="unotes">${C.userNotes.map(n => { const anchor = seenOn.has(n.on) ? '' : ` id="cl-note-${esc(n.on)}"`; seenOn.add(n.on);
       return `<blockquote class="unote"${anchor}><span class="on">${n.on === 'general' ? R.general : R.on.replace('{id}', idLink(n.on))}</span><p>“${esc(n.words)}”</p></blockquote>`; }).join('')}</div>` : none6(R.noneNotes);
     sec('cl-retro', SC.sec.retro, R.lede, `<div class="rel-blocks">
-      ${kick6(`${R.worked} · ${C.worked.length}`, worked)}
-      ${kick6(`${R.wrong} · ${C.wrong.length}`, wrong)}
+      ${kick6(`${R.well} · ${C.wentWell.length}`, well)}
+      ${kick6(`${R.stuck} · ${C.gotStuck.length}`, stuck)}
       ${kick6(`${R.ideas} · ${C.ideas.length}`, ideas)}
       ${kick6(`${R.notes} · ${C.userNotes.length}`, notes)}</div>`);
-
-    // ---- 5. the sweep: done, or left for him with the command ----
-    const W6 = SC.sweep;
-    const swState = x => x.done ? `<span class="pill good">${W6.done}</span>` : x.left ? `<span class="pill warn">${W6.left}</span>` : `<span class="pill bad">${W6.open}</span>`;
-    const sweep = C.sweep.length ? `<div class="list csweep">${C.sweep.map(x => `<div class="row${!x.done && !x.left ? ' open' : ''}"><span class="t">${md(x.what)}</span>${swState(x)}${x.command ? `<span class="d"><span class="kicker">${W6.command}</span> <code>${esc(x.command)}</code></span>` : ''}</div>`).join('')}</div>` : none6(W6.none);
-    sec('cl-sweep', SC.sec.sweep, C.closed ? W6.closedLede : W6.openLede, sweep);
   }
 
   // ---- mount: every tab is in the DOM (mermaid renders once); the inactive ones are hidden ----

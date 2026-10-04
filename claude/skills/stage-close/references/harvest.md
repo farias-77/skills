@@ -1,46 +1,45 @@
-# The harvest — step 1 of stage 6
+# The harvest — step 2 of stage 6
 
-The workstream's record is long: the review audits of three stages,
-the rulings, every entry's run in the execution, the audit, the
-release's trace and record, the notes. The session does not read it
-whole. One close-harvester (Sonnet 5.5, medium) per source reads it and
-returns what the retro needs, structured: the numbers, the precision
-per reviewer, every friction with its evidence.
+The numbers do not need a reader: they come from each stage's
+`telemetry.json` by `telemetry-sum.mjs` (step 1). What does need one
+is the frictions: what the stages and the user wrote down as it
+happened. One `close-harvester (Sonnet 5.5, medium)` reads them and
+returns each one with its evidence; the session does not read them
+whole.
 
-## The five sources
+## What it reads
 
-| Source key | Paths passed | What comes back |
-|---|---|---|
-| `documents` | `00-discovery/reviews.md`, `01-design/reviews.md`, `02-plan/reviews.md`, `rulings.md` | rounds per stage; findings per stage and reviewer; the user's rulings and the patterns in them (a lens he keeps dismissing, a class he keeps overruling, a card chosen against the recommendation); every friction the audits record |
-| `execution` | `03-execution/board.md`, `parked.md`, `audit.md`, every `entries/*/run-*.json` listed by path (never the `entries/` folder), `blueprint/execution/execution.json` | entries, amendments, rounds per entry, findings and precision per reviewer, parked entries and why, the choices where the documents were silent, the audit's items and rulings; every friction the runs and the board show |
-| `release` | `04-release/plan.md`, `trace.md`, every `04-release/entries/*/run-*.json` listed by path, `blueprint/release/release.json` | staging runs and reds, fixes, rollbacks, hotfixes, watch read and owned; every friction the trace notes |
-| `notes` | `dreaming-notes.md`, `taste-notes.md` | every note as a friction, the `[user]` ones marked; every taste note marked `taste` |
-| `telemetry` | only for a workstream older than the shared `<stage>/telemetry.json` (claude/docs/telemetry.md): `.state.md`, `01-design/telemetry.md`, whatever telemetry the other stages wrote, `04-release/trace.md`. With the shared files, `scripts/telemetry-sum.mjs` replaces this source ([metrics.md](metrics.md)) | per stage: wall-clock, his hours, agent hours, tokens, rounds, findings by class, each with its line; a stage that recorded nothing is a friction |
+| Paths passed | Why |
+|---|---|
+| `dreaming-notes.md` | every friction a stage noted on the spot, and his `[user]` notes, which weigh first |
+| `taste-notes.md` | the patterns in his rulings, as the stages saw them |
+| `rulings.md` | his rulings and the conductors' in his place: a ruling he overturned, a class he keeps dismissing |
+| `00-discovery/reviews.md`, `01-design/reviews.md`, `02-plan/reviews.md` | what each review cost and found |
+| `03-execution/board.md`, `parked.md`, `audit.md` | the slow entries, the parked ones and why |
+| `04-release/trace.md` | the reds, the fix, the rollbacks |
+| the slowest steps | the `slowest` list of `05-close/metrics.json`, given as text |
 
-A source with no file comes back empty; the trace says so.
-
-**Paths, never folders.** The session lists the run files itself
-(`ls`) and passes each one. A folder is never passed: an entry's
-folder also holds its evidence (screenshots, videos, test output),
-about 1,700 files in the last workstream, which carry no friction the
-run file does not already record. The harvester reads what it is
-given and nothing more.
+A file that does not exist is skipped; the answer lists it under
+`unread`. **Files, never folders**: an entry's evidence folder
+(screenshots, videos, test output) is never passed.
 
 ## What a friction is
 
-Anything the record says cost time, tokens, a round, a stop, a red, a
+Anything the record says cost time, a round, a stop, a red, a
 surprise, a workaround, a decision taken against the document, a thing
-the user asked to change — wherever it was recorded. The harvester
-does not filter for importance: every candidate comes back with where
-it was seen (`file:line`), the quote, the stage it bit, and, as a
-hint, where an idea from it would land and the pipeline file it would
-touch.
+the user asked to change. The harvester does not filter for
+importance: every one comes back with the stage it bit, where it was
+seen (`file:line`), the quote, and the time it cost when the record
+says (the step and the minutes, from the slowest steps or the line
+itself). It also returns what went smoothly, with its evidence, so the
+session has the "went well" without reading the record.
 
-## The workflow
+## The dispatch
 
-`close-harvest.js`: `parallel` over the five sources, one structured
-answer each, one re-dispatch on an invalid answer; a source that
-failed twice comes back `{ key, failed: true }` and the session reads
-it itself, saying so in the trace. The args carry paths, never text.
-Each answer is saved verbatim to `05-close/harvest/<key>.json` before
-anything is summed.
+One Agent call, `subagent_type: close-harvester` (or the definition's
+path, inline, when the agent is not installed), the paths and the
+slowest steps in the prompt, the workstream's language. An answer that
+is not in the agent's response contract is dispatched once more; a
+second failure and the session reads `dreaming-notes.md` itself and
+says so in the trace. The answer is saved verbatim to
+`05-close/harvest.json` before the retro is written.

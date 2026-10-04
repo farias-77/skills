@@ -58,14 +58,10 @@ export const useSpring = () => {
   return (f: number, delay = 0, config: any = CALM, durationInFrames?: number) => spring({frame: f - delay, fps, config, durationInFrames});
 };
 
-// The layout grid: everything is placed from these numbers, per aspect.
+// The layout grid: everything is placed from these numbers (16:9).
 export const useGrid = () => {
   const {width, height} = useVideoConfig();
-  const vertical = height > width;
-  return vertical
-    ? // a phone: the window takes the middle and most of the height, the caption the lower band
-      {vertical, W: width, H: height, mx: 72, win: {x: 40, y: 390, w: 1000, h: 1160}, hudY: 300, capY: 1630, safeW: width - 144}
-    : {vertical, W: width, H: height, mx: 120, win: {x: 192, y: 92, w: 1536, h: 864}, hudY: 34, capY: 978, safeW: Math.round(width * 0.68)};
+  return {W: width, H: height, mx: 120, win: {x: 192, y: 92, w: 1536, h: 864}, hudY: 34, capY: 978, safeW: Math.round(width * 0.68)};
 };
 
 // The stage: near-black, one soft accent light from the top left, film grain.
