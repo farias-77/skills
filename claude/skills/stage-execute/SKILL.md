@@ -1,6 +1,6 @@
 ---
 name: stage-execute
-description: Conducts stage 4 (Execute) — turns an approved plan into merged code on the feature branch, from one "play" to one call. Step 0 shows the plan's pre-flight once, waits until every item is handed over, and gives the user the /goal text to paste; from then on nobody asks him anything. One session (Opus 5.5, high) orchestrates without writing code: the foundation first, then every node of plan.graph.json whose edges are merged or ready, in the graph's start order, in parallel up to the cap, each through the exec-entry workflow — builder (Opus 5.5, medium) writes the code and the tests for the entry's ACs, running only the fast checks (two builders, back and front in parallel, when the brief carries a Contract); exec-gate (Sonnet 5.5, low) runs the gate once, the only place the suites run; then, in parallel, reviewer (Opus 5.5, high) with a closed scope, qa-frontend (Opus 5.5, medium) on screens and qa-backend (Opus 5.5, medium) on the API and data; a mechanical triage (blocking only on an AC not met, a reproduced bug, a security hole or a written rule broken; the rest are notes on the PR); at most one fix pass and a delta by the agents that blocked, then ready or parked. Done = the plan's ACs met and the gate green. The session is the local CI: its serial queue merges the base into each ready entry, tests the merged tree, merges, and signs off; the whole gate runs once at the end. It closes with the stage report, where the user checks the screens against the locked mock once, and calls him once, when everything is merged, green and reported. Use when a workstream's .state.md says stage execute, or to resume an execution in progress.
+description: Conducts stage 4 (Execute) — turns an approved plan into merged code on the feature branch, from one "play" to one call. Step 0 shows the plan's pre-flight once, waits until every item is handed over, and gives the user the /goal text to paste; from then on nobody asks him anything. One session (Opus 5.5, high) orchestrates without writing code: the foundation first, then every node of plan.graph.json whose edges are merged or ready, in the graph's start order, in parallel up to the cap, each through the exec-entry workflow — builder (Opus 5.5, medium) writes the code and the tests for the entry's ACs, running only the fast checks (two builders, back and front in parallel, when the brief carries a Contract); exec-gate (Sonnet 5.5, low) runs the gate once, the only place the suites run; then, in parallel, reviewer (Opus 5.5, high) with a closed scope, qa-frontend (Opus 5.5, medium) on screens and qa-backend (Opus 5.5, medium) on the API and data; a mechanical triage (blocking only on an AC not met, a reproduced bug, a security hole or a written rule broken; the rest are notes on the PR); at most one review fix pass (a gate-fix pass on a code red is apart, two at most) and a delta by the agents that blocked, then ready or parked. Done = the plan's ACs met and the gate green. The session is the local CI: its serial queue merges the base into each ready entry, tests the merged tree, merges, and signs off; the whole gate runs once at the end. It closes with the stage report, where the user checks the screens against the locked mock once, and calls him once, when everything is merged, green and reported. Use when a workstream's .state.md says stage execute, or to resume an execution in progress.
 disable-model-invocation: false
 argument-hint: "<workstream-slug>"
 allowed-tools: Read, Write, Edit, Glob, Grep, Agent, Workflow, AskUserQuestion, Artifact, PushNotification, Bash
@@ -14,9 +14,11 @@ and the files each owns) and a brief per node. Merged code comes out
 on `feat/<workstream>`.
 
 **Done means the plan's ACs are met and the gate is green. Nothing
-else blocks.** Each entry gets two builder passes at most (the build
-and one fix) and a target of 30 to 60 minutes. It never loops: past
-its budget it parks and the session reports it.
+else blocks.** Each entry gets the build, one review fix pass, and a
+target of 30 to 60 minutes. A pass that fixes a code-red gate is part
+of building and does not spend the review fix pass; at most two of them
+per entry, then it parks `gate-red`. It never loops: past its budget it
+parks and the session reports it.
 
 **No code enters without review.** Every commit that reaches an entry
 branch passes the gate and agents that never wrote it. The session
@@ -37,17 +39,17 @@ the end.
 ```
             ┌─ builder (back) ──┐   two builders in parallel only when the brief carries a Contract
 entry ──────┤                   ├─► gate ─┬─► reviewer                  ─┐
-            └─ builder (front) ─┘         ├─► qa-frontend (if screens)   ├─► at most 1 fix pass ─► ready ─► the queue
+            └─ builder (front) ─┘         ├─► qa-frontend (if screens)   ├─► at most 1 review fix pass ─► ready ─► the queue
                                           └─► qa-backend  (if API/data)  ─┘
 ```
 
 | Step | Who | What |
 |---|---|---|
 | build | `builder (Opus 5.5, medium)` | the code and one test per AC; only the fast checks (types, lint, unit tests) while it builds; a file outside Owns is allowed and listed (`outsideOwns`) |
-| gate | `exec-gate (Sonnet 5.5, low)` | the gate commands once (the check and the affected journeys); each failure `code` or `machine`; a machine red runs again after a load wait (2×), then parks `machine`; a code red takes the fix pass; green brings the stack up for the QAs |
+| gate | `exec-gate (Sonnet 5.5, low)` | the gate commands once (the check and the affected journeys); each failure `code` or `machine`; a machine red runs again after a load wait (2×), then parks `machine`; a code red takes a gate-fix pass (not the review budget; at most 2 per entry, then parks `gate-red`); green brings the stack up for the QAs |
 | check | `reviewer (Opus 5.5, high)` ∥ `qa-frontend (Opus 5.5, medium)` ∥ `qa-backend (Opus 5.5, medium)` | the reviewer always; qa-frontend when the screen changed; qa-backend when the API or the data changed |
 | triage | the workflow, in code | blocking = marked blocking, basis `ac` · `bug` · `security` · `rule`, and a proof. The rest are notes |
-| fix | `builder (Opus 5.5, medium)` | one pass over every blocking item, then the gate, then the delta: only the agents that blocked re-check their own items. Still blocking → parked `round-cap` |
+| fix | `builder (Opus 5.5, medium)` | the one review fix pass over every blocking item, then the gate (a code red there may take one gate-fix pass, within the 2), then the delta: only the agents that blocked re-check their own items. Still blocking → parked `round-cap` |
 
 The blocking rule is [references/judging.md](references/judging.md).
 Every agent stamps its start and end; the run returns `steps`, one
@@ -57,7 +59,7 @@ line per agent with its minutes, and the session keeps them.
 
 | Agent | Model, effort | Does |
 |---|---|---|
-| the session | Opus 5.5, high | pre-flight, the goal, worktrees, runs, the machine's load, the merge queue and its signoff, the record, the stage report |
+| the session | Opus 5.5, high | pre-flight, the goal, worktrees, runs, the machine's load, the merge queue, its migration ordering and its signoff, the record, the stage report |
 | `builder` | Opus 5.5, medium | the code and the tests of an entry, back and front or one side against the Contract; the fix pass |
 | `exec-gate` | Sonnet 5.5, low | the gate commands once, code or machine, the surface, the stack |
 | `reviewer` | Opus 5.5, high | the ACs implemented, bugs and races, the security checklist, operations, a written rule broken |
@@ -218,7 +220,8 @@ the board (the entry's minutes, and the slowest step). Then act on
   conservatively, writes `rulings.md` (`ruled: session`) and
   `entries/<id>/fixes-<n>.json` (`{ "fixes": [ { id, fix } ] }`), and
   resumes once (`mode: 'resume'`, `resume: { head, passesUsed,
-  fixesFile, check: 'whole' }`).
+  reviewFixes, gateFixes, fixesFile, check: 'whole' }`, the counts
+  from the parked return).
 - **`parked`**, by its `reason`, one line in `parked.md` with the
   evidence; the entries that depend on it wait; everything else goes
   on.
@@ -248,6 +251,7 @@ merge path.
 for each ready entry, one at a time (the critical path first, then in the order they came back)
   1 base in        feat moved? merge it into the entry branch (never a rebase); a conflict → exec-entry 'update'
   2 merged tree    the paths outside Owns ∪ Extends listed; signoff, the affected gate, on the entry head; red → parked gate-red
+  2b migrations    the entry's migrations against feat's; a number or order clash → renumbered on the entry branch, merge-prep commit, the gate again
   3 merge          git merge --no-ff into feat/<workstream>, the notes in the body, push; the entry's stack down, its worktree removed
   4 sign off       signoff, the same gate, on the new feat head — same tree, its record reused, status posted
   5 record         plan.md Status, board.md merged, start what it unblocked
@@ -268,6 +272,16 @@ once, at the end (Step 5)
    (`local-ci/affected`, or the one the project names): that head holds
    the base, so its tree is the tree the merge will make. Red → the
    entry is parked `gate-red` with the log's path and failing lines.
+   **Migrations are the session's.** Entries run in parallel and each
+   may add a migration; two can take the same number, which is no text
+   conflict, so nothing above catches it. Before the merge, list the
+   migrations the entry adds (`git diff --name-only --diff-filter=A
+   feat/<workstream>...<entry branch>` under the project's migrations
+   folder) and the ones already on `feat/<workstream>`. On a number or
+   order clash, renumber the entry's migration on the entry branch to
+   follow the last one on feat (and every reference to it), commit that
+   as a merge-prep commit, and run the signoff with the affected gate on
+   the new head again before the merge. Red → parked `gate-red`.
 3. **Merge** with a merge commit whose body carries the entry's notes,
    push, bring the entry's stack down (the doctrine's stack-down
    command) and remove its worktree.

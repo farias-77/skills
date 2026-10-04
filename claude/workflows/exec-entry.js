@@ -1,12 +1,12 @@
 /*
  * exec-entry.js — one entry of a stage-4 plan as deterministic code:
- * build, gate, review ∥ QA, at most one fix pass, the delta.
+ * build, gate, review ∥ QA, at most one review fix pass, the delta.
  *
  * Why a workflow: "no code enters without review" must be physical, and
  * so must the budget. Every commit that reaches the entry branch passes
- * the gate and agents that never wrote it, and an entry never loops: two
- * builder passes at most (the build and one fix), then it is ready or it
- * parks. The session that runs stage 4 starts one run per entry, in
+ * the gate and agents that never wrote it, and an entry never loops: one
+ * review fix pass at most, and at most two gate-fix passes, then it is
+ * ready or it parks. The session that runs stage 4 starts one run per entry, in
  * parallel up to the cap, and merges only what comes back ready, through
  * its local-CI queue.
  *
@@ -32,7 +32,7 @@
  *               A red only the machine caused never goes to a builder: the
  *               gate waits for the load (at most 10 min, under
  *               loadThreshold, nproc by default) and runs again, at most
- *               twice, then 'parked' (machine). A code red → the fix pass.
+ *               twice, then 'parked' (machine). A code red → a gate-fix pass.
  *               Green on a screen or API surface: the gate brings the
  *               stack up for the QAs.
  *   3. check    in parallel over the entry diff: reviewer (Opus 5.5, high)
@@ -45,21 +45,27 @@
  *               written rule of the project broken), and its `proof` is not
  *               empty. Everything else is a note: notes go to the entry's
  *               notes.md and the PR body, never to another pass.
- *   5. fix      one fix pass of the builder(s) (medium) with every blocking
- *               item, then the gate, then the delta: only the agents that
- *               raised blocking items re-check those items. Still blocking
- *               → 'parked' (round-cap). A code red that uses the fix pass
- *               leaves none for the check: blocking after it → round-cap.
- *               A code red after the fix pass → 'parked' (gate-red).
+ *   5. fix      one review fix pass of the builder(s) (medium) with every
+ *               blocking item, then the gate, then the delta: only the
+ *               agents that raised blocking items re-check those items.
+ *               Still blocking → 'parked' (round-cap).
+ *
+ * THE BUDGET. A builder pass that fixes a code-red gate is part of
+ * building: it does not consume the review fix pass. The hard bound is
+ * MAX_GATE_FIXES (2) gate-fix passes per run: the gate still red on code
+ * after them → 'parked' (gate-red). The gate after the review fix pass
+ * may take one gate-fix too, under the same run-wide bound. The review
+ * fix pass is the one counted: maxPasses - 1 of them (one by default).
  *
  * THE FLOW (mode 'update'): the session merges a moved base into the entry
  * branch itself and calls this mode only on a conflict. The gate tries the
  * merge (never a rebase); a clean merge runs the gate and returns. A
  * conflict is resolved by the builder (one pass), the gate runs, and the
- * reviewer reads the resolution; one fix pass at most, as above.
+ * reviewer reads the resolution; one review fix pass at most, as above.
  *
  * THE FLOW (mode 'resume'): a parked run continues. args.resume names the
- * parked head, the passes the run already used, an optional fixes file
+ * parked head, the passes the run already used (passesUsed, and the
+ * parked return's reviewFixes and gateFixes), an optional fixes file
  * the builder applies (the user's answer, the session's reading of a
  * blocked builder; it does not count against the budget), and the check
  * to run after the gate: 'whole' (the run parked before its check),
@@ -112,11 +118,12 @@
  *     loadThreshold:   8,                                  // optional (default: nproc)
  *     inlineAgents:    false,
  *     priorRuns:       ['/abs/.../entries/E-03/run-1.json'],
- *     resume:          { head: '<sha>', passesUsed: 1, fixesFile: '/abs/.../fixes-2.json', check: 'whole' | 'delta' | 'none',
+ *     resume:          { head: '<sha>', passesUsed: 1, reviewFixes: 0, gateFixes: 0, fixesFile: '/abs/.../fixes-2.json', check: 'whole' | 'delta' | 'none',
  *                        items: [{ id, agent, title, fix, proof }] },   // 'resume' only; items for 'delta'
  *   }})
  *
- * Returns { entry, mode, status, reason, head, passes, steps, rounds,
+ * Returns { entry, mode, status, reason, head, passes, reviewFixes,
+ * gateFixes, steps, rounds,
  * tally, notes, outsideOwns, decided, choices, questions, blocked, gate,
  * stack } — status is 'ready' | 'parked' | 'blocked' | 'interrupted' (an
  * agent returned nothing: the session relaunches by the run id); reason,
@@ -125,12 +132,12 @@
 
 export const meta = {
   name: 'exec-entry',
-  description: 'Stage-4 entry: one builder (two in parallel when the brief fixes the contract), the gate as the only place the suites run, the reviewer in parallel with the QAs of the surface, a mechanical triage, at most one fix pass and a delta by the agents that blocked',
+  description: 'Stage-4 entry: one builder (two in parallel when the brief fixes the contract), the gate as the only place the suites run, the reviewer in parallel with the QAs of the surface, a mechanical triage, at most one review fix pass (gate-fix passes apart, two at most) and a delta by the agents that blocked',
   phases: [
     { title: 'Build', detail: 'builder (Opus 5.5, medium): the code and the tests for the ACs, fast checks only; back ∥ front when the brief carries a Contract', model: 'opus' },
     { title: 'Gate', detail: 'exec-gate (Sonnet 5.5, low): the gate commands once, each failure code or machine; a machine red runs again after a load wait', model: 'sonnet' },
     { title: 'Check', detail: 'reviewer (Opus 5.5, high) ∥ qa-frontend (Opus 5.5, medium) on screens ∥ qa-backend (Opus 5.5, medium) on API and data', model: 'opus' },
-    { title: 'Fix', detail: 'builder (Opus 5.5, medium), one pass: the gate red or the blocking items', model: 'opus' },
+    { title: 'Fix', detail: 'builder (Opus 5.5, medium): a gate-fix pass on a code red (two at most), or the one review fix pass over the blocking items', model: 'opus' },
     { title: 'Delta', detail: 'only the agents that raised blocking items, over those items', model: 'opus' },
   ],
 }
@@ -229,10 +236,14 @@ const fastChecks = Array.isArray(args?.fastChecks) && args.fastChecks.length ? a
 const agentsDir = args?.agentsDir
 const loadThreshold = Number(args?.loadThreshold) > 0 ? Number(args.loadThreshold) : null
 const MACHINE_RERUNS = 2
+const MAX_GATE_FIXES = 2
 if (!gateCommands.length) log(`${entry}: no gateCommands given — the gate has nothing to run`)
 
 const result = {
   entry, mode, status: 'parked', reason: null, head: null, passes: resume ? Number(resume.passesUsed) || 0 : 0,
+  // The review fix passes and the gate-fix passes used; a resume without them reads the old count (one pass past the build = the fix used).
+  reviewFixes: resume ? Number(resume.reviewFixes ?? Math.min(1, Math.max(0, (Number(resume.passesUsed) || 0) - 1))) || 0 : 0,
+  gateFixes: resume ? Number(resume.gateFixes) || 0 : 0,
   steps: [], rounds: [], tally: {}, notes: [], outsideOwns: [], decided: [], choices: [], questions: [], blocked: null, gate: null, stack: null,
 }
 
@@ -325,7 +336,7 @@ const pass = async (task, items, label) => {
   const list = (side) => items.filter(i => side === 'both' || i.side === side)
   const text = (side) => items.length ? `${task}\n${list(side).map(i => `- ${i.id} (${i.agent}): ${i.title} — ${i.fix}${i.where ? `\n  where: ${i.where}` : ''}${(i.proof ?? '').trim() ? `\n  proof: ${i.proof}` : ''}`).join('\n')}` : task
   const outs = await parallel(sides.map(side => () => builder(text(side), side, label, label === 'build' ? 'Build' : 'Fix')))
-  log(`${entry}: builder pass ${result.passes}/${maxPasses} (${label}, ${sides.length === 2 ? 'back ∥ front' : 'one builder'})`)
+  log(`${entry}: builder pass ${result.passes} (${label}; review fixes ${result.reviewFixes}/${maxPasses - 1}, gate fixes ${result.gateFixes}/${MAX_GATE_FIXES}; ${sides.length === 2 ? 'back ∥ front' : 'one builder'})`)
   return absorb(outs, `the builder (${label})`)
 }
 
@@ -365,22 +376,22 @@ const gateOnce = async (task) => {
   return { g }
 }
 
-// The gate after a builder pass; a code red gets the fix pass when one is left.
-// Returns { g } green, or { stop }.
-const gateGreen = async (task) => {
+// The gate after a builder pass; a code red gets a gate-fix pass, outside the review
+// budget, up to `allowed` here and MAX_GATE_FIXES in the whole run. Returns { g } green, or { stop }.
+const gateGreen = async (task, allowed = MAX_GATE_FIXES) => {
   let r = await gateOnce(task)
-  if (r.stop) return r
-  if (r.g.green) return r
-  if (r.g.conflicts.length) { result.head = r.g.head; return { stop: park('gate-red', `the merge still conflicts: ${r.g.conflicts.join(', ')}`) } }
-  if (result.passes >= maxPasses) { result.head = r.g.head; return { stop: park('gate-red', `the gate is red on code after ${result.passes} builder pass(es)`) } }
-  const machine = r.g.failures.filter(f => f.cause === 'machine')
-  const items = r.g.failures.filter(f => f.cause !== 'machine').map((f, i) => ({ id: `gate-${gateN}#${i + 1}`, agent: GATE, title: `${f.check} red`, where: f.where, fix: 'turn it green in the product code', proof: f.output, side: f.side }))
-  const stop = await pass(`Mode: fix. Entry ${entry}. Turn the gate green; the failures, quoted:${machine.length ? `\n(Not yours, the machine's, re-run by the gate: ${machineList(r.g)})` : ''}`, items, 'fix')
-  if (stop) return { stop }
-  r = await gateOnce(`${machine.length ? `${loadWait()}\n` : ''}Run the gate on the entry branch after the builder's fix.`)
-  if (r.stop) return r
-  if (!r.g.green) { result.head = r.g.head; return { stop: park('gate-red', 'the gate is red on code after the fix pass') } }
-  return r
+  for (let k = 0; ; k++) {
+    if (r.stop) return r
+    if (r.g.green) return r
+    if (r.g.conflicts.length) { result.head = r.g.head; return { stop: park('gate-red', `the merge still conflicts: ${r.g.conflicts.join(', ')}`) } }
+    if (k >= allowed || result.gateFixes >= MAX_GATE_FIXES) { result.head = r.g.head; return { stop: park('gate-red', `the gate is red on code after ${result.gateFixes} gate-fix pass(es)`) } }
+    result.gateFixes++
+    const machine = r.g.failures.filter(f => f.cause === 'machine')
+    const items = r.g.failures.filter(f => f.cause !== 'machine').map((f, i) => ({ id: `gate-${gateN}#${i + 1}`, agent: GATE, title: `${f.check} red`, where: f.where, fix: 'turn it green in the product code', proof: f.output, side: f.side }))
+    const stop = await pass(`Mode: fix. Entry ${entry}. Turn the gate green; the failures, quoted:${machine.length ? `\n(Not yours, the machine's, re-run by the gate: ${machineList(r.g)})` : ''}`, items, 'gate-fix')
+    if (stop) return { stop }
+    r = await gateOnce(`${machine.length ? `${loadWait()}\n` : ''}Run the gate on the entry branch after the builder's fix.`)
+  }
 }
 
 // ---------- the check and the triage ----------
@@ -425,17 +436,18 @@ The diff: run \`${diffCmd}\` in the worktree.${name === REVIEWER ? outsideText :
   return { blocking }
 }
 
-// The check, then at most one fix pass and its delta. Returns the final result.
+// The check, then at most one review fix pass and its delta. Returns the final result.
 const checkAndFix = async (first) => {
   let round = 1
   let c = await check({ round, ...first })
   if (c.stop) return c.stop
   if (!c.blocking.length) return ready()
-  if (result.passes >= maxPasses) { result.head = result.gate?.head ?? result.head; return park('round-cap', `${c.blocking.length} blocking item(s) and no builder pass left (${result.passes}/${maxPasses})`) }
+  if (result.reviewFixes >= maxPasses - 1) { result.head = result.gate?.head ?? result.head; return park('round-cap', `${c.blocking.length} blocking item(s) and no review fix pass left (${result.reviewFixes}/${maxPasses - 1})`) }
   const since = result.head
+  result.reviewFixes++
   const stop = await pass(`Mode: fix. Entry ${entry}. Apply every blocking item below, its proof red first where it has one, then green; return one \`applied\` entry per id.`, c.blocking, 'fix')
   if (stop) return stop
-  const gr = await gateGreen('Run the gate on the entry branch after the fix.')
+  const gr = await gateGreen('Run the gate on the entry branch after the fix.', 1)
   if (gr.stop) return gr.stop
   const own = {}
   c.blocking.forEach(i => (own[i.agent] ??= []).push(i))
@@ -475,8 +487,7 @@ if (mode === 'update') {
 if (mode === 'resume') {
   log(`${entry}: resuming from ${resume.head ?? '?'} (${result.passes} pass(es) used), check ${resume.check ?? 'whole'}`)
   if (resume.fixesFile) {
-    // The user's answer or the session's reading of a blocked builder: outside the budget.
-    result.passes--
+    // The user's answer or the session's reading of a blocked builder: outside the budget (neither counter moves).
     const stop = await pass(`Mode: fix. Entry ${entry}. The items to apply are in ${resume.fixesFile} (its \`fixes\`: id, agent, fix, proof). Apply every one; return one \`applied\` entry per id.`, [], 'resume')
     if (stop) return stop
   }
