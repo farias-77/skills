@@ -31,12 +31,16 @@ The session is **Opus 5.5 at medium effort**. It reads neither the
 record nor the footage whole: the numbers come from the stages'
 `telemetry.json` by a script, the harvester reads the notes, the
 director and the recorder make the film, and the session assembles,
-checks and talks.
+checks and talks. The stage starts on his play (house rule "Every stage
+starts on his play"): `/clear`, `/model claude-opus-5-5`,
+`/effort medium`, `/stage-close <slug>`. It needs nothing from him at
+the start and runs on its own to the delivery. It is the last stage:
+it ends with no next play.
 
 ## The pattern
 
 ```
-0. Open      .state.md says close, the release is closed → L1 dispatched at once, in the background
+0. Open      model checked · .state.md says close, the release is closed → L1 dispatched at once, in the background
 1. Numbers   telemetry-sum.mjs over every stage's telemetry.json → metrics.json · the previous workstream's
              · the structure of main before and after
 2. Harvest   one close-harvester (Sonnet 5.5, medium): the frictions, dreaming-notes.md, rulings.md
@@ -103,8 +107,11 @@ blueprint/close/retro.json  # the retro in the fixed shape weekly-retro reads
 
 ## Step 0 — open, and start the film
 
-Read `.state.md` and the release's closed record. Then, before anything
-else, dispatch `launch-director (Opus 5.5, high)` in **plan mode**, in
+If the session is not on **Opus 5.5 at medium effort**, ask him once to
+switch (`/model claude-opus-5-5`, `/effort medium`) and wait; a
+non-interactive run goes on with what it has and writes one line in
+`dreaming-notes.md`. Read `.state.md` and the release's closed record.
+Then, before anything else, dispatch `launch-director (Opus 5.5, high)` in **plan mode**, in
 the background, by [references/launch.md](references/launch.md): the
 film is the long pole (recording, then up to an hour of rendering on a
 loaded machine), so it runs while the retro is written. The
@@ -268,7 +275,10 @@ when it is under 50 MB in all; the films always), push only with his
 explicit approval. The close's stage report is this package:
 the launch page replaces the stage video (`claude/docs/stage-report.md`), the
 retro's tab is its blueprint layer, and there are no slides: the retro
-is the weekly's, not his. Suggest `/clear`.
+is the weekly's, not his. The last message says the workstream is
+closed; there is no next play. The pipeline's next step is the
+`weekly-retro`, which he runs once a week over every closed
+workstream.
 
 ## How to write
 

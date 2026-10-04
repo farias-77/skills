@@ -15,7 +15,7 @@ afterwards for a veto.
 |---|---|---|
 | 1 discovery | **interview + mock + lock** | he talks; a clickable mock is built and iterated in front of him; he validates through it and locks it. The text (journeys, stories, PR-FAQ) is derived from the locked mock |
 | 2 design | **the talk + the debate** | he says what he has in mind; one proposal is presented as a video and slides and debated with him until he says it is closed, which is his approval; the four documents and the review run without him |
-| 3 plan | **autonomous** | nowhere: the conductor rules everything, lists its choices at the report for his veto, and gathers what only he can hand over into the pre-flight |
+| 3 plan | **his play, then autonomous** | only at the play that starts it; then the conductor rules everything, lists its choices at the report for his veto, and gathers what only he can hand over into the pre-flight |
 | 4 execute | **pre-flight, then play, then his hands-on** | he hands over the pre-flight and pastes one goal; he is called once, at the end, when everything is merged and green: the session runs the environment, he uses the app and sends adjustments, built in the stage until he says ok. One blocking rule, in code |
 | 5 release | **his play authorizes the head** | the play (`merge-from <audited head>` in the guard's allow file) is his "go"; the feature is not re-tested: the session merges, deploys, smokes, watches production for 15 minutes and rolls back on its own, under the guard; a red gets one fix, a second red stops; it asks only before what cannot be undone and before a new production deploy after a rollback |
 | 6 close | **retro + launch video** | the retro is a short record in the workstream for the weekly (the numbers, went well ×3, got stuck ×3, ideas ≤3); for the people, one 16:9 launch film and a "what's new" text he forwards |
@@ -30,6 +30,33 @@ source, and it can contradict the files later. If a stage suffers after
 a clear, the bug is a missing file in the previous stage — fix the
 file, not the context. Re-entry is always by workstream slug: the stage
 skill resumes from `.state.md`.
+
+## Every stage starts on his play
+
+No stage starts the next one. Each stage starts when he gives the
+play: he runs `/clear`, sets the model and the effort the stage names,
+and invokes the stage skill with the workstream slug. A stage that
+needs him (the discovery interview, the design talk and debate, the
+execute pre-flight, the release play) asks at the start; after that it
+runs on its own to its close. The plan asks nothing and still waits
+for his play.
+
+| Stage | The play |
+|---|---|
+| 1 discovery | `/model claude-opus-5-5` · `/effort medium` (high on the turns that rule) · `/stage-discovery` and the demand |
+| 2 design | `/model claude-opus-5-5` · `/effort high` · `/stage-design <slug>` |
+| 3 plan | `/model claude-opus-5-5` · `/effort high` · `/stage-plan <slug>` |
+| 4 execute | `/model claude-opus-5-5` · `/effort high` · `/stage-execute <slug>` |
+| 5 release | `/model claude-opus-5-5` · `/effort medium` · `/stage-release <slug>` |
+| 6 close | `/model claude-opus-5-5` · `/effort medium` · `/stage-close <slug>` |
+
+At the open, a session on another model or effort asks him once to
+switch and waits; a non-interactive run goes on with what it has and
+writes one line in `dreaming-notes.md`. Every stage's close ends with
+one **next play** block, in a code block, with the exact lines to type
+(`/clear`, `/model`, `/effort`, the next stage's skill and slug, and
+any `/goal` text the next stage takes), and nothing runs until he types
+them. The close is the last stage: it ends with no next play.
 
 ## "Note this for the dreaming"
 

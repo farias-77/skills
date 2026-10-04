@@ -21,10 +21,15 @@ It does not decide how it is built: no architecture, no data model, no
 technology. Stage 2 makes the mock real.
 
 The conductor is **Opus 5.5 at medium effort**, raised with `/effort
-high` for the turns where it rules (judging the review). If the session runs another model, ask him to switch
-(`/model`) before the first question and wait. A non-interactive run
-cannot switch: continue on the session's model and effort and write
-one line in `dreaming-notes.md`.
+high` for the turns where it rules (judging the review). The stage
+starts on his play (house rule "Every stage starts on his play"):
+`/clear`, `/model claude-opus-5-5`, `/effort medium`, then
+`/stage-discovery` with the demand. If the session runs another model
+or effort, ask him once to switch before the first question and wait.
+A non-interactive run cannot switch: continue on the session's model
+and effort and write one line in `dreaming-notes.md`. The interview is
+this stage's interaction at the start; from the lock on, the stage runs
+on its own to the approval of its report, and it never starts stage 2.
 At the open, load the interview pack: `Skill` →
 `pack-interview-journeys-copy`. Its checklist (I-, J-, C-, A- items) is
 the bar this stage is held to.
@@ -61,7 +66,7 @@ D4 derivation   journey-scribe (Sonnet 5.5, high) ∥ disc-author-prfaq (Sonnet 
 D5 review       discovery-review, one round: disc-reviewer (Sonnet 5.5, medium) ∥ one
                 disc-blind-reader (Sonnet 5.5, low) per story. You judge, fix, verify by
                 reading; his questions go out in one batch
-D6 report       blueprint JSON → build → video (the mock in use, 60–90 s) → slides → approval → /clear
+D6 report       blueprint JSON → build → video (the mock in use, 60–90 s) → slides → approval → next play
 ```
 
 He is in the loop at four points: the interview with the mock (D1–D2),
@@ -170,7 +175,8 @@ creates state.
 
 On open:
 
-1. Ask for Opus 5.5 (medium effort) if the session is not on it.
+1. Ask once for Opus 5.5 at medium effort if the session is not on it,
+   and wait.
 2. Derive the slug: `YYYY-MM-DD-<short-kebab-name>`. When the
    designs root's `CLAUDE.md` fixes a naming rule (for instance "slug
    in English"), check the slug against it; one that breaks it gets a
@@ -599,8 +605,16 @@ silence or a loose "looks good" does not close the stage. He may send
 adjustments one at a time: note each in a visible list and apply only
 when he says "apply" (a behavior change is an amendment). On approval:
 `.state.md` to `stage: design`, `telemetry.json` closed, commit the
-workstream folder (push only on his word), and suggest `/clear` before
-stage 2 (house rule). The close commit is the last act.
+workstream folder (push only on his word). The close commit is the
+last act on disk; the last message ends with the next play, and
+nothing runs until he types it:
+
+```
+/clear
+/model claude-opus-5-5
+/effort high
+/stage-design <slug>
+```
 
 ## Telemetry
 

@@ -34,6 +34,12 @@ blueprint JSON, and a fix of one or two lines the reviewer's finding
 asks for. Every other file is written by its agent: `proposal.md` by
 the architect, each document by its writer.
 
+The stage starts on his play (house rule "Every stage starts on his
+play"): `/clear`, `/model claude-opus-5-5`, `/effort high`,
+`/stage-design <slug>`. Its interaction is at the start: the talk (D1)
+and the debate (D3–D4) until he says "closed". From there it runs on
+its own to its close, and it never starts stage 3.
+
 At the start of the stage, load the `pack-right-sizing` skill (the
 Skill tool). Its bar, its floor and its overengineering list are how
 you read the proposal, the critic's cuts and the review.
@@ -76,7 +82,7 @@ D5 documents   design-writer (Sonnet 5.5, high) × 4 in parallel → review-prep
                AC coverage) → design-reviewer (Opus 5.5, medium), one round, blocking only
                → you judge → fixes applied by you or the writer, verified on disk
 D6 report      the blueprint JSON and build → the final video, the final slides, the blueprint
-               → state → plan; /clear
+               → state → plan; the next play
 ```
 
 ## The team
@@ -107,7 +113,7 @@ what is missing and run on:
 
 | Missing | What changes |
 |---|---|
-| a model switch (print mode, no human) | the stage runs on the session's model and effort; write both in `telemetry.json` (`session`) and go on |
+| a model switch (print mode, no human) | the stage runs on the session's model and effort; write both in `telemetry.json` (`session`), one line in `dreaming-notes.md`, and go on |
 | `Artifact` (a headless or cloud run) | **local mode**, `.state.md` gets `mode: local`: the decks stay on disk and the messages give the path of the first slide and of the video; at D6, as `docs/stage-report.md` says for local mode |
 | the question tool | the questions go as text, in the same shape: the context, the options with their cost, your pick first and marked |
 | `Workflow` accepting a `scriptPath` outside the working directories | copy `design-research.js` into `<workstream>/_run/` and check both `sha256sum`s match. `_run/` is not committed |
@@ -141,9 +147,9 @@ designs-root/2026-08-15-workspace-invites/
 
 ## D0 — reading
 
-If the session is not on **Opus 5.5 at high effort**, ask the user to
-switch (`/model`) and wait (a session that cannot switch: see the
-host table). Load `pack-right-sizing`. Read the lock's `stories.md`
+If the session is not on **Opus 5.5 at high effort**, ask the user
+once to switch (`/model claude-opus-5-5`, `/effort high`) and wait (a
+session that cannot switch: see the host table). Load `pack-right-sizing`. Read the lock's `stories.md`
 and `pr-faq.md` whole (you rule on them all stage long); the journeys,
 the mock and the codebase are read by agents. Create
 `01-design/notes.md` from [templates/notes.md](templates/notes.md) and
@@ -385,10 +391,18 @@ Then one message, after the three layers: the review in one line
 line. The stage closes now: he approved the design when he closed the
 proposal. `.state.md` to `stage: plan`, the close commit of the
 workstream folder (never `report/**/.remotion/`, the video kit's
-browser cache; push only on his word), the doctrine branch merged, and
-suggest `/clear` before stage 3. A veto he sends before stage 3 starts
-is applied by its writer, then the blueprint is rebuilt and
-republished.
+browser cache; push only on his word), the doctrine branch merged. The
+message ends with the next play, and nothing runs until he types it:
+
+```
+/clear
+/model claude-opus-5-5
+/effort high
+/stage-plan <slug>
+```
+
+A veto he sends before he gives that play is applied by its writer,
+then the blueprint is rebuilt and republished.
 
 ## How to write, in every file and every question
 

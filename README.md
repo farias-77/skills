@@ -38,14 +38,38 @@ resume from the workstream's `.state.md`.
 
 ```mermaid
 flowchart LR
-  D1["1 · Discovery<br/>interview + mock + lock"] --> D2["2 · Design<br/>one proposal · the debate"]
-  D2 --> D3["3 · Plan<br/>autonomous graph"]
-  D3 --> PF{{"pre-flight + play"}}
+  D1["1 · Discovery<br/>interview + mock + lock"] -- "his play" --> D2["2 · Design<br/>one proposal · the debate"]
+  D2 -- "his play" --> D3["3 · Plan<br/>autonomous graph"]
+  D3 -- "his play" --> PF{{"pre-flight + goal"}}
   PF --> D4["4 · Execute<br/>local CI queue"]
-  D4 --> D5["5 · Release<br/>under his play"]
-  D5 --> D6["6 · Close<br/>retro + launch video"]
+  D4 -- "his play" --> D5["5 · Release<br/>under his play"]
+  D5 -- "his play" --> D6["6 · Close<br/>retro + launch video"]
   D6 -. "the retro" .-> W["Weekly retro"]
   W -. "changes the pipeline" .-> D1
+```
+
+**Every stage starts on his play.** No stage starts the next one.
+He runs `/clear`, sets the model and effort the stage names, and
+invokes the stage skill with the workstream slug. A stage that needs
+him asks at the start (the discovery interview, the design talk and
+debate, the execute pre-flight, the release play); then it runs on its
+own to its close, and the close ends with the next play: the exact
+lines to type, and nothing runs until he types them.
+
+| Stage | Session | The play |
+|---|---|---|
+| 1 discovery | Opus 5.5, medium (high on the turns that rule) | `/stage-discovery` and the demand |
+| 2 design | Opus 5.5, high | `/stage-design <slug>` |
+| 3 plan | Opus 5.5, high | `/stage-plan <slug>` |
+| 4 execute | Opus 5.5, high | `/stage-execute <slug>` |
+| 5 release | Opus 5.5, medium | `/stage-release <slug>` |
+| 6 close | Opus 5.5, medium | `/stage-close <slug>`; the last stage, no next play |
+
+```
+/clear
+/model claude-opus-5-5
+/effort high
+/stage-plan 2026-08-15-workspace-invites
 ```
 
 **1 · Discovery — the interview builds the mock.** The demand's owner
@@ -78,7 +102,7 @@ Contract per feature), `tests.md` (one primary proof per AC) and
 medium)`, one round, blocking findings only (AC coverage, consistency,
 security posture).
 
-**3 · Plan — no user in the loop, maximum width.** From A (what the
+**3 · Plan — his play, then no user in the loop, maximum width.** From A (what the
 scouts find today and what the other running fronts are changing) to B
 (what the design says exists), as a build graph a script checks
 (`plan.graph.json`). Compute is infinite: one `planner (Opus 5.5,
@@ -90,7 +114,8 @@ high)` writes one brief per entry, all at once; one review round
 (`plan-reviewer (Opus 5.5, medium)` and a `plan-blind-reader (Sonnet
 5.5, low)` per brief, filtered). The conductor rules everything and
 lists its choices for veto; the pre-flight lists what only he can hand
-over, each item with a ready command. Stage 4 waits for his play.
+over, each item with a ready command. It asks him nothing, yet it
+starts only on his play, and stage 4 waits for the next one.
 
 **4 · Execute — play, and come back to use it.** He hands over
 the pre-flight and pastes one goal; he is called once, at the end.

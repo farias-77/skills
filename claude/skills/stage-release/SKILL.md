@@ -110,9 +110,15 @@ progressive when the CI does it that way.
   `blueprint/execution/execution.json` has `closed` set.
 - Every entry is merged or was ruled at the audit.
 
-If any is missing, halt and send the user back to stage 4. If the
-session is not on Opus 5.5 at medium effort, ask him to switch
-(`/model`) and wait.
+If any is missing, halt and send the user back to stage 4.
+
+The stage opens on his invocation (house rule "Every stage starts on
+his play"): `/clear`, `/model claude-opus-5-5`, `/effort medium`,
+`/stage-release <slug>`. That opens the stage; the play below (Step 1)
+is still what authorizes the merge. If the session is not on Opus 5.5
+at medium effort, ask him once to switch (`/model claude-opus-5-5`,
+`/effort medium`) and wait; a non-interactive run goes on with what it
+has and writes one line in `dreaming-notes.md`.
 
 ```
 designs-root/<workstream>/04-release/
@@ -379,7 +385,17 @@ before anything: the failing case, its log, the environment.
 
 Follow `claude/docs/stage-report.md`: slides, then the blueprint, in
 one message by [templates/report.md](templates/report.md). This stage
-makes no video. A later proof read after the report updates
+makes no video. When `.state.md` says `stage: close`, the message ends
+with the next play; while later proofs keep it on `stage: release`, the
+play comes with the update that moves it. The release never starts
+stage 6; nothing runs until he types:
+
+```
+/clear
+/model claude-opus-5-5
+/effort medium
+/stage-close <slug>
+``` A later proof read after the report updates
 `release.json` and the blueprint. The slides are not redone.
 
 ## Migrations: expand in this release, contract in a later one

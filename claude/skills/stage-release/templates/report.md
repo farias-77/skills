@@ -45,4 +45,15 @@ play <hh:mm> → main <hh:mm> → staging + smoke <hh:mm> → candidate → <n>%
 ## Files
 
 - `04-release/trace.md` · `plan.md` · `entries/` · `proof/` · `notes/`
-- `.state.md` → `stage: close` | `stage: release` until <hour> (later proofs). Next: `/clear`, then `/stage-close <slug>`.
+- `.state.md` → `stage: close` | `stage: release` until <hour> (later proofs).
+
+## Next play
+
+Nothing runs until you type it (only when `.state.md` says `stage: close`; until then, this block comes with the update that moves it):
+
+```
+/clear
+/model claude-opus-5-5
+/effort medium
+/stage-close <slug>
+```

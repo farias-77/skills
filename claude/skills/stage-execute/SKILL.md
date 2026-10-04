@@ -32,7 +32,11 @@ each merged head off and the whole gate signs off the top once.
 The session is the orchestrator, **Opus 5.5 at high effort**. It does
 not write product code and does not review it. The user hands over the
 pre-flight, pastes one goal and leaves; the session calls him once, at
-the end, to use the app himself. **Stage 5 assumes everything is
+the end, to use the app himself. The stage starts on his play (house
+rule "Every stage starts on his play"): `/clear`,
+`/model claude-opus-5-5`, `/effort high`, `/stage-execute <slug>`; the
+pre-flight and the goal are its interaction at the start. It never
+starts stage 5. **Stage 5 assumes everything is
 implemented and working**: what he wants changed is built here.
 
 ## The pipeline of one entry
@@ -140,8 +144,10 @@ designs-root/<workstream>/
 
 ## Step 0 — pre-flight, then play
 
-If the session is not on **Opus 5.5 at high effort**, ask the user to
-switch (`/model`) and wait. Read `plan.md`, `plan.graph.json`,
+If the session is not on **Opus 5.5 at high effort**, ask the user
+once to switch (`/model claude-opus-5-5`, `/effort high`) and wait; a
+non-interactive run goes on with what it has and writes one line in
+`dreaming-notes.md`. Read `plan.md`, `plan.graph.json`,
 `graph.json`, `preflight.md`, the pipeline's `docs/project-contract.md`
 and the project's `CLAUDE.md`; the briefs, the recon and the doctrine
 are read by the agents that use them.
@@ -432,7 +438,18 @@ changed, if he has not at the hands-on. Each ruling goes next to its
 item in `audit.md`, in `execution.json` and in `rulings.md`. A "fix"
 becomes one fix entry `X.<n>` through exec-entry, like any other code.
 When he approves: `.state.md` to `stage: release`, the close commit of
-the workstream folder, and suggest `/clear` before stage 5.
+the workstream folder, and one message that ends with the next play.
+Nothing runs until he types it:
+
+```
+/clear
+/model claude-opus-5-5
+/effort medium
+/stage-release <slug>
+```
+
+The release's own play (the pre-flight and the line that authorizes
+the merge) comes inside stage 5, at its Step 1.
 
 ## Resuming
 

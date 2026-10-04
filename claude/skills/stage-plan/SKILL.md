@@ -22,8 +22,11 @@ cannot be faked.
 **No user in the loop.** The conductor rules everything alone and
 records each choice ("Decided in his place" in `plan.md`, `ruled:
 conductor` in `rulings.md`). What only he can do in person (a key, an
-account, an access) is gathered into one prerequisites list. Stage 4
-waits for his play.
+account, an access) is gathered into one prerequisites list. The plan
+asks him nothing, but it starts only on his play (house rule "Every
+stage starts on his play"): `/clear`, `/model claude-opus-5-5`,
+`/effort high`, `/stage-plan <slug>`. It never starts stage 4: its
+close gives him the execute play, and stage 4 waits for it.
 
 The method is the pack **`pack-parallel-plan-local-ci`**; load it with
 the Skill tool at the open.
@@ -74,7 +77,7 @@ P3 review    plan-review, one round: plan-reviewer (Opus 5.5, medium)
              ∥ plan-blind-reader (Sonnet 5.5, low) × each brief, filtered
              → you rule, the owners apply, you verify by reading
 P4 close     blueprint JSON → build → video (the graph, the start order) → slides
-             → the checker pinned → stage: execute → /clear
+             → the checker pinned → stage: execute → the next play
 ```
 
 ## The team
@@ -118,9 +121,10 @@ Missing any: halt, back to the stage that owns it.
 
 ## Step 0 — open
 
-If the session is not on **Opus 5.5 at high effort**, ask for the
-switch (`/model`); a non-interactive run continues on its model and
-writes one line in `dreaming-notes.md`. Create `02-plan/telemetry.json`
+If the session is not on **Opus 5.5 at high effort**, ask him once for
+the switch (`/model claude-opus-5-5`, `/effort high`) and wait; a
+non-interactive run continues on its model and effort and writes one
+line in `dreaming-notes.md`. Create `02-plan/telemetry.json`
 with `openedAt` and the session's model
 ([claude/docs/telemetry.md](../../docs/telemetry.md)) and add a step
 row as each of P0–P4 ends. Load `pack-parallel-plan-local-ci`. Read
@@ -267,8 +271,18 @@ no second round.
 5. **The message**: the three links; the graph as a flow in a code
    block with the critical path marked; the start order; the decisions
    taken in his place, one line each; the prerequisites (item · blocks
-   · `!` command); the telemetry in one line. Then: stage 4 starts on
-   his play, after `/clear`.
+   · `!` command); the telemetry in one line. Last, the next play, and
+   nothing runs until he types it:
+
+   ```
+   /clear
+   /model claude-opus-5-5
+   /effort high
+   /stage-execute <slug>
+   ```
+
+   The execute stage shows the pre-flight first and, once it is handed
+   over, gives him its `/goal` text to paste (stage-execute, Step 0).
 
 A change he asks for after the report is an amendment: the planner
 changes the graph, the checker green and pinned again, the writers
