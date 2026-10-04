@@ -12,8 +12,9 @@ Read it before you write or judge a design: the proposal, its cuts,
 its evolution path, or a review asking "does this need to exist?".
 Readers: `architect (Opus 5.5, high)`, `overengineering-critic (Opus
 5.5, medium)` and the design conductor `(Opus 5.5, high)`; at stage 3,
-the plan's writers and lenses size a node the same way; at stage 4,
-`builder` holds list C.
+`planner (Opus 5.5, high)` and `plan-reviewer (Opus 5.5, medium)` size
+a node the same way; at stage 4, `builder (Opus 5.5, medium)` holds
+list C.
 
 **The bar is "basics done well":** the simplest design that meets
 every acceptance criterion and the whole floor (list D), built from
@@ -211,7 +212,7 @@ a status column and one guard would do.
    notices it.
 4. **Give care where the score forces it** (R2), and nowhere else.
 5. **Write what was relaxed** as the evolution path (B1, B2).
-6. **Cut.** `overengineering-critic` runs list C; the architect applies
+6. **Cut.** `overengineering-critic (Opus 5.5, medium)` runs list C; the architect applies
    or rebuts each cut with the requirement the mechanism serves.
 
 ### R2 · Where care goes
