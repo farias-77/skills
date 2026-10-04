@@ -1,0 +1,24 @@
+{
+  "doc": "solution",
+  "intro": "An admin invites a person by e-mail; the person opens the link and joins the workspace. Everything runs inside the existing API and web app: one table, two routes, one e-mail.",
+  "worthALook": [ "The e-mail is sent inside the request, with three tries; there is no queue." ],
+  "latitude": [ "The wording of validation messages that are not business rules." ],
+  "figure": { "mermaid": "flowchart LR\n  web[\"web app\"] -- \"POST /invites\" --> api[\"API · invites\"]\n  api -- \"writes\" --> db[(\"invites table\")]\n  api -- \"sends\" --> mail[\"e-mail provider\"]\n  link[\"invite link\"] -- \"POST /invites/accept\" --> api", "caption": "One module in the API, one table, one call to the e-mail provider." },
+  "parts": [
+    { "name": "invites use case", "runsWhere": "api", "does": "creates, resends and accepts invites" },
+    { "name": "Invites page", "runsWhere": "web app", "does": "the form and the pending list" }
+  ],
+  "flows": [
+    { "id": "send-invite", "name": "Send an invite", "stories": ["S-001"],
+      "happens": "The admin submits an e-mail. The API checks the admin's role, refuses a member's e-mail, and writes a pending invite valid for seven days. It sends the e-mail with three tries in about five seconds.",
+      "goesWrong": "When the provider is down, the invite stays pending and the list shows `not sent yet`. A second submit of the same e-mail resends the first invite instead of creating another.",
+      "look": "The resend on a repeat: one pending invite per e-mail and workspace." },
+    { "id": "accept-invite", "name": "Accept an invite", "stories": ["S-002"],
+      "happens": "The person opens the link. The API finds the invite by its hashed token, checks it is pending and not expired, adds the member and marks the invite accepted, in one transaction.",
+      "goesWrong": "An expired or used link shows the expired screen and changes nothing.",
+      "look": "The token is stored hashed; the link carries the only copy." }
+  ],
+  "screens": [ { "name": "Invites · pending", "route": "/settings/invites", "stories": ["S-001"], "whatsNew": "A form and the list of pending invites, each with its state." } ],
+  "security": [ { "topic": "who can invite", "how": "admins only, checked in the use case" }, { "topic": "the token", "how": "32 random bytes, stored hashed, valid seven days" } ],
+  "evolution": [ { "relaxed": "e-mail sent inside the request", "signal": "more than 5% of sends fail in a day", "add": "a queue with a dead-letter alarm", "cost": "1 day" } ]
+}

@@ -161,198 +161,156 @@
  "design": {
   "sec": {
    "what": "O que estamos construindo",
-   "size": "O tamanho",
-   "architecture": "Arquitetura",
-   "data": "Modelo de dados",
-   "contracts": "Contratos",
-   "ui": "Telas",
-   "security": "Segurança",
-   "infra": "Infraestrutura",
-   "observability": "Alarmes e painéis",
-   "rollout": "Como chega em produção",
-   "code": "Código",
-   "acceptance": "O que prova que funciona",
+   "proposal": "A proposta e o debate",
+   "solution": "A solução",
+   "data": "Dados e contratos",
+   "tests": "O que prova que funciona",
+   "operations": "Como vai para produção e é vigiado",
    "review": "A revisão"
   },
   "cells": {
+   "parts": "partes",
    "flows": "fluxos",
-   "components": "componentes",
-   "alarms": "alarmes que acordam alguém",
-   "alarmsTail": "de {n} alarmes no total",
+   "contracts": "contratos",
+   "tables": "tabelas",
+   "proofs": "critérios de aceitação provados",
+   "relaxed": "coisas relaxadas",
+   "relaxedTail": "cada uma com o que somar se crescer",
    "cards": "decisões registradas",
    "against": "contra a recomendação",
-   "cost": "por mês, hoje",
-   "costTail": "teto aceito: {e}",
-   "cases": "casos de aceitação",
-   "groups": "grupos",
-   "latitude": "pontos que o implementador decide"
+   "latitude": "pontos que o implementador decide",
+   "alarms": "alarmes"
   },
   "happens": "O que acontece",
   "goesWrong": "Quando dá errado",
   "look": "Vale um olhar",
-  "mechanisms": "Os mecanismos que guardam uma regra",
-  "mech": {
-   "name": "Mecanismo",
-   "rule": "A regra que ele guarda",
-   "ifFails": "Se ele falhar"
+  "latitude": "O implementador decide",
+  "docFull": "O documento inteiro · {f}",
+  "debate": {
+   "lede": "Uma proposta, debatida com o usuário até ele fechar. O que ele tinha em mente, onde o arquiteto discordou, o que mudou em cada rodada.",
+   "hisIdea": "O que ele tinha em mente",
+   "rounds": "As rodadas",
+   "round": "Rodada",
+   "date": "Data",
+   "changed": "O que mudou",
+   "closed": "Fechada em"
   },
-  "components": "Os componentes",
-  "comp": {
-   "name": "Componente",
+  "dis": {
+   "title": "Onde o arquiteto discordou",
+   "said": "Ele disse",
+   "proposed": "O arquiteto propôs",
+   "why": "Por quê",
+   "settled": "Como foi resolvido",
+   "none": "O arquiteto seguiu a ideia dele; nenhuma discordância."
+  },
+  "cut": {
+   "title": "O que o crítico cortou",
+   "mechanism": "Mecanismo",
+   "outcome": "Resultado",
+   "why": "Por quê",
+   "applied": "cortado",
+   "rebutted": "mantido",
+   "none": "O crítico não achou nada para cortar."
+  },
+  "evolution": "O que muda se crescer",
+  "evo": {
+   "relaxed": "Relaxado agora",
+   "signal": "Se isto acontecer",
+   "add": "Somar",
+   "cost": "Custo",
+   "none": "Nada foi relaxado."
+  },
+  "screens": "As telas",
+  "scr": {
+   "name": "Tela",
+   "route": "Rota",
+   "whatsNew": "O que é novo"
+  },
+  "security": "Postura de segurança",
+  "sca": {
+   "topic": "Tema",
+   "how": "Como"
+  },
+  "parts": "As partes",
+  "part": {
+   "name": "Parte",
    "runsWhere": "Roda onde",
    "does": "O que faz"
   },
-  "extensions": "Pontos de extensão",
-  "ext": {
-   "when": "Quando",
-   "what": "O que muda",
-   "unchanged": "O que não muda"
-  },
-  "latitude": "O implementador decide",
-  "docFull": "O documento inteiro · {f}",
-  "ent": {
-   "name": "Entidade",
-   "key": "Chave",
-   "holds": "O que guarda",
-   "retention": "Retenção"
-  },
-  "access": "O que cada tela ou job precisa ler",
-  "acc": {
-   "need": "Precisa de",
-   "how": "Como lê"
-  },
+  "dataLede": "Os contratos são o que deixa front e back serem construídos em paralelo: cada funcionalidade tem rota, requisição, resposta e erros num lugar só.",
+  "contracts": "Os contratos",
   "ct": {
-   "kind": "Tipo",
-   "name": "Contrato",
+   "feature": "Funcionalidade",
+   "routes": "Rotas",
    "caller": "Quem chama",
    "returns": "Devolve",
    "errors": "Erros"
   },
-  "kinds": {
-   "route": "rota",
-   "event": "evento",
-   "table": "tabela"
+  "tables": "As tabelas",
+  "tb": {
+   "name": "Tabela",
+   "key": "Chave",
+   "holds": "O que guarda"
   },
-  "artboard": "Ver a prancheta",
-  "reused": "O que já existe e é reaproveitado",
-  "noArtboard": "sem prancheta própria",
-  "sweep": {
-   "cls": "Classe",
-   "verdict": "Veredito",
-   "how": "Como"
+  "migrations": "As migrações",
+  "testsLede": "Cada critério de aceitação da descoberta, com a camada de teste que o prova.",
+  "tp": {
+   "ac": "Critério",
+   "layer": "Camada",
+   "proves": "A prova"
   },
-  "verdicts": {
-   "covered": "coberto",
-   "accepted": "risco aceito",
-   "n/a": "não se aplica"
+  "layers": {
+   "unit": "unidade",
+   "api": "API",
+   "journey": "jornada"
   },
-  "abuse": "Caminhos de abuso",
-  "ab": {
-   "stops": "O que barra"
+  "gate": "Antes do próximo passo",
+  "flags": "Flags",
+  "fl": {
+   "name": "Flag",
+   "guards": "Protege",
+   "default": "Padrão"
   },
-  "resources": "Recurso",
-  "res": {
-   "why": "Para quê",
-   "rule": "A config que codifica uma regra ou um custo"
-  },
-  "bill": "A conta mensal",
-  "billLine": "Linha",
-  "fixed": "Fixo",
-  "variable": "Variável",
-  "total": "Total",
-  "envelope": "Teto aceito",
-  "wayIn": "Como entra em produção",
+  "alarms": "Alarmes que acordam alguém",
+  "noAlarms": "Nenhum alarme novo: nada no caminho principal falha de um jeito novo.",
   "al": {
    "fires": "Toca quando",
    "wakes": "Acorda",
    "do": "O que fazer"
   },
-  "quiet": "não acorda ninguém",
-  "watched": "O que é olhado e nunca acorda ninguém",
-  "gate": "Antes do próximo passo",
   "wayBack": "O caminho de volta",
-  "firstRun": "A primeira execução",
-  "isNew": "repo novo",
-  "existing": "repo existente",
-  "changes": "O que muda",
-  "unchanged": "O que não muda",
-  "seams": "As costuras",
-  "groups": {
-   "group": "Grupo",
-   "count": "Casos",
-   "how": "Como roda",
-   "proves": "O que prova"
+  "runCost": "Quanto custa rodar",
+  "areas": {
+   "coverage": "cobertura",
+   "consistency": "consistência",
+   "security": "segurança"
   },
-  "decLede": "Cada decisão em três linhas: a pergunta, a escolha, o porquê. As outras opções ficam atrás do clique. As marcadas na borda foram contra a recomendação do condutor.",
-  "docNames": {
-   "macro": "A forma macro",
-   "architecture": "Arquitetura",
-   "data-model": "Modelo de dados",
-   "contracts": "Contratos",
-   "ui": "Telas",
-   "security": "Segurança",
-   "infra": "Infraestrutura",
-   "observability": "Alarmes e painéis",
-   "rollout": "Rollout",
-   "code": "Código",
-   "acceptance": "Aceitação"
+  "fixedBy": {
+   "conductor": "corrigido pelo condutor",
+   "writer": "corrigido pelo redator",
+   "implementer": "deixado ao implementador",
+   "his": "decidido no lugar dele"
   },
+  "rev": {
+   "sustained": "mantidos",
+   "verified": "critérios verificados",
+   "sustainedList": "Mantidos e corrigidos",
+   "clean": "O revisor não achou nada que bloqueie.",
+   "sizes": "O tamanho dos documentos",
+   "doc": "Documento"
+  },
+  "decisionsOf": "As decisões deste documento",
   "when": {
-   "session": "sessão",
-   "author": "pergunta do autor",
-   "round 1": "round 1",
-   "round 2": "round 2",
-   "approval": "aprovação",
-   "plan": "no plano",
-   "execution": "na execução"
+   "talk": "a conversa",
+   "debate": "o debate",
+   "writer": "pergunta de um redator",
+   "review": "a revisão",
+   "veto": "o veto"
   },
   "againstPill": "contra a recomendação",
   "options": "As opções",
   "recommended": "recomendada",
-  "rev": {
-   "conductor": "decididos pelo condutor",
-   "forPlan": "Vai para o plano"
-  },
-  "decisionsOf": "As decisões deste documento",
-  "picked": "escolhida",
-  "size": {
-   "lede": "Cada parte foi desenhada de três jeitos, enxuto, equilibrado e reforçado, e um nível escolhido por parte pelo risco, pela reversibilidade e pelo custo. Enxuto onde nada força mais.",
-   "cells": {
-    "pick": "a escolha, em horas de construção",
-    "pickTail": "contra um apetite de {a} h",
-    "acceptedTail": "{b} h aceitas pelo usuário",
-    "runCost": "custo de operação por mês",
-    "above": "partes acima do enxuto",
-    "aboveTail": "cada uma cita a nota que a forçou",
-    "doors": "portas de mão única",
-    "doorsTail": "{n} foram decisão sua"
-   },
-   "tiers": {
-    "lean": "enxuto",
-    "balanced": "equilibrado",
-    "hardened": "reforçado"
-   },
-   "noGos": "Fora deste tamanho",
-   "side": "Os três níveis, lado a lado",
-   "picks": "A escolha, por parte",
-   "doors": "As portas de mão única",
-   "evolution": "O caminho de evolução: o que sobe uma parte de nível, e quando",
-   "part": "Parte",
-   "tier": "Nível",
-   "rvc": "R V C",
-   "why": "Por quê",
-   "total": "Total",
-   "noChoice": "sem escolha: igual em todos os níveis",
-   "now": "Agora",
-   "signal": "Sinal",
-   "watchedBy": "vigiado por",
-   "next": "Próximo",
-   "cost": "Custo",
-   "his": "decisão sua · {q}",
-   "notHis": "não é sua",
-   "noDoors": "Nenhuma porta de mão única.",
-   "noEvolution": "Nenhuma linha de evolução: nenhuma parte enxuta tem risco 2 ou mais."
-  }
+  "picked": "escolhida"
  },
  "modalClose": "Fechar",
  "plan": {

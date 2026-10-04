@@ -161,198 +161,156 @@
  "design": {
   "sec": {
    "what": "What we are building",
-   "size": "The size",
-   "architecture": "Architecture",
-   "data": "Data model",
-   "contracts": "Contracts",
-   "ui": "Screens",
-   "security": "Security",
-   "infra": "Infrastructure",
-   "observability": "Alarms and dashboards",
-   "rollout": "How it reaches production",
-   "code": "Code",
-   "acceptance": "What proves it works",
+   "proposal": "The proposal and the debate",
+   "solution": "The solution",
+   "data": "Data and contracts",
+   "tests": "What proves it works",
+   "operations": "How it ships and is watched",
    "review": "The review"
   },
   "cells": {
+   "parts": "parts",
    "flows": "flows",
-   "components": "components",
-   "alarms": "alarms that wake someone",
-   "alarmsTail": "of {n} alarms in total",
+   "contracts": "contracts",
+   "tables": "tables",
+   "proofs": "acceptance criteria proved",
+   "relaxed": "things relaxed",
+   "relaxedTail": "each with what to add if it grows",
    "cards": "decisions recorded",
    "against": "against the recommendation",
-   "cost": "per month, today",
-   "costTail": "accepted ceiling: {e}",
-   "cases": "acceptance cases",
-   "groups": "groups",
-   "latitude": "points the implementer decides"
+   "latitude": "points the implementer decides",
+   "alarms": "alarms"
   },
   "happens": "What happens",
   "goesWrong": "When it goes wrong",
   "look": "Worth a look",
-  "mechanisms": "The mechanisms that guard a rule",
-  "mech": {
-   "name": "Mechanism",
-   "rule": "The rule it guards",
-   "ifFails": "If it fails"
+  "latitude": "The implementer decides",
+  "docFull": "The whole document · {f}",
+  "debate": {
+   "lede": "One proposal, debated with the user until he closed it. What he had in mind, where the architect disagreed, what changed each round.",
+   "hisIdea": "What he had in mind",
+   "rounds": "The rounds",
+   "round": "Round",
+   "date": "Date",
+   "changed": "What changed",
+   "closed": "Closed on"
   },
-  "components": "The components",
-  "comp": {
-   "name": "Component",
+  "dis": {
+   "title": "Where the architect disagreed",
+   "said": "He said",
+   "proposed": "The architect proposed",
+   "why": "Why",
+   "settled": "How it was settled",
+   "none": "The architect followed his idea; no disagreement."
+  },
+  "cut": {
+   "title": "What the critic cut",
+   "mechanism": "Mechanism",
+   "outcome": "Outcome",
+   "why": "Why",
+   "applied": "cut",
+   "rebutted": "kept",
+   "none": "The critic found nothing to cut."
+  },
+  "evolution": "What changes if it grows",
+  "evo": {
+   "relaxed": "Relaxed now",
+   "signal": "If this happens",
+   "add": "Add",
+   "cost": "Cost",
+   "none": "Nothing was relaxed."
+  },
+  "screens": "The screens",
+  "scr": {
+   "name": "Screen",
+   "route": "Route",
+   "whatsNew": "What is new"
+  },
+  "security": "Security posture",
+  "sca": {
+   "topic": "Topic",
+   "how": "How"
+  },
+  "parts": "The parts",
+  "part": {
+   "name": "Part",
    "runsWhere": "Runs where",
    "does": "What it does"
   },
-  "extensions": "Extension points",
-  "ext": {
-   "when": "When",
-   "what": "What changes",
-   "unchanged": "What does not"
-  },
-  "latitude": "The implementer decides",
-  "docFull": "The whole document · {f}",
-  "ent": {
-   "name": "Entity",
-   "key": "Key",
-   "holds": "What it holds",
-   "retention": "Retention"
-  },
-  "access": "What each screen or job needs to read",
-  "acc": {
-   "need": "Needs",
-   "how": "How it reads"
-  },
+  "dataLede": "The contracts are what lets the front and the back be built in parallel: each feature has its route, request, response and errors in one place.",
+  "contracts": "The contracts",
   "ct": {
-   "kind": "Kind",
-   "name": "Contract",
+   "feature": "Feature",
+   "routes": "Routes",
    "caller": "Who calls",
    "returns": "Returns",
    "errors": "Errors"
   },
-  "kinds": {
-   "route": "route",
-   "event": "event",
-   "table": "table"
+  "tables": "The tables",
+  "tb": {
+   "name": "Table",
+   "key": "Key",
+   "holds": "What it holds"
   },
-  "artboard": "See the artboard",
-  "reused": "What already exists and is reused",
-  "noArtboard": "no artboard of its own",
-  "sweep": {
-   "cls": "Class",
-   "verdict": "Verdict",
-   "how": "How"
+  "migrations": "The migrations",
+  "testsLede": "Every acceptance criterion of the discovery, with the one test layer that proves it.",
+  "tp": {
+   "ac": "Criterion",
+   "layer": "Layer",
+   "proves": "The proof"
   },
-  "verdicts": {
-   "covered": "covered",
-   "accepted": "risk accepted",
-   "n/a": "not applicable"
+  "layers": {
+   "unit": "unit",
+   "api": "API",
+   "journey": "journey"
   },
-  "abuse": "Abuse paths",
-  "ab": {
-   "stops": "What stops it"
+  "gate": "Before the next step",
+  "flags": "Flags",
+  "fl": {
+   "name": "Flag",
+   "guards": "Guards",
+   "default": "Default"
   },
-  "resources": "Resource",
-  "res": {
-   "why": "What for",
-   "rule": "The config that encodes a rule or a cost"
-  },
-  "bill": "The monthly bill",
-  "billLine": "Line",
-  "fixed": "Fixed",
-  "variable": "Variable",
-  "total": "Total",
-  "envelope": "Accepted ceiling",
-  "wayIn": "How it reaches production",
+  "alarms": "Alarms that wake someone",
+  "noAlarms": "No new alarm: nothing on the main path fails in a new way.",
   "al": {
    "fires": "Fires when",
    "wakes": "Wakes",
    "do": "What to do"
   },
-  "quiet": "wakes nobody",
-  "watched": "What is watched and never wakes anyone",
-  "gate": "Before the next step",
   "wayBack": "The way back",
-  "firstRun": "The first run",
-  "isNew": "new repo",
-  "existing": "existing repo",
-  "changes": "What changes",
-  "unchanged": "What does not change",
-  "seams": "The seams",
-  "groups": {
-   "group": "Group",
-   "count": "Cases",
-   "how": "Runs as",
-   "proves": "What it proves"
+  "runCost": "What it costs to run",
+  "areas": {
+   "coverage": "coverage",
+   "consistency": "consistency",
+   "security": "security"
   },
-  "decLede": "Every decision in three lines: the question, the pick, the why. The other options sit behind the click. The ones marked on the edge went against the conductor's recommendation.",
-  "docNames": {
-   "macro": "The macro shape",
-   "architecture": "Architecture",
-   "data-model": "Data model",
-   "contracts": "Contracts",
-   "ui": "Screens",
-   "security": "Security",
-   "infra": "Infrastructure",
-   "observability": "Alarms and dashboards",
-   "rollout": "Rollout",
-   "code": "Code",
-   "acceptance": "Acceptance"
+  "fixedBy": {
+   "conductor": "fixed by the conductor",
+   "writer": "fixed by the writer",
+   "implementer": "left to the implementer",
+   "his": "ruled in his place"
   },
+  "rev": {
+   "sustained": "sustained",
+   "verified": "criteria checked",
+   "sustainedList": "Sustained and fixed",
+   "clean": "The reviewer found nothing that blocks.",
+   "sizes": "The size of the documents",
+   "doc": "Document"
+  },
+  "decisionsOf": "The decisions of this document",
   "when": {
-   "session": "session",
-   "author": "author's question",
-   "round 1": "round 1",
-   "round 2": "round 2",
-   "approval": "approval",
-   "plan": "at plan",
-   "execution": "at execution"
+   "talk": "the talk",
+   "debate": "the debate",
+   "writer": "a writer's question",
+   "review": "the review",
+   "veto": "the veto"
   },
   "againstPill": "against the recommendation",
   "options": "The options",
   "recommended": "recommended",
-  "rev": {
-   "conductor": "ruled by the conductor",
-   "forPlan": "Goes to the plan"
-  },
-  "decisionsOf": "The decisions of this document",
-  "picked": "chosen",
-  "size": {
-   "lede": "Every part was drawn three ways, lean, balanced and hardened, and one tier picked per part on risk, reversibility and cost. Lean wherever nothing forces more.",
-   "cells": {
-    "pick": "the pick, in build hours",
-    "pickTail": "against an appetite of {a} h",
-    "acceptedTail": "{b} h accepted by the user",
-    "runCost": "run cost a month",
-    "above": "parts above lean",
-    "aboveTail": "each one cites the score that forced it",
-    "doors": "one-way doors",
-    "doorsTail": "{n} were your call"
-   },
-   "tiers": {
-    "lean": "lean",
-    "balanced": "balanced",
-    "hardened": "hardened"
-   },
-   "noGos": "Not in this size",
-   "side": "The three tiers, side by side",
-   "picks": "The pick, per part",
-   "doors": "The one-way doors",
-   "evolution": "The evolution path: what moves a part up, and when",
-   "part": "Part",
-   "tier": "Tier",
-   "rvc": "R V C",
-   "why": "Why",
-   "total": "Total",
-   "noChoice": "no choice: the same in every tier",
-   "now": "Now",
-   "signal": "Signal",
-   "watchedBy": "watched by",
-   "next": "Next",
-   "cost": "Cost",
-   "his": "your call · {q}",
-   "notHis": "not yours",
-   "noDoors": "No one-way door.",
-   "noEvolution": "No evolution row: no lean part carries a risk of 2 or more."
-  }
+  "picked": "chosen"
  },
  "modalClose": "Close",
  "plan": {

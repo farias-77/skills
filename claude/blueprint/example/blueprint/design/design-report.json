@@ -1,0 +1,12 @@
+{
+  "inOneSentence": "An admin invites a person by e-mail, and the person joins with one click.",
+  "figure": { "mermaid": "flowchart LR\n  admin[\"admin\"] -- \"invites\" --> api[\"API\"]\n  api -- \"e-mail\" --> person[\"person\"]\n  person -- \"accepts\" --> api", "caption": "The whole feature in one picture." },
+  "threeThings": [
+    { "t": "One table, two routes", "p": "Everything lives in the existing API and web app. Nothing new to run." },
+    { "t": "The e-mail is sent in the request", "p": "Three tries, then the invite shows as not sent. A queue is the next step if sends start failing." },
+    { "t": "The link is the only key", "p": "The token is stored hashed and expires in seven days." }
+  ],
+  "needsYourEye": [ { "t": "No queue for the e-mail", "p": "A failed send waits for the admin to resend. The evolution path names when to add a queue." } ],
+  "costPlain": "Under a dollar a month today.",
+  "reviewPlain": "One reviewer, one round. One finding was sustained and fixed by the conductor; none was dismissed."
+}

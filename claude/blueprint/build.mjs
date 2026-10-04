@@ -14,8 +14,8 @@
 //        <workstream-dir>/blueprint/close/retro.json when stage 6 ran (one file by the session: the numbers, the precision per
 //        reviewer, what worked, what went wrong, the ideas with their evidence, the user's notes, the sweep), read only against a
 //        closed release
-//        <workstream-dir>/blueprint/design/*.json when stage 2 ran (one per document + decisions, design-report, design-review;
-//        sizing optional; the documents themselves and the artboards are embedded from 01-design/)
+//        <workstream-dir>/blueprint/design/*.json when stage 2 ran (one per document: solution, data-and-contracts, tests,
+//        operations; plus proposal, decisions, design-report, design-review; the documents are embedded from 01-design/)
 //        <workstream-dir>/blueprint/stage-report.json when a stage closed with its video and slides (docs/stage-report.md):
 //        per tab, the video's path (relative to the workstream, published beside the page) and the slides' link
 // writes <workstream-dir>/blueprint.html
@@ -113,14 +113,14 @@ const inlineImages = (html, dir) => html.replace(/(src=["'])(?:\.\/)?([\w.-]+\.(
   return `${a}data:${MIME[ext.toLowerCase()]};base64,${readFileSync(p).toString('base64')}${z}`;
 });
 
-// ---- stage 2: one JSON per document, the documents embedded whole, the artboards embedded ----
-const DOCS = ['architecture', 'data-model', 'contracts', 'ui', 'security', 'infra', 'observability', 'rollout', 'code', 'acceptance'];
+// ---- stage 2 (schema/design.md): one JSON per document, the documents embedded whole; the conductor's proposal, decisions, report, review ----
+const DOCS = ['solution', 'data-and-contracts', 'tests', 'operations'];
 const designDir = join(dataDir, 'design');
 let design = null;
 if (existsSync(designDir)) {
   const dread = f => JSON.parse(readFileSync(join(designDir, f), 'utf8'));
   const dopt = f => existsSync(join(designDir, f)) ? dread(f) : null;
-  const docs = {}, mdDocs = {}, artboards = {};
+  const docs = {}, mdDocs = {};
   DOCS.forEach(k => {
     if (!existsSync(join(designDir, `${k}.json`))) { problems.push(`design/${k}.json: missing`); return; }
     docs[k] = dread(`${k}.json`);
@@ -128,36 +128,71 @@ if (existsSync(designDir)) {
     const mdPath = join(ws, '01-design', `${k}.md`);
     if (existsSync(mdPath)) mdDocs[k] = readFileSync(mdPath, 'utf8'); else problems.push(`01-design/${k}.md: missing (the tab embeds it whole)`);
   });
-  const dreport = dopt('design-report.json'), dreview = dopt('design-review.json') || { rounds: [] }, decisions = dopt('decisions.json') || [];
+  const lst = (v, name, W) => { if (v === undefined) return []; if (!Array.isArray(v)) { problems.push(`${W}: ${name} must be a list`); return []; } return v; };
+  const storiesOk = (list, w) => lst(list, 'stories', w).forEach(sid => { if (!ids.has(sid)) problems.push(`${w}: story ${sid} does not exist`); });
+  const dreport = dopt('design-report.json'), dreview = dopt('design-review.json') || {}, decisions = dopt('decisions.json') || [], proposal = dopt('proposal.json');
   if (!dreport) problems.push('design/design-report.json: missing'); else {
-    need(dreport, ['inOneSentence', 'figure', 'threeThings', 'needsYourEye', 'costPlain', 'latitudePlain', 'reviewPlain'], 'design-report.json');
+    need(dreport, ['inOneSentence', 'figure', 'threeThings', 'needsYourEye', 'reviewPlain'], 'design-report.json');
     if ((dreport.threeThings || []).length !== 3) problems.push('design-report.json: threeThings must have exactly three items');
   }
-  if (docs.architecture) {
-    if (!docs.architecture.figure?.mermaid) problems.push('design/architecture.json: figure.mermaid is required (the one picture)');
-    need(docs.architecture, ['components', 'flows', 'mechanisms'], 'design/architecture.json');
-    (docs.architecture.flows || []).forEach(f => { need(f, ['id', 'name', 'happens', 'goesWrong', 'look'], `flow ${f.id}`); (f.stories || []).forEach(sid => { if (!ids.has(sid)) problems.push(`flow ${f.id}: story ${sid} does not exist`); }); });
+  const SO = docs.solution, DC = docs['data-and-contracts'], TE = docs.tests, OP = docs.operations;
+  if (SO) {
+    const W = 'design/solution.json';
+    if (!SO.figure?.mermaid) problems.push(`${W}: figure.mermaid is required (the one picture)`);
+    need(SO, ['parts', 'flows', 'evolution'], W);
+    lst(SO.parts, 'parts', W).forEach((p, i) => need(p, ['name', 'runsWhere', 'does'], `${W} parts[${i + 1}]`));
+    lst(SO.flows, 'flows', W).forEach(f => { need(f, ['id', 'name', 'happens', 'goesWrong', 'look'], `flow ${f.id}`); storiesOk(f.stories, `flow ${f.id}`); });
+    lst(SO.screens, 'screens', W).forEach(sc => { need(sc, ['name', 'whatsNew'], `screen ${sc.name}`); storiesOk(sc.stories, `screen ${sc.name}`); });
+    lst(SO.security, 'security', W).forEach((x, i) => need(x, ['topic', 'how'], `${W} security[${i + 1}]`));
+    lst(SO.evolution, 'evolution', W).forEach((x, i) => need(x, ['relaxed', 'signal', 'add', 'cost'], `${W} evolution[${i + 1}]`));
   }
-  if (docs['data-model']) { if (!docs['data-model'].figure?.mermaid) problems.push('design/data-model.json: figure.mermaid is required'); need(docs['data-model'], ['entities', 'access'], 'design/data-model.json'); }
-  if (docs.contracts) need(docs.contracts, ['endpoints'], 'design/contracts.json');
-  if (docs.ui) { need(docs.ui, ['screens'], 'design/ui.json'); (docs.ui.screens || []).forEach(sc => {
-    (sc.stories || []).forEach(sid => { if (!ids.has(sid)) problems.push(`screen ${sc.name}: story ${sid} does not exist`); });
-    if (sc.file) { const p = join(ws, '01-design', sc.file); if (existsSync(p)) artboards[sc.file] = inlineImages(readFileSync(p, 'utf8'), dirname(p)); else problems.push(`screen ${sc.name}: artboard ${sc.file} not found under 01-design/`); } }); }
-  if (docs.security) need(docs.security, ['sweep'], 'design/security.json');
-  if (docs.infra) { need(docs.infra, ['resources', 'bill'], 'design/infra.json'); const b = docs.infra.bill || {};
-    if (b.scales) { const n = b.scales.length; [...(b.fixed || []), ...(b.variable || [])].forEach(l => { if (!Array.isArray(l.v) || l.v.length !== n) problems.push(`infra bill line "${l.name}": v must have ${n} numbers`); });
-      if ((b.totals || []).length !== n) problems.push(`infra bill: totals must have ${n} numbers`); if ((b.envelope || []).length !== n) problems.push(`infra bill: envelope must have ${n} numbers`); } }
-  if (docs.observability) { need(docs.observability, ['alarms'], 'design/observability.json'); (docs.observability.alarms || []).forEach(a => need(a, ['name', 'firesWhen', 'wakes', 'doWhat'], `alarm ${a.name}`)); }
-  if (docs.rollout) need(docs.rollout, ['order', 'wayBack'], 'design/rollout.json');
-  if (docs.code) need(docs.code, ['repos'], 'design/code.json');
-  if (docs.acceptance) need(docs.acceptance, ['groups'], 'design/acceptance.json');
+  if (DC) {
+    const W = 'design/data-and-contracts.json';
+    need(DC, ['contracts'], W);
+    lst(DC.contracts, 'contracts', W).forEach((c, i) => { need(c, ['feature', 'routes', 'caller', 'returns', 'errors'], `${W} contracts[${i + 1}]`); if (c.routes !== undefined && !(Array.isArray(c.routes) && c.routes.length)) problems.push(`${W} contracts[${i + 1}]: routes must be a non-empty list`); });
+    lst(DC.tables, 'tables', W).forEach((t, i) => need(t, ['name', 'holds'], `${W} tables[${i + 1}]`));
+  }
+  if (TE) {
+    // every acceptance criterion of the discovery has exactly one primary proof, in a known layer
+    const W = 'design/tests.json', LAYERS = ['unit', 'api', 'journey'];
+    const acIds = new Set(stories.stories.flatMap(s => (s.acs || []).map(a => a.id)));
+    const proofs = lst(TE.proofs, 'proofs', W), seen = new Set();
+    need(TE, ['proofs'], W);
+    proofs.forEach((p, i) => {
+      const w = `${W} proofs[${i + 1}]${p.ac ? ` (${p.ac})` : ''}`;
+      need(p, ['ac', 'layer', 'proves'], w);
+      if (p.ac !== undefined && !acIds.has(p.ac)) problems.push(`${w}: AC ${p.ac} does not exist in the discovery`);
+      if (seen.has(p.ac)) problems.push(`${w}: a second proof of the same AC (one AC, one primary proof)`); seen.add(p.ac);
+      if (p.layer !== undefined && !LAYERS.includes(p.layer)) problems.push(`${w}: layer "${p.layer}" must be one of ${LAYERS.join(', ')}`);
+    });
+    acIds.forEach(id => { if (!seen.has(id)) problems.push(`${W}: AC ${id} has no proof`); });
+  }
+  if (OP) {
+    const W = 'design/operations.json';
+    need(OP, ['rollout', 'rollback'], W);
+    lst(OP.rollout, 'rollout', W).forEach((o, i) => need(o, ['step', 'what'], `${W} rollout[${i + 1}]`));
+    lst(OP.flags, 'flags', W).forEach((f, i) => need(f, ['name', 'guards', 'default'], `${W} flags[${i + 1}]`));
+    lst(OP.alarms, 'alarms', W).forEach(a => need(a, ['name', 'firesWhen', 'wakes', 'doWhat'], `alarm ${a.name}`));
+  }
+  if (proposal) {
+    const W = 'design/proposal.json';
+    need(proposal, ['hisIdea', 'rounds', 'disagreements'], W);
+    lst(proposal.rounds, 'rounds', W).forEach((r, i) => need(r, ['n', 'changed'], `${W} rounds[${i + 1}]`));
+    lst(proposal.disagreements, 'disagreements', W).forEach((x, i) => need(x, ['said', 'proposed', 'why', 'settled'], `${W} disagreements[${i + 1}]`));
+    lst(proposal.cuts, 'cuts', W).forEach((c, i) => { need(c, ['mechanism', 'outcome', 'why'], `${W} cuts[${i + 1}]`); if (c.outcome !== undefined && !['applied', 'rebutted'].includes(c.outcome)) problems.push(`${W} cuts[${i + 1}]: outcome must be applied or rebutted`); });
+    if (proposal.closed) need(proposal.closed, ['date', 'words'], `${W} closed`);
+  } else problems.push('design/proposal.json: missing (the debate, by the conductor)');
+  lst(dreview.findings, 'findings', 'design/design-review.json').forEach(x => {
+    need(x, ['id', 'area', 'title', 'ruling', 'why'], `design-review.json finding ${x.id}`);
+    if (x.ruling !== undefined && !['sustained', 'dismissed'].includes(x.ruling)) problems.push(`design-review.json finding ${x.id}: ruling must be sustained or dismissed (one round, no deferral)`);
+  });
   // word caps: the text must invite reading (schema/design.md); a field over its cap refuses the build
-  const CAPS = { intro: 45, worthALook: 20, latitude: 18, happens: 60, goesWrong: 45, look: 20, rule: 18, ifFails: 18, does: 14, when: 14, unchanged: 14, holds: 14, need: 18, growth: 40,
-    returns: 20, errors: 14, whatsNew: 40, reused: 40, stops: 20, obs: 12, wayIn: 30, firesWhen: 20, doWhat: 30, watched: 40, gate: 14, wayBack: 45, firstRun: 30, changes: 40, seams: 35, proves: 25, convention: 35,
-    question: 16, chosen: 30, label: 18, cost: 14, inOneSentence: 35, p: 35, costPlain: 35, latitudePlain: 25, reviewPlain: 45, title: 12, ruling: 25, changed: 20 };
-  const SPECIFIC = { 'infra.resources.rule': 20, 'infra.resources.why': 14, 'infra.bill.plain': 40, 'security.sweep.how': 20, 'data-model.access.how': 18, 'rollout.order.what': 16, 'architecture.extensions.what': 14,
-    'decisions.why': 25, 'design-review.decisions.plain': 25, 'design-review.decisions.why': 30, 'design-review.dismissed.why': 30, 'design-review.residue.why': 30, 'design-review.forPlan.why': 30 };
-  const SKIP = new Set(['mermaid', 'svg', 'html', 'id', 'file', 'name', 'doc', 'kind', 'how', 'group', 'caption', 'words', 'run', 'lens', 'opened', 'approved', 'tree', 'unit', 'scales', 'source', 'repo', 'category', 'screen', 'as', 'k', 't', 'cls', 'verdict', 'wakes', 'caller', 'step', 'key', 'persona', 'term', 'status']);
+  const CAPS = { intro: 45, worthALook: 20, latitude: 18, happens: 60, goesWrong: 45, look: 20, does: 14, runsWhere: 8, whatsNew: 40, how: 20, relaxed: 12, signal: 14, add: 12,
+    caller: 8, returns: 20, errors: 16, holds: 14, key: 8, migrations: 35, proves: 16, convention: 35, what: 16, gate: 14, guards: 14, firesWhen: 20, doWhat: 30, rollback: 45, runCost: 35,
+    hisIdea: 60, changed: 20, said: 25, proposed: 20, why: 25, settled: 20, words: 30,
+    question: 16, chosen: 30, label: 18, cost: 14, inOneSentence: 35, p: 35, costPlain: 35, reviewPlain: 45, title: 12 };
+  const SPECIFIC = { 'decisions.why': 25, 'design-review.findings.why': 30, 'proposal.cuts.why': 20, 'solution.evolution.cost': 8 };
+  const SKIP = new Set(['mermaid', 'svg', 'html', 'id', 'file', 'name', 'doc', 'kind', 'group', 'caption', 'run', 'opened', 'approved', 'unit', 'source', 'repo', 'route', 'routes', 'k', 't', 'ac', 'layer', 'step', 'status', 'area', 'ruling', 'fixedBy', 'feature', 'topic', 'mechanism', 'outcome', 'date', 'default', 'wakes', 'verdict', 'when', 'recommended', 'pick']);
   const words = t => String(t).trim().split(/\s+/).filter(Boolean).length;
   const walk = (v, path, file) => {
     if (Array.isArray(v)) { v.forEach(x => walk(x, path, file)); return; }
@@ -169,80 +204,14 @@ if (existsSync(designDir)) {
   };
   Object.entries(docs).forEach(([k, d]) => walk(d, '', k));
   if (dreport) walk(dreport, '', 'design-report');
+  if (proposal) walk(proposal, '', 'proposal');
   walk(dreview, '', 'design-review');
   walk(decisions, '', 'decisions');
   const seen = new Set();
   decisions.forEach(c => { need(c, ['id', 'doc', 'when', 'question', 'chosen'], `decision ${c.id}`); if (seen.has(c.id)) problems.push(`decision ${c.id}: duplicate id`); seen.add(c.id);
-    if (!['macro', ...DOCS].includes(c.doc)) problems.push(`decision ${c.id}: doc "${c.doc}" is not a document`); });
-  (dreview.decisions || []).forEach(x => { if (!x.plain) problems.push(`design-review.json: decision ${x.id} has no plain sentence`); });
-  // the size (optional, by the conductor from sizing.md): three tiers side by side, the pick per part with R V C, the doors, the evolution path
-  const sizing = dopt('sizing.json');
-  if (sizing) {
-    const W = 'design/sizing.json', TIERS = ['lean', 'balanced', 'hardened'];
-    const num = v => typeof v === 'number' && Number.isFinite(v) && v >= 0;
-    const lst = (v, name) => { if (v === undefined) return []; if (!Array.isArray(v)) { problems.push(`${W}: ${name} must be a list`); return []; } return v; };
-    need(sizing, ['plain', 'appetite', 'tiers', 'parts', 'picks', 'doors', 'evolution'], W);
-    const ap = sizing.appetite && typeof sizing.appetite === 'object' ? sizing.appetite : {};
-    if (sizing.appetite !== undefined) {
-      need(ap, ['hours', 'pick', 'runCost', 'unit'], `${W} appetite`);
-      ['hours', 'pick', 'runCost', 'accepted'].forEach(k => { if (ap[k] !== undefined && !num(ap[k])) problems.push(`${W}: appetite.${k} must be a number`); });
-      if (num(ap.accepted) && num(ap.hours) && ap.accepted < ap.hours) problems.push(`${W}: appetite.accepted ${ap.accepted} h is under appetite.hours ${ap.hours} h (accepted is the overrun the user accepted, never a cut)`);
-      const ceiling = num(ap.accepted) ? ap.accepted : ap.hours;
-      if (num(ceiling) && num(ap.pick) && ap.pick > ceiling) problems.push(`${W}: appetite.pick ${ap.pick} h is over ${num(ap.accepted) ? `appetite.accepted ${ap.accepted}` : `appetite.hours ${ap.hours}`} h (over the appetite the scope is cut or the user accepts the hours, never the floor)`);
-    }
-    const tiers = lst(sizing.tiers, 'tiers');
-    if (sizing.tiers !== undefined && (tiers.length !== 3 || tiers.some((t, i) => t?.tier !== TIERS[i]))) problems.push(`${W}: tiers must be exactly three, in order: ${TIERS.join(', ')}`);
-    tiers.forEach((t, i) => ['hours', 'cost'].forEach(k => { if (!num(t?.[k])) problems.push(`${W}: tiers[${i + 1}].${k} must be a number`); }));
-    const parts = lst(sizing.parts, 'parts'), partNames = new Set();
-    if (sizing.parts !== undefined && !parts.length) problems.push(`${W}: parts must be a non-empty list`);
-    parts.forEach((p, i) => {
-      const w = `${W} parts[${i + 1}]${p.part ? ` (${p.part})` : ''}`;
-      need(p, ['part', ...TIERS], w);
-      if (partNames.has(p.part)) problems.push(`${w}: duplicate part`); partNames.add(p.part);
-      TIERS.forEach(t => { if (p[t] === undefined) return; need(p[t], ['what'], `${w} ${t}`); ['hours', 'cost'].forEach(k => { if (!num(p[t][k])) problems.push(`${w}: ${t}.${k} must be a number`); }); });
-    });
-    const known = n => partNames.has(n) || partNames.has(String(n).split('.')[0]);
-    const picks = lst(sizing.picks, 'picks'), pickNames = new Set();
-    picks.forEach((p, i) => {
-      const w = `${W} picks[${i + 1}]${p.part ? ` (${p.part})` : ''}`;
-      need(p, ['part', 'tier', 'rvc', 'why'], w);
-      if (pickNames.has(p.part)) problems.push(`${w}: duplicate part`); pickNames.add(p.part);
-      if (p.part !== undefined && !known(p.part)) problems.push(`${w}: part "${p.part}" is neither a part of parts nor <part>.<sub-part>`);
-      if (p.tier !== undefined && !TIERS.includes(p.tier)) problems.push(`${w}: tier "${p.tier}" must be one of ${TIERS.join(', ')}`);
-      if (p.rvc !== undefined && !(Array.isArray(p.rvc) && p.rvc.length === 3 && p.rvc.every(x => [1, 2, 3].includes(x)))) problems.push(`${w}: rvc must be three scores 1–3 (R, V, C)`);
-    });
-    partNames.forEach(n => { if (![...pickNames].some(x => x === n || String(x).startsWith(`${n}.`))) problems.push(`${W} picks: part ${n} has no pick (itself or a sub-part)`); });
-    lst(sizing.doors, 'doors').forEach((d, i) => {
-      const w = `${W} doors[${i + 1}]`;
-      need(d, ['door', 'decided'], w);
-      if (!('his' in d)) problems.push(`${w}: missing his (the question id Q-<n>, or null when the door is not his)`);
-      else if (d.his !== null && !/^Q-\d+$/.test(String(d.his))) problems.push(`${w}: his "${d.his}" must be Q-<n> or null`);
-      if (d.his === null && !d.why) problems.push(`${w}: a door that is not his says why (why)`);
-    });
-    const evo = lst(sizing.evolution, 'evolution');
-    evo.forEach((x, i) => {
-      const w = `${W} evolution[${i + 1}]${x.part ? ` (${x.part})` : ''}`;
-      need(x, ['part', 'now', 'signal', 'watchedBy', 'next', 'cost'], w);
-      if (x.part !== undefined && !pickNames.has(x.part) && !partNames.has(x.part)) problems.push(`${w}: part "${x.part}" is not a part or a pick`);
-    });
-    picks.filter(p => p.tier === 'lean' && Array.isArray(p.rvc) && p.rvc[0] >= 2).forEach(p => {
-      if (!evo.some(x => x.part === p.part || x.part === String(p.part).split('.')[0])) problems.push(`${W} evolution: the lean pick ${p.part} has R ${p.rvc[0]} and no evolution-path row`);
-    });
-    lst(sizing.noGos, 'noGos');
-    // word caps by exact path; numbers, ids, part names and req are never capped
-    const SCAPS = { plain: 45, noGos: 14, 'parts.lean.what': 12, 'parts.balanced.what': 12, 'parts.hardened.what': 12, 'picks.why': 25, 'doors.door': 12, 'doors.decided': 18, 'doors.why': 18,
-      'evolution.now': 12, 'evolution.signal': 14, 'evolution.watchedBy': 8, 'evolution.next': 12 };
-    const swalk = (v, path) => {
-      if (Array.isArray(v)) { v.forEach(x => swalk(x, path)); return; }
-      if (v && typeof v === 'object') { Object.entries(v).forEach(([k, x]) => swalk(x, path ? `${path}.${k}` : k)); return; }
-      if (typeof v !== 'string') return;
-      const cap = SCAPS[path];
-      if (cap && words(v) > cap) problems.push(`${W}: ${path} has ${words(v)} words, cap ${cap} — "${v.slice(0, 60)}…"`);
-    };
-    swalk(sizing, '');
-  }
+    if (!['macro', 'proposal', ...DOCS].includes(c.doc)) problems.push(`decision ${c.id}: doc "${c.doc}" is not a document`); });
   if (problems.length) { console.error('blueprint data problems:\n  ' + problems.join('\n  ')); process.exit(1); }
-  design = { docs, mdDocs, artboards, report: dreport, review: dreview, decisions, sizing };
+  design = { docs, mdDocs, report: dreport, review: dreview, decisions, proposal };
 }
 // ---- stage 3 (schema/plan.md): the foundation, the entries and their edges, one brief per entry, embedded whole ----
 const planDir = join(dataDir, 'plan');
@@ -815,7 +784,7 @@ if (existsSync(layersPath)) {
 const data = {
   workstream, strings, figures, review, report, mock, design, plan, execution, release, retro, tabs, layers,
   ...prfaq, ...stories,
-  files: ['00-discovery/pr-faq.md', '00-discovery/stories.md', '00-discovery/journeys/', '00-discovery/prototype/LOCK.json', '00-discovery/prototype/frames/', '00-discovery/reviews.md', 'rulings.md', ...(design ? ['01-design/*.md', ...(design.sizing ? ['01-design/sizing.md'] : []), '01-design/notes.md', '01-design/reviews.md', '01-design/ui/'] : []), ...(plan ? ['02-plan/plan.md', '02-plan/briefs/', '02-plan/recon/', '02-plan/reviews.md'] : []), ...(execution ? ['03-execution/board.md', '03-execution/parked.md', '03-execution/entries/', '03-execution/audit.md', '03-execution/explain.md'] : []), ...(release ? ['04-release/plan.md', '04-release/trace.md', '04-release/notes/', '04-release/entries/', '04-release/proof/'] : []), ...(retro ? ['05-close/retro.md', '05-close/metrics.json', '05-close/harvest/', '05-close/trace.md'] : [])],
+  files: ['00-discovery/pr-faq.md', '00-discovery/stories.md', '00-discovery/journeys/', '00-discovery/prototype/LOCK.json', '00-discovery/prototype/frames/', '00-discovery/reviews.md', 'rulings.md', ...(design ? ['01-design/*.md', '01-design/proposal.md', '01-design/notes.md', '01-design/reviews.md'] : []), ...(plan ? ['02-plan/plan.md', '02-plan/briefs/', '02-plan/recon/', '02-plan/reviews.md'] : []), ...(execution ? ['03-execution/board.md', '03-execution/parked.md', '03-execution/entries/', '03-execution/audit.md', '03-execution/explain.md'] : []), ...(release ? ['04-release/plan.md', '04-release/trace.md', '04-release/notes/', '04-release/entries/', '04-release/proof/'] : []), ...(retro ? ['05-close/retro.md', '05-close/metrics.json', '05-close/harvest/', '05-close/trace.md'] : [])],
   builtAt: new Date().toISOString().slice(0, 16).replace('T', ' ') + ' UTC',
 };
 // `</script` inside JSON would end the data block early; escape it.
@@ -823,4 +792,4 @@ const json = JSON.stringify(data).replace(/<\/script/gi, '<\\/script');
 const shell = readFileSync(join(here, 'shell.html'), 'utf8');
 // function replacements: a `$&` or `$'` inside the data would otherwise be read as a replacement pattern
 writeFileSync(out, shell.replace('__TITLE__', () => workstream.title.replace(/</g, '&lt;')).replace('__DATA__', () => json));
-console.log(`built ${out}: tabs ${tabs.join(' + ')} · ${stories.stories.length} stories, ${stories.stories.reduce((a, s) => a + s.acs.length, 0)} ACs, ${review.rounds.length} discovery rounds` + (design ? ` · design: ${design.docs.architecture.flows.length} flows, ${design.decisions.length} decisions, ${design.review.rounds.length} rounds${design.sizing ? `, sizing ${design.sizing.picks.length} picks` : ''}` : '') + (plan ? ` · plan: ${plan.plan.entries.length} entries, ${plan.plan.entries.reduce((a, e) => a + e.stories.length, 0)} stories, concurrency ${plan.plan.concurrency}${plan.plan.criticalPath ? `, critical path ${plan.plan.criticalPath.join(' → ')}` : ''}, ${Object.keys(plan.briefs).length} briefs` : '') + (execution ? (x => { const planned = new Set(['F', ...plan.plan.entries.map(e => e.id)]), req = x.entries.filter(e => planned.has(e.id)); return ` · execution: ${req.filter(e => e.status === 'merged').length}/${req.length} merged, ${x.entries.filter(e => e.status === 'parked').length} parked, ${x.amendments.length} amendments, audit ${x.closed ? 'closed' : 'open'}`; })(execution) : '') + (release ? ` · release: in production ${release.inProduction.length} artifact(s), ${release.staging.length} staging runs, ${release.fixes.length} fixes, ${release.watch.filter(r => r.readAt != null && r.got != null && r.ok != null).length}/${release.watch.length} watched, ${release.closed ? 'closed' : 'open'}` : '') + (retro ? ` · close: ${retro.wrong.length} wrong, ${retro.ideas.length} ideas (${retro.ideas.filter(i => i.lands === 'pipeline').length} pipeline), ${retro.userNotes.length} user notes, ${retro.closed ? 'closed' : 'open'}` : '') + (layers ? ` · stage report: ${Object.keys(layers).join(', ')}` : ''));
+console.log(`built ${out}: tabs ${tabs.join(' + ')} · ${stories.stories.length} stories, ${stories.stories.reduce((a, s) => a + s.acs.length, 0)} ACs, ${review.rounds.length} discovery rounds` + (design ? ` · design: ${design.docs.solution.flows.length} flows, ${design.docs['data-and-contracts'].contracts.length} contracts, ${design.docs.tests.proofs.length} proofs, ${design.decisions.length} decisions, ${(design.review.findings || []).length} findings` : '') + (plan ? ` · plan: ${plan.plan.entries.length} entries, ${plan.plan.entries.reduce((a, e) => a + e.stories.length, 0)} stories, concurrency ${plan.plan.concurrency}${plan.plan.criticalPath ? `, critical path ${plan.plan.criticalPath.join(' → ')}` : ''}, ${Object.keys(plan.briefs).length} briefs` : '') + (execution ? (x => { const planned = new Set(['F', ...plan.plan.entries.map(e => e.id)]), req = x.entries.filter(e => planned.has(e.id)); return ` · execution: ${req.filter(e => e.status === 'merged').length}/${req.length} merged, ${x.entries.filter(e => e.status === 'parked').length} parked, ${x.amendments.length} amendments, audit ${x.closed ? 'closed' : 'open'}`; })(execution) : '') + (release ? ` · release: in production ${release.inProduction.length} artifact(s), ${release.staging.length} staging runs, ${release.fixes.length} fixes, ${release.watch.filter(r => r.readAt != null && r.got != null && r.ok != null).length}/${release.watch.length} watched, ${release.closed ? 'closed' : 'open'}` : '') + (retro ? ` · close: ${retro.wrong.length} wrong, ${retro.ideas.length} ideas (${retro.ideas.filter(i => i.lands === 'pipeline').length} pipeline), ${retro.userNotes.length} user notes, ${retro.closed ? 'closed' : 'open'}` : '') + (layers ? ` · stage report: ${Object.keys(layers).join(', ')}` : ''));
