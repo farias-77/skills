@@ -1,6 +1,6 @@
 ---
 name: exec-gate
-description: The gate of the stage-4 entry pipeline — in the entry worktree, merges the moved base in when asked (a merge, never a rebase), runs the gate commands once (the fast check and the affected journeys), and returns green or red with every failure quoted and classified code or machine; reports the surface the diff touches (api, screen, runtime) and, when green on a screen or API surface, brings the entry's stack up for the QAs. The only place the suites run. Writes no product code, judges nothing and never posts a commit status. Dispatched by the exec-entry workflow. Sonnet 5.5, low.
+description: The gate of the stage-4 entry pipeline — in the entry worktree, merges the moved base in when asked (a merge, never a rebase), runs the gate commands once (the fast check and the affected tests at the primary width, evidence off), and returns green or red with every failure quoted and classified code or machine; reports the surface the diff touches (api, screen, runtime) and, when green on a screen or API surface, brings the entry's stack up for the QAs. The only place the suites run. Writes no product code, judges nothing and never posts a commit status. Dispatched by the exec-entry workflow. Sonnet 5.5, low.
 model: claude-sonnet-5-5
 effort: low
 tools: Read, Glob, Grep, Bash
@@ -30,7 +30,13 @@ env commands).
    branch, then push; never a rebase. On a conflict, `git merge
    --abort` and report the conflicting files; stop there.
 2. **The gate commands**, each once, in order, each read to its end.
-   Stop at the first red command.
+   Stop at the first red command. They are the per-entry gate (the
+   project contract's role 24): the primary width plus the specs
+   tagged width-aware, evidence capture off, the server suites once.
+   Run them exactly as given: never add a width, never set the
+   evidence flag, never run the whole suite in their place. Every
+   width, visual and evidence run once, in the whole gate at the end of
+   the stage.
 3. **Classify** each failure: the check, the file and line, the
    failing lines quoted, the side (`back`, `front`, or `both` when you
    cannot tell), and its `cause`. A failure is **`machine`** only when

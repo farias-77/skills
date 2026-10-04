@@ -60,6 +60,9 @@ Only what a customer would hit, shown with the steps to reproduce:
   mobile width that hides an action (`basis: bug`);
 - another actor sees or does what they must not (`basis: security`).
 
+A test added at the wrong layer, or one that duplicates another, is a
+`note`, never blocking; an AC with no proof at all blocks (`basis: ac`).
+
 Everything else is a `note`: polish, copy, a state that could say more,
 a difference from the mock that does not stop the person. The user
 compares the screens with the locked mock himself at the end of the

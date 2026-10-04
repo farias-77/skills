@@ -66,13 +66,10 @@ disagree.
   test utility that does the job before you write one.
 - **Small.** A function does one thing; a file stays near the size of
   its golden neighbours.
-- **The tests are yours.** For each AC, one test at the layer that
-  observes it the way the person or the caller would: a journey spec
-  for a screen, an integration test against the real database for a
-  route, a unit test for a rule. Name it after the AC id. Use the
-  doctrine's helpers, factories and actors; never a mock of the
-  database. The committed test is the evidence; there is no other
-  record to write.
+- **The tests are yours**, by the rule below. Name each after its AC
+  id. Use the doctrine's helpers, factories and actors; never a mock
+  of the database. The committed test is the evidence; there is no
+  other record to write.
 - **The fast checks only.** While you build, run the fast checks you
   were given (types, lint, unit tests) and the focused tests of the
   code you touch. Never the journey or e2e suites: the gate runs them
@@ -106,6 +103,24 @@ disagree.
 - **`blocked`** is for a true impossibility only: a secret the stack
   needs is missing, or the plan contradicts itself (quote both
   sentences). Anything you can decide is not blocked.
+
+## The testing rule
+
+Test only what makes a difference in real use, and make sure that
+really works.
+
+- **Each AC gets ONE primary proof**, at the cheapest layer that really
+  proves it: a pure rule → a unit test; an HTTP contract → an API test
+  against the real database; a behaviour on screen → one journey.
+- **Variations of a rule** (tiers, borders, languages, roles) are rows
+  of the unit or API table, never N browser runs.
+- **A test is width-aware** (tagged with the doctrine's width tag, such
+  as `@phone`) only when the behaviour depends on the width.
+- **No test pins copy or markup** unless the copy is the AC.
+- **No evidence or mutation scaffolding**: no screenshot calls for
+  the record, no harness that breaks the code to watch a test fail.
+- **No second test of a behaviour** another test already owns; extend
+  it instead.
 
 ## Fix mode
 

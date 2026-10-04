@@ -27,8 +27,8 @@
  *               impossibility (a missing secret, a contradiction in the
  *               plan); `questions` only for what needs the user in person.
  *   2. gate     exec-gate (Sonnet 5.5, low) runs the gate commands once (the
- *               fast check and the affected journeys): the only place the
- *               suites run. Green or red, each failure `code` or `machine`.
+ *               fast check and the affected tests at one width, evidence
+ *               off): the only place the suites run. Green or red, each failure `code` or `machine`.
  *               A red only the machine caused never goes to a builder: the
  *               gate waits for the load (at most 10 min, under
  *               loadThreshold, nproc by default) and runs again, at most

@@ -47,7 +47,7 @@ entry ──────┤                   ├─► gate ─┬─► review
 | Step | Who | What |
 |---|---|---|
 | build | `builder (Opus 5.5, medium)` | the code and one test per AC; only the fast checks (types, lint, unit tests) while it builds; a file outside Owns is allowed and listed (`outsideOwns`) |
-| gate | `exec-gate (Sonnet 5.5, low)` | the gate commands once (the check and the affected journeys); each failure `code` or `machine`; a machine red runs again after a load wait (2×), then parks `machine`; a code red takes a gate-fix pass (not the review budget; at most 2 per entry, then parks `gate-red`); green brings the stack up for the QAs |
+| gate | `exec-gate (Sonnet 5.5, low)` | the gate commands once (the check and the affected tests at the primary width, evidence off); each failure `code` or `machine`; a machine red runs again after a load wait (2×), then parks `machine`; a code red takes a gate-fix pass (not the review budget; at most 2 per entry, then parks `gate-red`); green brings the stack up for the QAs |
 | check | `reviewer (Opus 5.5, high)` ∥ `qa-frontend (Opus 5.5, medium)` ∥ `qa-backend (Opus 5.5, medium)` | the reviewer always; qa-frontend when the screen changed; qa-backend when the API or the data changed |
 | triage | the workflow, in code | blocking = marked blocking, basis `ac` · `bug` · `security` · `rule`, and a proof. The rest are notes |
 | fix | `builder (Opus 5.5, medium)` | the one review fix pass over every blocking item, then the gate (a code red there may take one gate-fix pass, within the 2), then the delta: only the agents that blocked re-check their own items. Still blocking → parked `round-cap` |
@@ -82,6 +82,16 @@ doctrine's contract table) names the codebase root, its doctrine, its
 and the affected tests against a base), its **whole gate** and its
 **signoff** command (the project contract's local-CI signoff). A
 missing role joins the pre-flight. Missing plan: halt, back to stage 3.
+
+**The gate is sized to the change** (the project contract's role 24).
+The per-entry gate, on every builder pass and every merge's affected
+signoff, runs the check and the affected tests at the one primary width
+plus the specs tagged width-aware, evidence capture off, the server
+suites once. The whole gate at the end runs everything: every width,
+the visual tests, the full server suites, evidence on. A project that
+does not meet role 24 yet still runs this stage, only slower: its gate
+commands run as the project names them, and `/pipeline-setup` proposes
+the fix.
 
 ```
 designs-root/<workstream>/
@@ -294,8 +304,8 @@ When every entry is merged or parked:
 
 1. **The whole gate, once**, on the top of `feat/<workstream>`:
    signoff with the whole gate and the context `main` requires
-   (`local-ci`), in a fresh worktree with its own stack, the journeys
-   keeping their screenshots. Green: the status is posted. Red: the
+   (`local-ci`), in a fresh worktree with its own stack: every width,
+   the visual tests, the full server suites, the evidence flag on. Green: the status is posted. Red: the
    session triggers the fixes itself, with no question: one fix entry
    `X.<n>` per failing area (failures whose files do not overlap run in
    parallel), each brief written by the session with the log's path and

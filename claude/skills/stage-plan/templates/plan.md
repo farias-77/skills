@@ -78,9 +78,10 @@
 ## Gate commands
 
 1. `<the fast check>`
-2. `<the affected tests, base=feat/<workstream>>`
+2. `<the affected tests, base=feat/<workstream>, at the primary width plus the width-tagged specs, evidence off>`
 
-The whole gate (`<make -k verify>`) runs once, at the end of stage 4.
+The whole gate (`<make -k verify>`: every width, visual, the full server
+suites, evidence on) runs once, at the end of stage 4.
 
 ## Pre-flight
 

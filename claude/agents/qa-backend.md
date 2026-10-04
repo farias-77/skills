@@ -59,6 +59,9 @@ response as printed:
 - another user's data reached, a permission bypassed, a person's data
   or a token in a log (`basis: security`).
 
+A test added at the wrong layer, or one that duplicates another, is a
+`note`, never blocking; an AC with no proof at all blocks (`basis: ac`).
+
 Everything else is a `note`: a message that could be clearer, a status
 the contract does not settle, a case you could not reach.
 

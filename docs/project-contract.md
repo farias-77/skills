@@ -53,6 +53,7 @@ says so ([the skill](../claude/skills/pipeline-setup/SKILL.md)).
 | 15 | Design tokens and components, exported | recommended | discovery, execute |
 | 16 | Observability as code: log metrics, alarms, runbooks | recommended | design, execute, release |
 | 17 | Parallelism capacity, measured | recommended | execute |
+| 24 | A gate sized to the change | recommended | plan, execute |
 | 18 | Autonomous release permissions | full experience | release |
 | 19 | Progressive delivery | full experience | release |
 | 20 | A cloud runner for parallel width | full experience | execute |
@@ -124,7 +125,8 @@ differs from CI lets a green entry turn red at merge.
 **How the stages use it.** Plan fixes the gate commands once in
 `plan.md`; `exec-gate (Sonnet 5.5, low)` runs them once per builder pass; the
 execute session runs the whole gate once on the feature branch at the
-end; release reads its result before the first merge.
+end; release reads its result before the first merge. How much the
+per-entry gate runs, against the whole gate, is role 24.
 
 ### 4 · The fast check, focused tests and affected tests
 
@@ -143,7 +145,8 @@ whole gate each time multiplies the clock by the number of entries.
 focused tests, never the journeys; `exec-gate (Sonnet 5.5, low)` runs
 the fast check and the affected tests once per builder pass, the only
 place the suites run. Without affected tests, each pass runs the whole
-gate.
+gate. How precise the selection is, and what a build file selects, is
+role 24.
 
 ### 5 · Stack up / env / down per worktree, with test actors
 
@@ -496,6 +499,36 @@ every run gets slower and the stage does not finish sooner.
 allows and never measures the machine: compute is infinite there. The
 execute session starts runs up to the plan's widest wave and holds the
 cap by the machine's load.
+
+### 24 · A gate sized to the change
+
+**What it is.** The commands of roles 3 and 4, set so each run tests
+what the change can break, and the whole suite runs once.
+
+| Part | Requirement |
+|---|---|
+| **the per-entry gate** | the fast check plus the affected tests, at **one primary width** (the browser tool's primary project, desktop for most products) plus only the specs tagged as width-aware (a tag such as `@phone`); **evidence capture off** (screenshots and video only under a flag such as `EVIDENCE=1`); the server suites **run once** (the affected step never re-runs what the check already ran) |
+| **the affected selection** | **non-UI files select no screen tests**: build files, ignore files, lint config and placeholder files are covered by the check, lint and build; it prints that decision per path ("`Makefile`: no screen tests, the check covers it"), so the selection is never silently empty. A **lockfile or manifest** selects the whole suite only when a runtime or test-runner dependency changed. The preferred precision is the **real import graph** (a screen's route to its module closure, a package to its dependants), with a fallback to the whole suite when the graph cannot be built |
+| **the whole gate** | once, at the end of the stage: every width, the visual tests, the full server suites, evidence on |
+
+The doctrine's testing document names the primary width, the
+width-aware tag and the evidence flag.
+
+**Why.** In one measured project the browser suite took 77% of the
+final gate and about 18 hours of one execute stage: every test ran at
+two widths, a change to a build or ignore file selected the whole
+suite, evidence screenshots ran in every gate, and the server suites
+ran twice per gate. None of that found a defect the whole gate at the
+end would have missed.
+
+**How the stages use it.** Plan copies the per-entry gate and the
+whole gate into `plan.md`; `exec-gate (Sonnet 5.5, low)` runs the
+per-entry gate once per builder pass, and the merge queue's affected
+signoff runs the same; the execute session runs the whole gate once
+on the top of the feature branch. A project that does not meet this
+yet still works: every pass pays for the full width, the evidence and
+the whole suite, and the stage is only slower. `/pipeline-setup`
+rates it and proposes the fix.
 
 ## For the full experience
 

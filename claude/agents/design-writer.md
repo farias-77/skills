@@ -59,8 +59,12 @@ line. Then write the document from the template:
 - **The lock is the product.** `solution` maps every screen and state
   of the mock onto the real front, the copy verbatim, and lists what
   the mock fakes. `tests` gives every AC of `stories.md` one row,
-  cited by id, never copied, with one primary proof in the lowest
-  layer that proves it. `data-and-contracts` writes one Contract per
+  cited by id, never copied, with one primary proof at the cheapest
+  layer that really proves it (a pure rule → unit, an HTTP contract →
+  api, a behaviour on screen → one journey); a rule's variations are
+  rows of its unit or api table; a row is width-aware only when the
+  behaviour depends on the width; no proof pins copy or markup unless
+  the copy is the AC; no second proof of what another row owns. `data-and-contracts` writes one Contract per
   entry-sized feature, each complete enough that a front builder and
   a back builder can work from it alone.
 - **The budget is about 40 KB.** A document over it is copying

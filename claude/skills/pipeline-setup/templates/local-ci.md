@@ -18,8 +18,10 @@ local-ci.sh [--post] [--context NAME] [REF]     REF defaults to HEAD
 2. With `SELECT_CMD` set (the affected context), runs it in the
    worktree; it prints the affected selection against `LOCAL_CI_BASE`.
    **An empty selection on a non-empty diff runs the whole gate**
-   (`FULL_GATE_CMD`) instead of signing off a run that tested nothing:
-   a change to the build files or the tooling often selects nothing.
+   (`FULL_GATE_CMD`) instead of signing off a run that tested nothing.
+   A selector sized to the change (role 24) maps a build or ignore
+   file to no screen tests and prints that decision with its reason,
+   so its output is not empty and the whole gate does not run for it.
 3. A tree that already passed the same gate command (same
    `git rev-parse <sha>^{tree}`) is not run again: its record is reused
    and re-posted.

@@ -14,8 +14,8 @@ Audited at `<sha>` on `<date>` against the pipeline's bar
 
 | Level | ✓ | ~ | ✗ | n/a |
 |---|---|---|---|---|
-| Required (1–13, 22) | <n> | <n> | <n> | <n> |
-| Recommended (14–17) | <n> | <n> | <n> | <n> |
+| Required (1–13, 22, 23) | <n> | <n> | <n> | <n> |
+| Recommended (14–17, 24) | <n> | <n> | <n> | <n> |
 | Full experience (18–21) | <n> | <n> | <n> | <n> |
 
 **Verdict:** <one sentence: which stages can run today, and the first
@@ -49,6 +49,7 @@ gap that halts one>.
 | 15 | Design tokens and components exported | | | |
 | 16 | Observability as code | | | |
 | 17 | Parallelism capacity, measured | | | |
+| 24 | Gate sized to the change: one primary width per entry, evidence off, server suites once, non-UI files select no screen tests | | | |
 
 ## For the full experience
 

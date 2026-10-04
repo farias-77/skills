@@ -13,7 +13,7 @@ provides the roles the bar names: a doctrine, golden paths, a gate that
 runs locally, an isolated stack per worktree, a structure check, the
 release roles, the permissions that make autonomy safe. The bar is
 [`docs/project-contract.md`](../../../docs/project-contract.md); it
-names 23 roles in three levels (required, recommended, for the full
+names 24 roles in three levels (required, recommended, for the full
 experience). This skill measures the project against it, says what is
 missing, and closes the cheap gaps itself.
 
@@ -162,6 +162,7 @@ What each gap becomes:
 | 14 | verify map | a section per feature map with something built to drive, filled from its existing journeys, in the maps' language | M | [verify-map.md](templates/verify-map.md) |
 | 15 | design tokens | the export, in the repo's own tooling language, and the components list; the per-state screenshots are M with a component catalogue, **L without one** (a demand) | M (export) · L (samples) | [design-tokens-export.md](templates/design-tokens-export.md) |
 | 3, 4, 5, 6, 10, 11, 16, 19, 20 | gate, commands, stack, evidence, browser, release, observability, progressive delivery, runner | engineering | L, or M when the pieces exist and only need a command that names them | — |
+| 24 | sized gate | per missing part: the per-entry gate passes the primary project and the width tag (`--project=desktop` plus `--grep @phone` on the phone project), evidence behind a flag (`EVIDENCE=1`), the affected step stops re-running the server suites the check ran, the selector maps non-UI files to no screen tests and the lockfile to the whole suite only on a runtime or test-runner dependency; the whole gate keeps every width, visual, the full server suites and evidence; the doctrine's testing document names the width, the tag and the flag | S per flag or mapping · M for the import-graph selector | — |
 | 17 | capacity | measured by the plan stage's machine scout on its first run | — | — |
 | 18 | autonomous release | after 12 and 13: the template already allows the merge and the prod deploy; the guard asks on any merge whose head the play did not authorize; the signoff required on `main` is his | S, his call | [permissions.md](templates/permissions.md) |
 | 21 | video toolchain | install Node LTS and ffmpeg on the station | S, his machine | — |
