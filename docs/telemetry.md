@@ -30,14 +30,14 @@ duration, where the result carries them).
   "closedAt": "2026-10-01T12:40:00Z",
   "session": {"model": "Opus 5.5", "effort": "high"},
   "steps": [
-    {"step": "G0", "startedAt": "2026-10-01T09:02:00Z", "endedAt": "2026-10-01T09:20:00Z", "wallClockMin": 18, "hisMin": 0},
-    {"step": "G3", "startedAt": "2026-10-01T10:05:00Z", "endedAt": "2026-10-01T10:31:00Z", "wallClockMin": 26, "hisMin": 22}
+    {"step": "D0", "startedAt": "2026-10-01T09:02:00Z", "endedAt": "2026-10-01T09:20:00Z", "wallClockMin": 18, "hisMin": 0},
+    {"step": "D4", "startedAt": "2026-10-01T10:05:00Z", "endedAt": "2026-10-01T10:31:00Z", "wallClockMin": 26, "hisMin": 22}
   ],
   "wallClockMin": 218,
   "hisMin": 31,
   "agents": [
-    {"agent": "design-writer", "model": "Sonnet 5.5", "effort": "high", "runs": 10, "hours": 3.4, "tokens": 5200000},
-    {"agent": "design-reviewer-data", "model": "Opus 5.5", "effort": "medium", "runs": 2, "hours": 0.6, "tokens": 1100000}
+    {"agent": "design-writer", "model": "Sonnet 5.5", "effort": "high", "runs": 4, "hours": 1.2, "tokens": 2100000},
+    {"agent": "design-reviewer", "model": "Opus 5.5", "effort": "medium", "runs": 1, "hours": 0.3, "tokens": 600000}
   ],
   "tokens": {"session": 2400000, "agents": 9800000, "total": 12200000},
   "rounds": 2,
@@ -55,7 +55,7 @@ duration, where the result carries them).
 | `stage`, `workstream` | the stage's name as `.state.md` writes it; the slug | required |
 | `openedAt`, `closedAt` | ISO 8601 UTC (`date -u +%FT%TZ`) | `closedAt` null while the stage runs |
 | `session` | the conducting session's model and effort | the ones it actually ran on, not the ones the skill asks for |
-| `steps[]` | one row per step of the stage's pattern (D0–D7, G0–G6, P0–P6, the release's steps, the close's steps; execute: one row per entry, with `step` the entry id) | `wallClockMin` from the two timestamps; `hisMin` the minutes the stage waited on him or talked with him in that step |
+| `steps[]` | one row per step of the stage's pattern (discovery D0–D7, design D0–D6, P0–P6, the release's steps, the close's steps; execute: one row per entry, with `step` the entry id) | `wallClockMin` from the two timestamps; `hisMin` the minutes the stage waited on him or talked with him in that step |
 | `wallClockMin`, `hisMin` | the stage's totals | `wallClockMin` from `openedAt` to `closedAt`; `hisMin` the sum of the steps' |
 | `agents[]` | one row per agent name, with its model and effort as the frontmatter fixes them | `runs`, and `hours` and `tokens` summed from the harness's results |
 | `tokens` | the session's, the agents', the total | the session's from the harness when it reports them, else null |

@@ -1,169 +1,143 @@
 #!/usr/bin/env node
 /*
- * review-prep.mjs — prepares a design-review round so its args stay small.
+ * review-prep.mjs — the mechanical checks before the design review.
  *
- *   node review-prep.mjs <workstream> --round 1
- *   node review-prep.mjs <workstream> --round 2 --fixes <fixes.json>
- *        [--workflow <path to design-review.js>]   (default: the pipeline's claude/workflows/design-review.js)
- *        [--doc-budget-kb <n>] [--total-budget-kb <n>]   (defaults: 40 and 320)
+ *   node review-prep.mjs <workstream> [--doc-budget-kb <n>] [--total-budget-kb <n>]
+ *   node review-prep.mjs --self-test
  *
- * A workflow script cannot read files, and the round needs text: every
- * flow of architecture.md, and in round 2 the fixes, the documents and
- * flows that changed, and the lenses to seat. Passed as args, that is
- * tens of kilobytes the conductor types out. This script reads them
- * from disk and writes <workstream>/_run/design-review.js: a copy of
- * the workflow with them embedded (the line `const EMBEDDED = null`).
- * The conductor then runs the copy by scriptPath with the small args
- * (paths, round, language, glossary). The copy also sidesteps a
- * Workflow tool that refuses a scriptPath resolving outside the
- * session's working directories.
+ * The conductor runs it at D5, after the four writers return and
+ * before the design-reviewer reads. It checks what a script checks
+ * better than an agent:
  *
- * round 1  splits `## Flows` of 01-design/architecture.md at every `### `
- *          heading (id: the heading, without "(covers …)", as a slug);
- *          writes _run/review-r1-snapshot.json (a sha256 per document
- *          and per flow) for round 2 to diff against.
- * round 2  the same split; `changed` = the documents (01-design/*.md
- *          but reviews.md and telemetry.md) and flows whose sha256
- *          differs from the round-1 snapshot;
- *          `fixes` from --fixes (a JSON list the conductor writes from
- *          his rulings: { id, doc, fix, severity? }, a merged group's id
- *          joined with "+"); a fix without severity takes the highest
- *          severity of its ids in 01-design/reviews/round-1.json;
- *          `lenses` = the lenses of the fixes whose severity is blocker
- *          or fix, plus design-reviewer-consistency.
+ * documents  the four documents exist under 01-design/ (solution.md,
+ *            data-and-contracts.md, tests.md, operations.md), and each
+ *            has its "## The implementer decides" section.
+ * coverage   every AC id of 00-discovery/stories.md (`J1.s2.1`,
+ *            `frame:<token>.<n>`, written as **`<id>`**) is cited in
+ *            tests.md. Without stories.md, the ids come from
+ *            blueprint/stories.json. A missing id goes back to the
+ *            tests writer.
+ * size       one document over --doc-budget-kb (default 40) or the four
+ *            over --total-budget-kb (default 160) is a warning on stderr
+ *            and in `sizeWarnings`, never a failure. A document over
+ *            budget usually copies what another source holds.
  *
- * size     every round weighs the documents the round reviews (notes.md
- *          aside: it is the conductor's record): one document over
- *          --doc-budget-kb (default 40 KB) or the set over
- *          --total-budget-kb (default 320 KB) is a warning on stderr and
- *          in `sizeWarnings`, never a failure. The defaults fit a build
- *          of about a working week; a bigger pick passes bigger numbers.
- *          A document over budget usually copies what another source
- *          holds (an AC's text, a table of another document).
- *
- * Prints one JSON line: the copy's path, the source's sha256, the flow
- * ids, the size warnings, and in round 2 changed, lenses and the fix
- * count. Exit 1 on a missing input.
+ * Prints one JSON line: { documents, sizesKB, sizeWarnings, acs,
+ * missingAcs, missingSections, ok }. Exit 0 when every document exists,
+ * every section is there and every AC is cited (size warnings
+ * allowed); 1 otherwise; 2 on a usage error.
  */
 
-import { createHash } from 'node:crypto'
-import { existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from 'node:fs'
-import { basename, dirname, join, resolve } from 'node:path'
+import { existsSync, mkdtempSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
+import { tmpdir } from 'node:os'
+import { join, resolve } from 'node:path'
+import { spawnSync } from 'node:child_process'
 import { fileURLToPath } from 'node:url'
 
+const DOCS = ['solution.md', 'data-and-contracts.md', 'tests.md', 'operations.md']
+const LATITUDE = /^## The implementer decides\b/m
+const KB = 1024
 const argv = process.argv.slice(2)
 const opt = (name) => { const i = argv.indexOf(`--${name}`); return i >= 0 ? argv[i + 1] : undefined }
-const die = (msg) => { console.error(`review-prep: ${msg}`); process.exit(1) }
+const usage = (msg) => { console.error(`review-prep: ${msg}`); process.exit(2) }
 
-const ws = argv[0] && !argv[0].startsWith('--') ? resolve(argv[0]) : die('usage: review-prep.mjs <workstream> --round 1|2 [--fixes fixes.json] [--workflow design-review.js]')
-const round = Number(opt('round') ?? die('--round 1|2 is required'))
-if (![1, 2].includes(round)) die(`round ${round}: 1 or 2 (there is no round 3)`)
-const here = dirname(fileURLToPath(import.meta.url))
-const source = resolve(opt('workflow') ?? join(here, '../../../workflows/design-review.js'))
-const designDir = join(ws, '01-design')
-const runDir = join(ws, '_run')
-const sha = (text) => createHash('sha256').update(text).digest('hex')
+if (argv.includes('--self-test')) selfTest()
+else check()
 
-// ---------- the flows ----------
-
-const archPath = join(designDir, 'architecture.md')
-if (!existsSync(archPath)) die(`${archPath} not found`)
-const lines = readFileSync(archPath, 'utf8').split('\n')
-const start = lines.findIndex(l => /^## Flows\b/.test(l))
-if (start < 0) die('architecture.md has no "## Flows" section')
-let end = lines.findIndex((l, i) => i > start && /^## /.test(l))
-if (end < 0) end = lines.length
-const slug = (s) => s.replace(/\(covers[^)]*\)/i, '').normalize('NFD').replace(/[̀-ͯ]/g, '')
-  .toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'flow'
-const flows = []
-const seen = new Map()
-lines.slice(start + 1, end).forEach(line => {
-  if (/^### /.test(line)) {
-    const base = slug(line.slice(4))
-    const n = (seen.get(base) ?? 0) + 1
-    seen.set(base, n)
-    flows.push({ id: n > 1 ? `${base}-${n}` : base, text: line })
-  } else if (flows.length) flows[flows.length - 1].text += `\n${line}`
-})
-flows.forEach(f => { f.text = f.text.trimEnd() })
-if (!flows.length) die('the Flows section has no "### " flow')
-
-// ---------- the snapshot, and the delta ----------
-
-// the ten documents, sizing.md and notes.md; the round audit and the telemetry are records, not reviewed
-const RECORDS = ['reviews.md', 'telemetry.md']
-const DOCS = readdirSync(designDir).filter(n => n.endsWith('.md') && !RECORDS.includes(n)).sort()
-const snapshot = {
-  docs: Object.fromEntries(DOCS.map(n => [basename(n, '.md'), sha(readFileSync(join(designDir, n), 'utf8'))])),
-  flows: Object.fromEntries(flows.map(f => [f.id, sha(f.text)])),
-}
-// ---------- the size budget (a warning, never a failure) ----------
-
-const KB = 1024
-const budgetOf = (name, fallback) => {
-  const v = opt(name)
-  if (v === undefined) return fallback
-  const n = Number(v)
-  if (!(n > 0)) die(`--${name} ${v}: a positive number of KB`)
-  return n
-}
-const docBudget = budgetOf('doc-budget-kb', 40)
-const totalBudget = budgetOf('total-budget-kb', 320)
-const sizes = DOCS.filter(n => n !== 'notes.md').map(n => [n, readFileSync(join(designDir, n)).length])
-const sizeWarnings = sizes.filter(([, b]) => b > docBudget * KB)
-  .map(([n, b]) => `${n}: ${Math.round(b / KB)} KB, over the ${docBudget} KB budget of one document`)
-const total = sizes.reduce((sum, [, b]) => sum + b, 0)
-if (total > totalBudget * KB) sizeWarnings.push(`the design set: ${Math.round(total / KB)} KB, over the ${totalBudget} KB budget of the whole set`)
-sizeWarnings.forEach(w => console.error(`review-prep: warning: ${w}`))
-
-mkdirSync(runDir, { recursive: true })
-writeFileSync(join(runDir, `review-r${round}-snapshot.json`), JSON.stringify(snapshot, null, 2))
-
-const embedded = { flows }
-if (round === 2) {
-  const prevPath = join(runDir, 'review-r1-snapshot.json')
-  if (!existsSync(prevPath)) die(`${prevPath} not found: run round 1 through review-prep.mjs, or pass changed by hand`)
-  const prev = JSON.parse(readFileSync(prevPath, 'utf8'))
-  embedded.changed = {
-    docs: Object.keys(snapshot.docs).filter(d => snapshot.docs[d] !== prev.docs?.[d]),
-    flows: Object.keys(snapshot.flows).filter(f => snapshot.flows[f] !== prev.flows?.[f]),
+function check() {
+  const ws = argv[0] && !argv[0].startsWith('--') ? resolve(argv[0]) : usage('usage: review-prep.mjs <workstream> [--doc-budget-kb n] [--total-budget-kb n] | --self-test')
+  const budget = (name, fallback) => {
+    const v = opt(name)
+    if (v === undefined) return fallback
+    const n = Number(v)
+    if (!(n > 0)) usage(`--${name} ${v}: a positive number of KB`)
+    return n
   }
-  const fixesPath = opt('fixes') ?? die('round 2 needs --fixes <fixes.json> (the fixes applied, from your rulings)')
-  const fixes = JSON.parse(readFileSync(resolve(fixesPath), 'utf8'))
-  if (!Array.isArray(fixes)) die('--fixes must hold a JSON list')
-  const r1Path = join(designDir, 'reviews', 'round-1.json')
-  const r1 = existsSync(r1Path) ? JSON.parse(readFileSync(r1Path, 'utf8')) : null
-  const severityOf = new Map(((r1?.result ?? r1)?.findings ?? []).map(f => [f.id, f.severity]))
-  const RANK = { blocker: 3, fix: 2, detail: 1 }
-  fixes.forEach(f => {
-    if (f.severity) return
-    const ids = String(f.id).split('+').map(s => s.trim())
-    const best = ids.map(i => severityOf.get(i)).filter(Boolean).sort((a, b) => RANK[b] - RANK[a])[0]
-    if (best) f.severity = best
-  })
-  const lensesOf = (id) => String(id).match(/design-reviewer-[a-z]+/g) ?? []
-  const seat = new Set(fixes.filter(f => !f.severity || f.severity !== 'detail').flatMap(f => lensesOf(f.id)))
-  seat.delete('design-reviewer-ambiguity')
-  seat.add('design-reviewer-consistency')
-  embedded.fixes = fixes
-  embedded.lenses = [...seat].sort()
+  const docBudget = budget('doc-budget-kb', 40)
+  const totalBudget = budget('total-budget-kb', 160)
+  const designDir = join(ws, '01-design')
+
+  const present = DOCS.filter(d => existsSync(join(designDir, d)))
+  const missingDocs = DOCS.filter(d => !present.includes(d))
+  const text = Object.fromEntries(present.map(d => [d, readFileSync(join(designDir, d), 'utf8')]))
+  const missingSections = present.filter(d => !LATITUDE.test(text[d])).map(d => `${d}: no "## The implementer decides"`)
+
+  // the AC ids: stories.md first, the blueprint's stories.json when the markdown is absent
+  const storiesMd = join(ws, '00-discovery', 'stories.md')
+  const storiesJson = join(ws, 'blueprint', 'stories.json')
+  let acs = []
+  if (existsSync(storiesMd)) {
+    const re = /\*\*`((?:J\d+\.s\d+\.\d+)|(?:frame:[A-Za-z0-9_.-]+?\.\d+))`\*\*/g
+    acs = [...new Set([...readFileSync(storiesMd, 'utf8').matchAll(re)].map(m => m[1]))]
+  } else if (existsSync(storiesJson)) {
+    acs = [...new Set(JSON.parse(readFileSync(storiesJson, 'utf8')).stories.flatMap(s => (s.acs || []).map(a => a.id)))]
+  } else usage(`${ws}: neither 00-discovery/stories.md nor blueprint/stories.json`)
+  const cited = (id) => new RegExp(`(^|[^A-Za-z0-9_.:-])${id.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}(?![0-9])`).test(text['tests.md'] ?? '')
+  const missingAcs = acs.filter(id => !cited(id))
+
+  const sizes = present.map(d => [d, Buffer.byteLength(text[d])])
+  const sizeWarnings = sizes.filter(([, b]) => b > docBudget * KB)
+    .map(([d, b]) => `${d}: ${Math.round(b / KB)} KB, over the ${docBudget} KB budget of one document`)
+  const total = sizes.reduce((sum, [, b]) => sum + b, 0)
+  if (total > totalBudget * KB) sizeWarnings.push(`the four documents: ${Math.round(total / KB)} KB, over the ${totalBudget} KB budget of the set`)
+  sizeWarnings.forEach(w => console.error(`review-prep: warning: ${w}`))
+  missingDocs.forEach(d => console.error(`review-prep: missing: 01-design/${d}`))
+  missingSections.forEach(s => console.error(`review-prep: missing: ${s}`))
+  missingAcs.forEach(id => console.error(`review-prep: tests.md does not cite ${id}`))
+
+  const ok = !missingDocs.length && !missingSections.length && !missingAcs.length
+  console.log(JSON.stringify({
+    documents: present, missingDocs,
+    sizesKB: Object.fromEntries(sizes.map(([d, b]) => [d, Math.round(b / KB * 10) / 10])),
+    sizeWarnings, acs: acs.length, missingAcs, missingSections, ok,
+  }))
+  process.exit(ok ? 0 : 1)
 }
 
-// ---------- the copy ----------
+function selfTest() {
+  const self = fileURLToPath(import.meta.url)
+  const dir = mkdtempSync(join(tmpdir(), 'review-prep-'))
+  const ws = join(dir, 'ws')
+  mkdirSync(join(ws, '00-discovery'), { recursive: true })
+  mkdirSync(join(ws, '01-design'), { recursive: true })
+  writeFileSync(join(ws, '00-discovery', 'stories.md'),
+    '- **`J1.s2.1`** [INV-1] GIVEN a\n- **`J1.s2.10`** [S-001] GIVEN b\n- **`frame:invites.error.1`** [INV-2] GIVEN c\n')
+  const doc = (body) => `# Doc\n\n${body}\n\n## The implementer decides\n\n- x\n`
+  const write = (name, body) => writeFileSync(join(ws, '01-design', name), body)
+  const run = (...extra) => {
+    const r = spawnSync(process.execPath, [self, ws, ...extra], { encoding: 'utf8' })
+    return { code: r.status, out: JSON.parse(r.stdout.trim() || '{}') }
+  }
+  const cases = []
+  const expect = (name, cond) => cases.push([name, !!cond])
 
-if (!existsSync(source)) die(`${source} not found`)
-const src = readFileSync(source, 'utf8')
-const PLACEHOLDER = 'const EMBEDDED = null'
-if (src.split(PLACEHOLDER).length !== 2) die(`${source}: the line "${PLACEHOLDER}" must appear exactly once`)
-const out = join(runDir, 'design-review.js')
-writeFileSync(out, src.replace(PLACEHOLDER, `const EMBEDDED = ${JSON.stringify(embedded)}`))
+  write('solution.md', doc('parts'))
+  write('data-and-contracts.md', doc('contracts'))
+  write('operations.md', doc('ops'))
+  let r = run()
+  expect('a missing document fails', r.code === 1 && r.out.missingDocs?.includes('tests.md'))
 
-console.log(JSON.stringify({
-  script: out,
-  source,
-  sourceSha256: sha(src),
-  round,
-  flows: flows.map(f => f.id),
-  sizeWarnings,
-  ...(round === 2 ? { changed: embedded.changed, lenses: embedded.lenses, fixes: embedded.fixes.length } : {}),
-}))
+  write('tests.md', doc('| `J1.s2.1` | api |\n| `frame:invites.error.1` | journey |'))
+  r = run()
+  expect('J1.s2.10 is not covered by J1.s2.1', r.code === 1 && r.out.missingAcs?.join() === 'J1.s2.10')
+
+  write('tests.md', doc('| `J1.s2.1` | api |\n| `J1.s2.10` | unit |\n| `frame:invites.error.1` | journey |'))
+  r = run()
+  expect('every AC cited passes', r.code === 0 && r.out.ok && r.out.acs === 3)
+
+  write('operations.md', '# Ops\n\nno latitude section\n')
+  r = run()
+  expect('a missing latitude section fails', r.code === 1 && r.out.missingSections?.length === 1)
+
+  write('operations.md', doc('x'.repeat(41 * KB)))
+  r = run()
+  expect('over 40 KB warns and still passes', r.code === 0 && r.out.sizeWarnings?.length === 1)
+  r = run('--doc-budget-kb', '50')
+  expect('a bigger budget clears the warning', r.code === 0 && r.out.sizeWarnings?.length === 0)
+
+  rmSync(dir, { recursive: true, force: true })
+  cases.forEach(([name, pass]) => console.log(`${pass ? 'ok  ' : 'FAIL'} ${name}`))
+  const failed = cases.filter(([, pass]) => !pass).length
+  console.log(`${cases.length - failed}/${cases.length} passed`)
+  process.exit(failed ? 1 : 0)
+}

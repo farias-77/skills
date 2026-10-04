@@ -1,8 +1,8 @@
 /*
  * design-research.js — deep research on ONE topic of a design, as
- * deterministic code. The stage-design conductor runs one of these per
- * topic listed from the recon, all in parallel, where a premise of the
- * design is unconfirmed (an external platform, a limit, a price).
+ * deterministic code. Optional: the stage-design conductor runs one per
+ * topic only when the architect's proposal leans on a premise the
+ * scouts could not confirm (an external platform, a limit, a price).
  *
  * The shape is the research pattern Anthropic documents for multi-agent
  * systems (orchestrator-workers): a planner turns the topic's questions

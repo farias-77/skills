@@ -3,9 +3,9 @@
 Public sources only.
 
 - https://basecamp.com/shapeup/1.2-chapter-03 — appetite as a time budget; the soft no.
-- https://basecamp.com/shapeup/1.3-chapter-04 — breadboarding; shaped work is rough, solved and bounded.
+- https://basecamp.com/shapeup/1.3-chapter-04 — shaped work is rough, solved and bounded.
 - https://basecamp.com/shapeup/1.4-chapter-05 — rabbit holes: patch, declare out of bounds, cut back.
-- https://basecamp.com/shapeup/1.5-chapter-06 — the pitch ingredients (appetite, rabbit holes, no-gos), which shape `sizing.md`.
+- https://basecamp.com/shapeup/1.5-chapter-06 — the pitch ingredients (appetite, rabbit holes, no-gos), which shape the proposal.
 - https://basecamp.com/shapeup/3.5-chapter-14 — "compare down to baseline"; the scope-hammering questions.
 - https://martinfowler.com/bliki/Yagni.html — the costs of build, delay, carry and repair; YAGNI needs malleable code.
 - https://mcfunley.com/choose-boring-technology — innovation tokens; known failure modes.

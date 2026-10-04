@@ -1,6 +1,6 @@
 ---
 name: pack-right-sizing
-description: Right-sizing a design; read it before producing, picking or judging design tiers, writing sizing.md, or reviewing whether a mechanism needs to exist at all.
+description: Right-sizing a design at the "basics done well" bar; read it before writing or cutting a design proposal, writing its evolution path, or reviewing whether a mechanism needs to exist at all.
 user-invocable: false
 ---
 
@@ -8,18 +8,20 @@ user-invocable: false
 
 ## 1 · When this pack applies
 
-Read it before you produce or judge a design: the three tiers, the
-pick for each part, `sizing.md`, or a review asking "does this need to
-exist?". Readers: `architect (Opus 5.5, high)`, `sizing-judge (Opus
-5.5, high)`, `overengineering-critic (Sonnet 5.5, high)`,
-`risk-critic (Sonnet 5.5, high)`, `design-reviewer-sizing (Opus 5.5,
-medium)` and the design conductor `(Opus 5.5, high)`; at stage 4,
-`builder (Opus 5.5, medium)` holds list C.
+Read it before you write or judge a design: the proposal, its cuts,
+its evolution path, or a review asking "does this need to exist?".
+Readers: `architect (Opus 5.5, high)`, `overengineering-critic (Opus
+5.5, medium)` and the design conductor `(Opus 5.5, high)`; at stage 3,
+the plan's writers and lenses size a node the same way; at stage 4,
+`builder` holds list C.
 
-The tiers are **lean** (the most basic and fastest design that is
-still reliable), **balanced** and **hardened** (maximum safety). The
-failure this pack prevents: a feature that should take an hour turning
-into a day of hardening on top of hardening.
+**The bar is "basics done well":** the simplest design that meets
+every acceptance criterion and the whole floor (list D), built from
+the primitives the project already runs. Every mechanism names what
+forces it. What a bigger design would add is relaxed, and written as
+an evolution path. The failure this pack prevents: a feature that
+should take an hour turning into a day of hardening on top of
+hardening.
 
 Precedence: the user's words and rulings, then the project's doctrine
 and golden paths, then this pack. The doctrine decides the primitives
@@ -30,15 +32,15 @@ pack gives a default, the doctrine's choice wins.
 
 ## 2 · Principles
 
-1. **Set the appetite, then design.** Write the hours before any tier.
-   *Why:* "Appetites start with a number and end with a design" (Shape
-   Up).
+1. **Bound the work before designing.** Write the no-gos first, from
+   the stories' Out lines. *Why:* "Appetites start with a number and
+   end with a design" (Shape Up).
 2. **Every mechanism names its requirement:** a story AC, a doctrine
    rule, a measured signal or a one-way door. *Why:* a mechanism built
    for a guessed need pays build, delay and carry costs (Fowler,
    YAGNI).
-3. **Each part starts lean** and moves up only when its score forces
-   it. *Why:* "find the simplest solution possible, and only increase
+3. **Each part starts at the basic version** and gets more only when
+   its score forces it (§5 R2). *Why:* "find the simplest solution possible, and only increase
    complexity when needed" (Anthropic). Prefer growth by changing
    configuration over changing the design.
 4. **Spend care only on one-way doors.** Data shape, public contract,
@@ -67,33 +69,26 @@ pack gives a default, the doctrine's choice wins.
 
 ## 3 · The checklist
 
-Every item is pass/fail on the tier files, `sizing.md` or a design
-document.
+Every item is pass/fail on the proposal or a design document.
 
-**A · Tiers (architects)**
+**A · The proposal (architect)**
 
-- A1. `sizing.md` opens with the appetite in hours and the no-gos. The
-  pick fits the appetite, or the scope is cut. Never cut the floor or
-  an AC.
-- A2. Every tier covers the same eight parts: data, contracts, compute
-  and jobs, integrations, security, ops, UI, tests. A part that is the
-  same in all tiers is marked "no choice".
-- A3. Each part gives build hours, run cost per month, risks covered
-  and risks accepted.
-- A4. Lean meets every AC and the whole floor. A lean that fails an AC
-  is a strawman.
-- A5. Each hardened addition names the failure it closes. "Best
-  practice" is not a failure.
+- A1. One solution, not options. It meets every AC and the whole floor
+  (list D); a proposal that fails an AC is not basic, it is broken.
+- A2. Every part and every mechanism names its requirement: an AC, a
+  floor item, a doctrine rule, a one-way door, the user's words.
+- A3. The one-way doors are named and decided now: data shape, public
+  contract, identity, third-party state, money, deletion, a message
+  sent.
+- A4. A disagreement with the user's idea names a concrete reason (an
+  AC, a floor item, a cost, a door, the doctrine), never taste.
 
-**B · The pick (sizing-judge)**
+**B · The evolution path**
 
-- B1. Every part has R, V and C scores and a one-line reason.
-- B2. Every part above lean cites the score that forced it (rubric
-  below).
-- B3. Every lean part with R ≥ 2 has an evolution-path row.
-- B4. One-way doors are listed by name. The ones that are the user's go
-  to the single question call: cost, scope, data format, contract
-  shape and security posture.
+- B1. Everything relaxed has a row: the signal with its number, what
+  already watches it, what to add, the cost.
+- B2. The next step is configuration or code that only adds. If moving
+  later would rewrite data, it is a one-way door: decide it now.
 
 **C · Overengineering flags.** Each one is a defect unless the line
 cites its requirement.
@@ -134,7 +129,7 @@ cites its requirement.
 - C17. A control for a risk the user already accepted in an earlier
   workstream (check its `rulings.md`).
 
-**D · The floor (risk-critic).** Never traded for speed.
+**D · The floor.** Never traded for speed; the architect meets it and the reviewer checks it.
 
 - D1. An external effect whose outcome can be unknown carries an
   idempotency key or is reconciled before it repeats.
@@ -143,8 +138,8 @@ cites its requirement.
 - D3. Every critical invariant has a DB constraint.
 - D4. An effect with no human in the loop survives a restart: a queue
   plus a dead-letter alarm.
-- D5. No failure ends silently. Even lean shows a failed state and logs
-  a line that alarms.
+- D5. No failure ends silently. Even the basic version shows a failed
+  state and logs a line that alarms.
 - D6. No transaction stays open across a network call.
 - D7. No PII in logs or payloads. Secrets live in the secret manager.
   Each piece has its own service identity. Authorization runs in the
@@ -159,8 +154,8 @@ cites its requirement.
 
 - E1. A lens reports against the requirement and the floor, and is
   never told to "be conservative", because that makes it under-report.
-  The judge keeps a finding only if it names the failure, who sees it,
-  how likely it is and the requirement. Anything else is optional.
+  The conductor keeps a finding only if it names the failure, who sees
+  it, how likely it is and the requirement. Anything else is optional.
 - E2. "Nothing to cut" or "nothing missing" is a complete answer.
 - E3. A fix that adds a mechanism must pass list C first.
 
@@ -204,50 +199,43 @@ a status column and one guard would do.
 
 ### R1 · The procedure
 
-1. **Bound the work.** Read the lock and the recon. Write the appetite
-   in hours and the no-gos. If the stories do not fit, propose cuts to
-   the conductor. Never widen scope quietly.
-2. **Breadboard it.** For the UI: places, affordances, connections.
-   For the server, one line per AC: `entry → use case → writes →
-   effects`. Circle every effect that leaves the process; those are
-   the doors and the retries.
-3. **Write lean.** Use the primitives already running. For each circled
-   effect ask "what if it half-succeeds?", then patch with the smallest
-   fix, or declare the case out of bounds.
-4. **Write hardened.** Pair every addition with the failure it closes.
-5. **Write balanced.** Take the cheapest hardened additions that close
-   the R = 3 failures.
-6. **Score and pick** (rubric below). Over the appetite: cut scope,
-   never the floor.
-7. **Attack the pick.** `overengineering-critic` runs list C;
-   `risk-critic` runs list D; the judge applies E1.
-8. **Write `sizing.md`** in one page
-   ([references/recipes.md](references/recipes.md)).
+1. **Bound the work.** Read the lock and the recon. Write the no-gos.
+   If the stories do not fit, say so to the conductor. Never widen
+   scope quietly.
+2. **Trace each AC.** For the server, one line per AC:
+   `entry → use case → writes → effects`. Circle every effect that
+   leaves the process; those are the doors and the retries.
+3. **Write the basic version.** Use the primitives already running.
+   For each circled effect ask "what if it half-succeeds?", then patch
+   with the smallest fix, or declare the case out of bounds and say who
+   notices it.
+4. **Give care where the score forces it** (R2), and nowhere else.
+5. **Write what was relaxed** as the evolution path (B1, B2).
+6. **Cut.** `overengineering-critic` runs list C; the architect applies
+   or rebuts each cut with the requirement the mechanism serves.
 
-### R2 · Scoring rubric for each part
+### R2 · Where care goes
 
 The scale is our own construction (inference), built on Bezos, SRE and
-YAGNI.
+YAGNI. Score each part where the basic version could fail.
 
-| | R: risk if lean fails | V: how hard to move up later | C: cost to move up now |
-|---|---|---|---|
-| 1 | cosmetic; the user retries; fixed at once | a config change, or code that only adds | < 2 h, no new component |
-| 2 | a user is blocked or files a ticket; fixed by hand within a day | a migration with backfill, or code across modules | hours; a new table, route or alarm |
-| 3 | data lost or wrong, money, PII, a silent failure, legal | one-way: data that can't be rebuilt, a contract in use, third-party state, a message sent | a day or more, or a new component |
+| | R: risk if the basic version fails | V: how hard to add more later |
+|---|---|---|
+| 1 | cosmetic; the user retries; fixed at once | a config change, or code that only adds |
+| 2 | a user is blocked or files a ticket; fixed by hand within a day | a migration with backfill, or code across modules |
+| 3 | data lost or wrong, money, PII, a silent failure, legal | one-way: data that can't be rebuilt, a contract in use, third-party state, a message sent |
 
-Pick with need = R × V:
-- need ≤ 3 → lean.
-- need 4 → lean plus an evolution path; balanced only if C = 1.
-- need 6 → balanced; hardened only if R = 3 and C ≤ 2.
-- need 9 → the cheapest tier that closes the door.
-- C = 3 with need ≤ 4 → flag C6 or C14.
-- A tie → lean.
+With need = R × V:
+- need ≤ 3 → the basic version.
+- need 4 → the basic version plus an evolution-path row.
+- need 6 or 9 → the cheapest care that closes the failure or the door,
+  now.
+- A tie → the basic version.
 
 The other recipes are in [references/recipes.md](references/recipes.md):
-**R3** the tier ladder, **R4** the `sizing.md` template and the
-evolution-path rules, **R5** the default retry, alarm and cap values,
-and one platform's retry defaults. **§6**, the mechanical checks with
-the `req:` trace convention, is
+**R4** the evolution path, **R5** the default retry, alarm and cap
+values, and one platform's retry defaults. **§6**, the mechanical
+checks with the `req:` trace convention, is
 [references/tooling.md](references/tooling.md); sources in
 [references/sources.md](references/sources.md). Agents cite this pack
 by these numbers (§3 C1, §5 R2); keep them when editing.

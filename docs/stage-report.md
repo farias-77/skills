@@ -104,9 +104,9 @@ cannot know, `__VIDEO_URL__` and `__BLUEPRINT_URL__`.
   `auto_open: "after_first_write"`, and no files. The reply carries
   the deck's URL. The deck's look is the house identity in
   `slides-scribe`: no design system is installed. A stage may make one
-  more deck the same way before its report: design's sizing call, in
-  `01-design/call/`, eight slides with no video and no blueprint
-  placeholders.
+  more deck the same way before its report: design's proposal, in
+  `01-design/presentation/`, with its video beside it and no blueprint
+  placeholder, re-rendered at each round of the debate.
 - **b. The blueprint.** Add the tab to `blueprint/stage-report.json`
   (`{"<tab>": {"video": "report/<tab>/video.mp4", "slides": "<deck URL>"}}`,
   keeping the earlier stages' keys), rebuild, and publish
@@ -174,8 +174,9 @@ what it costs at each scale; the decisions he took (those against the
 recommendation first) and, apart, the ones the conductor or a writer
 took in his place; the risks accepted, with who accepted them; how it
 reaches the first environment; the review in numbers. And **why it is
-this size**: the three tiers in one picture, what got care and what was
-relaxed, the evolution path as the way it grows.
+this size**: what is done well, what was relaxed and the evolution path
+as the way it grows, where the architect disagreed with him and how it
+was settled, and what the critic cut.
 
 **Plan — the graph, the width, the foundation.** From A to B in one
 picture; the thin foundation and why it comes first; the build as a

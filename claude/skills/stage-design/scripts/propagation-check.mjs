@@ -12,7 +12,7 @@
  * searches, as fixed strings:
  *
  *   design (default)  the design documents and the conductor's files
- *                     (01-design/*.md: the ten documents, sizing.md,
+ *                     (01-design/*.md: the four documents, proposal.md,
  *                     notes.md) and the writers' JSON (blueprint/design/*.json)
  *   plan              plan.md, plan.graph.json, preflight.md, the briefs
  *                     (02-plan/briefs/*.md) and their JSON

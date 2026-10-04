@@ -1,14 +1,13 @@
 # Design notes — <workstream>
 
 <!--
-  Written by the CONDUCTOR, as the stage happens. With sizing.md it is
-  the writers' only source of decisions: sizing.md says what is built
-  and at what size; this file says what exists today, the frame the
-  tiers were drawn in, the user's rulings at the call, and every answer
-  given after it. The writers never edit it. If the context is lost,
-  the next session resumes from here and from the files on disk.
-  One version of each decision: a revised decision replaces the old
-  text in place, and the change is dated under Amendments.
+  Written by the CONDUCTOR, as the stage happens. With proposal.md it
+  is the writers' source: proposal.md says what is built; this file
+  says what exists today, the user's words, how the debate went, and
+  every answer given to the writers. The writers never edit it. If the
+  context is lost, the next session resumes from here and from the
+  files on disk. A revised decision replaces the old text in place,
+  and the change is dated under Amendments.
 -->
 
 Opened <date>. Language of the documents: <language>.
@@ -19,42 +18,42 @@ The rulings the design cannot reopen are in `../rulings.md`.
 
 <the demand in one sentence, in the user's words where he gave them>
 
-## The frame
-
-<!-- Written at the end of G0, before the tiers. The architects design
-     inside it. -->
-
-- **Appetite:** <h> h — <why this number: the size of the lock, the user's words if he gave one>
-- **No-gos:** <from the PR-FAQ and the stories' Out lines, one each>
-- **Doctrine:** <the engineering doctrine the project's CLAUDE.md names; the rules this demand touches, with path:line>
-- **Other fronts:** <running workstreams and the files they share with this one, or "none">
-
 ## What exists today
 
-<!-- G0's recon, one line per fact, each with its source (path:line or
-     research/<topic>.md). The tiers extend what is here. -->
+<!-- D0, one line per fact, each with its source (recon/<topic>.md, path:line). -->
 
 - <fact> — <source>
 
-## Premises
+## No-gos
 
-<!-- Each premise the breadboard listed: confirmed (source), or
-     assumed, and what the design does if it is false. -->
+- <from the PR-FAQ and the stories' Out lines, one each>
 
-## His call
+## His idea
 
-<!-- G3. The deck's link; each question asked, the pick, his answer in
-     his words; what changed in sizing.md because of it (amended by
-     the judge, dated). "Nothing was his" is a complete entry. -->
+<!-- D1: his answer to "do you have something in mind?", as close to
+     verbatim as the notes allow. "Nothing in mind" is a complete entry. -->
 
-- Deck: <url>
-- **Q-1** <question> — pick <A> — his answer: "<words>" — sizing.md: <unchanged | amended: what>
+> "<his words>"
 
-## Questions answered after the call
+## The debate
 
-<!-- The writers' questions (G4), one block per decision. A decision
-     of his class that could not wait goes to rulings.md as
-     `ruled: conductor` and is listed at the close for veto. -->
+<!-- D3–D4: the deck's link, then one block per round. -->
+
+- Video and deck: <url>
+
+### Round <n> — <date>
+
+- **His points:** 1. "<words>" · 2. "<words>"
+- **Ruled:** <point → the decision, with the question's pick when one was asked>
+- **Changed in proposal.md:** <one line>
+
+Closed <date>: "<his words>"
+
+## Questions answered
+
+<!-- D5: the writers' questions, one block per decision. A decision of
+     his class goes to rulings.md as `ruled: conductor` and to the veto
+     list of the close. -->
 
 > **Decision — <title>** `(decided in your place)`   <- flag only when the class was his
 > Context: <the writer's question, with its Q-n>
@@ -63,4 +62,4 @@ The rulings the design cannot reopen are in `../rulings.md`.
 
 ## Amendments
 
-<!-- dated, from the rulings of each round and from the close -->
+<!-- dated, from the review's fixes and from a veto after the close -->
