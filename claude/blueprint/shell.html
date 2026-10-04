@@ -954,7 +954,7 @@
       </div>`);
 
     // ---- 2. the path: feature branch → staging → the ask → production ----
-    // v9 order: the play → the merge into main → staging (and the verifier) → production → a rollback when a trigger fires
+    // v9 order: the play → the merge into main → staging (and its smoke) → production (its smoke and the watch) → a rollback when a trigger fires
     const KORD = ['ask', 'merge', 'staging', 'production', 'rollback'];
     const events = [...L.staging.map(s => ({ k: 'staging', at: s.at, s })), ...L.asks.map(a => ({ k: 'ask', at: a.at, s: a })), ...(L.merge ? [{ k: 'merge', at: L.merge.at, s: L.merge }] : []),
       ...L.production.map(p => ({ k: 'production', at: p.at, s: p })), ...(L.rollbacks || []).map(r => ({ k: 'rollback', at: r.at, s: r }))]

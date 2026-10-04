@@ -5,16 +5,16 @@ step: `release.json`. `node claude/blueprint/build.mjs <workstream>`
 validates it against the plan and the execution record and assembles
 the Release tab. The build refuses with the field named: an entry the
 plan does not know, a merge into main or a production step (a deploy,
-a traffic shift) before the play was answered `go`, a production step
-after a red or a rollback with no new `go`, a closed release with a
-watch row neither read nor owned, a fix entry without its run, **a
+a traffic shift) before the play was answered `go`, a closed release
+with a later proof neither read nor owned, a fix entry without its run, **a
 text over its word cap**. Text fields accept `` `code` `` and
 `**bold**`. Everything in the workstream's language.
 
 The order the tab tells: **the play** (his `go`) → **the merge** into
-main behind the local-CI signoff → **staging** → the verifier on the
-locked journeys → **production** (progressive, or straight with a
-smoke run) → each **alarm's first evaluation** → done.
+main behind the local-CI signoff → **staging** and its smoke →
+**production** (progressive, or straight) and its smoke → **the
+watch**, 15 minutes, with each alarm's first evaluation → done. A red
+gets one fix under the same play; a second red stops.
 
 ## The voice
 
@@ -38,9 +38,9 @@ there, what broke on the way and what still waits for someone.
   "merge": { "pr": 41, "sha": "9f8e7d6", "at": "2026-10-03 14:10", "signoff": "local-ci" },
   "staging": [
     { "n": 1, "at": "2026-10-03 14:20", "run": "123456789", "ok": false,
-      "summary": "verifier 5/6 entries PASS; E-05 FAIL: `ready-email-sent`", "cause": "code", "fix": "R.1", "proof": "proof/staging-1.txt" },
+      "summary": "smoke: health ok, 3/4 read-only journeys; `order-list` FAIL", "cause": "code", "fix": "R.1", "proof": "proof/staging-1.txt" },
     { "n": 2, "at": "2026-10-03 16:02", "pr": 43, "run": "123456901", "ok": true,
-      "summary": "verifier 6/6 entries PASS", "cause": null, "fix": null, "proof": "proof/staging-2.txt" }
+      "summary": "smoke: health ok, 4/4 read-only journeys", "cause": null, "fix": null, "proof": "proof/staging-2.txt" }
   ],
   "fixes": [ { "id": "R.1", "kind": "staging", "what": "the ready e-mail job retried on an unknown result", "rounds": 2, "sha": "7c6b5a4", "run": "04-release/entries/R.1/run-1.json" } ],
   "versions": [ { "artifact": "api", "from": "v1.4.0", "to": "v1.5.0", "bump": "minor", "commits": 23, "unparsed": 0, "notes": "04-release/notes/api.md" } ],
@@ -48,7 +48,7 @@ there, what broke on the way and what still waits for someone.
     "mode": "progressive",
     "candidate": { "rev": "api-00042", "tag": "rc-9f8e7d6", "smoke": "4/4" },
     "shifts": [ { "pct": 10, "at": "2026-10-03 16:20" }, { "pct": 100, "at": "2026-10-03 16:31" } ],
-    "bake": { "minutes": 10, "newReq": 412, "new5xx": 0.0, "prev5xx": 0.1, "newP95": 180, "prevP95": 190, "verdict": "hold" }
+    "bake": { "minutes": 15, "newReq": 412, "new5xx": 0.0, "prev5xx": 0.1, "newP95": 180, "prevP95": 190, "verdict": "hold" }
   },
   "production": [
     { "n": 1, "at": "2026-10-03 16:31", "run": "123457002", "ok": true, "rolledBack": false,
@@ -69,17 +69,16 @@ there, what broke on the way and what still waits for someone.
 - `ask` is **the play**: `words` his words, verbatim; `answer` is `go`
   (or `not-now` when he held it); `at` the play's hour; `pr` optional
   (no release PR is asked on). No merge into main and no production
-  step exists before an `ask` answered `go`; a new artifact after a
-  production red or a rollback needs a new `go` (`asks` may be an
-  array when there were several; the last one is the one that
-  shipped).
+  step exists before an `ask` answered `go`. The one fix after a red
+  ships under the same `go` (`asks` may be an array when there were
+  several; the last one is the one that shipped).
 - `merge` (optional until it happens): the PR into main, its merge
   `sha`, `at`, and the `signoff` context it merged behind
   (`local-ci`).
 - `ships.entries` names ids of `execution.json` that are merged;
   `amendments` names its `F.<n>`.
-- `staging[]` is each staging deploy with the verifier's run on the
-  locked journeys; `pr` is optional (staging deploys main's merge
+- `staging[]` is each staging deploy with its smoke (health, the sha,
+  the read-only journeys); `pr` is optional (staging deploys main's merge
   sha). `cause` is `code` (then `fix` names an `R.<n>` in `fixes`),
   `environment`, or `null` on a green run.
 - `fixes[].kind` is `staging`, `production` or `hotfix`; each has its
@@ -88,25 +87,26 @@ there, what broke on the way and what still waits for someone.
   progressive one names its `candidate` (`rev`, `tag`, `smoke` as
   read on the tag); `shifts[]` are the traffic moves (`pct` 0–100,
   `at`), each one a production step under the same `go` rule; `bake`
-  is the new revision against the previous one (`minutes`, `newReq`,
-  `new5xx` and `prev5xx` in %, `newP95` and `prevP95` in ms, `null`
-  when not measured) and its `verdict`: `hold`, `no-signal` or
-  `trigger`.
+  is **the watch**, 15 minutes of the new revision against the
+  previous one (`minutes`, `newReq`, `new5xx` and `prev5xx` in %,
+  `newP95` and `prevP95` in ms, `null` when not measured) and its
+  `verdict`: `hold`, `no-signal` or `trigger`.
 - A `production[]` step with `rolledBack: true` names the `fix` that
   followed. `rollbacks[]` (optional): `at`, the `trigger` that fired,
   its `value`, the revision traffic went back `to`, and the `fix`
   (`null` until opened).
-- `alarms[]` (optional): each alarm's first evaluation after the
-  bake, written as read: `ok`, `no-datapoints`, `firing` or
+- `alarms[]` (optional): each alarm's first evaluation, read by the
+  watch, written as read: `ok`, `no-datapoints`, `firing` or
   `not-evaluated`. "No datapoints" is never written as `ok`.
 - `numbers` (optional, from the trace's numbers line): `wallClockH`
   (play → done), `hisMin` (his minutes), `tokensM`, `reverts`,
   `revertRate` (reverts ÷ commits); each a number, or `null` when the
   record does not carry it.
-- `watch[]`: `readAt`, `got` and `ok` are filled when read; `owner`
-  when it is left as a pendency.
-- `closed` is set when every watch row is read or owned and no fix is
-  open.
+- `watch[]` are the later proofs, each with its own hour: `readAt`,
+  `got` and `ok` are filled when read; `owner` when it is left as a
+  pendency.
+- `closed` is set when every later proof is read or owned and no fix
+  is open.
 
 Word caps: `summary` 25 · `what` 18 · `item` 16 · `verified` 25 ·
 `expects` 20 · `rollbacks[].trigger` 14 · `inOneSentence` 35 ·

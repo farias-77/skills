@@ -110,15 +110,17 @@ what to change in plain words, and each adjustment is built on the
 spot (builder, gate, merge; the reviewer only when it touches auth,
 permissions or personal data) until he says ok.
 
-**5 · Release — autonomous, responsible.** His play is his "go": one
+**5 · Release — autonomous, responsible.** Stage 4 owns working, so
+the release does not re-test the feature. His play is his "go": one
 message carries the pre-flight and the play line that authorizes the
 audited head. Then the session merges into `main` behind the local-CI
-signoff, deploys staging, runs the locked journeys there, ships
-production progressively where the platform allows (a candidate at 0%
-smoked on its tag, the shift, a bake against the previous revision),
-reads each alarm's first evaluation, and rolls back on its own on the
-triggers it wrote before the play. A guard hook holds whatever cannot
-be undone.
+signoff, deploys staging and smokes the read-only journeys there,
+ships production progressively where the platform allows (a candidate
+at 0% smoked on its tag, then the shift), smokes it, and watches
+errors and latency for 15 minutes, rolling back on its own on the
+triggers it wrote before the play. A red gets one fix through the
+stage-4 pipeline; a second red stops and reports. A guard hook holds
+whatever cannot be undone.
 
 **6 · Close — the retro for the pipeline, the launch for the people.**
 The retro harvests the whole record (what worked, what went wrong, the
@@ -169,8 +171,7 @@ an agent's frontmatter disagrees.
 |  | `reviewer` | Opus 5.5, high |
 |  | `qa-frontend` | Opus 5.5, medium |
 |  | `qa-backend` | Opus 5.5, medium |
-| release | `verifier` | Opus 5.5, medium |
-|  | `release-scribe` | Sonnet 5.5, medium |
+| release | `release-scribe` | Sonnet 5.5, medium |
 | close | `close-harvester` | Sonnet 5.5, medium |
 |  | `launch-director` | Opus 5.5, high |
 |  | `footage-recorder` | Sonnet 5.5, medium |
@@ -192,7 +193,7 @@ path in the prompt; a session loads one with the Skill tool.
 | `parallel-plan-local-ci` | the plan conductor, planner (Opus 5.5, high), plan-reviewer (Opus 5.5, medium), the execute session |
 | `go-backend` · `react-frontend` | builder (Opus 5.5, medium), reviewer (Opus 5.5, high); go also qa-backend (Opus 5.5, medium), react also qa-frontend (Opus 5.5, medium) |
 | `ops` | architect (Opus 5.5, high), builder (Opus 5.5, medium; ops), reviewer (Opus 5.5, high), the release session |
-| `release` | the release session, verifier (Opus 5.5, medium) on staging and production |
+| `release` | the release session |
 | `launch-video` | launch-director (Opus 5.5, high), footage-recorder (Sonnet 5.5, medium), the video kit's launch mode |
 | `model-selection` | whoever picks a model: the evidence behind `docs/models.md` |
 

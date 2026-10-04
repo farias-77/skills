@@ -17,12 +17,14 @@ pre-flight, the play and the stop list.
 | Versioned artifacts | the doctrine's delivery standard: what is versioned and released (one repo, or several deployables in one) |
 | Permissions | the checks of `permissions.md`: the guard, the allow rules the steps need, branch protection |
 | Pre-flight | the design's `operations.md`: every step that needs him, the plan's open pre-flight items, anything the audit left "with the user", every step the classifier reserves for him (below), and the guard's verbatim lines |
-| Steps | the doctrine's delivery standard: what deploys staging and production, the read-only check of each, the production diff command; then the verifier on staging |
+| Steps | the doctrine's delivery standard: what deploys staging and production, the read-only check of each, the production diff command |
+| The smoke | the doctrine's journey command and the journeys stage 4 left: the read-only ones, the URL and the actors per environment |
 | Rollout mode | `rollout.md` of this skill and the doctrine's role 19: progressive where the platform has it, straight otherwise |
 | Rollback triggers | `rollout.md` defaults, overridden by the doctrine's values and the design's `operations.md` |
 | Migrations | `data-and-contracts.md` and the migrations in the diff: each classified expand or contract |
 | Toggles | the design's rollout: each release toggle and ops kill switch |
-| The watch | the audit's residue deferred to production with its own hour (first scheduled run, first real data) |
+| The watch | the 15 minutes and the triggers it reads; the alarms the release touches |
+| The later proofs | the audit's residue deferred to production with its own hour (first scheduled run, first real data) |
 | The stop list | SKILL.md, plus anything this release adds (a rollback not safe for data, named) |
 
 ## The pre-flight and the play
@@ -133,16 +135,18 @@ One row per release toggle or kill switch:
   release");
 - its removal task.
 
-## The verifier on staging and the smoke
+## The smoke
 
-One row per entry for staging: the acceptance files, the staging URLs
-and actors, and the evidence folder. Name the lines that stage 4 could
-not check locally and staging reaches. For production, list the
+The release does not re-test the feature: stage 4 proved it and he
+used it. The smoke only proves each environment serves it. List the
 **read-only journeys**: the ones that write nothing, or write only as
-a test actor into data the doctrine says is safe in production. Only
-those run on the candidate and in the smoke.
+a test actor into data the doctrine says is safe in that environment.
+Write the one smoke command verbatim (health, the sha served, those
+journeys run by the project's journey command against a URL), and per
+environment the URL and the test actors the doctrine names (never a
+production actor, never a token).
 
-## The watch
+## The later proofs
 
 A row per deferred proof with its own hour:
 
@@ -152,12 +156,12 @@ A row per deferred proof with its own hour:
 - what it expects;
 - the command that reads it.
 
-An alarm's first evaluation is not a row: step 6 reads it after the
-bake. A proof more than 48 h after production is a pendency with an
-owner.
+An alarm's first evaluation is not a row: the watch reads it. A proof
+more than 48 h after production is a pendency with an owner.
 
 ## Where the session stops
 
 The stop list of SKILL.md, plus what this release names (the rollback
-not safe for data, the contract migration). Nothing else stops the
-release, and nothing runs before the play.
+not safe for data, the contract migration), and the second red, which
+stops and reports. Nothing else stops the release, and nothing runs
+before the play.

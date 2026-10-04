@@ -72,7 +72,7 @@ TypeScript project):
 ## verify-map.md
 
 A section appended to each feature map (the file the doctrine names for
-the feature). The verifier, the release check and the footage recorder
+the feature). The QAs, the release smoke and the footage recorder
 read it to reach and drive the feature without rediscovering the path.
 
 - **Written in the feature maps' language**: the headings, the row

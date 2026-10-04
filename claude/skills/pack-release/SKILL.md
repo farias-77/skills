@@ -16,7 +16,7 @@ deploys, and when configuring the release session's permissions.
 Precedence: the user's words, then the project's doctrine (its
 delivery standard and deploy workflows), then this pack. The doctrine
 decides the environments and branch names, the deploy order, which
-identity writes to production, the CI's automatic rollback, the bake
+identity writes to production, the CI's automatic rollback, the watch
 length and the platform. The commands in the references are examples
 of one platform, never the rule.
 
@@ -122,8 +122,8 @@ of one platform, never the rule.
       `pageerror`, non-empty root.
 - [ ] After the CI's green, the session runs one read-only check of its
       own.
-- [ ] The bake compares the new revision with the previous one in the
-      same window, never before against after.
+- [ ] The 15-minute watch compares the new revision with the previous
+      one in the same window, never before against after.
 - [ ] Alarm state is written as read: "no datapoints" is not "healthy".
 - [ ] Tags and releases go on the merge sha after green; a published tag
       is never rewritten.
@@ -178,14 +178,14 @@ of one platform, never the rule.
 | 0 | Plan; one message with the user's actions | every pre-flight item read back | park before the staging merge, one line |
 | 1 | Production diff: saved plan, JSON gate | no deletes on stateful resources; counts as expected | stop, ask (data) |
 | 2 | PR feature → staging, merge | required check green on the head sha | fix entry `R.n` |
-| 3 | Follow the staging deploy | run green, suite included | environment red → one rerun or park; code red → `R.n`; third red on a step → stop |
-| 4 | Verifier journeys on staging | every entry PASS (browser, side effects, personal-data canary) | as in 3 |
+| 3 | Follow the staging deploy | run green | environment red → one rerun or park; code red → the one fix `R.n`; a second red → stop and report |
+| 4 | Smoke on staging: health, the sha, the read-only journeys | green | as in 3 |
 | 5 | Release PR staging → `main`, ask for the go | the user's go, or the goal quoted verbatim | stop |
 | 6 | Merge (merge commit) | required check green on the head sha | — |
 | 7 | Follow the production deploy: data → app (old image serving) → migrate → candidate at 0% → tag smoke → 100% → smoke → front via preview channel | each step green | automatic rollback |
-| 8 | Bake ≥ 10 min, per-revision reads | rollback thresholds hold | roll back, then ask |
+| 8 | Watch 15 min, per-revision reads, the alarms the release touches | rollback thresholds hold | roll back; the one fix `R.n`; a second red → stop and report |
 | 9 | Tags and releases on the merge sha | — | — |
-| 10 | Watch the proofs that have their own hour | read and traced | hotfix |
+| 10 | The later proofs that have their own hour | read and traced | hotfix |
 
 **Rollback triggers**
 
@@ -194,13 +194,13 @@ of one platform, never the rule.
 | Any step after serve fails | non-zero | traffic → previous revision; job → previous image | CI |
 | Candidate smoke on the tag URL | non-2xx or digest mismatch | never promote | CI |
 | Front smoke on the channel | `pageerror` or empty root | never promote to live | CI |
-| 5xx ratio, new vs previous revision, same window | > 2× previous and > 1%, with ≥ 100 requests on new (inference) | roll back | CI bake; after the run, the agent asks |
-| p95 latency, same window | > 1.5× previous for 10 min (inference) | roll back | same |
+| 5xx ratio, new vs previous revision, same window | > 2× previous and > 1%, with ≥ 100 requests on new (inference) | roll back | the watch |
+| p95 latency, same window | > 1.5× previous over the watch (inference) | roll back | same |
 | Start failures, memory kills | instance could not start; OOM in logs | roll back | same |
 | Job execution on the new image | `failed` | previous image | agent asks |
 | Migrate fails | any | old revision keeps serving; no schema rollback; stop | human |
 | Contract ran, or real side effects sent | — | roll forward through `R.n` | human |
-| Fewer than 100 requests in the bake | — | verdict "no signal", not "healthy"; rely on smoke and journeys | — |
+| Fewer than 100 requests in the watch | — | verdict "no signal", not "healthy"; rely on the smoke | — |
 
 Read request count by response class and latency per revision, exclude
 4xx, and also check an absolute SLO; alert policies and log-based
@@ -245,11 +245,12 @@ promotion or production rerun outside the workflow. The boundary that
 holds stays outside the session: the agent's cloud CLI runs as a
 read-only identity, with no secret accessor.
 
-**When the agent stops and asks:** a production merge without the user's word;
-a deletion or replacement on a stateful resource in the plan; a
-contract migration, or a rollback not safe for data; a secret, IAM, DNS
-or TLS write; a third red on one step; a new artifact after a
-production rollback; anything the go or the goal did not name.
+**When the agent stops and asks** (only what cannot be undone): a
+production merge without the user's word; a deletion or replacement on
+a stateful resource in the plan; a contract migration, or a rollback
+not safe for data; a secret, IAM, DNS or TLS write; anything the go or
+the goal did not name. **When it stops and reports:** a failed
+migration; a second red after the one fix.
 
 The settings file, the guard script, the platform example commands and
 the migration SQL are in [references/recipes.md](references/recipes.md);

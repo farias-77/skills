@@ -592,8 +592,8 @@
     "fixes": "correções",
     "rollbacks": "rollbacks",
     "hotfixes": "hotfixes",
-    "watchRead": "provas da vigília lidas",
-    "watchOwned": "provas da vigília com dono",
+    "watchRead": "provas posteriores lidas",
+    "watchOwned": "provas posteriores com dono",
     "rulings": "suas decisões",
     "tokensM": "tokens (milhões)"
    }
@@ -673,7 +673,7 @@
    "rollout": "O rollout, e os alarmes",
    "versions": "Versões, e o que está em produção",
    "fixes": "As correções",
-   "watch": "A vigília, e o que espera"
+   "watch": "As provas posteriores, e o que espera"
   },
   "started": "início",
   "closed": "fechado",
@@ -700,11 +700,11 @@
    "fixesTail": "{n} ainda abertas",
    "rollbacks": "rollbacks",
    "rollbacksTail": "em {n} passos de produção",
-   "watch": "linhas da vigília lidas",
+   "watch": "provas posteriores lidas",
    "watchTail": "{n} deixadas com um dono"
   },
   "path": {
-   "lede": "O play dele autoriza tudo: o merge na main atrás do signoff do CI local, o staging, o verificador nas jornadas travadas, a produção e a primeira avaliação de cada alarme. Um vermelho vira correção e roda de novo.",
+   "lede": "O play dele autoriza tudo: o merge na main atrás do signoff do CI local, o staging e seu smoke, a produção e seu smoke, e uma vigília de 15 minutos. A funcionalidade não é testada de novo aqui. Um vermelho ganha uma correção; um segundo vermelho para.",
    "feat": "branch da feature",
    "staging": "staging {n}",
    "production": "produção {n}",
@@ -726,15 +726,15 @@
    "signoff": "signoff"
   },
   "rollout": {
-   "lede": "A produção sai de forma progressiva onde a plataforma permite: um candidato a 0% testado na sua tag, a troca de tráfego, um bake contra a revisão anterior. Senão, direto, e depois um smoke.",
+   "lede": "A produção sai de forma progressiva onde a plataforma permite: um candidato a 0% testado na sua tag, depois a troca de tráfego. Senão, direto. Depois um smoke e uma vigília de 15 minutos contra a revisão anterior.",
    "mode": "Como saiu",
    "modes": {
     "progressive": "progressivo",
     "straight": "direto"
    },
    "modeNote": {
-    "progressive": "um candidato a 0%, testado na sua tag, depois o tráfego trocado e assado contra a revisão anterior.",
-    "straight": "publicado inteiro, depois um smoke das jornadas só de leitura."
+    "progressive": "um candidato a 0%, testado na sua tag, depois o tráfego trocado e vigiado contra a revisão anterior.",
+    "straight": "publicado inteiro, depois um smoke das jornadas só de leitura e a vigília."
    },
    "rev": "candidato",
    "tag": "tag",
@@ -743,7 +743,7 @@
    "pct": "Tráfego",
    "at": "Quando",
    "bake": {
-    "title": "O bake, revisão nova contra a anterior",
+    "title": "A vigília de 15 minutos, revisão nova contra a anterior",
     "minutes": "Duração",
     "req": "Requisições",
     "err": "5xx",

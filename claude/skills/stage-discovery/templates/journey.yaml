@@ -7,7 +7,7 @@
 # frame shows in words a test can assert (expect) and what happens behind it
 # (effects), read from the mock's screens, copy and backstage.
 #
-# Later stages read these files: the verifier turns each step into a test
+# Later stages read these files: the builder turns each step into a test
 # step, the UX reviewer compares the real screen with each step's frame, the
 # plan gives every journey to exactly one slice. Ids never change after the
 # lock. Keys stay at this indentation: the trace check reads them by line.

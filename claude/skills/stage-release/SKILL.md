@@ -1,6 +1,6 @@
 ---
 name: stage-release
-description: Conducts stage 5 (Release). It takes the audited feature branch into main and production on its own, from the user's play to done. The session (Opus 5.5, medium) writes the release plan, with the rollback triggers, the stop list, the migrations and the toggles, and checks the project's permissions and guard hook. It sends him, in one message, every action only he can run plus the play line that authorizes the merge. His play is his "go". Then it runs alone. It merges into main behind the local-CI signoff and deploys staging. The verifier (Opus 5.5, medium) runs the locked journeys on staging. Production goes out progressively where the platform allows: a candidate at 0% smoked on its tag, the traffic shift, and a bake against the previous revision. Otherwise it goes straight, followed by a smoke run. The session reads each alarm's first evaluation, tags the versions from one release-scribe (Sonnet 5.5, medium) per artifact, and closes with the stage report (video, slides, blueprint). A red on staging is fixed as an entry R.n through the stage-4 pipeline. A rollback trigger rolls production back automatically. It stops and asks only on its written list. Also runs a hotfix while the workstream is not closed. Use when a workstream's .state.md says stage release, to resume a release in progress, or with `hotfix` for a regression found in production.
+description: Conducts stage 5 (Release). It takes the audited feature branch into main and production on its own, from the user's play to done. The session (Opus 5.5, medium) writes the release plan, with the rollback triggers, the stop list, the migrations and the toggles, and checks the project's permissions and guard hook. It sends him, in one message, every action only he can run plus the play line that authorizes the merge. His play is his "go". Then it runs alone. It does not re-test the feature: stage 4 owns working. It merges into main behind the local-CI signoff, deploys staging and runs a smoke of the read-only journeys. Production goes out progressively where the platform allows (a candidate at 0% smoked on its tag, then the traffic shift), otherwise straight; then a smoke and a 15-minute watch of errors and latency against the previous revision, with automatic rollback on the plan's triggers. It tags the versions from one release-scribe (Sonnet 5.5, medium) per artifact and closes with the stage report (video, slides, blueprint). A red smoke after a deploy gets one fix, an entry R.n through the stage-4 pipeline; a second red stops and reports. It stops and asks only on its written list of what cannot be undone. Also runs a hotfix while the workstream is not closed. Use when a workstream's .state.md says stage release, to resume a release in progress, or with `hotfix` for a regression found in production.
 disable-model-invocation: false
 argument-hint: "<workstream-slug> [hotfix]"
 allowed-tools: Read, Write, Edit, Glob, Grep, Agent, Workflow, Skill, AskUserQuestion, Artifact, PushNotification, ScheduleWakeup, Bash
@@ -8,14 +8,17 @@ allowed-tools: Read, Write, Edit, Glob, Grep, Agent, Workflow, Skill, AskUserQue
 
 # Stage 5: Release
 
-Stage 4 left `feat/<workstream>` merged, gated, reviewed and audited.
-This stage puts it in `main` and in production, and reports once.
+Stage 4 left `feat/<workstream>` merged, gated, reviewed, audited and
+used by him on screen. **This stage assumes it works.** It does not
+re-test the feature; it puts it in `main` and in production, proves
+each environment serves it with a smoke, watches production for 15
+minutes, and reports once.
 
 **Mode: autonomous under his play.** He presses play once. **His play
 is his "go"** (reports render the word in the workstream's
 language). From then on the session conducts every step alone:
-the merge into `main`, the deploys, the proof on staging, the
-progressive rollout, the rollback, the fixes. It asks him only for
+the merge into `main`, the deploys, the smokes, the progressive
+rollout, the watch, the rollback, the fix. It asks him only for
 what it cannot reach (a key, an account, a DNS record, all in one
 message up front) and for what is on the stop list below. Merge and
 deploy permissions are granted by the project's settings. In
@@ -43,17 +46,16 @@ It never deploys by hand what the doctrine says the CI deploys.
 | **the plan** | `04-release/plan.md`: what ships, the pre-flight, every step with its command and its read-only check, the rollback triggers, the migrations, the toggles, the stop list. Written before the play |
 | **the guard** | the project's `.claude/hooks/guard-irreversible.sh` (the pipeline's `claude/hooks/guard-irreversible.sh`, installed by pipeline-setup). It denies what cannot be undone and asks before a merge into a protected branch that the play did not authorize |
 | **staging** | the environment the doctrine deploys before production (a project may call it alpha) |
-| **the locked journeys** | the journeys locked at discovery, as stage 4 turned them into each entry's acceptance checks |
+| **the smoke** | health, the sha served, and the plan's **read-only journeys** (the ones that write nothing in that environment) run by the project's journey command against the environment's URL with its test actors. A command the session runs, not an agent |
 | **candidate** | the new production revision, deployed with no traffic under a tag URL |
-| **bake** | ≥ 10 minutes with the new revision serving, read against the previous revision in the same window |
+| **the watch** | 15 minutes with the new revision serving: errors and latency read against the previous revision in the same window, and the alarms the release touches. A trigger rolls back on its own |
 | **entry `R.n`** | a fix built through the stage-4 pipeline (`exec-entry`). The session never writes or reviews code |
 
 ## The team
 
 | Agent | Does |
 |---|---|
-| the session (Opus 5.5, medium) | the plan, the pre-flight, the merges, the deploys, the reads, the rollback, the record |
-| `verifier (Opus 5.5, medium)` | prove mode: the locked journeys on staging, and the read-only ones on the candidate and on production |
+| the session (Opus 5.5, medium) | the plan, the pre-flight, the merges, the deploys, the smokes, the watch, the rollback, the record |
 | `release-scribe (Sonnet 5.5, medium)` | one per versioned artifact: the version, the notes, the reverts |
 | the stage-4 pipeline | an `R.n` fix: `builder (Opus 5.5, medium)`, `exec-gate (Sonnet 5.5, low)`, `reviewer (Opus 5.5, high)`, and `qa-frontend (Opus 5.5, medium)` or `qa-backend (Opus 5.5, medium)` by its surface |
 | `scout (Sonnet 5.5, low)` | whatever the session needs to look up, by the house rule |
@@ -62,13 +64,12 @@ It never deploys by hand what the doctrine says the CI deploys.
 **Packs.** At step 0 the session loads `pack-release` and `pack-ops`
 with the Skill tool. They hold the checklists and recipes this skill
 points to: the go/no-go per step, the candidate commands per platform,
-the thresholds, the migration rules and the toggle rules. Every
-verifier prompt names `pack-release` to read first.
+the thresholds, the migration rules and the toggle rules.
 
 The session is **Opus 5.5 at medium effort**. It runs the steps
 in order and has no workers. Every reply that dispatches or waits
 carries a status table (what · state). A wait on something outside (a
-CI run, a deploy, a bake, a proof's hour) ends the turn on a wakeup
+CI run, a deploy, the watch, a proof's hour) ends the turn on a wakeup
 sized to it. It never loops to check early.
 
 ## The pattern
@@ -82,20 +83,23 @@ sized to it. It never loops to check early.
             --match-head-commit · the guard checks the head against the play
             ‖ release-scribe (Sonnet 5.5, medium) per artifact on the merge sha
 3 staging   the doctrine's deploy of that sha → read-only: staging serves it · migrations ran
-4 verify    verifier (Opus 5.5, medium) per entry, on staging: the locked journeys
-            red → R.n through exec-entry → PR into main → 3 again · third red on a step: stop
-5 prod      progressive: candidate at 0% + tag → smoke on the tag → shift → bake vs previous → 100%
-            straight:    deploy → smoke run of the read-only journeys
-            a trigger fires → automatic rollback → R.n → 3 → ask before the new artifact
-6 alarms    each alarm's first evaluation, read once after the bake, written as read
-7 done      tags + releases on the released sha · release.json · .state.md · PushNotification
-8 report    claude/docs/stage-report.md: video → slides → blueprint
+            → the smoke: the read-only journeys against staging
+4 prod      progressive: candidate at 0% + tag → smoke on the tag → shift (a share, or 100%)
+            straight:    deploy
+            → the smoke against production
+5 watch     15 min: errors and latency vs the previous revision, the alarms the release touches
+            green → the share to 100%
+            a trigger fires → automatic rollback
+            a red smoke or a rollback → ONE fix R.n through exec-entry → main → 3 again
+            a second red → stop and report
+6 done      tags + releases on the released sha · release.json · .state.md · PushNotification
+7 report    claude/docs/stage-report.md: video → slides → blueprint
 ```
 
 **When a merge into `main` deploys production by itself** (the
-doctrine says so), the order changes. Steps 3 and 4 run first, from
+doctrine says so), the order changes. Step 3 runs first, from
 `feat/<workstream>` or the staging branch the doctrine names. Step 2
-then *is* the production deploy, and step 5 follows the CI's rollout,
+then *is* the production deploy, and step 4 follows the CI's rollout,
 progressive when the CI does it that way.
 
 ## Preconditions
@@ -115,7 +119,7 @@ designs-root/<workstream>/04-release/
 ├── trace.md       # one line per step as it ends, `date -u`
 ├── notes/         # per versioned artifact: <artifact>.md (the notes) and <artifact>.json (the scribe's return)
 ├── entries/R.<n>/ # the fix entries' run-*.json and evidence
-├── proof/         # CI summaries, smoke and bake reads, the alarms, the watch, verify/<entry>/
+├── proof/         # CI summaries, the smokes, the watch's reads, the alarms, the later proofs
 └── telemetry.json # the stage's measures, shared shape (claude/docs/telemetry.md)
 ```
 
@@ -160,7 +164,8 @@ fact). It then writes `04-release/plan.md` from
   commands;
 - the migrations, each one an expansion;
 - the toggles;
-- the watch;
+- the read-only journeys and the smoke command;
+- the watch and its triggers, and the later proofs;
 - the stop list.
 
 The plan is complete before the play, because the play authorizes
@@ -252,44 +257,13 @@ previous revision still serves through it, by
 any rollback path that has never run. That path runs once here, back
 and forward, before production relies on it.
 
-## Step 4 — the verifier on staging
+**The smoke on staging.** The plan's smoke command: health, the sha
+served, and the read-only journeys against staging's URL with the
+test actors the doctrine names for staging (never a production actor,
+never a token). Its summary goes under `proof/`. Green: production.
+A red goes to [the one fix](#a-red-one-fix-then-stop).
 
-Dispatch one `verifier (Opus 5.5, medium)` per entry in prove mode,
-all in one message. Each one gets:
-
-- `pack-release` to read first;
-- the entry's acceptance files and the commit that added them (the
-  locked journeys);
-- staging's URLs and the test actors the doctrine names for staging,
-  never a production actor and never a token;
-- the sha it must find deployed;
-- `04-release/proof/verify/<entry>/` as its evidence folder.
-
-The checks that proved the entry on the local stack now run on the
-real environment: every screen in a browser, every side effect read
-back, and the PII canary over staging's logs. The lines stage 4 could
-not reach locally, and staging reaches, run here too. The
-failure-mode block stays in stage 4. FAIL or INCONCLUSIVE is a red.
-
-**A red is read before anything:** the failing case, its log, the
-environment.
-
-- **A red caused by the environment** (a missing pre-flight item, a
-  flaky provider) is traced, and parked when it is his.
-- **A red in the code becomes entry `R.n`.** The session writes the
-  brief: the failure, the evidence, the design section it breaks. It
-  runs the entry through
-  `${CLAUDE_SKILL_DIR}/../../workflows/exec-entry.js` with `main` as
-  its base, merges the PR into `main` exactly as in step 2, and
-  returns to step 3.
-- **A defect in the checks themselves** (not the product): the
-  entry's verifier runs them from the station against staging until
-  they pass, before the PR. That costs one deploy cycle instead of
-  one per attempt.
-
-The third red on the same step stops the release.
-
-## Step 5 — production
+## Step 4 — production
 
 The previous revision, job image and front release are recorded
 first: they are the rollback target. Production deploys the artifact
@@ -302,71 +276,79 @@ serves, and they only expand. The mode comes from the plan, by
 - **Progressive, where the platform allows it** (role 19: a tagged
   revision, a traffic split, a canary):
   1. Deploy the candidate with no traffic, under a tag.
-  2. The smoke runs on the tag URL. It covers health, the sha and
-     digest served, and a `verifier (Opus 5.5, medium)` in its
-     read-only mode (`mode: read-only`, `target`: the tag URL,
-     `journeys`: the plan's read-only list) running those journeys
-     only.
+  2. The smoke on the tag URL: the plan's smoke command against it,
+     plus the digest served. Red: never promoted.
   3. Shift the traffic. When production gives a signal (≥ 100 requests
-     expected in the bake window), shift a share first and bake it
-     against the previous revision in the same window. When it does
-     not, go to 100% at once and write the bake's verdict as "no
-     signal".
-  4. Promote to 100%. Clear any sticky split.
-- **Straight, otherwise:** deploy, then the smoke run (health, the sha
-  served, the verifier on the read-only journeys), then a bake against
-  the absolute thresholds.
+     expected in 15 minutes), shift a share (10% by default); the
+     smoke and the watch run on it, and a green watch promotes it to
+     100%. When it does not, go to 100% at once and write the watch's
+     verdict as "no signal".
+  4. At 100%, clear any sticky split.
+- **Straight, otherwise:** deploy.
+
+Then **the smoke against production**, the same command, and **the
+watch**.
+
+## Step 5 — the watch
+
+Fifteen minutes with the new revision serving, read once at the end
+(a wakeup, never a loop): the 5xx ratio and the p95 latency of the new
+revision against the previous one **in the same window** (against the
+absolute thresholds when there is no previous one serving), start
+failures and memory kills, and the first evaluation of each alarm the
+release touches, written exactly as read (OK with data, "no
+datapoints", firing, "not evaluated yet"; "no datapoints" is never
+healthy). From then on the alarms watch on their own.
 
 **The rollback triggers are automatic.** They are written in the plan
-before the play. When one fires, the session acts in this order:
-
-1. Run the rollback the plan names: traffic back to the previous
-   revision, the job's image back, the front's release back. It is
-   never a down migration.
-2. Verify read-only that production serves the previous revision.
-3. Trace it.
-4. Build the fix as `R.n`, merge it into `main`, and prove it on
-   staging (steps 3–4).
-5. Ask him before the new artifact goes to production, because a new
-   artifact after a rollback is on the stop list.
-
-The default triggers:
+before the play. When one fires, the session runs the rollback the
+plan names (traffic back to the previous revision, the job's image
+back, the front's release back; never a down migration), verifies
+read-only that production serves the previous revision, and traces it.
+The default triggers, which the doctrine's values override:
 
 - the candidate's smoke is red, or its digest is not the release's:
   it is never promoted;
-- the smoke after the shift is red;
+- the smoke after the shift or the straight deploy is red;
 - the 5xx ratio is above 2× the previous revision's and above 1%;
-- p95 latency is above 1.5× for 10 minutes;
+- p95 latency is above 1.5× the previous revision's;
 - start failures or memory kills;
 - an alarm the release touches fires;
 - a job run on the new image fails.
 
-The doctrine's values override these defaults.
-
-## Step 6 — the alarms
-
-Read each alarm's first evaluation once, after the bake. The alarms
-are the ones the design's `operations.md` names, plus the
-existing ones the release touches. By then, the platform has
-evaluated them. Each state is written exactly as read: OK with data,
-"no datapoints", firing, or "not evaluated yet". "No datapoints" is
-never written as healthy. A firing alarm the release touches is a
-rollback trigger. Nothing waits past the bake: from here the alarms
-watch on their own and notify whoever they notify.
-
-**The watch.** Some proofs have an hour of their own: the first
+**The later proofs.** Some proofs have an hour of their own: the first
 scheduled run, or the first real data. Each one is a wakeup at that
 hour, by [references/watch.md](references/watch.md). A proof more than
 48 h out becomes a pendency with an owner.
 
-## Step 7 — done
+## A red: one fix, then stop
+
+A red smoke on staging or production, or a rollback trigger, is read
+before anything: the failing case, its log, the environment.
+
+- **A red caused by the environment** (a missing pre-flight item, a
+  flaky provider) is traced and the step runs once more; a missing
+  item of his parks the release with one line.
+- **A red in the code gets one fix, `R.n`.** The session writes the
+  brief: the failure, the evidence, the design section it breaks. It
+  runs the entry through
+  `${CLAUDE_SKILL_DIR}/../../workflows/exec-entry.js` with `main` as
+  its base, merges the PR into `main` exactly as in step 2, and goes
+  back to step 3: staging, the smoke, production, the watch.
+- **A second red**, on any step, stops the release. Production stays
+  on the last revision that passed (rolled back when a trigger fired).
+  The session traces it, writes `release.json`, and sends one
+  PushNotification with what failed, the evidence and the state of
+  each environment. It does not ask; he decides what comes next.
+
+## Step 6 — done
 
 1. Tag each versioned artifact on the released sha with its version,
    and create the release with its notes, as the doctrine says.
 2. Write `blueprint/release/release.json` (schema:
    `${CLAUDE_SKILL_DIR}/../../blueprint/schema/release.md`). The play
    is the `ask`, with `words` set to his words; `merge`, `rollout`
-   (candidate, shifts, bake), `rollbacks`, `alarms` and `numbers` come
+   (candidate, shifts, the watch as `bake`), `rollbacks`, `alarms` and `numbers` come
    from the trace (rates and 5xx in %, p95 in ms, `revertRate` =
    reverts ÷ commits).
 3. Build and publish with
@@ -375,18 +357,18 @@ hour, by [references/watch.md](references/watch.md). A proof more than
    [templates/trace.md](templates/trace.md).
 5. `telemetry.json` closed (`closedAt`, the totals, the fix entries'
    rounds and findings by class), then `.state.md` → `stage: close`,
-   once no watch row is still waiting.
+   once no later proof is still waiting.
    Until then, it stays `stage: release` with the hours of the
-   waiting rows.
+   waiting proofs.
 6. Commit the workstream folder and send one **PushNotification**:
    what is in production, the versions, the pendencies with their
    owners.
 
-## Step 8 — the stage report
+## Step 7 — the stage report
 
 Follow `claude/docs/stage-report.md`: video, then slides, then the
 blueprint, in one message by [templates/report.md](templates/report.md).
-A watch row read after the report updates `release.json` and the
+A later proof read after the report updates `release.json` and the
 blueprint. The video and the slides are not redone.
 
 ## Migrations: expand in this release, contract in a later one
@@ -417,20 +399,20 @@ it for the close. A release toggle lives a week or two.
 
 ## When the session stops and asks
 
-The session stops and asks on this list, and only on it. One question
-goes through the question tool, with one PushNotification, and
-whatever does not depend on the answer goes on:
+The session stops and asks only before what cannot be undone. One
+question goes through the question tool, with one PushNotification,
+and whatever does not depend on the answer goes on:
 
-- a failed migration (the old revision keeps serving);
 - a contract migration, or a rollback the plan marks not safe for data;
 - a deletion or replacement of a stateful resource in the production
   diff;
 - anything the guard asks. A guard "deny" is never retried another way;
 - anything outside the plan: a command, an environment, an artifact or
-  a toggle it does not name;
-- a new artifact for production after a production rollback;
-- the third red on one step;
-- a pre-flight item found missing (a secret, IAM, DNS, TLS).
+  a toggle it does not name.
+
+It **stops and reports**, without a question, on a failed migration
+(the old revision keeps serving), on the second red, and on a
+pre-flight item found missing (a secret, IAM, DNS, TLS).
 
 His answer is a ruling: it goes to `rulings.md` and the trace,
 verbatim.
@@ -446,7 +428,7 @@ handles a regression found in production. His invocation is the play.
    base.
 4. Merge the PR into `main` behind the signoff. The play's
    `merge-from` covers it because it descends from the audited head.
-5. Run steps 3 to 7.
+5. Run steps 3 to 6.
 
 A hotfix the session starts on its own, from the watch, asks him
 first, because it is a new artifact. After `closed`, a regression is
@@ -465,7 +447,7 @@ a new demand: say so and stop.
 
 Everything is in files. Read `.state.md`, `plan.md`, `trace.md`,
 `proof/` and `entries/`. The first plan step with no trace line is
-where to resume. A CI run, a deploy or a bake in flight is followed
+where to resume. A CI run, a deploy or the watch in flight is followed
 from where it is, never redone. A candidate left at 0% is either
 smoked or removed by the plan's rollback, never promoted unread.
 

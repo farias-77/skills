@@ -592,8 +592,8 @@
     "fixes": "fixes",
     "rollbacks": "rollbacks",
     "hotfixes": "hotfixes",
-    "watchRead": "watch proofs read",
-    "watchOwned": "watch proofs given an owner",
+    "watchRead": "later proofs read",
+    "watchOwned": "later proofs given an owner",
     "rulings": "your rulings",
     "tokensM": "tokens (millions)"
    }
@@ -673,7 +673,7 @@
    "rollout": "The rollout, and the alarms",
    "versions": "Versions, and what is in production",
    "fixes": "The fixes",
-   "watch": "The watch, and what waits"
+   "watch": "The later proofs, and what waits"
   },
   "started": "started",
   "closed": "closed",
@@ -700,11 +700,11 @@
    "fixesTail": "{n} still open",
    "rollbacks": "rollbacks",
    "rollbacksTail": "across {n} production steps",
-   "watch": "watch rows read",
+   "watch": "later proofs read",
    "watchTail": "{n} left with an owner"
   },
   "path": {
-   "lede": "His play authorizes everything: the merge into main behind the local-CI signoff, staging, the verifier on the locked journeys, production, and each alarm’s first evaluation. A red becomes a fix and runs again.",
+   "lede": "His play authorizes everything: the merge into main behind the local-CI signoff, staging and its smoke, production and its smoke, and a 15-minute watch. The feature is not re-tested here. A red gets one fix; a second red stops.",
    "feat": "feature branch",
    "staging": "staging {n}",
    "production": "production {n}",
@@ -726,15 +726,15 @@
    "signoff": "signoff"
   },
   "rollout": {
-   "lede": "Production goes out progressively where the platform allows: a candidate at 0% smoked on its tag, the traffic shift, a bake against the previous revision. Otherwise straight, then a smoke run.",
+   "lede": "Production goes out progressively where the platform allows: a candidate at 0% smoked on its tag, then the traffic shift. Otherwise straight. Then a smoke and a 15-minute watch against the previous revision.",
    "mode": "How it went out",
    "modes": {
     "progressive": "progressive",
     "straight": "straight"
    },
    "modeNote": {
-    "progressive": "a candidate at 0%, smoked on its tag, then the traffic shifted and baked against the previous revision.",
-    "straight": "deployed whole, then a smoke run of the read-only journeys."
+    "progressive": "a candidate at 0%, smoked on its tag, then the traffic shifted and watched against the previous revision.",
+    "straight": "deployed whole, then a smoke of the read-only journeys and the watch."
    },
    "rev": "candidate",
    "tag": "tag",
@@ -743,7 +743,7 @@
    "pct": "Traffic",
    "at": "At",
    "bake": {
-    "title": "The bake, new revision against the previous",
+    "title": "The 15-minute watch, new revision against the previous",
     "minutes": "Duration",
     "req": "Requests",
     "err": "5xx",

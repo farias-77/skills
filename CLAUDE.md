@@ -17,7 +17,7 @@ afterwards for a veto.
 | 2 design | **the talk + the debate** | he says what he has in mind; one proposal is presented as a video and slides and debated with him until he says it is closed, which is his approval; the four documents and the review run without him |
 | 3 plan | **autonomous** | nowhere: the conductor rules everything, lists its choices at the report for his veto, and gathers what only he can hand over into the pre-flight |
 | 4 execute | **pre-flight, then play, then his hands-on** | he hands over the pre-flight and pastes one goal; he is called once, at the end, when everything is merged and green: the session runs the environment, he uses the app and sends adjustments, built in the stage until he says ok. One blocking rule, in code |
-| 5 release | **his play authorizes the head** | the play (`merge-from <audited head>` in the guard's allow file) is his "go"; the session merges, deploys, verifies and rolls back on its own, under the guard; it stops only on its written list |
+| 5 release | **his play authorizes the head** | the play (`merge-from <audited head>` in the guard's allow file) is his "go"; the feature is not re-tested: the session merges, deploys, smokes, watches production for 15 minutes and rolls back on its own, under the guard; a red gets one fix, a second red stops; it asks only before what cannot be undone |
 | 6 close | **retro + launch video** | the retro is a file for the weekly; for the people, a launch video and a "what's new" text he forwards |
 
 ## Stage transitions: `/clear`, never `/compact`
@@ -157,9 +157,9 @@ no judge at all.
   `A.<n>`, and his "ok" closes the hands-on, recorded in `rulings.md`.
 - **Release.** His ruling is **the play**: the pre-flight message and
   the play line, recorded verbatim in the trace and in `rulings.md`.
-  An answer to a question on the stop list is a ruling too. A fix
-  built during the release is an entry through the stage-4 pipeline,
-  triaged there the same way.
+  An answer to a question on the stop list is a ruling too. The one
+  fix a red gets during the release is an entry through the stage-4
+  pipeline, triaged there the same way.
 - **Close.** Nothing is ruled: the retro records what went wrong and
   the ideas it suggests, and his comments go in verbatim. The pipeline
   changes only at the weekly retro, where he rules each group of ideas

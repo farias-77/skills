@@ -47,7 +47,6 @@ To change a pick, change the row and the agent's frontmatter together.
 | `reviewer` | execute | Opus 5.5 | high | One reader carries the whole closed scope; hardest bugs: Opus caught them at 67% precision, Sonnet at 41% |
 | `qa-frontend` | execute | Opus 5.5 | medium | Drives the screens in a browser: Opus beats Sonnet on OSWorld at every cost |
 | `qa-backend` | execute | Opus 5.5 | medium | Calls the API and reads the store: judgment on what a customer would hit |
-| `verifier` | release | Opus 5.5 | medium | OSWorld: Opus beats Sonnet at every cost; reads screenshots better |
 | `release-scribe` | release | Sonnet 5.5 | medium | Tags and notes from a fixed record |
 | `close-harvester` | close | Sonnet 5.5 | medium | Collects items and numbers from the files |
 | `launch-director` | close | Opus 5.5 | high | Films as code (Remotion, three.js); best on graphics; reads its own frames |

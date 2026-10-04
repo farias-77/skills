@@ -53,17 +53,20 @@ Sent to him in one message (and one PushNotification) at <YYYY-MM-DD HH:MM UTC>.
 | 1 | — | the production diff: `<command>` | — | no delete or replace on a stateful resource; counts `<n> add · <n> change` |
 | 2 | main | PR `feat/<workstream>` → `main`; `gh pr merge <n> --merge --match-head-commit <head>` | the required checks; the signoff on the head | `main` @ the merge sha |
 | 3 | staging | <follow / dispatch / command> | <deploys staging> | `<command>` → serves `<sha>`; migrations at `<version>` |
-| 4 | staging | the verifier per entry | — | every entry PASS |
+| 4 | staging | the smoke: `<smoke command>` against staging | — | green |
 | 5 | prod | <candidate at 0% + tag \| deploy> | <…> | `<command>` → `<value>` |
+| 6 | prod | the smoke against production, then the watch, 15 min | — | green; no trigger |
 | … | | | | |
 
-## The verifier
+## The smoke
 
-| Entry | Acceptance files | Staging URLs and actors | Lines staging reaches that local could not |
-|---|---|---|---|
-| <E-nn> | `<paths>` @ `<commit>` | <the doctrine's staging actors> | <line> \| none |
+- **Command:** `<the project's journey command, the read-only journeys, against a URL>`
+- **Read-only journeys:** `<journey>`, … — <why each writes nothing in that environment>
 
-**Read-only journeys** (candidate and production smoke): `<journey>`, … — <why each writes nothing in production>
+| Environment | URL | Test actors |
+|---|---|---|
+| staging | <url> | <the doctrine's staging actors> |
+| production (tag, then live) | <url> | <the doctrine's production-safe actor> \| none: health and the sha only |
 
 ## Rollback
 
@@ -79,11 +82,11 @@ Sent to him in one message (and one PushNotification) at <YYYY-MM-DD HH:MM UTC>.
 |---|---|---|---|
 | candidate smoke | any red, digest ≠ release | the smoke | never promote |
 | 5xx ratio, new vs previous, same window | > <2>× and > <1>%, ≥ 100 requests | `<query>` | traffic → previous |
-| p95 latency | > <1.5>× for <10> min | `<query>` | traffic → previous |
+| p95 latency | > <1.5>× over the watch | `<query>` | traffic → previous |
 | start failures, memory kills | any | `<query>` | traffic → previous |
 | alarm the release touches | firing | `<command>` | traffic → previous |
 | job on the new image | failed | `<command>` | job → previous image |
-| migration | failed | the deploy run | stop and ask |
+| migration | failed | the deploy run | stop and report |
 
 ## Migrations
 
@@ -99,7 +102,11 @@ Sent to him in one message (and one PushNotification) at <YYYY-MM-DD HH:MM UTC>.
 
 ## The watch
 
-<!-- Only proofs with their own hour (the first scheduled run, the first real data). An alarm's first evaluation is read at step 6, not here. -->
+15 minutes after production serves, read once: the triggers above and these alarms: `<alarm>`, … (known red on a first deploy: <alarm> \| none)
+
+## The later proofs
+
+<!-- Only proofs with their own hour (the first scheduled run, the first real data). An alarm's first evaluation is read by the watch, not here. -->
 
 | # | What | Readable at (UTC) | Expects | Read by |
 |---|---|---|---|---|
@@ -107,9 +114,10 @@ Sent to him in one message (and one PushNotification) at <YYYY-MM-DD HH:MM UTC>.
 
 ## Where the session stops
 
-- A failed migration · a contract migration · a rollback not safe for data: <which> | none
+Asks, before what cannot be undone:
+
+- A contract migration · a rollback not safe for data: <which> | none
 - A delete or replace on a stateful resource in the production diff
 - Anything the guard asks · anything outside this plan
-- A new artifact for production after a production rollback
-- The third red on one step
-- A pre-flight item found missing
+
+Stops and reports: a failed migration · the second red · a pre-flight item found missing

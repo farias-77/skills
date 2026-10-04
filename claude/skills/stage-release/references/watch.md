@@ -1,7 +1,8 @@
-# The watch: proofs with their own hour
+# The later proofs: proofs with their own hour
 
 Most of what the audit sent to production is read before the report:
-the smoke, the bake and the alarms' first evaluation (step 6). What
+the smoke and the 15-minute watch, with the alarms' first evaluation
+(step 5). What
 remains are the proofs whose evidence does not exist until a later
 hour: the first scheduled run, the first real data, a cost line after
 a day. Each one is a step with an hour. The stage is not `closed`
@@ -12,7 +13,7 @@ implicit, and the user found out from a false alarm in his inbox.
 
 The rows come from the audit's residue deferred to production, plus
 every check the design's `operations.md` writes for "after the first
-<run/day>". Each becomes a row in the plan's watch table and in
+<run/day>". Each becomes a row in the plan's later-proofs table and in
 `release.json` `watch[]`:
 
 - what;
@@ -23,8 +24,8 @@ every check the design's `operations.md` writes for "after the first
 
 ## What is not a row
 
-An alarm's first evaluation is not a row. Step 6 reads it once after
-the bake and writes it as read. From then on the alarm watches on its
+An alarm's first evaluation is not a row. The watch (step 5) reads it
+once and writes it as read. From then on the alarm watches on its
 own and notifies whoever it notifies. Twice in a row a user cancelled
 a scheduled hour that waited on an alarm: off-peak it reads "no
 datapoints", and at peak it shows nothing the alarm would not send by
@@ -44,7 +45,7 @@ open. When the wakeup fires, the session:
 6. schedules the next hour, or, when this was the last row, moves
    `.state.md` to `stage: close`.
 
-The stage report was already sent at step 8. A watch row changes the
+The stage report was already sent at step 7. A later proof changes the
 blueprint, not the video or the slides. A wakeup that did not fire
 (the session was resumed later) is read as soon as the session is
 back, because the evidence is still there.
@@ -64,8 +65,8 @@ The session reads before deciding: the alarm's history, the run's
 log, the metric with its exact query. Then it writes what it found in
 the trace.
 
-- **The code is wrong:** that is a hotfix, and because the session
-  started it, it asks him first (a new artifact).
+- **The code is wrong:** that is a hotfix. The session started it on
+  its own, so it tells him first and waits for his word.
 - **Only the expectation was wrong:** that is a note in
   `dreaming-notes.md` naming the design section that has to change.
 

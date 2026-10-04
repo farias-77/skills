@@ -17,12 +17,12 @@
 
 | Artifact | Version | Sha | Deployed | Rollout |
 |---|---|---|---|---|
-| `<artifact>` | `vX.Y.Z` | `<sha>` | <YYYY-MM-DD HH:MM UTC> | progressive: candidate smoked, <n>% baked, 100% \| straight + smoke |
+| `<artifact>` | `vX.Y.Z` | `<sha>` | <YYYY-MM-DD HH:MM UTC> | progressive: candidate smoked, <n>% watched, 100% \| straight + smoke + watch |
 
 ## The path
 
 ```
-play <hh:mm> → main <hh:mm> → staging <hh:mm> → verifier <n>/<n> → candidate → <n>% bake → 100% <hh:mm> → alarms read
+play <hh:mm> → main <hh:mm> → staging + smoke <hh:mm> → candidate → <n>% → smoke → watch 15 min → 100% <hh:mm>
 ```
 
 ## The release in numbers
@@ -38,7 +38,7 @@ play <hh:mm> → main <hh:mm> → staging <hh:mm> → verifier <n>/<n> → candi
 
 ## What stays with an owner
 
-- <watch row> · readable at <hour> · I write here when read
+- <later proof> · readable at <hour> · I write here when read
 - <pendency> · <owner> · <why>
 - <toggle> · removal task at <where>
 - the signoff was not enforced on `main` | the session's identity can write production outside the CI | nothing
@@ -46,4 +46,4 @@ play <hh:mm> → main <hh:mm> → staging <hh:mm> → verifier <n>/<n> → candi
 ## Files
 
 - `04-release/trace.md` · `plan.md` · `entries/` · `proof/` · `notes/`
-- `.state.md` → `stage: close` | `stage: release` until <hour> (watch). Next: `/clear`, then `/stage-close <slug>`.
+- `.state.md` → `stage: close` | `stage: release` until <hour> (later proofs). Next: `/clear`, then `/stage-close <slug>`.

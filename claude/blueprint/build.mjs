@@ -537,7 +537,7 @@ if (existsSync(releasePath)) {
     if (a.answer !== undefined && !['go', 'not-now'].includes(a.answer)) problems.push(`${w}: answer "${a.answer}" must be go or not-now`);
   });
   const goes = asks.filter(a => a && a.answer === 'go' && stamp(a.at)).map(a => a.at);
-  // v9 order: the play → the merge into main behind the local-CI signoff → staging → the verifier → production → the alarms → done
+  // v9 order: the play → the merge into main behind the local-CI signoff → staging and its smoke → production and its smoke → the 15-minute watch → done
   const obj = (v, name) => { if (v === undefined || v === null) return null; if (typeof v !== 'object' || Array.isArray(v)) { problems.push(`${W}: ${name} must be an object`); return null; } return v; };
   const rate = (o, k, w) => { if (o[k] !== undefined && o[k] !== null && !(typeof o[k] === 'number' && Number.isFinite(o[k]) && o[k] >= 0)) problems.push(`${w}: ${k} must be a number or null`); };
   const M = obj(L.merge, 'merge');
@@ -584,14 +584,12 @@ if (existsSync(releasePath)) {
     NUMBERS.forEach(k => { if (!(k in NB)) problems.push(`${W}: numbers.${k} missing (a number, or null when the record does not carry it)`); else rate(NB, k, `${W} numbers`); });
     Object.keys(NB).filter(k => !NUMBERS.includes(k)).forEach(k => problems.push(`${W}: numbers.${k} is not a key of the schema`));
   }
-  // every production step, traffic shift and rollback in time order: none before a go; after a red or a rollback, a new go first
+  // every production step and traffic shift in time order: none before a go (a red gets one fix under the same go; a second red stops)
   const production = list(L.production, 'production');
   const prod = [
-    ...production.map((p, i) => ({ k: 'p', at: p.at, x: p, w: `${W} production[${i + 1}]`, what: 'a production step' })),
-    ...shifts.map((s, i) => ({ k: 's', at: s.at, x: s, w: `${W} rollout.shifts[${i + 1}]`, what: 'a traffic shift' })),
-    ...rollbacks.map((r, i) => ({ k: 'r', at: r.at, x: r, w: `${W} rollbacks[${i + 1}]`, what: 'a rollback' })),
-  ].sort((a, b) => !stamp(a.at) || !stamp(b.at) ? 0 : a.at < b.at ? -1 : a.at > b.at ? 1 : 0);
-  let lastRed = null;
+    ...production.map((p, i) => ({ at: p.at, w: `${W} production[${i + 1}]`, what: 'a production step' })),
+    ...shifts.map((s, i) => ({ at: s.at, w: `${W} rollout.shifts[${i + 1}]`, what: 'a traffic shift' })),
+  ];
   production.forEach((p, i) => {
     const w = `${W} production[${i + 1}]`;
     need(p, ['n', 'at', 'run', 'checks', 'verified', 'proof'], w); bool(p, 'ok', w); bool(p, 'rolledBack', w);
@@ -599,13 +597,8 @@ if (existsSync(releasePath)) {
     if (p.rolledBack === true) fixOk(p.fix, `${w}: rolled back`);
     else if (p.fix != null) fixOk(p.fix, w);
   });
-  prod.forEach(({ k, at, x, w, what }) => {
-    if (!stamp(at)) return;
-    if (k !== 'r') {
-      if (!goes.some(g => g <= at)) problems.push(`${w}: ${what} at ${at} before any ask answered go`);
-      else if (lastRed && !goes.some(g => g > lastRed && g <= at)) problems.push(`${w}: ${what} after the red at ${lastRed} needs a new ask answered go`);
-    }
-    if (k === 'r' || (k === 'p' && (x.ok === false || x.rolledBack === true))) lastRed = at;
+  prod.forEach(({ at, w, what }) => {
+    if (stamp(at) && !goes.some(g => g <= at)) problems.push(`${w}: ${what} at ${at} before any ask answered go`);
   });
   const versions = list(L.versions, 'versions'), artifacts = new Set();
   versions.forEach((v, i) => {

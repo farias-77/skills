@@ -162,8 +162,10 @@ run into a flaky one.
 **How the stages use it.** Discovery's recon screenshots the current
 screens as an actor; plan's scouts quote the commands; `qa-frontend (Opus 5.5, medium)`
 and `qa-backend (Opus 5.5, medium)` use each entry on its own stack as
-the actors; release asks the doctrine for the staging
-actors (never a production actor).
+the actors; the execute session brings a stack up on the top of the
+feature branch for the user's hands-on and gives him the actors'
+logins; release asks the doctrine for the staging actors (never a
+production actor).
 
 ### 6 · The evidence command
 
@@ -267,9 +269,8 @@ evidence the user audits.
 **How the stages use it.** `builder (Opus 5.5, medium)` writes the
 screen acceptance as browser journeys; the gate runs them;
 `qa-frontend (Opus 5.5, medium)` drives the screens by hand; the user
-compares the screenshots with the locked mock's frames once, in the
-stage report; release runs the same journeys against staging with
-`verifier (Opus 5.5, medium)`.
+uses the app himself at the hands-on that ends execute; release runs
+the read-only journeys against staging and production as its smoke.
 
 ### 11 · Release roles: environments, deploy, rollback
 
@@ -288,9 +289,9 @@ deploys by hand what the doctrine automates. A rollback that is not
 written in advance is improvised during an incident.
 
 **How the stages use it.** The release session writes its plan from
-this document, merges to staging on its own, follows the CI, runs the
-verifier on staging, and rolls back on the triggers written in the
-plan.
+this document, merges to staging on its own, follows the CI, smokes
+each environment, watches production for 15 minutes, and rolls back on
+the triggers written in the plan.
 
 ### 12 · Permission settings and the guard hook
 
