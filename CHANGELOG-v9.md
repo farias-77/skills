@@ -40,13 +40,15 @@ blueprint; the pipeline measures itself.
 | Change | Mechanism | Why |
 |---|---|---|
 | The interview builds a mock | while the owner talks, `prototyper` builds a clickable mock of the product: every screen and state, the app's real look, realistic data, a faked store whose side effects show in a backstage pane, a journey panel that plays each journey step by step; he validates by using it | the user approves what he sees and clicks, not a document about it |
-| A lock gate before the lock | `prototype-checker` walks every journey and every state mechanically (Playwright) and runs the design-taste checklist on the screenshots; he locks only a mock that passes, or overrides on the record | the lock is a proof, not an impression |
-| Text derived from the locked mock | `journey-scribe` derives the journeys (YAML a test can run), the use cases and the acceptance criteria (`J1.s2.1 [RULE] GIVEN/WHEN/THEN`, each outcome with where it is observed), with a mechanical trace from every step to its criteria; a one-page PR-FAQ | nothing in the text is new after the lock, and every later stage cites the same ids |
-| One round plus a delta | the acceptance and boundary lenses, and one blind reader per story walking the mock with that story only; the conductor judges and his product questions go out in one batch | the mock already settled most of what review rounds used to argue |
+| His word is the lock | he says "lock it" and that is the gate; `proto.mjs lock` walks every journey and every state once more and freezes the frames; open items are listed once and he answers them or locks over them, on the record | the lock is his, and the walk keeps it a proof |
+| Text derived from the locked mock | `journey-scribe` derives the journeys (YAML a test can run), the use cases and the acceptance criteria (`J1.s2.1 [RULE] GIVEN/WHEN/THEN`, one per rule and one per behavior, each outcome with where it is observed), with a mechanical trace from every step to its criteria; a one-page PR-FAQ | nothing in the text is new after the lock, and every later stage cites the same ids |
+| One round, no delta | `disc-reviewer (Sonnet 5.5, medium)` and one `disc-blind-reader (Sonnet 5.5, low)` per story walking the mock with that story only, filtered; the conductor judges, verifies the fixes by reading, and his product questions go out in one batch | the mock already settled most of what review rounds used to argue |
 | A tool for the mock | `claude/skills/stage-discovery/scripts/proto.mjs`: walk, frames, look, lock, trace, model; the lock commits the reference frame per state and per journey step, the full matrix is regenerated on demand | the mock is checked and frozen by running it |
-| Removed | the stories-first authoring and the story-by-story playback; `disc-author-stories`, `disc-reviewer-walkthrough`, `disc-reviewer-ambiguity` | superseded by the mock, the mechanical walk and the derivation |
+| Removed | the stories-first authoring and the story-by-story playback; `disc-author-stories`, `disc-reviewer-walkthrough`, `disc-reviewer-ambiguity`; later (pass 5/6) `prototype-checker`, `disc-reviewer-acceptance`, `disc-reviewer-boundary` | superseded by the mock, his lock, the walk and the derivation |
 
 ## Design
+
+The table below is the first v9 design; pass 5/6 replaced it (one proposal, the debate, four documents, one reviewer).
 
 | Change | Mechanism | Why |
 |---|---|---|
@@ -59,6 +61,8 @@ blueprint; the pipeline measures itself.
 | One video for the stage | the per-document videos are gone; the stage report's video explains how it works and why it is this size | ten renders per design cost more than they returned |
 
 ## Plan
+
+The table below is the first v9 plan; pass 5/6 replaced its review and its roster (one planner, one round, no user in the loop).
 
 | Change | Mechanism | Why |
 |---|---|---|
@@ -152,7 +156,45 @@ for any project that meets the bar.
 | stage-execute: the load threshold carries the outside load read before the first run, and one run always goes (d8b715f) | on a shared machine at load 12–20 the threshold (nproc) never opened, so the root entries could never start in parallel |
 | stage-plan: F's brief names the self-test that keeps its not-yet-called helpers in use, and who removes it | a reviewer blocked that test in stage 4 because no written rule named it, which cost the foundation one more run |
 
-## Pass 5 (stage 4 lean)
+## Pass 5/6 (stages 1–4 rebuilt)
+
+The measured runs showed the same cost at every stage: volume. Agents
+left alone overengineer, a panel of lenses finds much that is not the
+product, and every round after the first re-reads leftovers. Pass 5/6
+rebuilds discovery, design, plan and execute around one producer, one
+reviewer and one round, and puts the user where only he can decide.
+
+### Discovery
+
+| Change | Why |
+|---|---|
+| His "lock it" is the gate; `proto.mjs lock` walks every journey and state once more and freezes the frames; open items are answered or locked over, on the record | a checker agent before the lock duplicated the walk and argued taste |
+| One AC per rule and per behavior, never one per step or per frame state | the AC count tracked the mock's frames, not the product's rules |
+| One review round, verified by reading, no delta: `disc-reviewer (Sonnet 5.5, medium)` (judgeable ACs, the In/Out fence, one AC per rule and behavior) ∥ one `disc-blind-reader (Sonnet 5.5, low)` per story, filtered | the mock settles what the rounds used to argue |
+| The report's video is 60–90 s of the mock in use; the slides add the stories | he re-watches what he approved; the detail is a layer up |
+| Removed: `prototype-checker`, `disc-reviewer-acceptance`, `disc-reviewer-boundary` (replaced by `disc-reviewer`) | one reader with a checklist does their work |
+
+### Design
+
+| Change | Why |
+|---|---|
+| D0–D6: scouts read the system; the talk ("do you have something in mind?"); one `architect (Opus 5.5, high)` writes one proposal at the "basics done well" bar, with where it disagrees with him and the evolution path; `overengineering-critic (Opus 5.5, medium)` cuts what serves no AC and no real risk | three tiers and a sizing judge produced three designs to throw two away |
+| The debate: the proposal as a video and slides, iterated with him until he says it is closed, the slides re-rendered each round; closing it is his approval | he decides the shape once, early, with the reasons in front of him |
+| Four documents, about 40 KB each, written in parallel by `design-writer (Sonnet 5.5, high)`: `solution.md`, `data-and-contracts.md` (a Contract per feature), `tests.md` (one primary proof per AC), `operations.md`; `review-prep.mjs` warns over 40 KB per document or 160 KB in all | ten documents reached half a megabyte for a few days of build |
+| One reviewer, one round, blocking only: `design-reviewer (Opus 5.5, medium)` checks AC coverage, consistency (documents, proposal, mock) and the security posture | twelve lenses and two rounds re-read their own fixes |
+| The Design tab built from the four documents, the proposal and the debate; `tests.json` proves every AC once | the tab follows what the stage now produces |
+| Removed: `sizing-judge`, `risk-critic`, the twelve `design-reviewer-<lens>`, `design-blind-reader`, the tiers, `sizing.md` and the old documents (`architecture.md`, `data-model.md`, `contracts.md`, `ui.md`, `acceptance.md`, `rollout.md`, `observability.md`, `infra.md`) | folded into the proposal, the critic, the four documents and the one reviewer |
+
+### Plan
+
+| Change | Why |
+|---|---|
+| No user in the loop: the conductor rules everything, records each choice for veto, and gathers what only he can hand over into the pre-flight; stage 4 waits for his play | plan is mechanical once the design is closed |
+| P0–P4: `scout (Sonnet 5.5, low)` × N over the system and the other running fronts; one `planner (Opus 5.5, high)` cuts the whole graph; `plan-writer (Sonnet 5.5, high)` writes every brief at once; one round (`plan-reviewer (Opus 5.5, medium)` ∥ one `plan-blind-reader (Sonnet 5.5, low)` per brief, filtered) | the judgment sits in one agent; the writers copy |
+| Compute is infinite: a thin foundation, every entry one whole behaviour, front ∥ back on the design's Contract, hot files made cold, an edge only where nothing can be faked, one integration entry at the end, merge points with the other fronts | the machine throttles stage 4, never the cut |
+| Removed: `plan-scout` (the shared `scout`), the four `plan-reviewer-<lens>`, round 2, the machine scout | one reader of the cut and the briefs does their work |
+
+### Execute (stage 4 lean)
 
 Two measured stage-4 runs: two small web features took 55 hours; 61% of
 agent time went to suites run three times per pass and to waiting on
@@ -169,4 +211,5 @@ findings were evidence paperwork.
 | A builder may change a file outside its Owns and lists it; the reviewer reads it | amendments to the foundation cost hours each |
 | The plan's brief carries a Contract section when a node has both sides | it is what lets two builders run in parallel |
 | `scripts/exec-entry-dry-run.mjs`: the workflow with mocked agents over the paths that matter | the flow is checked before a real run |
-
+| The plan closes on its own; stage 4 waits for his play and caps its runs at the plan's widest wave, held by the machine's load | no approval step and no machine scout between the plan and the play |
+| `video-scribe (Sonnet 5.5, medium)` at every stage | templated storyboards from a fixed source hold at medium |
