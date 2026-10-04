@@ -32,7 +32,7 @@ one verdict:
   something a user, a caller or the test suite could tell apart from
   build B, **or** A and B would check different things (one asserts
   the row, the other only the screen; one checks 8 cases, the other
-  3). This is a finding: at stage 4 the verifier and the builder are
+  3). This is a finding: at stage 4 the builder and the reviewer are
   two readers too.
 
 A build that keeps two options open ("maybe X", "X or Y, not

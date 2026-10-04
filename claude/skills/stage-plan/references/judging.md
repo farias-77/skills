@@ -41,8 +41,8 @@ listed in the reason.
 ## The razor
 
 **A finding is sustained when a builder reading only its brief, the
-design and the codebase could not build the node one way; a verifier
-could not turn an acceptance line into one check; either would run
+design and the codebase could not build the node one way, or
+could not turn an acceptance line into one test; it would run
 into something missing (a behaviour with no edge, a name nothing
 provides, an AC no node carries, a file it must write that it does
 not own, a frozen file); or the graph is narrower or deeper than the
@@ -69,7 +69,7 @@ latitude.
 Rule `sustained` or at most `deferred`, never `dismissed`:
 
 - an AC or an acceptance case with no node, or carried twice;
-- an acceptance line a verifier cannot check, or one that needs a
+- an acceptance line a test cannot check, or one that needs a
   deployed environment or a person;
 - a name a node uses that nothing provides before it;
 - a pre-flight item a node needs and `preflight.md` does not carry, or

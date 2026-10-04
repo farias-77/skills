@@ -7,11 +7,11 @@
   F.md (written first, so every name used from it is fixed).
 
   This file is the whole instruction one `builder (Opus 5.5, medium)`
-  receives at stage 4. It has no conversation, only the codebase, the
-  design folder, the golden paths and this file. Before any code a
-  `verifier (Opus 5.5, medium)` writes one check per Acceptance line and
-  runs it red against the base. The builder builds until those checks
-  and the Gate commands are green.
+  receives at stage 4 (two, back and front in parallel, when the brief
+  carries a Contract). It has no conversation, only the codebase, the
+  design folder, the golden paths and this file. The builder writes one
+  test per Acceptance line beside the code; the gate runs them with the
+  Gate commands, and `reviewer (Opus 5.5, high)` checks each AC is met.
 
   The sections Owns, Extends, Uses from the foundation, Provides and
   Acceptance are read by scripts/plan-graph.mjs --briefs: their FIRST
@@ -49,8 +49,8 @@
 ## Before you start
 
 - Read: `01-design/` (`sizing.md` first: the final design and the tier of each part; `notes.md` is the law), the sections named below, the recon of the areas below, the consuming project's `CLAUDE.md`, its engineering doctrine and its golden paths.
-- Frozen: the doctrine's shared files (`<the shared globs from plan.graph.json>`). Never edit them. A change there is a foundation amendment: stop and report it.
-- Write only inside **Owns**, plus the additions under **Extends**. The merge queue refuses a path outside both.
+- Frozen: the doctrine's shared files (`<the shared globs from plan.graph.json>`). Change one only when the node cannot be built without it, minimally, and list it in `outsideOwns`.
+- Write inside **Owns**, plus the additions under **Extends**. A file outside both is changed only when needed, and listed in `outsideOwns`.
 - Feature map: rows `<ids>` of `<the feature map's path>`<; or "none: E-nn owns these rows">.
 
 ## Builds
@@ -66,8 +66,8 @@
 ## Acceptance
 
 <!-- One line per AC id the node carries (stories.md, `<journey>.<step>.<n>`),
-     plus one per contract case of acceptance.md it owns. The verifier
-     turns each line into ONE check. A line names:
+     plus one per contract case of acceptance.md it owns. The builder
+     turns each line into ONE test. A line names:
      - the actor (a role the stack seeds, or a caller) and what they do, with values;
      - what they observe (the screen state and its frame, the status and body, the exit code);
      - the side effect read back from the store, the fake inbox, the log, the event, or "none";
@@ -87,6 +87,19 @@
 | `<create-order-no-auth>` | — | <no token> | <the doctrine's 401> | none | integration · case `<create-order-no-auth>` |
 
 **Seeds:** <the factory calls the checks use (`factory.Order(t, …)`), each test creating what it spends; never a pre-seeded record>
+
+## Contract
+
+<!-- Only when the node has both a Back and a Front side; omit the
+     section otherwise. With it, stage 4 runs two builders in parallel,
+     one per side, each against this section; without it, one builder
+     does both. Copy from contracts.md, never invent: every route the
+     two sides share, the request and response JSON with every field and
+     type, and every error case with its status and code. -->
+
+| Route | Request | Response | Errors |
+|---|---|---|---|
+| `<POST /orders>` | `<{ "day": "2026-10-05", "items": [{ "sku": "baguette", "qty": 2 }] }>` | `<201 { "id": "ord_…", "status": "placed" }>` | `<422 day_in_past · 401 no token · 403 another bakery>` |
 
 ## Golden paths
 

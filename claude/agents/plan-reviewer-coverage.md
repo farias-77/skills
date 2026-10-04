@@ -43,13 +43,13 @@ yours.
 - **Every AC → a line that says it.** The line carrying an AC has its
   GIVEN as the seed, its WHEN as the action, every THEN as an
   observation or a read-back, and the effects it forbids. A line that
-  carries the id and drops a THEN is a finding: the verifier checks
+  carries the id and drops a THEN is a finding: the builder tests
   the line, not the story.
 - **Every journey step → its node.** Each step of `journeys/*.yaml`
   with an `expect` or `effects` is walked by the node that carries its
   ACs; a walk across slices sits in E-int, not in two slices at once.
 - **Every acceptance case → the acceptance line that carries it.** At
-  stage 4 a verifier writes one check per acceptance line; a case of
+  stage 4 the builder writes one test per acceptance line; a case of
   `acceptance.md` no line carries is never checked.
 - **Every kind of code the design adds → a golden path.** The recon
   names an exemplar for it, or F's "Exemplars" creates the first one.

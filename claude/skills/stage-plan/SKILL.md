@@ -48,7 +48,7 @@ the machine.
 |---|---|---|
 | **F** — the foundation | the thin serial head: what two nodes would both write. Migrations (expansion only), the contract with its generated code (one file per path), the registry and wiring, config and the test env, **one seam per cross-slice interface** (the interface, an in-memory fake, a contract suite), the factories, one exemplar per new kind of code. At most one L of hand-written code; nothing behavioural. It owns every shared file | built alone, first; every other node starts the moment it merges |
 | **F-x\<n\>** — a foundation lane | foundation work that no node waits for: the deploy skeleton, docs fragments, extra fake modes, harness extras | built beside the slices, in wave 1 |
-| **E-\<nn\>** — a slice | one story (or two or three that only prove together), vertical: back, front, tests, by one builder in one context, within the size cap | the verifier writes its checks, one builder builds it, one merge |
+| **E-\<nn\>** — a slice | one story (or two or three that only prove together), vertical: back, front, tests, by one builder in one context, within the size cap | one builder builds it with its tests (two, back and front, when its brief carries a Contract), one merge |
 | **E-int** — the integration node | the journeys that cross three or more slices, size S, merging last. At most one | starts when its edges are `ready` (stacked) |
 | **edge** | node B waits for node A **only** when a journey of B drives A's UI (class `ui`) or a check of B reads A's real side effect (class `side-effect`). Data is a factory; an interface is a fake. Neither is an edge | B starts on A's branch the moment A is `ready` (stacked), never waiting for the merge. **B stacks on one parent only**: with two or more edges, B starts when all but one have merged, on the last one's branch |
 | **wave** | the nodes at one depth after F. Wave 1 is everything with no edge. The target is **depth ≤ 2** | a reading aid: nodes start by their edges, critical path first |
@@ -75,9 +75,10 @@ it and note the drift in `dreaming-notes.md`.
 | a node starts when every `after` node is merged or `ready`; with **one** unmerged parent `ready` it stacks on that branch; with **two or more** unmerged it waits until one is left | a node with k parents starts after k − 1 merges, not after k readies: an extra parent costs a merge on the path |
 | `graph.json`'s `startOrder` first, up to the measured cap | the critical path starts first; the width is not throttled by the plan |
 | the path guard: the diff against `owns` ∪ `extends`, literal paths and `dir/**` globs | `owns` lists every path the node writes, exactly |
-| the verifier writes every acceptance check first, red on the node's base, read-only after | each line is red on that base for the right reason; a clause asserting the absence of an element another node builds passes vacuously there, so it moves to that node or is named as proved by the whole gate |
+| the builder writes one test per acceptance line beside the code; the reviewer checks each AC is met | each line is one test that fails without the node and passes with it; a clause asserting the absence of an element another node builds moves to that node or is named as proved by the whole gate |
+| two builders, back and front in parallel, only when the brief carries a **Contract** (routes, request and response JSON, error cases); otherwise one | a node with both a back and a front side gets a Contract section, copied from `contracts.md` |
 | the per-node gate is the plan's three gate commands; the whole gate (coverage floors included) runs once at the end | F's stubs are green at the node gate; a coverage floor is met by the filled stubs at the end, not by F |
-| a change to a frozen file is a foundation amendment `F.<n>`, built alone in the queue | every name a node needs from a frozen file is in F before stage 4 |
+| a builder may change a file outside its Owns, minimally, and lists it; the reviewer reads it | every name a node needs from a frozen file is in F before stage 4, so that list stays short |
 
 ## The pattern
 
@@ -435,7 +436,7 @@ definition and its packs from disk.
 | `plan-reviewer-order` (Sonnet 5.5, high) | the graph as it will run: every edge's class is true (no fake or factory could stand in); every real need has its edge; F is thin (each item serves two nodes or is shared) and sufficient (each node's Uses against F.md's Provides, by the walk (a)–(e)); ownership matches what each node's acceptance makes it write; hot files are cold; no F test pins a stub; the other fronts' overlaps are handled |
 | `plan-reviewer-coverage` (Sonnet 5.5, high) | every AC id and every acceptance case carried by exactly one acceptance line; every design part, resource and alarm in a node; every new kind with an exemplar; nothing built that nothing forces |
 | `plan-reviewer-verifiability` (Sonnet 5.5, high) | every acceptance line becomes one check on the local stack (actor, action, observation and frame, side effect read back, bad paths); seeds from factories; golden paths exist; each node within the cap; the gate commands exist |
-| 2 × `plan-blind-reader` (Sonnet 5.5, low) → `plan-reviewer-ambiguity` (Sonnet 5.5, high), per brief | would two builders build the same node from this brief alone, and would two verifiers check the same thing? |
+| 2 × `plan-blind-reader` (Sonnet 5.5, low) → `plan-reviewer-ambiguity` (Sonnet 5.5, high), per brief | would two builders build the same node from this brief alone, and would two builders test the same thing? |
 
 Save the return as it came in `02-plan/reviews/round-N.json` and write
 `reviews.md` ([template](templates/reviews.md)) from it in one `Write`.
