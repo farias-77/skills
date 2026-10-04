@@ -13,8 +13,8 @@ pick for each part, `sizing.md`, or a review asking "does this need to
 exist?". Readers: `architect (Opus 5.5, high)`, `sizing-judge (Opus
 5.5, high)`, `overengineering-critic (Sonnet 5.5, high)`,
 `risk-critic (Sonnet 5.5, high)`, `design-reviewer-sizing (Opus 5.5,
-medium)`, the design conductor `(Opus 5.5, high)` and
-`structure-reviewer (Opus 5.5, medium)`.
+medium)` and the design conductor `(Opus 5.5, high)`; at stage 4,
+`builder (Opus 5.5, medium)` holds list C.
 
 The tiers are **lean** (the most basic and fastest design that is
 still reliable), **balanced** and **hardened** (maximum safety). The

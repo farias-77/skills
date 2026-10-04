@@ -7,8 +7,8 @@ cites it). Three findings carry most of the table:
 
 - **Opus 5.5 at medium writes the most mergeable code** (FrontierCode
   54.6%, the best of any model at any effort); above medium it edits
-  out of scope and scores lower. Builders run at medium and go to high
-  only on a fix.
+  out of scope and scores lower. Builders run at medium, the fix pass
+  too.
 - **Opus 5.5 medium and Sonnet 5.5 high cost about the same**; Opus is
   more precise on judgment (67% vs 41% on the hardest bugs), Sonnet
   reads literally and runs faster. Judgment goes to Opus, literal
@@ -61,15 +61,12 @@ To change a pick, change the row and the agent's frontmatter together.
 | `plan-reviewer-verifiability` | plan | Sonnet 5.5 | high | Each acceptance line against "can a command prove it" |
 | `plan-reviewer-ambiguity` | plan | Sonnet 5.5 | high | Literal reading of the briefs |
 | `plan-blind-reader` | plan | Sonnet 5.5 | low | A blind reader must read literally |
-| `builder` | execute | Opus 5.5 | medium | FrontierCode peaks at Opus medium (54.6%); high only on the fix |
-| `exec-gate` | execute | Sonnet 5.5 | medium | Runs a scripted gate and reads logs |
-| `verifier` | execute, release | Opus 5.5 | medium | OSWorld: Opus beats Sonnet at every cost; reads screenshots better |
-| `reviewer` | execute | Opus 5.5 | medium | Hardest bugs: Opus 8 caught at 67% precision, Sonnet 6 at 41% |
-| `structure-reviewer` | execute | Opus 5.5 | medium | Code judgment |
-| `ux-reviewer` | execute | Opus 5.5 | medium | Screens against the mock's frames: reads screenshots better |
-| `exec-lens-security` | execute | Opus 5.5 | high | More effort pays on security work |
-| `exec-lens-operations` | execute | Opus 5.5 | medium | Code judgment |
-| `exec-lens-craft` | execute | Opus 5.5 | medium | Code judgment |
+| `builder` | execute | Opus 5.5 | medium | FrontierCode peaks at Opus medium (54.6%); the fix pass too: it applies proven items |
+| `exec-gate` | execute | Sonnet 5.5 | low | Runs the gate commands once and reads logs: no judgment |
+| `reviewer` | execute | Opus 5.5 | high | One reader carries the whole closed scope; hardest bugs: Opus caught them at 67% precision, Sonnet at 41% |
+| `qa-frontend` | execute | Opus 5.5 | medium | Drives the screens in a browser: Opus beats Sonnet on OSWorld at every cost |
+| `qa-backend` | execute | Opus 5.5 | medium | Calls the API and reads the store: judgment on what a customer would hit |
+| `verifier` | release | Opus 5.5 | medium | OSWorld: Opus beats Sonnet at every cost; reads screenshots better |
 | `release-scribe` | release | Sonnet 5.5 | medium | Tags and notes from a fixed record |
 | `close-harvester` | close | Sonnet 5.5 | medium | Collects items and numbers from the files |
 | `launch-director` | close | Opus 5.5 | high | Films as code (Remotion, three.js); best on graphics; reads its own frames |
