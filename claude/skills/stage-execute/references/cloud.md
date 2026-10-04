@@ -53,20 +53,19 @@ needed: `claude -p "<message>" --cloud <session-id>`.
 
 The cloud session's commits are the only channel the pipeline trusts:
 
-1. **The entry branch**: the acceptance commit, the builder's commits,
-   every fix. Commits made in a cloud session carry a `Claude-Session:`
+1. **The entry branch**: the builder's commits (the code and its
+   tests), every fix. Commits made in a cloud session carry a `Claude-Session:`
    trailer with the session's URL, so each one points at its run.
 2. **`evidence/<workstream>/<id>`**: the run's return
-   (`run-<n>.json`, the same shape as a local run), the verifier's
-   screenshots and videos, the ux-reviewer's measurements. The gate's
-   record step has already swept them for tokens.
+   (`run-<n>.json`, the same shape as a local run), `notes.md` and the
+   QAs' screenshots; no token is ever written to them.
 
 The local session waits for that branch with one shell loop in the
 background (`git ls-remote` every few minutes until the run file's
 commit appears, under a time limit), never with model turns. Then it
 fetches, copies the evidence folder into `03-execution/entries/<id>/`,
 and handles the return as in Step 3. A cloud `ready` is evidence, not
-a merge: the queue runs the path guard, the merged-tree test and the
+a merge: the queue lists the paths outside Owns, runs the merged-tree test and the
 signoff on this machine. To read the session's transcript or continue
 it by hand, `claude --teleport <session-id>` pulls its branch and its
 conversation into a local terminal.

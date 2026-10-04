@@ -2,16 +2,16 @@
 
 <!--
   Consolidated by the SESSION from board.md, parked.md, the entries'
-  run-<n>.json and the code, BEFORE the user is asked anything. The user
-  rules item by item; his ruling and words are written next to each
-  item and in rulings.md.
+  run-<n>.json and notes.md, and the code, BEFORE the user is asked
+  anything. The user rules item by item; his ruling and words are
+  written next to each item and in rulings.md.
 -->
 
 ## The demand in numbers
 
-| Entries | Amendments | Batch slices | Checks | Found | Blocking | Deferred | Learn log | PASS · FAIL · INCONCLUSIVE |
-|---|---|---|---|---|---|---|---|---|
-| | | | | | | | | |
+| Entries merged | Parked | Builder passes | Minutes per entry (median · slowest) | Found | Blocking | Notes |
+|---|---|---|---|---|---|---|
+| | | | | | | |
 
 **Branch:** `feat/<workstream>` @ `<sha>` · whole gate: `<its summary line>` · signoff: `local-ci = <state>` on `<sha>`
 
@@ -19,7 +19,7 @@
 
 ### P.1 — <entry> · <title>
 
-- **Why it parked:** <the question only he can answer, the red gate, or what stayed blocking — quoted>
+- **Why it parked:** <round-cap, gate-red, user, machine — the blocking items or the red, quoted>
 - **What waits on it:** <entries>
 - **Recommendation:** <one sentence>
 - **Ruling:** — · **Words:** —
@@ -35,30 +35,21 @@
 - **Where:** `<file>:<line>`
 - **The documents:** silent on <what>; the nearest sentence: "<quote>"
 - **What was chosen:** <the choice and the alternative rejected>
-- **Reading the code:** <one line>
 - **Recommendation:** keep | fix — <why>
 - **Ruling:** — · **Words:** —
 
-## Acceptance that is not a check
+## Outside Owns
 
-- <entry> · <the acceptance line> — <why it cannot be a check; the nearest check written>
+- <entry> · `<path>` — <the builder's reason, or "unlisted">
 
-## Precision per reviewer
+## The screens against the locked mock
 
-| Reviewer | Found | Blocking (repro · rule only) | Deferred | Learn log | Closed at the delta |
+In the stage report: each frame beside the real screen. **Drifts he names:** — <none yet>
+
+## The tally per agent
+
+| Agent | Found | Blocking | Notes | Downgraded | Closed at the delta |
 |---|---|---|---|---|---|
 | reviewer | | | | | |
-| structure-reviewer | | | | | |
-| ux-reviewer | | | | | |
-| exec-lens-security | | | | | |
-| exec-lens-operations | | | | | |
-
-**Deferred:** <n> done · <n> skipped (the reasons in `deferred.md`)
-
-## The proof's numbers
-
-| Entry | Verdicts | Canary hits | Failure-mode cases failed → fixed | Evidence |
-|---|---|---|---|---|
-| <E-nn> | PASS · FAIL · INCONCLUSIVE | | | `entries/<E-nn>/verify/` |
-
-**Escapes so far:** <a defect found after its entry merged that an acceptance check or a failure-mode case should have caught — where; "none">
+| qa-frontend | | | | | |
+| qa-backend | | | | | |
