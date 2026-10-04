@@ -235,7 +235,8 @@ retros get short.
 | No re-test of the feature: the verifier's proof per entry on staging and the re-QA are gone; each environment gets a smoke of the read-only journeys (health, the sha served, the journeys run by the project's journey command against its URL) | stage 4 proved it and he used it |
 | Production (progressive where the platform allows), its smoke, then a 15-minute watch of errors and latency against the previous revision, with automatic rollback on the plan's triggers; the alarms' first evaluation is read in the watch | one bounded wait instead of a bake and a separate alarms step |
 | A red smoke or a rollback gets one fix, `R.n`, through the stage-4 pipeline, under the same play; a second red stops and reports | no loop and no question for a fix the pipeline already reviewed |
-| The session asks only before what cannot be undone (a contract migration, a rollback not safe for data, a stateful delete, the guard, anything outside the plan); a failed migration, the second red and a missing pre-flight item stop and report | the stop list is the irreversible list |
+| After a production rollback the fix is built and smoked on staging, but the new production deploy asks him first; the build refuses a production step after a rollback with no new `go` | the stop list he accepted names it: production already failed once on this release |
+| The session asks only before what cannot be undone (a contract migration, a rollback not safe for data, a stateful delete, the guard, anything outside the plan) and before a new production deploy after a rollback; a failed migration, the second red and a missing pre-flight item stop and report | the stop list is the irreversible list plus the deploy after a rollback |
 | Removed: `verifier` | nothing else used it |
 
 ### The stage reports

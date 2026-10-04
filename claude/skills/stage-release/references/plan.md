@@ -161,7 +161,8 @@ more than 48 h after production is a pendency with an owner.
 
 ## Where the session stops
 
-The stop list of SKILL.md, plus what this release names (the rollback
-not safe for data, the contract migration), and the second red, which
-stops and reports. Nothing else stops the release, and nothing runs
+The stop list of SKILL.md (it includes the new production deploy
+after a production rollback), plus what this release names (the
+rollback not safe for data, the contract migration), and the second
+red, which stops and reports. Nothing else stops the release, and nothing runs
 before the play.

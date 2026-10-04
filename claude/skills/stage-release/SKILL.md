@@ -1,6 +1,6 @@
 ---
 name: stage-release
-description: Conducts stage 5 (Release). It takes the audited feature branch into main and production on its own, from the user's play to done. The session (Opus 5.5, medium) writes the release plan, with the rollback triggers, the stop list, the migrations and the toggles, and checks the project's permissions and guard hook. It sends him, in one message, every action only he can run plus the play line that authorizes the merge. His play is his "go". Then it runs alone. It does not re-test the feature: stage 4 owns working. It merges into main behind the local-CI signoff, deploys staging and runs a smoke of the read-only journeys. Production goes out progressively where the platform allows (a candidate at 0% smoked on its tag, then the traffic shift), otherwise straight; then a smoke and a 15-minute watch of errors and latency against the previous revision, with automatic rollback on the plan's triggers. It tags the versions from one release-scribe (Sonnet 5.5, medium) per artifact and closes with the stage report (video, slides, blueprint). A red smoke after a deploy gets one fix, an entry R.n through the stage-4 pipeline; a second red stops and reports. It stops and asks only on its written list of what cannot be undone. Also runs a hotfix while the workstream is not closed. Use when a workstream's .state.md says stage release, to resume a release in progress, or with `hotfix` for a regression found in production.
+description: Conducts stage 5 (Release). It takes the audited feature branch into main and production on its own, from the user's play to done. The session (Opus 5.5, medium) writes the release plan, with the rollback triggers, the stop list, the migrations and the toggles, and checks the project's permissions and guard hook. It sends him, in one message, every action only he can run plus the play line that authorizes the merge. His play is his "go". Then it runs alone. It does not re-test the feature: stage 4 owns working. It merges into main behind the local-CI signoff, deploys staging and runs a smoke of the read-only journeys. Production goes out progressively where the platform allows (a candidate at 0% smoked on its tag, then the traffic shift), otherwise straight; then a smoke and a 15-minute watch of errors and latency against the previous revision, with automatic rollback on the plan's triggers. It tags the versions from one release-scribe (Sonnet 5.5, medium) per artifact and closes with the stage report (slides and blueprint; no video). A red smoke after a deploy gets one fix, an entry R.n through the stage-4 pipeline; a second red stops and reports. After a production rollback the fix is built and smoked on staging, but the new production deploy asks him first. It stops and asks only on its written list: what cannot be undone, and a new production deploy after a rollback. Also runs a hotfix while the workstream is not closed. Use when a workstream's .state.md says stage release, to resume a release in progress, or with `hotfix` for a regression found in production.
 disable-model-invocation: false
 argument-hint: "<workstream-slug> [hotfix]"
 allowed-tools: Read, Write, Edit, Glob, Grep, Agent, Workflow, Skill, AskUserQuestion, Artifact, PushNotification, ScheduleWakeup, Bash
@@ -91,6 +91,7 @@ sized to it. It never loops to check early.
             green → the share to 100%
             a trigger fires → automatic rollback
             a red smoke or a rollback → ONE fix R.n through exec-entry → main → 3 again
+            after a production rollback: 3 runs, then ASK him before 4 (a new production deploy)
             a second red → stop and report
 6 done      tags + releases on the released sha · release.json · .state.md · PushNotification
 7 report    claude/docs/stage-report.md: slides → blueprint (no video)
@@ -335,6 +336,16 @@ before anything: the failing case, its log, the environment.
   `${CLAUDE_SKILL_DIR}/../../workflows/exec-entry.js` with `main` as
   its base, merges the PR into `main` exactly as in step 2, and goes
   back to step 3: staging, the smoke, production, the watch.
+- **After a production rollback, the new production deploy asks him
+  first.** The fix is built and merged, staging deploys it and its
+  smoke runs, all without him. Then, before step 4, one question
+  through the question tool with one PushNotification: the trigger
+  that fired and its value, the revision production serves now, what
+  `R.n` changed, the staging smoke. His answer is a ruling
+  (`rulings.md`, the trace, and a new `ask` in `release.json`); until
+  it comes, production stays on the previous revision. A rollback on
+  staging, or a red that never reached production traffic (the
+  candidate's smoke on its tag), does not ask.
 - **A second red**, on any step, stops the release. Production stays
   on the last revision that passed (rolled back when a trigger fired).
   The session traces it, writes `release.json`, and sends one
@@ -399,13 +410,17 @@ it for the close. A release toggle lives a week or two.
 
 ## When the session stops and asks
 
-The session stops and asks only before what cannot be undone. One
+The session stops and asks only before what cannot be undone, and
+before a new production deploy after a rollback. One
 question goes through the question tool, with one PushNotification,
 and whatever does not depend on the answer goes on:
 
 - a contract migration, or a rollback the plan marks not safe for data;
 - a deletion or replacement of a stateful resource in the production
   diff;
+- **a new production deploy after a production rollback**: the fix is
+  built and smoked on staging, then the deploy waits for his go
+  ([A red: one fix, then stop](#a-red-one-fix-then-stop));
 - anything the guard asks. A guard "deny" is never retried another way;
 - anything outside the plan: a command, an environment, an artifact or
   a toggle it does not name.

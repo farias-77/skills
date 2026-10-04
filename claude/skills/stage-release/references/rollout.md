@@ -125,9 +125,12 @@ After it:
 
 1. verify read-only that production serves the previous revision;
 2. trace it;
-3. the release's one fix, `R.n`, through staging, the smoke,
-   production and the watch again; when it already had its fix, stop
-   and report.
+3. the release's one fix, `R.n`, through staging and its smoke; when
+   it already had its fix, stop and report;
+4. **ask him before the new production deploy** (it is on the stop
+   list): the trigger and its value, the revision serving now, what
+   the fix changed, the staging smoke. On his go, production, its
+   smoke and the watch again.
 
 When the CI already rolls back on its own (a deploy step that fails
 after serve), the session confirms it happened and does not repeat

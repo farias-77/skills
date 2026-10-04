@@ -114,10 +114,11 @@ Sent to him in one message (and one PushNotification) at <YYYY-MM-DD HH:MM UTC>.
 
 ## Where the session stops
 
-Asks, before what cannot be undone:
+Asks, before what cannot be undone and before a new production deploy after a rollback:
 
 - A contract migration · a rollback not safe for data: <which> | none
 - A delete or replace on a stateful resource in the production diff
+- A new production deploy after a production rollback (the fix is built and smoked on staging first)
 - Anything the guard asks · anything outside this plan
 
 Stops and reports: a failed migration · the second red · a pre-flight item found missing

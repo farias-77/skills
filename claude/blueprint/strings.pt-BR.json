@@ -654,7 +654,7 @@
    "watchTail": "{n} deixadas com um dono"
   },
   "path": {
-   "lede": "O play dele autoriza tudo: o merge na main atrás do signoff do CI local, o staging e seu smoke, a produção e seu smoke, e uma vigília de 15 minutos. A funcionalidade não é testada de novo aqui. Um vermelho ganha uma correção; um segundo vermelho para.",
+   "lede": "O play dele autoriza tudo: o merge na main atrás do signoff do CI local, o staging e seu smoke, a produção e seu smoke, e uma vigília de 15 minutos. A funcionalidade não é testada de novo aqui. Um vermelho ganha uma correção; depois de um rollback em produção, o novo deploy em produção pergunta a ele antes; um segundo vermelho para.",
    "feat": "branch da feature",
    "staging": "staging {n}",
    "production": "produção {n}",

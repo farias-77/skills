@@ -5,7 +5,8 @@ step: `release.json`. `node claude/blueprint/build.mjs <workstream>`
 validates it against the plan and the execution record and assembles
 the Release tab. The build refuses with the field named: an entry the
 plan does not know, a merge into main or a production step (a deploy,
-a traffic shift) before the play was answered `go`, a closed release
+a traffic shift) before the play was answered `go`, a production step
+after a production rollback with no new `go`, a closed release
 with a later proof neither read nor owned, a fix entry without its run, **a
 text over its word cap**. Text fields accept `` `code` `` and
 `**bold**`. Everything in the workstream's language.
@@ -14,7 +15,8 @@ The order the tab tells: **the play** (his `go`) → **the merge** into
 main behind the local-CI signoff → **staging** and its smoke →
 **production** (progressive, or straight) and its smoke → **the
 watch**, 15 minutes, with each alarm's first evaluation → done. A red
-gets one fix under the same play; a second red stops.
+gets one fix under the same play; after a production rollback, the
+new production deploy asks him first; a second red stops.
 
 ## The voice
 
@@ -70,7 +72,10 @@ there, what broke on the way and what still waits for someone.
   (or `not-now` when he held it); `at` the play's hour; `pr` optional
   (no release PR is asked on). No merge into main and no production
   step exists before an `ask` answered `go`. The one fix after a red
-  ships under the same `go` (`asks` may be an array when there were
+  ships under the same `go`, except after a **production rollback**: a
+  production step or a traffic shift after a rollback (a `rollbacks[]`
+  entry, or a `production[]` step with `rolledBack: true`) needs a new
+  `ask` answered `go` after it (`asks` may be an array when there were
   several; the last one is the one that shipped).
 - `merge` (optional until it happens): the PR into main, its merge
   `sha`, `at`, and the `signoff` context it merged behind

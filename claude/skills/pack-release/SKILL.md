@@ -183,7 +183,7 @@ of one platform, never the rule.
 | 5 | Release PR staging → `main`, ask for the go | the user's go, or the goal quoted verbatim | stop |
 | 6 | Merge (merge commit) | required check green on the head sha | — |
 | 7 | Follow the production deploy: data → app (old image serving) → migrate → candidate at 0% → tag smoke → 100% → smoke → front via preview channel | each step green | automatic rollback |
-| 8 | Watch 15 min, per-revision reads, the alarms the release touches | rollback thresholds hold | roll back; the one fix `R.n`; a second red → stop and report |
+| 8 | Watch 15 min, per-revision reads, the alarms the release touches | rollback thresholds hold | roll back; the one fix `R.n` through staging; ask before the new production deploy; a second red → stop and report |
 | 9 | Tags and releases on the merge sha | — | — |
 | 10 | The later proofs that have their own hour | read and traced | hotfix |
 
@@ -245,11 +245,13 @@ promotion or production rerun outside the workflow. The boundary that
 holds stays outside the session: the agent's cloud CLI runs as a
 read-only identity, with no secret accessor.
 
-**When the agent stops and asks** (only what cannot be undone): a
+**When the agent stops and asks** (what cannot be undone, and a new
+production deploy after a rollback): a
 production merge without the user's word; a deletion or replacement on
 a stateful resource in the plan; a contract migration, or a rollback
-not safe for data; a secret, IAM, DNS or TLS write; anything the go or
-the goal did not name. **When it stops and reports:** a failed
+not safe for data; a secret, IAM, DNS or TLS write; a new production
+deploy after a production rollback; anything the go or the goal did
+not name. **When it stops and reports:** a failed
 migration; a second red after the one fix.
 
 The settings file, the guard script, the platform example commands and

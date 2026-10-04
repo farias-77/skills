@@ -654,7 +654,7 @@
    "watchTail": "{n} left with an owner"
   },
   "path": {
-   "lede": "His play authorizes everything: the merge into main behind the local-CI signoff, staging and its smoke, production and its smoke, and a 15-minute watch. The feature is not re-tested here. A red gets one fix; a second red stops.",
+   "lede": "His play authorizes everything: the merge into main behind the local-CI signoff, staging and its smoke, production and its smoke, and a 15-minute watch. The feature is not re-tested here. A red gets one fix; after a production rollback, the new production deploy asks him first; a second red stops.",
    "feat": "feature branch",
    "staging": "staging {n}",
    "production": "production {n}",

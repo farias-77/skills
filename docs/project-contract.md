@@ -486,7 +486,9 @@ head.
 the play.
 
 **How the stages use it.** Release merges, deploys and watches without
-a stop; a production red rolls back on its own by the plan's triggers.
+a stop but its written list; a production red rolls back on its own by
+the plan's triggers, and the new production deploy after a rollback
+waits for his go.
 
 ### 19 · Progressive delivery
 

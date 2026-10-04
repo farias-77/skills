@@ -33,7 +33,7 @@ play <hh:mm> → main <hh:mm> → staging + smoke <hh:mm> → candidate → <n>%
 ## What was fixed or rolled back on the way
 
 - `R.<n>` · <where it was seen> · <what changed, one line> | none
-- rollback · <trigger, value> · <what followed> | none
+- rollback · <trigger, value> · <what followed> · his answer before the new production deploy: "<his words>" | none
 
 ## What stays with an owner
 

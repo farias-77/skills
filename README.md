@@ -119,8 +119,9 @@ ships production progressively where the platform allows (a candidate
 at 0% smoked on its tag, then the shift), smokes it, and watches
 errors and latency for 15 minutes, rolling back on its own on the
 triggers it wrote before the play. A red gets one fix through the
-stage-4 pipeline; a second red stops and reports. A guard hook holds
-whatever cannot be undone.
+stage-4 pipeline; after a production rollback, the new production
+deploy asks him first; a second red stops and reports. A guard hook
+holds whatever cannot be undone.
 
 **6 · Close — the retro for the pipeline, the launch for the people.**
 The retro is short and fixed: the numbers from every stage's telemetry

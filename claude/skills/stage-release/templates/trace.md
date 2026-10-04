@@ -27,6 +27,7 @@
 - <date> · alarms · <n> read · OK <n> · no datapoints <n> · not evaluated yet <n> · firing <n> · `proof/alarms.txt`
 - <date> · tags · `<artifact>` `vX.Y.Z` @ `<sha>` · release <url>
 - <date> · later proof <n> · scheduled for <YYYY-MM-DD HH:MM UTC> | read · <got> ✅|❌ · `proof/watch-<n>.txt`
+- <date> · ask · new production deploy after the rollback · R.<n> smoked on staging · answer: "<his words>" · `rulings.md` written
 - <date> · stop · <the stop-list item> · asked · answer: "<his words>" | reported
 - <date> · hotfix · seen: <what, where> · entry R.<n> · …
 - <date> · **numbers** · wall-clock <h> (play → done) · his time <min> (pre-flight + answers) · staging runs <n> · reds <n> · R.<n> fixes <n> · rollbacks <n> · reverts <n>/<n> commits · tokens <M | not recorded>
