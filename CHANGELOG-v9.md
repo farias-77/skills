@@ -154,7 +154,7 @@ for any project that meets the bar.
 
 ## Pass 5 (stage 4 lean)
 
-Two measured stage-4 runs: two landing pages took 55 hours; 61% of
+Two measured stage-4 runs: two small web features took 55 hours; 61% of
 agent time went to suites run three times per pass and to waiting on
 the machine's load; a panel of 6–10 lenses and a judge produced 454
 rulings, 216 of them deferred into finishing entries that went through
