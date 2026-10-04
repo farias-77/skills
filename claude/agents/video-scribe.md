@@ -105,26 +105,24 @@ Six beats, in this order, each one a scene or two:
 
 1. **What the brief asked** — the entry's goal in one line, and its
    stories (`title` + `bullets`).
-2. **The acceptance checks, written red** — the checks the verifier
-   wrote before any code, red on the base for the right reason
-   (`table` of the checks with `tone: "fail"`, or `numbers`: how
-   many checks).
+2. **The ACs and their tests** — each AC of the brief and the test the
+   builder wrote for it (`table`: AC · test), from the run's `tests`.
 3. **What the builder built** — the files and modules it touched, in
    one picture (`flow` of the modules, or `table` of the files with
    what each does). From the diff stat and the run's record, never a
    guess.
-4. **The proof** — the screenshots of the evidence folder (`image`
-   scenes, the most telling one or two, captioned with what they
-   prove), or the command output that proves it (`code`, ≤12 lines).
-5. **What the reviewers found and what blocked** — per reviewer, what
-   it found and how it was ruled (`table`: reviewer · found ·
-   sustained · deferred; the sustained ones `fail`), and what the fix
-   round changed. The rounds and what parked the entry, if it parked.
-6. **The result** — merged or not, the sha, the time from the first
-   run to the merge, the rounds, the agents that ran (`numbers` or
-   `timeline`, with the red events in red), then the `end` card.
+4. **The gate** — its summary line, green or red, and a QA screenshot
+   when there is one (`image`, captioned with what it shows), or the
+   command output (`code`, ≤12 lines).
+5. **What the reviewer and the QAs found and what blocked** — per
+   agent (`table`: agent · found · blocking · notes; the blocking ones
+   `fail`), and what the fix pass changed. What parked the entry, if
+   it parked.
+6. **The result** — merged or not, the sha, the minutes per step from
+   the run's `steps`, the builder passes (`numbers` or `timeline`, with
+   the red events in red), then the `end` card.
 
-A run that parked, a gate that went red, a sustained finding: all of
+A run that parked, a gate that went red, a blocking finding: all of
 it is on screen. The time comes from the run returns and the board,
 never estimated.
 
