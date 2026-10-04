@@ -411,7 +411,7 @@ if (existsSync(execDir) && plan) {
   if (existsSync(execGraphPath)) {
     const X = JSON.parse(readFileSync(execGraphPath, 'utf8'));
     const W = 'execution/execution.json';
-    need(X, ['started', 'branch', 'head', 'gate', 'entries', 'amendments', 'precision', 'report', 'audit'], W);
+    need(X, ['started', 'branch', 'head', 'gate', 'entries', 'precision', 'report', 'audit'], W);
     if (!('closed' in X)) problems.push(`${W}: missing closed (null until you approve the audit)`);
     const list = (v, name) => { if (v === undefined) return []; if (!Array.isArray(v)) { problems.push(`${W}: ${name} must be a list`); return []; } return v; };
     const entries = list(X.entries, 'entries'), amendments = list(X.amendments, 'amendments'), precision = list(X.precision, 'precision');
@@ -445,16 +445,17 @@ if (existsSync(execDir) && plan) {
       if (a.id !== undefined && !/^F\.\d+$/.test(a.id)) problems.push(`${w}: id "${a.id}" must be F.<n>`);
       if (a.for !== undefined && !known.has(a.for)) problems.push(`${w}: for names "${a.for}", which is not a known entry id`);
     });
-    // v8 counted found → sustained · latitude · dismissed · user; v9 (exec-entry's tally) counts found → blocking · deferred · learn,
-    // the blocking split into withRepro and ruleOnly, and closed in the delta. A row carries either set, or both.
-    const PREC = ['found', 'sustained', 'blocking', 'deferred', 'latitude', 'dismissed', 'learn', 'user', 'withRepro', 'ruleOnly', 'closed'];
+    // v8 counted found → sustained · latitude · dismissed · user; the first v9 tally counted found → blocking · deferred · learn
+    // (withRepro + ruleOnly = blocking); the lean tally counts found → blocking · notes · downgraded, and closed in the delta.
+    // A row carries one set; older records still build.
+    const PREC = ['found', 'sustained', 'blocking', 'notes', 'downgraded', 'deferred', 'latitude', 'dismissed', 'learn', 'user', 'withRepro', 'ruleOnly', 'closed'];
     precision.forEach((p, i) => {
       const w = `${W} precision[${i + 1}]${p.lens ? ` (${p.lens})` : ''}`;
-      need(p, ['lens', 'found', 'deferred'], w);
+      need(p, ['lens', 'found'], w);
       if (p.sustained === undefined && p.blocking === undefined) problems.push(`${w}: missing blocking (or sustained, the v8 count)`);
-      if (p.sustained !== undefined) need(p, ['latitude', 'dismissed', 'user'], w);
-      if (p.blocking !== undefined) need(p, ['learn'], w);
-      if (p.lens !== undefined && !/^(verifier|reviewer|structure-reviewer|ux-reviewer|exec-(lens|qa)-[a-z]+)$/.test(p.lens)) problems.push(`${w}: lens "${p.lens}" must be verifier, reviewer, structure-reviewer, ux-reviewer, exec-lens-<name> or exec-qa-<name>`);
+      if (p.sustained !== undefined) need(p, ['deferred', 'latitude', 'dismissed', 'user'], w);
+      if (p.blocking !== undefined && p.notes === undefined) need(p, ['deferred', 'learn'], w);
+      if (p.lens !== undefined && !/^(reviewer|qa-frontend|qa-backend|verifier|structure-reviewer|ux-reviewer|exec-(lens|qa)-[a-z]+)$/.test(p.lens)) problems.push(`${w}: lens "${p.lens}" must be reviewer, qa-frontend or qa-backend (or a retired name: verifier, structure-reviewer, ux-reviewer, exec-lens-<name>, exec-qa-<name>)`);
       PREC.forEach(k => { if (p[k] !== undefined && !nat(p[k])) problems.push(`${w}: ${k} must be a whole number`); });
       if ([p.blocking, p.withRepro, p.ruleOnly].every(nat) && p.withRepro + p.ruleOnly !== p.blocking) problems.push(`${w}: withRepro ${p.withRepro} + ruleOnly ${p.ruleOnly} must equal blocking ${p.blocking}`);
     });
@@ -497,6 +498,7 @@ if (existsSync(execDir) && plan) {
     };
     xwalk(X, '');
     if (problems.length) { console.error('blueprint data problems:\n  ' + problems.join('\n  ')); process.exit(1); }
+    X.amendments ??= [];
     execution = X;
   }
 } else if (existsSync(execDir) && !plan) {

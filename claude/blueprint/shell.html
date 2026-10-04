@@ -925,7 +925,7 @@
         <div class="cells">
           <div class="cell"><span class="v">${mergedN}/${planned.length}</span><span class="l">${SX.cells.merged}</span><span class="s">${SX.cells.mergedTail}</span></div>
           <div class="cell"><span class="v">${parkedN}</span><span class="l">${SX.cells.parked}</span><span class="s">${SX.cells.parkedTail}</span></div>
-          <div class="cell"><span class="v">${X.amendments.length}</span><span class="l">${SX.cells.amendments}</span><span class="s">${SX.cells.amendmentsTail}</span></div>
+          ${X.amendments.length ? `<div class="cell"><span class="v">${X.amendments.length}</span><span class="l">${SX.cells.amendments}</span><span class="s">${SX.cells.amendmentsTail}</span></div>` : ''}
           <div class="cell"><span class="v">${roundsN}</span><span class="l">${SX.cells.rounds}</span><span class="s">${SX.cells.roundsTail}</span></div>
           <div class="cell"><span class="v">${foundN}</span><span class="l">${SX.cells.findings}</span><span class="s">${SX.cells.findingsTail.replace('{n}', sustN)}</span></div>
         </div>
@@ -957,11 +957,11 @@
     const amend = X.amendments.length ? tbl4([SX.amendTable.id, SX.amendTable.what, SX.amendTable.for, SX.amendTable.sha], X.amendments.map(a => [`<code>${esc(a.id)}</code>`, md(a.what), xlink(a.for), a.sha ? `<code>${esc(a.sha)}</code>` : '—']))
       : `<p class="plain" style="color:var(--ink-3)">${SX.noAmendments}</p>`;
     sec('exec-entries', SX.sec.entries, null, `${tbl4([SX.table.id, SX.table.status, SX.table.sha, '#' + SX.table.rounds, SX.table.findings, SX.table.summary], rows, 'xent')}
-      ${kick4(`${SX.amendments} · ${X.amendments.length}`, amend)}`);
+      ${X.amendments.length ? kick4(`${SX.amendments} · ${X.amendments.length}`, amend) : ''}`);
 
     // ---- 4. the review: how precise each reviewer was ----
-    // v8 rows count sustained · latitude · dismissed · user; v9 rows count blocking · learn · withRepro · ruleOnly · closed: the table shows the columns the record carries
-    const PK = ['found', 'sustained', 'blocking', 'withRepro', 'ruleOnly', 'deferred', 'learn', 'closed', 'latitude', 'dismissed', 'user'].filter(k => X.precision.some(p => p[k] !== undefined));
+    // v8 rows count sustained · latitude · dismissed · user; v9 rows count blocking · learn · withRepro · ruleOnly · closed; lean rows count blocking · notes · downgraded · closed: the table shows the columns the record carries
+    const PK = ['found', 'sustained', 'blocking', 'withRepro', 'ruleOnly', 'notes', 'downgraded', 'deferred', 'learn', 'closed', 'latitude', 'dismissed', 'user'].filter(k => X.precision.some(p => p[k] !== undefined));
     const kept = p => p.blocking ?? p.sustained ?? 0;
     const ratio = (k, f) => f ? `${Math.round(100 * k / f)}%` : '—';
     const sumP = Object.fromEntries(PK.map(k => [k, X.precision.reduce((a, p) => a + (p[k] ?? 0), 0)]));
