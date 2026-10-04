@@ -21,9 +21,9 @@ with a launch video at the end. Six rules hold at every stage:
 | Rule | What it means |
 |---|---|
 | **Proof over opinion** | whatever can be checked by running something is: a clickable mock, journeys that become tests, a gate, QA on the running app. Reviewers exist for what cannot be run |
-| **Right size, always** | every design is picked part by part from three tiers, with an evolution path; every mechanism names the requirement that forces it |
+| **Right size, always** | one proposal at the "basics done well" bar, a critic whose only job is to cut, and an evolution path for what was relaxed; every mechanism names the AC or the risk that forces it |
 | **Specialists with knowledge packs** | each agent reads the packs of its craft before it works |
-| **He is asked only what is his** | he is in the loop at discovery and at one short design call; plan, execute and release run from play to done. What needs him in person is gathered up front, in one pre-flight message |
+| **He is asked only what is his** | he is in the loop at discovery and in the design debate; plan, execute and release run from play to done. What needs him in person is gathered up front, in one pre-flight message |
 | **Three layers per stage** | every stage reports as a video, then slides, then the blueprint |
 | **The pipeline measures itself** | each stage records its time, his minutes, agent hours, tokens, rounds and findings; the retro turns what went wrong into pipeline issues |
 
@@ -38,7 +38,7 @@ resume from the workstream's `.state.md`.
 
 ```mermaid
 flowchart LR
-  D1["1 · Discovery<br/>interview + mock + lock"] --> D2["2 · Design<br/>three tiers · one call"]
+  D1["1 · Discovery<br/>interview + mock + lock"] --> D2["2 · Design<br/>one proposal · the debate"]
   D2 --> D3["3 · Plan<br/>autonomous graph"]
   D3 --> PF{{"pre-flight + play"}}
   PF --> D4["4 · Execute<br/>local CI queue"]
@@ -54,48 +54,58 @@ built in front of him: exact in look (the project's exported tokens
 and components) and in behaviour (every screen and state, realistic
 data, a faked store whose side effects show in a backstage pane). A
 journey panel plays each journey step by step; he validates through
-it. Before he can lock it, a checker walks every journey and state
-mechanically. From the locked mock, the journeys (YAML a test can
-run), the use cases and the acceptance criteria (`J1.s2.1 [RULE]
-GIVEN/WHEN/THEN`) are derived, plus a one-page PR-FAQ. One review round
-plus a delta.
+it. His "lock it" is the gate: the lock walks every journey and state
+once more and freezes the frames. From the locked mock, the journeys
+(YAML a test can run), the use cases and the acceptance criteria
+(`J1.s2.1 [RULE] GIVEN/WHEN/THEN`, one per rule and one per behavior)
+are derived by `journey-scribe (Sonnet 5.5, high)`, plus a one-page
+PR-FAQ. One review round (`disc-reviewer (Sonnet 5.5, medium)` and a
+`disc-blind-reader (Sonnet 5.5, low)` per story, filtered), verified
+by reading: no second round, no delta. The report's video is the mock
+in use, 60–90 s.
 
-**2 · Design — autonomous, three tiers, right-sized.** Three
-architects design every part in parallel at three tiers — lean,
-balanced, hardened — with build hours, run cost and risks covered. A
-sizing judge picks a tier per part on risk × reversibility × cost,
-usually lean, with care only where a one-way door or a real risk
-sits; two critics attack the pick from opposite sides; the result is
-`sizing.md` with the evolution path. He gets one short deck and at most
-one question call (cost, scope, security posture, one-way doors). Then
-ten writers in two waves (data model and contracts first, to fix the
-names) and two automatic review rounds that report only correctness,
-coverage of the lock, contradictions and one-way doors.
+**2 · Design — one proposal, debated until closed.** Scouts (`scout
+(Sonnet 5.5, low)`) read the current system; he is asked what he has
+in mind. One `architect (Opus 5.5, high)` writes one proposal at the
+"basics done well" bar, with where it disagrees with him and the
+evolution path; `overengineering-critic (Opus 5.5, medium)` cuts what
+serves no AC and no real risk. The proposal is presented as a video
+and slides and debated with him until he says it is closed, the slides
+re-rendered each round. Then four `design-writer (Sonnet 5.5, high)`
+in parallel write `solution.md`, `data-and-contracts.md` (with a
+Contract per feature), `tests.md` (one primary proof per AC) and
+`operations.md`, about 40 KB each; one `design-reviewer (Opus 5.5,
+medium)`, one round, blocking findings only (AC coverage, consistency,
+security posture).
 
-**3 · Plan — autonomous, maximum width.** From A (what the recon finds
-today) to B (the sized design), as a build graph a script checks
-(`plan.graph.json`): a thin contract-first foundation (the contract,
-migrations, seams with fakes and contract suites, factories, one
-exemplar per new kind of code), lanes nobody waits for, vertical
-slices sized to one agent's context, and one integration node. Edges
-exist only where a slice's proof needs another slice's real
-behaviour; every file has one owner. The conductor rules every
-finding and lists its choices for veto; the pre-flight lists what only
-he can hand over, each item with a ready command.
+**3 · Plan — no user in the loop, maximum width.** From A (what the
+scouts find today and what the other running fronts are changing) to B
+(what the design says exists), as a build graph a script checks
+(`plan.graph.json`). Compute is infinite: one `planner (Opus 5.5,
+high)` cuts the most parallel graph — a thin foundation, every entry
+one whole behaviour built at once, front and back in parallel on the
+design's Contract, hot files made cold, an edge only where nothing can
+be faked, one integration entry at the end. `plan-writer (Sonnet 5.5,
+high)` writes one brief per entry, all at once; one review round
+(`plan-reviewer (Opus 5.5, medium)` and a `plan-blind-reader (Sonnet
+5.5, low)` per brief, filtered). The conductor rules everything and
+lists its choices for veto; the pre-flight lists what only he can hand
+over, each item with a ready command. Stage 4 waits for his play.
 
 **4 · Execute — play, and come back when it is done.** He hands over
 the pre-flight and pastes one goal; he is called once, at the end.
 Done means the plan's ACs met and the gate green; nothing else blocks.
-Per node: one builder writes the code and a test per AC (two, back and
-front in parallel, when the brief fixes the contract), running only
-the fast checks; the gate runs the suites once; then, in parallel, one
-reviewer and the QAs of the surface, none of whom wrote the code. A
-finding blocks only on an AC not met, a reproduced bug, a security hole
-or a written rule broken; the rest are notes on the PR. One fix pass at
-most, then the entry merges or parks. The session is the **local CI**:
-a serial queue tests each merged tree and signs it off; the whole gate
-runs once at the end. He checks the screens against the locked mock
-once, in the stage report.
+Per node: one `builder (Opus 5.5, medium)` writes the code and a test
+per AC (two, back and front in parallel, when the brief fixes the
+contract), running only the fast checks; the gate runs the suites
+once; then, in parallel, one `reviewer (Opus 5.5, high)` and the QAs
+of the surface (`qa-frontend`, `qa-backend`, both Opus 5.5, medium),
+none of whom wrote the code. A finding blocks only on an AC not met, a
+reproduced bug, a security hole or a written rule broken; the rest are
+notes on the PR. One fix pass at most, then the entry merges or parks.
+The session is the **local CI**: a serial queue tests each merged tree
+and signs it off; the whole gate runs once at the end. He checks the
+screens against the locked mock once, in the stage report.
 
 **5 · Release — autonomous, responsible.** His play is his "go": one
 message carries the pre-flight and the play line that authorizes the
@@ -138,37 +148,18 @@ an agent's frontmatter disagrees.
 |  | `video-scribe` | Sonnet 5.5, medium |
 |  | `slides-scribe` | Sonnet 5.5, high |
 | discovery | `prototyper` | Opus 5.5, medium |
-|  | `prototype-checker` | Sonnet 5.5, high |
 |  | `journey-scribe` | Sonnet 5.5, high |
 |  | `disc-author-prfaq` | Sonnet 5.5, high |
+|  | `disc-reviewer` | Sonnet 5.5, medium |
 |  | `disc-blind-reader` | Sonnet 5.5, low |
-|  | `disc-reviewer-acceptance` | Sonnet 5.5, medium |
-|  | `disc-reviewer-boundary` | Sonnet 5.5, medium |
-| design | `design-researcher` | Sonnet 5.5, medium |
-|  | `architect` | Opus 5.5, high |
-|  | `sizing-judge` | Opus 5.5, high |
-|  | `overengineering-critic` | Sonnet 5.5, high |
-|  | `risk-critic` | Sonnet 5.5, high |
+| design | `architect` | Opus 5.5, high |
+|  | `overengineering-critic` | Opus 5.5, medium |
+|  | `design-researcher` | Sonnet 5.5, medium |
 |  | `design-writer` | Sonnet 5.5, high |
-|  | `design-reviewer-code` | Opus 5.5, medium |
-|  | `design-reviewer-contracts` | Opus 5.5, medium |
-|  | `design-reviewer-data` | Opus 5.5, medium |
-|  | `design-reviewer-infra` | Opus 5.5, medium |
-|  | `design-reviewer-security` | Opus 5.5, medium |
-|  | `design-reviewer-sizing` | Opus 5.5, medium |
-|  | `design-reviewer-alarms` | Sonnet 5.5, medium |
-|  | `design-reviewer-consistency` | Sonnet 5.5, medium |
-|  | `design-reviewer-coverage` | Sonnet 5.5, medium |
-|  | `design-reviewer-facts` | Sonnet 5.5, medium |
-|  | `design-reviewer-ui` | Sonnet 5.5, medium |
-|  | `design-reviewer-ambiguity` | Sonnet 5.5, low |
-|  | `design-blind-reader` | Sonnet 5.5, low |
-| design, plan | `plan-scout` | Sonnet 5.5, low |
-| plan | `plan-writer` | Opus 5.5, medium |
-|  | `plan-reviewer-order` | Sonnet 5.5, high |
-|  | `plan-reviewer-coverage` | Sonnet 5.5, high |
-|  | `plan-reviewer-verifiability` | Sonnet 5.5, high |
-|  | `plan-reviewer-ambiguity` | Sonnet 5.5, high |
+|  | `design-reviewer` | Opus 5.5, medium |
+| plan | `planner` | Opus 5.5, high |
+|  | `plan-writer` | Sonnet 5.5, high |
+|  | `plan-reviewer` | Opus 5.5, medium |
 |  | `plan-blind-reader` | Sonnet 5.5, low |
 | execute | `builder` | Opus 5.5, medium |
 |  | `exec-gate` | Sonnet 5.5, low |
@@ -191,15 +182,15 @@ path in the prompt; a session loads one with the Skill tool.
 
 | Pack | Read by |
 |---|---|
-| `design-taste` | prototyper, prototype-checker, builder (screens) |
-| `motion-3d` | prototyper, builder (screens), launch-director |
-| `interview-journeys-copy` | discovery conductor, prototyper, journey-scribe, the discovery lenses |
-| `right-sizing` | architects, sizing-judge, the critics, design-reviewer-sizing, the design conductor |
-| `parallel-plan-local-ci` | the plan conductor, plan-writer, the plan lenses, the execute session |
-| `go-backend` · `react-frontend` | builder, reviewer; go also qa-backend, react also qa-frontend |
-| `ops` | architects, design-reviewer-alarms, builder (ops), reviewer, the release session |
-| `release` | the release session, the verifier on staging and production |
-| `launch-video` | launch-director, footage-recorder, the video kit's launch mode |
+| `design-taste` | prototyper (Opus 5.5, medium), builder (Opus 5.5, medium; screens) |
+| `motion-3d` | prototyper (Opus 5.5, medium), builder (Opus 5.5, medium; screens), launch-director (Opus 5.5, high) |
+| `interview-journeys-copy` | discovery conductor, prototyper (Opus 5.5, medium), journey-scribe (Sonnet 5.5, high), disc-author-prfaq (Sonnet 5.5, high), disc-reviewer (Sonnet 5.5, medium) |
+| `right-sizing` | the design conductor, architect (Opus 5.5, high), overengineering-critic (Opus 5.5, medium) |
+| `parallel-plan-local-ci` | the plan conductor, planner (Opus 5.5, high), plan-reviewer (Opus 5.5, medium), the execute session |
+| `go-backend` · `react-frontend` | builder (Opus 5.5, medium), reviewer (Opus 5.5, high); go also qa-backend (Opus 5.5, medium), react also qa-frontend (Opus 5.5, medium) |
+| `ops` | architect (Opus 5.5, high), builder (Opus 5.5, medium; ops), reviewer (Opus 5.5, high), the release session |
+| `release` | the release session, verifier (Opus 5.5, medium) on staging and production |
+| `launch-video` | launch-director (Opus 5.5, high), footage-recorder (Sonnet 5.5, medium), the video kit's launch mode |
 | `model-selection` | whoever picks a model: the evidence behind `docs/models.md` |
 
 ## Three layers per stage
@@ -303,10 +294,11 @@ scripts/                check-models.mjs
 ## On cost
 
 The pipeline spends tokens where they buy quality and cuts them where
-the runs showed waste. Review rounds stop at two (the second only over
-the delta), an execute entry gets one fix pass and the suites run
-once per pass, in the gate, design and plan ask him nothing they can
-decide, and each role runs on the cheapest model and effort the
+the runs showed waste. Every review is one round (at design and plan
+one reviewer, at discovery and plan plus filtered blind readers), an
+execute entry gets one fix pass and the suites run
+once per pass, in the gate, design asks him only in the debate and plan asks
+him nothing, and each role runs on the cheapest model and effort the
 benchmarks support ([docs/models.md](docs/models.md)). What stays
 redundant on purpose: the reviewer and the QAs never wrote what they
 read, and the whole gate runs once more on the top of the branch.
@@ -318,7 +310,7 @@ read, and the whole gate runs once more on the top of the branch.
 | **workstream** | one demand, end to end — one folder, one blueprint |
 | **conductor** | the stage's session: dispatches, routes, rules, talks to him; never writes the deliverables |
 | **mock** | discovery's clickable prototype, exact in look and behaviour, fully faked; locked by him |
-| **tier** | lean · balanced · hardened: three designs of every part, one picked per part |
+| **proposal** | design's one solution at the "basics done well" bar, debated with him until he says it is closed |
 | **foundation** | `F`: what two nodes would both write (contract, migrations, seams, factories, exemplars), built first and thin |
 | **node** | one unit of the build graph: the foundation, a lane `F-x<n>`, a slice `E-<nn>`, the integration node `E-int` |
 | **play** | his one message that starts an autonomous stage; at release it authorizes the audited head |

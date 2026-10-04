@@ -14,8 +14,8 @@ afterwards for a veto.
 | Stage | Mode | Where he is in the loop |
 |---|---|---|
 | 1 discovery | **interview + mock + lock** | he talks; a clickable mock is built and iterated in front of him; he validates through it and locks it. The text (journeys, stories, PR-FAQ) is derived from the locked mock |
-| 2 design | **autonomous + one short call** | one deck with three tiers per part and at most one question call (four questions, only cost, scope, security posture and one-way doors); the stage closes on his approval of the report |
-| 3 plan | **autonomous** | nowhere: the conductor rules everything and lists its choices at the report for his veto |
+| 2 design | **the talk + the debate** | he says what he has in mind; one proposal is presented as a video and slides and debated with him until he says it is closed, which is his approval; the four documents and the review run without him |
+| 3 plan | **autonomous** | nowhere: the conductor rules everything, lists its choices at the report for his veto, and gathers what only he can hand over into the pre-flight |
 | 4 execute | **pre-flight, then play** | he hands over the pre-flight and pastes one goal; he is called once, at the end, when everything is merged, green and reported, and checks the screens against the locked mock there. One blocking rule, in code |
 | 5 release | **his play authorizes the head** | the play (`merge-from <audited head>` in the guard's allow file) is his "go"; the session merges, deploys, verifies and rolls back on its own, under the guard; it stops only on its written list |
 | 6 close | **retro + launch video** | the retro is a file for the weekly; for the people, a launch video and a "what's new" text he forwards |
@@ -120,24 +120,29 @@ The conductor judges every finding by the stage's
 `references/judging.md`; there is no judge agent, and at execution
 no judge at all.
 
-- **Discovery.** His validation is **the lock**: he locks the mock,
-  recorded as `<date> · discovery D4 · lock v<N> · ruled: locked ·
-  "<his words>"` (with an override line when he locks over gate gaps).
-  Then one round plus a delta, automatic. Wording goes to the author
-  without a question; product, scope and confirmed decisions go to
-  him, one question per decision, in one batch.
-- **Design.** Round 1 whole and round 2 over the delta, both
-  automatic, then stop: there is no third round. He is asked only at
-  the call (one deck, at most one question call). After it, a finding
-  of his class is ruled by the conductor conservatively, marked
-  `ruled: conductor`, and listed for his veto in the report; a real
-  observation that is declared latitude goes to the implementer, as one
-  line in the document's "The implementer decides".
-- **Plan.** Round 1 whole and round 2 over the delta, both automatic.
-  The conductor rules everything, his classes included (`ruled:
-  conductor`); execution latitude goes to the builder as a line in the
-  brief. Nothing reaches him as a question; the report lists every
-  choice for his veto.
+- **Discovery.** His validation is **the lock**: his word "lock it"
+  is the gate, recorded as `<date> · discovery D3 · lock v<N> · ruled:
+  locked · "<his words>"` (with an override line when he locks over
+  open items). Then one review round, automatic, verified by reading:
+  no second round and no delta. Wording goes to the author without a
+  question; product, scope and confirmed decisions go to him, one
+  question per decision, in one batch.
+- **Design.** He is in the loop twice: the talk (what he has in mind)
+  and the debate over the one proposal, until he says it is closed;
+  each choice of the debate goes through the question tool and into
+  `rulings.md`. Then one reviewer, one round, blocking findings only,
+  ruled by the conductor: there is no second round. After he closed
+  the proposal, a decision of his class is ruled by the conductor
+  conservatively, marked `ruled: conductor`, and listed for his veto
+  in the close message; a real observation that is declared latitude
+  goes to the implementer, as one line in the document's "The
+  implementer decides".
+- **Plan.** No user in the loop. One review round, automatic: one
+  reviewer and the blind readers, filtered. The conductor rules
+  everything, his classes included (`ruled: conductor`); execution
+  latitude goes to the builder as a line in the brief. Nothing reaches
+  him as a question; the report lists every choice for his veto, and
+  what only he can hand over goes to the pre-flight.
 - **Execution.** Done is the plan's ACs met and the gate green. One
   blocking rule, in code, by the execute stage's `judging.md`: a
   finding of `reviewer (Opus 5.5, high)`, `qa-frontend (Opus 5.5,
@@ -172,7 +177,7 @@ Every ruling is appended, as it happens, to the workstream's
 line each:
 
 ```
-2025-11-04 · design r2 · design-reviewer-infra#2 · proposed: dismissed · ruled: sustained · "the cost line encodes the SLA, it stays"
+2025-11-04 · design · design-reviewer#R-2 · proposed: dismissed · ruled: sustained · "the cost line encodes the SLA, it stays"
 ```
 
 Date · stage and round (or the entry at stage 4) · the finding id ·
@@ -237,7 +242,7 @@ altitude.
 - **The test for a detail:** it enters the blueprint if the reader
   would decide something differently knowing it. Otherwise it stays in
   the file — and the file is named as the authority ("the exact numbers
-  live in `data-model.md`"), so nobody reads the blueprint as source.
+  live in `data-and-contracts.md`"), so nobody reads the blueprint as source.
 - **The intro of every tab is the report.** Read only the opening
   paragraph and you know what this is, how it is organized, what it
   costs. Then, up front: *what needs your eye here* — the decisions
@@ -261,8 +266,9 @@ altitude.
   line-by-line JSON comments, projection expressions, per-round
   history. Diagrams earn their place when they replace prose — the
   whole cycle in one picture, yes; one per mechanism, no.
-- **Ceiling:** a wave's Design tab reads in 20–30 minutes — roughly
-  6–8 thousand words across its nine subtabs; a subtab in two or three.
+- **Ceiling:** the Design tab reads in 20–30 minutes across its seven
+  sections, from the proposal and the debate to the review; the word
+  caps of `claude/blueprint/schema/design.md` hold it there.
   Plan and Execution tabs hold the same altitude.
 
 Discovery keeps the PR-FAQ, the stories and the locked journeys with
