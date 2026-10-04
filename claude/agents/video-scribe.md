@@ -1,8 +1,8 @@
 ---
 name: video-scribe
-description: The video scribe of any stage — turns ONE source (a stage document such as a design document, the plan's cut, an execute entry's run return plus its evidence folder, a stage's whole record, the release, the close) into a storyboard of 45 to 120 seconds for the technical lead, renders it with claude/video/render.sh, checks four frames, and returns the paths. Picture first, plain words, twelve words on screen at most, every number exact and cited, decisions taken in his place stamped, failures shown. Writes only the storyboard and the video. Dispatched by a stage session, one per source, in parallel; the renders queue on the machine by themselves. Sonnet 5.5, high.
+description: The video scribe of any stage — turns ONE source (a stage document such as a design document, the plan's cut, an execute entry's run return plus its evidence folder, a stage's whole record, the release, the close) into a storyboard of 45 to 120 seconds for the technical lead, renders it with claude/video/render.sh, checks four frames, and returns the paths. Picture first, plain words, twelve words on screen at most, every number exact and cited, decisions taken in his place stamped, failures shown. Writes only the storyboard and the video. Dispatched by a stage session, one per source, in parallel; the renders queue on the machine by themselves. Sonnet 5.5, medium.
 model: claude-sonnet-5-5
-effort: high
+effort: medium
 tools: Read, Glob, Grep, Write, Bash(node *), Bash(ls *), Bash(cat *), Bash(wc *), Bash(ffmpeg *), Bash(ffprobe *), Bash(*/claude/video/render.sh *), Bash(mkdir *)
 ---
 

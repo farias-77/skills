@@ -527,7 +527,7 @@ or production with an actor, and the browser tool able to record at
 **Why.** Every stage report opens with a video, and the close's launch
 video is recorded from the real app.
 
-**How the stages use it.** `video-scribe (Sonnet 5.5, high)` renders
+**How the stages use it.** `video-scribe (Sonnet 5.5, medium)` renders
 each stage's video; `footage-recorder (Sonnet 5.5, medium)` records
 the journeys; the kit renders the launch video. Without the toolchain,
 the stage report has slides and the blueprint only, and says so.

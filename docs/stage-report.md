@@ -10,7 +10,7 @@ order, each one a step up in detail:
 
 | Layer | What it answers | Size | Made by |
 |---|---|---|---|
-| Video | how the stage's result works | 1–2 min, ≤ 10 MB | `video-scribe (Sonnet 5.5, high)` + `claude/video/render.sh` |
+| Video | how the stage's result works | 1–2 min, ≤ 10 MB | `video-scribe (Sonnet 5.5, medium)` + `claude/video/render.sh` |
 | Slides | the details he follows day to day | 8–15 slides, ≤ 40 words each | `slides-scribe (Sonnet 5.5, high)` |
 | Blueprint | everything, with the documents behind the click | as today | `claude/blueprint/build.mjs` |
 
@@ -67,7 +67,7 @@ stop at 10 MB.
 
 ```
 1 blueprint   node claude/blueprint/build.mjs <workstream>          (the stage's own close, as today)
-2 video       video-scribe (Sonnet 5.5, high) → report/<tab>/storyboard.json
+2 video       video-scribe (Sonnet 5.5, medium) → report/<tab>/storyboard.json
               → claude/video/render.sh … report/<tab>/video.mp4    (background, nice, concurrency 2)
 3 slides      slides-scribe (Sonnet 5.5, high) → report/<tab>/project/   (dispatched while the video renders)
 4 publish     a. the deck Artifact, created from the Slides type   → slides URL
@@ -80,7 +80,7 @@ stop at 10 MB.
 that refuses stops here: the report is built on a blueprint that
 builds.
 
-**2 · The video.** Dispatch `video-scribe (Sonnet 5.5, high)` with
+**2 · The video.** Dispatch `video-scribe (Sonnet 5.5, medium)` with
 the stage, the workstream path, the language, the stage's focus
 paragraph (below) and `report/<tab>/` as its folder. It writes
 `storyboard.json` and renders it:

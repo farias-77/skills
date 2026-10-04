@@ -78,7 +78,7 @@ the lock (D3), the one batch of questions (D5) and the approval (D6).
 | `disc-author-prfaq` | Sonnet 5.5, high | the one-page PR-FAQ from the locked mock and the notes |
 | `disc-reviewer` | Sonnet 5.5, medium | can a stranger judge each AC; is every capability In or Out; does every rule and behavior of the mock have its one AC? |
 | `disc-blind-reader` | Sonnet 5.5, low | walks the mock with one story only; reports an AC only when undecidable or contradicted |
-| `video-scribe` | Sonnet 5.5, high | the stage report's video: the mock in use, 60–90 s (D6) |
+| `video-scribe` | Sonnet 5.5, medium | the stage report's video: the mock in use, 60–90 s (D6) |
 | `slides-scribe` | Sonnet 5.5, high | the stage report's slides (D6) |
 
 ## Files
@@ -582,7 +582,7 @@ Then the stage report: follow
 [claude/docs/stage-report.md](../../docs/stage-report.md) (video,
 slides, blueprint). For discovery, the video is **short: 60 to 90
 seconds of the mock being used**. Give `video-scribe (Sonnet 5.5,
-high)` the locked journey frames (`frames/journeys/J<n>.s<k>.png`, in
+medium)` the locked journey frames (`frames/journeys/J<n>.s<k>.png`, in
 journey order, each with its step's `do` line) so he re-watches what he
 approved, the mock's fixture list (`meta.fixtures` from `proto.mjs
 model`: those names are invented, not personal data), and the cap in

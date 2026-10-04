@@ -88,7 +88,8 @@ P4 close     blueprint JSON → build → video (the graph, the start order) →
 | `plan-writer` × each node | Sonnet 5.5, high | one brief and its blueprint JSON; asks, never decides; applies its brief's fixes |
 | `plan-reviewer` | Opus 5.5, medium | each entry buildable without asking, every edge real, the foundation thin, the fronts coordinated |
 | `plan-blind-reader` × each brief | Sonnet 5.5, low | reads one brief alone; reports a key only `undecidable` or `contradicts`, with a quote |
-| `video-scribe` · `slides-scribe` | Sonnet 5.5, high | the stage report |
+| `video-scribe` | Sonnet 5.5, medium | the stage report's video |
+| `slides-scribe` | Sonnet 5.5, high | the stage report's slides |
 
 ## Preconditions
 

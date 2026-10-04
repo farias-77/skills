@@ -135,7 +135,7 @@ an agent's frontmatter disagrees.
 | Stage | Agent | Model, effort |
 |---|---|---|
 | all | `scout` | Sonnet 5.5, low |
-|  | `video-scribe` | Sonnet 5.5, high |
+|  | `video-scribe` | Sonnet 5.5, medium |
 |  | `slides-scribe` | Sonnet 5.5, high |
 | discovery | `prototyper` | Opus 5.5, medium |
 |  | `prototype-checker` | Sonnet 5.5, high |

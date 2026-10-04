@@ -26,40 +26,21 @@ To change a pick, change the row and the agent's frontmatter together.
 | Agent | Stage | Model | Effort | Evidence |
 |---|---|---|---|---|
 | `scout` | all | Sonnet 5.5 | low | Lookups, not writing: literal, fast, < $0.4 a task |
-| `video-scribe` | all | Sonnet 5.5 | high | Templated storyboards; ties Opus medium at equal cost, 30% faster |
+| `video-scribe` | all | Sonnet 5.5 | medium | Templated storyboards from a fixed source; medium holds the template at lower cost |
 | `slides-scribe` | all | Sonnet 5.5 | high | Follows slide templates with minimal editing; same cost as Opus medium |
 | `prototyper` | discovery | Opus 5.5 | medium | Best on graphics and polish; leads CursorBench at every cost; `/effort low` on comment rounds |
-| `prototype-checker` | discovery | Sonnet 5.5 | high | A mechanical gate plus a checklist: literal reading |
 | `journey-scribe` | discovery | Sonnet 5.5 | high | Derives text from a locked source: templated writing |
 | `disc-author-prfaq` | discovery | Sonnet 5.5 | high | One page from a template |
 | `disc-blind-reader` | discovery | Sonnet 5.5 | low | A blind reader must read literally; low keeps it cheap |
-| `disc-reviewer-acceptance` | discovery | Sonnet 5.5 | medium | Checklist critic |
-| `disc-reviewer-boundary` | discovery | Sonnet 5.5 | medium | Checklist critic |
+| `disc-reviewer` | discovery | Sonnet 5.5 | medium | Checklist critic: judgeable ACs, the In/Out fence, one AC per rule and behavior |
 | `design-researcher` | design | Sonnet 5.5 | medium | Searches and cites; the citer downgrades what a source does not hold |
 | `architect` | design | Opus 5.5 | high | Open-ended design judgment: GDPval 1576 (medium) → 1690 (high) |
-| `sizing-judge` | design | Opus 5.5 | high | Weighs risk, reversibility and cost per part: sustained judgment |
-| `overengineering-critic` | design | Sonnet 5.5 | high | Checks a pick against a fixed list (right-sizing C1–C17) |
-| `risk-critic` | design | Sonnet 5.5 | high | Checks a pick against a fixed list of failure classes |
+| `overengineering-critic` | design | Opus 5.5 | medium | Cuts what serves no AC and no real risk: judgment on "does this need to exist?" |
 | `design-writer` | design | Sonnet 5.5 | high | Documents from templates and a fixed design |
-| `design-reviewer-code` | design | Opus 5.5 | medium | Judgment critic: Opus more precise at the same cost |
-| `design-reviewer-contracts` | design | Opus 5.5 | medium | Judgment critic |
-| `design-reviewer-data` | design | Opus 5.5 | medium | Judgment critic |
-| `design-reviewer-infra` | design | Opus 5.5 | medium | Judgment critic |
-| `design-reviewer-security` | design | Opus 5.5 | medium | Judgment critic on documents (code security runs at high in execute) |
-| `design-reviewer-sizing` | design | Opus 5.5 | medium | Judgment: "does this need to exist?" |
-| `design-reviewer-alarms` | design | Sonnet 5.5 | medium | Checklist critic (the ops pack) |
-| `design-reviewer-consistency` | design | Sonnet 5.5 | medium | Cross-document comparison: literal |
-| `design-reviewer-coverage` | design | Sonnet 5.5 | medium | Two lists compared |
-| `design-reviewer-facts` | design | Sonnet 5.5 | medium | Claim against source: literal |
-| `design-reviewer-ui` | design | Sonnet 5.5 | medium | Checklist critic against the locked mock |
-| `design-reviewer-ambiguity` | design | Sonnet 5.5 | low | Literal reading |
-| `design-blind-reader` | design | Sonnet 5.5 | low | A blind reader must read literally |
-| `plan-scout` | design, plan | Sonnet 5.5 | low | Locates and quotes per repo and area |
-| `plan-writer` | plan | Opus 5.5 | medium | Same cost as Sonnet high, equal or better (GDPval +36); sequencing is judgment |
-| `plan-reviewer-order` | plan | Sonnet 5.5 | high | The graph against the pack's checklist; the checker settles the mechanical part |
-| `plan-reviewer-coverage` | plan | Sonnet 5.5 | high | Every criterion owned once: two lists compared |
-| `plan-reviewer-verifiability` | plan | Sonnet 5.5 | high | Each acceptance line against "can a command prove it" |
-| `plan-reviewer-ambiguity` | plan | Sonnet 5.5 | high | Literal reading of the briefs |
+| `design-reviewer` | design | Opus 5.5 | medium | One round over the four documents: AC coverage, consistency, security posture; Opus more precise at the same cost |
+| `planner` | plan | Opus 5.5 | high | Cuts the whole graph; the judgment of the stage |
+| `plan-writer` | plan | Sonnet 5.5 | high | One brief from a fixed graph; copies, decides nothing |
+| `plan-reviewer` | plan | Opus 5.5 | medium | One reader of the cut and every brief: buildable, edges real, foundation thin, fronts |
 | `plan-blind-reader` | plan | Sonnet 5.5 | low | A blind reader must read literally |
 | `builder` | execute | Opus 5.5 | medium | FrontierCode peaks at Opus medium (54.6%); the fix pass too: it applies proven items |
 | `exec-gate` | execute | Sonnet 5.5 | low | Runs the gate commands once and reads logs: no judgment |

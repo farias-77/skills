@@ -279,7 +279,7 @@ layer only when he wants more detail, so each layer is whole at its
 altitude and never sends him up for what it should have shown. On a
 normal day he watches and reads; the blueprint is for when he needs
 it. The stage's close message names the three in that order, nothing
-before them. The procedure — `video-scribe (Sonnet 5.5, high)`,
+before them. The procedure — `video-scribe (Sonnet 5.5, medium)`,
 `slides-scribe (Sonnet 5.5, high)`, the publishing and the links both
 ways — is [docs/stage-report.md](docs/stage-report.md). The close is
 the exception: no review video and no slides. Its layers are the

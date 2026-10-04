@@ -1,6 +1,6 @@
 ---
 name: stage-execute
-description: Conducts stage 4 (Execute) — turns an approved plan into merged code on the feature branch, from one "play" to one call. Step 0 shows the plan's pre-flight once, waits until every item is handed over, and gives the user the /goal text to paste; from then on nobody asks him anything. One session (Opus 5.5, high) orchestrates without writing code: the foundation first, then every node of plan.graph.json whose edges are merged or ready, in the graph's start order, in parallel up to the cap, each through the exec-entry workflow — builder (Opus 5.5, medium) writes the code and the tests for the entry's ACs, running only the fast checks (two builders, back and front in parallel, when the brief carries a Contract); exec-gate (Sonnet 5.5, low) runs the gate once, the only place the suites run; then, in parallel, reviewer (Opus 5.5, high) with a closed scope, qa-frontend (Opus 5.5, medium) on screens and qa-backend (Opus 5.5, medium) on the API and data; a mechanical triage (blocking only on an AC not met, a reproduced bug, a security hole or a written rule broken; the rest are notes on the PR); at most one review fix pass (a gate-fix pass on a code red is apart, two at most) and a delta by the agents that blocked, then ready or parked. Done = the plan's ACs met and the gate green. The session is the local CI: its serial queue merges the base into each ready entry, tests the merged tree, merges, and signs off; the whole gate runs once at the end. It closes with the stage report, where the user checks the screens against the locked mock once, and calls him once, when everything is merged, green and reported. Use when a workstream's .state.md says stage execute, or to resume an execution in progress.
+description: Conducts stage 4 (Execute) — turns a closed plan into merged code on the feature branch, from one "play" to one call. Step 0 shows the plan's pre-flight once, waits until every item is handed over, and gives the user the /goal text to paste; from then on nobody asks him anything. One session (Opus 5.5, high) orchestrates without writing code: the foundation first, then every node of plan.graph.json whose edges are merged or ready, in the graph's start order, in parallel up to the cap, each through the exec-entry workflow — builder (Opus 5.5, medium) writes the code and the tests for the entry's ACs, running only the fast checks (two builders, back and front in parallel, when the brief carries a Contract); exec-gate (Sonnet 5.5, low) runs the gate once, the only place the suites run; then, in parallel, reviewer (Opus 5.5, high) with a closed scope, qa-frontend (Opus 5.5, medium) on screens and qa-backend (Opus 5.5, medium) on the API and data; a mechanical triage (blocking only on an AC not met, a reproduced bug, a security hole or a written rule broken; the rest are notes on the PR); at most one review fix pass (a gate-fix pass on a code red is apart, two at most) and a delta by the agents that blocked, then ready or parked. Done = the plan's ACs met and the gate green. The session is the local CI: its serial queue merges the base into each ready entry, tests the merged tree, merges, and signs off; the whole gate runs once at the end. It closes with the stage report, where the user checks the screens against the locked mock once, and calls him once, when everything is merged, green and reported. Use when a workstream's .state.md says stage execute, or to resume an execution in progress.
 disable-model-invocation: false
 argument-hint: "<workstream-slug>"
 allowed-tools: Read, Write, Edit, Glob, Grep, Agent, Workflow, AskUserQuestion, Artifact, PushNotification, Bash
@@ -8,7 +8,7 @@ allowed-tools: Read, Write, Edit, Glob, Grep, Agent, Workflow, AskUserQuestion, 
 
 # Stage 4: Execute
 
-An approved plan comes in: the build graph (`plan.graph.json`: the
+A closed plan comes in: the build graph (`plan.graph.json`: the
 foundation, the lanes, the slices, the integration node, their edges
 and the files each owns) and a brief per node. Merged code comes out
 on `feat/<workstream>`.
@@ -65,12 +65,12 @@ line per agent with its minutes, and the session keeps them.
 | `reviewer` | Opus 5.5, high | the ACs implemented, bugs and races, the security checklist, operations, a written rule broken |
 | `qa-frontend` | Opus 5.5, medium | the screens used like a person: the ACs' journeys, the states, mobile width |
 | `qa-backend` | Opus 5.5, medium | the API called like a client, the data read back, and "try to break it" |
-| `video-scribe` | Sonnet 5.5, high | a short video of what the agents did, per entry and once for the stage |
+| `video-scribe` | Sonnet 5.5, medium | a short video of what the agents did, per entry and once for the stage |
 
 ## Preconditions
 
-`.state.md` says `stage: execute`; `02-plan/plan.md` is approved with
-its gate commands; `02-plan/plan.graph.json` is the build graph the
+`.state.md` says `stage: execute` (the plan closes on its own; this
+stage waits for his play); `02-plan/plan.md` with its gate commands; `02-plan/plan.graph.json` is the build graph the
 plan's checker passed, and `02-plan/graph.json` its last output (the
 `startOrder`, the critical path); a brief per node in
 `02-plan/briefs/`; `02-plan/preflight.md`; discovery's locked mock in
@@ -140,13 +140,11 @@ audit for my veto. Then notify me.
 ```
 
 **3. Prepare the codebase.** `feat/<workstream>` cut from `main` and
-pushed; the start order from `graph.json`; the cap: the one measured
-in `02-plan/recon/machine.md`, or else the plan's widest wave, held by
+pushed; the start order from `graph.json`; the cap: the plan's widest wave, held by
 the load below; `board.md` with every node `waiting`.
 
 **The machine is the session's.** Before it starts a run, the session
-reads `cat /proc/loadavg`; above the threshold (the median load
-`machine.md` measured at the cap, else `nproc`), the start waits for
+reads `cat /proc/loadavg`; above the threshold (`nproc`), the start waits for
 the next run to finish. On a machine other work shares, the session
 reads the load once before its first run, writes it on the board as
 the outside load, and holds the cap at the threshold plus that load.
@@ -207,7 +205,7 @@ the board (the entry's minutes, and the slowest step). Then act on
 `status`:
 
 - **`ready`** → the merge queue (Step 4); in the background, the
-  entry's video: `video-scribe (Sonnet 5.5, high)` with the run return
+  entry's video: `video-scribe (Sonnet 5.5, medium)` with the run return
   and the evidence folder, writing under `entries/<id>/video/`. The
   queue never waits on it.
 - **`interrupted`** → an agent returned nothing (the API, the network,
@@ -304,7 +302,7 @@ When every entry is merged or parked:
    queue; then the whole gate again.
 2. `explain.md` from [templates/explain.md](templates/explain.md).
 3. `audit.md` by [references/audit.md](references/audit.md).
-4. **The stage's video**: `video-scribe (Sonnet 5.5, high)` once more,
+4. **The stage's video**: `video-scribe (Sonnet 5.5, medium)` once more,
    with every `run-*.json`.
 5. `blueprint/execution/execution.json` (schema:
    `${CLAUDE_SKILL_DIR}/../../blueprint/schema/execution.md`).

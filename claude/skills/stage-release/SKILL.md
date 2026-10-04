@@ -57,7 +57,7 @@ It never deploys by hand what the doctrine says the CI deploys.
 | `release-scribe (Sonnet 5.5, medium)` | one per versioned artifact: the version, the notes, the reverts |
 | the stage-4 pipeline | an `R.n` fix: `builder (Opus 5.5, medium)`, `exec-gate (Sonnet 5.5, low)`, `reviewer (Opus 5.5, high)`, and `qa-frontend (Opus 5.5, medium)` or `qa-backend (Opus 5.5, medium)` by its surface |
 | `scout (Sonnet 5.5, low)` | whatever the session needs to look up, by the house rule |
-| `video-scribe (Sonnet 5.5, high)`, `slides-scribe (Sonnet 5.5, high)` | the stage report |
+| `video-scribe (Sonnet 5.5, medium)`, `slides-scribe (Sonnet 5.5, high)` | the stage report |
 
 **Packs.** At step 0 the session loads `pack-release` and `pack-ops`
 with the Skill tool. They hold the checklists and recipes this skill
