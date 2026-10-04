@@ -39,6 +39,7 @@ gap that halts one>.
 | 12 | Permission settings and guard hook | | | |
 | 13 | Local-CI signoff main accepts (two contexts) | | | |
 | 22 | Mock toolchain (station): Node, playwright-core, Chromium | | `<probe output>` | |
+| 23 | The smoke: journey command against a URL, read-only journeys marked | | | |
 
 ## Recommended
 

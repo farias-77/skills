@@ -51,7 +51,7 @@ the reason.
 | 5 stack | `docker-compose*.yml`, `compose.yaml`, devcontainer, `Tiltfile`, `Procfile`, stack scripts; `COMPOSE_PROJECT_NAME` or a name derived from the worktree; ports from an env or an offset; a `down` that removes only its project; seed scripts with users per role | up / env / down per worktree, isolated names and ports, actors seeded per role | one stack per machine (fixed ports or names), or no actors |
 | 10 browser | `playwright.config.*`, `@playwright/test` in a manifest with its version, an auth setup (`storageState`, a login helper), e2e folder | pinned, headless, an actor logs in without a human | present but logins need a human, or not pinned |
 
-## Group D — release and permissions (roles 11, 12, 18, 19)
+## Group D — release and permissions (roles 11, 12, 18, 19, 23)
 
 | Role | Look for | ✓ when | ~ when |
 |---|---|---|---|
@@ -59,6 +59,7 @@ the reason.
 | 12 permissions | `.claude/settings.json` `permissions.allow/deny/ask`; `hooks.PreToolUse` and the hook scripts — **in every session root** of Step 0 (the root repository of a two-root layout, the product repository when sessions open there) | deny covers the irreversible classes and a guard hook exists, in every directory the pipeline's sessions open in | rules but no hook; allow rules broad enough to cover a destroy; or settings and guard only in a repository no session opens in (Claude Code loads them from the session's directory, so they are inert there) |
 | 18 autonomous | merge and prod deploy in `allow`, with the signoff required on `main` | both | merge allowed without a required signoff (a risk: rate it ~ and say so) |
 | 19 progressive | traffic split, tagged revisions, canary config, feature flags in the deploy code | the deploy can send a share of traffic and move it back | flags exist but deploys are all-or-nothing |
+| 23 smoke | the journey command (role 3's journeys) and its options: a base URL (`--base-url`, `BASE_URL`, `baseURL` from an env), a journey selection (a tag, a grep, a project); journeys marked read-only (a tag such as `@readonly`, a folder, a list in the doctrine); the test actors per environment in the delivery document | one command runs the read-only journeys against a given URL with that environment's actors, all named in the doctrine | the command takes a URL but no journey is marked read-only, or the actors per environment are not named |
 
 ## Group E — design and observability (roles 15, 16)
 

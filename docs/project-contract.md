@@ -48,6 +48,7 @@ says so ([the skill](../claude/skills/pipeline-setup/SKILL.md)).
 | 12 | Permission settings and the guard hook | required | execute, release |
 | 13 | Local-CI signoff that main accepts | required | execute, release |
 | 22 | The mock toolchain, on the station | required | discovery |
+| 23 | The smoke: the journey command against a URL | required | release |
 | 14 | The verify map inside each feature map | recommended | execute, release, close |
 | 15 | Design tokens and components, exported | recommended | discovery, execute |
 | 16 | Observability as code: log metrics, alarms, runbooks | recommended | design, execute, release |
@@ -270,7 +271,8 @@ evidence the user audits.
 screen acceptance as browser journeys; the gate runs them;
 `qa-frontend (Opus 5.5, medium)` drives the screens by hand; the user
 uses the app himself at the hands-on that ends execute; release runs
-the read-only journeys against staging and production as its smoke.
+the read-only journeys against staging and production as its smoke
+(role 23).
 
 ### 11 · Release roles: environments, deploy, rollback
 
@@ -397,6 +399,31 @@ walk the mock and render its frames; the lock (his word, then the
 `proto.mjs lock` walk) freezes the frames; the
 recon screenshots the current app's screens (role 10) with
 `proto.mjs look`.
+
+### 23 · The smoke: the journey command against a URL
+
+**What it is.** The project's journey command (the one the gate uses
+to run the browser and API journeys, role 3) accepts a base URL and a
+set of journeys, and runs them against an environment that is not the
+local stack: staging, a production tag URL, production. The project
+marks which journeys are **read-only**: they write nothing in the
+environment they run against, or write only as a test actor into data
+that actor owns. The doctrine names the command, how a journey is
+marked read-only, and the test actors per environment (never a
+production person's account, never a token in the command line).
+
+**Why.** Stage 4 owns working, so the release does not re-test the
+feature; it only proves each environment serves it. Without a command
+that points the journeys at a URL, that proof is a health check, and a
+deploy that serves a broken screen passes it.
+
+**How the stages use it.** The release plan writes the one smoke
+command verbatim (health, the sha served, the read-only journeys
+against a URL); the release runs it on staging, on the production
+candidate's tag URL and on production, and a red one is a rollback
+trigger. The close's footage recorder may use the read-only journeys
+as its actor's path. Without it, release halts at its pre-flight and
+names the role.
 
 ## Recommended
 

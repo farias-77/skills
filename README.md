@@ -242,10 +242,11 @@ video; the procedure is [docs/stage-report.md](docs/stage-report.md).
 
 The pipeline is generic: it reads the stack, the layout and the taste
 from the project. [docs/project-contract.md](docs/project-contract.md)
-is the bar, written as 22 **roles** in three levels — required (a
+is the bar, written as 23 **roles** in three levels — required (a
 doctrine, golden paths, a gate that runs locally, a stack per
 worktree, the structure check, the release roles, the permissions and
-the guard, the local-CI signoff, the mock toolchain), recommended, and
+the guard, the local-CI signoff, the mock toolchain, the release's
+smoke), recommended, and
 for the full experience (autonomous release, progressive delivery, a
 cloud runner, the video toolchain).
 

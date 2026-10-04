@@ -46,7 +46,7 @@ It never deploys by hand what the doctrine says the CI deploys.
 | **the plan** | `04-release/plan.md`: what ships, the pre-flight, every step with its command and its read-only check, the rollback triggers, the migrations, the toggles, the stop list. Written before the play |
 | **the guard** | the project's `.claude/hooks/guard-irreversible.sh` (the pipeline's `claude/hooks/guard-irreversible.sh`, installed by pipeline-setup). It denies what cannot be undone and asks before a merge into a protected branch that the play did not authorize |
 | **staging** | the environment the doctrine deploys before production (a project may call it alpha) |
-| **the smoke** | health, the sha served, and the plan's **read-only journeys** (the ones that write nothing in that environment) run by the project's journey command against the environment's URL with its test actors. A command the session runs, not an agent |
+| **the smoke** | health, the sha served, and the plan's **read-only journeys** (the ones that write nothing in that environment) run by the project's journey command against the environment's URL with its test actors (role 23 of `docs/project-contract.md`; missing, it joins the pre-flight). A command the session runs, not an agent |
 | **candidate** | the new production revision, deployed with no traffic under a tag URL |
 | **the watch** | 15 minutes with the new revision serving: errors and latency read against the previous revision in the same window, and the alarms the release touches. A trigger rolls back on its own |
 | **entry `R.n`** | a fix built through the stage-4 pipeline (`exec-entry`). The session never writes or reviews code |

@@ -18,7 +18,7 @@ pre-flight, the play and the stop list.
 | Permissions | the checks of `permissions.md`: the guard, the allow rules the steps need, branch protection |
 | Pre-flight | the design's `operations.md`: every step that needs him, the plan's open pre-flight items, anything the audit left "with the user", every step the classifier reserves for him (below), and the guard's verbatim lines |
 | Steps | the doctrine's delivery standard: what deploys staging and production, the read-only check of each, the production diff command |
-| The smoke | the doctrine's journey command and the journeys stage 4 left: the read-only ones, the URL and the actors per environment |
+| The smoke | the doctrine's journey command against a URL (role 23) and the journeys stage 4 left: the read-only ones, the URL and the actors per environment |
 | Rollout mode | `rollout.md` of this skill and the doctrine's role 19: progressive where the platform has it, straight otherwise |
 | Rollback triggers | `rollout.md` defaults, overridden by the doctrine's values and the design's `operations.md` |
 | Migrations | `data-and-contracts.md` and the migrations in the diff: each classified expand or contract |
@@ -164,5 +164,5 @@ more than 48 h after production is a pendency with an owner.
 The stop list of SKILL.md (it includes the new production deploy
 after a production rollback), plus what this release names (the
 rollback not safe for data, the contract migration), and the second
-red, which stops and reports. Nothing else stops the release, and nothing runs
-before the play.
+red, which stops and reports. Nothing else stops the release, and
+nothing runs before the play.
