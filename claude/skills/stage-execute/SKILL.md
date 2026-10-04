@@ -295,10 +295,14 @@ When every entry is merged or parked:
 1. **The whole gate, once**, on the top of `feat/<workstream>`:
    signoff with the whole gate and the context `main` requires
    (`local-ci`), in a fresh worktree with its own stack, the journeys
-   keeping their screenshots. Green: the status is posted. Red: one fix
-   entry `X.<n>`, its brief written by the session with the log's path
-   and its failing lines, run through exec-entry, merged through the
-   queue; then the whole gate again.
+   keeping their screenshots. Green: the status is posted. Red: the
+   session triggers the fixes itself, with no question: one fix entry
+   `X.<n>` per failing area (failures whose files do not overlap run in
+   parallel), each brief written by the session with the log's path and
+   its failing lines, run on the fast path (`mode: 'adjust'`: builder →
+   gate → merge, no panel; the reviewer only on auth, permissions or
+   personal data), merged through the queue; then the whole gate again.
+   Still red after two such cycles: the failures go to the audit for him.
 2. `audit.md` by [references/audit.md](references/audit.md).
 
 ## Step 6 — his hands-on
