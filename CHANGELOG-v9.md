@@ -213,3 +213,36 @@ findings were evidence paperwork.
 | `scripts/exec-entry-dry-run.mjs`: the workflow with mocked agents over the paths that matter | the flow is checked before a real run |
 | The plan closes on its own; stage 4 waits for his play and caps its runs at the plan's widest wave, held by the machine's load | no approval step and no machine scout between the plan and the play |
 | `video-scribe (Sonnet 5.5, medium)` at every stage | templated storyboards from a fixed source hold at medium |
+
+## Pass 7 (the end of execute, release, close and the weekly retro)
+
+Stage 4 owns working; the stages after it stop re-proving it, and the
+retros get short.
+
+### Execute: his hands-on
+
+| Change | Why |
+|---|---|
+| After every entry merged and the whole gate is green, the session brings the environment up (the project's stack with its seed) and gives him the local URLs and the test actors' logins; he uses the app and says what to change in plain words | the visual check is his, on the real thing, not screenshots beside the mock in a report |
+| Each adjustment is an entry `A.<n>` on exec-entry's fast path (`mode: 'adjust'`): `builder (Opus 5.5, medium)` → `exec-gate (Sonnet 5.5, low)` → the merge queue; no QA, and `reviewer (Opus 5.5, high)` only when the change touches authentication, permissions or personal data (the session marks it, or the gate's `surface.sensitive`); adjustments whose files do not overlap run in parallel | it is his own request on a screen he is looking at; the security checklist still holds |
+| His "ok" closes the hands-on; then the stage report and the audit | stage 5 assumes everything is implemented and working |
+
+### Release
+
+| Change | Why |
+|---|---|
+| No re-test of the feature: the verifier's proof per entry on staging and the re-QA are gone; each environment gets a smoke of the read-only journeys (health, the sha served, the journeys run by the project's journey command against its URL) | stage 4 proved it and he used it |
+| Production (progressive where the platform allows), its smoke, then a 15-minute watch of errors and latency against the previous revision, with automatic rollback on the plan's triggers; the alarms' first evaluation is read in the watch | one bounded wait instead of a bake and a separate alarms step |
+| A red smoke or a rollback gets one fix, `R.n`, through the stage-4 pipeline, under the same play; a second red stops and reports | no loop and no question for a fix the pipeline already reviewed |
+| The session asks only before what cannot be undone (a contract migration, a rollback not safe for data, a stateful delete, the guard, anything outside the plan); a failed migration, the second red and a missing pre-flight item stop and report | the stop list is the irreversible list |
+| Removed: `verifier` | nothing else used it |
+
+### Close and the weekly retro
+
+| Change | Why |
+|---|---|
+| The launch film is one format, 16:9; the 9:16 cut is gone from the kit (`launch-vertical`, `--vertical`), the director, the launch page and the delivery | one film to make, check and forward |
+| The retro has a fixed short format: the numbers from every stage's `telemetry.json` beside the previous workstream's, went well ×3, got stuck ×3 with where the time went (`telemetry-sum.mjs` now lists the slowest steps), ideas ≤3; `retro.json` and the Close tab follow it | a long retro was read by nobody |
+| One `close-harvester (Sonnet 5.5, medium)` reads the frictions, `dreaming-notes.md` and `rulings.md`; the `close-harvest` workflow and its five sources are gone | the numbers come from telemetry by script, not from readers |
+| The ideas stay in the workstream (`05-close/retro.md`); nothing is opened on the skills repo | the record is the workstream's |
+| The weekly retro runs over the workstreams closed that week: one `weekly-reader (Opus 5.5, medium)` reads each one's record and finds what went wrong and the patterns across; he rules each proposal (apply, park, drop) | the week's view is where a pattern shows |
