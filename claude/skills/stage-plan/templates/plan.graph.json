@@ -1,64 +1,56 @@
 {
   "$comment": [
-    "02-plan/plan.graph.json — the build graph in machine form. The CONDUCTOR writes it at P2 and keeps it in step with plan.md and the briefs; scripts/plan-graph.mjs checks it (cycle, orphan or doubled AC, a file with two owners, a shared file outside the foundation, a used name with no producer, an edge that is not real behaviour, depth over target, size over the cap) and computes the waves, the width and the critical path. Stage 4 reads it for the start order.",
-    "acs: every AC id of 00-discovery/stories.md (<journey>.<step>.<n>), exactly as written there. Every one is carried by exactly one node.",
-    "shared: the doctrine's shared files (migrations, the contract, the generated code, the module registry) as globs. Only a foundation node owns them; no other node owns or extends them.",
-    "nodes[].kind: foundation (F, the thin serial head; F-b only when F splits) · lane (F-x<n>: foundation work nobody waits for, run beside the slices) · slice (E-<nn>: one vertical slice, one builder) · integration (E-int: the journeys that cross three or more slices, size S, merges last).",
-    "nodes[].after: only real behaviour. class 'ui' = a journey drives the other node's UI; class 'side-effect' = a check reads that node's real side effect. Data is a factory and an interface is a fake: neither is an edge. stacked: true = the node may start on the other's branch as soon as it is ready. Stage 4 stacks a node on one parent only: with two or more edges, it starts when all but one have merged.",
-    "nodes[].owns: the paths the node creates or edits (literal paths or dir/** globs; no two nodes overlap). extends: append-only additions to a file the foundation or an ancestor created, or to an existing append-safe file; the one replacement allowed is filling a stub F left, by exactly one node.",
-    "appendSafe: optional, the files several nodes extend on lines that never meet (one row per node in a feature map), each with why; the checker does not warn on them.",
-    "nodes[].provides / uses: the names that cross a node boundary, exactly as code imports or calls them. Every used name has one producer: the foundation, or an ancestor behind an edge.",
-    "nodes[].needs: optional, the P2 classification kept for the audit: {name, class: shared|data|interface|ui|side-effect|e2e, resolved: F | factory | fake | edge:<id> | E-int}.",
-    "size: S · M · L, and L is the cap (one screen with its states and one server flow, about 2,500 changed lines with tests). weights turn sizes into the critical path's length.",
-    "name: at most 8 words (the blueprint's cap), the same in plan.md, the brief and the blueprint.",
-    "checker: written at the close, never before: the path of the plan's checker in the pipeline repo and its git blob sha (git hash-object), the version whose green closed the plan. Stage 4 runs that version or reads a newer one's new rules as notes.",
-    "target.maxAcs: optional. Omitted, the checker's AC guide per slice is 8 scaled by the discovery's grain (ACs per journey step or frame state); over it is a warning: size the node by screens, flows and lines."
+    "02-plan/plan.graph.json — the build graph in machine form. The PLANNER writes it at P1 and keeps it in step with plan.md; scripts/plan-graph.mjs checks it (cycle, orphan or doubled AC, a file with two owners, a shared file outside the foundation, a used name with no producer, an edge that is not real behaviour, a size over the cap; with --briefs, every brief equal to its node and a Contract on every node with two sides) and reports the waves, the width, the depth, the critical path and the start order. Stage 4 reads it for the start order and the owners.",
+    "acs: every AC id of 00-discovery/stories.md, exactly as written there. Every one is carried by exactly one node.",
+    "shared: the doctrine's shared files (migrations, the contract, the generated code, the registry) and every file the generators write, as globs. Only the foundation owns them.",
+    "nodes[].kind: foundation (F; F-b only when F splits) · slice (E-<nn>: one whole behaviour, data to screen) · integration (E-int: the journeys that cross entries, merges last) · lane (F-x<n>: foundation work nobody waits for; rare).",
+    "nodes[].sides: back and/or front. Both only when data-and-contracts.md gives the node's Contract: its brief copies it, and stage 4 runs two builders.",
+    "nodes[].after: only what nothing can fake. class 'ui' = a journey drives the other node's screen; class 'side-effect' = a check reads that node's real side effect. need = the behaviour, in words. stacked: true = the node may start on the other's branch as soon as it is ready.",
+    "nodes[].owns: the paths the node creates or edits (literal paths or dir/** globs; no two nodes overlap). extends: append-only additions to a file the foundation or an ancestor created; filling a stub F left is an extends of exactly one node.",
+    "nodes[].provides / uses: the names that cross a node boundary, exactly as code imports or calls them, copied from data-and-contracts.md. Every used name has one producer: the foundation, or an ancestor behind an edge.",
+    "appendSafe: optional, the files several nodes extend on lines that never meet, each with why.",
+    "fronts: optional, the other running workstreams that change files this plan touches: the front, its branch, the files, and the merge point and order plan.md names. A node other than the foundation owning one of those files is a warning.",
+    "size: S · M · L, and L is the cap (one screen with its states and one server flow). weights turn sizes into the critical path's length and the start order.",
+    "name: at most 8 words, the same in plan.md, the brief and the blueprint.",
+    "checker: written at the close, never before: the path of the checker and its git blob sha (git hash-object), the version whose green closed the plan. Stage 4 never re-judges a closed plan with a newer one.",
+    "target: depth is the warning threshold (the typical shape is F → every entry at once → E-int); maxAcs the AC guide per slice (default 8, at one AC per rule or behavior)."
   ],
   "workstream": "<workstream-slug>",
   "checker": { "path": "claude/skills/stage-plan/scripts/plan-graph.mjs", "blob": "<git hash-object of plan-graph.mjs, at the close>" },
   "target": { "depth": 2, "sizeCap": "L" },
   "weights": { "S": 1, "M": 2, "L": 3 },
-  "acs": ["<J01.s1.1>", "<J01.s2.1>"],
+  "acs": ["<J1.s1.1>", "<J1.s2.1>", "<J3.s3.1>"],
   "shared": ["<api/openapi/**>", "<db/migrations/**>", "<internal/gen/**>", "<cmd/server/registry.go>"],
-  "appendSafe": { "<docs/features/orders.md>": "<one row per node: E-01 rows ORD-1..2, E-03 row ORD-3>" },
+  "fronts": [
+    { "front": "<other-workstream-slug>", "branch": "<feat/other-workstream>", "files": ["<db/migrations/**>"], "merge": "<its branch merges into the base before F; F takes the next migration number>" }
+  ],
   "nodes": [
     {
       "id": "F", "kind": "foundation", "name": "<Contract and seams>", "size": "M",
       "after": [], "acs": [],
-      "owns": ["<api/openapi/**>", "<db/migrations/**>", "<internal/gen/**>", "<cmd/server/registry.go>", "<internal/<module>/port.go>", "<internal/<module>/fake/**>", "<internal/testkit/factory/**>"],
+      "owns": ["<api/openapi/**>", "<db/migrations/**>", "<internal/gen/**>", "<cmd/server/registry.go>", "<internal/orders/port.go>", "<internal/orders/fake/**>", "<internal/testkit/factory/**>"],
       "extends": [],
       "provides": ["<POST /orders>", "<orders.Store>", "<fake.Store>", "<factory.Order>", "<actors.Customer>"],
       "uses": []
     },
     {
-      "id": "F-x1", "kind": "lane", "name": "<Deploy skeleton>", "size": "S",
-      "after": [], "acs": [],
-      "owns": ["<deploy/<service>/**>"],
-      "extends": [], "provides": [], "uses": []
-    },
-    {
       "id": "E-01", "kind": "slice", "name": "<Place an order>", "size": "M",
-      "stories": ["<S-001>"],
+      "sides": ["back", "front"],
       "after": [],
-      "acs": ["<J01.s1.1>", "<J01.s2.1>"],
-      "needs": [
-        { "name": "<orders.Store>", "class": "interface", "resolved": "fake" },
-        { "name": "<a customer>", "class": "data", "resolved": "factory" }
-      ],
-      "owns": ["<internal/orders/place/**>", "<web/src/pages/orders/new/**>", "<e2e/journeys/j01-place-order.spec.ts>"],
-      "extends": ["<web/src/tokens.css>"],
+      "acs": ["<J1.s1.1>", "<J1.s2.1>"],
+      "owns": ["<internal/orders/place/**>", "<web/src/pages/orders/new/**>", "<e2e/journeys/j1-place-order.spec.ts>"],
+      "extends": [],
       "provides": [],
       "uses": ["<POST /orders>", "<fake.Store>", "<factory.Order>", "<actors.Customer>"]
     },
     {
       "id": "E-int", "kind": "integration", "name": "<Order to e-mail>", "size": "S",
-      "stories": ["<S-001>", "<S-004>"],
+      "sides": ["front"],
       "after": [
-        { "id": "<E-03>", "class": "ui", "need": "<the journey clicks 'Mark ready', which E-03 builds>", "stacked": true },
-        { "id": "<E-04>", "class": "side-effect", "need": "<the check reads the ready e-mail E-04 really sends>", "stacked": true }
+        { "id": "<E-03>", "class": "ui", "need": "<the journey clicks 'Mark ready', which E-03 builds>", "stacked": true }
       ],
-      "acs": ["<J03.s3.1>"],
-      "owns": ["<e2e/journeys/j03-order-to-email.spec.ts>"],
+      "acs": ["<J3.s3.1>"],
+      "owns": ["<e2e/journeys/j3-order-to-email.spec.ts>"],
       "extends": [], "provides": [],
       "uses": ["<actors.Customer>", "<factory.Order>"]
     }

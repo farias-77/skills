@@ -1,23 +1,52 @@
 {
   "workstream": "example-bakery-orders",
-  "acs": ["J01.s1.1"],
-  "shared": ["api/openapi/**"],
+  "acs": [
+    "J01.s1.1"
+  ],
+  "shared": [
+    "api/openapi/**"
+  ],
   "nodes": [
     {
-      "id": "F", "kind": "foundation", "name": "Contract and factories", "size": "S",
-      "after": [], "acs": [],
-      "owns": ["api/openapi/**", "internal/testkit/factory/**"],
+      "id": "F",
+      "kind": "foundation",
+      "name": "Contract and factories",
+      "size": "S",
+      "after": [],
+      "acs": [],
+      "owns": [
+        "api/openapi/**",
+        "internal/testkit/factory/**"
+      ],
       "extends": [],
-      "provides": ["POST /orders", "factory.Order"],
+      "provides": [
+        "POST /orders",
+        "factory.Order"
+      ],
       "uses": []
     },
     {
-      "id": "E-01", "kind": "slice", "name": "Place an order", "size": "M",
-      "after": [], "acs": ["J01.s1.1"],
-      "owns": ["internal/orders/place/**"],
+      "id": "E-01",
+      "kind": "slice",
+      "name": "Place an order",
+      "size": "M",
+      "after": [],
+      "acs": [
+        "J01.s1.1"
+      ],
+      "owns": [
+        "internal/orders/place/**"
+      ],
       "extends": [],
       "provides": [],
-      "uses": ["POST /orders", "factory.Order"]
+      "uses": [
+        "POST /orders",
+        "factory.Order"
+      ],
+      "sides": [
+        "back",
+        "front"
+      ]
     }
   ]
 }

@@ -1,0 +1,6 @@
+{ "id": "E-01", "file": "02-plan/briefs/E-01.md",
+  "intro": "One node of the workspace invites plan, built from this brief alone.",
+  "back": ["the server side named in the brief"], "front": ["the screen side named in the brief"],
+  "proof": ["each AC of the brief as one test, and the gate green"],
+  "worthALook": ["the daily limit is enforced by the server, not only the form"],
+  "builderDecides": ["the order of the form fields"] }

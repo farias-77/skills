@@ -1,130 +1,99 @@
 /*
- * plan-review.js — the stage-3 review round as deterministic code (v9).
+ * plan-review.js — the stage-3 review as deterministic code.
  *
- * v9: the stage runs with nobody to ask. The round reads the build graph
- * (plan.graph.json) and the checker's output (graph.json) beside the
- * briefs; the lenses judge what scripts/plan-graph.mjs cannot (whether an
- * edge's class is true, whether F is thin and sufficient, whether a line
- * says what its AC says) and never re-report what it settled. Round 1 is
- * whole, round 2 the delta, then the stage stops: the conductor enforces
- * the count.
+ * What it reviews: the plan the planner cut (plan.graph.json, plan.md,
+ * the checker's output graph.json) and the briefs the writers wrote. The
+ * checker (scripts/plan-graph.mjs) already ran green: every AC owned
+ * once, no file with two owners, acyclic, a Contract on every brief with
+ * two sides. The review covers what a script cannot see:
  *
- * Why a workflow: the guarantee that no lens is skipped must be
- * physical, not discipline. Round 1 is whole: the three lenses in
- * parallel with, per brief, two blind readers and a referee. Round 2
- * runs automatically over the delta: only the lenses the conductor
- * names (`lenses`: those with a finding sustained in round 1) receive
- * the briefs that changed and the fixes that were applied, and check
- * that each fix landed and did not break its surroundings; the blind
- * readers reopen only the briefs named in `changed.reread` (those whose
- * Builds or Acceptance a fix changed, and any new brief; default: every
- * brief in `changed.briefs`). A brief changed only in its Uses, Owns,
- * Extends or pointers is not re-read blind: the checker compares those
- * with the graph, and the lenses read it.
+ *   - plan-reviewer (Opus 5.5, medium): can each entry be built without
+ *     asking anything; is every edge real (nothing could be faked); is
+ *     the foundation thin (only what two entries need, plus what the
+ *     generators write) and sufficient; is the coordination with the
+ *     other running fronts right?
+ *   - one plan-blind-reader (Sonnet 5.5, low) per brief: reads that brief
+ *     alone and reports a key only when it could not decide what to
+ *     build or how to prove it (`undecidable`, saying what was missing)
+ *     or when two texts disagree (`contradicts`, quoting both). The keys
+ *     are the brief's AC ids, plus `contract` when it carries one; for
+ *     the foundation and a lane, `provides` and `proof`. Everything
+ *     decidable returns an empty list.
  *
- * THE BLIND READS are per brief (one node of the graph: F, a lane F-x<n>,
- * a slice E-<nn>, or E-int): two Sonnet readers (5.5, low) build it alone, reading
- * only that file (and the design sections it points at), in the
- * brief's language, one build per key (`brief`, `back`, `front`,
- * `acceptance`: what the checks would assert, since at stage 4 a
- * verifier and a builder read the same brief apart). A Sonnet referee (5.5, high) compares the two readings key
- * by key; only a `different-product` verdict becomes a finding; an
- * open build ("maybe X") is judged by the referee as two possible
- * builds. A reading that misses a key or is empty is invalid and
- * re-dispatched once; a brief whose two readings do not both survive
- * is reported as unread. A round in which no brief was read is
- * INVALID (`valid: false`): the conductor fixes the cause and runs it
- * again.
+ * One round, whole. There is no delta round: the conductor applies the
+ * fixes and verifies them by reading.
  *
- * THE ARGS CARRY PATHS, NOT TEXT. The agents read the files.
+ * THE FILTER. A blind finding passes only with its `kind`, the brief's
+ * text quoted, and, by kind, what was missing or the other text. A
+ * finding without them, or on a key the reader was not given, is dropped
+ * here, mechanically, and listed in `dropped`.
  *
- * THERE IS NO JUDGE AGENT. The conductor judges every finding by
- * stage-plan/references/judging.md, with the cut in its head: merge
- * by fix, sustained / deferred / dismissed, owner writer / conductor /
- * builder. The workflow returns the findings as the lenses gave them,
- * ids assigned.
+ * THERE IS NO JUDGE HERE. The conductor (Opus 5.5, high) rules every
+ * finding by stage-plan/references/judging.md.
  *
- * The prompts below carry INPUTS only. Every instruction lives in the
- * agent definitions under agents/ and in the shared reviewer contract
- * (docs/standards/reviewer-contract.md).
+ * THE ARGS CARRY PATHS, NOT TEXT. Every instruction lives in the agent
+ * definitions and the reviewer contract (docs/standards/reviewer-contract.md).
  *
  * RUNNING UNREGISTERED AGENTS: with args.inlineAgents, agent() is called
  * without agentType; the prompt points at <agentsDir>/<name>.md and at the
- * SKILL.md of each pack the definition lists (<skillsDir>/<pack>/SKILL.md),
- * and the model and effort come from the AGENTS map below.
+ * SKILL.md of each pack the definition lists, and the model and effort
+ * come from the AGENTS map below.
  *
- * Invoked by the stage-plan conductor:
+ * Invoked by the stage-plan conductor, by scriptPath, never by name:
  *   Workflow({ scriptPath: '<...>/workflows/plan-review.js', args: {
- *                 // by scriptPath, never by name
  *     planDir:      'absolute path to <slug>/02-plan',
  *     designDir:    'absolute path to <slug>/01-design',
  *     discoveryDir: 'absolute path to <slug>/00-discovery',
- *     reconDir:     'absolute path to <slug>/02-plan/recon',
- *     graphPath:    'absolute path to <slug>/02-plan/plan.graph.json',
- *     graphReport:  'absolute path to <slug>/02-plan/graph.json',   // plan-graph.mjs --json output
  *     root:         'absolute path to the codebase',
- *     round:        1,            // 1 or 2; shown in labels and ids
- *     language:     'pt-BR',      // the briefs' language; the readers build in it
- *     briefs: [                   // one entry per brief file
- *       { id: 'E-03', path: '/abs/.../02-plan/briefs/E-03.md' },
- *     ],
- *     // round 2 only — the delta:
- *     changed: { briefs: ['E-03', 'E-05'],   // every brief whose text changed: the lenses read them
-               reread: ['E-03'] },         // the blind readers reopen only these (Builds or Acceptance changed, or new)
- *     fixes:   [ { id: 'plan-reviewer-order#1', brief: 'E-03', fix: 'what was applied, one line' } ],
- *     lenses:  ['plan-reviewer-order'], // the lenses with a finding sustained last round; omitted = all three
- *     // when the v9 agents are not installed in the running Claude Code:
- *     inlineAgents: true, agentsDir: '<...>/claude/agents', skillsDir: '<...>/claude/skills',
+ *     language:     'pt-BR',      // the briefs' language
+ *     briefs:       [ { id: 'E-03', path: '/abs/.../02-plan/briefs/E-03.md', keys: ['J1.s2.1', 'contract'] } ],
+ *                   // graph.json's reviewBriefs, as plan-graph.mjs --briefs --json wrote it
+ *     inlineAgents: false, agentsDir: '<...>/claude/agents', skillsDir: '<...>/claude/skills',
  *   }})
  *
- * Returns { round, mode, valid, findings, lenses, unread } — findings
- * is every finding with its id, lens, brief (for referee findings),
- * severity, title, says, gap, fix; lenses is [{ lens, verdict,
- * verified, quote, findings, invalid }] with the referees merged as
- * one `plan-reviewer-ambiguity` entry; unread lists the brief ids
- * whose readings did not survive; valid is false when the round read
- * no brief it was asked to read.
+ * Where the return lives: the Workflow result is an envelope { summary,
+ * logs, result, … }; what this script returns is its `.result`. Save
+ * `.result` as 02-plan/reviews/round-1.json.
+ *
+ * Returns { round, valid, findings, lenses, reads, unread, dropped }:
+ * findings carry id, lens, brief and key (blind), kind (blind), severity,
+ * title, says, gap, fix; reads lists per brief the keys judged and the
+ * findings kept; unread lists the briefs whose reading did not survive;
+ * dropped lists the blind findings the filter removed, with why; valid is
+ * false when every brief was unread or the reviewer came back invalid
+ * twice.
  */
 
 export const meta = {
   name: 'plan-review',
-  description: 'Stage-3 review round (v9): three Sonnet lenses (5.5, high) over the graph and the briefs in parallel with two Sonnet blind readers (5.5, low) and a Sonnet referee (5.5, high) per brief; whole in round 1, delta in round 2 (only the lenses that had a finding sustained); no judge agent — the conductor rules everything',
+  description: 'Stage-3 review of the cut and the briefs: one plan-reviewer (Opus 5.5, medium: buildable without asking, edges real, foundation thin, fronts coordinated) and one plan-blind-reader (Sonnet 5.5, low) per brief with a strict filter; one round; returns every finding for the conductor to rule',
   phases: [
-    { title: 'Lenses', detail: 'coverage, verifiability and order (the graph) in parallel, each reads everything (or the delta)', model: 'sonnet' },
-    { title: 'Blind reads', detail: 'per brief: two Sonnet readers build it alone from the file, a Sonnet referee compares them key by key' },
+    { title: 'Review', detail: 'plan-reviewer over the graph, plan.md and every brief' },
+    { title: 'Blind reads', detail: 'per brief: one reader, that brief only' },
   ],
 }
 
 // name → model, effort and packs, as in each definition's frontmatter (used when the agents run inline).
 const AGENTS = {
-  'plan-reviewer-coverage': { model: 'sonnet', effort: 'high', packs: ['pack-parallel-plan-local-ci', 'pack-right-sizing'] },
-  'plan-reviewer-verifiability': { model: 'sonnet', effort: 'high', packs: ['pack-parallel-plan-local-ci'] },
-  'plan-reviewer-order': { model: 'sonnet', effort: 'high', packs: ['pack-parallel-plan-local-ci', 'pack-right-sizing'] },
-  'plan-reviewer-ambiguity': { model: 'sonnet', effort: 'high', packs: [] },
+  'plan-reviewer': { model: 'opus', effort: 'medium', packs: ['pack-parallel-plan-local-ci'] },
   'plan-blind-reader': { model: 'sonnet', effort: 'low', packs: [] },
 }
+const LENS = 'plan-reviewer'
+const READER = 'plan-blind-reader'
+const round = 1
+
 const inline = args?.inlineAgents === true
-const agentsDir = args?.agentsDir
-const skillsDir = args?.skillsDir
-// One call shape for registered and inline agents.
 const call = (name, prompt, opts) => {
   const def = AGENTS[name]
   if (!inline) return agent(prompt, { ...opts, agentType: name })
-  const packs = def.packs.map(p => `${skillsDir}/${p}/SKILL.md`)
-  return agent(`Your instructions are the file ${agentsDir}/${name}.md (read it first and follow it; its frontmatter's model and effort are already applied).${packs.length ? `
+  const packs = def.packs.map(p => `${args?.skillsDir}/${p}/SKILL.md`)
+  return agent(`Your instructions are the file ${args?.agentsDir}/${name}.md (read it first and follow it; its frontmatter's model and effort are already applied).${packs.length ? `
 Read these knowledge packs before you work: ${packs.join(', ')}` : ''}
 
 ${prompt}`, { ...opts, model: def.model, effort: def.effort })
 }
-if (inline && (!agentsDir || !skillsDir)) log('inlineAgents without agentsDir or skillsDir — the agents cannot find their definitions or packs')
-
-const ALL_LENSES = [
-  'plan-reviewer-coverage',
-  'plan-reviewer-verifiability',
-  'plan-reviewer-order',
-]
-const REFEREE = 'plan-reviewer-ambiguity'
-const READER = 'plan-blind-reader'
+if (inline && (!args?.agentsDir || !args?.skillsDir)) log('inlineAgents without agentsDir or skillsDir: the agents cannot find their definitions or packs')
+if (args?.round > 1 || args?.changed || args?.fixes || args?.lenses) log('round, changed, fixes and lenses are gone: the review is one whole round; ignored')
 
 const FINDING = {
   type: 'object', additionalProperties: false,
@@ -132,9 +101,9 @@ const FINDING = {
   properties: {
     severity: { type: 'string', enum: ['blocker', 'fix', 'detail'] },
     title: { type: 'string' },
-    says: { type: 'string', description: 'what the material says, verbatim or "nothing"' },
-    gap: { type: 'string', description: 'the concrete problem, through this lens' },
-    fix: { type: 'string', description: 'the concrete change that would resolve it' },
+    says: { type: 'string', description: 'what the material says, verbatim, or "nothing"' },
+    gap: { type: 'string', description: 'the concrete problem' },
+    fix: { type: 'string', description: 'the smallest change that resolves it' },
   },
 }
 
@@ -144,205 +113,153 @@ const REVIEW = {
   properties: {
     verdict: { type: 'string', enum: ['pass', 'pass with fixes', 'fail'] },
     verified: { type: 'array', items: { type: 'string', description: 'one point this reviewer actually checked, with where it looked' } },
-    quote: { type: 'string', description: 'verbatim sentence from the material it judged — the proof it read' },
+    quote: { type: 'string', description: 'a verbatim line from the material it judged: the proof it read' },
     findings: { type: 'array', items: FINDING },
   },
 }
 
-const READING = {
+const READ = {
   type: 'object', additionalProperties: false,
-  required: ['brief', 'builds'],
+  required: ['brief', 'judged', 'findings'],
   properties: {
     brief: { type: 'string' },
-    builds: {
-      type: 'array', minItems: 1,
+    judged: { type: 'array', minItems: 1, items: { type: 'string', description: 'a key judged: an AC id, contract, provides or proof' } },
+    findings: {
+      type: 'array', description: 'empty when every key was decidable and nothing disagrees',
       items: {
         type: 'object', additionalProperties: false,
-        required: ['key', 'sentence', 'build'],
+        required: ['key', 'kind', 'quote', 'missing', 'other'],
         properties: {
-          key: { type: 'string', description: 'brief, back, front, or acceptance' },
-          sentence: { type: 'string', description: 'the brief\'s line that drives this key, verbatim' },
-          build: { type: 'string', description: 'what this reader would build, or for acceptance the checks it would write and what they assert; at most sixty words; in the brief\'s language' },
+          key: { type: 'string', description: 'the key' },
+          kind: { type: 'string', enum: ['undecidable', 'contradicts'] },
+          quote: { type: 'string', description: 'the brief\'s line at issue, verbatim' },
+          missing: { type: 'string', description: 'undecidable: exactly what was missing to decide what to build or how to prove it; contradicts: ""' },
+          other: { type: 'string', description: 'contradicts: the other text, quoted, with its file and section; undecidable: ""' },
         },
       },
     },
   },
 }
 
-const REFEREE_REVIEW = {
-  type: 'object', additionalProperties: false,
-  required: ['brief', 'keys', 'verdict', 'verified', 'quote', 'findings'],
-  properties: {
-    brief: { type: 'string' },
-    keys: {
-      type: 'array',
-      items: {
-        type: 'object', additionalProperties: false,
-        required: ['key', 'verdict'],
-        properties: {
-          key: { type: 'string' },
-          verdict: { type: 'string', enum: ['same', 'same-in-other-words', 'different-product'] },
-        },
-      },
-    },
-    verdict: REVIEW.properties.verdict,
-    verified: REVIEW.properties.verified,
-    quote: REVIEW.properties.quote,
-    findings: REVIEW.properties.findings,
-  },
+const language = args?.language ?? 'the language of the briefs'
+const briefs = (Array.isArray(args?.briefs) ? args.briefs : [])
+  .filter(b => b && b.id && b.path)
+  .map(b => ({ ...b, keys: new Set((Array.isArray(b.keys) ? b.keys : []).map(String)) }))
+if (!briefs.length) log('no briefs passed in args: the blind reads are skipped; pass graph.json\'s reviewBriefs')
+
+const P = args?.planDir
+const docInputs = `Round 1 · whole.
+The plan: ${P}/plan.md · the graph: ${P}/plan.graph.json · the checker's output (it ran green; do not re-report what it settles): ${P}/graph.json
+The pre-flight: ${P}/preflight.md
+The briefs, one per node:
+${briefs.map(b => `  - ${b.id}: ${b.path}`).join('\n')}
+The recon (what exists, the generators and what they write, the hot files, the other fronts): ${P}/recon/
+The design: ${args?.designDir}/solution.md · data-and-contracts.md · tests.md · operations.md · notes.md
+The demand: ${args?.discoveryDir}/stories.md · ${args?.discoveryDir}/journeys/
+The codebase: ${args?.root ?? '(not given)'}
+Language of the briefs: ${language}`
+
+// ---------- the filter on a blind read ----------
+
+const clean = (k) => String(k ?? '').replace(/[`*\s]/g, '')
+const missingKeys = (r, expected) => {
+  if (!r) return ['no output']
+  const got = new Set(r.judged.map(clean))
+  return [...expected].filter(k => !got.has(k)).map(k => `missing key ${k}`)
 }
-
-const round = args?.round ?? 1
-if (round > 2) throw new Error(`round ${round}: there is no round 3 — round 1 is whole, round 2 is the delta, then stop; what is still sustained is ruled by the conductor and listed for veto`)
-const language = args?.language ?? 'en'
-const allBriefs = Array.isArray(args?.briefs) ? args.briefs.filter(b => b && b.id && b.path) : []
-const delta = round > 1 && args?.changed
-  ? { briefs: args.changed.briefs ?? [], reread: args.changed.reread ?? args.changed.briefs ?? [] }
-  : null
-const fixes = Array.isArray(args?.fixes) ? args.fixes : []
-const mode = delta ? 'delta' : 'whole'
-const briefs = delta ? allBriefs.filter(b => delta.reread.includes(b.id)) : allBriefs
-// A delta re-runs only the lenses that had a finding sustained: a lens
-// with nothing sustained read that text and passed it.
-const asked = delta && Array.isArray(args?.lenses) ? args.lenses.filter(l => ALL_LENSES.includes(l)) : null
-const LENSES = asked ?? ALL_LENSES
-if (!allBriefs.length) log('no briefs passed in args — the blind reads are skipped this round; pass briefs: [{id, path}] to run them')
-if (delta) log(`delta round: briefs ${delta.briefs.join(', ') || '(none)'} · re-read blind ${delta.reread.join(', ') || '(none)'} · ${fixes.length} fix(es) applied · lenses ${LENSES.join(', ') || '(none)'}`)
-
-const docInputs = `Round ${round}, ${mode}.
-The plan the conductor drew (the foundation, the nodes, the edges, the ownership, the gate): ${args.planDir}/plan.md
-The graph in machine form: ${args.graphPath ?? `${args.planDir}/plan.graph.json`}
-The checker's output (waves, width, depth, critical path, warnings; it ran green — do not re-report what it settles): ${args.graphReport ?? `${args.planDir}/graph.json`}
-The pre-flight: ${args.planDir}/preflight.md
-The briefs, one per node (F the foundation, F-x<n> the lanes, E-<nn> the slices, E-int the integration node):
-${allBriefs.map(b => `  - ${b.id}: ${b.path}`).join('\n')}
-The recon, what exists in each area today and the other fronts (fronts.md): ${args.reconDir}
-The design (sizing.md is the final design; notes.md is the law): ${args.designDir}
-The demand it must satisfy: ${args.discoveryDir}/stories.md (AC ids <journey>.<step>.<n>), ${args.discoveryDir}/journeys/, ${args.discoveryDir}/pr-faq.md
-The codebase: ${args.root ?? '(not given)'}
-The round audit so far: ${args.planDir}/reviews.md
-Language of the briefs: ${language}${delta ? `
-
-THIS IS A DELTA ROUND. The briefs that changed since the last round: ${delta.briefs.join(', ') || '(none)'}. The fixes that were applied, each with the finding it answers:
-${fixes.map(f => `- ${f.id} (${f.brief}): ${f.fix}`).join('\n') || '(none listed)'}
-Read the changed briefs whole and plan.md and every other brief for what the fixes touched. Report: a fix that did not land as described, a fix that broke its surroundings or another brief, and anything new in the changed text. Text no fix touched was read and passed last round; a finding on it needs the razor at full strength.` : ''}`
-
-// ---------- mechanical checks on a reading ----------
-
-const KEYS = ['brief', 'back', 'front', 'acceptance']
-const normalizeKey = (k) => String(k).trim().replace(/^`|`$/g, '').replace(/\s+/g, '').toLowerCase()
-
-const readingProblems = (reading) => {
-  if (!reading) return ['no output']
-  const problems = []
-  const got = new Map(reading.builds.map(b => [normalizeKey(b.key), b]))
-  for (const k of KEYS) if (!got.has(k)) problems.push(`missing key ${k}`)
-  for (const [k, b] of got) if (!b.build || !b.build.trim()) problems.push(`empty build at ${k}`)
-  return problems
+// Why a blind finding does not pass, or null when it does.
+const dropReason = (f, expected) => {
+  const key = clean(f.key)
+  if (!expected.has(key)) return `${key || '(no key)'}: not a key this reader was given`
+  if (f.kind !== 'undecidable' && f.kind !== 'contradicts') return `${key}: no kind`
+  if ((f.quote ?? '').trim().length < 12) return `${key}: the brief is not quoted`
+  if (f.kind === 'undecidable' && !(f.missing ?? '').trim()) return `${key}: undecidable without what was missing`
+  if (f.kind === 'contradicts' && !(f.other ?? '').trim()) return `${key}: contradicts without the other text`
+  return null
 }
-
-// ---------- dispatch helpers ----------
 
 // Re-dispatch once on the two invalid shapes: a dead agent, or a lazy
-// clean pass (zero findings AND no verified enumeration proves nothing).
-const reviewed = async (dispatch, name) => {
+// clean pass (zero findings AND nothing verified proves nothing).
+const reviewed = async (dispatch) => {
   let r = await dispatch()
   if (!r || (r.findings.length === 0 && r.verified.length === 0)) {
-    log(`${name}: ${r ? 'clean pass without verification' : 'no output'} — re-dispatching`)
+    log(`${LENS}: ${r ? 'clean pass without verification' : 'no output'}, re-dispatching`)
     r = await dispatch()
   }
   const lazy = r && r.findings.length === 0 && r.verified.length === 0
-  return r && !lazy ? { ...r, invalid: false }
-    : { verdict: 'fail', verified: [], quote: '', findings: [], invalid: true }
+  return r && !lazy ? { ...r, invalid: false } : { verdict: 'fail', verified: [], quote: '', findings: [], invalid: true }
 }
 
-const briefInputs = (b) => `Round ${round}. Brief ${b.id}.
-Language of the brief (write every build in it): ${language}
-The brief file — read it whole, and only it: ${b.path}
-The design folder, for looking up a route, a field, a table or a screen the brief points at: ${args.designDir}
-The keys your reading must carry: ${KEYS.join(', ')}`
-
-const readBlind = async (b, n) => {
-  const dispatch = () => call(READER, briefInputs(b), {
-    label: `${b.id}·read${n}·r${round}`, phase: 'Blind reads', schema: READING,
-  })
+const dropped = []
+const readBlind = async (b) => {
+  if (!b.keys.size) { log(`${b.id}: no keys given`); return { brief: b.id, unread: true } }
+  const dispatch = () => call(READER, `Brief ${b.id}. Language of the brief: ${language}.
+The brief (read this file whole): ${b.path}
+The design folder, only for a section the brief names: ${args?.designDir}
+The keys to judge: ${[...b.keys].join(', ')}`, { label: `${b.id}·read`, phase: 'Blind reads', schema: READ })
   let r = await dispatch()
-  let problems = readingProblems(r)
+  let problems = missingKeys(r, b.keys)
   if (problems.length) {
-    log(`${b.id} reader ${n}: ${problems.join(', ')} — re-dispatching`)
+    log(`${b.id} reader: ${problems.join(', ')}, re-dispatching`)
     r = await dispatch()
-    problems = readingProblems(r)
+    problems = missingKeys(r, b.keys)
   }
-  if (problems.length) { log(`${b.id} reader ${n}: still invalid (${problems.join(', ')}) — dropped`); return null }
-  return { reader: n, builds: r.builds.map(x => ({ ...x, key: normalizeKey(x.key) })) }
+  if (problems.length) { log(`${b.id} reader: still invalid (${problems.join(', ')}), unread`); return { brief: b.id, unread: true } }
+  const findings = [], seen = new Set()
+  for (const f of r.findings) {
+    const why = dropReason(f, b.keys)
+    if (why) { dropped.push({ brief: b.id, why }); continue }
+    const key = clean(f.key)
+    if (seen.has(`${key}|${f.kind}`)) { dropped.push({ brief: b.id, why: `${key}: a second ${f.kind} on the same key` }); continue }
+    seen.add(`${key}|${f.kind}`)
+    findings.push(f.kind === 'contradicts'
+      ? { severity: 'blocker', kind: f.kind, key, title: `${b.id} ${key}: two texts disagree`, says: f.quote.trim(), gap: `the other text: ${f.other.trim()}`, fix: 'make the brief say what the design says; if the design is what is wrong, that is an amendment request in notes.md' }
+      : { severity: 'fix', kind: f.kind, key, title: `${b.id} ${key}: a builder would have to ask`, says: f.quote.trim(), gap: `missing: ${f.missing.trim()}`, fix: 'write the missing value into the brief, from the design or the recon' })
+  }
+  return { brief: b.id, judged: [...new Set(r.judged.map(clean))].filter(k => b.keys.has(k)), findings, unread: false }
 }
 
-const referee = async (b, readings) => {
-  const r = await reviewed(() => call(REFEREE, `${briefInputs(b)}
+// ---------- the round: the reviewer and the blind reads, concurrently ----------
 
-READING 1:
-${JSON.stringify(readings[0].builds, null, 2)}
+phase('Review')
+log(`round 1: ${LENS} · ${briefs.length} blind read(s)`)
 
-READING 2:
-${JSON.stringify(readings[1].builds, null, 2)}`, {
-    label: `${b.id}·referee·r${round}`, phase: 'Blind reads', schema: REFEREE_REVIEW,
-  }), `${b.id} referee`)
-  return { brief: b.id, ...r }
-}
-
-// ---------- the round: lenses and per-brief reads, concurrently ----------
-
-phase('Lenses')
-log(`round ${round} (${mode}): ${LENSES.length} lenses · ${briefs.length} briefs × (2 readers + referee) · the conductor judges`)
-
-const [lensResults, briefResults] = await parallel([
-  () => parallel(LENSES.map(name => () =>
-    reviewed(() =>
-      call(name, docInputs, { label: `${name}·r${round}`, phase: 'Lenses', schema: REVIEW }),
-      name).then(r => ({ lens: name, ...r }))
-  )),
-  () => pipeline(
-    briefs,
-    (b) => parallel([() => readBlind(b, 1), () => readBlind(b, 2)]).then(rs => rs.filter(Boolean)),
-    (readings, b) => readings.length === 2
-      ? referee(b, readings)
-      : Promise.resolve({ brief: b.id, unread: true }),
-  ),
+const [lensResult, readResults] = await parallel([
+  () => reviewed(() => call(LENS, docInputs, { label: LENS, phase: 'Review', schema: REVIEW })).then(r => ({ lens: LENS, ...r })),
+  () => parallel(briefs.map(b => () => readBlind(b))),
 ])
 
-// The referees merge into one ambiguity lens entry: the conductor and
-// the audit see one lens with per-brief findings.
-const refereed = (briefResults ?? []).filter(Boolean)
-const unread = refereed.filter(r => r.unread).map(r => r.brief)
-const perBrief = refereed.filter(r => !r.unread)
-if (unread.length) log(`unread this round (readings did not survive): ${unread.join(', ')}`)
+const reads = (readResults ?? []).filter(Boolean)
+const unread = reads.filter(r => r.unread).map(r => r.brief)
+const read = reads.filter(r => !r.unread)
+if (unread.length) log(`unread (the reading did not survive): ${unread.join(', ')}`)
+if (dropped.length) log(`${dropped.length} blind finding(s) dropped by the filter`)
 
-const ambiguity = {
-  lens: REFEREE,
-  verdict: perBrief.some(r => r.verdict === 'fail') ? 'fail'
-    : perBrief.some(r => r.verdict === 'pass with fixes') ? 'pass with fixes' : 'pass',
-  verified: perBrief.flatMap(r => r.verified.map(v => `${r.brief}: ${v}`)),
-  quote: perBrief[0]?.quote ?? '',
-  findings: perBrief.flatMap(r => r.findings.map(f => ({ ...f, brief: r.brief }))),
-  invalid: perBrief.some(r => r.invalid) || (briefs.length > 0 && perBrief.length === 0),
-  keys: perBrief.map(r => ({ brief: r.brief, keys: r.keys })),
+// The blind reads merge into one lens entry, so the audit sees one lens with per-brief findings.
+const blind = {
+  lens: READER,
+  verdict: read.some(r => r.findings.some(f => f.severity === 'blocker')) ? 'fail'
+    : read.some(r => r.findings.length) ? 'pass with fixes' : 'pass',
+  verified: read.map(r => `${r.brief}: ${r.judged.length} key(s) judged, ${r.findings.length} finding(s)`),
+  quote: read.flatMap(r => r.findings)[0]?.says ?? '',
+  findings: read.flatMap(r => r.findings.map(f => ({ ...f, brief: r.brief }))),
+  invalid: briefs.length > 0 && read.length === 0,
 }
-
-const lenses = [...(lensResults ?? []).filter(Boolean), ...(briefs.length ? [ambiguity] : [])]
-
-// ---------- ids; the conductor judges from here ----------
+const lenses = [...(lensResult ? [lensResult] : []), ...(briefs.length ? [blind] : [])]
 
 const findings = []
-for (const r of lenses) r.findings.forEach((f, i) => {
-  f.id = `${r.lens}#${i + 1}`
-  findings.push({ lens: r.lens, ...f })
+for (const l of lenses) l.findings.forEach((f, i) => {
+  f.id = `${l.lens}#${i + 1}`
+  findings.push({ lens: l.lens, ...f })
 })
 
-// A round that was asked to read briefs and read none is not a round.
-const valid = !(briefs.length > 0 && perBrief.length === 0)
-if (!valid) log(`round ${round} is INVALID: ${briefs.length} brief(s) to read, none survived — fix the cause (language, keys) and run the round again`)
+const allUnread = briefs.length > 0 && unread.length === briefs.length
+const invalidLenses = lenses.filter(l => l.invalid).map(l => l.lens)
+const valid = !!lensResult && !allUnread && invalidLenses.length === 0
+log(`round 1: ${findings.length} finding(s)${unread.length ? ` · unread ${unread.length}/${briefs.length}` : ''}${valid ? '' : ` · INVALID ROUND:${allUnread ? ' every brief unread' : ''}${invalidLenses.length ? ' ' + invalidLenses.join(', ') : ''}`} → the conductor rules by references/judging.md`)
 
-const bySeverity = (s) => findings.filter(f => f.severity === s).length
-log(`round ${round}: ${findings.length} finding(s) — ${bySeverity('blocker')} blocker · ${bySeverity('fix')} fix · ${bySeverity('detail')} detail${lenses.some(l => l.invalid) ? ' · INVALID lens: ' + lenses.filter(l => l.invalid).map(l => l.lens).join(', ') : ''} → the conductor judges by references/judging.md`)
-
-return { round, mode, valid, findings, lenses, unread }
+return {
+  round, valid, findings, lenses,
+  reads: read.map(r => ({ brief: r.brief, judged: r.judged, findings: r.findings.length })),
+  unread, dropped,
+}

@@ -6,6 +6,9 @@
 #   double-owner.json                 → fails: E-01 and E-03 both own web/src/pages/orders/new/**
 #   briefs.json --briefs briefs       → holds: a "## Provides, in detail" heading is not read as Provides
 #   briefs.json --briefs briefs-stale → fails: a Uses row names a stale producer, and an HTML comment
+#   briefs.json --briefs briefs-no-contract → fails: E-01 has a back and a front side and no Contract
+#   briefs.json --json                → carries reviewBriefs, E-01 with its contract key
+#   fixtures/blueprint over a copy of the blueprint example → the Plan tab builds
 set -uo pipefail
 here="$(cd "$(dirname "$0")" && pwd)"
 bad=0
@@ -24,5 +27,15 @@ check orphan-ac 1 orphan-ac
 check double-owner 1 owner
 check briefs 0 "" briefs
 check briefs 1 "brief comment" briefs-stale
-[[ $bad -eq 0 ]] && echo "selftest: all six verdicts as expected"
+check briefs 1 contract briefs-no-contract
+reviewed="$(node "$here/plan-graph.mjs" "$here/fixtures/briefs.json" --briefs "$here/fixtures/briefs" --json /dev/stdout --quiet)"
+grep -q '"keys": \[' <<<"$reviewed" && grep -q '"contract"' <<<"$reviewed" \
+  || { echo "SELFTEST FAILED: --json lacks reviewBriefs with E-01's contract key"; bad=1; }
+ws="$(mktemp -d)"
+cp -r "$here/../../../blueprint/example/." "$ws/" && rm -f "$ws/blueprint.html" && cp -r "$here/fixtures/blueprint/." "$ws/"
+built="$(node "$here/../../../blueprint/build.mjs" "$ws" 2>&1)"; rc=$?
+echo "=== blueprint build (exit $rc)"; echo "$built"
+[[ $rc -eq 0 ]] && grep -q "plan: 3 entries" <<<"$built" || { echo "SELFTEST FAILED: the plan fixture does not build"; bad=1; }
+rm -rf "$ws"
+[[ $bad -eq 0 ]] && echo "selftest: all nine verdicts as expected"
 exit $bad

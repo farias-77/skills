@@ -5,40 +5,46 @@
  *   node plan-graph.mjs <02-plan/plan.graph.json> [--briefs <02-plan/briefs>]
  *                       [--json <out.json>] [--mermaid <out.mmd>] [--quiet]
  *
- * Reads the machine-readable graph the conductor writes at P2
+ * Reads the machine-readable graph the planner writes at P1
  * (templates/plan.graph.json) and answers, with no judgement:
  *
  *   FAIL  a cycle · an edge to nothing · an edge whose need is not real
- *         behaviour (class other than `ui` or `side-effect`) · depth after
- *         the foundation over the target · an acceptance criterion no node
- *         carries (orphan), carried twice, or unknown · a file with two
- *         owners · a shared (frozen) file owned or extended outside the
- *         foundation · a shared file with no foundation owner · an extended
- *         file whose owner builds it in parallel · a used name nothing
- *         provides, or provided by a node with no path to the user · a size
- *         over the cap · a node name over 8 words (the blueprint's cap) ·
- *         a slice or integration node that carries no AC · an HTML comment
- *         in a plan file (plan.md, preflight.md, reviews.md, a brief) ·
- *         with --briefs, a brief whose Owns, Extends, Uses, Provides or
- *         Acceptance disagree with the graph, or whose Uses table names a
- *         producer other than the graph's.
- *   WARN  a file extended by two or more nodes (a hot file: make it cold,
- *         or declare it in `appendSafe` with why the additions never meet) ·
- *         a slice over the AC guide (target.maxAcs, or 8 scaled by the
- *         discovery's grain: ACs per journey step or frame state) ·
- *         a lane that is not a leaf · an integration node that is not last.
+ *         behaviour (class other than `ui` or `side-effect`) · an
+ *         acceptance criterion no node carries (orphan), carried twice, or
+ *         unknown · a file with two owners · a shared (frozen) file owned
+ *         or extended outside the foundation · a shared file with no
+ *         foundation owner · an extended file whose owner builds it in
+ *         parallel · a used name nothing provides, or provided by a node
+ *         with no path to the user · a size over the cap · a node name
+ *         over 8 words (the blueprint's cap) · a slice or integration node
+ *         that carries no AC · `sides` other than back and/or front · an
+ *         HTML comment in a plan file (plan.md, preflight.md, reviews.md,
+ *         a brief) · with --briefs, a brief whose Owns, Extends, Uses,
+ *         Provides or Acceptance disagree with the graph, whose Uses table
+ *         names a producer other than the graph's, or whose node has both
+ *         sides and no Contract (stage 4 runs two builders only on one).
+ *   WARN  depth after the foundation over the target · a file extended by
+ *         two or more nodes (a hot file: make it cold, or declare it in
+ *         `appendSafe` with why the additions never meet) · a slice over
+ *         the AC guide (target.maxAcs, default 8 at one AC per rule or
+ *         behavior) · a lane that is not a leaf · an integration node that
+ *         is not last · a node other than the foundation owning a file a
+ *         running front changes (`fronts`) · with --briefs, a Contract on
+ *         a node with one side.
  *
  *   REPORT the waves (levels after the foundation), the width (widest wave),
  *         the depth, the critical path with its weight, the total weight,
- *         the parallelism (total / critical), and the start order (bottom
- *         level, descending: what stage 4 starts first).
+ *         the parallelism (total / critical), the start order (bottom
+ *         level, descending: what stage 4 starts first) and, with
+ *         --briefs, `reviewBriefs`: per brief its path and the keys its
+ *         blind reader judges (the plan-review workflow's `briefs` arg).
  *
  * Exit 0 when nothing fails, 1 when something fails, 2 on a bad call.
  * No dependencies; Node 18+.
  */
 
 import { readFileSync, writeFileSync, existsSync, readdirSync } from 'node:fs'
-import { join, dirname } from 'node:path'
+import { join, dirname, resolve } from 'node:path'
 
 // ---------- arguments ----------
 
@@ -60,17 +66,15 @@ const weights = { S: 1, M: 2, L: 3, ...(G.weights || {}) }
 const SIZES = Object.keys(weights)
 const capRank = SIZES.indexOf(target.sizeCap)
 const universe = new Set(G.acs || [])
-// The pack's 8 ACs per slice assume one AC per journey step. A discovery
-// that writes several per step, or one per frame state, scales the guide
-// by its grain: ACs ÷ distinct stems (the id without its trailing .<n>).
-const stems = new Set([...universe].map(a => String(a).replace(/\.\d+$/, '')))
-const grain = stems.size ? universe.size / stems.size : 1
-if (target.maxAcs == null) target.maxAcs = Math.ceil(8 * grain)
+// The pack's guide: 8 ACs per slice, at one AC per rule or behavior.
+if (target.maxAcs == null) target.maxAcs = 8
 const appendSafe = G.appendSafe || {}
+const fronts = Array.isArray(G.fronts) ? G.fronts : []
 const shared = G.shared || []
 const nodes = Array.isArray(G.nodes) ? G.nodes : []
 const KINDS = ['foundation', 'lane', 'slice', 'integration']
 const EDGE_CLASSES = ['ui', 'side-effect']
+const SIDES = ['back', 'front']
 const list = (x) => Array.isArray(x) ? x : []
 
 // ---------- shape ----------
@@ -82,7 +86,8 @@ for (const n of nodes) {
   byId.set(n.id, n)
   if (!KINDS.includes(n.kind)) fail('shape', `${n.id}: kind "${n.kind}" is not one of ${KINDS.join(', ')}`)
   n.after = list(n.after).map(e => typeof e === 'string' ? { id: e } : e)
-  for (const k of ['acs', 'owns', 'extends', 'provides', 'uses']) n[k] = list(n[k])
+  for (const k of ['acs', 'owns', 'extends', 'provides', 'uses', 'sides']) n[k] = list(n[k])
+  for (const s of n.sides) if (!SIDES.includes(s)) fail('shape', `${n.id}: side "${s}" is not one of ${SIDES.join(', ')}`)
   const words = String(n.name || '').trim().split(/\s+/).filter(Boolean).length
   if (!words) fail('shape', `${n.id}: no name`)
   else if (words > 8) fail('shape', `${n.id}: name "${n.name}" has ${words} words; the blueprint caps entries[].name at 8 — one short name, the same in plan.md, the brief and the blueprint`)
@@ -145,7 +150,7 @@ if (acyclic) {
   rest.forEach(n => { const l = levelOf(n); (waves[l - 1] ||= []).push(n.id); depth = Math.max(depth, l) })
   if (depth > target.depth) {
     const deep = rest.filter(n => level.get(n.id) > target.depth).map(n => n.id)
-    fail('depth', `depth after the foundation is ${depth}, target ${target.depth}: ${deep.join(', ')} sit past it — fake the edge behind an interface or stack it`)
+    warn('depth', `depth after the foundation is ${depth}, target ${target.depth}: ${deep.join(', ')} sit past it — can the edge be faked behind an interface, or stacked?`)
   }
 }
 const width = Math.max(0, ...waves.map(w => w.length))
@@ -265,6 +270,12 @@ for (const n of nodes) for (const name of n.uses) {
   if (!ps.some(p => p.id !== n.id && before(p, n))) fail('uses', `${n.id} uses \`${name}\`, provided by ${ps.map(p => p.id).join(', ')} with no path to ${n.id}: put it in the foundation, or the edge is missing`)
 }
 
+// ---------- other fronts: a file a running front changes is merged once, in the foundation ----------
+
+for (const f of fronts) for (const p of list(f.files)) for (const n of rest) for (const o of n.owns) {
+  if (overlap(o, p)) warn('front', `${n.id} owns \`${o}\`, which the front ${f.front ?? f.branch ?? '?'} changes (\`${p}\`): move it into the foundation so the merge with that front happens once, or name the merge order in plan.md`)
+}
+
 // ---------- shape warnings ----------
 
 for (const n of rest) {
@@ -320,6 +331,7 @@ const same = (id, what, graphList, briefList, filter = () => true) => {
   if (missing.length) fail('brief', `${id}.md ${what}: missing ${missing.map(x => `\`${x}\``).join(', ')} (in the graph)`)
   if (extra.length) fail('brief', `${id}.md ${what}: ${extra.map(x => `\`${x}\``).join(', ')} not in the graph`)
 }
+const reviewBriefs = []
 if (briefsDir) for (const n of nodes) {
   const file = join(briefsDir, `${n.id}.md`)
   if (!existsSync(file)) { fail('brief', `${n.id}: no brief at ${file}`); continue }
@@ -333,6 +345,11 @@ if (briefsDir) for (const n of nodes) {
     producers(n, uses)
   }
   same(n.id, '§Acceptance', n.acs, firstColumn(section(md, 'Acceptance')), x => universe.has(x))
+  const contract = /^## Contract\s*$/m.test(md) && firstColumn(section(md, 'Contract')).filter(x => !/^route$/i.test(x)).length > 0
+  const twoSides = SIDES.every(s => n.sides.includes(s))
+  if (twoSides && !contract) fail('contract', `${n.id}.md: the node has a back and a front side and no Contract (routes, request and response JSON, errors, copied from data-and-contracts.md) — stage 4 runs two builders only on a Contract`)
+  if (!twoSides && contract) warn('contract', `${n.id}.md: a Contract on a node with ${n.sides.length ? 'one side' : 'no sides declared'} — stage 4 would run two builders; declare both sides in the graph or drop the section`)
+  reviewBriefs.push({ id: n.id, path: resolve(file), keys: isF(n) || n.kind === 'lane' ? ['provides', 'proof'] : [...n.acs, ...(contract ? ['contract'] : [])] })
 }
 
 // ---------- no HTML comment in an output ----------
@@ -380,6 +397,7 @@ const summary = {
   criticalPath: critical, criticalWeight, totalWeight,
   parallelism: criticalWeight ? Math.round((totalWeight / criticalWeight) * 100) / 100 : 0,
   startOrder,
+  ...(briefsDir ? { reviewBriefs } : {}),
   acs: { total: universe.size, carried: [...carriers.keys()].filter(a => universe.has(a)).length },
   fails, warns,
 }
@@ -393,7 +411,7 @@ if (!quiet) {
   if (acyclic) {
     p(`  foundation ${summary.foundation.join(' → ') || '—'}`)
     waves.forEach((wv, i) => p(`  wave ${i + 1}     ${wv.join(' · ')}`))
-    p(`  width ${width} · depth ${depth} (target ≤ ${target.depth}) · ACs ${summary.acs.carried}/${summary.acs.total} · AC guide per slice ${target.maxAcs}${G.target?.maxAcs == null ? ` (8 × grain ${Math.round(grain * 100) / 100})` : ''}`)
+    p(`  width ${width} · depth ${depth} (target ≤ ${target.depth}) · ACs ${summary.acs.carried}/${summary.acs.total} · AC guide per slice ${target.maxAcs}`)
     p(`  critical   ${critical.join(' → ')}  (weight ${criticalWeight} of ${totalWeight}; parallelism ×${summary.parallelism})`)
     p(`  start      ${startOrder.join(', ')}`)
   }

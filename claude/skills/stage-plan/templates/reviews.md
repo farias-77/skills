@@ -1,75 +1,38 @@
-# Plan review audit — <workstream>
+# Plan review — <workstream>
 
 <!--
-  Written by THE CONDUCTOR (Opus 5.5, high), with no scribe agent: the workflow's
-  return value is saved as is in 02-plan/reviews/round-N.json (the
-  authority), and this file is the index written from it in one pass,
-  the rulings appended as they happen. Permanent: the proof the review
-  happened and the record of the rulings; plan-review.json is filled
-  from it at the close. MUST have, per round: every lens that ran with
-  verdict, run id (from the workflow journal, not prose) and verified
-  list; the briefs read blind, with the keys where the two readers
-  built or proved different things; every finding with the conductor's
-  ruling, owner and reason (the foreclosing sentence quoted on every
-  dismissal); every graph change with the checker's summary line after
-  it. Written before anything is applied. Round 1 is whole; round 2 is
-  delta and automatic; then the stage stops: what is still sustained is
-  applied without re-review and written as residue. Nobody is asked:
-  every ruling is the conductor's, and those that change the cut are
-  listed for his veto.
+  Written by THE CONDUCTOR (Opus 5.5, high) from 02-plan/reviews/round-1.json
+  (the workflow's return, the authority), in one pass, the rulings
+  written before any fix leaves. One round: the fixes are applied and
+  verified by reading, never re-reviewed. Nobody is asked.
 
   These comments are instructions to you: none of them reaches
   reviews.md (the plan's checker refuses an HTML comment).
 -->
 
-## Round <N> — <date> · run <id> · whole | delta over <briefs>
+## Round 1 — <date> · run <id>
 
 **Checker before the round:** `<✓ graph holds · width n · depth n · critical F → … (weight n)>`
 
-| Lens | Verdict | Run id | Findings |
-|---|---|---|---|
-| plan-reviewer-coverage | | | |
-| plan-reviewer-verifiability | | | |
-| plan-reviewer-order | | | |
-| plan-reviewer-ambiguity | | — | |
+| Lens | Verdict | Findings | Dropped by the filter | Unread |
+|---|---|---|---|---|
+| plan-reviewer | | | — | — |
+| plan-blind-reader | | | <n> | <briefs, or none> |
 
-### Blind reads
+## Findings and rulings
 
-| Brief | Keys compared | Different product | Unread |
-|---|---|---|---|
-| <E-nn> | <n> | <keys, or none> | <yes when a reader was dropped> |
+| Id | Brief | Finding | Ruling | Owner | Why |
+|---|---|---|---|---|---|
+| <plan-reviewer#1> | <E-02> | <the false edge to E-01> | sustained | planner | <factory.Order seeds the order> |
+| <plan-blind-reader#1> | <E-01> | <the 422 code of a past day is missing> | sustained | writer | <data-and-contracts.md §Orders gives `day_in_past`> |
+| <plan-reviewer#2> | — | <…> | dismissed | — | <the sentence that forecloses it, quoted> |
 
-### Findings and rulings
+## Applied and verified
 
-#### [<severity>] <lens>#<n> — <title>
-
-- **Finding:** <gap>
-- **Merged with:** <ids, or —>
-- **Ruling:** <sustained / deferred / dismissed> · owner <writer / conductor / builder / —> — <reason; the sentence quoted on a dismissal>
-- **Graph:** <for a conductor ruling: what changed in plan.graph.json and plan.md, and the checker's line after it; "—" otherwise>
-
-### The lists
-
-- **To the writers** (by brief): …
-- **Graph changes** (by decision, `ruled: conductor`, listed at the close for veto): …
-- **To the builder** (by brief): …
-- **Dismissed**: …
-
-### Round close
-
-<sustained N (writer N · conductor N · builder N) · deferred N · dismissed N · round 2 automatic | the stage stops here>
+| Id | What changed | Verified (file:line) |
+|---|---|---|
+| <plan-reviewer#1> | <edge dropped; checker green> | `plan.graph.json:42` · `<✓ graph holds …>` |
 
 ## Close
 
-### Precision per lens
-
-| Lens | Findings | Sustained | Deferred | Dismissed |
-|---|---|---|---|---|
-
-### Residue
-
-<what stayed sustained after round 2 and was applied without re-review, with the line proof; what he vetoed after the report, with his words>
-
-### Taste notes added
-
-<one line each, as written to the workstream's taste-notes.md>
+sustained <n> (writer <n> · planner <n>) · dismissed <n> · unread <briefs, or none> · the checker with --briefs: `<summary line>`

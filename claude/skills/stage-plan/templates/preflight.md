@@ -1,7 +1,7 @@
 # Pre-flight — <workstream>
 
 <!--
-  Written by THE CONDUCTOR (Opus 5.5, high) at P5. Stage 4 opens by
+  Written by THE CONDUCTOR (Opus 5.5, high) at P4. Stage 4 opens by
   showing this file once; he hands every item over in one sitting, and
   from "play" on he is called only at the end.
 
@@ -10,7 +10,7 @@
   third-party contract or approval, a text only he can write. Nothing
   an agent can do with the access it already has. Nothing that is a
   decision: decisions were taken at plan, conservatively, and sit in
-  plan.md "Decided in his place" for his veto.
+  plan.md "Decided in his place".
 
   Every item carries:
   - why: the node it unblocks and what breaks without it;

@@ -77,8 +77,7 @@ and `test-affected` here are illustrations.
 6. Each entry is at most L: one screen with its states, one server
    flow, about 2,500 changed lines (inference; the project's doctrine
    may set its own ceiling). The AC count is a warning, not a cap:
-   about 8 ACs when the discovery writes one AC per journey step,
-   scaled by its grain (ACs per journey step or frame state). A node
+   8 ACs at one AC per rule or behavior. A node
    over the guide is sized by its screens, flows and lines, and split
    only when those say it is over L (the plan's checker,
    `plan-graph.mjs`, prints the guide and warns).

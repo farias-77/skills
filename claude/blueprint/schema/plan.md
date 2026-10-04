@@ -4,7 +4,7 @@ Stage 3 writes under `<workstream>/blueprint/plan/`: the conductor
 writes `plan.json` (the cut: from A to B, the foundation, the entries
 with their edges and proofs, the concurrency cap, the cut's cards, the
 pre-flight), `plan-report.json` (the plain layer the tab opens with)
-and `plan-review.json` (the rounds and the rulings); each
+and `plan-review.json` (the round and the rulings); each
 `plan-writer` (Sonnet 5.5, high) writes `briefs/<id>.json` in the same
 pass as its brief (`02-plan/briefs/<id>.md`).
 `node claude/blueprint/build.mjs <workstream>` validates them, embeds
@@ -169,9 +169,12 @@ file is missing.
 
 ## `plan-review.json` (the conductor)
 
-The design review's shape: `opened`, `approved`, `rounds[] {n, findings,
-toAuthor, toUser, deferred, dismissed, unread[], changed}`,
-`decisions[] {round, id, title, plain, ruling, words}` (the user's),
-`conductorRulings[] {id, title, ruling}` (ruled in his place, listed
-for veto), `dismissed[] {id, lens, title, why}`, `residue[] {title,
-why}`. Every `decisions[]` entry has a `plain` sentence.
+One round, ruled by the conductor alone: `opened`, `approved` (the
+close's date: nobody approves the plan), `rounds[]` with one entry
+`{n: 1, findings, toAuthor, toUser: 0, deferred: 0, dismissed, unread[],
+changed}` (`toAuthor` counts the fixes sent to the planner and the
+writers; `changed` says in a few words what moved),
+`conductorRulings[] {id, title, ruling}` (every sustained finding,
+ruled in his place), `dismissed[] {id, lens, title, why}` (`lens` is
+`plan-reviewer` or `plan-blind-reader`). `decisions[]` and `residue[]`
+stay empty: no question goes to him and there is no second round.
