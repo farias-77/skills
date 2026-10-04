@@ -76,12 +76,14 @@ blueprint; the pipeline measures itself.
 | Change | Mechanism | Why |
 |---|---|---|
 | Pre-flight, then play | the plan's pre-flight is handed over once, then one `/goal`; the session calls him only at the end | he is not interrupted between the play and done |
-| Acceptance first | the verifier writes the checks from the brief, proves them red on the base and commits them; the builder cannot edit them | the definition of done is fixed before the code and cannot be bent to fit it |
-| One builder per entry | back and front by one writer in the entry's worktree, following the golden paths | the back/front seam produced most conflicts and amendments |
-| Prove and review in parallel | the verifier proves on the running stack while reviewers that never wrote the code read the diff, including a structure reviewer and a UX reviewer that compares screens with the locked mock | breadth of the first read kept with fewer seats |
-| No judge | a finding blocks only with a reproduction or a violated written rule; the rest is deferred or logged | the same ruling every time, and the judge loop is gone from the clock |
-| One fix, one delta | the builder fixes once at high effort; only the verifier and the reviewers that blocked re-check; still blocking, the entry parks | the fix loop was the largest block of time, and later rounds were mostly regressions of earlier fixes |
-| Deferred work in batches | deferred findings are built at the end in one slice per side | replaces many small finishing slices, each with a full review |
+| Done is the ACs and the gate | an entry is done when the brief's ACs are met and the gate is green; nothing else blocks | everything else that blocked was paperwork or taste, and each block cost a builder pass and a gate |
+| The builder writes its tests | one test per AC, beside the code, by the builder; while it builds it runs only the fast checks | the suites ran three times per pass (builder, gate, replay) |
+| The gate is the only place the suites run | `exec-gate (Sonnet 5.5, low)` runs the gate commands once per pass and tags each failure `code` or `machine` | the builder's green is checked once, cheaply |
+| Two builders only with a contract | back ∥ front when the brief carries a Contract section (routes, JSON, errors); otherwise one builder | two sides without a fixed contract took many passes to meet |
+| One reviewer, closed scope | `reviewer (Opus 5.5, high)`: the ACs, bugs and races, a security checklist, operations, a written rule; plus `qa-frontend` and `qa-backend` (Opus 5.5, medium) using the running app | a panel of lenses found much and most of it was not the product |
+| One blocking rule, in code | blocks only on an AC not met, a reproduced bug, a security hole or a written rule broken, with its proof; the rest are notes on the PR | the same ruling every time; notes open no work |
+| One fix pass, then stop | two builder passes per entry at most; still blocking after the delta, the entry parks and is reported | the fix loop was the largest block of time |
+| His eye on the screens, once | the stage report puts each real screen beside its locked frame; he checks them at the end | an agent comparing screens with the mock blocked on taste |
 
 ## Release
 
@@ -149,3 +151,22 @@ for any project that meets the bar.
 |---|---|
 | stage-execute: the load threshold carries the outside load read before the first run, and one run always goes (d8b715f) | on a shared machine at load 12–20 the threshold (nproc) never opened, so the root entries could never start in parallel |
 | stage-plan: F's brief names the self-test that keeps its not-yet-called helpers in use, and who removes it | a reviewer blocked that test in stage 4 because no written rule named it, which cost the foundation one more run |
+
+## Pass 5 (stage 4 lean)
+
+Two measured stage-4 runs: two landing pages took 55 hours; 61% of
+agent time went to suites run three times per pass and to waiting on
+the machine's load; a panel of 6–10 lenses and a judge produced 454
+rulings, 216 of them deferred into finishing entries that went through
+the panel again (56% of the time outside the plan); half the blocking
+findings were evidence paperwork.
+
+| Change | Why |
+|---|---|
+| exec-entry: build → gate → reviewer ∥ QAs → at most one fix pass → the delta by the agents that blocked; a budget of two builder passes, 30–60 minutes per entry, every step stamped with its minutes | the entry never loops |
+| The roster: `builder (Opus 5.5, medium)`, `exec-gate (Sonnet 5.5, low)`, `reviewer (Opus 5.5, high)`, `qa-frontend (Opus 5.5, medium)`, `qa-backend (Opus 5.5, medium)` | one reader per question a customer would ask |
+| Removed from stage 4: the verifier as author and prover (it stays at release), `structure-reviewer`, `ux-reviewer`, the security, operations and craft lenses, acceptance-first, foundation amendments, the deferred register, batch and finishing entries, the maintainability read, the evidence record | each one opened work outside the plan or re-ran the suites |
+| A builder may change a file outside its Owns and lists it; the reviewer reads it | amendments to the foundation cost hours each |
+| The plan's brief carries a Contract section when a node has both sides | it is what lets two builders run in parallel |
+| `scripts/exec-entry-dry-run.mjs`: the workflow with mocked agents over the paths that matter | the flow is checked before a real run |
+

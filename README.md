@@ -20,7 +20,7 @@ with a launch video at the end. Six rules hold at every stage:
 
 | Rule | What it means |
 |---|---|
-| **Proof over opinion** | whatever can be checked by running something is: a clickable mock, journeys that become tests, a gate, a verifier on the real app. Reviewers exist for what cannot be run |
+| **Proof over opinion** | whatever can be checked by running something is: a clickable mock, journeys that become tests, a gate, QA on the running app. Reviewers exist for what cannot be run |
 | **Right size, always** | every design is picked part by part from three tiers, with an evolution path; every mechanism names the requirement that forces it |
 | **Specialists with knowledge packs** | each agent reads the packs of its craft before it works |
 | **He is asked only what is his** | he is in the loop at discovery and at one short design call; plan, execute and release run from play to done. What needs him in person is gathered up front, in one pre-flight message |
@@ -84,16 +84,18 @@ finding and lists its choices for veto; the pre-flight lists what only
 he can hand over, each item with a ready command.
 
 **4 · Execute — play, and come back when it is done.** He hands over
-the pre-flight and pastes one goal; he is called once, at the end. Per
-node: the verifier writes the acceptance checks first (red on the
-base, read-only from then on); one builder writes back and front with
-the packs of its surface; the gate; then, in parallel, the verifier
-proving on the running stack, a UX reviewer comparing the real screens
-with the locked mock's frames, and reviewers that never wrote the
-code. The triage is mechanical: a finding blocks only with a
-reproduction or a written rule. The session is the **local CI**: a
-serial queue tests each merged tree and signs it off; the whole gate
-runs once at the end and posts the status `main` requires.
+the pre-flight and pastes one goal; he is called once, at the end.
+Done means the plan's ACs met and the gate green; nothing else blocks.
+Per node: one builder writes the code and a test per AC (two, back and
+front in parallel, when the brief fixes the contract), running only
+the fast checks; the gate runs the suites once; then, in parallel, one
+reviewer and the QAs of the surface, none of whom wrote the code. A
+finding blocks only on an AC not met, a reproduced bug, a security hole
+or a written rule broken; the rest are notes on the PR. One fix pass at
+most, then the entry merges or parks. The session is the **local CI**:
+a serial queue tests each merged tree and signs it off; the whole gate
+runs once at the end. He checks the screens against the locked mock
+once, in the stage report.
 
 **5 · Release — autonomous, responsible.** His play is his "go": one
 message carries the pre-flight and the play line that authorizes the
@@ -168,16 +170,13 @@ an agent's frontmatter disagrees.
 |  | `plan-reviewer-verifiability` | Sonnet 5.5, high |
 |  | `plan-reviewer-ambiguity` | Sonnet 5.5, high |
 |  | `plan-blind-reader` | Sonnet 5.5, low |
-| execute | `builder` | Opus 5.5, medium; high on the fix |
-|  | `exec-gate` | Sonnet 5.5, medium |
-| execute, release | `verifier` | Opus 5.5, medium |
-| execute | `reviewer` | Opus 5.5, medium |
-|  | `structure-reviewer` | Opus 5.5, medium |
-|  | `ux-reviewer` | Opus 5.5, medium |
-|  | `exec-lens-security` | Opus 5.5, high |
-|  | `exec-lens-operations` | Opus 5.5, medium |
-|  | `exec-lens-craft` | Opus 5.5, medium |
-| release | `release-scribe` | Sonnet 5.5, medium |
+| execute | `builder` | Opus 5.5, medium |
+|  | `exec-gate` | Sonnet 5.5, low |
+|  | `reviewer` | Opus 5.5, high |
+|  | `qa-frontend` | Opus 5.5, medium |
+|  | `qa-backend` | Opus 5.5, medium |
+| release | `verifier` | Opus 5.5, medium |
+|  | `release-scribe` | Sonnet 5.5, medium |
 | close | `close-harvester` | Sonnet 5.5, medium |
 |  | `launch-director` | Opus 5.5, high |
 |  | `footage-recorder` | Sonnet 5.5, medium |
@@ -192,13 +191,13 @@ path in the prompt; a session loads one with the Skill tool.
 
 | Pack | Read by |
 |---|---|
-| `design-taste` | prototyper, prototype-checker, builder (screens), ux-reviewer |
-| `motion-3d` | prototyper, builder (screens), ux-reviewer, launch-director |
+| `design-taste` | prototyper, prototype-checker, builder (screens) |
+| `motion-3d` | prototyper, builder (screens), launch-director |
 | `interview-journeys-copy` | discovery conductor, prototyper, journey-scribe, the discovery lenses |
-| `right-sizing` | architects, sizing-judge, the critics, design-reviewer-sizing, the design conductor, structure-reviewer |
+| `right-sizing` | architects, sizing-judge, the critics, design-reviewer-sizing, the design conductor |
 | `parallel-plan-local-ci` | the plan conductor, plan-writer, the plan lenses, the execute session |
-| `go-backend` · `react-frontend` | builder, reviewer, structure-reviewer; react also ux-reviewer |
-| `ops` | architects, design-reviewer-alarms, builder (ops), exec-lens-operations, the release session |
+| `go-backend` · `react-frontend` | builder, reviewer; go also qa-backend, react also qa-frontend |
+| `ops` | architects, design-reviewer-alarms, builder (ops), reviewer, the release session |
 | `release` | the release session, the verifier on staging and production |
 | `launch-video` | launch-director, footage-recorder, the video kit's launch mode |
 | `model-selection` | whoever picks a model: the evidence behind `docs/models.md` |
@@ -218,8 +217,8 @@ use the product.
 
 - **The CI is local.** In execute the session is the only process that
   merges into the feature branch. Per node: the base comes in by a
-  merge, the merged tree passes the path guard (the node's owned files)
-  and the affected gate, it merges, and the signoff posts
+  merge, the paths outside the node's owned files are listed, the
+  merged tree passes the affected gate, it merges, and the signoff posts
   `local-ci/affected`. The whole gate runs once at the end in a fresh
   worktree and posts `local-ci`, the only context `main` requires.
   Hosted CI keeps the deploy.
@@ -305,12 +304,12 @@ scripts/                check-models.mjs
 
 The pipeline spends tokens where they buy quality and cuts them where
 the runs showed waste. Review rounds stop at two (the second only over
-the delta), the execute triage has no judge, design and plan ask him
-nothing they can decide, and each role runs on the cheapest model and
-effort the benchmarks support ([docs/models.md](docs/models.md)).
-What stays redundant on purpose: the checks are written before the
-code, the reviewers never wrote what they read, and the whole gate runs
-once more on the top of the branch.
+the delta), an execute entry gets one fix pass and the suites run
+once per pass, in the gate, design and plan ask him nothing they can
+decide, and each role runs on the cheapest model and effort the
+benchmarks support ([docs/models.md](docs/models.md)). What stays
+redundant on purpose: the reviewer and the QAs never wrote what they
+read, and the whole gate runs once more on the top of the branch.
 
 ## Glossary
 

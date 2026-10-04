@@ -39,8 +39,8 @@ says so ([the skill](../claude/skills/pipeline-setup/SKILL.md)).
 | 3 | The gate, run locally | required | execute, release |
 | 4 | The fast check, focused tests, affected tests | required | plan, execute |
 | 5 | Stack up / env / down per worktree, with test actors | required | discovery, plan, execute, release |
-| 6 | The evidence command | required | execute, close |
-| 7 | The structure check and its comparison | required | execute, close, weekly |
+| 6 | The evidence command | recommended | release, close |
+| 7 | The structure check and its comparison | required | close, weekly |
 | 8 | The shared files list | required | plan, execute |
 | 9 | Feature maps | required | discovery, design, plan, execute |
 | 10 | A browser-drivable app | required when the product has screens | execute, release, close |
@@ -104,9 +104,9 @@ named. Without it, five entries of the same kind write five shapes.
 **How the stages use it.** Design reads it in recon. `plan-scout
 (Sonnet 5.5, low)` copies the right line into each area's recon and
 every brief names the golden path of each kind it adds. `builder (Opus
-5.5, medium)` starts a new unit from it; `structure-reviewer (Opus 5.5,
-medium)` measures the diff against it. Stage 4 halts at its pre-flight
-without it.
+5.5, medium)` starts a new unit from it; `reviewer (Opus 5.5, high)`
+blocks on a departure only where it is written as a rule. Stage 4
+halts at its pre-flight without it.
 
 ### 3 · The gate, run locally
 
@@ -120,7 +120,7 @@ and cannot wait for a hosted CI queue on every round. A gate that
 differs from CI lets a green entry turn red at merge.
 
 **How the stages use it.** Plan fixes the gate commands once in
-`plan.md`; `exec-gate (Sonnet 5.5, medium)` runs them on every round; the
+`plan.md`; `exec-gate (Sonnet 5.5, low)` runs them once per builder pass; the
 execute session runs the whole gate once on the feature branch at the
 end; release reads its result before the first merge.
 
@@ -138,9 +138,10 @@ end; release reads its result before the first merge.
 whole gate each time multiplies the clock by the number of entries.
 
 **How the stages use it.** The builder loops on the fast check and the
-focused tests; `exec-gate (Sonnet 5.5, medium)` runs the fast check, the
-affected tests and the structure check on each round. Without affected
-tests, each round runs the whole gate.
+focused tests, never the journeys; `exec-gate (Sonnet 5.5, low)` runs
+the fast check and the affected tests once per builder pass, the only
+place the suites run. Without affected tests, each pass runs the whole
+gate.
 
 ### 5 · Stack up / env / down per worktree, with test actors
 
@@ -159,8 +160,9 @@ run into a flaky one.
 
 **How the stages use it.** Discovery's recon screenshots the current
 screens as an actor; plan's scout reads the commands and the machine
-scout measures how many stacks fit; the verifier proves each entry on
-its own stack as the actors; release asks the doctrine for the staging
+scout measures how many stacks fit; `qa-frontend (Opus 5.5, medium)`
+and `qa-backend (Opus 5.5, medium)` use each entry on its own stack as
+the actors; release asks the doctrine for the staging
 actors (never a production actor).
 
 ### 6 · The evidence command
@@ -168,15 +170,16 @@ actors (never a production actor).
 **What it is.** A command that writes the entry's verification record
 for the head it runs on: which gate commands ran, on which sha, with
 which result, plus pointers to the screenshots, videos and side
-effects the verifier captured. Redacted: no token, password or
+effects captured. Redacted: no token, password or
 person's data.
 
 **Why.** Merge decisions are made on a record, not on a message that
 says "tests pass".
 
-**How the stages use it.** The execute session merges only an entry
-whose record matches the head being merged; the close harvests the
-records for the retro's numbers.
+**How the stages use it.** Stage 4 writes no record per entry: the
+committed tests and the gate's summary line are its evidence, and the
+signoff's record per tree is what the queue reads. Release and the
+close may run it for their own record.
 
 ### 7 · The structure check and its comparison
 
@@ -211,12 +214,10 @@ Template: [structure-check](../claude/skills/pipeline-setup/templates/structure-
 failure the pipeline fears most. Taste cannot be gated; size,
 complexity, duplication and fences can.
 
-**How the stages use it.** It is one of the gate commands on every
-entry round; `structure-reviewer (Opus 5.5, medium)` reads its output
-before judging what the numbers cannot see; the close measures `main`
-before and after the workstream; the weekly retro watches the trend
-and proposes a refactor slice past a threshold. Stage 4 halts at its
-pre-flight without it.
+**How the stages use it.** The project may list it among the gate
+commands; the close measures `main` before and after the workstream;
+the weekly retro watches the trend and proposes a refactor slice past
+a threshold.
 
 ### 8 · The shared files list
 
@@ -230,9 +231,10 @@ Laying those files down once removes the collision instead of
 resolving it every time.
 
 **How the stages use it.** Plan's foundation owns every change to them
-and is built first; after it they are frozen. An entry that needs one
-changed returns `needs-amendment`, and the execute session writes a
-foundation amendment.
+and is built first; after it they are frozen. An entry that cannot be
+built without changing one changes it minimally and lists it
+(`outsideOwns`); the reviewer reads it, and the queue merges entries
+one at a time, so a collision shows as a conflict at the update.
 
 ### 9 · Feature maps
 
@@ -262,11 +264,12 @@ the tool's version and its browsers.
 reading the code that draws it. Screenshots and video are the
 evidence the user audits.
 
-**How the stages use it.** `verifier (Opus 5.5, medium)` writes the
-screen acceptance as browser journeys, proves them red on the base and
-green on the entry, and records video; `ux-reviewer (Opus 5.5,
-medium)` compares the screenshots with the locked mock's frames; release
-runs the same journeys against staging.
+**How the stages use it.** `builder (Opus 5.5, medium)` writes the
+screen acceptance as browser journeys; the gate runs them;
+`qa-frontend (Opus 5.5, medium)` drives the screens by hand; the user
+compares the screenshots with the locked mock's frames once, in the
+stage report; release runs the same journeys against staging with
+`verifier (Opus 5.5, medium)`.
 
 ### 11 · Release roles: environments, deploy, rollback
 
@@ -403,12 +406,12 @@ it, the steps to reach each state, the side effects to read back (the
 table, the event, the e-mail) and how to read them. Template:
 [verify-map.md](../claude/skills/pipeline-setup/templates/verify-map.md).
 
-**Why.** The verifier, the release check and the footage recorder all
+**Why.** The QAs, the release check and the footage recorder all
 need to drive a feature they did not build. Without the map each one
 rediscovers the path, and a wrong path proves the wrong thing.
 
-**How the stages use it.** The verifier starts from it when it writes
-the acceptance checks; release reuses it on staging; `footage-recorder
+**How the stages use it.** The QAs start from it when they drive an
+entry; release reuses it on staging; `footage-recorder
 (Sonnet 5.5, medium)` follows it to record the launch video.
 
 ### 15 · Design tokens and components, exported
@@ -426,8 +429,8 @@ the builder then rebuilds it in the real look.
 
 **How the stages use it.** Discovery's recon hands the export to
 `prototyper (Opus 5.5, medium)`, so the mock uses the real tokens and
-the real component shapes; the builder and `ux-reviewer (Opus 5.5,
-medium)` compare screens against the same tokens.
+the real component shapes; the builder builds the screens on the same
+tokens.
 
 ### 16 · Observability as code
 
@@ -445,8 +448,8 @@ nothing. Release reads each alarm's first evaluation, which only
 works when the alarm is code with a name.
 
 **How the stages use it.** Design writes the observability document
-from what exists; `exec-lens-operations` reads every server diff for
-logs, metrics and alarms; release reads the alarms once at the end of
+from what exists; `reviewer (Opus 5.5, high)` checks every diff for
+errors logged and no silent failure; release reads the alarms once at the end of
 production.
 
 ### 17 · Parallelism capacity, measured

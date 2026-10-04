@@ -37,7 +37,7 @@ not the reviewer's call. Who rules, per stage:
 | discovery | the conductor, by `references/judging.md` | his product questions go out in one batch |
 | design | the conductor | the owner is the writer, the implementer (declared latitude) or his class; after his one call, his class is ruled conservatively (`ruled: conductor`) and listed for his veto |
 | plan | the conductor, every finding | owners: writer, conductor, builder; listed for his veto at the report |
-| execute | no judge: a mechanical triage, by `stage-execute/references/judging.md` | blocks with a repro or a written rule; the rest is deferred, details go to the learn log |
+| execute | no judge: one blocking rule in code, by `stage-execute/references/judging.md` | a finding is `blocking` or a `note`; it blocks only on an AC not met, a reproduced bug, a security hole or a written rule broken, with its proof; notes go to the PR and open no work |
 | release | a fix row goes through the execute pipeline | the same triage |
 | close | no reviewers | the harvesters report every friction with its evidence |
 

@@ -16,7 +16,7 @@ afterwards for a veto.
 | 1 discovery | **interview + mock + lock** | he talks; a clickable mock is built and iterated in front of him; he validates through it and locks it. The text (journeys, stories, PR-FAQ) is derived from the locked mock |
 | 2 design | **autonomous + one short call** | one deck with three tiers per part and at most one question call (four questions, only cost, scope, security posture and one-way doors); the stage closes on his approval of the report |
 | 3 plan | **autonomous** | nowhere: the conductor rules everything and lists its choices at the report for his veto |
-| 4 execute | **pre-flight, then play** | he hands over the pre-flight and pastes one goal; he is called once, at the end, when everything is merged, green, verified and reported. The triage of findings is mechanical |
+| 4 execute | **pre-flight, then play** | he hands over the pre-flight and pastes one goal; he is called once, at the end, when everything is merged, green and reported, and checks the screens against the locked mock there. One blocking rule, in code |
 | 5 release | **his play authorizes the head** | the play (`merge-from <audited head>` in the guard's allow file) is his "go"; the session merges, deploys, verifies and rolls back on its own, under the guard; it stops only on its written list |
 | 6 close | **retro + launch video** | the retro is a file for the weekly; for the people, a launch video and a "what's new" text he forwards |
 
@@ -138,14 +138,17 @@ no judge at all.
   conductor`); execution latitude goes to the builder as a line in the
   brief. Nothing reaches him as a question; the report lists every
   choice for his veto.
-- **Execution.** The triage is mechanical, by the execute stage's
-  `judging.md`. A finding blocks when it carries a reproduction or
-  names a written rule it violates, and the entry is fixed before it
-  merges; the rest goes to `deferred.md`, built in batch before the
-  audit, and the details go to the learn log, which the retro reads.
-  What is his (an entry still blocked after its fix, what needs him in
-  person, the builders' conservative calls in his classes) is parked,
-  never asked, and he rules it at the audit that closes stage 4.
+- **Execution.** Done is the plan's ACs met and the gate green. One
+  blocking rule, in code, by the execute stage's `judging.md`: a
+  finding of `reviewer (Opus 5.5, high)`, `qa-frontend (Opus 5.5,
+  medium)` or `qa-backend (Opus 5.5, medium)` blocks only on an AC not
+  met, a reproduced bug, a security hole or a written rule broken,
+  with its proof; the entry gets one fix pass. The rest are notes on
+  the PR and open no work. What is his (an entry still blocking after
+  its fix pass, what needs him in person, the builders' conservative
+  calls in his classes, the screens against the locked mock) is
+  parked or listed, never asked, and he rules it at the audit that
+  closes stage 4.
 - **Release.** His ruling is **the play**: the pre-flight message and
   the play line, recorded verbatim in the trace and in `rulings.md`.
   An answer to a question on the stop list is a ruling too. A fix
@@ -300,8 +303,8 @@ A value nobody measured is `null`, never estimated.
 The gate runs on this machine, never on a hosted queue. In execute the
 session is the queue host and the only process that merges into
 `feat/<workstream>`: per ready entry, the base comes in by a merge
-(never a rebase), the merged tree passes the path guard (the node's
-Owns and Extends) and the affected gate, it merges, and the signoff
+(never a rebase), the paths outside the node's Owns and Extends are
+listed, the merged tree passes the affected gate, it merges, and the signoff
 posts `local-ci/affected` on the merged head. The whole gate runs once
 at the end, in a fresh worktree, and only it posts **`local-ci`**, the
 one context `main` requires. No agent posts a status; the guard denies
