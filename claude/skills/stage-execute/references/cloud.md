@@ -124,7 +124,8 @@ evidence/<workstream>/<id>        orphan branch, pushed by this session before t
 claude --cloud "$(cat <<'EOF'
 You run one stage-4 entry of a delivery pipeline, alone: nobody will answer a question.
 Entry <id>, workstream <ws>, attempt <a>, run <n>.
-1. git fetch origin evidence/<ws>/<id>:evidence/<ws>/<id>
+1. git fetch origin evidence/<ws>/<id>:evidence/<ws>/<id> <the entry's base branch>
+   (first git fetch --unshallow if git rev-parse --is-shallow-repository says true)
    git worktree add ../evidence-<id> evidence/<ws>/<id>
 2. Write ../evidence-<id>/started.json as {"entry":"<id>","attempt":<a>,"run":<n>,"startedAt":"<now, ISO>"};
    commit it there ("started <id> a<a>") and git push origin evidence/<ws>/<id>.
