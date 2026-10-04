@@ -9,8 +9,9 @@
   id (`J1.s2.1`, `frame:<token>.<n>`), never copied: the GIVEN / WHEN /
   THEN live once, in stories.md.
 
-  The rule: test only what makes a difference in real use, and make
-  sure that really works. Each AC gets ONE primary proof, at the
+  The aim: the build verifies that it works, without testing the same
+  thing several times and without evidence scaffolding. Guidance, not
+  a gate; use judgment. Prefer ONE primary proof per AC, at the
   cheapest layer that really proves it:
 
   - unit: a pure rule inside one module (a date, a status move, a
@@ -19,12 +20,14 @@
     a permission);
   - journey: a behaviour on screen, across screens, in the browser.
 
-  Variations of a rule (tiers, borders, languages, roles) are rows of
-  the unit or api proof, never one journey each. A row is width-aware
-  (Width column: the doctrine's tag, such as @phone) only when the
-  behaviour depends on the width; otherwise "—". No proof pins copy or
-  markup unless the copy is the AC. No second proof of what another
-  row owns; no evidence or mutation scaffolding.
+  Variations of a rule (tiers, borders, languages, roles) usually fit
+  as rows of the unit or api proof rather than one journey each. A row
+  is width-aware (Width column: the doctrine's tag, such as @phone)
+  when the behaviour depends on the width; otherwise "—". A proof pins
+  copy or markup only when the copy is the AC. When a case really
+  needs a second proof (a risky flow worth an api test and a journey),
+  say so in the row's proof with the reason; otherwise one row owns
+  each behaviour.
   scripts/review-prep.mjs lists every AC id this file does not cite.
 -->
 

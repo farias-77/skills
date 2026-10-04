@@ -28,6 +28,9 @@ note     everything else
   The close and the weekly retro read them.
 - A finding marked `blocking` without a blocking basis or a proof is a
   note; the workflow logs it and counts it (`downgraded`).
+- **How the tests are cut never blocks.** The testing guidance is the
+  builder's judgment; a test at a costly layer or a duplicate is a
+  note at most. Only an AC with no proof at all blocks, as `ac`.
 
 The visual check is not a finding of any agent: he makes it himself,
 using the app at the hands-on that ends the stage.

@@ -1,6 +1,6 @@
 ---
 name: stage-execute
-description: Conducts stage 4 (Execute) — turns a closed plan into merged code on the feature branch, from one "play" to one call. Step 0 shows the plan's pre-flight once, waits until every item is handed over, and gives the user the /goal text to paste; from then on nobody asks him anything. One session (Opus 5.5, high) orchestrates without writing code: the foundation first, then every node of plan.graph.json whose edges are merged or ready, in the graph's start order, in parallel up to the cap, each through the exec-entry workflow — builder (Opus 5.5, medium) writes the code and the tests for the entry's ACs, running only the fast checks (two builders, back and front in parallel, when the brief carries a Contract); exec-gate (Sonnet 5.5, low) runs the gate once, the only place the suites run; then, in parallel, reviewer (Opus 5.5, high) with a closed scope, qa-frontend (Opus 5.5, medium) on screens and qa-backend (Opus 5.5, medium) on the API and data; a mechanical triage (blocking only on an AC not met, a reproduced bug, a security hole or a written rule broken; the rest are notes on the PR); at most one review fix pass (a gate-fix pass on a code red is apart, two at most) and a delta by the agents that blocked, then ready or parked. Done = the plan's ACs met and the gate green. The session is the local CI: its serial queue merges the base into each ready entry, tests the merged tree, merges, and signs off; the whole gate runs once at the end. Then it calls him once, for his hands-on: it runs the environment, he uses the app and sends adjustments in plain words, each built as a small entry A.<n> (builder → gate → merge; the reviewer only on auth, permissions or personal data) until he says ok. Then the stage report. Use when a workstream's .state.md says stage execute, or to resume an execution in progress.
+description: Conducts stage 4 (Execute) — turns a closed plan into merged code on the feature branch, from one "play" to one call. Step 0 shows the plan's pre-flight once, waits until every item is handed over, and gives the user the /goal text to paste; from then on nobody asks him anything. One session (Opus 5.5, high) orchestrates without writing code: the foundation first, then every node of plan.graph.json whose edges are merged or ready, in the graph's start order, in parallel up to the cap, each through the exec-entry workflow — builder (Opus 5.5, medium) writes the code and the tests for the entry's ACs, running only the fast checks and trying a changed screen or endpoint once against the local stack (two builders, back and front in parallel, when the brief carries a Contract); exec-gate (Sonnet 5.5, low) runs the gate once, the only place the suites run; then, in parallel, reviewer (Opus 5.5, high) with a closed scope, the QAs that make sense for the change, trying to break it: qa-frontend (Opus 5.5, medium) when screen behaviour changed (not for a pure visual, copy or asset tweak) and qa-backend (Opus 5.5, medium) when the API, data or permissions changed; a mechanical triage (blocking only on an AC not met, a reproduced bug, a security hole or a written rule broken; the rest are notes on the PR); at most one review fix pass (a gate-fix pass on a code red is apart, two at most) and a delta by the agents that blocked, then ready or parked. Done = the plan's ACs met and the gate green. The session is the local CI: its serial queue merges the base into each ready entry, tests the merged tree, merges, and signs off; the whole gate runs once at the end. Then it calls him once, for his hands-on: it runs the environment, he uses the app and sends adjustments in plain words, each built as a small entry A.<n> (builder → gate → merge; the reviewer only on auth, permissions or personal data) until he says ok. Then the stage report. Use when a workstream's .state.md says stage execute, or to resume an execution in progress.
 disable-model-invocation: false
 argument-hint: "<workstream-slug>"
 allowed-tools: Read, Write, Edit, Glob, Grep, Agent, Workflow, AskUserQuestion, Artifact, PushNotification, Bash
@@ -39,18 +39,37 @@ implemented and working**: what he wants changed is built here.
 
 ```
             ┌─ builder (back) ──┐   two builders in parallel only when the brief carries a Contract
-entry ──────┤                   ├─► gate ─┬─► reviewer                  ─┐
-            └─ builder (front) ─┘         ├─► qa-frontend (if screens)   ├─► at most 1 review fix pass ─► ready ─► the queue
-                                          └─► qa-backend  (if API/data)  ─┘
+entry ──────┤                   ├─► gate ─┬─► reviewer                         ─┐
+            └─ builder (front) ─┘         ├─► qa-frontend (when it makes sense) ├─► at most 1 review fix pass ─► ready ─► the queue
+                                          └─► qa-backend  (when it makes sense)─┘
 ```
 
 | Step | Who | What |
 |---|---|---|
-| build | `builder (Opus 5.5, medium)` | the code and one test per AC; only the fast checks (types, lint, unit tests) while it builds; a file outside Owns is allowed and listed (`outsideOwns`) |
-| gate | `exec-gate (Sonnet 5.5, low)` | the gate commands once (the check and the affected tests at the primary width, evidence off); each failure `code` or `machine`; a machine red runs again after a load wait (2×), then parks `machine`; a code red takes a gate-fix pass (not the review budget; at most 2 per entry, then parks `gate-red`); green brings the stack up for the QAs |
-| check | `reviewer (Opus 5.5, high)` ∥ `qa-frontend (Opus 5.5, medium)` ∥ `qa-backend (Opus 5.5, medium)` | the reviewer always; qa-frontend when the screen changed; qa-backend when the API or the data changed |
+| build | `builder (Opus 5.5, medium)` | the code and the tests its ACs need (one primary proof each, by judgment); only the fast checks (types, lint, unit tests) while it builds; a changed screen or endpoint tried once against the local stack (`tried`, one line); a file outside Owns is allowed and listed (`outsideOwns`) |
+| gate | `exec-gate (Sonnet 5.5, low)` | the gate commands once, as given (the check and the affected tests, sized to the change); each failure `code` or `machine`; a machine red runs again after a load wait (2×), then parks `machine`; a code red takes a gate-fix pass (not the review budget; at most 2 per entry, then parks `gate-red`); green brings the stack up for the QAs |
+| check | `reviewer (Opus 5.5, high)` ∥ `qa-frontend (Opus 5.5, medium)` ∥ `qa-backend (Opus 5.5, medium)` | the reviewer always; each QA when it makes sense (below), trying to break the feature like a real user or attacker, never adding tests |
 | triage | the workflow, in code | blocking = marked blocking, basis `ac` · `bug` · `security` · `rule`, and a proof. The rest are notes |
 | fix | `builder (Opus 5.5, medium)` | the one review fix pass over every blocking item, then the gate (a code red there may take one gate-fix pass, within the 2), then the delta: only the agents that blocked re-check their own items. Still blocking → parked `round-cap` |
+
+**Which QAs run** is decided per entry, from the gate's surface and
+the builder's `screenChange`, and recorded in the run's result as `qa:
+{ frontend: run | skipped, backend: run | skipped, why }`:
+
+| QA | Runs when | Skipped when |
+|---|---|---|
+| `qa-frontend (Opus 5.5, medium)` | what a person can do on a screen changed: logic, forms, routes, state, permissions on screen | no screen changed, or only styling, copy or an asset |
+| `qa-backend (Opus 5.5, medium)` | the API, the data or the permissions changed | none of them changed |
+
+When in doubt, it runs. A QA that finds nothing worth breaking returns
+quickly with `pass`. The session may call either one itself with the
+run's `qa` argument (a style change that could hide an action at phone
+width, say); the result records its reason too.
+
+**Tests are guidance, not a gate.** The builder verifies that it
+works: the tests its ACs need, by the builder's "How you test", and
+one try against the local stack. Nothing about how the tests are cut
+blocks an entry; only an AC with no proof at all does.
 
 The blocking rule is [references/judging.md](references/judging.md).
 Every agent stamps its start and end; the run returns `steps`, one
@@ -64,8 +83,8 @@ line per agent with its minutes, and the session keeps them.
 | `builder` | Opus 5.5, medium | the code and the tests of an entry, back and front or one side against the Contract; the fix pass |
 | `exec-gate` | Sonnet 5.5, low | the gate commands once, code or machine, the surface, the stack |
 | `reviewer` | Opus 5.5, high | the ACs implemented, bugs and races, the security checklist, operations, a written rule broken |
-| `qa-frontend` | Opus 5.5, medium | the screens used like a person: the ACs' journeys, the states, mobile width |
-| `qa-backend` | Opus 5.5, medium | the API called like a client, the data read back, and "try to break it" |
+| `qa-frontend` | Opus 5.5, medium | when screen behaviour changed: the screens used like a person, trying to break them; the ACs' journeys, the states, mobile width |
+| `qa-backend` | Opus 5.5, medium | when the API, data or permissions changed: the API called like a client and like an attacker, the data read back |
 | `slides-scribe` | Sonnet 5.5, high | the stage report's slides (no video at this stage: his hands-on is the validation) |
 
 ## Preconditions
@@ -85,10 +104,12 @@ missing role joins the pre-flight. Missing plan: halt, back to stage 3.
 
 **The gate is sized to the change** (the project contract's role 24).
 The per-entry gate, on every builder pass and every merge's affected
-signoff, runs the check and the affected tests at the one primary width
-plus the specs tagged width-aware, evidence capture off, the server
-suites once. The whole gate at the end runs everything: every width,
-the visual tests, the full server suites, evidence on. A project that
+signoff, runs what the change can break: usually the check and the
+affected tests at the primary width plus the specs tagged width-aware,
+evidence capture off, the server suites once. The whole gate at the
+end runs everything: every width, the visual tests, the full server
+suites, evidence on. Sizing, not a straitjacket: when a change really
+needs more, the session runs more. A project that
 does not meet role 24 yet still runs this stage, only slower: its gate
 commands run as the project names them, and `/pipeline-setup` proposes
 the fix.
@@ -213,7 +234,9 @@ Save the return as `entries/<id>/run-<n>.json`. Write its `notes` to
 `entries/<id>/notes.md` (agent · where · what · the fix it suggests);
 they go into the merge commit's body and never open work. Its
 `decided`, `choices` and `outsideOwns` go to the audit; its `steps` to
-the board (the entry's minutes, and the slowest step). Then act on
+the board (the entry's minutes, and the slowest step); its `qa`
+decision and the builder's `tried` line to the entry's line in
+`notes.md`. Then act on
 `status`:
 
 - **`ready`** → the merge queue (Step 4).

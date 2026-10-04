@@ -503,9 +503,12 @@ cap by the machine's load.
 ### 24 · A gate sized to the change
 
 **What it is.** The commands of roles 3 and 4, set so each run tests
-what the change can break, and the whole suite runs once.
+what the change can break, and the whole suite runs once. It is a
+sizing, not a straitjacket: a change that really needs more (a shared
+layout touched, worth every width) may run more, and the gate commands
+say so.
 
-| Part | Requirement |
+| Part | What good looks like |
 |---|---|
 | **the per-entry gate** | the fast check plus the affected tests, at **one primary width** (the browser tool's primary project, desktop for most products) plus only the specs tagged as width-aware (a tag such as `@phone`); **evidence capture off** (screenshots and video only under a flag such as `EVIDENCE=1`); the server suites **run once** (the affected step never re-runs what the check already ran) |
 | **the affected selection** | **non-UI files select no screen tests**: build files, ignore files, lint config and placeholder files are covered by the check, lint and build; it prints that decision per path ("`Makefile`: no screen tests, the check covers it"), so the selection is never silently empty. A **lockfile or manifest** selects the whole suite only when a runtime or test-runner dependency changed. The preferred precision is the **real import graph** (a screen's route to its module closure, a package to its dependants), with a fallback to the whole suite when the graph cannot be built |
@@ -524,7 +527,8 @@ end would have missed.
 **How the stages use it.** Plan copies the per-entry gate and the
 whole gate into `plan.md`; `exec-gate (Sonnet 5.5, low)` runs the
 per-entry gate once per builder pass, and the merge queue's affected
-signoff runs the same; the execute session runs the whole gate once
+signoff runs the same; the
+execute session runs the whole gate once
 on the top of the feature branch. A project that does not meet this
 yet still works: every pass pays for the full width, the evidence and
 the whole suite, and the stage is only slower. `/pipeline-setup`

@@ -26,9 +26,15 @@
  *               the reviewer reads it. `blocked` is only for a true
  *               impossibility (a missing secret, a contradiction in the
  *               plan); `questions` only for what needs the user in person.
+ *               When the change is on a screen or an endpoint, the builder
+ *               also runs it once against the local stack and says what
+ *               it saw (`tried`, one line), and it says what kind of
+ *               screen change it made (`screenChange`: behaviour, visual
+ *               or none).
  *   2. gate     exec-gate (Sonnet 5.5, low) runs the gate commands once (the
- *               fast check and the affected tests at one width, evidence
- *               off): the only place the suites run. Green or red, each failure `code` or `machine`.
+ *               fast check and the affected tests, sized to the change): the
+ *               only place the suites run. Green or red, each failure `code`
+ *               or `machine`.
  *               A red only the machine caused never goes to a builder: the
  *               gate waits for the load (at most 10 min, under
  *               loadThreshold, nproc by default) and runs again, at most
@@ -36,9 +42,15 @@
  *               Green on a screen or API surface: the gate brings the
  *               stack up for the QAs.
  *   3. check    in parallel over the entry diff: reviewer (Opus 5.5, high)
- *               always ∥ qa-frontend (Opus 5.5, medium) when the screen
- *               changed ∥ qa-backend (Opus 5.5, medium) when the API or the
- *               data changed.
+ *               always ∥ the QAs that make sense for the change, decided
+ *               from the gate's surface and the builder's screenChange:
+ *               qa-frontend (Opus 5.5, medium) when screen behaviour
+ *               changed (logic, forms, routes, state, permissions on
+ *               screen), skipped for a pure visual, copy or asset tweak;
+ *               qa-backend (Opus 5.5, medium) when the API, the data or
+ *               the permissions changed. In doubt, it runs. args.qa (the
+ *               session's call) overrides either. The decision is in the
+ *               result: qa { frontend, backend: 'run' | 'skipped', why }.
  *   4. triage   mechanical: a finding blocks only when the agent marked it
  *               `blocking`, its basis is one of `ac` (an AC not met), `bug`
  *               (a concrete reproduction), `security` (a hole) or `rule` (a
@@ -109,6 +121,7 @@
  *     entry:           'E-03',
  *     briefPath:       '/abs/.../02-plan/briefs/E-03.md',
  *     contract:        true,                               // the brief carries a Contract section: two builders
+ *     qa:              { frontend: 'run' | 'skipped', backend: 'run' | 'skipped', why: '...' },   // optional: the session's call, overrides the workflow's
  *     security:        false,                              // 'adjust' only: the request touches auth, permissions or personal data
  *     designDir:       '/abs/.../01-design',
  *     discoveryDir:    '/abs/.../00-discovery',            // the locked mock's journeys
@@ -134,7 +147,7 @@
  *   }})
  *
  * Returns { entry, mode, status, reason, head, passes, reviewFixes,
- * gateFixes, steps, rounds,
+ * gateFixes, steps, rounds, qa, tried,
  * tally, notes, outsideOwns, decided, choices, questions, blocked, gate,
  * stack } — status is 'ready' | 'parked' | 'blocked' | 'interrupted' (an
  * agent returned nothing: the session relaunches by the run id); reason,
@@ -147,7 +160,7 @@ export const meta = {
   phases: [
     { title: 'Build', detail: 'builder (Opus 5.5, medium): the code and the tests for the ACs, fast checks only; back ∥ front when the brief carries a Contract', model: 'opus' },
     { title: 'Gate', detail: 'exec-gate (Sonnet 5.5, low): the gate commands once, each failure code or machine; a machine red runs again after a load wait', model: 'sonnet' },
-    { title: 'Check', detail: 'reviewer (Opus 5.5, high) ∥ qa-frontend (Opus 5.5, medium) on screens ∥ qa-backend (Opus 5.5, medium) on API and data', model: 'opus' },
+    { title: 'Check', detail: 'reviewer (Opus 5.5, high) ∥ qa-frontend (Opus 5.5, medium) when screen behaviour changed ∥ qa-backend (Opus 5.5, medium) when the API, data or permissions changed', model: 'opus' },
     { title: 'Fix', detail: 'builder (Opus 5.5, medium): a gate-fix pass on a code red (two at most), or the one review fix pass over the blocking items', model: 'opus' },
     { title: 'Delta', detail: 'only the agents that raised blocking items, over those items', model: 'opus' },
   ],
@@ -191,6 +204,8 @@ const BUILD = obj({
   commits: { type: 'array', description: 'the commits of this turn only; empty when you changed nothing', items: obj({ sha: str, message: str }) },
   checks: { type: 'array', description: 'one per fast check, in order', items: obj({ command: str, lastLine: str, green: { type: 'boolean' } }) },
   tests: { type: 'array', description: 'one per AC: the test that proves it', items: obj({ ac: str, test: str }) },
+  tried: { type: 'string', description: 'when the change is on a screen or an endpoint: what you saw running it once against the local stack, one line; empty otherwise' },
+  screenChange: { type: 'string', enum: ['behaviour', 'visual', 'none'], description: 'behaviour: what a person can do on a screen changed (logic, a form, a route, state, a permission) · visual: only styling, copy or an asset · none: no screen changed · when unsure, behaviour' },
   files: strs,
   outsideOwns: { type: 'array', description: 'every file you changed outside the brief\'s Owns and Extends, with why', items: obj({ path: str, why: str }) },
   reused: strs,
@@ -255,7 +270,7 @@ const result = {
   // The review fix passes and the gate-fix passes used; a resume without them reads the old count (one pass past the build = the fix used).
   reviewFixes: resume ? Number(resume.reviewFixes ?? Math.min(1, Math.max(0, (Number(resume.passesUsed) || 0) - 1))) || 0 : 0,
   gateFixes: resume ? Number(resume.gateFixes) || 0 : 0,
-  steps: [], rounds: [], tally: {}, notes: [], outsideOwns: [], decided: [], choices: [], questions: [], blocked: null, gate: null, stack: null,
+  steps: [], rounds: [], qa: null, tried: [], tally: {}, notes: [], outsideOwns: [], decided: [], choices: [], questions: [], blocked: null, gate: null, stack: null,
 }
 
 const interrupted = (what) => { result.status = 'interrupted'; result.reason = 'interrupted'; log(`${entry}: ${what} returned nothing — interrupted; relaunch by resumeFromRunId`); return result }
@@ -324,6 +339,7 @@ const absorb = (outs, who) => {
     b.decided.forEach(d => result.decided.push(d))
     b.choices.forEach(c => result.choices.push(c))
     b.outsideOwns.forEach(o => result.outsideOwns.push(o))
+    if ((b.tried ?? '').trim()) result.tried.push(b.tried.trim())
   }
   const head = outs.at(-1).head
   const blocked = outs.map(b => b.blocked).filter(s => s && s.trim())
@@ -336,6 +352,10 @@ const absorb = (outs, who) => {
   return null
 }
 
+// The kind of screen change the build made: behaviour wins, then visual; unknown reads as behaviour (in doubt, the QA runs).
+let screenChange = null
+const combineScreen = (kinds) => kinds.some(k => k === 'behaviour' || !['visual', 'none'].includes(k)) ? 'behaviour' : kinds.includes('visual') ? 'visual' : 'none'
+
 // One builder pass: two builders by side when the run has two and the items split cleanly, else one.
 const pass = async (task, items, label) => {
   result.passes++
@@ -347,6 +367,7 @@ const pass = async (task, items, label) => {
   const list = (side) => items.filter(i => side === 'both' || i.side === side)
   const text = (side) => items.length ? `${task}\n${list(side).map(i => `- ${i.id} (${i.agent}): ${i.title} — ${i.fix}${i.where ? `\n  where: ${i.where}` : ''}${(i.proof ?? '').trim() ? `\n  proof: ${i.proof}` : ''}`).join('\n')}` : task
   const outs = await parallel(sides.map(side => () => builder(text(side), side, label, label === 'build' ? 'Build' : 'Fix')))
+  if (label === 'build' && outs.every(Boolean)) screenChange = combineScreen(outs.map(b => b.screenChange))
   log(`${entry}: builder pass ${result.passes} (${label}; review fixes ${result.reviewFixes}/${maxPasses - 1}, gate fixes ${result.gateFixes}/${MAX_GATE_FIXES}; ${sides.length === 2 ? 'back ∥ front' : 'one builder'})`)
   return absorb(outs, `the builder (${label})`)
 }
@@ -475,11 +496,32 @@ const ready = () => {
   return result
 }
 
-const seatsFor = (surface) => [REVIEWER, ...(surface.screen ? [QA_FRONT] : []), ...(surface.api || surface.runtime ? [QA_BACK] : [])]
+// Which QAs run: qa-frontend when screen behaviour changed, qa-backend when the API, the data or the
+// permissions changed; in doubt, run. args.qa, the session's call, overrides. Recorded in result.qa.
+const decideQa = (surface) => {
+  const why = []
+  let frontend = 'skipped', backend = 'skipped'
+  if (!surface.screen) why.push('no screen changed')
+  else if (screenChange === 'visual') why.push('a visual, copy or asset change only: nothing on screen to break')
+  else { frontend = 'run'; why.push(screenChange === 'behaviour' ? 'screen behaviour changed' : 'a screen changed and its kind is unknown: run') }
+  if (surface.api || surface.runtime || surface.sensitive) { backend = 'run'; why.push(`${[surface.api && 'the API', surface.runtime && 'the runtime', surface.sensitive && 'permissions or personal data'].filter(Boolean).join(', ')} changed`) }
+  else why.push('no API, data or permissions changed')
+  const o = args?.qa ?? {}
+  const pick = (v, d) => v === 'run' || v === 'skipped' ? v : d
+  const qa = { frontend: pick(o.frontend, frontend), backend: pick(o.backend, backend), why: `${why.join('; ')}${o.why ? `; the session: ${o.why}` : ''}` }
+  result.qa = qa
+  log(`${entry}: qa-frontend ${qa.frontend}, qa-backend ${qa.backend} — ${qa.why}`)
+  return qa
+}
+const seatsFor = (surface) => {
+  const qa = decideQa(surface)
+  return [REVIEWER, ...(qa.frontend === 'run' ? [QA_FRONT] : []), ...(qa.backend === 'run' ? [QA_BACK] : [])]
+}
 
 // ---------- the run ----------
 
 if (mode === 'update') {
+  result.qa = { frontend: 'skipped', backend: 'skipped', why: 'an update: the reviewer reads a conflict resolution only' }
   const r = await gateOnce(`Update ${args?.branch} with ${args?.base}: \`git merge --no-ff ${args?.base}\` on the entry branch, never a rebase, then push. On a conflict, \`git merge --abort\` and report the files. On a clean merge, run the gate.`)
   if (r.stop) return r.stop
   if (!r.g.conflicts.length) {
@@ -516,6 +558,7 @@ if (mode === 'resume') {
 }
 
 if (mode === 'adjust') {
+  result.qa = { frontend: 'skipped', backend: 'skipped', why: 'an adjustment: his own request, on the screen he is looking at' }
   const stop = await pass(`Mode: build. Entry ${entry}: an adjustment the user asked for while using the app; the brief quotes his words and the AC written from them. The smallest change that does what he asked, and a test when the AC is behaviour.`, [], 'build')
   if (stop) return stop
   const ga = await gateGreen('Run the gate on the entry branch.')

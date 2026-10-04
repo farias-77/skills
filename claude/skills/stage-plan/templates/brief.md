@@ -6,8 +6,9 @@
   instruction one `builder (Opus 5.5, medium)` receives at stage 4, or
   two (back and front in parallel) when it carries a Contract. The
   builder has the codebase, the design folder, the golden paths and
-  this file, and nobody to ask. It writes one test per AC; the gate runs
-  them; `reviewer (Opus 5.5, high)` checks each AC is met.
+  this file, and nobody to ask. It writes the tests its ACs need (one
+  primary proof each, by judgment) and tries the change once against
+  the local stack; the gate runs them; `reviewer (Opus 5.5, high)` checks each AC is met.
 
   scripts/plan-graph.mjs --briefs reads the sections Acceptance,
   Contract, Uses from the foundation, Provides, Owns and Extends: the

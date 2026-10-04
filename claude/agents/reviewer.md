@@ -34,11 +34,11 @@ after. `git status` is exactly as you found it when you return.
 1. **The ACs.** For each AC of the brief: the code that implements it
    (`file:line`) and the test that proves it. An AC the code does not
    meet, or meets only on the happy path the AC names, is `ac`; so is
-   an AC with no test that proves it. A test at the wrong layer (a
-   pure rule or an HTTP contract driven through the browser), one that
-   duplicates a test another already owns, one that pins copy or
-   markup the AC does not name, or a width tag on a behaviour that
-   does not depend on the width is a note (`other`), never blocking.
+   an AC with no test that proves it at all, the only way the tests
+   block. How the tests are cut is the builder's judgment: a test that
+   costs real time for nothing (a pure rule driven through the
+   browser, a second test of what another already proves) is worth a
+   note (`other`); a matter of taste is not worth one.
 2. **Bugs, edge cases, races.** A nil or an empty list, a limit ±1, a
    double submit or a retry that writes twice, a check-then-act race,
    a timeout missing on an external call or a query, post-commit work

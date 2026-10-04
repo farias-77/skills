@@ -20,6 +20,7 @@ const T = (n) => ({ started: `2026-10-04T10:${String(n).padStart(2, '0')}:00Z`, 
 const API = { api: true, screen: false, runtime: false, paths: ['server/orders/create.go'] };
 const SCREEN = { api: false, screen: true, runtime: false, paths: ['web/src/orders/OrderList.tsx'] };
 const BOTH = { api: true, screen: true, runtime: false, paths: ['server/orders/create.go', 'web/src/orders/OrderList.tsx'] };
+const STYLE = { api: false, screen: true, runtime: false, paths: ['web/src/orders/OrderList.css'] };
 const AUTH = { api: true, screen: false, runtime: false, sensitive: true, paths: ['server/auth/session.go'] };
 const CODE = { check: 'journey', where: 'e2e/orders.spec.ts:40', output: 'Expected "Order received", received "Error"', cause: 'code', side: 'front', load: '' };
 const MACHINE = { check: 'journey', where: 'e2e/orders.spec.ts:12', output: 'TimeoutError: locator.waitFor: Timeout 5000ms exceeded', cause: 'machine', side: 'front', load: '34.2 · nproc 8' };
@@ -29,7 +30,7 @@ const gate = (kind, surface, n) => {
   const failures = green || kind === 'conflict' ? [] : kind === 'machine' ? [MACHINE] : [CODE];
   return { green, head: `h${n}`, summary: green ? 'ok' : 'red', checks: [], failures, load: 'start 3.0 · end 3.2 · nproc 8', stack: green ? 'http://localhost:8080 · actors: customer, staff' : 'down', conflicts: kind === 'conflict' ? ['server/orders/create.go'] : [], surface, ...T(n) };
 };
-const build = (n, o = {}) => ({ branch: 'b', head: `b${n}`, commits: [{ sha: `c${n}`, message: 'feat: orders' }], checks: [{ command: 'make check', lastLine: 'ok', green: true }], tests: [{ ac: 'J01.s2.1', test: 'e2e/orders.spec.ts' }], files: [], outsideOwns: [], reused: [], choices: [], decided: [], questions: [], blocked: '', applied: [], ...T(n), ...o });
+const build = (n, o = {}) => ({ branch: 'b', head: `b${n}`, commits: [{ sha: `c${n}`, message: 'feat: orders' }], checks: [{ command: 'make check', lastLine: 'ok', green: true }], tests: [{ ac: 'J01.s2.1', test: 'e2e/orders.spec.ts' }], tried: 'POST /orders as customer → 201, listed as pending', screenChange: 'behaviour', files: [], outsideOwns: [], reused: [], choices: [], decided: [], questions: [], blocked: '', applied: [], ...T(n), ...o });
 const review = (findings = [], closed = []) => ({ verified: ['J01.s2.1'], findings, closed, ...T(20) });
 const BUG = { severity: 'blocking', basis: 'bug', title: 'a double submit writes two orders', where: 'server/orders/create.go:41', says: 'no idempotency key', fix: 'use the request id as the key', proof: 'two POST /orders with the same body → two rows', side: 'back' };
 const AC = { severity: 'blocking', basis: 'ac', title: 'J01.s2.2 not met', where: 'web/src/orders/New.tsx:30', says: 'a past day is accepted', fix: 'reject a past day with day_in_past', proof: 'J01.s2.2: the form submits 2020-01-01 and shows "Order received"', side: 'front' };
@@ -63,6 +64,14 @@ const scenarios = [
     gate: seq('conflict', 'green'), expect: ['ready', 1] },
   { title: 'resume after a machine park before the check → gate → whole check → ready', surface: API,
     args: { mode: 'resume', resume: { head: 'h3', passesUsed: 1, check: 'whole' } }, expect: ['ready', 1] },
+  { title: 'a style-only change: the builder says visual → both QAs skipped, the reviewer only → ready', surface: STYLE,
+    build: (n) => build(n, { screenChange: 'visual', tried: 'the order list opened: the new spacing shows' }),
+    expect: ['ready', 1], calls: ['builder', 'exec-gate', 'reviewer'], qa: ['skipped', 'skipped'] },
+  { title: 'a logic change on screen: the builder says behaviour → qa-frontend runs, qa-backend skipped → ready', surface: SCREEN,
+    expect: ['ready', 1], calls: ['builder', 'exec-gate', 'reviewer', 'qa-frontend'], qa: ['run', 'skipped'] },
+  { title: 'a style-only change, the session calls qa-frontend anyway → it runs', surface: STYLE, args: { qa: { frontend: 'run', why: 'the layout hides an action at phone width' } },
+    build: (n) => build(n, { screenChange: 'visual' }),
+    expect: ['ready', 1], calls: ['builder', 'exec-gate', 'reviewer', 'qa-frontend'], qa: ['run', 'skipped'] },
   { title: 'adjust: his request on screen → builder → gate → ready, no reviewer, no QA', surface: SCREEN, args: { mode: 'adjust', entry: 'A.1' },
     expect: ['ready', 1], calls: ['builder', 'exec-gate'] },
   { title: 'adjust: a code red → one gate fix → green → ready, still no review', surface: SCREEN, args: { mode: 'adjust', entry: 'A.2' },
@@ -94,11 +103,12 @@ for (const sc of scenarios) {
   agent, async (th) => Promise.all(th.map(t => t())), (m) => logs.push(m), () => {});
   const [status, passes, reason] = sc.expect;
   const ok = r.status === status && r.passes === passes && (reason === undefined || r.reason === reason)
-    && (!sc.calls || sc.calls.join() === names.join());
+    && (!sc.calls || sc.calls.join() === names.join())
+    && (!sc.qa || (r.qa?.frontend === sc.qa[0] && r.qa?.backend === sc.qa[1]));
   if (!ok) bad++;
   const mins = r.steps.reduce((a, s) => a + (s.minutes ?? 0), 0);
   console.log(`${ok ? 'ok  ' : 'FAIL'} ${sc.title}\n     status=${r.status}${r.reason ? ` (${r.reason})` : ''} passes=${r.passes} rounds=${r.rounds.length} notes=${r.notes.length} steps=${r.steps.length} (${mins} min)${ok ? '' : ` — expected ${status} passes=${passes}${reason ? ` (${reason})` : ''}${sc.calls ? ` calls ${sc.calls.join(' → ')}` : ''}`}`);
-  console.log(`     calls: ${calls.join(' → ')}`);
+  console.log(`     calls: ${calls.join(' → ') || '(none)'}${r.qa ? ` · qa front ${r.qa.frontend}, back ${r.qa.backend}` : ''}`);
   if (verbose) console.log(logs.map(l => `       ${l}`).join('\n'));
 }
 console.log(bad ? `exec-entry dry run: ${bad} scenario(s) failed` : `exec-entry dry run: all ${scenarios.length} scenarios as expected`);
