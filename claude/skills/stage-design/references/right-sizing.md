@@ -45,6 +45,11 @@ default, the standards win.
 10. **Every "not now" is a version on the evolution path:** the signal
     with its number, who watches it, what to add, the cost.
 11. **Simple is not basic.** The floor and the review never shrink.
+12. **The next contributor is an agent:** it sees only the files it
+    opened and copies the nearest example. Avoid two ways to do one
+    thing, a list kept in sync by hand, one fact owned by two parts, an
+    internal another module can import. The architect's criterion,
+    never a guard's cut.
 
 ## 3 · The checklist
 

@@ -64,26 +64,20 @@ what comes back, and write it in `tried`, one line ("`POST /orders` as
 leader → 201, listed as pending"). One try, not a test run. Bring the
 stack down if you brought it up.
 
+## While you build
+
+- Subtract before you add: what the change lets you delete goes first.
+- A new value threaded through three or more layers asks for a direct
+  path.
+- Three similar pieces beat a premature abstraction.
+- The urge to comment is a rename, an extraction or a type; a
+  constraint you would explain becomes a test.
+- The same edit in many files is a script, committed with the change.
+
 ## What blocks after you
 
-The reviewer blocks only on six classes; build so none applies:
-
-1. **It does not work or is not proved**: an AC that does not happen,
-   or has no proof that would fail.
-2. **Security**: scope from the client, a missing permission check,
-   a secret, unvalidated input reaching storage or a screen.
-3. **The gate weakened to pass**: a looser assert, threshold or
-   baseline; a lint, coverage or gate target changed; a failing test
-   deleted without naming its replacement.
-4. **A workaround**: a special case for the test's data, a sleep, a
-   retry or a longer timeout hiding a race, an error swallowed.
-5. **Speculative code**: an abstraction, parameter, flag or layer with
-   no consumer in the diff or the codebase, and no extension point the
-   design names.
-6. **Contract and data**: a field removed or its meaning changed while
-   a client uses it; a migration that the running code cannot run on;
-   an invariant ("only one", "once", money, ownership) with no database
-   constraint; money not in integer cents; time not in UTC.
+The reviewer blocks only on the six classes in `review.md`, in this
+folder. Build so none applies.
 
 ## What you return
 

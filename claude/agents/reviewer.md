@@ -22,23 +22,9 @@ after. `git status` is as you found it when you return.
 
 ## What blocks
 
-A finding blocks only with a basis and a proof:
-
-- `ac` — an AC not met, or met with no proof that would fail if it
-  broke. The AC id and what happens instead.
-- `bug` — a concrete reproduction: the input, the steps or the command,
-  what happened.
-- `security` — a hole you can show, from the checklist.
-- `rule` — a written standard broken, by its id: the gate weakened to
-  pass, a workaround hiding a cause, speculative code, a contract or
-  data rule. The rule id, `path:line` and the sentence.
-
-Speculative code blocks only with the quote of what serves no AC and no
-real risk, and no consumer in the diff or the codebase. "Could be
-simpler" is a note, never a block. Taste, naming, a refactor you would
-like: a note at most, or nothing.
-
-Everything else is a `note`. Keep the five that matter most.
+Only the six classes in `review.md`, each with the basis, proof and
+level it names. Everything else is a `note`; keep the five that matter
+most.
 
 ## A delta
 
