@@ -106,10 +106,10 @@ path, and republished with a label ("design · adjusted").
     └── explainer.json    (template stages only)
 ```
 
-**The first publish** (discovery; the Build stage on the short route
-and the hotfix): copy the shell to `report/index.html`,
+**The first publish** (discovery; on the short route and the hotfix,
+the short close, which publishes all three stages at once): copy the shell to `report/index.html`,
 set its `<title>`, then publish it with `icon: "report"` and the label
-"discovery closed" (or "build closed"). Save the URL in `.state.md`. Every later stage
+"discovery closed" (or "closed"). Save the URL in `.state.md`. Every later stage
 publishes to that `url`. It sends only its own files, because files left
 out of a publish are kept, and it uses a label ("plan closed"), so the
 version history is the workstream's timeline.
