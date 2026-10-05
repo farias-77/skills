@@ -163,6 +163,21 @@ run deny Bash 'gh api -X PUT repos/acme/shop/branches/main/protection --input p.
 run none Bash 'gh api repos/acme/shop/git/refs/tags/v1.4.0'
 run none Bash 'gh release view v1.4.0'
 run none Bash 'gh workflow run rollback.yml -f tag=v1.3.0'
+run deny Bash 'curl -X POST -H "Authorization: Bearer $T" https://api.github.com/repos/acme/shop/statuses/abc1234 -d "{\"state\":\"success\"}"'
+run deny Bash "curl -sd '{\"state\":\"success\",\"context\":\"local-ci\"}' https://api.github.com/repos/acme/shop/statuses/abc1234"
+run deny Bash "curl --json '{\"state\":\"success\"}' https://api.github.com/repos/acme/shop/statuses/abc1234"
+run deny Bash "wget -qO- --post-data='{\"state\":\"success\"}' https://api.github.com/repos/acme/shop/statuses/abc1234"
+run deny Bash "python3 -c \"import requests; requests.post('https://api.github.com/repos/acme/shop/statuses/abc1234', json={'state': 'success'})\""
+run deny Bash "python3 -c \"import urllib.request as u; u.urlopen(u.Request('https://api.github.com/repos/acme/shop/statuses/abc1234', data=b'{}'))\""
+run deny Bash 'http POST api.github.com/repos/acme/shop/statuses/abc1234 state=success context=local-ci'
+run deny Bash "node -e \"fetch('https://api.github.com/repos/acme/shop/statuses/abc1234', {method: 'POST', body: '{}'})\""
+run deny Bash "gh api graphql -f query='mutation { createCheckRun(input: {name: \"local-ci\"}) { checkRun { id } } }'"
+run none Bash 'gh api repos/acme/shop/commits/abc1234/statuses'
+run none Bash 'curl -s https://api.github.com/repos/acme/shop/commits/abc1234/statuses'
+run none Bash 'git commit -m "local-ci: posts the status to /statuses/ itself"'
+run none Bash 'tooling/local-ci abc1234'
+run none Bash 'gh pr create --base main --head feat/orders --title "feat: orders" --body "post the orders"'
+run none Bash 'gh pr view 12 --json statusCheckRollup'
 
 echo "-- identity"
 run deny Bash 'GH_CONFIG_DIR=~/.config/gh gh pr list'
@@ -175,6 +190,16 @@ run deny Bash 'cat ~/.config/local-ci/token'
 run deny Bash 'GH_TOKEN=$(cat $HOME/.config/local-ci/token) gh api user'
 run deny Bash 'head -c 4 < ~/.config/local-ci/token'
 run deny Bash 'cat ~/.config/gh/hosts.yml'
+run deny Bash 'cat ~/.config/labs-agent/gh/hosts.yml'
+run deny Bash 'cat $HOME/.config/acme-agent/gcloud/key.json'
+run deny Bash 'tar czf /tmp/id.tgz ~/.config/acme-agent'
+run deny Bash "python3 -c \"print(open('/home/u/.config/acme-agent/gcloud/key.json').read())\""
+run deny Bash 'cat "$GH_CONFIG_DIR/hosts.yml"'
+run deny Bash 'base64 ${CLOUDSDK_CONFIG}/application_default_credentials.json'
+run deny Bash 'unset GH_CONFIG_DIR; tooling/local-ci abc1234'
+run deny Bash 'env -u GH_CONFIG_DIR tooling/local-ci abc1234'
+run deny Bash 'env -i PATH=/usr/bin tooling/local-ci abc1234'
+run none Bash 'cat .claude/agents/labs-agent.md'
 run deny Bash 'echo $SHOP_CI_TOKEN'
 run deny Bash 'printenv ACME_CI_TOKEN'
 run deny Bash 'LOCAL_CI_TOKEN_FILE=/tmp/t bash claude/scripts/local-ci.sh --ref feat/x'

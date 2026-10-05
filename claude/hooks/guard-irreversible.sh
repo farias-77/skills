@@ -8,9 +8,10 @@
 #          pushing to a protected branch; deleting a remote branch other
 #          than story/* and evidence/*; a merge into a protected branch, or
 #          a v* tag push, that no live authorization covers; creating a
-#          release or writing refs, tags, statuses or check runs through
-#          the GitHub API; switching the agent's identity; reading the CI
-#          token or the gh and cloud credentials; editing the
+#          release or writing refs or tags through the GitHub API; writing
+#          a commit status or a check run with any HTTP client; switching
+#          or unsetting the agent's identity; naming the CI token, the gh
+#          and cloud configs or the agent's identity folder; editing the
 #          guard, the authorization script, the allow file or the settings
 #   ask    writing or reading a secret's value; a merge or a tag the guard
 #          cannot resolve (GitHub silent for 20 s, a PR it cannot read)
@@ -45,6 +46,9 @@
 #   default-branch <branch>  the repo's default branch, also protected
 #   auth <route> <slug> merge=<branch>[@<sha>] tag=<0|1> until=<UTC> [repo=<name>]
 #                            written by authorize.sh; see "Authorizations"
+#
+# The agent's identity folder (its gh login, its cloud key) is one ERE in
+# $GUARD_IDENTITY_DIR, default `\.config/<name>-agent`; no command may name it.
 #
 # Authorizations. A live `auth` line (before `until`, not yet used) lets:
 #   - a PR merge into a protected branch whose head branch is <branch>; with
@@ -129,6 +133,7 @@ allow_file=${GUARD_ALLOW_FILE:-${CLAUDE_PROJECT_DIR:-$cwd}/.claude/hooks/irrever
 norm() { tr -s '[:space:]' ' ' | sed 's/^ //; s/ $//'; }
 verbatim=() protected=(main master production prod)
 default_branch=${GUARD_DEFAULT_BRANCH:-}
+identity_dir=${GUARD_IDENTITY_DIR:-'\.config/[A-Za-z0-9._-]+-agent'}
 A_LINE=() A_ROUTE=() A_SLUG=() A_BRANCH=() A_SHA=() A_TAG=() A_REPO=() A_USED=() A_MERGED=()
 now=$(date -u +%s)
 if [ -f "$allow_file" ]; then
@@ -209,11 +214,14 @@ if has "$guarded_path|authorize\.sh"; then
 fi
 
 # --- identity: the agent keeps the identity its settings give it ------------
-has "${S}(export[[:space:]]+)?(GH_CONFIG_DIR|GH_TOKEN|GITHUB_TOKEN|GH_ENTERPRISE_TOKEN|CLOUDSDK_CONFIG|CLOUDSDK_CORE_ACCOUNT|CLOUDSDK_AUTH_ACCESS_TOKEN_FILE|GOOGLE_APPLICATION_CREDENTIALS)=" && deny "switching the identity the agent runs as"
+ids='GH_CONFIG_DIR|GH_TOKEN|GITHUB_TOKEN|GH_ENTERPRISE_TOKEN|CLOUDSDK_CONFIG|CLOUDSDK_CORE_ACCOUNT|CLOUDSDK_AUTH_ACCESS_TOKEN_FILE|GOOGLE_APPLICATION_CREDENTIALS'
+has "${S}(export[[:space:]]+)?($ids)=" && deny "switching the identity the agent runs as"
+# Unset, gh falls back to the user's own keyring login: a command run as him.
+has "${S}(unset[[:space:]]+([^;&|]*[[:space:]])?|env[[:space:]]+([^;&|]*[[:space:]])?(-u[[:space:]]*|--unset[=[:space:]]))($ids)([^A-Za-z0-9_]|$)|${S}env[[:space:]]+(-[a-zA-Z]*i[a-zA-Z]*|--ignore-environment|-)([[:space:]]|$)" && deny "dropping the identity the agent runs as falls back to the user's own login"
 has "${S}gcloud[[:space:]][^;&|]*--(account|impersonate-service-account)([=[:space:]]|$)" && deny "switching the identity the agent runs as"
 has "${S}gcloud[[:space:]]+(auth[[:space:]]+(login|activate-service-account|print-access-token)|config[[:space:]]+set[[:space:]]+(account|auth/))" && deny "switching or printing the agent's cloud credentials"
 has "${S}gh[[:space:]]+auth[[:space:]]+(login|switch|token|refresh)" && deny "switching or printing the agent's GitHub credentials"
-has "${S}(cat|head|tail|less|more|cp|mv|scp|base64|xxd|od|strings|grep|rg|awk|sed|jq|curl|tar|zip)[[:space:]][^;&|]*(local-ci/token|\.config/(gh|gcloud)/)|<[[:space:]]*[^;&|[:space:]]*(local-ci/token|\.config/(gh|gcloud)/)" && deny "reading a credential the agent does not hold: the CI token is the signoff command's, the gh and cloud configs are the identity's"
+has "local-ci/token|(\.config/(gh|gcloud)|$identity_dir)([/\"'[:space:]]|$)|\\\$\{?(GH_CONFIG_DIR|CLOUDSDK_CONFIG|GOOGLE_APPLICATION_CREDENTIALS)([^A-Za-z0-9_]|$)" && deny "naming a credential the agent does not hold: the CI token is the signoff command's; the gh and cloud configs and the identity folder are the identity's"
 has "\\\$\{?[A-Z0-9_]*CI_TOKEN|${S}(printenv|env)[[:space:]]+[A-Z0-9_]*CI_TOKEN|${S}LOCAL_CI_TOKEN_FILE=" && deny "the CI token is the signoff command's alone"
 
 # --- infrastructure: destroy and state surgery ------------------------------
@@ -342,7 +350,13 @@ has "${S}gh[[:space:]]+repo[[:space:]]+(delete|archive)" && deny "deleting or ar
 has "${S}gh[[:space:]]+release[[:space:]]+delete" && deny "deleting a release"
 has "${S}gh[[:space:]]+release[[:space:]]+create" && deny "the CI creates the release after the production watch is green"
 has "${S}gh[[:space:]]+api[^;&|]*(/pulls/[0-9]+/merge|/merges)([[:space:]/?\"']|$)" && deny "merging through the API skips the guard's check; merge with gh pr merge"
-has "${S}gh[[:space:]]+api[^;&|]*(/statuses/|/check-runs)" && has "$W" && deny "posting a commit status or a check by hand forges the CI's signal; only the gate script posts it"
+# Any client (gh, curl, wget, a one-liner): a write that names the statuses or
+# check-runs API. The gate script posts from inside, so its command never names it.
+if has '/statuses([/?"'"'"'[:space:]]|$)|/check-runs|(create|update|rerequest)CheckRun'; then
+  { has "$W|[[:space:]](-[a-zA-Z]*[dFT]|--data[a-z-]*|--form[a-z-]*|--json|--upload-file|--post-data|--post-file|--body-data|--body-file)([=[:space:]]|$)" \
+    || hasi '(^|[^a-z])(post|patch)([^a-z]|$)|[^a-z_]data[[:space:]]*='; } \
+    && deny "posting a commit status or a check by hand forges the CI's signal; only the gate script posts it"
+fi
 has "${S}gh[[:space:]]+api[^;&|]*(/git/refs|/git/tags|/releases)" && has "$W" && deny "writing refs, tags or releases through the API skips the guard's check"
 has "${S}gh[[:space:]]+api[^;&|]*(-X|--method)[[:space:]]*DELETE" && deny "a DELETE through the GitHub API"
 has "${S}gh[[:space:]]+api[^;&|]*(/protection|/rulesets)" && has '(-X|--method)[[:space:]]*(PUT|POST|PATCH|DELETE)' && deny "changing branch protection or rulesets"
