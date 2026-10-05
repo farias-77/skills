@@ -112,8 +112,9 @@ from its header and keep interviewing.
    line.
 4. **One front at a time.** Read the designs root's coordination file.
    When another front holds his attention in a discovery or a design
-   debate, say so once and queue this one; message that front's
-   session when it frees him.
+   debate, say so once and queue this one: message that front's
+   session (`SendMessage`) to tell this one when it frees him, and
+   wait on its answer.
 5. **New:** the slug `YYYY-MM-DD-<short-kebab-name>` (the project's
    naming rule wins), the folder, `.state.md` (`stage: discovery`,
    `step: D1`), `.gitignore`, and `00-discovery/notes.md` from
