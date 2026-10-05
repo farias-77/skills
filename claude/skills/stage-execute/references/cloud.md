@@ -26,7 +26,8 @@ product's history.
 
 ```
 evidence/<slug>/<id>
-├── input/args.json        the exec-entry args; paths as {repo}/… and {evidence}/…; no loadThreshold
+├── input/args.json        the exec-entry args; paths as {repo}/… and {evidence}/…; no loadThreshold;
+│                          inlineAgents: true, agentsDir and referencesDir under {evidence}/input/pipeline/
 ├── input/brief.md · design/ · discovery/ (the entry's mock frames only) · rulings.md
 ├── input/pipeline/        this pipeline at the session's version: workflows/, agents/, skills/stage-execute/
 ├── beats.jsonl            one line per agent start and end (heartbeat.sh)
