@@ -1,0 +1,177 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Explainer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500&display=swap">
+<style>
+  /* the routine stages' explainer: one column of blocks read from explainer.json beside this file */
+  :root {
+    --bg: #fbfbfb; --surface: #ffffff; --surface-2: #f7f7f8; --surface-3: #f0f0f2;
+    --line: #ececef; --line-strong: #dcdce0; --ink-1: #111113; --ink-2: #52525a; --ink-3: #6b6b72;
+    --ok: #16a34a; --warn: #ca8a04; --bad: #dc2626; --idle: #a1a1a8; --hot: #111113;
+    --f-sans: 'Geist', 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+    --f-mono: 'Geist Mono', ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) { --bg: #09090a; --surface: #0e0e10; --surface-2: #131316; --surface-3: #1a1a1e; --line: #1e1e22; --line-strong: #2a2a2f; --ink-1: #ededef; --ink-2: #a1a1a8; --ink-3: #85858c; --ok: #22c55e; --warn: #eab308; --bad: #ef4444; --idle: #6b6b72; --hot: #ededef; color-scheme: dark; }
+  }
+  :root[data-theme="dark"] { --bg: #09090a; --surface: #0e0e10; --surface-2: #131316; --surface-3: #1a1a1e; --line: #1e1e22; --line-strong: #2a2a2f; --ink-1: #ededef; --ink-2: #a1a1a8; --ink-3: #85858c; --ok: #22c55e; --warn: #eab308; --bad: #ef4444; --idle: #6b6b72; --hot: #ededef; color-scheme: dark; }
+  * { box-sizing: border-box; }
+  html, body { overflow-x: clip; }
+  body { margin: 0; background: var(--bg); color: var(--ink-1); font: 16px/1.6 var(--f-sans); -webkit-font-smoothing: antialiased; padding-inline: 16px; padding-block: 28px 48px; }
+  .page { max-width: 1100px; margin: 0 auto; display: flex; flex-direction: column; gap: 36px; }
+  .page > * { min-width: 0; }
+  h1 { margin: 0; font-size: 26px; line-height: 32px; font-weight: 600; letter-spacing: -.025em; text-wrap: balance; }
+  h2 { margin: 0; font-size: 18px; line-height: 26px; font-weight: 600; letter-spacing: -.015em; }
+  .lede { margin: 6px 0 0; color: var(--ink-2); max-width: 70ch; font-size: 17px; }
+  .ov { font: 500 11px/16px var(--f-mono); letter-spacing: .06em; text-transform: uppercase; color: var(--ink-3); }
+  .block { display: flex; flex-direction: column; gap: 12px; }
+  .block > .sub { margin: 0; color: var(--ink-2); max-width: 70ch; }
+  .box { border: 1px solid var(--line); border-radius: 10px; background: var(--surface); overflow-x: auto; }
+  .nums { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; }
+  .num { border: 1px solid var(--line); border-radius: 10px; background: var(--surface); padding: 14px 16px; display: flex; flex-direction: column; gap: 4px; }
+  .num .v { font: 500 28px/34px var(--f-mono); font-variant-numeric: tabular-nums; letter-spacing: -.02em; }
+  .num .s { font-size: 13px; color: var(--ink-3); }
+  .graph { display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: 12px; align-items: start; }
+  .graph svg { display: block; }
+  .graph .node { cursor: pointer; }
+  .graph .node rect { fill: var(--surface-2); stroke: var(--line-strong); stroke-width: 1; }
+  .graph .node text { fill: var(--ink-1); font: 500 13px var(--f-sans); }
+  .graph .node .id { fill: var(--ink-3); font: 11px var(--f-mono); }
+  .graph .node.done rect { fill: var(--ink-1); stroke: var(--ink-1); } .graph .node.done text { fill: var(--bg); }
+  .graph .node.running rect { stroke: var(--warn); stroke-dasharray: 4 3; stroke-width: 1.5; }
+  .graph .node.parked rect { stroke: var(--bad); stroke-width: 1.5; }
+  .graph .node.todo text { fill: var(--ink-3); }
+  .graph .node.hot rect { stroke: var(--hot); stroke-width: 2; }
+  .graph .node.sel rect { stroke: var(--ink-1); stroke-width: 2.5; }
+  .graph path { fill: none; stroke: var(--line-strong); stroke-width: 1.5; }
+  .graph path.hot { stroke: var(--ink-1); stroke-width: 2; }
+  .graph .elabel { fill: var(--ink-3); font: 11px var(--f-mono); }
+  .detail { border: 1px solid var(--line); border-radius: 10px; background: var(--surface); padding: 14px 16px; display: flex; flex-direction: column; gap: 8px; font-size: 14px; position: sticky; top: 12px; }
+  .detail dl { margin: 0; display: grid; grid-template-columns: minmax(0, 1fr); gap: 2px 0; }
+  .detail dt { font: 500 11px/16px var(--f-mono); letter-spacing: .06em; text-transform: uppercase; color: var(--ink-3); margin-top: 8px; }
+  .detail dd { margin: 0; color: var(--ink-2); overflow-wrap: anywhere; }
+  .legend { display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: 13px; color: var(--ink-2); }
+  .legend span { display: inline-flex; gap: 6px; align-items: center; }
+  .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--idle); display: inline-block; }
+  .dot.ok { background: var(--ok); } .dot.done { background: var(--ink-1); } .dot.running, .dot.warn { background: var(--warn); } .dot.parked, .dot.bad { background: var(--bad); }
+  .tl { padding: 14px 16px; display: flex; flex-direction: column; gap: 6px; min-width: 560px; }
+  .tl .row { display: grid; grid-template-columns: 160px minmax(0, 1fr); gap: 12px; align-items: center; font-size: 13.5px; }
+  .tl .lab { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--ink-2); }
+  .tl .track { position: relative; height: 18px; background: var(--surface-2); border-radius: 4px; }
+  .tl .bar { position: absolute; top: 3px; height: 12px; border-radius: 3px; background: var(--idle); }
+  .tl .bar.ok { background: var(--ok); } .tl .bar.warn { background: var(--warn); } .tl .bar.bad { background: var(--bad); } .tl .bar.hot { background: var(--ink-1); }
+  .tl .axis { display: flex; justify-content: space-between; padding-left: 172px; font: 11px var(--f-mono); color: var(--ink-3); }
+  .tl .cursor { position: absolute; top: -4px; bottom: -4px; width: 2px; background: var(--ink-1); }
+  .ctl { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+  .btn { height: 32px; padding: 0 12px; border-radius: 6px; border: 1px solid var(--line-strong); background: var(--surface-2); color: var(--ink-1); font: 500 13px var(--f-sans); cursor: pointer; }
+  .btn:hover { background: var(--surface-3); }
+  input[type=range] { flex: 1; min-width: 160px; accent-color: var(--ink-1); }
+  table { border-collapse: collapse; width: 100%; font-size: 14px; }
+  th, td { text-align: left; padding: 10px 14px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  th { font: 500 11px/16px var(--f-mono); letter-spacing: .06em; text-transform: uppercase; color: var(--ink-3); }
+  tr:last-child td { border-bottom: 0; }
+  td.n { font-family: var(--f-mono); font-variant-numeric: tabular-nums; text-align: right; white-space: nowrap; }
+  .note { display: flex; gap: 10px; align-items: baseline; padding: 12px 14px; border: 1px solid var(--line-strong); border-radius: 8px; background: var(--surface-2); color: var(--ink-1); font-size: 15px; max-width: 80ch; }
+  pre.mermaid { margin: 0; padding: 16px; background: transparent; }
+  :focus-visible { outline: 1px solid var(--ink-1); outline-offset: 2px; }
+  @media (max-width: 760px) { .graph { grid-template-columns: minmax(0, 1fr); } .detail { position: static; } }
+</style>
+</head>
+<body>
+<div class="page" id="page"><p class="lede">…</p></div>
+<script>
+const $page = document.getElementById('page');
+const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'}[c]));
+const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+try { const t = parent !== window && parent.document.documentElement.getAttribute('data-theme'); if (t) document.documentElement.setAttribute('data-theme', t); } catch {}
+
+const head = (b) => `${b.title ? `<h2>${esc(b.title)}</h2>` : ''}${b.sub ? `<p class="sub">${esc(b.sub)}</p>` : ''}`;
+
+const kinds = {
+  numbers: (b) => `${head(b)}<div class="nums">${b.items.map((i) => `<div class="num"><span class="ov">${esc(i.label)}</span><span class="v">${esc(i.value)}</span>${i.sub ? `<span class="s">${esc(i.sub)}</span>` : ''}</div>`).join('')}</div>`,
+  note: (b) => `<div class="note"><span class="dot ${esc(b.tone || '')}"></span><span>${esc(b.text)}</span></div>`,
+  table: (b) => `${head(b)}<div class="box"><table><thead><tr>${b.columns.map((c) => `<th>${esc(c)}</th>`).join('')}</tr></thead><tbody>${b.rows.map((r) => `<tr>${r.map((c) => `<td class="${typeof c === 'number' ? 'n' : ''}">${esc(c)}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`,
+  mermaid: (b) => `${head(b)}<div class="box"><pre class="mermaid">${esc(b.code)}</pre></div>`,
+  graph: (b, i) => `${head(b)}<div class="graph"><div class="box" id="g${i}"></div><aside class="detail" id="d${i}"><span class="ov">${esc(b.hint || 'Click a node')}</span></aside></div>${b.legend ? `<div class="legend">${b.legend.map((l) => `<span><span class="dot ${esc(l.group)}"></span>${esc(l.label)}</span>`).join('')}</div>` : ''}`,
+  timeline: (b, i) => `${head(b)}<div class="box"><div class="tl" id="t${i}"></div></div><div class="ctl"><button class="btn" type="button" id="p${i}">▶ ${esc(b.play || 'Replay')}</button><input type="range" min="0" max="1000" value="1000" id="r${i}" aria-label="time"><span class="ov" id="n${i}"></span></div>`,
+};
+
+function drawGraph(b, i) {
+  const nodes = b.nodes, byId = Object.fromEntries(nodes.map((n) => [n.id, n]));
+  const layer = {};
+  const depth = (id, seen = new Set()) => {
+    if (layer[id] != null) return layer[id];
+    if (seen.has(id)) return 0;
+    seen.add(id);
+    const ins = b.edges.filter((e) => e.to === id && byId[e.from]);
+    return (layer[id] = ins.length ? 1 + Math.max(...ins.map((e) => depth(e.from, seen))) : 0);
+  };
+  nodes.forEach((n) => depth(n.id));
+  const cols = [];
+  nodes.forEach((n) => (cols[layer[n.id]] ||= []).push(n));
+  const NW = 168, NH = 46, GX = 70, GY = 18, P = 16;
+  const pos = {};
+  cols.forEach((c, x) => c.forEach((n, y) => (pos[n.id] = {x: P + x * (NW + GX), y: P + y * (NH + GY)})));
+  const W = P * 2 + cols.length * NW + (cols.length - 1) * GX, H = P * 2 + Math.max(...cols.map((c) => c.length)) * (NH + GY) - GY;
+  const edges = b.edges.filter((e) => pos[e.from] && pos[e.to]).map((e) => {
+    const a = pos[e.from], z = pos[e.to], x1 = a.x + NW, y1 = a.y + NH / 2, x2 = z.x, y2 = z.y + NH / 2, k = (x2 - x1) / 2;
+    return `<path class="${e.hot ? 'hot' : ''}" d="M${x1},${y1} C${x1 + k},${y1} ${x2 - k},${y2} ${x2},${y2}" marker-end="url(#a${i})"></path>${e.label ? `<text class="elabel" x="${(x1 + x2) / 2}" y="${(y1 + y2) / 2 - 4}" text-anchor="middle">${esc(e.label)}</text>` : ''}`;
+  }).join('');
+  const boxes = nodes.map((n) => { const p = pos[n.id]; return `<g class="node ${esc(n.group || '')}" data-id="${esc(n.id)}" tabindex="0" role="button" aria-label="${esc(n.id + ' ' + n.label)}"><rect x="${p.x}" y="${p.y}" width="${NW}" height="${NH}" rx="7"></rect><text class="id" x="${p.x + 10}" y="${p.y + 17}">${esc(n.id)}</text><text x="${p.x + 10}" y="${p.y + 35}">${esc(n.label.length > 22 ? n.label.slice(0, 21) + '…' : n.label)}</text></g>`; }).join('');
+  const g = document.getElementById('g' + i);
+  g.innerHTML = `<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}"><defs><marker id="a${i}" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L8,4 L0,8 z" style="fill:var(--line-strong);stroke:none"></path></marker></defs>${edges}${boxes}</svg>`;
+  const show = (id) => {
+    const n = byId[id];
+    g.querySelectorAll('.node').forEach((el) => el.classList.toggle('sel', el.dataset.id === id));
+    document.getElementById('d' + i).innerHTML = `<span class="ov">${esc(n.id)}</span><b>${esc(n.label)}</b><dl>${Object.entries(n.detail || {}).map(([k, v]) => `<dt>${esc(k)}</dt><dd>${esc(Array.isArray(v) ? v.join(', ') : v)}</dd>`).join('')}</dl>`;
+  };
+  g.addEventListener('click', (e) => { const el = e.target.closest('.node'); if (el) show(el.dataset.id); });
+  g.addEventListener('keydown', (e) => { const el = e.target.closest('.node'); if (el && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); show(el.dataset.id); } });
+  if (b.select && byId[b.select]) show(b.select);
+}
+
+function drawTimeline(b, i) {
+  const rows = b.rows, lo = Math.min(...rows.map((r) => r.start)), hi = Math.max(...rows.map((r) => r.end)), span = hi - lo || 1;
+  const box = document.getElementById('t' + i), range = document.getElementById('r' + i), now = document.getElementById('n' + i);
+  const pct = (v) => ((v - lo) / span) * 100;
+  box.innerHTML = rows.map((r, k) => `<div class="row" title="${esc(r.note || '')}"><span class="lab">${esc(r.label)}</span><div class="track"><div class="bar ${esc(r.tone || '')}" id="b${i}-${k}"></div><div class="cursor" id="c${i}-${k}"></div></div></div>`).join('') + `<div class="axis"><span>${esc(lo)} ${esc(b.unit || '')}</span><span>${esc(hi)} ${esc(b.unit || '')}</span></div>`;
+  const paint = (v) => {
+    const at = lo + (v / 1000) * span;
+    rows.forEach((r, k) => {
+      const end = Math.min(r.end, at);
+      const bar = document.getElementById(`b${i}-${k}`);
+      bar.style.left = pct(r.start) + '%';
+      bar.style.width = Math.max(0, pct(end) - pct(r.start)) + '%';
+      document.getElementById(`c${i}-${k}`).style.left = `calc(${pct(at)}% - 1px)`;
+    });
+    now.textContent = `${Math.round(at)} ${b.unit || ''}`;
+  };
+  range.addEventListener('input', () => paint(+range.value));
+  document.getElementById('p' + i).addEventListener('click', () => {
+    if (reduce) { range.value = 1000; return paint(1000); }
+    const t0 = performance.now(), d = (b.seconds || 6) * 1000;
+    const step = (t) => { const v = Math.min(1000, ((t - t0) / d) * 1000); range.value = v; paint(v); if (v < 1000) requestAnimationFrame(step); };
+    requestAnimationFrame(step);
+  });
+  paint(1000);
+}
+
+fetch('explainer.json', {cache: 'no-store'}).then((r) => r.json()).then((x) => {
+  document.title = x.title || document.title;
+  if (x.lang) document.documentElement.lang = x.lang;
+  $page.innerHTML = `<header><h1>${esc(x.title)}</h1>${x.lede ? `<p class="lede">${esc(x.lede)}</p>` : ''}</header>` + x.blocks.map((b, i) => `<section class="block">${(kinds[b.kind] || (() => ''))(b, i)}</section>`).join('');
+  x.blocks.forEach((b, i) => { if (b.kind === 'graph') drawGraph(b, i); if (b.kind === 'timeline') drawTimeline(b, i); });
+  if (x.blocks.some((b) => b.kind === 'mermaid')) {
+    const s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/mermaid/11.4.0/mermaid.min.js';
+    s.onload = () => { const dark = matchMedia('(prefers-color-scheme: dark)').matches && document.documentElement.getAttribute('data-theme') !== 'light' || document.documentElement.getAttribute('data-theme') === 'dark'; mermaid.initialize({startOnLoad: false, theme: dark ? 'dark' : 'neutral'}); mermaid.run(); };
+    document.head.appendChild(s);
+  }
+}).catch(() => { $page.innerHTML = '<p class="lede">explainer.json could not be loaded.</p>'; });
+</script>
+</body>
+</html>

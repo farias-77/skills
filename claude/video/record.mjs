@@ -1,12 +1,12 @@
-// Records the launch footage: one journey at a time, the real app driven by
+// Records product footage: one journey at a time, the real app driven by
 // Playwright at 1920x1080, every frame kept with its timestamp, every move,
 // click and keystroke logged on the same clock. The cursor is NOT baked in:
-// the launch render draws it from the log, eased, with a ripple per click.
+// the film draws it from the log (Screen), eased, with a ripple per click.
 //
 //   node claude/video/record.mjs <shots.json> <out-dir> [--journey <id>] [--slow <rate>]
 //
 // Writes, per journey, <out-dir>/<id>/footage.mp4 (H.264, 30 fps CFR) and
-// <out-dir>/<id>/log.json (schema.md, "The footage log"). Exit 1 names the
+// <out-dir>/<id>/log.json (make-it-a-movie, references/footage.md). Exit 1 names the
 // journey and the step that failed; a failed journey leaves no folder.
 //
 // Safety: "mode": "read-only" aborts every request that is not GET, HEAD or

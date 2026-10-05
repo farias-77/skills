@@ -1,4 +1,0 @@
-[ { "id": "D-1", "doc": "solution", "when": "debate", "question": "Where does the invite e-mail get sent?",
-    "chosen": "A) inside the request, three tries", "why": "a human can resend; no queue to run",
-    "options": [ { "label": "A) inside the request", "cost": "nothing new" }, { "label": "B) a background job", "cost": "a queue and an alarm" } ],
-    "recommended": "A", "pick": "A", "againstRecommendation": false } ]

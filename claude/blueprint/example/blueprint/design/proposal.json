@@ -1,7 +1,0 @@
-{
-  "hisIdea": "Keep it simple: a link by e-mail, no roles yet.",
-  "disagreements": [ { "said": "send the e-mail from a background job", "proposed": "send it inside the request, three tries", "why": "a human is in the loop and can resend; a job adds a queue and an alarm", "settled": "he agreed: \"inside the request is fine\"" } ],
-  "rounds": [ { "n": 1, "date": "2026-08-20", "changed": "the resend on a repeated e-mail replaced a second invite" } ],
-  "cuts": [ { "mechanism": "a sweeper for expired invites", "outcome": "applied", "why": "expiry is checked on read; nothing reads an expired row" } ],
-  "closed": { "date": "2026-08-20", "words": "closed, go" }
-}

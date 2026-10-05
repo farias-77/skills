@@ -1,0 +1,30 @@
+{
+  "title": "The build graph",
+  "lede": "A thin contract first, then three entries side by side, and one integration entry that waits for two of them.",
+  "lang": "en",
+  "blocks": [
+    {"kind": "numbers", "items": [{"label": "entries", "value": "5"}, {"label": "start together", "value": "3"}, {"label": "longest chain", "value": "3 steps"}]},
+    {"kind": "graph", "title": "Click an entry", "sub": "An arrow means the entry at its head needs the other one merged to prove itself.", "select": "E-int",
+     "legend": [{"group": "done", "label": "merged"}, {"group": "running", "label": "building"}, {"group": "todo", "label": "waiting"}],
+     "nodes": [
+       {"id": "C", "label": "Orders contract", "group": "done", "detail": {"owns": ["openapi.yaml", "orders migration"], "provides": ["POST /orders", "GET /orders"]}},
+       {"id": "E-01", "label": "Place an order", "group": "running", "detail": {"ACs": ["S1.1", "S1.2"], "sides": "back + front"}},
+       {"id": "E-02", "label": "List orders by day", "group": "running", "detail": {"ACs": ["S2.1"], "sides": "back + front"}},
+       {"id": "E-03", "label": "Cancel an order", "group": "todo", "detail": {"ACs": ["S4.1"]}},
+       {"id": "E-int", "label": "Place, then see it listed", "group": "todo", "detail": {"ACs": ["S3.1"], "needs": "the form of E-01 and the list of E-02"}}
+     ],
+     "edges": [
+       {"from": "C", "to": "E-01"}, {"from": "C", "to": "E-02"}, {"from": "C", "to": "E-03"},
+       {"from": "E-01", "to": "E-int", "label": "ui", "hot": true}, {"from": "E-02", "to": "E-int", "label": "ui"}
+     ]},
+    {"kind": "timeline", "title": "Estimated run", "unit": "min", "play": "Replay",
+     "rows": [
+       {"label": "C · contract", "start": 0, "end": 18, "tone": "ok"},
+       {"label": "E-01", "start": 18, "end": 70, "tone": "hot"},
+       {"label": "E-02", "start": 18, "end": 55},
+       {"label": "E-03", "start": 18, "end": 47},
+       {"label": "E-int", "start": 70, "end": 92, "tone": "warn"}
+     ]},
+    {"kind": "note", "tone": "warn", "text": "E-03 shares the orders table migration with another front; agreed by message: it merges second."}
+  ]
+}

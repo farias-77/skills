@@ -2,10 +2,10 @@
   "name": "pipeline-video-kit",
   "private": true,
   "version": "1.0.0",
-  "description": "Renders a pipeline storyboard JSON into a short video. See schema.md.",
+  "description": "Renders a film (a TSX file on the kit motion library) into a short video. See README.md.",
   "type": "module",
   "scripts": {
-    "check": "node prepare.mjs --check"
+    "check": "node film.mjs check"
   },
   "dependencies": {
     "@react-three/fiber": "9.4.0",

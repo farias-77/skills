@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=1920">
+<title>Decided for you</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=IBM+Plex+Mono:wght@500&display=swap">
+<style>
+  :root { --bg: #0f1115; --panel: #171a21; --ink: #f2f3f5; --mute: #9aa1ad; --accent: #7cc4fa; }
+  html, body { margin: 0; width: 1920px; height: 1080px; overflow: hidden; background: var(--bg); color: var(--ink); font-family: 'Space Grotesk', system-ui, sans-serif; }
+  .slide { width: 1920px; height: 1080px; box-sizing: border-box; padding: 120px 128px; display: flex; flex-direction: column; gap: 56px; }
+  .kicker { font: 500 26px 'IBM Plex Mono', monospace; letter-spacing: 3px; text-transform: uppercase; color: var(--accent); }
+  h1 { margin: 12px 0 0; font-size: 76px; line-height: 1.05; font-weight: 700; letter-spacing: -1.5px; }
+  .pair { flex: 1; display: grid; grid-template-columns: 1fr 1fr; gap: 40px; align-items: center; }
+  .card { padding: 48px; border-radius: 18px; background: var(--panel); border: 2px solid #2a2f3a; }
+  .card.pick { border-color: var(--accent); }
+  .card .k { font: 500 24px 'IBM Plex Mono', monospace; color: var(--mute); text-transform: uppercase; letter-spacing: 2px; }
+  .card.pick .k { color: var(--accent); }
+  .card p { margin: 16px 0 0; font-size: 48px; line-height: 1.15; font-weight: 700; }
+  .card small { display: block; margin-top: 20px; font-size: 32px; color: var(--mute); }
+</style>
+</head>
+<body>
+<div class="slide">
+  <div><div class="kicker">Decided for you · veto if you want</div><h1>One queue, no event bus</h1></div>
+  <div class="pair">
+    <div class="card pick"><div class="k">Picked</div><p>One queue</p><small>Simple now; one consumer.</small></div>
+    <div class="card"><div class="k">Alternative</div><p>An event bus</p><small>Ready for ten consumers we do not have.</small></div>
+  </div>
+</div>
+</body>
+</html>
