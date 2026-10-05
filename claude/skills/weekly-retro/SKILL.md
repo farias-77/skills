@@ -112,5 +112,6 @@ the shas into the board and close it.
 ## Boundaries
 
 This skill changes the pipeline and nothing else: no product code, no
-project standard, no front's folder but the board. Never an edit he
-did not approve.
+project standard, no front's folder but the board. The one exception is
+a lint or test check opened as a PR to the project for his approval,
+as governance.md allows. Never an edit he did not approve.

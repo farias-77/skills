@@ -31,7 +31,7 @@ he rules ──► apply · park · drop ──► fast-forward on the pipeline 
 | fixing something broken | a script that crashes, a stale reference | the agent | applies it; listed on the board for veto |
 | a fix that unblocks a front now | a workflow bug that parks entries | the front's session | another worktree, the smallest change, the repo's tests, fast-forward; a line in `dreaming-notes.md`; ratified at the weekly. **Never** the guard, `authorize.sh`, the hooks or the settings: those wait for his explicit ok |
 | behavior | a step, an agent, a model, a rule | **him** | at the weekly |
-| the project's standards | tests, architecture | **him** | a PR to the project |
+| the project's standards | tests, architecture | **him** | a PR to the project. A new lint or test check the weekly may open itself, for his approval, only with the proof that it fails on a real past commit (the sha and the failing line) |
 | the principles | — | **him** | a conversation of its own |
 
 ## A proposal
