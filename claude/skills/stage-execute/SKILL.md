@@ -203,8 +203,8 @@ hotfix) is merged into `feat`.
    path, it carries the PR link and "approve it on GitHub with your ok"
    (an approval is dismissed by every push, so it comes after the last
    round). It also carries the release authorization line he runs
-   (`! .claude/hooks/authorize.sh release <slug> feat/<slug>@<sha>`) and
-   the release's `/goal`.
+   (`! .claude/hooks/authorize.sh release <slug> feat/<slug>@<sha>`);
+   the release's `/goal` comes from `/stage-release` itself.
 
 His "ok" closes the hands-on: one line in `rulings.md`. Local CI may
 still be running on the last head; the release waits for its green.
@@ -221,7 +221,8 @@ All at once:
    template (the board replayed on a timeline from `run-*.json` and
    `beats.jsonl`). Published on the front's link.
 2. **Telemetry**: `node claude/scripts/telemetry.mjs <slug> --stage
-   execute` reads the runs, beats and commits. Nothing by hand.
+   execute --ws <designs-root>/<slug>` reads the runs, beats and
+   commits. Nothing by hand.
 3. **Cleanup**: every entry worktree and its stack down (`make down`
    removes the images too), the hands-on environment down after the
    video's capture, local `story/<slug>/*` branches, remote

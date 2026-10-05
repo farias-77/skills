@@ -36,7 +36,7 @@ overlap: settle it now, before it is a conflict.
 | `parked: round-cap` | read the blocking items. A clear fix inside the design → **one** resume with a fresh budget, the why on the board. A brief too big → split it in two entries. Product or scope → it waits for him |
 | `parked: gate-red` | the log's failing lines decide: a code fix → one resume; a broken environment → fix the environment, resume; the contract commit is always resumed, it never parks |
 | `parked: machine` | wait for the load, resume with the same check |
-| `parked: user` / `blocked` | a credential or account only he has: it waits for him, everything else goes on. A contradiction in the plan: decide by the design, conservatively, write a fixes file, resume once; `ruled: session` in `rulings.md` |
+| `parked: user` / `blocked` | a credential or account only he has: it waits for him, everything else goes on. A contradiction in the plan: decide by the design, conservatively, write a fixes file, resume once; `ruled: conductor` in `rulings.md` |
 | `interrupted` (rate limit, network) | `resumeFromRunId` after the reset the message names (or 30 minutes); the critical path's entry first, the others 5 minutes later; never a new build. Expect about one per stage |
 | A cloud entry gone silent | `cloud.md`: past its agent's ceiling with no beat → relaunch on a new branch `-r2` from its last commit; once more in the cloud, then local |
 | Another front (or a hotfix) merged into `main` | merge `main` into `feat` between two queue merges (never a rebase), `make restamp`, the affected gate |
