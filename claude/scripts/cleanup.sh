@@ -27,7 +27,8 @@
 # branch, or a worktree with uncommitted changes, is listed as "unmerged"
 # (and counts) until the session passes --discard or --keep for it, from
 # what the user ruled. Remote branches other than story/* and evidence/* are
-# the user's (the ruleset deletes merged ones): listed, never pushed away.
+# the user's (the ruleset deletes merged ones): listed as "his", never pushed
+# away, and never counted, since no agent can remove them.
 set -uo pipefail
 
 usage() { sed -n '6,15p' "$0" | sed 's/^# \{0,1\}//' >&2; exit 2; }
@@ -121,7 +122,7 @@ for r in ${repos[@]+"${repos[@]}"}; do
       story/*)
         if in_list "$b" ${discard[@]+"${discard[@]}"} || merged "$sha"; then found remote "origin/$b" "git -C $(q "$r") push origin --delete $(q "$b")"
         else unmerged remote "origin/$b" "not in $base, or not fetched"; fi ;;
-      *) say his remote "origin/$b (only the user or the ruleset deletes it)"; left=1 ;;
+      *) say his remote "origin/$b (only the user or the ruleset deletes it; name it in the message)" ;;
     esac
   done < <(git -C "$r" ls-remote --heads origin 2>/dev/null)
 

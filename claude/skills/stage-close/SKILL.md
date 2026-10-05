@@ -85,9 +85,11 @@ Start all three in one turn.
 
 **The video for users.** The release dispatched the
 `video-builder (Sonnet 5.5, medium)` at its green staging. Read its
-state: done, rendering (wake when it should end), or never started
-(dispatch it now with `references/user-video.md` and the stories; it
-records in staging). When it returns, check it as that reference says.
+state from the machine: `report/close/video.mp4` exists → done; a
+render of it still running (`pgrep -af 'render.sh.*<slug>'`) → wake
+when it should end; neither → dispatch it now with
+`references/user-video.md` and the stories (it records in staging).
+When it returns, check it as that reference says.
 
 **The retro.**
 1. Dispatch one `scout (Sonnet 5.5, low)` with `templates/harvest.md`
@@ -96,7 +98,7 @@ records in staging). When it returns, check it as that reference says.
    `04-release/trace.md`), and the reviews files. It returns each
    friction with `path:line`, the quote and the time it cost; nothing
    is written to a file.
-2. Run `node claude/scripts/telemetry.mjs <slug>`. It writes
+2. Run `node claude/scripts/telemetry.mjs <slug> --ws <designs-root>/<slug>`. It writes
    `metrics.json`: time, cost and his touches per stage, with `gaps`
    for what it could not measure.
 3. Write `05-close/retro.md` from `templates/retro.md`, as

@@ -40,7 +40,7 @@ Nothing in `rulings.md` about it: keep it, and say so in the retro.
 |---|---|
 | staging actors created for the video | the project's staging-actor command, delete, for this front's actors |
 | cloud sessions the front launched | none still running (the execute's list of cloud runs) |
-| remote `feat/` or `hotfix/` branches still there | the ruleset deletes merged branches; one left is listed as `his`: name it in the message |
+| remote `feat/` or `hotfix/` branches still there | the ruleset deletes merged branches; one left is listed as `his` (it does not count against the empty `--check`): name it in the message |
 
 ## The proof
 
