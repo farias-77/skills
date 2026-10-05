@@ -36,10 +36,22 @@ he rules ──► apply · park · drop ──► fast-forward on the pipeline 
 
 ## A proposal
 
+A lesson becomes a proposal only past four filters; a "no" drops it
+with its code: **F1** will it still matter in six months? · **F2** does
+it change a future decision? · **F3** would no mechanism already catch
+it? · **F4** is it not written already? (written and still missed: the
+problem is execution, not the text). A class counts once seen twice.
+
 - **What changes in practice**, one plain sentence.
 - **The evidence:** the fronts that hit it, a quote, the minutes or the
   cost it took.
 - **The edit:** the file and the exact change.
+- **The level**, the strongest that holds the lesson: architecture (the
+  wrong thing cannot be written) → a type → a lint or CI check whose
+  error names the fix → a test → text, last (nothing fails when an
+  agent skips a sentence). Why not one level up, in one line. A new
+  check proves it fails on a real past commit; once it lands, the text
+  it replaces goes.
 - **The number it should move:** time, cost or his touches. The next
   boards show whether it did.
 

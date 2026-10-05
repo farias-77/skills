@@ -24,6 +24,7 @@
 - **Evidence:** <fronts> · "<quote>" · <minutes or cost>
 - **His notes:** "<[user] words, verbatim>" \| none
 - **Edit:** `<file>`: <the exact change>
+- **Level:** architecture \| type \| lint or CI \| test \| text · why not one up: <one line>
 - **Moves:** <time \| cost \| touches> · **Costs:** <what it adds, or what it removes>
 - **Ruling:** apply \| park \| drop · "<his words>"
 
