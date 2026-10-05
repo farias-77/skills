@@ -31,8 +31,9 @@ versioned and rolled back.
 
 The week is ISO (`YYYY-Www`), Monday to Sunday: the one given, or the
 one that just ended. A front belongs to it when its `.state.md` says
-`closed` with a date inside the week. Short routes and hotfixes count
-(their record is `close.md`). The boards live in
+`closed` and the "Closed:" date of its `05-close/retro.md` falls inside
+the week. Short routes and hotfixes count (their record is `close.md`,
+with the same line). The boards live in
 `<designs-root>/_retros/`; the pipeline repo is the one this skill is
 installed from.
 
