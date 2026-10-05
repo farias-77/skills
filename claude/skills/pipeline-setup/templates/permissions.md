@@ -1,155 +1,143 @@
-# Permissions — notes on `settings.json` and the guard
+# Permissions — notes on `settings.json`, the guard and the authorization
 
 `settings.json` (beside this file) is the `.claude/settings.json` for a
-pipeline run. Its PreToolUse hook is the pipeline's own guard,
-`claude/hooks/guard-irreversible.sh`, copied to `.claude/hooks/`;
-`claude/hooks/tests/guard-irreversible.test.sh` checks it. There is one
-guard: setup installs it, release relies on it. JSON has no comments,
-so each rule's reason is here.
+pipeline run (role 14 of `docs/project-contract.md`). JSON has no
+comments, so each rule's reason is here.
 
 ## Where they go: every directory a session opens in
 
 Claude Code loads `.claude/settings.json`, and the hooks it registers,
-from the directory the session opens in (its project directory), not
-from the repository a command later touches. A guard installed only in
-the product repository does not guard a session opened above it.
+from the directory the session opens in, not from the repository a
+command later touches.
 
-| Layout | Install the settings and the guard in |
+| Layout | Install the settings, the guard and `authorize.sh` in |
 |---|---|
-| one repository: `CLAUDE.md`, the doctrine and the product together | that repository |
-| two roots: `CLAUDE.md`, the doctrine and `.claude/skills/` in a root repository, the product in a child repository | the root (the pipeline's sessions open there), and also the product repository when sessions open there too |
+| one repository | that repository |
+| two roots: `CLAUDE.md`, the standards and `.claude/skills/` in a root, the product in a child repository | the root, and the product repository too when sessions open there (a cloud entry always does) |
 
-The rules are written for the session's directory: at the root, a
-command into the product names it (`git -C <product> …`,
-`make -C <product> …`), so the allow rules carry that form. Each copy is
+At the root, a command into the product names it (`git -C <product> …`,
+`make -C <product> …`); the allow rules carry that form. Each copy is
 committed in its own repository, on that repository's setup branch.
 
-## The comment rule
+## What to copy
 
-The guard and its test are the pipeline's files, copied verbatim and
-updated from the pipeline: they keep their header comments. When the
-project's doctrine or a linter forbids comments in code, that rule
-excludes `.claude/hooks/`, written where the rule is.
+| From the pipeline | To | Why |
+|---|---|---|
+| `claude/hooks/guard-irreversible.sh` | `.claude/hooks/`, `chmod +x` | the guard |
+| `claude/hooks/authorize.sh` | `.claude/hooks/`, `chmod +x` | the user's authorization lines; the guard denies it to agents |
+| `claude/hooks/tests/guard-irreversible.test.sh` | `.claude/hooks/tests/` | proves the copy, with the project's own rules added as cases |
+
+All three keep their header comments. A standards rule against code
+comments, or a linter that enforces one, excludes `.claude/hooks/`, in
+the same commit.
 
 ## Replace the placeholders
 
-The `make …` targets and `./scripts/local-ci.sh` are placeholders for the
-commands the doctrine names. Replace each with the project's own:
+The `make …` targets and `tooling/local-ci` stand for the commands the
+project's commands table names:
 
-| Placeholder | Role (`docs/project-contract.md`) |
+| Placeholder | Role |
 |---|---|
-| `make ci` | the gate (3) |
-| `make check`, `make test`, `make test-affected` | fast check, focused tests, affected tests (4) |
-| `make structure-check` | the structure check (7) |
-| `make evidence` | the evidence command (6) |
-| `make stack-up`, `make stack-env`, `make stack-down`, `make migrate-local` | the stack per worktree (5) |
-| `./scripts/local-ci.sh` | the local-CI signoff (13) |
-| `make deploy-staging`, `make deploy-prod`, `make migrate-prod`, `make migrate-down` | release roles (11) |
-| `env.GUARD_PROTECTED` | the branches besides `main`, `master`, `production` and `prod` that take changes only through a pull request (a staging or alpha branch the doctrine names), comma separated; delete the key when there are none |
+| `make check` | the fast check (3) |
+| `make test-affected` | the entry gate (4) |
+| `make verify` | the whole gate (5) |
+| `tooling/local-ci` | the signoff command (6); `claude/scripts/local-ci.sh` when the project has none |
+| `make floor` | the floor (7) |
+| `make up`, `make env`, `make down`, `make sweep` | the stack per worktree and the sweep (8) |
+| `make restamp` | migrations (9) |
+| `make staging-actor` | the staging actors (13) |
+| `rollback.yml` | the rollback workflow (12) |
 
-A project whose deploys run only in hosted CI on a merge drops the deploy
-lines: the merge is the deploy, and the guard already holds the merge.
-
-**Dead rules are pruned, not left in.** After filling, every rule that
-names a target is probed with the runner's dry run: `make -n <target>`
-(or `just --dry-run <recipe>`, `task --dry <task>`, the `scripts` key of
-`package.json`), run in the repository the rule reaches. A target the
-probe does not find is removed from every list, and the readiness file
-lists what was removed. A deny rule for a command the project does not
-have is removed too: the guard already denies its class.
-
-`env.GUARD_PROTECTED` is how the guard learns the project's other
-protected branches without the allow file, which is the user's alone.
-The settings are an agent-unwritable file too (the guard denies the
-write), so the value holds like the allow file's `protected` lines.
+**Dead rules are pruned.** Every rule that names a target is probed
+with the runner's dry run (`make -n <target>`, or the project's
+equivalent) in the repository it reaches; a target not found is removed
+and the readiness file lists it.
 
 ## The three lists
 
-**allow** — what the stages run all day without a prompt: the gate and
-its parts, the stack, read-only `git` and `gh`, commits and pushes of
-feature branches, opening pull requests, the staging deploy, and, for the
-autonomous release, the merge into `main` and the production deploy and
-migration. The merge is allowed because the guard checks it: it asks
-whenever the head is not the one the user's play authorized. Keep each
-rule as narrow as the command: `Bash(make ci)`, never `Bash(make *)`.
-A broad allow rule (`Bash(gh *)`, `Bash(terraform *)`, `Bash(gcloud *)`)
-covers an irreversible command too.
+**allow** — what the stages run all day: the gates, the stack, the
+signoff command, read-only `git` and `gh`, commits and pushes of
+`feat/*`, `fix/*`, `story/*` and `evidence/*`, deleting remote
+`story/*` and `evidence/*` (the guard allows no other deletion), a `v*`
+tag push, `gh pr merge`, re-running a run, the rollback workflow. The
+merge and the tag sit in allow because the guard checks each against
+his authorization line. Keep each rule as narrow as the command: a
+broad `Bash(gh *)` or `Bash(gcloud *)` covers an irreversible command
+too. Nothing allows a push to `main`.
 
-**ask** — what still stops for the user's click: re-running a deploy
-workflow, a release, writing a secret, `terraform apply`.
+**ask** — what still stops for his click: writing a secret,
+`terraform apply`.
 
-**deny** — what no stage runs: force-push, deleting a remote branch,
-pushing to `main`, `--admin` merges, deleting a repo or a release,
-`terraform destroy` and state surgery, deleting a bucket, dropping a
-database, migrating down; reading `.env` and secrets; editing the
-settings and the hooks; posting a commit status directly
-(`gh api *statuses*`), so the only signoff is the one `local-ci.sh`
-posts after it ran the gate.
+**deny** — force-push, `--admin` merges, deleting a repository,
+creating or deleting a release (the CI creates it after the watch),
+`terraform destroy`; any commit status by hand (`gh api *statuses*`:
+only the signoff command posts); **reading credentials**: `.env`,
+`secrets/`, `~/.config/gh/`, `~/.config/gcloud/` and the CI token
+(`~/.config/local-ci/`, or wherever the signoff command keeps it);
+editing the settings and the hooks.
 
-Rules match the start of the command and its wildcards; they are not a
-security boundary on their own: one reordered flag or a `bash -c`
-escapes a prefix. That is why the hook exists.
+Rules match prefixes and are not a boundary on their own: one
+reordered flag or a `bash -c` escapes them. That is why the hook
+exists.
 
 ## The guard hook
 
-`guard-irreversible.sh` reads the whole tool call (stdin JSON) for Bash
-and for every file tool, so `bash -c`, a full binary path or a chained
-command is caught too. It decides one of three things:
+Registered on `Bash|Edit|Write|MultiEdit|NotebookEdit` with timeout 60
+through a **fail-closed wrapper**: when the guard file is missing or
+not executable, the wrapper exits 2 and every call is blocked. The
+guard reads the whole tool call:
 
 - **deny** — destroying infrastructure; deleting data, databases or
-  buckets; force-push, pushing a deletion, a mirror or `--all`; pushing
-  straight to a protected branch; merges that bypass protection
-  (`--admin`, the merge API); forging a commit status; any agent write
-  to the guard, its allow file or the settings;
-- **ask** — writing or reading a secret's value; a merge into a
-  protected branch whose head the play did not authorize, or that the
-  guard cannot resolve;
-- **nothing** — the settings' rules decide.
+  buckets; force-push, a mirror, `--all`, a refspec push (`src:dst`,
+  which makes `git push origin a:b` the canary); pushing to a protected
+  branch; deleting any remote branch but `story/*` and `evidence/*`; a
+  merge into a protected branch or a `v*` tag that no live
+  authorization covers; a status, ref, tag or release written through
+  the API; switching the agent's identity or printing its credentials;
+  reading the CI token; any agent write to the guard, `authorize.sh`,
+  the allow file or the settings;
+- **ask** — writing or reading a secret's value; a merge the guard
+  cannot resolve (GitHub silent for 20 s);
+- **nothing** — the rules decide.
 
-It fails closed: input it cannot read blocks. A hook's decision holds in
-every permission mode, before the rules. `--self-test` runs a few
-samples; the test file runs every case.
+Input it cannot read, and any internal error, blocks. `--self-test`
+runs a few samples; the test file runs every case. Add the project's
+own irreversible commands under `PROJECT RULES` in the copy, each with a
+test case.
 
-- **Project rules.** Add the project's own irreversible commands under
-  `PROJECT RULES` in the copy (a production database name, a wipe
-  script) and a case for each in the copied test; run the test.
-- **The allow file.** `.claude/hooks/irreversible.allow`, written by the
-  user himself (a `!` command), never by an agent. One entry per line:
-  a command verbatim (that exact string passes, for an irreversible
-  step the release plan names); `merge-from <sha>` (a merge whose head
-  is that sha or descends from it: the play's line, which covers the
-  release's own fixes); `merge-head <sha>` (exactly that head);
-  `protected <branch>` and `default-branch <branch>` (`main`, `master`,
-  `production` and `prod` always are). The release stage's
-  `references/permissions.md` says how the play writes it and how the
-  close removes the workstream's lines.
-- **False positives.** A commit message that mentions "drop table"
-  is denied too; the agent rewords it. A project whose doctrine runs
-  down-migrations on the local stack narrows that line to its
-  production target.
+## The allow file and the authorization lines
 
-## Two postures for release
+`.claude/hooks/irreversible.allow`, written only by the user (a `!`
+command), never by an agent. One entry per line:
 
-| Posture | `gh pr merge`, prod deploy | Safe because |
-|---|---|---|
-| **autonomous** (the template's default, role 18) | **allow** | branch protection requires the `local-ci` signoff, so `main` takes only a head the whole gate passed; the guard asks on any head the play did not authorize and denies the irreversible |
-| **supervised** | moved back to **ask** | the user clicks each one |
+| Line | Meaning |
+|---|---|
+| a command, verbatim | that exact command passes |
+| `protected <branch>` | one more protected branch (`main`, `master`, `production`, `prod` always are) |
+| `default-branch <branch>` | the repository's default branch, protected too |
+| `auth <route> <slug> merge=<branch>[@<sha>] tag=<0\|1> until=<UTC>` | written by `authorize.sh` |
 
-The autonomous posture holds only once the signoff is required on
-`main` (see `local-ci.md`). Until he sets that protection, setup moves
-the three rules back to **ask** and says why. When the doctrine names
-another check as the one `main` requires (the hosted CI's aggregate),
-requiring `local-ci` is a doctrine ruling first: the plan lists it as
-his, with the doctrine lines it changes.
+He authorizes a front with one of:
 
-## The limits that sit outside the session
+```
+! .claude/hooks/authorize.sh release <slug> feat/<slug>@<sha>   # the head he said ok to, its fix/<slug>/* PRs, one v* tag
+! .claude/hooks/authorize.sh short   <slug> feat/<slug>         # one merge, one patch tag
+! .claude/hooks/authorize.sh hotfix  <slug> hotfix/<slug>       # one merge and a revert/* PR, one patch tag
+! .claude/hooks/authorize.sh legacy  <repo> <branch>            # one merge in that repository, no tag
+```
 
-The settings and the hook guard the session. The real boundary is
-outside it, and setup lists it for the user:
+The guard marks `merged=<sha>` when it lets a merge through and
+`used=<tag>` when it lets the tag through; after the tag the line is
+dead. Lines expire in 3 days. After a production rollback the fix's
+new production deploy needs a new line: his word, by construction.
 
-- branch protection or a ruleset on `main`: pull requests only, the
-  signoff required, no force-push, no deletion;
-- the cloud identity the agent uses can deploy and read, not delete
-  data or change IAM;
-- secrets are written by the user (a `!` command), never read by an
-  agent.
+## The limits outside the session
+
+The settings and the hook guard the session; the boundary is outside
+it, and setup lists it for the user with ready commands:
+
+- `main`'s ruleset: pull requests only, `local-ci` required, no
+  force-push, no deletion; `CODEOWNERS` on the gate paths only;
+- the agents run as a bot GitHub identity and a cloud identity that
+  reads production and holds a staging-only role (role 15);
+- secrets are written by the user, never read by an agent.

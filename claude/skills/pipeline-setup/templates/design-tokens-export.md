@@ -8,11 +8,11 @@ they never drift:
 
 | File | What it holds | Read by |
 |---|---|---|
-| `design/export/tokens.css` | every token as a CSS custom property on `:root`, plus the dark theme under `[data-theme="dark"]` (or `@media (prefers-color-scheme: dark)`) | the prototyper inlines it as is |
-| `design/export/tokens.json` | the same tokens as data: `{ "color": { "bg": "#fff", ... }, "space": {...}, "radius": {...}, "font": {...}, "shadow": {...}, "motion": {...} }` | the prototype checker and the UX reviewer compare against it |
-| `design/export/components.md` | the core components: name, the props that change its look, the states, the source path, and a screenshot path per state | the prototyper copies the shapes; the builder finds the real component |
+| `design/export/tokens.css` | every token as a CSS custom property on `:root`, plus the dark theme under `[data-theme="dark"]` (or `@media (prefers-color-scheme: dark)`) | the prototype-builder inlines it as is |
+| `design/export/tokens.json` | the same tokens as data: `{ "color": { "bg": "#fff", ... }, "space": {...}, "radius": {...}, "font": {...}, "shadow": {...}, "motion": {...} }` | the mock's checks compare against it |
+| `design/export/components.md` | the core components: name, the props that change its look, the states, the source path, and a screenshot path per state | the prototype-builder copies the shapes; builder-frontend finds the real component |
 
-The doctrine names the export command (for example `make design-export`)
+The commands table names the export command (for example `make design-export`)
 and the folder. Commit the output: the pipeline reads files, never
 builds the app to find a color.
 
@@ -90,9 +90,9 @@ every component in every state. Light and dark, at 1x.
 
 - The export command runs in the gate's "generated code is up to date"
   check, so a token change without a re-export fails the gate.
-- The doctrine's frontend document names `design/export/` as the
+- The standards' frontend document names `design/export/` as the
   prototype's source.
-- Discovery's recon passes the three files to the prototyper; the mock
+- Discovery's recon passes the three files to the prototype-builder (Sonnet 5.5, medium); the mock
   inlines `tokens.css` and copies the component shapes.
 
 ## What it costs

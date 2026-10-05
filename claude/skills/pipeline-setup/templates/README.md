@@ -5,16 +5,16 @@ reads this file before it applies one; nothing here is copied.
 
 ## Rules for every template
 
-- **No code comments.** Many doctrines forbid comments in code, so the
+- **No code comments.** Many projects' standards forbid comments in code, so the
   scripts ship without them: usage is printed by the code
   (`--help`), and the explanation lives in the tool's own document
-  copied beside it (`local-ci.md`, `structure-check/README.md`). The
+  copied beside it (`structure-check/README.md`). The
   only `#` lines kept are shebangs.
 - **The guard is the exception.** `guard-irreversible.sh` and its test
   are the pipeline's files, copied verbatim and updated from the
-  pipeline, so they keep their header. When the project's doctrine (or
+  pipeline, so they keep their header. When the project's standards (or
   a linter) enforces a no-comment rule, that rule must exclude
-  `.claude/hooks/`: the role-12 step adds the exclusion where the rule
+  `.claude/hooks/`: the role-14 step adds the exclusion where the rule
   is written, in the same commit.
 - **No placeholder survives.** Every `<…>` is replaced with what the
   audit found, or the line is deleted. A value not known yet is written
@@ -22,7 +22,7 @@ reads this file before it applies one; nothing here is copied.
   station lacks"), never as a token to fill later. Step 4 greps for
   leftovers.
 - **The project's language.** A document goes in the language its
-  neighbours are written in (the feature maps, the doctrine); a script
+  neighbours are written in (the feature maps, the standards); a script
   goes in the language the repo's own tooling uses, where its lint and
   formatting already apply. The templates are English and bash, Python
   and Node; translating them is part of applying them.
@@ -34,11 +34,11 @@ measures a diff against. One section per kind of unit; each names ONE
 exemplar that exists in the code at the audited sha and says what to
 copy from it.
 
-- **Fill it after the structure check is calibrated** (role 7): its
+- **Fill it after the structure check is calibrated** (role 17): its
   size line quotes the p95/p99 that the calibration writes.
 - **Pick the exemplar by a rule, and write the rule**: the most recent
   module that passes the gate with no structure warning; the one the
-  doctrine cites; the one the team points new people at. Never the
+  standards cite; the one the team points new people at. Never the
   biggest.
 - **Verify it at the audited sha**, not in a research note or another
   branch: `git ls-tree -r --name-only <sha> -- <path>` lists it, and
@@ -52,7 +52,7 @@ copy from it.
   error handling, the test shape. A pointer and a reason, not a
   tutorial.
 - A kind the codebase does not have yet: "none — the plan's foundation
-  builds the first one in the doctrine's full shape".
+  builds the first one in the standards' full shape".
 - Keep it under ~150 lines. The weekly retro re-reads it; when an
   exemplar drifts, it is replaced.
 
@@ -71,8 +71,8 @@ TypeScript project):
 
 ## verify-map.md
 
-A section appended to each feature map (the file the doctrine names for
-the feature). The QAs, the release smoke and the footage recorder
+A section appended to each feature map (the file the standards name for
+the feature). The QAs, the release smoke and the users' video
 read it to reach and drive the feature without rediscovering the path.
 
 - **Written in the feature maps' language**: the headings, the row
@@ -93,15 +93,15 @@ its compose file and its browser tool use):
 
 | Template | Goes to | Fill |
 |---|---|---|
-| `cloud-setup.sh` | the doctrine's tooling folder (pasted into the environment's setup script) | `<toolchain-installs>`: only what the base image lacks or has at another version; `<marker-file>`: a file only this repository has; `<dependency-warmup>`: the lockfile installs (`go mod download`, `pnpm fetch`); `<image-warmup>`: the stack's pulls and builds; `<browser-install>`: the browser tool's install at its pinned version, or the pull of the pinned browser image |
-| `cloud-session-start.sh` | `.claude/hooks/` | `<default-branch>`; `<dependency-install>`: the offline-first installs from the warm caches; `<stack-up>` and `<stack-env-summary>`: the doctrine's stack-up and env commands |
-| `cloud-settings.json` | merged into `.claude/settings.json` (lists unioned, never overwritten) | the doctrine's commands in place of each `<…>` |
-| `cloud-env.md` | beside the doctrine | the environment's fields, the env var names with their test-only values, the allowlist with a reason per host, the checks with their output |
+| `cloud-setup.sh` | the project's tooling folder (pasted into the environment's setup script) | `<toolchain-installs>`: only what the base image lacks or has at another version; `<marker-file>`: a file only this repository has; `<dependency-warmup>`: the lockfile installs (`go mod download`, `pnpm fetch`); `<image-warmup>`: the stack's pulls and builds; `<browser-install>`: the browser tool's install at its pinned version, or the pull of the pinned browser image |
+| `cloud-session-start.sh` | `.claude/hooks/` | `<default-branch>`; `<dependency-install>`: the offline-first installs from the warm caches; `<stack-up>` and `<stack-env-summary>`: the stack-up and env commands of the commands table |
+| `cloud-settings.json` | merged into `.claude/settings.json` (lists unioned, never overwritten) | the commands table's commands in place of each `<…>` |
+| `cloud-env.md` | beside the standards | the environment's fields, the env var names with their test-only values, the allowlist with a reason per host, the checks with their output |
 
 Measure the setup script once, uncached: each step prints its elapsed
 seconds. Over about five minutes the snapshot is not cached and every
 session pays it; move the slowest step to the hook only if it is per
 branch, otherwise trim it (fewer images, one browser). The pipeline is
 vendored with it: `.claude/pipeline/` holds `workflows/`, `agents/` and
-the `skills/pack-*` folders the agents read, copied from a tag of the
+the `skills/` folders the agents read, and `references/`, `scripts/` and `hooks/`, copied from a tag of the
 pipeline repository, with a `VERSION` file naming the tag and its sha.

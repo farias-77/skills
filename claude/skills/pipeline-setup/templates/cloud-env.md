@@ -3,14 +3,14 @@
 Role 20 of the pipeline's bar. Stage 4 runs each entry in its own
 Claude Code cloud session from this repository; this file is what the
 environment at claude.ai/code holds and where each piece lives. Kept
-in the repository beside the doctrine; the values typed at claude.ai
+in the repository beside the standards; the values typed at claude.ai
 are the ones below, never others.
 
 ## The environment at claude.ai/code
 
 | Field | Value |
 |---|---|
-| Name | `<environment-name>` (the doctrine names it) |
+| Name | `<environment-name>` (the commands table names it) |
 | Repository | `<owner>/<repo>`, alone: a multi-repository session does not load `.claude/settings.json` |
 | Setup script | the contents of `<path>/cloud-setup.sh`, pasted; re-pasted whenever that file changes |
 | Network | Custom: the Trusted defaults plus the hosts below |

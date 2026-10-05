@@ -2,627 +2,425 @@
 
 The pipeline is generic. It does not know the stack, the layout or the
 taste of the project that uses it: every agent reads them from the
-consuming project. This file is the bar the project meets, written as
-**roles**, never as a language, a framework, a command or a folder.
-The project's `CLAUDE.md` names its engineering doctrine; the
-doctrine names the command, the file or the folder that fills each
-role. Agents run what the doctrine names. The examples in agent
-prompts and in this file are illustrations, never the rule.
+project. This file is the bar the project meets, written as **roles**.
+The project's `CLAUDE.md` names its standards and carries a **commands
+table**: one row per role below, with the command, file or folder that
+fills it. Agents run what that table names. The command names in this
+file (`make check`, `make verify`) are examples, never the rule.
 
-In a two-root layout (a session root holds `CLAUDE.md`, the doctrine
+In a two-root layout (a session root holds `CLAUDE.md`, the standards
 and `.claude/skills/`; the product repositories sit beside or under
-it) the product repositories need no `CLAUDE.md` of their own: the
-session root's `CLAUDE.md` and the doctrine's contract table (one row
-per role of this file, with the command, file or folder that fills
-it) are the source every stage reads.
+it) the session root's `CLAUDE.md` is the source every stage reads.
 
 `/pipeline-setup <path-to-project>` audits a project against this bar,
-writes `pipeline-readiness.md` on a setup branch of it (✓ present · ✗
-missing · ~ partial, each with its evidence), proposes the cheapest order to close
-the gaps, and applies the generic pieces on a branch when the user
-says so ([the skill](../claude/skills/pipeline-setup/SKILL.md)).
+writes `pipeline-readiness.md` on a setup branch (✓ present · ~
+partial · ✗ missing, each with its evidence), proposes the cheapest
+order to close the gaps, and applies the generic pieces on that branch
+when the user says so ([the skill](../claude/skills/pipeline-setup/SKILL.md)).
 
 ## The three levels
 
 | Level | What it buys | Without it |
 |---|---|---|
-| **Required** | the six stages run end to end without a human between the gates | a stage halts at its pre-flight and names the missing role |
-| **Recommended** | the stages run fast and the output looks and behaves like the product | the stage runs, slower or plainer, and the retro lists the gap |
-| **For the full experience** | release without a stop, parallel width past one machine, the launch video | the stage falls back to the plain path and says so |
+| **Required** | the stages run end to end without a human between the gates | a stage halts at its open or its pre-flight and names the missing role |
+| **Recommended** | the stages run faster and the output looks like the product | the stage runs, slower or plainer, and the retro lists the gap |
+| **Full experience** | every entry in its own cloud VM, as wide as the plan | entries run on the station |
 
 ## The roles at a glance
 
 | # | Role | Level | Used by |
 |---|---|---|---|
-| 1 | Doctrine folder and its index | required | every stage |
-| 2 | Golden paths file | required | design, plan, execute, weekly |
-| 3 | The gate, run locally | required | execute, release |
-| 4 | The fast check, focused tests, affected tests | required | plan, execute |
-| 5 | Stack up / env / down per worktree, with test actors | required | discovery, plan, execute, release |
-| 6 | The evidence command | recommended | release, close |
-| 7 | The structure check and its comparison | required | close, weekly |
-| 8 | The shared files list | required | plan, execute |
-| 9 | Feature maps | required | discovery, design, plan, execute |
-| 10 | A browser-drivable app | required when the product has screens | execute, release, close |
-| 11 | Release roles: environments, deploy, rollback | required | release |
-| 12 | Permission settings and the guard hook | required | execute, release |
-| 13 | Local-CI signoff that main accepts | required | execute, release |
-| 22 | The mock toolchain, on the station | required | discovery |
-| 23 | The smoke: the journey command against a URL | required | release |
-| 14 | The verify map inside each feature map | recommended | execute, release, close |
-| 15 | Design tokens and components, exported | recommended | discovery, execute |
-| 16 | Observability as code: log metrics, alarms, runbooks | recommended | design, execute, release |
-| 17 | Parallelism capacity, measured | recommended | execute |
-| 24 | A gate sized to the change | recommended | plan, execute |
-| 18 | Autonomous release permissions | full experience | release |
-| 19 | Progressive delivery | full experience | release |
+| 1 | Standards and the commands table | required | every stage |
+| 2 | Golden paths | required | design, plan, execute |
+| 3 | The fast check | required | execute |
+| 4 | The entry gate, sized to the change | required | plan, execute |
+| 5 | The whole gate, run locally | required | execute, release |
+| 6 | The signoff command and the `local-ci` status | required | execute, release, lets-cook |
+| 7 | Gate paths and the floor | required | execute, release |
+| 8 | A stack per worktree, test actors, the sweep | required | discovery, execute, close |
+| 9 | Shared files and migrations | required | plan, execute, release |
+| 10 | Feature maps, with how to drive each feature | required | every stage |
+| 11 | A browser-drivable app | required with screens | execute, release, close |
+| 12 | Delivery: staging, production on a tag, watch, rollback | required | release |
+| 13 | The smoke and the staging actors | required | release, close |
+| 14 | Permissions, the guard and the authorization | required | every stage |
+| 15 | Agent identities | required | execute, release |
+| 16 | The station's toolchain | required | discovery, every report |
+| 17 | The house lint and the structure check | recommended | execute, weekly |
+| 18 | Design tokens and components, exported | recommended | discovery, execute |
+| 19 | Observability as code | recommended | design, release |
 | 20 | A cloud environment for entries | full experience | execute |
-| 21 | The video toolchain | full experience | the discovery, design and plan reports, close |
 
 ---
 
 ## Required
 
-### 1 · The doctrine folder and its index
+### 1 · Standards and the commands table
 
-**What it is.** A folder of documents that is the bar every builder
-writes to and every reviewer measures against, and one index file that
-says which document holds what. The project's `CLAUDE.md` names the
-folder. The doctrine covers, in whatever files it chooses:
+**What it is.** A folder of short standards (architecture, backend,
+frontend, code, testing, security and data, delivery), each rule with
+an id a reviewer can cite, plus an index; and in `CLAUDE.md` the
+commands table that names the command, file or folder of every role
+here, the worktrees root, and whether a cloud environment exists.
 
-| Topic | What it fixes |
-|---|---|
-| architecture | where code runs, the modules and how they talk, what the shape grows into |
-| backend | how a server-side feature is organized: modules, layers, persistence, contracts, jobs |
-| frontend | how a screen is organized: routes, features, state, components, the visual direction |
-| code | the rules of the diff, including what the guard rejects mechanically and what a workaround is |
-| testing | the test layers, what each proves, the coverage bar, the rules of a good test |
-| local development | the commands of roles 3–7 and how a stack is isolated per worktree |
-| delivery | the branches, what runs on each, the environments, deploy and rollback (role 11) |
-| sides | which folders are the server side and which the screen side |
+**Why.** The pipeline carries no taste of its own. A reviewer's
+finding blocks on a `rule` basis only when it cites a written rule.
 
-**Why.** The pipeline carries no taste of its own. A reviewer's finding
-blocks only when it names a written rule it violates, so a rule that is
-not written cannot block.
+**How the stages use it.** Design applies it and never reopens it; a
+change to it is his question. The builders write to it, the reviewer
+cites it by id, the weekly retro sends standards changes to him as a
+PR in the project.
 
-**How the stages use it.** Design applies it and never reopens it; plan
-cuts entries along its sides; the builder writes to it; the reviewers
-cite it by `path:line`; the weekly retro turns repeated lessons into
-doctrine lines. A gate failure is attributed to the side whose folder
-it is in.
+### 2 · Golden paths
 
-### 2 · The golden paths file
-
-**What it is.** A short file naming the exemplary unit to copy for
-every kind of code: a server module, an endpoint, a job, a screen, a
-component, a migration, and a test of each layer. Each line is a path
-and one sentence on what to copy from it. A kind the codebase does not
-have yet says "none"; the plan's foundation builds its first exemplar.
-Template: [golden-paths.md](../claude/skills/pipeline-setup/templates/golden-paths.md).
+**What it is.** A short file naming one exemplar per kind of code (a
+server module, an endpoint, a job, a screen, a component, a migration,
+a test per layer), each a path and one sentence on what to copy. A
+kind the codebase lacks says "none"; the contract commit builds the
+first. Template: [golden-paths.md](../claude/skills/pipeline-setup/templates/golden-paths.md).
 
 **Why.** Parallel builders converge on one shape only when one shape is
-named. Without it, five entries of the same kind write five shapes.
+named.
 
-**How the stages use it.** Design reads it in recon. The plan's scouts
-(`scout (Sonnet 5.5, low)`) quote the commands, the generators' output
-paths and the golden path of each kind into the recon, and every brief
-names the golden path of each kind it adds. `builder (Opus
-5.5, medium)` starts a new unit from it; `reviewer (Opus 5.5, high)`
-blocks on a departure only where it is written as a rule. Stage 4
-halts at its pre-flight without it.
+**How the stages use it.** The plan's scouts quote the golden path of
+each kind; every brief names it; the builders start from it.
 
-### 3 · The gate, run locally
+### 3 · The fast check
 
-**What it is.** One command that runs everything the CI runs, locally
-and identically: the guard, lint, contract and generated-code checks,
-all tests, coverage, builds, the structure check, the journeys. Exit 0
-or not. It runs in any worktree, against that worktree's own stack.
+**What it is.** One command (`make check`): lint, types, the house
+lint, the unit tests. No Docker, about a minute, run in parallel
+internally.
 
-**Why.** Execution runs many entries at once, each in its own worktree,
-and cannot wait for a hosted CI queue on every round. A gate that
-differs from CI lets a green entry turn red at merge.
+**Why.** The builders loop on it dozens of times per entry.
 
-**How the stages use it.** Plan fixes the gate commands once in
-`plan.md`; `exec-gate (Sonnet 5.5, low)` runs them once per builder pass; the
-execute session runs the whole gate once on the feature branch at the
-end; release reads its result before the first merge. How much the
-per-entry gate runs, against the whole gate, is role 24.
+**How the stages use it.** `builder-backend` and `builder-frontend
+(Opus 5.5, medium)` loop on it; it is the first step of the entry gate;
+C, the contract commit, proves itself with it green on the stubs.
 
-### 4 · The fast check, focused tests and affected tests
+### 4 · The entry gate, sized to the change
 
-**What it is.** Three commands under the gate.
+**What it is.** The fast check plus the **affected tests** against a
+base (`make test-affected base=<ref>`): the tests of what the diff
+touched and of what depends on it, chosen from the real import graph
+with a whole-suite fallback, printing what it chose and why. Sized: one
+primary browser width plus the specs tagged width-aware, evidence
+capture off unless a flag turns it on, the server suites once. A
+non-UI file (a build file, a lint config) selects no screen tests; the
+lockfile selects the whole suite only on a runtime or test-runner
+dependency. Under 5 minutes is the aim.
 
-| Command | What it does |
+**Why.** Every entry runs it once per builder pass, many entries at
+once. Running the whole gate each time multiplies the clock.
+
+**How the stages use it.** The plan copies it into `plan.md`;
+`exec-gate (Sonnet 5.5, low)` runs it once per pass; the merge queue
+runs it on the merged tree (skipped when the base has not moved since
+the entry's green gate).
+
+### 5 · The whole gate, run locally
+
+**What it is.** One command (`make verify`) that runs everything:
+every lint, the contract and generated-code checks, every suite at
+every width, coverage, builds, the infrastructure scans, the journeys.
+Exit 0 or not. It runs in any clean worktree against that worktree's
+own stack, on the station or a cloud session VM.
+
+**Why.** There is no hosted CI gate: this command is the gate.
+
+**How the stages use it.** The signoff command (role 6) runs it once on
+the top of `feat/<slug>` while he uses the app, and again after each
+`A.n` or `X.n` push.
+
+### 6 · The signoff command and the `local-ci` status
+
+**What it is.** A command the project names (`tooling/local-ci <sha>`,
+or the pipeline's fallback
+[`claude/scripts/local-ci.sh`](../claude/scripts/local-ci.sh)) that
+runs the whole gate in a fresh worktree at one pushed sha and, **only
+on exit 0**, posts the commit status **`local-ci`** on that sha under
+the **bot identity** (role 15). It has a `--dry-run` that posts
+nothing; without the bot's token it exits 3 ("green, not posted"). The
+token is readable by that command alone: the guard and the settings
+deny agents any read of it.
+
+`main`'s ruleset requires `local-ci`, pull requests only, no
+force-push, no deletion. Hosted CI keeps only what needs GitHub: the
+deploys on `main` and on tags, the environments.
+
+**Why.** A local run of the same commands costs no CI minutes; the
+status makes the claim checkable; a status only the gate can post
+cannot be forged by an agent.
+
+**How the stages use it.** Plan's pre-flight runs it with `--dry-run`
+on `main`; execute runs it on the top of the feature branch;
+release merges only a head with `local-ci` green; lets-cook runs it on
+the short route's PR.
+
+### 7 · Gate paths and the floor
+
+**What it is.** The **gate paths**: the files that decide green (the
+gate's configuration, the lint and coverage settings, the CI workflows,
+the floor's tests, the guard and the settings), listed in `CODEOWNERS`
+and only those, so a pull request touching one needs his approval on
+GitHub. The execute stage passes them to each entry as `gatePaths`.
+The **floor**: the security tests that may never disappear, and a
+command (`make floor base=<ref>`) that fails when one of them is gone
+unless the project's exceptions register names it.
+
+**Why.** An agent can turn a gate green by loosening it. Those paths
+are where that happens, so they are the ones a person must see.
+
+**How the stages use it.** The reviewer re-reads any fix that touched a
+gate path; execute's ok question carries the PR link when the diff
+touched one; release merges only with his approval there.
+
+### 8 · A stack per worktree, test actors, the sweep
+
+**What it is.** Commands that bring up an isolated stack for the
+current worktree (its own ports, containers, network, volumes and
+database, derived from the worktree), print its URLs and test actors
+(one login per role the permissions distinguish), and take only that
+stack down, **its images included**. Every container, volume and image
+carries a label with the worktree and the front. The **sweep**
+(`make sweep front=<slug> [check=1]`) lists (`check=1`) or removes
+everything labelled with a front. The commands table names the
+worktrees root (`<root>/<slug>/<id>`).
+
+**Why.** Entries run side by side; a `down` that touches a neighbour,
+or images left behind by deleted worktrees, turn a parallel run into a
+flaky one and fill the disk.
+
+**How the stages use it.** Each entry and QA on its own stack; the
+hands-on stack on the top of `feat`; the close's
+`claude/scripts/cleanup.sh` calls the sweep and proves nothing is left.
+
+### 9 · Shared files and migrations
+
+**What it is.** The standards list the files every feature would
+otherwise edit (migrations, the API contract and its generated code,
+the module registry, a route table). Migrations are named by
+timestamp, and `make restamp` re-stamps this branch's migrations that
+are older than the base's newest, the one renumbering the queue and
+the release run after `main` moves. Expand and contract across
+releases; no down migration.
+
+**Why.** Two parallel entries editing one file collide at merge; two
+fronts' migrations collide by order.
+
+**How the stages use it.** The plan's C owns every change to them;
+execute's queue and release's step 1 run `make restamp` after merging
+`main` in.
+
+### 10 · Feature maps, with how to drive each feature
+
+**What it is.** One file per feature or domain: what it does, one line
+per rule, its screens, routes, tables and jobs, and a short section on
+how to drive it (the route, the actor, the steps per state, the side
+effects to read back). Template:
+[verify-map.md](../claude/skills/pipeline-setup/templates/verify-map.md).
+
+**Why.** A scout can quote only what is written; the QAs and the users'
+video must drive a feature they did not build.
+
+**How the stages use it.** Discovery's and design's scouts read them
+first; every brief names the map lines it changes; the builder updates
+them in the same diff.
+
+### 11 · A browser-drivable app
+
+**What it is.** With screens: the stack serves them at a URL, an actor
+logs in without a human (a seeded password or a stored session), and a
+pinned browser tool (Playwright is the reference) drives them
+headless.
+
+**Why.** An AC on a screen is proved by driving it.
+
+**How the stages use it.** The builders write the screen proofs as
+browser tests; `qa-frontend (Opus 5.5, medium)` drives the screens;
+the release smoke and the users' video use it.
+
+### 12 · Delivery: staging, production on a tag, watch, rollback
+
+**What it is.** In the hosted CI, which keeps only these:
+
+| Piece | What good looks like |
 |---|---|
-| **fast check** | the loop while coding: lint and the tests of what was touched, in seconds to a minute |
-| **focused tests** | the tests of one module or one spec, with their arguments |
-| **affected tests** | the tests of every module and screen a diff touched and of what depends on them, chosen from the diff against a base; prints what it chose and why |
+| staging | a push to `main` deploys staging and runs the smoke |
+| production | a `v*` tag promotes **the image staging ran**, smokes it, watches errors and latency for 15 minutes, and only then creates the GitHub release from the tag's annotation |
+| rollback | a red smoke or watch moves traffic back to the previous tag by itself (code only, never a down migration) and alarms him; the same workflow can be run by hand |
+| one at a time | a tag waits for the previous tag's watch to end |
+| data | daily backups with point-in-time restore on the production database, and a restore drill every quarter |
+| alarms | by email, both severities |
 
-**Why.** The builder iterates dozens of times per entry. Running the
-whole gate each time multiplies the clock by the number of entries.
+**Why.** The release never deploys by hand; a rollback written in
+advance is not improvised.
 
-**How the stages use it.** The builder loops on the fast check and the
-focused tests, never the journeys; `exec-gate (Sonnet 5.5, low)` runs
-the fast check and the affected tests once per builder pass, the only
-place the suites run. Without affected tests, each pass runs the whole
-gate. How precise the selection is, and what a build file selects, is
-role 24.
+**How the stages use it.** Release merges, follows the staging run,
+tags, follows production. After a production rollback, the fix's new
+production deploy waits for his word and a new authorization line.
 
-### 5 · Stack up / env / down per worktree, with test actors
+### 13 · The smoke and the staging actors
 
-**What it is.** Three commands that bring up an isolated local stack for
-the current worktree, print its URLs and test actors, and remove only
-that stack. Isolated means its own ports, its own container, network
-and volume names and its own database, all derived from the worktree,
-so N stacks run side by side and `down` never touches another one.
-The stack seeds **test actors**: one login per role the product's
-permissions distinguish, with credentials that exist only in the
-local stack.
+**What it is.** The journey command accepts a base URL and a selection,
+and the journeys that write nothing (or only as a test actor into its
+own data) are marked **read-only**; the CI runs them on staging and
+production. A **staging-actor command** (`make staging-actor role=<role>
+[scope=<scope>]`) creates a synthetic actor in staging only, under the
+agents' staging-only role; a real person's name never appears.
 
-**Why.** Entries are built and proved in parallel. Two stacks on one
-port, or a `down` that removes a neighbour's database, turn a parallel
-run into a flaky one.
+**Why.** Stage 4 owns working, so the release only proves each
+environment serves it; the users' video needs a logged-in actor on
+staging, never production.
 
-**How the stages use it.** Discovery's recon screenshots the current
-screens as an actor; plan's scouts quote the commands; `qa-frontend (Opus 5.5, medium)`
-and `qa-backend (Opus 5.5, medium)` use each entry on its own stack as
-the actors; the execute session brings a stack up on the top of the
-feature branch for the user's hands-on and gives him the actors'
-logins; release asks the doctrine for the staging actors (never a
-production actor).
+**How the stages use it.** The CI's smoke; `video-builder (Sonnet 5.5,
+medium)` records the close's users' video on staging as those actors.
 
-### 6 · The evidence command
+### 14 · Permissions, the guard and the authorization
 
-**What it is.** A command that writes the entry's verification record
-for the head it runs on: which gate commands ran, on which sha, with
-which result, plus pointers to the screenshots, videos and side
-effects captured. Redacted: no token, password or
-person's data.
+**What it is.** In `.claude/` of **every directory the sessions open
+in** (Claude Code loads settings and hooks from the session's own
+directory):
 
-**Why.** Merge decisions are made on a record, not on a message that
-says "tests pass".
+- `settings.json` with **allow** rules for what the stages run all day
+  (the gates, the stack, read-only `git` and `gh`, pushes of `feat/*`,
+  `story/*` and `evidence/*`, deleting remote `story/*` and
+  `evidence/*`, `gh pr merge`, re-running a run and the rollback
+  workflow), **ask** for the rest that reaches production, and **deny**
+  for reads of the `gh` and cloud credentials and the CI token, and for
+  edits to the settings and hooks;
+- the pipeline's guard
+  [`guard-irreversible.sh`](../claude/hooks/guard-irreversible.sh) and
+  [`authorize.sh`](../claude/hooks/authorize.sh) in `.claude/hooks/`,
+  registered on `Bash|Edit|Write|MultiEdit|NotebookEdit` through a
+  **fail-closed wrapper**: a missing guard blocks every call;
+- the allow file `.claude/hooks/irreversible.allow`, written only by
+  him: verbatim commands, `protected <branch>`, `default-branch
+  <branch>`, and the `auth` lines `authorize.sh` writes.
 
-**How the stages use it.** Stage 4 writes no record per entry: the
-committed tests and the gate's summary line are its evidence, and the
-signoff's record per tree is what the queue reads. Release and the
-close may run it for their own record.
+Templates: [settings.json](../claude/skills/pipeline-setup/templates/settings.json)
+and [permissions.md](../claude/skills/pipeline-setup/templates/permissions.md).
+A standards rule against code comments excludes `.claude/hooks/`.
 
-### 7 · The structure check and its comparison
+**Why.** The stages run without a human between the gates. Permission
+rules match prefixes; the hook reads the whole command and decides
+before them. The real limits sit outside the session too (role 15).
 
-**What it is.** A command that checks the files a diff changed against
-a base, for:
+**How the stages use it.** Every stage opens with the canary (`git push
+origin a:b`, denied). He authorizes a release with `! .claude/hooks/authorize.sh
+release <slug> feat/<slug>@<sha>` (or `short`, `hotfix`, `legacy`); the
+guard lets one merge and one tag through, then the line is dead.
 
-| Check | Fails when |
-|---|---|
-| complexity | a changed function goes over the ceiling for its class |
-| size | a changed function or file goes over the ceiling for its class |
-| duplication | the share of added lines inside a clone exceeds the codebase's own rate |
-| import boundaries | an added import crosses a layer or module fence the doctrine writes |
-| new dependencies | a new direct dependency, or an unpinned version, that no ruling allowed |
+### 15 · Agent identities
 
-It prints each violation with its file and line and exits non-zero on
-any. A **comparison** mode measures two refs and prints the numbers
-side by side.
+**What it is.** The agents never run as him. A **bot GitHub identity**
+(a fine-grained token: push branches, open and merge PRs, post
+statuses only through the signoff command; it cannot approve, delete a
+repository or change protection) and a **cloud identity** that reads
+production, deploys nothing by hand, and holds a **staging-only** role
+to create and delete synthetic actors. His own keys are out of the
+agents' reach; the bot's token expiry is on a calendar.
 
-**The thresholds come from the codebase's own distribution**, never
-from a book: measure every function of the code as it is today, set
-the warning line at the p95 and the failing line at the p99 of each
-class (product and test, per language). A gate at a number the code
-already lives far inside never fires; a gate at a number half the code
-breaks is ignored. Re-measure between workstreams, never during one.
-Its tools are dependencies like any other: declared in a manifest with
-exact versions, not fetched ad hoc. Because it diffs against a base,
-a hosted CI job that runs it needs the history and the base ref (a
-full-depth checkout, the base passed explicitly).
-Template: [structure-check](../claude/skills/pipeline-setup/templates/structure-check/).
+**Why.** An author cannot approve his own PR, so `CODEOWNERS` bites only
+when the agents are someone else; a read-only cloud identity cannot
+destroy what the guard missed.
 
-**Why.** Code that works and that nobody can extend later is the
-failure the pipeline fears most. Taste cannot be gated; size,
-complexity, duplication and fences can.
+**How the stages use it.** Plan's pre-flight checks `gh` acts as the
+bot; every push, PR and status comes from it.
 
-**How the stages use it.** The project may list it among the gate
-commands; the close measures `main` before and after the workstream;
-the weekly retro watches the trend and proposes a refactor slice past
-a threshold.
+### 16 · The station's toolchain
 
-### 8 · The shared files list
+**What it is.** On the machine that runs the sessions: Node (current
+LTS); `playwright-core` and a Chromium for discovery's mock
+(`PLAYWRIGHT_DIR`, `PROTO_CHROME`); `ffmpeg` and `npm ci` in
+`claude/video/` for the reports' videos; `gitleaks`, which every report
+publish runs first.
 
-**What it is.** The doctrine names the files every feature would
-otherwise edit: schema migrations, the API contract and its generated
-code, the module registry, and any other single file a new feature has
-to touch (a route table, a permissions matrix, a translation index).
+**Why.** The mock is proved by walking it headless; every stage's
+report has a video; nothing is published before a leak check.
 
-**Why.** Two parallel entries editing one file collide at merge.
-Laying those files down once removes the collision instead of
-resolving it every time.
-
-**How the stages use it.** Plan's foundation owns every change to them
-and is built first; after it they are frozen. An entry that cannot be
-built without changing one changes it minimally and lists it
-(`outsideOwns`); the reviewer reads it, and the queue merges entries
-one at a time, so a collision shows as a conflict at the update.
-
-### 9 · Feature maps
-
-**What it is.** The doctrine names where the documentation of each
-feature lives: one file per feature or per business domain, saying
-what it does, the screens and routes it has, the tables it writes, the
-jobs and events it owns. A technical module without a map of its own
-is covered when the doctrine names where its rules are written.
-
-**Why.** Recon must find what exists without reading the whole
-codebase, and a scout can only quote what is written down.
-
-**How the stages use it.** Discovery's recon reads the maps of the
-areas the user names; design's scouts read them before the codebase;
-plan names which rows each entry updates; the builder updates the map
-for what its entry changed.
-
-### 10 · A browser-drivable app
-
-**What it is.** When the product has screens: the local stack serves
-them at a URL, an actor can log in without a human (a seeded password,
-a test login route or a stored session), and a browser automation tool
-(Playwright is the reference) drives them headless. The project pins
-the tool's version and its browsers.
-
-**Why.** Acceptance on a screen is proved by driving it, not by
-reading the code that draws it. Screenshots and video are the
-evidence the user audits.
-
-**How the stages use it.** `builder (Opus 5.5, medium)` writes the
-screen acceptance as browser journeys; the gate runs them;
-`qa-frontend (Opus 5.5, medium)` drives the screens by hand; the user
-uses the app himself at the hands-on that ends execute; release runs
-the read-only journeys against staging and production as its smoke
-(role 23).
-
-### 11 · Release roles: environments, deploy, rollback
-
-**What it is.** The doctrine's delivery document names:
-
-| Role | What it is |
-|---|---|
-| environments | at least one pre-production environment (staging, alpha) and production, with the branch that deploys each |
-| deploy commands | how each environment is deployed: the CI on a merge, or a command; the read-only check of its result |
-| the production diff | a command that shows what production would change before it does |
-| rollback command | how production returns to the previous version, and whether it is safe for the data a migration wrote |
-| migrations policy | expand and contract across releases; what is reversible |
-
-**Why.** Release follows the project's own delivery pipeline and never
-deploys by hand what the doctrine automates. A rollback that is not
-written in advance is improvised during an incident.
-
-**How the stages use it.** The release session writes its plan from
-this document, merges to staging on its own, follows the CI, smokes
-each environment, watches production for 15 minutes, and rolls back on
-the triggers written in the plan.
-
-### 12 · Permission settings and the guard hook
-
-**What it is.** The `.claude/settings.json` of **every directory the
-pipeline's sessions open in**, with the items below. Claude Code loads
-the settings and the hooks they register from the session's own
-directory, so where `CLAUDE.md`, the doctrine and `.claude/skills/`
-sit in a root above the product repository, the root carries them
-(and the product repository too, when sessions open there as well); a
-copy only in a repository no session opens in guards nothing.
-
-- **allow** rules for what the stages run all day: the gate commands,
-  the stack commands, read-only `git` and `gh`, staging deploys, and
-  (role 18) the merge into `main` and the production deploy and
-  migration;
-- **ask** rules for the rest that reaches production: re-running a
-  deploy workflow, a release, writing a secret, `terraform apply`;
-- **deny** rules for what cannot be undone: force-push, destroying
-  infrastructure, dropping data, deleting a bucket or a repository,
-  posting a commit status by hand, and edits to the settings and hooks
-  themselves;
-- the pipeline's **PreToolUse guard hook**,
-  [`claude/hooks/guard-irreversible.sh`](../claude/hooks/guard-irreversible.sh),
-  copied to `.claude/hooks/` and registered on `Bash` and every file
-  tool. It is the pipeline's file and keeps its header comments: a
-  doctrine rule against code comments excludes `.claude/hooks/`. It **denies** the irreversible classes even when a rule is
-  broad, unless the allow file names that exact command; it **asks**
-  before a secret's value is written or read, and before a merge into
-  a protected branch whose head the user's play did not authorize. The
-  allow file (`.claude/hooks/irreversible.allow`, written only by the
-  user) takes verbatim commands and the lines `merge-from <sha>`,
-  `merge-head <sha>`, `protected <branch>` and
-  `default-branch <branch>`.
-
-Templates: [settings.json](../claude/skills/pipeline-setup/templates/settings.json),
-the guard's tests in
-[claude/hooks/tests/](../claude/hooks/tests/guard-irreversible.test.sh),
-and the notes on each rule in
-[permissions.md](../claude/skills/pipeline-setup/templates/permissions.md).
-
-**Why.** Execute and release run without a human between the gates.
-Permission rules match command prefixes and are not a security
-boundary on their own; a hook reads the whole command and decides
-before the rules. The real limits sit outside the session too: branch
-protection, cloud roles that cannot delete, secrets the agent cannot
-read.
-
-**How the stages use it.** Execution runs entries under the allow list
-with no prompt; release merges and deploys under it; the hook stops
-the class of command no stage should ever run on its own.
-
-### 13 · Local-CI signoff that main accepts
-
-**What it is.** One command that runs a gate command of role 3 in a
-clean worktree at one commit and posts a commit status on that sha
-through the GitHub commit status API
-(`gh api repos/:owner/:repo/statuses/:sha`). It posts under **two
-contexts**: `local-ci/affected` for the affected gate on each merge of
-the execute queue, and `local-ci` for the whole gate, run once at the
-end of the stage. Branch protection on `main` requires `local-ci`
-only, so no intermediate head of the feature branch satisfies `main`
-after only an affected gate. An affected run whose selection is empty
-on a non-empty diff runs the whole gate instead of signing off a run
-that tested nothing. The command removes its worktree and the stack
-the gate brought up on exit. Hosted CI keeps the deploy and a cheap
-trust check. Template:
-[local-ci.sh](../claude/skills/pipeline-setup/templates/local-ci.sh)
-and its document
-[local-ci.md](../claude/skills/pipeline-setup/templates/local-ci.md)
-(`--context` picks the context). When the doctrine names another
-check as the one `main` requires, requiring `local-ci` is a doctrine
-ruling before it is a protection change. A remote that is not GitHub
-has no commit status: the signoff's protection part does not apply.
-
-**Why.** A hosted queue on every merge is the slowest step of a
-parallel build. A local run of the same commands takes minutes, and the
-status makes the claim checkable.
-
-**How the stages use it.** Execute requires it: without the command,
-it is an item of the pre-flight. The execute session's merge queue
-posts `local-ci/affected` on each merged head and `local-ci` once on
-the top of the feature branch after the whole gate; release merges
-into `main` behind `local-ci`. A signoff is only as strong as who can
-post it: the strongest setup posts it from one host with a token that
-agent shells cannot read.
-
-### 22 · The mock toolchain, on the station
-
-**What it is.** On the machine that runs the discovery session, not in
-the project: Node 18 or later, `playwright-core` (or `playwright`) and
-a Chromium. Discovery's `claude/skills/stage-discovery/scripts/proto.mjs`
-finds them through `PLAYWRIGHT_DIR` (a folder whose `node_modules` has
-playwright-core) and `PROTO_CHROME` (a Chromium binary; otherwise the
-common system paths, then Playwright's own browser). Install once:
-`npm i --prefix "$PLAYWRIGHT_DIR" playwright-core`.
-
-**Why.** The mock is proved mechanically: every journey walked, every
-state reached, every frame rendered headless before he can lock it.
-Without a browser the lock gate cannot run.
-
-**How the stages use it.** `prototyper (Opus 5.5, medium)` and `proto.mjs`
-walk the mock and render its frames; the lock (his word, then the
-`proto.mjs lock` walk) freezes the frames; the
-recon screenshots the current app's screens (role 10) with
-`proto.mjs look`.
-
-### 23 · The smoke: the journey command against a URL
-
-**What it is.** The project's journey command (the one the gate uses
-to run the browser and API journeys, role 3) accepts a base URL and a
-set of journeys, and runs them against an environment that is not the
-local stack: staging, a production tag URL, production. The project
-marks which journeys are **read-only**: they write nothing in the
-environment they run against, or write only as a test actor into data
-that actor owns. The doctrine names the command, how a journey is
-marked read-only, and the test actors per environment (never a
-production person's account, never a token in the command line).
-
-**Why.** Stage 4 owns working, so the release does not re-test the
-feature; it only proves each environment serves it. Without a command
-that points the journeys at a URL, that proof is a health check, and a
-deploy that serves a broken screen passes it.
-
-**How the stages use it.** The release plan writes the one smoke
-command verbatim (health, the sha served, the read-only journeys
-against a URL); the release runs it on staging, on the production
-candidate's tag URL and on production, and a red one is a rollback
-trigger. The close's footage recorder may use the read-only journeys
-as its actor's path. Without it, release halts at its pre-flight and
-names the role.
+**How the stages use it.** `proto.mjs` walks and locks the mock;
+`claude/video/render.sh` renders every video; `gitleaks dir` gates every
+publish. Without the video toolchain the Video tab is `failed` with its
+reason and the stage closes on the other two.
 
 ## Recommended
 
-### 14 · The verify map inside each feature map
+### 17 · The house lint and the structure check
 
-**What it is.** A short section in each feature map that says how to
-reach and drive the feature: the URL or route, the actor who can see
-it, the steps to reach each state, the side effects to read back (the
-table, the event, the e-mail) and how to read them. Template:
-[verify-map.md](../claude/skills/pipeline-setup/templates/verify-map.md).
+**What it is.** A house linter in the fast check for what review keeps
+finding by hand (a code comment where the standards forbid one, a
+suppressed lint, a skipped test, a gate path missing from
+`CODEOWNERS`), skipping `.claude/`; and a structure check on a diff
+against a base: complexity, size, duplication, import fences, new
+dependencies, with thresholds from the codebase's own p95/p99, never
+from a book. Template:
+[structure-check](../claude/skills/pipeline-setup/templates/structure-check/).
 
-**Why.** The QAs, the release check and the footage recorder all
-need to drive a feature they did not build. Without the map each one
-rediscovers the path, and a wrong path proves the wrong thing.
+**Why.** Code that works and that nobody can extend is the failure the
+pipeline fears most; size, complexity and fences can be gated.
 
-**How the stages use it.** The QAs start from it when they drive an
-entry; release reuses it on staging; `footage-recorder
-(Sonnet 5.5, medium)` follows it to record the launch video.
+**How the stages use it.** In the fast check; the weekly retro watches
+the trend.
 
-### 15 · Design tokens and components, exported
+### 18 · Design tokens and components, exported
 
-**What it is.** The product's design tokens (colors, type scale,
-spacing, radii, shadows, motion) exported as one CSS file of custom
-properties and one JSON file, generated from the source of truth, plus
-a list of the core components with their props and a rendered sample
-of each. Recipe:
+**What it is.** The tokens (colors, type, spacing, radii, motion) as one
+CSS file and one JSON, generated from the source of truth, plus the
+core components with their props. Recipe:
 [design-tokens-export.md](../claude/skills/pipeline-setup/templates/design-tokens-export.md).
 
-**Why.** The discovery mock is what the user approves. A mock that
-looks like a different product is approved for the wrong reasons, and
-the builder then rebuilds it in the real look.
+**Why.** A mock that looks like another product is approved for the
+wrong reasons.
 
-**How the stages use it.** Discovery's recon hands the export to
-`prototyper (Opus 5.5, medium)`, so the mock uses the real tokens and
-the real component shapes; the builder builds the screens on the same
-tokens.
+**How the stages use it.** Discovery's recon hands them to
+`prototype-builder (Sonnet 5.5, medium)`; `builder-frontend (Opus 5.5,
+medium)` builds on the same tokens.
 
-### 16 · Observability as code
+### 19 · Observability as code
 
-**What it is.**
+**What it is.** Structured logs with stable event names, metrics
+derived from them, and alarms in the repo, each with a threshold, a
+window, an email channel and a runbook line (the action and the first
+command).
 
-| Role | What it is |
-|---|---|
-| log-based metrics | structured logs with stable event names, and metrics derived from them in code |
-| alarm definitions | alarms declared in the repo (infrastructure as code), each with a threshold, a window and a channel |
-| runbooks | one per alarm: what it means, how to check, how to mitigate, who is told; text inline in the alarm's definition counts when it states the action and the first command to run |
+**Why.** An alarm without a runbook wakes someone for nothing; the
+production watch reads alarms by name.
 
-**Why.** Design right-sizes operations per part; a mechanism without a
-reader is cut, and an alarm without a runbook wakes someone for
-nothing. Release reads each alarm's first evaluation, which only
-works when the alarm is code with a name.
+**How the stages use it.** Design writes `operations.md` from what
+exists; the reviewer checks no failure is silent; the watch reads them.
 
-**How the stages use it.** Design writes the alarms into `operations.md`
-from what exists; `reviewer (Opus 5.5, high)` checks every diff for
-errors logged and no silent failure; release reads the alarms once at the end of
-production.
-
-### 17 · Parallelism capacity, measured
-
-**What it is.** A number: how many stacks, builds and browser runs the
-machine holds at once before every run gets slower, measured with the
-project's real stack and recorded with its load. The project's role is
-a stack light enough to run several copies, and the machine's
-resources written down (cores, memory, disk pressure).
-
-**Why.** The plan maximizes parallel width; past the measured cap,
-every run gets slower and the stage does not finish sooner.
-
-**How the stages use it.** The plan draws the widest graph the work
-allows and never measures the machine: compute is infinite there. The
-execute session starts runs up to the plan's widest wave and holds the
-cap by the machine's load.
-
-### 24 · A gate sized to the change
-
-**What it is.** The commands of roles 3 and 4, set so each run tests
-what the change can break, and the whole suite runs once. It is a
-sizing, not a straitjacket: a change that really needs more (a shared
-layout touched, worth every width) may run more, and the gate commands
-say so.
-
-| Part | What good looks like |
-|---|---|
-| **the per-entry gate** | the fast check plus the affected tests, at **one primary width** (the browser tool's primary project, desktop for most products) plus only the specs tagged as width-aware (a tag such as `@phone`); **evidence capture off** (screenshots and video only under a flag such as `EVIDENCE=1`); the server suites **run once** (the affected step never re-runs what the check already ran) |
-| **the affected selection** | **non-UI files select no screen tests**: build files, ignore files, lint config and placeholder files are covered by the check, lint and build; it prints that decision per path ("`Makefile`: no screen tests, the check covers it"), so the selection is never silently empty. A **lockfile or manifest** selects the whole suite only when a runtime or test-runner dependency changed. The preferred precision is the **real import graph** (a screen's route to its module closure, a package to its dependants), with a fallback to the whole suite when the graph cannot be built |
-| **the whole gate** | once, at the end of the stage: every width, the visual tests, the full server suites, evidence on |
-
-The doctrine's testing document names the primary width, the
-width-aware tag and the evidence flag.
-
-**Why.** In one measured project the browser suite took 77% of the
-final gate and about 18 hours of one execute stage: every test ran at
-two widths, a change to a build or ignore file selected the whole
-suite, evidence screenshots ran in every gate, and the server suites
-ran twice per gate. None of that found a defect the whole gate at the
-end would have missed.
-
-**How the stages use it.** Plan copies the per-entry gate and the
-whole gate into `plan.md`; `exec-gate (Sonnet 5.5, low)` runs the
-per-entry gate once per builder pass, and the merge queue's affected
-signoff runs the same (skipped when the feature branch has not moved
-since the entry's green gate: the merged tree is the tested tree); the
-execute session runs the whole gate once
-on the top of the feature branch. A project that does not meet this
-yet still works: every pass pays for the full width, the evidence and
-the whole suite, and the stage is only slower. `/pipeline-setup`
-rates it and proposes the fix.
-
-## For the full experience
-
-### 18 · Autonomous release permissions
-
-**What it is.** The merge into `main` and the production deploy sit
-in **allow** in the settings (the template's default), kept safe by
-three things: branch protection that requires the `local-ci` signoff
-(role 13), the guard hook (role 12), and the user's play, which writes
-`merge-from <audited head>` into the guard's allow file (the strict
-variant is `merge-head`, the exact head). The guard asks on any other
-head.
-
-**Why.** Release then runs from play to done, and his one ruling is
-the play.
-
-**How the stages use it.** Release merges, deploys and watches without
-a stop but its written list; a production red rolls back on its own by
-the plan's triggers, and the new production deploy after a rollback
-waits for his go.
-
-### 19 · Progressive delivery
-
-**What it is.** The platform can send a share of production traffic to
-the new version (a traffic split, a tagged revision, a canary, a
-feature flag) and move it back with one command.
-
-**Why.** A defect reaches a fraction of the users for minutes instead
-of all of them.
-
-**How the stages use it.** Release ships progressively where the
-platform allows it, reads the smoke run and the alarms, and promotes
-or rolls back; otherwise it deploys straight and runs the smoke.
+## Full experience
 
 ### 20 · A cloud environment for entries
 
-**What it is.** A Claude Code cloud environment (configured at
-claude.ai/code) in which one stage-4 entry runs end to end in a fresh
-VM, from the project's GitHub repository alone, with no person to
-answer a prompt. One repository: a multi-repository session does not
-load `.claude/settings.json`, so the hooks and permissions below would
-be inert.
+**What it is.** A Claude Code cloud environment in which one stage-4
+entry runs end to end in a fresh VM from the repository alone: a setup
+script (toolchains at the pinned versions, warm caches, the stack's
+images, the browsers; about five minutes), a `SessionStart` hook that
+brings the stack up only when `CLAUDE_CODE_REMOTE` is `true`, test-only
+env vars (never a real secret), the guard and the settings committed,
+a network allowlist with a reason per host, and the pipeline vendored
+under `.claude/pipeline/` at a tag with its `VERSION`. One repository
+per session: a multi-repository session loads no hooks. Templates:
+[cloud-setup.sh](../claude/skills/pipeline-setup/templates/cloud-setup.sh),
+[cloud-session-start.sh](../claude/skills/pipeline-setup/templates/cloud-session-start.sh),
+[cloud-settings.json](../claude/skills/pipeline-setup/templates/cloud-settings.json),
+[cloud-env.md](../claude/skills/pipeline-setup/templates/cloud-env.md).
 
-| Part | What good looks like |
-|---|---|
-| **the setup script** | installs what the base image lacks (the language toolchains at the versions the project pins, the browsers, the package manager), warms the dependency caches from the lockfiles, pulls or builds the stack's images; exits 0 and finishes in about five minutes so the snapshot caches it; kept in the repository (`/pipeline-setup` writes it from its `cloud-setup.sh` template) and pasted into the environment |
-| **the stack up** | a `SessionStart` hook in the repository's `.claude/settings.json`, on startup and resume, that runs the doctrine's stack-up only when `CLAUDE_CODE_REMOTE` is `true`, so local sessions are untouched; the snapshot keeps files, never processes |
-| **test values** | the environment's env vars, in `.env` format: test-only values the stack and the gate need (fakes, local URLs, a test project id), plus `BASH_DEFAULT_TIMEOUT_MS` and `BASH_MAX_TIMEOUT_MS` raised for the gate. Anyone who uses the environment reads them: never a production secret or a real third-party key |
-| **permissions** | the repository's allow list covers the gate, the fast checks, the stack, `git fetch`, `git ls-remote` and `git push` of `story/*` and `evidence/*`; the guard hook (role 12) is committed and loads with it |
-| **network** | Custom: the Trusted defaults plus each host the setup and the stack reach (the toolchain's downloads, the browser and image registries); Full only when nothing narrower works |
-| **browsers** | installed by the setup script, at the version the browser tool pins, or the pinned browser image pulled when the journeys run in a container |
-| **the pipeline** | vendored under `.claude/pipeline/` at a tag of the pipeline repository, by `/pipeline-setup`; never a symlink, which the VM cannot follow |
+**Why.** One machine caps the width; with a VM per entry the width is
+the plan's, bounded only by rate limits, which are waited out.
 
-**Why.** One machine caps the width: past its measured cap every run
-gets slower. With a cloud environment every entry runs in its own VM,
-the stage's width is the plan's, and the station keeps only the queue,
-the signoffs, the whole gate and the hands-on.
-
-**How the stages use it.** When the doctrine names it, the execute
-session runs every entry in a cloud session by default and falls back
-to local entry by entry; it sends each run's inputs on an evidence
-branch, watches the pushed branches with a git loop, and merges what
-comes back through the same local queue. How one entry runs, the
-return channel and the fallback are in
-[stage-execute/references/cloud.md](../claude/skills/stage-execute/references/cloud.md).
-Without it, entries run locally up to the measured cap (role 17).
-
-### 21 · The video toolchain
-
-**What it is.** On the station that runs the pipeline: Node (the
-current LTS), `ffmpeg`, and the video kit's dependencies installed once
-(`claude/video/`). For the launch video, the app reachable on staging
-or production with an actor, and the browser tool able to record at
-1920×1080.
-
-**Why.** The discovery, design and plan reports open with a video,
-and the close's launch video is recorded from the real app. Execute
-and release make none.
-
-**How the stages use it.** `video-scribe (Sonnet 5.5, medium)` renders
-the discovery, design and plan videos; `footage-recorder (Sonnet 5.5, medium)` records
-the journeys; the kit renders the launch video. Without the toolchain,
-the stage report has slides and the blueprint only, and says so.
+**How the stages use it.** Execute runs every entry in a cloud session
+by default and falls back to local entry by entry
+([stage-execute/references/cloud.md](../claude/skills/stage-execute/references/cloud.md));
+the signoff command can run the whole gate there too (no bot token on
+the VM: "green, not posted", and the station posts).
 
 ---
 
 ## What never lives in the pipeline
 
-Project specifics stay in the project: the doctrine, the commands,
+Project specifics stay in the project: the standards, the commands,
 environments and credentials, the deploy targets, the thresholds, the
 golden paths, the permission rules. The pipeline's files name roles;
 the project's files fill them.

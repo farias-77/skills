@@ -1,7 +1,7 @@
 # structure-check
 
 The structure check role of the pipeline's bar
-(`docs/project-contract.md`, role 7): what a diff adds, measured for
+(`docs/project-contract.md`, role 17): what a diff adds, measured for
 complexity, size, duplication, import boundaries and new dependencies.
 
 | File | What it is |
@@ -13,7 +13,7 @@ complexity, size, duplication, import boundaries and new dependencies.
 | `requirements.txt`, `package.json` | the tools' manifests, versions pinned exactly: lizard (pip), jscpd and typescript (npm) |
 
 Copy the folder into the project (for example `tools/structure-check/`)
-and name the command in the doctrine. The scripts carry no comments;
+and name the command in the commands table. The scripts carry no comments;
 this file is their documentation.
 
 ## Use
@@ -92,8 +92,8 @@ it may sit over p95. Golden-path exemplars are checked this way.
 
 ## Boundaries
 
-Write one `boundaries` rule per fence the doctrine already states, with
-the doctrine line in `rule`. `files` and `forbid` are regular
+Write one `boundaries` rule per fence the standards already state, with
+the standards line in `rule`. `files` and `forbid` are regular
 expressions; `except` exempts paths.
 
 A group captured by `files` is available in `forbid` as `{{name}}` (a
@@ -106,7 +106,7 @@ instead of one per module:
   "id": "module-only-through-its-root",
   "files": "^backend/internal/(?P<module>[^/]+)/",
   "forbid": "\"[^\"]*/internal/(?!{{module}}[/\"])[^/\"]+/[^\"]+\"",
-  "rule": "<doctrine file>:<line>"
+  "rule": "<standards file>:<line>"
 }
 ```
 

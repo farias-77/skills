@@ -29,7 +29,7 @@
  *         and waits in order; prints what is on screen (the frame, the visible text, the new side
  *         effects). Takes a URL too, for the current app: --wait <selector|ms> and --wait-url <text or
  *         /regex/> let a logged-in SPA settle after a click; a fill value `env:NAME` is read from the
- *         environment (or from the KEY=VALUE lines --env-cmd prints: the project's env command, role 5)
+ *         environment (or from the KEY=VALUE lines --env-cmd prints: the project's env command, role 8)
  *         and never printed, so a test actor's password never sits on the command line. --page opens
  *         a whole HTML page or a file:// URL as it is (no artifact skeleton): a blueprint, a report.
  * shots   the pictures he looks at when the mock is not published (local mode): one PNG per state
@@ -348,7 +348,7 @@ async function frames(file, outDir, opts = {}) {
 }
 
 // ── look ────────────────────────────────────────────────────────────────
-// The KEY=VALUE lines a command prints (`export KEY=VALUE` too): the project's env command (role 5),
+// The KEY=VALUE lines a command prints (`export KEY=VALUE` too): the project's env command (role 8),
 // read for `env:NAME` fill values. Kept in memory, never printed.
 function envFrom(cmd) {
   if (!cmd) return {};
