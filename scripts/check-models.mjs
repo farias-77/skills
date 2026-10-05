@@ -6,7 +6,8 @@
 //   - an agent in claude/agents/ with no row in docs/models.md;
 //   - a model or effort that differs from the agent's row;
 //   - a description whose "(Model 5.5, effort)" mention differs from the frontmatter;
-//   - a workflow's AGENTS map entry that differs from the row.
+//   - a workflow's AGENTS map entry that differs from the row;
+//   - a file in claude/workflows/ not named <name>-workflow.js.
 // Warns on a row with no agent file (an agent planned or removed).
 //
 // Usage: node scripts/check-models.mjs [repo-root]
@@ -58,6 +59,8 @@ for (const file of readdirSync(agentsDir).filter((f) => f.endsWith('.md')).sort(
 // The workflows' AGENTS maps (used when agents run inline) must agree too.
 const wfDir = join(root, 'claude/workflows');
 const SHORT = { opus: 'Opus 5.5', sonnet: 'Sonnet 5.5' };
+for (const file of readdirSync(wfDir).filter((f) => !/^[a-z0-9-]+-workflow\.js$/.test(f)))
+  errors.push(`workflows/${file}: a workflow file is named <name>-workflow.js`);
 for (const file of readdirSync(wfDir).filter((f) => f.endsWith('.js')).sort()) {
   const text = readFileSync(join(wfDir, file), 'utf8');
   for (const m of text.matchAll(/^\s*'?([a-z][a-z0-9-]*)'?:\s*\{\s*model:\s*'(\w+)',\s*effort:\s*'(\w+)'/gm)) {
