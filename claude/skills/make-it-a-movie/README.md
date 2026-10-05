@@ -3,9 +3,10 @@
 Claude makes a short motion video in code with Remotion. The film is one
 `.tsx` file built on a small motion library: diagrams that build,
 numbers that count, decisions set against their alternatives, real
-product screens with a camera that follows the clicks. Claude checks
-every scene as a still, renders once, and checks three frames of the
-result.
+product screens with a camera that follows the clicks. A brief, a
+style guide and a shot list fix every decision before the code. Claude
+then checks every scene as a still, renders once, and repairs only the
+three largest defects seen in the rendered frames.
 
 Two audiences:
 
@@ -25,12 +26,16 @@ Two audiences:
 3. Ask: "make it a movie: what changed in checkout, for our users", and
    give the kit's path.
 
-In the pipeline, the `video-builder` agent preloads this skill and makes
-the Video tab of the stage report.
+In the pipeline, `video-builder (Sonnet 5.5, medium)` preloads this skill
+and makes the Video tab of the stage report. It renders; the brief and
+the shot list come from the session that asks for the film.
 
 ## Files
 
-- `SKILL.md`: the method, the sizes, the rules on screen and the return.
+- `SKILL.md`: the gates, the sizes, the rules on screen and the return.
+- `references/production-contract.md`: the five layers, the gates, the
+  contact sheet, the critique and the known traps.
+- `templates/`: `brief.md`, `style-guide.md` and `shotlist.md`.
 - `references/motion.md`: the motion library, scene by scene: its parts,
   your own motion, timing, themes, music.
 - `references/story.md`: the arcs for a reviewer (per stage) and for

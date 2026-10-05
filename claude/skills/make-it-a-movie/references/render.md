@@ -60,17 +60,20 @@ has to. Audio is kept when the film has it (AAC 128k).
 
 - `check` passes, and the total seconds are inside the length you were
   given.
-- Every still has been read: no cut text, nothing off the frame, the
-  accents right, one focus per scene.
+- Every still has been read, at the default scale and at `0.33`, against
+  the contact-sheet checklist in `production-contract.md`.
 - Every number on screen matches its source.
 
 ## After the render
 
-- Take three frames with ffmpeg (start, middle, end card) and read them.
+- The critique in `production-contract.md`: three frames, strips around
+  the fastest transitions, and `reviews/critique.md`.
 - `ffprobe -v error -show_entries format=duration,size -of csv=p=0 out.mp4`
   confirms the length and size.
-- Delete `stills/` and the frames. The kit already removed its run folders
-  and keeps no bundle cache.
+- Delete `<film>/stills/` by its full path. Never `rm` a glob, and never
+  delete anything under `/tmp` or `$TMPDIR`: other renders' bundles live
+  there. The kit already removed its run folders and keeps no bundle
+  cache.
 
 ## When the render fails
 

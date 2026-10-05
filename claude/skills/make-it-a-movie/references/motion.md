@@ -61,6 +61,10 @@ const Fill: React.FC<{at: number; pct: number}> = ({at, pct}) => {
 
 - Animate only from the frame (`useSec`, `useCurrentFrame`); never from
   `Date`, timers or CSS animations, which do not render frame by frame.
+  Frame N must render on its own, with no hidden clock and no state
+  carried from the frame before.
+- Never use `Math.random`. Use `random('a-seed')` from `remotion`, which
+  returns the same value on every render.
 - `prog` eases out (`bezier(.16, 1, .3, 1)`); `lin` is linear, for
   progress bars and clocks.
 - Springs: `spring({frame, fps, config: {damping: 200}})` from `remotion`,
@@ -68,14 +72,19 @@ const Fill: React.FC<{at: number; pct: number}> = ({at, pct}) => {
 
 ## Timing that reads
 
-| Use | Value |
+Each class of object moves its own way. Never make everything overshoot.
+
+| Object | Motion |
 |---|---|
-| an element in | 0.5–0.8 s, ease out |
+| micro UI (a check, a toggle, a chip) | snaps: 0.15–0.25 s, ease out, no bounce |
+| an element, a panel, a card | settles: 0.5–0.8 s, ease out |
+| a headline | arrives fast (0.4–0.6 s), then holds long enough to read |
+| the camera (zoom or drift on a `Shot` or `Screen`) | almost invisible: 0.7–1.2 s, at most one change per 3 s |
+| the one thing that lands | the scene's only small bounce, if any |
 | stagger between siblings | 0.25–0.6 s |
 | an arrow drawing | 0.5–0.6 s |
 | hold after the last item lands | at least 45% of the scene |
-| a zoom on footage | 0.7–1.2 s in, at most one zoom change per 3 s |
-| scene fade | built in (7 frames in, 6 out) |
+| scene fade | built in (7 frames in, 6 out); a dip, never a crossfade |
 
 ## Themes
 
@@ -94,4 +103,5 @@ Fields: `bg`, `panel`, `fg`, `mute`, `accent`, `onAccent`, `display`,
 
 `audio: 'assets/bed.mp3'` plays under the whole film at 0.6 and fades
 out over the last 2 s. Use only licensed music, with its source and licence
-in your return. Stage videos have no music.
+in your return. The shot list holds its beat grid, and the cuts that
+matter land on a beat. Stage videos have no music.

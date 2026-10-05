@@ -13,47 +13,77 @@ render it once, and check the result.
 
 ## What you receive
 
-- **The story:** what the film must make clear, and for whom. In a stage
-  report, this is the stage's paragraph in `docs/stage-report.md`.
-- **The sources:** the files the facts come from.
+- **The brief** (`brief.md`): what the film must make clear, for whom,
+  the length, the real assets, and the visual rules.
+- **The shot list** (`shotlist.md`), and the style guide when the caller
+  fixes the look.
+- **For a stage report**, the brief is the stage's line in
+  `docs/stage-report.md` with its source files, and the shot list is the
+  stage's arc in `references/story.md`. You write both files from them
+  and add nothing they do not hold.
 - **The audience:**
   - a **reviewer**, who knows the work and wants how it works, what was
     decided and what needs their eye;
   - or **users**, who want what is new and how to use it, with no
     technical detail at all.
 - **The language** of everything on screen.
-- **The output:** the film's folder (`film.tsx`, `assets/`) and the
-  `.mp4` path.
+- **The output:** the film's folder and the `.mp4` path.
 - **The kit:** `claude/video/` of the pipeline repo. Its `README.md` is
   the contract: commands, flags, the library's parts.
 
+The film's decisions (what it says, its beats) belong to whoever was
+asked for the film. If that is you, in your own session, write the brief
+and the shot list from the templates first. If you are a builder sent by
+a session, they come from that session or an Opus agent it sends; when
+the film is not a stage report and either file is missing, stop and ask
+for it.
+
 ## How you work
 
-1. **Read the source whole.** Write down, for yourself, the three to
-   five things the viewer must leave with.
-2. **Write the script** as a list of scenes: one idea each, and the words
-   on screen for each. The arcs are in `references/story.md`.
-3. **Write `film.tsx`** with the library (`references/motion.md`). Start
-   from `claude/video/example/film.tsx`. Put screenshots, footage and
-   music in `assets/` next to it.
-4. **Check:** `node <kit>/film.mjs check film.tsx`. It bundles the film and
-   lists the scenes and seconds. Fix any error it prints.
-5. **Stills:** `node <kit>/film.mjs stills film.tsx stills/`. This gives one
-   PNG per scene, at 70% of the scene. Read every PNG. Look for text that
-   is cut, crowded or too small, wrong accents, anything off the frame,
-   and two motions fighting for the eye. Fix it all in one pass. Redo only
-   the stills of the scenes you changed (`--scene <id>`).
+The film moves through gates. Each gate is a file or a check, and the
+next one starts only when it passes. The detail is in
+`references/production-contract.md`, and the templates are in
+`templates/`.
+
+```
+brief → assets → style guide + shot list → film.tsx + check → contact sheet
+      → render once → critique → repair (one more render at most) → deliver
+```
+
+1. **Brief.** Read `brief.md` and its sources whole. Write down, for
+   yourself, the three to five things the viewer must leave with.
+2. **Assets.** Put every asset the brief lists in `assets/`. A missing
+   logo, screen, recording or number stops the work with a question.
+   Never draw a stand-in.
+3. **Style guide and shot list.** Write `style-guide.md` (the palette in
+   hex, the type, the pacing, the motion, the texture). Write or complete
+   `shotlist.md`: per beat, the entry state, the exit state, why it
+   exists, and the words on screen. A beat without a reason is cut. The
+   arcs are in `references/story.md`.
+4. **Film.** Write `film.tsx` with the library (`references/motion.md`),
+   starting from `claude/video/example/film.tsx`. Then run
+   `node <kit>/film.mjs check film.tsx`, which bundles the film and lists
+   the scenes and seconds. Fix any error it prints.
+5. **Contact sheet.** Run `node <kit>/film.mjs stills film.tsx stills/`,
+   then again at scale `0.33`. Read every PNG against the contract's
+   checklist: readable at phone size, inside the safe area, real assets,
+   one type scale and one palette, the subject read by 2 s, and a last
+   frame that works as a poster. Fix it all in one pass, then redo only
+   the stills you changed (`--scene <id>`).
 6. **Render once:** `<kit>/render.sh film.tsx out.mp4` with the flags in
    the table below. It waits for the machine (`queued on …` means wait,
    not failure). Never start a render another way, never run two of yours
    at once, and never render again to polish.
-7. **Check the video:** take three frames with
-   `ffmpeg -nostdin -ss <t> -i out.mp4 -frames:v 1 f<t>.png`: one near the
-   start, one in the middle, one in the end card. Read them. If one is
-   broken, fix the film and render one more time. That is the only second
-   render, and it goes in your return.
-8. **Clean up:** delete `stills/` and the frames. The kit removes its own
-   run folders.
+7. **Critique.** Judge only the rendered file. Take three frames and
+   strips around the fastest transitions, and write
+   `reviews/critique.md` with the 3 largest defects: timestamp,
+   evidence, and a local fix.
+8. **Repair.** When a defect breaks the film, fix only the scenes it
+   names and render one more time. That is the only second render, and
+   it goes in your return.
+9. **Clean up.** Delete `<film>/stills/` by its full path. Never `rm` a
+   glob, and never delete anything under `/tmp` or `$TMPDIR`: other
+   renders keep their bundles there. The kit removes its own run folders.
 
 When the film is rendered and checked, stop. Don't add scenes, versions,
 files or docs that weren't asked for.
@@ -65,6 +95,9 @@ files or docs that weren't asked for.
 | a stage video for the reviewer | 45–90 s | `--size 720` (default), 30 fps, `--max-mb 10` |
 | the design debate's video, watched live | ≤ 60 s | `--size 720`, `fps: 24`, `--first` (goes ahead of the queue) |
 | the users' video (what is new) | 1–3 min | `--size 1080` when it shows real screens, else 720; `--max-mb 15` |
+
+**One format:** 1920×1080, horizontal. A vertical or square cut is never
+made from it by cropping.
 
 **2D by default.** Use 3D (`references/three.md`) only when the brief asks
 for it. A 3D scene costs about as much per frame as a whole 2D scene at
@@ -91,11 +124,15 @@ cut a scene before you lower the reading time. The details are in
 - **Twelve words on screen at most** per scene, in big type. The library
   holds each scene at least 1 s per 4 words. Over the length, cut a
   scene, never the reading time.
-- **Exact numbers.** Every number on screen is the number in the source.
-  List each with its `path:line` in your return.
+- **Exact numbers, real screens.** Every number on screen is the number
+  in the source; list each with its `path:line` in your return. Never
+  invent a product screen, a metric, a logo or a quote.
 - **Decisions taken in the viewer's place are marked as such** (a
   `DecisionCard`, a "decided for you" label). The viewer's own decisions
   are shown as theirs.
+- **Sober.** State things plainly and calmly. No exclamation marks, no
+  teaser question answered in capitals ("Fast or reliable? BOTH!"), and
+  no hype words.
 - **Honest.** A failure, a risk accepted or a point still open is shown as
   one.
 - **For users: no technical detail.** No services, endpoints, tables,
@@ -109,19 +146,28 @@ cut a scene before you lower the reading time. The details are in
 
 ## The look
 
-The look is yours, chosen for the subject: start from `THEMES.ink` or
-`THEMES.paper`, then change the accent, the fonts (the kit's local faces)
-and the background. Keep one accent for the one thing that matters in
-each scene. Avoid template motion: a whoosh on every cut, bouncing text,
-3D text spinning for no reason, word-by-word karaoke captions.
+The look is the style guide. Without one from the caller, choose it for
+the subject: start from `THEMES.ink` or `THEMES.paper`, then change the
+accent, the fonts (the kit's local faces) and the background. Keep one
+accent for the one thing that matters in each scene. Each object moves by
+its class (`references/motion.md`), and after every move the viewer knows
+where to look.
+
+Avoid these template defaults: big centred text on every scene,
+everything fading in the same way, everything overshooting, a gradient
+for its own sake, a logo sting at the end, a whoosh on every cut, bouncing
+text, 3D text spinning for no reason, and word-by-word karaoke captions.
+Any background beyond the theme's `bgKind` is a pre-rendered image, never
+a live full-screen SVG or gradient, which glitches under software GL.
 
 ## What you return
 
-- The paths of `film.tsx` and the `.mp4`.
+- The paths of `film.tsx`, `brief.md`, `style-guide.md`, `shotlist.md`,
+  `reviews/critique.md` and the `.mp4`.
 - The seconds and the MB, from `render.sh`'s last line.
-- The scenes, one line each.
-- The three frame PNGs you checked, and what they showed.
+- The beats, one line each.
+- The frames and strips you checked, and what they showed.
 - Every number shown, with its source.
 - What you left out of the source, one line each.
-- What is still wrong after the one fix, or `none`.
+- What is still wrong after the repair, or `none`.
 - Whether a second render happened, and why.
