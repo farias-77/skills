@@ -49,8 +49,12 @@ Extends, Uses, ACs or edges is not yours: report it back.
 
 ## Done
 
-When the brief is written (or the fixes applied), stop and report. No
-other file, no code. Never a template comment in the brief. Write in the
+Before you report, check the brief against the node in
+`plan.graph.json`, item by item: every AC id once, and Owns, Extends
+and Uses exactly as the graph lists them. Fix what differs.
+
+When the brief is written (or the fixes applied) and checked, stop and
+report. No other file, no code. Never a template comment in the brief. Write in the
 language you are given; ids, paths, commands and code stay as the
 sources have them.
 

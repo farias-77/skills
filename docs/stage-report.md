@@ -57,7 +57,8 @@ language and the output path.
 
 ```
 stage work done
-  → report.json: this stage "running", its tabs "building"
+  → report.json: this stage "running", its tabs "building", its numbers from
+    node claude/scripts/telemetry.mjs <slug> --stage <stage> --ws <workstream> --out -
   → in parallel: video-builder · slides-builder · artifact-builder (or the session fills explainer.json)
   → wait for all three (renders queue on the machine, one at a time)
   → gitleaks dir <workstream>; a finding stops the publish (a leak, per the security standard)
@@ -105,9 +106,10 @@ path, and republished with a label ("design · adjusted").
     └── explainer.json    (template stages only)
 ```
 
-**The first publish** (discovery): copy the shell to `report/index.html`,
+**The first publish** (discovery; the Build stage on the short route
+and the hotfix): copy the shell to `report/index.html`,
 set its `<title>`, then publish it with `icon: "report"` and the label
-"discovery closed". Save the URL in `.state.md`. Every later stage
+"discovery closed" (or "build closed"). Save the URL in `.state.md`. Every later stage
 publishes to that `url`. It sends only its own files, because files left
 out of a publish are kept, and it uses a label ("plan closed"), so the
 version history is the workstream's timeline.
