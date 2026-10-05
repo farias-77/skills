@@ -33,7 +33,9 @@ primary proof, at the cheapest layer that really proves it.**
   about that dimension.
 - **A proof fails if the AC breaks.** Assert state and effect, never
   markup or an internal call. An expected value is a literal, never the
-  code's own formula.
+  code's own formula. Would it pass if every function it imports
+  returned `undefined`? Then rewrite it or delete it: no new test beats
+  a bad one. See a new proof red for the right reason before green.
 - **Deterministic.** Time, ids and randomness injected; no sleep; a wait
   has a deadline and an observable condition; each test creates its own
   data.

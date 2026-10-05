@@ -12,7 +12,7 @@ it.
 
 | Class | Basis | Blocks when | Proof |
 |---|---|---|---|
-| 1 · Does not work, or is not proved | `ac` | an AC does not happen, or has no proof that would fail if it broke, or the diff breaks a behaviour that existed | the AC id and what happens instead |
+| 1 · Does not work, or is not proved | `ac` | an AC does not happen, or has no proof that would fail if it broke (it would pass if every imported function returned `undefined`: a weak assert alone, only mocks or an absence, the test's own setup asserted, a constant pinned, a fixture asserting a fixture), or the diff breaks a behaviour that existed | the AC id and what happens instead |
 | 2 · Security | `security` | a hole from the checklist below | the steps or the command and what it showed |
 | 3 · The gate weakened to pass | `rule` | a looser assert, baseline or threshold; a lint, coverage or gate target changed; a failing test deleted with no replacement named | the line, and the rule id |
 | 4 · A workaround | `rule` or `bug` | the symptom treated: a special case for the test's data, a sleep, retry or longer timeout hiding a race, an error swallowed | the line, and the reproduction or the rule |
