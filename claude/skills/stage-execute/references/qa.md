@@ -50,3 +50,6 @@ request and response) and what they showed: an AC not met (`ac`), a
 broken behaviour (`bug`), another actor reaching what is not theirs
 (`security`). Everything else is a note. The screens against the mock
 are the user's to judge, not yours.
+
+A case you could not run (the stack down, an actor missing, a route
+unreachable) is never a pass: name it and why in `inconclusive`.

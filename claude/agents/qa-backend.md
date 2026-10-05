@@ -52,4 +52,6 @@ built or changed, stop and report.
 `verified` (each AC and route, the break-it cases run, one line each) ·
 `findings` (severity `blocks` | `note` · basis · title · where (the
 route) · says (request and response, verbatim) · fix · proof (the
-command and what it printed) · side) · `closed` (in a delta).
+command and what it printed) · level (4 when you ran it) · side) ·
+`closed` (in a delta) · `inconclusive` (what you could not run and why,
+or "").

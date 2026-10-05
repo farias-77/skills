@@ -55,4 +55,6 @@ and report.
 `verified` (each AC walked, each screen and state tried, one line each)
 · `findings` (severity `blocks` | `note` · basis · title · where (screen
 and state) · says (what you saw and the screenshot path) · fix (the
-behaviour expected) · proof (the steps) · side) · `closed` (in a delta).
+behaviour expected) · proof (the steps) · level (5 when you reproduced
+it in the app) · side) · `closed` (in a delta) · `inconclusive` (what
+you could not run and why, or "").

@@ -63,4 +63,5 @@ it changed.
 
 `verified` (each AC: the code `file:line` and its proof; each checklist
 line you checked) · `findings` (severity `blocks` | `note` · basis ·
-title · where · says · fix · proof · side) · `closed` (in a delta).
+title · where · says · fix · proof · level · side) · `closed` (in a
+delta) · `inconclusive` (what you could not run, or "").

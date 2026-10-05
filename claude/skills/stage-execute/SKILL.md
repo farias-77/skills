@@ -162,7 +162,7 @@ and `outsideOwns` to the board's log. Then act by
 |---|---|
 | `ready` | the merge queue |
 | `interrupted` | `resumeFromRunId` after the reset |
-| `parked` (`round-cap`, `gate-red`, `machine`, `user`) · `blocked` | the playbook's row for it |
+| `parked` (`round-cap`, `gate-red`, `machine`, `inconclusive`, `user`) · `blocked` | the playbook's row for it |
 
 ## 5 · The merge queue
 

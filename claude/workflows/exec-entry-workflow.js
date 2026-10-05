@@ -21,7 +21,7 @@ const AGENTS = {
 }
 const CEILING = { 'builder-backend': 120, 'builder-frontend': 120 }
 const BUILDER_OF = { back: 'builder-backend', front: 'builder-frontend' }
-const BLOCKING_BASES = ['ac', 'bug', 'security', 'rule']
+const MIN_LEVEL = { ac: 4, bug: 4, security: 3, rule: 2 }
 const MAX_GATE_FIXES = 2
 const MAX_REVIEW_FIXES = 1
 const MACHINE_RERUNS = 2
@@ -83,6 +83,7 @@ const FINDING = obj({
   says: { type: 'string', description: 'the lines or what you saw, verbatim' },
   fix: str,
   proof: { type: 'string', description: 'ac: the AC id and what happens instead · bug, security: the steps and what they showed · rule: the rule id, path:line and the sentence · "" for a note' },
+  level: { type: 'integer', enum: [1, 2, 3, 4, 5], description: 'the proof ladder: 1 said · 2 pointed at the line · 3 showed the case can happen · 4 ran it · 5 reproduced it in the running app' },
   side: SIDE,
 })
 
@@ -90,6 +91,7 @@ const REVIEW = obj({
   verified: strs,
   findings: arr(FINDING),
   closed: { ...strs, description: 'in a delta: the ids of your items now closed' },
+  inconclusive: { type: 'string', description: 'what you could not run and why; "" when you ran everything your check needed' },
 })
 
 // ---------- the run ----------
@@ -105,7 +107,7 @@ const result = {
   entry, mode, status: 'parked', reason: null, head: null, since: null,
   passes: { build: 0, gateFixes: 0, reviewFixes: 0 },
   blocking: [], notes: [], flaky: [], outsideOwns: [], decided: [], questions: [], blocked: null,
-  tried: [], qa: null, gate: null, stack: null,
+  tried: [], qa: null, gate: null, stack: null, inconclusive: [],
 }
 
 const finish = (status, reason, why) => {
@@ -115,7 +117,9 @@ const finish = (status, reason, why) => {
   return result
 }
 const interrupted = (who) => finish('interrupted', 'interrupted', `${who} returned nothing; relaunch with resumeFromRunId`)
-const ready = () => finish('ready', null, `at ${result.head}, ${result.notes.length} note(s) for the PR`)
+const ready = () => result.inconclusive.length
+  ? finish('parked', 'inconclusive', result.inconclusive.map(i => `${i.seat}: ${i.why}`).join(' · '))
+  : finish('ready', null, `at ${result.head}, ${result.notes.length} note(s) for the PR`)
 
 // ---------- calling an agent ----------
 
@@ -258,7 +262,7 @@ function qaSeats(surface) {
 }
 
 const blocks = (f) => f.severity === 'blocks' && f.proof.trim() !== '' &&
-  (contractCommit ? f.basis === 'security' : BLOCKING_BASES.includes(f.basis))
+  (!contractCommit || f.basis === 'security') && f.level >= MIN_LEVEL[f.basis]
 
 function checkPrompt(name, kind, since, own, diffCmd) {
   const diff = diffCmd ?? (kind === 'delta' ? `git diff ${since} HEAD` : `git diff ${args?.base}...HEAD`)
@@ -284,6 +288,7 @@ async function check(seats, kind, since, ownBySeat = {}, diffCmd = null) {
   seats.forEach((name, i) => {
     const items = outs[i].findings.map((f, k) => ({ id: `${name}#${kind}.${k + 1}`, agent: name, ...f }))
     const notes = items.filter(f => !blocks(f))
+    if (outs[i].inconclusive.trim()) result.inconclusive.push({ seat: name, why: outs[i].inconclusive.trim() })
     blocking.push(...items.filter(blocks))
     if (notes.length > NOTES_PER_SEAT) log(`${entry}: ${name} gave ${notes.length} notes; the first ${NOTES_PER_SEAT} kept`)
     result.notes.push(...notes.slice(0, NOTES_PER_SEAT))

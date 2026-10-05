@@ -28,10 +28,10 @@ const build = (n, o = {}) => ({
   fastCheck: { green: true, lastLine: 'ok' }, proofs: [{ ac: 'S1.1', proof: 'place_order_test.go:TestPlaceOrder' }],
   tried: 'POST /orders as leader → 201', screenChange: 'behaviour', files: [], outsideOwns: [], decided: [], questions: [], blocked: '', applied: [], ...o,
 })
-const review = (findings = [], closed = []) => ({ verified: ['S1.1 at place_order.go:30'], findings, closed })
-const BUG = { severity: 'blocks', basis: 'bug', title: 'a double submit writes two orders', where: 'place_order.go:41', says: 'no key', fix: 'idempotency key', proof: 'two POSTs → two rows', side: 'back' }
-const HOLE = { ...BUG, basis: 'security', title: 'another unit reads the order by id', proof: 'GET /orders/ord_2 as another unit → 200' }
-const NOTE = { severity: 'note', basis: 'other', title: 'the empty list could name the next step', where: 'List.tsx:12', says: 'No orders', fix: 'name the action', proof: '', side: 'front' }
+const review = (findings = [], closed = [], inconclusive = '') => ({ verified: ['S1.1 at place_order.go:30'], findings, closed, inconclusive })
+const BUG = { severity: 'blocks', basis: 'bug', title: 'a double submit writes two orders', where: 'place_order.go:41', says: 'no key', fix: 'idempotency key', proof: 'two POSTs → two rows', level: 4, side: 'back' }
+const HOLE = { ...BUG, basis: 'security', title: 'another unit reads the order by id', proof: 'GET /orders/ord_2 as another unit → 200', level: 3 }
+const NOTE = { severity: 'note', basis: 'other', title: 'the empty list could name the next step', where: 'List.tsx:12', says: 'No orders', fix: 'name the action', proof: '', level: 1, side: 'front' }
 const NO_PROOF = { ...BUG, title: 'might race', proof: '' }
 const seq = (...kinds) => (n) => kinds[Math.min(n, kinds.length) - 1]
 const ARGS = {
@@ -64,6 +64,12 @@ const scenarios = [
   { title: 'a "blocks" without proof is a note; seven notes keep five', surface: SCREEN, args: { sides: ['front'] },
     reviewer: () => review([NO_PROOF, NOTE, NOTE, NOTE, NOTE, NOTE, NOTE]),
     expect: { status: 'ready', notes: 5 } },
+  { title: 'a bug only read, never run (level 2), is a note', surface: SCREEN, args: { sides: ['front'] },
+    reviewer: () => review([{ ...BUG, level: 2 }]),
+    expect: { status: 'ready', notes: 1, reviewFixes: 0 } },
+  { title: 'qa-backend could not run its cases → parked inconclusive, never ready', surface: API, args: { sides: ['back'] },
+    qaBack: () => review([], [], 'the stack did not come up: port 5432 taken'),
+    expect: { status: 'parked', reason: 'inconclusive' } },
   { title: 'the contract commit: reviewer only; a bug is a note, a hole blocks and is fixed', surface: API, args: { kind: 'contract', entry: 'C', sides: ['back'] },
     reviewer: (n) => (n === 1 ? review([BUG, HOLE]) : review([], ['reviewer#whole.2'])),
     expect: { status: 'ready', notes: 1, reviewFixes: 1, calls: 'builder-backend exec-gate reviewer builder-backend exec-gate reviewer' } },

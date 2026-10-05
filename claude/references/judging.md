@@ -111,9 +111,17 @@ brief, read by the same kinds as discovery.
 - A finding of `reviewer (Opus 5.5, high)`, `qa-frontend (Opus 5.5,
   medium)` or `qa-backend (Opus 5.5, medium)` **blocks** only with a
   basis of `ac` (not met or not proved), `bug` (reproduced), `security`
-  or `rule` (a written standard broken), **and** its proof. Everything
-  else is a note: at most 5 per seat, carried to the PR, never opening
-  work.
+  or `rule` (a written standard broken), **and** its proof at the level
+  the basis needs. Everything else is a note: at most 5 per seat,
+  carried to the PR, never opening work.
+- **The proof ladder:** 1 said it · 2 pointed at the line · 3 showed
+  the case can happen · 4 ran it (a command, a test, a request) and
+  quoted what came back · 5 reproduced it in the running app as its
+  actor. `ac` and `bug` block from 4, `security` from 3, `rule` from 2.
+  A missing or hollow proof reaches 4 by breaking the behaviour and
+  running the test: still green.
+- **`inconclusive` is not green.** A seat that could not run what its
+  check needed says what and why; the entry parks `inconclusive`.
 - **C, the contract commit:** only `security` blocks.
 - **Speculative code** blocks only with the quote of what serves no AC
   and no real risk.

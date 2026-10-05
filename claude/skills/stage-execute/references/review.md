@@ -43,9 +43,13 @@ naming, a refactor you would like: a note at most.
 `rule`, `other`) · `title` · `where` (`file:line`) · `says` (the lines,
 verbatim, or "nothing" for something missing) · `fix` (the smallest
 change) · `proof` (as the table says; a rule from memory is not a rule)
-· `side` (`back`, `front`, `both`).
+· `level` (the proof ladder in `claude/references/judging.md`: `ac` and
+`bug` block from 4, ran it; `security` from 3) · `side` (`back`,
+`front`, `both`). What you could not run goes in `inconclusive`, never
+in a guess.
 
-The triage is code: `blocks` with a blocking basis and a proof blocks;
+The triage is code: `blocks` with a blocking basis and a proof at its
+level blocks;
 everything else is a note on the PR. **At most five notes**, the ones
 that matter most. An entry has one fix pass: block only what must not
 merge.
