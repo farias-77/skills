@@ -1,299 +1,184 @@
 # skills
 
-An opinionated, stage-gated development pipeline for AI agent teams —
+An opinionated, stage-gated development pipeline for AI agent teams,
 built as [Claude Code](https://claude.com/claude-code) skills, agents
 and workflows, extracted from production use at a real software
 company and published as-is.
 
 **This is not a framework.** It is one team's working pipeline, made
-public because the ideas travel even where the specifics don't. It is
-deliberately opinionated: read it, steal what fits, and shape your own.
-The best way to use it is to **fork it and keep editing** — the
-weekly retro exists precisely to keep rewriting these files as
-reality pushes back.
+public because the ideas travel even where the specifics don't. Read
+it, steal what fits, and shape your own. The best way to use it is to
+**fork it and keep editing**: the weekly retro exists to keep
+rewriting these files as reality pushes back.
 
 ## What it is
 
-A software factory for a team of one: a person says what to build,
-and a crew of agents turns it into tested, reviewed, released code
-with a launch video at the end. Six rules hold at every stage:
+A software factory for a team of one: a person says what to build, and
+a crew of agents turns it into tested, reviewed, released code, with a
+report he can watch at every stage. Several fronts run at once, through
+the night, and he is asked only what is his.
 
 | Rule | What it means |
 |---|---|
-| **Proof over opinion** | whatever can be checked by running something is: a clickable mock, journeys that become tests, a gate, QA on the running app. Reviewers exist for what cannot be run |
-| **Right size, always** | one proposal at the "basics done well" bar, a critic whose only job is to cut, and an evolution path for what was relaxed; every mechanism names the AC or the risk that forces it |
-| **Specialists with knowledge packs** | each agent reads the packs of its craft before it works |
-| **He is asked only what is his** | he is in the loop at discovery and in the design debate; plan, execute and release run from play to done. What needs him in person is gathered up front, in one pre-flight message |
-| **A report in layers** | every stage reports as slides, then the blueprint; discovery, design and plan open with a short video, and the close with the launch film |
-| **The pipeline measures itself** | each stage records its time, his minutes, agent hours, tokens, rounds and findings; the retro records where it got stuck, and the weekly retro turns what repeats into pipeline changes he rules |
+| **Proof over opinion** | a live mock he clicks, ACs that become tests, a gate, QA on the running app; reviewers exist for what cannot be run |
+| **Right size** | one proposal sized to the problem, an overengineering guard whose only job is to cut, an evolution path for what was left out; "could be simpler" never blocks |
+| **One round** | every review runs once; a fix is verified by reading or by the delta, never by a second round |
+| **He is asked only what is his** | the conductor decides his class conservatively and lists it for veto; only a locked AC changed, a new recurring cost or something irreversible becomes a question |
+| **A report he can watch** | one link per front: each stage gets a Video, a Deck and an Explainer, finished before the stage closes |
+| **Local CI, one guard** | the whole gate runs on our compute and posts the status `main` requires; a hook denies what cannot be undone |
+| **It measures itself** | a script reads time, cost and his touches per stage; the weekly retro turns what repeats into changes he rules |
 
-One demand becomes a **workstream**: one folder, one conducting Claude
-Code session per stage, one **blueprint** (a single self-contained HTML
-page, the same URL from discovery to done, a tab per stage, built from
-JSON the stages write and never edited by an agent). State lives in
-files, never in a session's memory: any session can `/clear` and
-resume from the workstream's `.state.md`.
+## One door, three routes
+
+```
+/lets-cook <idea> ──► scouts in the background ──► a light interview ──► the route, in one line
+  ├─ full    ──► the six stages below
+  ├─ short   ──► one-page brief ──► ! authorize + /goal ──► one entry ──► his use ──► release ──► short close
+  └─ hotfix  ──► brief + a test that reproduces the bug ──► ! authorize + /goal ──► one entry ──► release
+```
+
+Every route keeps every check (builder, gate, reviewer and QAs, local
+CI, staging, tag, watch); only the ceremony shrinks.
 
 ## The six stages
 
 ```mermaid
 flowchart LR
-  D1["1 · Discovery<br/>interview + mock + lock"] -- "his play" --> D2["2 · Design<br/>one proposal · the debate"]
-  D2 -- "his play" --> D3["3 · Plan<br/>autonomous graph"]
-  D3 -- "his play" --> PF{{"pre-flight + goal"}}
-  PF --> D4["4 · Execute<br/>local CI queue"]
-  D4 -- "his play" --> D5["5 · Release<br/>under his play"]
-  D5 -- "his play" --> D6["6 · Close<br/>retro + launch video"]
+  D1["1 · Discovery<br/>live mock + stories"] --> D2["2 · Design<br/>one proposal · the debate"]
+  D2 --> D3["3 · Plan<br/>the build graph"]
+  D3 --> D4["4 · Execute<br/>entries + local CI + his hands-on"]
+  D4 --> D5["5 · Release<br/>main · staging · tag · production"]
+  D5 --> D6["6 · Close<br/>users' video + retro"]
   D6 -. "the retro" .-> W["Weekly retro"]
   W -. "changes the pipeline" .-> D1
 ```
 
-**Every stage starts on his play.** No stage starts the next one.
-He runs `/clear`, sets the model and effort the stage names, and
-invokes the stage skill with the workstream slug. A stage that needs
-him asks at the start (the discovery interview, the design talk and
-debate, the execute pre-flight, the release play); then it runs on its
-own to its close, and the close ends with the next play: the exact
-lines to type, and nothing runs until he types them.
+Each stage opens with **the canary** (the guard must deny `git push
+origin a:b`) and, except discovery, hands him **one `/goal`**; then it
+runs on its own to its close. It closes with its report published and
+the next play: `/clear`, then `/stage-<next> <slug>`. Every session
+runs on Opus 5.5, high.
 
-| Stage | Session | The play |
+| Stage | What happens | His part |
 |---|---|---|
-| 1 discovery | Opus 5.5, medium (high on the turns that rule) | `/stage-discovery` and the demand |
-| 2 design | Opus 5.5, high | `/stage-design <slug>` |
-| 3 plan | Opus 5.5, high | `/stage-plan <slug>` |
-| 4 execute | Opus 5.5, high | `/stage-execute <slug>` |
-| 5 release | Opus 5.5, medium | `/stage-release <slug>` |
-| 6 close | Opus 5.5, medium | `/stage-close <slug>`; the last stage, no next play |
+| **1 · Discovery** | while he talks, `prototype-builder (Sonnet 5.5, medium)` turns each answer into a visible edit of a live mock; the conductor locks it when nothing is open; `story-writer (Sonnet 5.5, high)` writes the stories, one AC per rule; one review round (`discovery-review-workflow.js`: three `disc-lens (Sonnet 5.5, medium)` and, per story, two `blind-reader (Sonnet 5.5, low)` and a `blind-judge (Sonnet 5.5, medium)`) | the conversation; the playback, story by story |
+| **2 · Design** | scouts read the system; `architect (Opus 5.5, high)` writes one proposal with its v1 → v2 → v3 path; `overengineering-guard (Opus 5.5, medium)` cuts; after his "closed", the architect writes `solution.md` and five `design-writer (Sonnet 5.5, high)` the other documents; four lenses review once, called directly by the session: `design-consistency` and `design-security` (Opus 5.5, medium), `design-contracts (Sonnet 5.5, high)`, the guard again | the debate over a deck and a ≤60 s video, until "closed" |
+| **3 · Plan** | `planner (Opus 5.5, high)` cuts the widest graph: a thin contract commit C, entries of one whole behaviour (≤12 ACs) with front and back in parallel, E-int last; `plan-writer (Sonnet 5.5, high)` writes one brief per node; one round (`plan-review-workflow.js`: `plan-reviewer (Opus 5.5, medium)` and the double-blind per brief); the session rules everything and writes the pre-flight | nothing; a veto list at the close |
+| **4 · Execute** | the session is the tech lead. Every ready entry runs `exec-entry-workflow.js`, in its own cloud session when the project has one: `builder-backend` ∥ `builder-frontend (Opus 5.5, medium)` → `exec-gate (Sonnet 5.5, low)` → `reviewer (Opus 5.5, high)` ∥ `qa-frontend` · `qa-backend (Opus 5.5, medium)` by surface → one fix pass → the delta. A serial queue merges into `feat/<slug>`; the project's signoff command runs the whole gate and posts `local-ci` | the pre-flight; his hands-on with the running app, each answer an `A.n` round, until "ok" |
+| **5 · Release** | merge into `main` behind `local-ci`; the CI deploys staging and smokes; a `vX.Y.Z` tag promotes the same image to production, smokes, watches 15 minutes and rolls back on its own. A red gets one fix entry; a second red stops | his authorization line; a question only on the stop list (a new production deploy after a rollback is one) |
+| **6 · Close** | the users' video (1–3 min, recorded on staging) and a "what's new" text he forwards; a short retro with the script's numbers; a script proves nothing of the front is left on the machine | nothing |
 
-```
-/clear
-/model claude-opus-5-5
-/effort high
-/stage-plan 2026-08-15-workspace-invites
-```
-
-**1 · Discovery — the interview builds the mock.** The demand's owner
-says everything that needs to be built while a clickable mock of it is
-built in front of him: exact in look (the project's exported tokens
-and components) and in behaviour (every screen and state, realistic
-data, a faked store whose side effects show in a backstage pane). A
-journey panel plays each journey step by step; he validates through
-it. His "lock it" is the gate: the lock walks every journey and state
-once more and freezes the frames. From the locked mock, the journeys
-(YAML a test can run), the use cases and the acceptance criteria
-(`J1.s2.1 [RULE] GIVEN/WHEN/THEN`, one per rule and one per behavior)
-are derived by `journey-scribe (Sonnet 5.5, high)`, plus a one-page
-PR-FAQ. One review round (`disc-reviewer (Sonnet 5.5, medium)` and a
-`disc-blind-reader (Sonnet 5.5, low)` per story, filtered), verified
-by reading: no second round, no delta. The report's video is the mock
-in use, 60–90 s.
-
-**2 · Design — one proposal, debated until closed.** Scouts (`scout
-(Sonnet 5.5, low)`) read the current system; he is asked what he has
-in mind. One `architect (Opus 5.5, high)` writes one proposal at the
-"basics done well" bar, with where it disagrees with him and the
-evolution path; `overengineering-critic (Opus 5.5, medium)` cuts what
-serves no AC and no real risk. The proposal is presented as a video
-and slides and debated with him until he says it is closed, the slides
-re-rendered each round. Then four `design-writer (Sonnet 5.5, high)`
-in parallel write `solution.md`, `data-and-contracts.md` (with a
-Contract per feature), `tests.md` (one primary proof per AC) and
-`operations.md`, about 40 KB each; one `design-reviewer (Opus 5.5,
-medium)`, one round, blocking findings only (AC coverage, consistency,
-security posture).
-
-**3 · Plan — his play, then no user in the loop, maximum width.** From A (what the
-scouts find today and what the other running fronts are changing) to B
-(what the design says exists), as a build graph a script checks
-(`plan.graph.json`). Compute is infinite: one `planner (Opus 5.5,
-high)` cuts the most parallel graph — a thin foundation, every entry
-one whole behaviour built at once, front and back in parallel on the
-design's Contract, hot files made cold, an edge only where nothing can
-be faked, one integration entry at the end. `plan-writer (Sonnet 5.5,
-high)` writes one brief per entry, all at once; one review round
-(`plan-reviewer (Opus 5.5, medium)` and a `plan-blind-reader (Sonnet
-5.5, low)` per brief, filtered). The conductor rules everything and
-lists its choices for veto; the pre-flight lists what only he can hand
-over, each item with a ready command. It asks him nothing, yet it
-starts only on his play, and stage 4 waits for the next one.
-
-**4 · Execute — play, and come back to use it.** He hands over
-the pre-flight and pastes one goal; he is called once, at the end.
-Done means the plan's ACs met and the gate green; nothing else blocks.
-Per node: one `builder (Opus 5.5, medium)` writes the code and a test
-per AC (two, back and front in parallel, when the brief fixes the
-contract), running only the fast checks; the gate runs the suites
-once; then, in parallel, one `reviewer (Opus 5.5, high)` and the QAs
-of the surface (`qa-frontend`, `qa-backend`, both Opus 5.5, medium),
-none of whom wrote the code. A finding blocks only on an AC not met, a
-reproduced bug, a security hole or a written rule broken; the rest are
-notes on the PR. One fix pass at most, then the entry merges or parks.
-When the project has a cloud environment, each entry runs in its own
-Claude Code cloud session, as many at once as are ready, and comes back
-as pushed branches the session watches with a git loop; without one, or
-when a cloud run fails twice, entries run locally up to the measured
-cap. The session is the **local CI**: a serial queue tests each merged
-tree and signs it off; the whole gate runs once at the end. Then his
-hands-on: the session runs the environment, he uses the app and says
-what to change in plain words, and each adjustment is built on the
-spot (builder, gate, merge; the reviewer only when it touches auth,
-permissions or personal data) until he says ok.
-
-**5 · Release — autonomous, responsible.** Stage 4 owns working, so
-the release does not re-test the feature. His play is his "go": one
-message carries the pre-flight and the play line that authorizes the
-audited head. Then the session merges into `main` behind the local-CI
-signoff, deploys staging and smokes the read-only journeys there,
-ships production progressively where the platform allows (a candidate
-at 0% smoked on its tag, then the shift), smokes it, and watches
-errors and latency for 15 minutes, rolling back on its own on the
-triggers it wrote before the play. A red gets one fix through the
-stage-4 pipeline; after a production rollback, the new production
-deploy asks him first; a second red stops and reports. A guard hook
-holds whatever cannot be undone.
-
-**6 · Close — the retro for the pipeline, the launch for the people.**
-The retro is short and fixed: the numbers from every stage's telemetry
-beside the previous workstream's, three things that went well, three
-where it got stuck and where the time went, at most three ideas. It
-stays in the workstream for the weekly retro, the only place the
-pipeline changes: one `weekly-reader (Opus 5.5, medium)` reads the
-week's closed workstreams and proposes changes he rules. For the
-product's users and the team, a launch director plans a film, a
-recorder captures the real app journey by journey, and the video kit
-renders one portfolio-grade 16:9 launch video with a tutorial per
-feature, plus a "what's new" text.
+The **weekly retro** reads the week's closed fronts together and
+proposes changes, each with its evidence and exact edit; he rules each
+one (apply · park · drop). It is the only place the pipeline changes.
 
 ## The roster
 
-Every agent is a file under `claude/agents/`, and every mention of one
-carries its model and effort. Only **Opus 5.5** and **Sonnet 5.5** are
-used: Opus at medium writes the most mergeable code and judges more
-precisely; Sonnet reads literally and fills templates fast. The table
-below is generated from [docs/models.md](docs/models.md), which holds
-the evidence for each pick; `node scripts/check-models.mjs` fails when
-an agent's frontmatter disagrees.
-
-| Session | Model, effort |
-|---|---|
-| discovery conductor | Opus 5.5, medium; high on the turns that rule |
-| design, plan conductors · execute session | Opus 5.5, high |
-| release, close sessions · `/pipeline-setup` | Opus 5.5, medium |
+Every agent is a file under `claude/agents/`. Only **Opus 5.5** and
+**Sonnet 5.5** are used: Opus where judgment pays (architecture, the
+cut, code, review, QA, the risk lenses), Sonnet for literal reading
+and templated writing, never above high.
+[docs/models.md](docs/models.md) holds the evidence for each pick;
+`node scripts/check-models.mjs` fails when an agent disagrees with it.
 
 | Stage | Agent | Model, effort |
 |---|---|---|
 | all | `scout` | Sonnet 5.5, low |
-| discovery, design, plan | `video-scribe` | Sonnet 5.5, medium |
-| discovery to release | `slides-scribe` | Sonnet 5.5, high |
-| discovery | `prototyper` | Opus 5.5, medium |
-|  | `journey-scribe` | Sonnet 5.5, high |
-|  | `disc-author-prfaq` | Sonnet 5.5, high |
-|  | `disc-reviewer` | Sonnet 5.5, medium |
-|  | `disc-blind-reader` | Sonnet 5.5, low |
+| every report | `video-builder` · `slides-builder` · `artifact-builder` | Sonnet 5.5, medium |
+| discovery, plan | `blind-reader` | Sonnet 5.5, low |
+|  | `blind-judge` | Sonnet 5.5, medium |
+| discovery | `prototype-builder` | Sonnet 5.5, medium |
+|  | `story-writer` | Sonnet 5.5, high |
+|  | `disc-lens` | Sonnet 5.5, medium |
 | design | `architect` | Opus 5.5, high |
-|  | `overengineering-critic` | Opus 5.5, medium |
-|  | `design-researcher` | Sonnet 5.5, medium |
+|  | `overengineering-guard` | Opus 5.5, medium |
 |  | `design-writer` | Sonnet 5.5, high |
-|  | `design-reviewer` | Opus 5.5, medium |
+|  | `design-consistency` · `design-security` | Opus 5.5, medium |
+|  | `design-contracts` | Sonnet 5.5, high |
 | plan | `planner` | Opus 5.5, high |
 |  | `plan-writer` | Sonnet 5.5, high |
 |  | `plan-reviewer` | Opus 5.5, medium |
-|  | `plan-blind-reader` | Sonnet 5.5, low |
-| execute | `builder` | Opus 5.5, medium |
+| execute | `builder-backend` · `builder-frontend` | Opus 5.5, medium |
 |  | `exec-gate` | Sonnet 5.5, low |
 |  | `reviewer` | Opus 5.5, high |
-|  | `qa-frontend` | Opus 5.5, medium |
-|  | `qa-backend` | Opus 5.5, medium |
-| release | `release-scribe` | Sonnet 5.5, medium |
-| close | `close-harvester` | Sonnet 5.5, medium |
-|  | `launch-director` | Opus 5.5, high |
-|  | `footage-recorder` | Sonnet 5.5, medium |
-| weekly | `weekly-reader` | Opus 5.5, medium |
+|  | `qa-frontend` · `qa-backend` | Opus 5.5, medium |
 
-## Knowledge packs
+## The skills
 
-A pack is a reference-only skill (`claude/skills/pack-<name>/`, with
-`user-invocable: false`): a checklist plus recipes for one craft,
-never an essay. Registered agents preload theirs through `skills:` in
-their frontmatter; agents run inline by a workflow get each pack's
-path in the prompt; a session loads one with the Skill tool.
+| Skill | Runs as | What it does |
+|---|---|---|
+| `lets-cook` | session | the one door: interview, route, and the short route and hotfix end to end |
+| `stage-discovery` · `stage-design` · `stage-plan` · `stage-execute` · `stage-release` · `stage-close` | session | the six stages |
+| `weekly-retro` | session | the week's fronts read together; the only place the pipeline changes |
+| `pipeline-setup` | session | audits a project against the bar and closes the cheap gaps on a branch |
+| `draw-it-for-me` | preloaded by `artifact-builder`, `prototype-builder` | explanatory pages: diagrams that build, motion, 3D, charts |
+| `pitch-it-for-me` | preloaded by `slides-builder` | HTML slide decks, one idea per slide |
+| `make-it-a-movie` | preloaded by `video-builder` | motion films written as one TSX file on the video kit, rendered once |
+| `i-wont-read-all-this` | always on | replies shaped for a reader who skims |
 
-| Pack | Read by |
-|---|---|
-| `design-taste` | prototyper (Opus 5.5, medium), builder (Opus 5.5, medium; screens) |
-| `motion-3d` | prototyper (Opus 5.5, medium), builder (Opus 5.5, medium; screens), launch-director (Opus 5.5, high) |
-| `interview-journeys-copy` | discovery conductor, prototyper (Opus 5.5, medium), journey-scribe (Sonnet 5.5, high), disc-author-prfaq (Sonnet 5.5, high), disc-reviewer (Sonnet 5.5, medium) |
-| `right-sizing` | the design conductor, architect (Opus 5.5, high), overengineering-critic (Opus 5.5, medium) |
-| `parallel-plan-local-ci` | the plan conductor, planner (Opus 5.5, high), plan-reviewer (Opus 5.5, medium), the execute session |
-| `go-backend` · `react-frontend` | builder (Opus 5.5, medium), reviewer (Opus 5.5, high); go also qa-backend (Opus 5.5, medium), react also qa-frontend (Opus 5.5, medium) |
-| `ops` | architect (Opus 5.5, high), builder (Opus 5.5, medium; ops), reviewer (Opus 5.5, high), the release session |
-| `release` | the release session |
-| `launch-video` | launch-director (Opus 5.5, high), footage-recorder (Sonnet 5.5, medium), the video kit's launch mode |
-| `model-selection` | whoever picks a model: the evidence behind `docs/models.md` |
+Each skill folder has its own `README.md`: what it does, how to install
+only it, its files. Knowledge lives in each skill's `references/`.
 
-## A report in layers
+## The workflows
 
-Every stage closes with one report in layers, read in order: a
-**video** on how the result works, **slides** with the details one
-idea at a time, and the **blueprint** with everything. He goes up one
-layer only when he wants more.
-
-| Stage | Video | Slides | Blueprint |
+| Workflow | Stage | Runs | Dry run |
 |---|---|---|---|
-| Discovery | the locked mock in use, 60–90 s | yes | yes |
-| Design | the proposal, at the start of the debate and at the end | yes, re-rendered each round | yes |
-| Plan | the graph, 60–90 s | yes | yes |
-| Execute | none: his hands-on with the running app is the validation | yes | yes |
-| Release | none | yes | yes |
-| Close | the launch film, 16:9 only, for the people who use the product | none | the Retro tab |
+| `discovery-review-workflow.js` | discovery | three lenses ∥ the double-blind per story | `scripts/discovery-review-dry-run.mjs` |
+| `plan-review-workflow.js` | plan | the plan reviewer ∥ the double-blind per brief | `scripts/plan-review-dry-run.mjs` |
+| `exec-entry-workflow.js` | execute, release, lets-cook | one entry: builders → gate → reviewer ∥ QAs → triage → one fix → the delta; modes `build`, `resume`, `update`, `fix` | `scripts/exec-entry-dry-run.mjs` |
 
-A stage with a video waits for its render before it closes. The video
-kit (`claude/video/`) renders a storyboard JSON to MP4 with no code per
-video; the procedure is [docs/stage-report.md](docs/stage-report.md).
+The design review needs no workflow: the session calls its four lenses
+directly.
+
+## The report
+
+Each front has **one private link**: a rail of stages, each with
+**Video · Deck · Explainer**, filled as each stage closes and finished
+before it does. The shell is `claude/report/shell.html` plus a
+`report.json`; the video kit (`claude/video/`) renders a TSX film on
+its motion library into an MP4; the decks are HTML slides. The short
+route's rail is Build · Release · Close. See
+[docs/stage-report.md](docs/stage-report.md).
 
 ## Local CI and the guard
 
-- **The CI is local.** In execute the session is the only process that
-  merges into the feature branch. Per node: the base comes in by a
-  merge, the paths outside the node's owned files are listed, the
-  merged tree passes the affected gate, it merges, and the signoff posts
-  `local-ci/affected`. The whole gate runs once at the end in a fresh
-  worktree and posts `local-ci`, the only context `main` requires.
-  Hosted CI keeps the deploy.
+- **The CI is local.** The project's signoff command runs the whole
+  gate in a clean worktree on our compute and, only on exit 0 and
+  under a bot identity, posts the `local-ci` status `main` requires.
+  `claude/scripts/local-ci.sh` is the generic fallback. Hosted CI keeps
+  the deploys and the environments.
 - **One guard.** `claude/hooks/guard-irreversible.sh` is a PreToolUse
-  hook on Bash and every file tool: it denies the irreversible
-  (destroying infrastructure, deleting data, force-push, a forged
-  status, edits to itself), asks before a secret's value is touched,
-  and asks before a merge whose head his play did not authorize. That
-  is why the merge and the production deploy can sit in `allow`.
+  hook on Bash and every file tool, installed behind a fail-closed
+  wrapper: it denies the irreversible (destroying infrastructure,
+  deleting data, force-push, a forged status, reading the CI token,
+  switching identity, edits to itself), and any merge into `main` or
+  `v*` tag that his authorization line does not cover.
+  `claude/hooks/authorize.sh` writes that line; only he runs it, as
+  `! .claude/hooks/authorize.sh …`.
 
 ## The bar and `/pipeline-setup`
 
-The pipeline is generic: it reads the stack, the layout and the taste
-from the project. [docs/project-contract.md](docs/project-contract.md)
-is the bar, written as 23 **roles** in three levels — required (a
-doctrine, golden paths, a gate that runs locally, a stack per
-worktree, the structure check, the release roles, the permissions and
-the guard, the local-CI signoff, the mock toolchain, the release's
-smoke), recommended, and
-for the full experience (autonomous release, progressive delivery, a
-cloud environment for entries, the video toolchain).
+The pipeline is generic: it reads the stack, the commands and the
+taste from the project. [docs/project-contract.md](docs/project-contract.md)
+is the bar, written as roles in three levels: required (standards,
+golden paths, the gates, a stack per worktree, the release roles, the
+permissions and the guard, the local-CI signoff, the mock toolchain,
+the smoke), recommended, and for the full experience (a cloud
+environment for entries, the video toolchain).
 
 Run **`/pipeline-setup <path-to-project>`** first. It audits the
-project against the bar with scouts reading a detached worktree at the
-default branch's sha, writes `pipeline-readiness.md` (present ·
-partial · missing, each with its evidence) and commits it on the setup
-branch, never in your working tree, proposes the cheapest order to
-close the gaps, and applies the generic pieces on that branch when you
-say so — the settings template, the guard and its
-tests, the local-CI script, the structure check. What is the user's
-alone (branch protection, the autonomous posture, anything with a
+project with scouts reading a detached worktree at the default
+branch's sha, writes `pipeline-readiness.md` (present · partial ·
+missing, each with its evidence) on a setup branch, proposes the
+cheapest order to close the gaps, and applies the generic pieces on
+that branch when you say so: the settings, the guard and
+`authorize.sh`, the structure check, the cloud templates. What is the
+user's alone (branch protection, the bot identity, anything with a
 secret) is listed with a ready command, never run.
 
 ## Install
 
-Shared across projects by symlink — each project keeps its own
-settings and machine tuning; the pipeline stays one source:
+Shared across projects by symlink; each project keeps its own settings:
 
 ```bash
 git clone https://github.com/farias-77/skills.git ~/skills
@@ -302,71 +187,42 @@ cd <your-project>/.claude
 ln -s ~/skills/claude/skills skills
 ln -s ~/skills/claude/agents agents
 ln -s ~/skills/claude/workflows workflows
-ln -s ~/skills/docs docs
 ```
 
 Then, in Claude Code inside the project: `/pipeline-setup .`
 
-What the pipeline expects around it:
-
-- **Claude Code**, with the `gh` CLI authenticated: GitHub is the
+- **Claude Code** with the `gh` CLI authenticated: GitHub is the
   source of record and the signoff's target.
-- The Workflow tool launches only a script it can read from the working
-  directory or an added directory, and it resolves the symlink: add the
-  clone to the project's settings
-  (`permissions.additionalDirectories: ["~/skills"]`), or the workflows
-  refuse to start.
-- On the station: Node (current LTS), `ffmpeg` and the video kit's
-  dependencies (`npm ci` in `claude/video/`) for the stage reports;
-  `playwright-core` and a Chromium for discovery's mock
-  (`PLAYWRIGHT_DIR`, `PROTO_CHROME`).
-- Project specifics — environments, credentials, deploy targets — live
-  in **your** project's `CLAUDE.md` and doctrine, never in these files.
+- The Workflow tool resolves the symlink: add the clone to the
+  project's settings (`permissions.additionalDirectories: ["~/skills"]`),
+  or the workflows refuse to start (each stage also knows how to copy
+  the script into the workstream and run the copy).
+- On the station: Node (current LTS), `ffmpeg` and `npm ci` in
+  `claude/video/` for the reports; `playwright-core` and a Chromium for
+  discovery's mock (`PLAYWRIGHT_DIR`, `PROTO_CHROME`); `gitleaks`.
+- Project specifics (environments, credentials, deploy targets) live
+  in **your** project's `CLAUDE.md` and standards, never in these files.
 
 ## Layout
 
 ```
 CLAUDE.md               the house rules every stage follows
 claude/
-  skills/               stage-*: one folder per stage (SKILL.md, templates, references, scripts);
-                        pack-*: the knowledge packs; pipeline-setup; weekly-retro
+  GLOSSARY.md           one line per term
+  references/           judging.md: the one rule for every review
+  skills/               one folder per skill: SKILL.md, README.md, references/, templates/, scripts/
   agents/               every agent, its model and effort in the frontmatter
-  workflows/            deterministic multi-agent rounds (plain JS, single file each)
-  hooks/                guard-irreversible.sh and its tests
-  blueprint/            the blueprint shell, its build, strings per language, the JSON schemas
-  video/                the video kit (Remotion): storyboard JSON → MP4, launch mode
-docs/                   the bar, models.md, the stage report, the reviewer contract
-scripts/                check-models.mjs; the workflows' dry runs (mocked agents)
+  workflows/            <name>-workflow.js: the multi-agent rounds, plain JS
+  hooks/                guard-irreversible.sh, authorize.sh, their tests
+  scripts/              local-ci.sh (the fallback signoff), telemetry.mjs, cleanup.sh
+  report/               the report shell, the template explainer, a working example
+  video/                the video kit (Remotion): the motion library, render.sh
+docs/                   the bar, models.md, the stage report, testing the pipeline
+scripts/                check-models.mjs; the workflows' and local-ci's dry runs
+codex/                  a placeholder
 ```
 
-## On cost
-
-The pipeline spends tokens where they buy quality and cuts them where
-the runs showed waste. Every review is one round (at design and plan
-one reviewer, at discovery and plan plus filtered blind readers), an
-execute entry gets one fix pass and the suites run
-once per pass, in the gate, design asks him only in the debate and plan asks
-him nothing, and each role runs on the cheapest model and effort the
-benchmarks support ([docs/models.md](docs/models.md)). What stays
-redundant on purpose: the reviewer and the QAs never wrote what they
-read, and the whole gate runs once more on the top of the branch.
-
-## Glossary
-
-| Term | Meaning |
-|---|---|
-| **workstream** | one demand, end to end — one folder, one blueprint |
-| **conductor** | the stage's session: dispatches, routes, rules, talks to him; never writes the deliverables |
-| **mock** | discovery's clickable prototype, exact in look and behaviour, fully faked; locked by him |
-| **proposal** | design's one solution at the "basics done well" bar, debated with him until he says it is closed |
-| **foundation** | `F`: what two nodes would both write (contract, migrations, seams, factories, exemplars), built first and thin |
-| **node** | one unit of the build graph: the foundation, a lane `F-x<n>`, a slice `E-<nn>`, the integration node `E-int` |
-| **play** | his one message that starts an autonomous stage; at release it authorizes the audited head |
-| **pre-flight** | everything only he can hand over (keys, accounts, DNS), asked once, up front |
-| **local CI** | the gate run on the station, signed off as a commit status `main` requires |
-| **pack** | a knowledge pack: a checklist plus recipes for one craft |
-| **blind reader** | an agent that reads alone, so what it cannot judge exposes ambiguity |
-| **weekly retro** | the only place the pipeline changes: the week's closed workstreams read together, he rules each proposal |
+Terms are in [claude/GLOSSARY.md](claude/GLOSSARY.md).
 
 ## License
 

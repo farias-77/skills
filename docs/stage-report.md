@@ -2,7 +2,7 @@
 
 Each workstream has **one link**. The page has a rail of stages on the
 left, and each stage has three tabs: **Video · Deck · Explainer**. The same
-link fills in as each stage finishes. It replaces the blueprint.
+link fills in as each stage finishes.
 
 ```
 ┌──────────────┬───────────────────────────────────────────┐
@@ -33,7 +33,7 @@ when its three tabs are published, and that message carries the link.
 | Release | main → staging → tag → production, smokes and the watch, 30–45 s | versions, notes, smokes, rollback if any | the release timeline; with an incident, the incident drawn |
 | Close | **for users**: a tutorial of the new screens, or a motion piece of the idea if only the backend changed, 1–3 min, recorded on staging | the retro (up to 5 per section) + the numbers + the "what's new" text to paste | the workstream's numbers: time, cost and touches per stage, against earlier workstreams |
 
-**Direct route and hotfix:** the rail is **Build · Release · Close**. Build
+**Short route and hotfix:** the rail is **Build · Release · Close**. Build
 and Release have only the Deck. The Close makes the users' video only when
 a screen users see changed. Under each stage, its three numbers (time,
 cost, his touches) come from the telemetry.
@@ -77,7 +77,8 @@ closed proposal.
 
 **The close** waits for its users' video, which is the close's product.
 Recording starts as soon as the release is green on staging. The video
-goes out as an `.mp4` plus the "what's new" text for him to forward;
+is rendered at `report/close/video.mp4` (`--size 1080 --max-mb 15`), where
+the Close tab plays it, and goes out as that `.mp4` plus the "what's new" text for him to forward;
 nothing is published outside the company without his approval.
 
 **When a piece fails** (a render that dies, a deck that cannot be
@@ -131,7 +132,7 @@ per version.
 ```
 
 - `stages[].id`: `discovery` `design` `plan` `execute` `release` `close`, or
-  `build` `release` `close` on the direct route.
+  `build` `release` `close` on the short route and the hotfix.
 - `state`: `closed` · `running` · `todo`.
 - A tab's `state`: `ready` · `building` · `failed` (with `why`) · `none`
   (not made for this stage, with `why`).

@@ -24,7 +24,7 @@ The prompt tells the conductor three things beyond the slash command:
 
 | Setting | Why |
 |---|---|
-| `CLAUDE_CODE_PRINT_BG_WAIT_CEILING_MS=0` in the session's environment | print mode ends background tasks 600 s after the turn ends ("Background tasks still running after 600s; terminating"). A stage dispatches long agents in the background (the prototyper, the scribes, the review); without this they die midway and nothing is written |
+| `CLAUDE_CODE_PRINT_BG_WAIT_CEILING_MS=0` in the session's environment | print mode ends background tasks 600 s after the turn ends ("Background tasks still running after 600s; terminating"). A stage dispatches long agents in the background (the prototype-builder, the report builders, the review); without this they die midway and nothing is written |
 | the persona's definition and any harness agents JSON **outside** the conductor's working directories | the persona's prompt holds the answers (what he wants built, his rules, when he locks). A file the conductor can read contaminates the test: it knows the answers before it asks. Keep it where only the harness reads it (a path passed with `--agents` from outside the tree, or the user-level agents folder of a separate config dir) |
 | the pipeline reachable without a symlink across directories, or `--add-dir <the pipeline root>` | the Workflow tool refuses a `scriptPath` that resolves outside the session's working directories; the skills then copy the workflow into the workstream's `_run/` (sha checked), which works but costs a turn |
 | `PLAYWRIGHT_DIR` (optional) | `proto.mjs` finds `playwright-core` in the pipeline's `claude/video/node_modules` by default; set it only to use another install |
