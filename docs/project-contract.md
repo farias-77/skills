@@ -142,8 +142,10 @@ runs the whole gate in a fresh worktree at one pushed sha and, **only
 on exit 0**, posts the commit status **`local-ci`** on that sha under
 the **bot identity** (role 15). It has a `--dry-run` that posts
 nothing; without the bot's token it exits 3 ("green, not posted"). The
-token is readable by that command alone: the guard and the settings
-deny agents any read of it.
+token is the bot's everyday one (role 15), not a second token, so the
+gate runs overnight with nobody pasting anything. The barrier is the
+guard: it denies agents printing the token and posting any status by
+hand, so only this command posts.
 
 `main`'s ruleset requires `local-ci`, pull requests only, no
 force-push, no deletion. Hosted CI keeps only what needs GitHub: the
