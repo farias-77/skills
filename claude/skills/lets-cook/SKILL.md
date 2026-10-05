@@ -98,7 +98,9 @@ small on the wrong thing builds the wrong thing.
 2. `gitleaks dir <designs-root>/<slug>`: a finding stops everything
    (a secret in a brief is an incident).
 3. `.state.md`: route, `repo` (legacy or not), step. Your line in
-   `_coordination.md`: slug, route, branch, this session's name.
+   `_coordination.md`: slug, route, branch, this session's name. A
+   hotfix also tells every session named there, by `SendMessage`:
+   "hotfix <slug> in flight, it merges first".
 4. One message, then end the turn: the brief's link, the route line,
    and the two commands he runs:
 
@@ -121,14 +123,16 @@ In a legacy repo the first line is
 - **Hotfix first:** the test that reproduces the bug, at the cheapest
   layer that shows it, red on the current code. It stays in the
   security floor when the bug was one.
-- Run `exec-entry-workflow.js` mode `build`, one entry, its brief being
-  `brief.md`. The `reviewer (Opus 5.5, high)` always runs; on a hotfix, with the security
-  pass.
-- As soon as the entry's gate is green, open the PR ready and start
+- Run `exec-entry-workflow.js` mode `build`, one entry, with the args
+  of stage-execute's table (its step 3): `briefPath` = `brief.md`,
+  `sides` = the sides its ACs touch (`['back']`, `['front']` or both),
+  `designDir`, `storiesPath` and `mockDir` none, `base` = `main`. The
+  `reviewer (Opus 5.5, high)` always runs; on a hotfix, with the
+  security pass.
+- When the entry comes back `ready`, push, open the PR ready and run
   the project's signoff command on the head (`claude/scripts/local-ci.sh`
-  when it names none); it runs while the `reviewer (Opus 5.5, high)` and the QAs (Opus 5.5, medium) work.
-  The merge waits for all three. A fix pushes again and the local CI
-  runs on the new head.
+  when it names none). The merge waits for its `local-ci`. A fix pushes
+  again and the local CI runs on the new head.
 
 ## 6 · His use
 
@@ -150,7 +154,7 @@ users' video only when a screen users see changed.
 
 ## 8 · The short close
 
-1. `node claude/scripts/telemetry.mjs <slug>`.
+1. `node claude/scripts/telemetry.mjs <slug> --ws <designs-root>/<slug>`.
 2. Write `<designs-root>/<slug>/close.md` from `templates/short-close.md`:
    the numbers, a short retro, the "what's new" text.
 3. `claude/scripts/cleanup.sh <slug> --check` → `--apply` → `--check`
