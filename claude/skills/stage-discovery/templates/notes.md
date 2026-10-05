@@ -3,8 +3,8 @@
 <!--
   The interview's record, written by the conductor as the conversation
   happens, every turn. Three readers: the conductor, to resume from any
-  point; prototyper, which builds the mock from it; journey-scribe and
-  disc-author-prfaq, which derive the documents from it and the locked mock.
+  point; prototype-builder, which builds the mock from it; story-writer,
+  which writes the stories from it and the locked mock.
   If a fact is not here or in the mock, they do not know it. Write in the
   user's language; keep his own words where they carry a decision or a taste.
 -->
@@ -16,7 +16,6 @@
 - **References:** <product, site, screen, repo folder: what to look at, what he liked>
 - **Prior decisions:** <none> | <document · what it decided · imported as Confirmed with its source>
 - **Languages of the copy:** <en, pt-BR, …> · **Widths that matter:** <phone, desktop>
-- **Timebox:** <behavior locked by …; beyond v8 or one day, lock behavior and park polish>
 
 ## Recon
 
@@ -36,7 +35,9 @@
 | Journeys (trigger → steps → end, happy and bad) | Missing |
 | Rules with numbers (limits, expiry, cadence, thresholds) | Missing |
 | Data on screen (and where each value comes from) | Missing |
-| States per screen (empty, loading, error, permission, success) | Missing |
+| States per screen (the ones it really reaches) | Missing |
+| Error paths (limit, dependency down, permission, repeat) | Missing |
+| Personal data (who sees it, how long it is kept) | Missing |
 | Copy (every string, every language) | Missing |
 | Look (tokens, references, what he liked) | Missing |
 | Constraints (legal, cost, deadline, platform, personal data) | Missing |
@@ -64,7 +65,7 @@
 
 ## Journeys
 
-<!-- The sketch the prototyper builds from. One line per step. A journey is
+<!-- The sketch the prototype-builder builds from. One line per step. A journey is
      ready for the mock when its actor, trigger, steps and end are here. -->
 
 ### J1 — <title>
@@ -72,8 +73,8 @@
 - **Actor / job:** <persona> · When <situation>, I want to <motivation>, so I can <outcome>.
 - **Steps:** s1 <do> → <lands on> · s2 <do> → <lands on> · …
 - **Behind:** <rows, e-mails, events per step>
-- **Bad paths:** <boundary input · repeat · dependency down · permission: each → a journey, a frame, or Out>
-- **Status:** sketched · in mock v<N> · walked on v<N>
+- **Error paths:** <limit · dependency down · permission · repeat: each → a journey, a frame, or Out>
+- **Status:** sketched · in mock v<N>
 
 ## Themes
 
@@ -106,7 +107,7 @@
 | Version | Date | What changed | From |
 |---|---|---|---|
 | v1 | <date> | first build: J1, J2 | interview |
-| v2 | <date> | <change> | <verdict J1.s2 · comment · chat> |
+| v2 | <date> | <change> | <batch n · comment <id> · chat> |
 
 ## Bets
 
@@ -121,8 +122,14 @@
 
 ## Lock
 
-<!-- Written at D3. -->
+<!-- Written at D3, and again at each amendment of the playback. -->
 
-- **Version:** v<N> · **Date:** <date> · **His words:** "<verbatim>"
-- **Walk:** <passed> | <overridden: the gaps, and his words>
-- **Walked:** <step verdicts in the artifact> | <local mode: walks/verdicts.json, from his chat answers>
+- **Version:** v<N> · **Date:** <date> · **Words:** "<the announcement, or his answer that locked an amendment>"
+- **Walk:** <passed> | <gaps carried in LOCK.json: where · what>
+- **[build] rules he confirmed:** <ids> | none
+
+## For the design
+
+<!-- The last playback call's answer, verbatim. Stage 2 opens on it. -->
+
+- **His answer:** <Nothing in mind, propose> | <I have an idea: "…"> | <I have a constraint: "…">

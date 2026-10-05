@@ -20,7 +20,7 @@
  *         exactly as declared); coverage (frames no journey visits and not marked debugOnly); a taste
  *         audit (font < 12px, target < 24px, transition: all, dashes in copy) reported apart; and
  *         `idOrder`: journeys whose step ids are not s1, s2, … in play order (the lock refuses them;
- *         the prototyper renumbers before the lock). Exit 0 when the mechanical gate passes, 1 when it fails.
+ *         the prototype-builder renumbers before the lock). Exit 0 when the mechanical gate passes, 1 when it fails.
  * frames  one PNG per frame × theme × language × width (<token>~<theme>~<lang>~<width>.png), one
  *         reference PNG per frame (<token>.png: first theme, first language, widest width), one per
  *         journey step (journeys/<J>.<s>.png), and manifest.json with each file's sha256. The page is

@@ -1,65 +1,67 @@
 # Design notes — <workstream>
 
 <!--
-  Written by the CONDUCTOR, as the stage happens. With proposal.md it
-  is the writers' source: proposal.md says what is built; this file
-  says what exists today, the user's words, how the debate went, and
-  every answer given to the writers. The writers never edit it. If the
-  context is lost, the next session resumes from here and from the
-  files on disk. A revised decision replaces the old text in place,
-  and the change is dated under Amendments.
+  Written by the conductor as the stage happens. With proposal.md it is
+  the writers' source: proposal.md says what is built; this file says
+  what exists today, his words, how the debate went, and every answer
+  given to the writers. A revised decision replaces the old text in
+  place and is dated under Amendments.
 -->
 
-Opened <date>. Language of the documents: <language>.
-Lock: `00-discovery/prototype/` version <v>, locked <date> · journeys <n> · stories <S-001 … S-0NN>.
-The rulings the design cannot reopen are in `../rulings.md`.
+Opened <date>. Language: <language>.
+Lock: `00-discovery/prototype/` v<N> · journeys <n> · stories <S-001 … S-0NN> · ACs <n>.
 
 ## What we are building (one sentence)
 
-<the demand in one sentence, in the user's words where he gave them>
-
-## What exists today
-
-<!-- D0, one line per fact, each with its source (recon/<topic>.md, path:line). -->
-
-- <fact> — <source>
-
-## No-gos
-
-- <from the PR-FAQ and the stories' Out lines, one each>
+<the demand, in his words where he gave them>
 
 ## His idea
 
-<!-- D1: his answer to "do you have something in mind?", as close to
-     verbatim as the notes allow. "Nothing in mind" is a complete entry. -->
+<!-- From the discovery playback's last question, verbatim. -->
 
-> "<his words>"
+> <Nothing in mind, propose> | <"his idea"> | <"his constraint">
+
+Where the conductor disagrees, with its ground: <an AC it fails, a floor item, a cost, a one-way door, a standard> | none
+
+## What exists today
+
+- <fact> — <recon/<topic>.md, path:line>
+
+## No-gos
+
+- <from the stories' Out lines, one each>
+
+## For the design (from the discovery review)
+
+- <S-00N · the mechanism to decide · finding id>
 
 ## The debate
 
-<!-- D3–D4: the deck's link, then one block per round. -->
-
-- Video and deck: <url>
+- Deck and video: <the front's link, Design tab>
 
 ### Round <n> — <date>
 
 - **His points:** 1. "<words>" · 2. "<words>"
-- **Ruled:** <point → the decision, with the question's pick when one was asked>
+- **Ruled:** <point → decision; the question's pick when one was asked>
 - **Changed in proposal.md:** <one line>
 
 Closed <date>: "<his words>"
 
 ## Questions answered
 
-<!-- D5: the writers' questions, one block per decision. A decision of
-     his class goes to rulings.md as `ruled: conductor` and to the veto
-     list of the close. -->
-
-> **Decision — <title>** `(decided in your place)`   <- flag only when the class was his
+> **Decision — <title>** `(decided in your place)`   <- only when it was his class
 > Context: <the writer's question, with its Q-n>
 > Options: A) <option — its cost> · B) <option — its cost>
-> Chosen: <letter> — <why; the conservative pick when the class was his>
+> Chosen: <letter> — <why; the conservative pick when it was his>
+
+## Veto list
+
+<!-- Every decision taken in his place after he closed the proposal:
+     ruled: conductor lines, guard cuts after the close. Goes in the
+     close message. -->
+
+- <decision · the pick · why it is the conservative one>
 
 ## Amendments
 
-<!-- dated, from the review's fixes and from a veto after the close -->
+- <date · what changed · why>

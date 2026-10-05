@@ -1,11 +1,11 @@
 # Stories: <feature name> (`<slug>`)
 
 <!--
-  Derived from the LOCKED mock by journey-scribe. Nothing here is new: every
+  Written by story-writer from the conversation and the LOCKED mock. Nothing here is new: every
   use case is a family of locked journeys, every acceptance criterion is a
   rule or a behavior the mock shows, every value is one the mock shows or
   the notes confirmed.
-  What the scribe had to guess goes to Inferred; what it could not settle
+  What the writer had to guess goes to Inferred; what it could not settle
   goes to Open. Both MUST be empty to close the stage.
 
   IDs:
@@ -98,17 +98,18 @@ Personas: **<persona>** (<who, in one line>), …
   WHEN <event the mock cannot play: a reload, a second user, the server>
   THEN <outcome> (observed: <where, in the built product>)
 
-### Bad paths
+### Error paths
 
-<!-- The four categories, each mapped to a journey step or a frame. A
-     category with neither is a gap: it goes to Inferred or Open. -->
+<!-- The four paths, each mapped to a journey step, a frame, or an Out
+     line with its reason. A path with none of them is a gap: it goes to
+     Inferred or Open, never silence. -->
 
-| Category | Case | Where in the mock |
+| Path | Case | Where in the mock |
 |---|---|---|
-| Boundary input | <case> | <J4.s1, or frame token> |
-| Repeat / concurrency | <case> | <…> |
+| Limit (boundary input) | <case> | <J4.s1, or frame token> |
 | Dependency failure | <case> | <…> |
 | Permission | <case> | <…, or "Out: <reason>"> |
+| Repeat (double submit, two tabs, a retry) | <case> | <…> |
 
 ### In and Out
 
@@ -119,9 +120,9 @@ Personas: **<persona>** (<who, in one line>), …
 
 ## Inferred
 
-<!-- Every fact the scribe wrote that neither the locked mock nor the notes
-     contain: id, the guess, where it landed. The conductor asks him with
-     the review's decisions. MUST be empty to close. -->
+<!-- Every fact the writer wrote that neither the locked mock nor the notes
+     contain: id, the guess, where it landed. The conductor asks him at the
+     playback. MUST be empty to close. -->
 
 - **I-1** — <the guess> — in <AC id>
 

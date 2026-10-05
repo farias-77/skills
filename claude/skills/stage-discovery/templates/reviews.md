@@ -1,75 +1,44 @@
-# Discovery review audit: <workstream>
+# Discovery review: <workstream>
 
 <!--
-  Written by the CONDUCTOR, who is the judge. The workflow's return value is
-  saved as is in 00-discovery/reviews/round-1.json (the authority); this file
-  is the index written from it before any fix is sent. One round, whole: no
-  delta. The conductor verifies the fixes by reading them.
+  Written by the conductor, who rules. The workflow's return is saved as
+  is in 00-discovery/reviews/round-1.json (the authority); this file is
+  the index, written before any fix is sent. One round; the fixes are
+  verified by reading. Scale: blocks · note.
 -->
 
-## Mechanical checks before the round
+## Before the round
 
 | Check | Result |
 |---|---|
-| `proto.mjs walk` on the locked mock | <PASS · or the gaps he accepted at the lock> |
-| `proto.mjs trace` (journeys ↔ mock, ACs ↔ steps and frames, one AC per rule) | <PASS · fails listed and sent to the scribe> · <ACs: N, per story: …> |
+| `proto.mjs walk` at the lock | <PASS · or the gaps in LOCK.json> |
+| `proto.mjs trace` | <PASS> · ACs <N>, per story <S-001: n, …> |
 
 ## The round — <date> · run <id>
 
-| Source | Verdict | Findings |
-|---|---|---|
-| disc-reviewer | | |
-| disc-blind-reader (per story) | | |
+| Source | Valid | Findings | Dropped |
+|---|---|---|---|
+| disc-lens in-out | | | |
+| disc-lens coverage | | | |
+| disc-lens acceptance | | | |
+| blind (per story) | <stories read / total; unread: …> | | |
 
-### Blind walks
+## Rulings
 
-| Story | ACs judged | contradicts (mock disagrees) | undecidable | Unread |
+| Id (merged) | Severity | Ruling | Owner | Reason (the quote or the frame) |
 |---|---|---|---|---|
-| S-001 | <n> | <ids> | <ids> | <yes when the reading was dropped> |
+| <disc-lens/coverage#2, blind/S-003#1> | blocks | fix | story-writer | <…> |
 
-Dropped by the filter: <n, with the reasons from `dropped`>
+## To the playback (his)
 
-### Findings and rulings
+| Story | Decision | Conductor's pick | Why |
+|---|---|---|---|
 
-#### [<severity>] <source>#<n> — <title>  <(merged with <ids>)>
+## For the design
 
-- **Finding:** <gap>
-- **Ruling:** sustained · owner <author / user> | deferred | for the design | dismissed — <the reason; the sentence or the frame that decides it>
-- **User:** <his answer, verbatim, when the owner was him; "—" otherwise>
+- <S-00N · the mechanism to decide · the finding id>
 
-### The round's lists
+## Fixes verified
 
-- **To `journey-scribe`:** <ids>
-- **To `disc-author-prfaq`:** <ids>
-- **To the user, by decision:** <decision → ids>, …
-- **For the design:** <ids with the story each came from>
-- **Dismissed:** <ids>
-
-### Round close
-
-<findings N · to the authors N · to the user N (as N decisions) · deferred N · for the design N · dismissed N>
-
-### Fixes verified
-
-| Finding | Changed line (file:line) | Closed |
+| Id | Line now | Verified |
 |---|---|---|
-| <id> | <the line as it now reads> | <yes · no: back to the author once · residue> |
-
-## Close
-
-### Precision per source
-
-| Source | Findings | Sustained | Deferred | For the design | Dismissed |
-|---|---|---|---|---|---|
-
-### For the design
-
-<the whole list, with the story each came from; stage 2 reads it>
-
-### Residue
-
-<what was still wrong after the fixes were verified, with the reason; what he decided about it>
-
-### Taste notes added
-
-<one line each, as written to the workstream's taste-notes.md>

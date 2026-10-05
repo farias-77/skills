@@ -1,34 +1,30 @@
-# Design review audit — <workstream>
+# Design review — <workstream>
 
 <!--
-  Written by the CONDUCTOR. The reviewer's return is saved as it came
-  in reviews/review.json (the authority); this file is the index
-  written from it, the rulings added before any fix moves, the proof
-  of each fix added after it lands. One reviewer, one round: there is
-  no second round. design-review.json is filled from this file at the
-  close. The critic's cuts of D2 live in reviews/critic.json and in
-  proposal.md "The critic's cuts", not here.
+  Written by the conductor, who rules. Each lens's return is saved as it
+  came in 01-design/reviews/<lens>.json. One round; fixes verified by
+  reading and by review-prep.mjs. Scale: blocks · note.
 -->
 
-## The round — <date> · design-reviewer (Opus 5.5, medium)
+## Before the round
 
-Verdict: <clean | findings> · verified: <the ACs counted, the documents read, the frames compared>
+`review-prep.mjs`: <ok · ACs <n>, cited <n> · sizes · warnings>
 
-| Finding | Area | Ruling | Fixed by | Reason | Proof |
-|---|---|---|---|---|---|
-| <R-1> | <coverage · consistency · security> | <sustained · dismissed> | <conductor · writer of <doc> · implementer · his class: ruled: conductor> | <one or two sentences; on a dismissal, the sentence that forecloses it, quoted> | <`<doc>.md:<line>` as it now reads> |
+## The round — <date>
 
-## Size
+| Lens | Findings | Blocks | Notes |
+|---|---|---|---|
+| design-consistency (Opus 5.5, medium) | | | |
+| design-security (Opus 5.5, medium) | | | |
+| design-contracts (Sonnet 5.5, high) | | | |
+| overengineering-guard (Opus 5.5, medium) | | | |
 
-| Document | KB |
-|---|---|
-| solution.md | |
-| data-and-contracts.md | |
-| tests.md | |
-| operations.md | |
+## Rulings
 
-<the warnings review-prep.mjs printed, or "none">
+| Id (merged) | Severity | Ruling | Owner | Reason (the quote) |
+|---|---|---|---|---|
 
-## Taste notes added
+## Fixes verified
 
-<one line each, as written to the workstream's taste-notes.md>
+| Id | Line now | Verified |
+|---|---|---|

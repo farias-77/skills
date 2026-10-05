@@ -1,15 +1,15 @@
 # journeys/<J-id>-<kebab-title>.yaml: one locked journey, derived from the locked mock.
 #
-# Written by journey-scribe after the lock, one file per journey of the
+# Written by story-writer after the lock, one file per journey of the
 # mock's journey panel. The mock is the source: id, start, step ids, target,
 # fill, net and the frame each step lands on are copied from it, and
-# `proto.mjs trace` refuses any difference. What the scribe adds is what the
+# `proto.mjs trace` refuses any difference. What the writer adds is what the
 # frame shows in words a test can assert (expect) and what happens behind it
 # (effects), read from the mock's screens, copy and backstage.
 #
-# Later stages read these files: the builder turns each step into a test
-# step, the UX reviewer compares the real screen with each step's frame, the
-# plan gives every journey to exactly one slice. Ids never change after the
+# Later stages read these files: the journey walk of stage 4 follows the
+# steps (one walk per journey, one test step per AC), QA compares the real
+# screen with each step's frame. Ids never change after the
 # lock. Keys stay at this indentation: the trace check reads them by line.
 
 id: J1

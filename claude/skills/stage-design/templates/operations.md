@@ -1,49 +1,39 @@
 # Operations — <workstream>
 
 <!--
-  Written by its design-writer (Sonnet 5.5, high) from proposal.md,
-  notes.md, recon/ and the doctrine. Budget: about 40 KB, and usually
-  far less. Stage 5 (release) reads it for the pre-flight, the rollout
-  order, the toggles, the alarms it watches and the rollback triggers.
-
-  Only what this demand adds or changes. An alarm exists only for a
-  main-path failure with an action (pack-right-sizing §2 8). A section
-  with nothing to add says "None." and why in one line.
+  Written by its design-writer (Sonnet 5.5, high). Only what this demand
+  adds or changes. An alarm only for a main-path failure with an action
+  (references/right-sizing.md §2 8); a flag only with more than one
+  audience. A section with nothing says "None." and why.
 -->
 
 ## Migration and rollout
 
-| Step | What | Gate before the next step | Needs a person |
+| Step | What | Gate before the next | Needs a person |
 |---|---|---|---|
-| 1 | <apply migration `<name>` (expand)> | <the table exists in staging> | <no> |
 
 ## Flags
 
-| Flag | Guards | Default | Removed when |
-|---|---|---|---|
-| `<invites_enabled>` | <the invite button and its route> | <off> | <a week after release with no alarm> |
+None. <or: flag · what it guards · default · removed when>
 
 ## Alarms that would wake someone
 
-| Alarm | Fires when | Wakes | First action |
-|---|---|---|---|
-| `<invites-send-failed>` | <more than 5 failed sends in 10 min> | <on-call> | <check the provider's status page> |
+| Alarm | Fires when | First action |
+|---|---|---|
 
 ## Rollback
 
-<!-- Per step above: how it is undone. What cannot be undone (a sent
-     e-mail, a dropped column) is named, with what stands in for it. -->
+- Step <n>: <how it is undone; what cannot be, and what stands in>
 
-- Step <n>: <how to undo>
+## Resources
 
-## Run cost
-
-<one or two lines: what this adds to the monthly bill today, and what drives it>
+| Resource | New or changed | Identity and role | Env vars | Secrets |
+|---|---|---|---|---|
 
 ## The implementer decides
 
-- <script details, dashboard panels with no alarm: one line each>
+- <script details: one line each with its bound>
 
 ## References
 
-- <the doctrine's rollout and alarm rules, path:line>
+- <the standards' rollout and alarm rules, path:line>

@@ -1,426 +1,338 @@
 ---
 name: stage-design
-description: Conducts stage 2 (Design) — takes the locked discovery (the mock the user approved, its journeys and stories) and turns it into one solution at the "basics done well" bar, agreed with the user, then into the four documents stage 3 plans from. Scouts read the current system (Sonnet 5.5, low); the conductor asks the user what he has in mind; one architect (Opus 5.5, high) writes one proposal, with where it disagrees with him and the evolution path; an overengineering critic (Opus 5.5, medium) cuts what serves no AC and no real risk; the proposal is presented as a video and slides and debated with him until he says it is closed, the slides re-rendered each round; four writers (Sonnet 5.5, high) write solution.md, data-and-contracts.md, tests.md and operations.md in parallel, about 40 KB each; one reviewer (Opus 5.5, medium), one round, blocking findings only; the stage report (video, slides, blueprint). Runs in Claude Code with an Opus 5.5 session at high effort. Use after a discovery is locked, or to resume a design in progress.
-disable-model-invocation: false
+description: Conducts stage 2 (Design) of the pipeline, under one /goal. Takes the locked discovery (the mock, its stories and ACs) and produces one proposal sized to the problem, with its evolution path (v1 → v2 → v3), debated with the user until he says it is closed, then six documents the plan cuts without asking. Scouts (Sonnet 5.5, low) read the system; an architect (Opus 5.5, high) proposes and later writes solution.md; an overengineering-guard (Opus 5.5, medium) cuts what serves no AC and no real risk; he watches a deck and a short video and debates through the question tool; five design-writers (Sonnet 5.5, high) write the other documents; four lenses review once; the stage closes with its report (video, deck, explainer). The session runs on Opus 5.5, high. Use after a discovery closes, or to resume a design by its slug.
 argument-hint: "<workstream-slug>"
-allowed-tools: Read, Write, Edit, Glob, Grep, Agent, SendMessage, Workflow, AskUserQuestion, Artifact, Skill, Bash(mkdir *), Bash(date *), Bash(ls *), Bash(cat *), Bash(rg *), Bash(git *), Bash(node *), Bash(cp *), Bash(sha256sum *)
+allowed-tools: Read, Write, Edit, Glob, Grep, Agent, SendMessage, AskUserQuestion, Artifact, Skill, Bash(mkdir *), Bash(date *), Bash(ls *), Bash(cp *), Bash(rm *), Bash(git *), Bash(node *), Bash(gitleaks *), Bash(realpath *)
 ---
 
 # Stage 2: Design
 
-The lock comes in: the mock the user clicked and approved, its
-journeys, its stories. The design comes out: **one** way the system
-carries that product, at the "basics done well" bar, agreed with him,
-and written in four documents the plan can cut. The design covers the
-whole demand; the cut into slices is stage 3's.
+The lock comes in: the mock he clicked, its stories, its acceptance
+criteria (ACs). Out comes **one** way the system carries it, sized to
+the problem, agreed with him, and written in six documents stage 3
+cuts into entries without asking anyone. Agents left alone
+overengineer; every page this stage adds is a page stage 4 builds and
+carries. So: one proposal, a guard whose only job is to cut, one review
+round.
 
-This stage has one enemy: volume. Agents left alone overengineer, and
-every page a design adds is a page stage 4 builds, reviews and carries.
-So there is one proposal, not three; one critic whose only job is to
-cut; four documents with a budget of about 40 KB each; one reviewer,
-one round. What the design relaxes is written down as the evolution
-path: what to add, and on which signal, if the feature grows.
+## The bar
 
-The shape of the system is given. The consuming project's engineering
-doctrine (its `CLAUDE.md` says where) fixes where code runs, how
-modules talk, the stack and the quality gates. The design applies it
-and never reopens it; a demand the doctrine cannot hold is a point for
-the debate, marked **changes the doctrine**.
+1. **One** proposal the size of the problem, with the evolution path
+   (v1 → v2 → v3) and the signal that triggers each step.
+2. He understands it from the video and the deck in 15 minutes or
+   less, and closes it in one to three rounds.
+3. Six documents stage 3 cuts without asking: every AC with its layer
+   and proof; every Contract field marked required · optional ·
+   nullable; every cloud resource with an owner.
+4. Nothing in the documents that serves no AC and no real risk.
+5. One review round; only blocking findings hold anything.
 
-The session is the conductor, **Opus 5.5 at high effort**. It writes
-`notes.md`, `reviews.md`, `rulings.md`, `taste-notes.md`,
-`telemetry.json`, the scouts' answers under `recon/`, the conductor's
-blueprint JSON, and a fix of one or two lines the reviewer's finding
-asks for. Every other file is written by its agent: `proposal.md` by
-the architect, each document by its writer.
+## How the stage runs
 
-The stage starts on his play (house rule "Every stage starts on his
-play"): `/clear`, `/model claude-opus-5-5`, `/effort high`,
-`/stage-design <slug>`. Its interaction is at the start: the talk (D1)
-and the debate (D3–D4) until he says "closed". From there it runs on
-its own to its close, and it never starts stage 3.
+The opening hands him **one `/goal`**; from then on the stage runs to
+its close on its own. Everything you ask him goes through the question
+tool, so the goal never blocks on a plain reply. He is in the loop for
+the debate (D3–D4) and, rarely, for a D6 decision that changes a locked
+AC, adds a recurring cost or cannot be undone.
 
-At the start of the stage, load the `pack-right-sizing` skill (the
-Skill tool). Its bar, its floor and its overengineering list are how
-you read the proposal, the critic's cuts and the review.
+Do not stop to summarize and announce the next step, to offer to wait,
+to list decisions you can take, or because a step finished: go on in
+the same turn. Stop only for: a question through the question tool, a
+background agent you wait on (end the turn on a status table: agent ·
+task · state; it wakes you), or the close.
 
-## He is in the loop twice
-
-1. **D1, the talk**: what he has in mind, before anything is drawn.
-2. **D3–D4, the debate**: he watches and reads the proposal, and you
-   iterate with him until he says it is closed ("fechado", "closed",
-   or words to that effect).
-
-Everything else runs without him: dispatch, judge, write the audit,
-build the reports, update the state, without asking permission. A
-decision of his class that arises after he closed the proposal is
-taken in his place, conservatively (the option that keeps the lock and
-the floor and stays reversible, at the smallest cost), marked
-`ruled: conductor` in `rulings.md`, and listed in the close message
-for his veto.
-
-Every reply that dispatches or waits on an agent carries a status
-table (agent · task · state), the state read from the harness. Say in
-one line what you are about to do, and close with a recap that stands
-on its own. Do not end a turn on a plan or a promise; do the work.
-
-## The pattern
+## The flow
 
 ```
-D0 reading     you read the lock; scout (Sonnet 5.5, low) × N in parallel read the current
-               system (routes, data, patterns, the doctrine, the other fronts) → recon/
-D1 talk        "do you have something in mind?" → his words in notes.md (nothing is an answer)
-D2 proposal    architect (Opus 5.5, high) → proposal.md: one solution at the "basics done
-               well" bar, where it disagrees with him and why, the evolution path
-               → overengineering-critic (Opus 5.5, medium) cuts → the architect applies or rebuts
-               (design-research only when the proposal leans on what the scouts could not confirm)
-D3 present     video-scribe (Sonnet 5.5, medium) ∥ slides-scribe (Sonnet 5.5, high)
-               → a video of 2–3 min and a deck; no blueprint yet → he watches, reads, debates
-D4 iterate     his points → decided with him → the architect updates proposal.md
-               → the slides re-rendered (never the video) … until he says "closed"
-D5 documents   design-writer (Sonnet 5.5, high) × 4 in parallel → review-prep.mjs (size,
-               AC coverage) → design-reviewer (Opus 5.5, medium), one round, blocking only
-               → you judge → fixes applied by you or the writer, verified on disk
-D6 report      the blueprint JSON and build → the final video, the final slides, the blueprint
-               → state → plan; the next play
+/stage-design <slug> → opening: D0 scouts in background + the /goal
+D0 reading → D1 his idea → D2 architect → guard → your ruling
+→ D3 deck first, then video ≤ 60 s → D4 debate until "closed"
+→ D5 six documents → review-prep → D6 four lenses → your ruling → fixes
+→ D7 report ∥ cleanup → close: /clear + /stage-plan <slug>
 ```
 
-## The team
-
-| Agent | Model, effort | Does |
+| Step | Who (model, effort) | Produces |
 |---|---|---|
-| the conductor | Opus 5.5, high | the reading, the talk, the debate, the answers to the writers, the judging, the close |
-| `scout` × N | Sonnet 5.5, low | one question each about the current system or the doctrine, all at D0 in parallel: quotes with `path:line`, never conclusions; you save each answer to `recon/` |
-| `architect` | Opus 5.5, high | one agent for the whole stage, resumed with `SendMessage` so it keeps its context: writes and updates `proposal.md` |
-| `overengineering-critic` | Opus 5.5, medium | cuts from the proposal what serves no AC and no real risk |
-| `design-researcher` | Sonnet 5.5, medium | only when needed: the `design-research` workflow, one per premise about an external tool the scouts could not confirm |
-| `video-scribe` | Sonnet 5.5, medium | the video at D3 and the final one at D6 |
-| `slides-scribe` | Sonnet 5.5, high | the deck at D3, re-rendered each D4 round, and the final one at D6 |
-| `design-writer` × 4 | Sonnet 5.5, high | one document each, in parallel, with its blueprint JSON; asks, never decides |
-| `design-reviewer` | Opus 5.5, medium | one round over the four documents: AC coverage, consistency, security posture; blocking findings only, each with a quote |
+| D0 reading | `scout (Sonnet 5.5, low)` × N | `recon/<topic>.md`, each written by its scout |
+| D1 his idea | you (Opus 5.5, high) | `notes.md` · His idea |
+| D2 proposal | `architect (Opus 5.5, high)` → `overengineering-guard (Opus 5.5, medium)` | `proposal.md` |
+| D3 present | `slides-builder (Sonnet 5.5, medium)` first; `video-builder (Sonnet 5.5, medium)` beside it | deck + video on the front's link (Design, running) |
+| D4 debate | you + **him** + the same `architect` by `SendMessage` | `proposal.md` closed, his words |
+| D5 documents | `architect` (solution) ∥ `design-writer (Sonnet 5.5, high)` × up to 5 | six documents, `review-prep.mjs` green |
+| D6 review | `design-consistency (Opus 5.5, medium)` ∥ `design-security (Opus 5.5, medium)` ∥ `design-contracts (Sonnet 5.5, high)` ∥ `overengineering-guard (Opus 5.5, medium)` | `reviews.md`, fixes verified |
+| D7 report | `slides-builder` ∥ `artifact-builder (Sonnet 5.5, medium)`; `video-builder` only if the system's figure changed | the Design tab of the front's link |
 
-## Preconditions
+## What you read
 
-`.state.md` says `stage: design`; `00-discovery/` has the lock
-(`prototype/` with its version and `frames/`, `journeys/*.yaml`,
-`stories.md`, `pr-faq.md`); `blueprint/` has the discovery JSON.
-Missing: halt, back to stage 1.
-
-## The host
-
-Check at the open which of these the session has; say in one line
-what is missing and run on:
-
-| Missing | What changes |
+| File | When |
 |---|---|
-| a model switch (print mode, no human) | the stage runs on the session's model and effort; write both in `telemetry.json` (`session`), one line in `dreaming-notes.md`, and go on |
-| `Artifact` (a headless or cloud run) | **local mode**, `.state.md` gets `mode: local`: the decks stay on disk and the messages give the path of the first slide and of the video; at D6, as `docs/stage-report.md` says for local mode |
-| the question tool | the questions go as text, in the same shape: the context, the options with their cost, your pick first and marked |
-| `Workflow` accepting a `scriptPath` outside the working directories | copy `design-research.js` into `<workstream>/_run/` and check both `sha256sum`s match. `_run/` is not committed |
+| [references/right-sizing.md](references/right-sizing.md) | at the opening: how you rule the proposal, the cuts and the review |
+| [references/documents.md](references/documents.md) | before D5 |
+| [references/contracts.md](references/contracts.md) | before you rule a contracts finding |
+| `claude/references/judging.md` | before D6: the shared scale (blocks · note) and owners |
+| `00-discovery/stories.md`, `proposal.md`, the six documents | whole: you rule on them |
 
-**Waiting.** A workflow or a background agent wakes you when it ends.
-End the turn on the status table; never wait in a foreground `sleep`.
-A print-mode session (`claude -p`) ends background tasks 600 s after
-the turn ends unless its harness sets
-`CLAUDE_CODE_PRINT_BG_WAIT_CEILING_MS=0`
-([testing the pipeline](../../docs/testing-the-pipeline.md)).
+Anything else you need (the code, the standards, other fronts, the
+mock) goes to a scout.
+
+## Files
 
 ```
-designs-root/2026-08-15-workspace-invites/
-├── .state.md                  # stage: design
-├── blueprint.html             # built, never edited (house rule)
-├── blueprint/design/          # <doc>.json × 4 (writers) · proposal.json · decisions.json · design-report.json · design-review.json (you)
-├── report/design/             # the stage report (D6): storyboard.json, video.mp4, project/
-├── rulings.md · taste-notes.md · dreaming-notes.md
-├── 00-discovery/              # the lock (stage 1, untouched here)
+<designs-root>/<slug>/
+├── .state.md                 stage: design, step, kit, mode, architect id, writer ids, report url
+├── rulings.md · dreaming-notes.md
+├── report/design/            video.mp4, deck/, explainer.html
+├── 00-discovery/             the lock (read only)
 └── 01-design/
-    ├── notes.md               # your record: what exists today, his words, the debate, the answers
-    ├── telemetry.json         # your record, in the shared shape (claude/docs/telemetry.md)
-    ├── recon/                 # <topic>.md: the scouts' answers, saved by you
-    ├── research/              # <topic>.md, only when a premise needed it
-    ├── proposal.md            # the architect's: the solution, the disagreements, the evolution path
-    ├── presentation/          # D3–D4: storyboard.json, video.mp4, project/ (the deck)
-    ├── solution.md · data-and-contracts.md · tests.md · operations.md
-    ├── reviews/               # critic.json (D2), review.json (D5): each return, as it came
-    └── reviews.md             # the audit: your file
+    ├── notes.md              your record ([template](templates/notes.md))
+    ├── recon/                <topic>.md, one per scout
+    ├── proposal.md           the architect's
+    ├── solution.md · data-and-contracts.md · tests.md · operations.md · security-and-access.md · screens.md
+    ├── reviews/              guard-proposal.md, and one return per lens as it came
+    └── reviews.md            your rulings ([template](templates/reviews.md))
 ```
 
-## D0 — reading
+## Opening
 
-If the session is not on **Opus 5.5 at high effort**, ask the user
-once to switch (`/model claude-opus-5-5`, `/effort high`) and wait (a
-session that cannot switch: see the host table). Load `pack-right-sizing`. Read the lock's `stories.md`
-and `pr-faq.md` whole (you rule on them all stage long); the journeys,
-the mock and the codebase are read by agents. Create
-`01-design/notes.md` from [templates/notes.md](templates/notes.md) and
-`01-design/telemetry.json` with `openedAt` and the session's model
-([claude/docs/telemetry.md](../../docs/telemetry.md)).
+1. **The kit**: `realpath ${CLAUDE_SKILL_DIR}/../..`, written in
+   `.state.md` as `kit:`. **Preconditions**: `.state.md` says
+   `stage: design`; `00-discovery/` has `LOCK.json`, `stories.md` and
+   the notes' "For the design". Missing: stop, back to stage 1.
+2. **The model**: not on Opus 5.5 at high effort, one line recommending
+   it; go on without waiting.
+3. **The guard canary**: `git push origin a:b` must come back denied
+   by the guard hook. No denial, no stage.
+4. **D0 starts now**, in the background, before the goal (below).
+5. **The goal.** One message with the scouts' status and the command
+   to paste, written in his language:
 
-Then, in one message, one **`scout (Sonnet 5.5, low)`** per question,
-all in parallel:
+```
+/goal Conduct the design of <slug> with the stage-design skill to its close.
+Done when: the proposal is closed in my words; the six documents passed one round
+of the four lenses and review-prep; the Design tab of the front's link has its
+video, deck and explainer; the last message lists what you decided in my place
+and the next command. Every question to me goes through the question tool.
+```
 
-- per area the lock touches (a backend module, a frontend app, a job,
-  the infra): what exists today (routes, tables, screens, jobs, the
-  commands) and the golden path (the exemplary module) of each kind of
-  code the lock will need;
-- the front's design tokens and components, so the screens map the
-  mock onto what the app has;
-- the doctrine's rules for anything the lock will add (a table, a
+The design debate holds his attention: when another front is in its
+discovery or its debate (the coordination file), D3 waits for it and
+says so once; D0–D2 run anyway.
+
+Missing tools: no `Artifact` (headless or cloud) → **local mode**: the
+deck and video stay in `report/design/` and the messages give their
+paths; no question tool → the questions as text, same shape, your pick
+first.
+
+## D0 · Reading
+
+Read `stories.md` whole. Create `01-design/notes.md` from the
+template. Then one `scout (Sonnet 5.5, low)` per question, all in
+parallel, each writing its answer (quotes with `path:line`, the base as
+`<repo>@<branch> <sha>`) to `recon/<topic>.md`:
+
+- per area the lock touches: what exists today (routes, tables,
+  screens, jobs) and the exemplary module of each kind of code it will
+  need;
+- the front's components and tokens, for the screens;
+- the project's standards for anything the lock adds (a table, a
   route, a job, a screen, an alarm);
-- the other running workstreams (the designs root's coordination
-  file, each `.state.md`) and the files they share with this one.
+- the feature maps of those areas;
+- other fronts: the coordination file, each `.state.md`, the files
+  they share with this one.
 
-**The base** is each repo's base branch at its current head: each
-scout opens its answer with `<repo>@<branch> <sha>`. Ask each scout to
-quote file by file (`grep -n` on one file, or a `Read`), never from a
-concatenated listing, whose line numbers drift. The scout never
-writes: save each answer, as it came, to `01-design/recon/<topic>.md`
-in one `Write`; the architect and the writers read `recon/`.
+Write the notes' "What exists today" (one line per fact, its source)
+and "No-gos" (the stories' Out lines).
 
-When they return, write the notes' **What exists today** (one line per
-fact with its source) and **No-gos** (from the PR-FAQ and the stories'
-Out lines). Then D1 in the same turn.
+## D1 · His idea
 
-## D1 — the talk
+His answer is already in `00-discovery/notes.md` "For the design" (the
+last playback question). Copy it, verbatim, to the notes' "His idea".
+You may disagree with it, only with a ground: an AC it does not meet, a
+floor item, a cost, a one-way door, a standard. Write the ground in the
+notes; the architect weighs it.
 
-One message, then wait. Three lines on the lock (what is being built,
-for whom, how many stories), three lines on what exists today, then
-one open question: **"Do you have something in mind for how to build
-this?"** He may describe a whole design, one constraint, or nothing.
-"Nothing" is a complete answer.
+## D2 · The proposal
 
-Write his words, as close to verbatim as the notes allow, to the
-notes' **His idea**. One follow-up question at most, and only when his
-words leave open a choice the architect cannot make without him
-(which of two things he meant). Then D2 in the same turn.
+Dispatch `architect (Opus 5.5, high)` in propose mode with: the
+workstream path, the lock, `notes.md`, `recon/`,
+[references/right-sizing.md](references/right-sizing.md), the
+template ([templates/proposal.md](templates/proposal.md)), the
+standards' path, the repos with their base branch, the language, the
+date. Keep its agent id in `.state.md`: every later turn is a
+`SendMessage`, so it remembers why it chose. It researches an outside
+premise (a vendor's API, a limit, a price) itself, with the source
+cited.
 
-## D2 — the proposal
+Then `overengineering-guard (Opus 5.5, medium)` in proposal mode reads
+`proposal.md` and cuts; save its return to `reviews/guard-proposal.md`.
+Send the cuts to the architect: it applies each or rebuts it with the
+AC or real risk the mechanism serves. Read `proposal.md` whole and rule
+each rebuttal (right-sizing §3 E): a rebuttal without a requirement
+goes back once.
 
-Dispatch **`architect (Opus 5.5, high)`** with `Agent`, in propose
-mode: the workstream path, the lock, `notes.md`, `recon/`,
-`research/`, the doctrine's path, the repos with their base branch,
-the template ([templates/proposal.md](templates/proposal.md)), the
-language and the date. Write its agent id in `telemetry.json`
-(`design.architect`): every later turn of the architect is a
-`SendMessage` to that id, so it keeps what it read and why it chose.
+## D3 · Present
 
-The architect writes `01-design/proposal.md`: one solution, the names
-the documents will copy, where it disagrees with his idea and why,
-and the evolution path. It returns its premises. **A premise it could
-not confirm** about an external tool (a vendor API, a limit, a price
-the design leans on) is when research runs: the
-[`design-research`](../../workflows/design-research.js) workflow by
-`scriptPath`, one per topic, with `topic`, `questions`, `designDir`,
-`repos`, `template` ([templates/research-target.md](templates/research-target.md)),
-`language`, `date`; then `SendMessage` the architect to revise from
-`research/<topic>.md`. No unconfirmed premise, no research.
+In one message, both in the background:
 
-**The critic.** Dispatch **`overengineering-critic (Opus 5.5,
-medium)`** with `proposal.md`, `notes.md`, the lock, `recon/` and the
-doctrine. Save its return, as it came, to `01-design/reviews/critic.json`.
-Send the cuts to the architect (`SendMessage`): it applies each or
-rebuts it in the proposal's "The critic's cuts", one row each.
+- `slides-builder (Sonnet 5.5, medium)`: the deck from `proposal.md`:
+  the problem, the system in one figure, the main flow, the versions,
+  where the architect disagrees with him and why, what the guard cut;
+  the **last slide is the open points**. It is published first, to the
+  front's link, Design tab, marked running.
+- `video-builder (Sonnet 5.5, medium)`: **60 s at most**, 720p, 24 fps:
+  the system's figure first, the main flow, the versions. It jumps the
+  render queue: it is the one video someone waits for live.
 
-**Read `proposal.md` whole: you rule on it.** A rebuttal stands only
-when it names the AC, the floor item (pack §3 D) or the real risk the
-mechanism serves; a weak one goes back to the architect once, with
-your reason. A disagreement with his idea stands only on a clear
-reason (an AC it fails, a floor item, a cost, a one-way door, the
-doctrine); a preference goes back. Then D3 in the same turn.
+When the deck is published, ask through the question tool, the deck's
+link and the video's ETA in the question ("the video arrives in ~N
+min"): **Closed** (recommended when nothing is open) · **I have
+points** (he writes them in Other).
 
-## D3 — present
+## D4 · The debate, until "closed"
 
-Dispatch, in one message, with `<root>` = `01-design/presentation`,
-the workstream path, the language, the date, the sources
-(`proposal.md`, `notes.md`) and this focus paragraph:
+Each round:
 
-> **The proposal.** The problem in the user's words. The solution in
-> one picture. The main flows, step by step. The bar: what is done
-> well, and what was relaxed. The evolution path: what to add, and on
-> which signal. Where the architect disagrees with his idea, and why.
-> What the critic cut.
+1. His points, numbered, his words quoted, in the notes' "The debate".
+2. An instruction ("drop the queue") is applied as given. A question
+   for the architect ("why not a cron?") goes to it and comes back to
+   him in one line. A choice goes through the question tool, the
+   architect's pick first and marked.
+3. One `SendMessage` to the architect with every ruled point and his
+   words: it edits `proposal.md` in place and adds a row to "Changes
+   per round".
+4. `slides-builder` updates only the slides that changed and returns
+   their ids; republish only those. The video is not redone.
+5. The question again: the changes in a short table, **Closed** · **I
+   have points**.
 
-- **`video-scribe (Sonnet 5.5, medium)`**: a video of about 2 to 3
-  minutes (this brief overrides its usual length), plain language, the
-  picture first; written to `<root>/storyboard.json` and
-  `<root>/video.mp4`.
-- **`slides-scribe (Sonnet 5.5, high)`**: the deck, before any
-  blueprint exists: the same story plus the details for debate (the
-  parts and the names, each flow, the evolution table, each
-  disagreement with both sides); the last slide is the open points.
-  `__BLUEPRINT_URL__` has no target and is left out; `__VIDEO_URL__`
-  becomes `video.mp4`.
+Every ruling is a line in `rulings.md`; one against the architect's
+pick is also a `[taste]` line in `dreaming-notes.md`. A design that
+needs a change to the project's standards is his to decide, always as
+a question.
 
-Publish the deck as `docs/stage-report.md` step 4a does (a new
-Artifact from the Slides type, `title: "<workstream title> ·
-Proposal"`), read the slide files, and publish them to the deck's URL
-with the video beside them (`files: {"video.mp4": "<root>/video.mp4"}`;
-local mode: the host table). Then one message: the video and the deck
-in two lines, the solution in one sentence, the disagreements in short
-topics, and "What do you think?". Then wait.
+When he says closed: `SendMessage` the architect to set `Status:
+closed` with the date and his words. If the proposal grew during the
+debate by something he did not ask for, the guard reads only that
+delta; a cut applied after his close goes to the notes' "Veto list".
 
-## D4 — iterate until he says closed
+## D5 · The documents
 
-Each time he answers:
+[references/documents.md](references/documents.md) fixes what each
+carries. In one message, in parallel:
 
-1. **Take his points.** A visible numbered list, his words quoted.
-2. **Decide with him.** A point that is an instruction ("drop the
-   queue") is taken as given. A point that is a question for the
-   architect ("why not a cron?") goes to it first (`SendMessage`), and
-   its answer comes back to him in one line. A point that is a choice
-   goes through the question tool in the house shape: the context in
-   the question, the architect's pick first and marked, at most four
-   to a call. Each ruling goes to `rulings.md`; one against the pick
-   also goes to `taste-notes.md`, as the pattern.
-3. **Update the proposal through the architect.** One `SendMessage`
-   with every ruled point and his words. It edits `proposal.md` in
-   place, adds a row to "Changes per round", and records how each
-   disagreement was settled. You never edit `proposal.md`.
-4. **Re-render the slides only.** `slides-scribe (Sonnet 5.5, high)`
-   in update mode over the same `<root>`, with what changed; republish
-   to the same deck URL (read the slide files first). The video is not
-   redone.
-5. **One message:** the deck's link, what changed in a table (point ·
-   change), what is still open. Then wait.
+- `SendMessage` the architect in solution mode: it writes
+  `solution.md` from the closed proposal;
+- one `design-writer (Sonnet 5.5, high)` per remaining document, write
+  mode: the document it owns, the workstream path, `proposal.md`,
+  `notes.md`, `recon/`, the lock, its template,
+  [references/documents.md](references/documents.md) (and
+  [references/contracts.md](references/contracts.md) for
+  `data-and-contracts`), the standards' path, the language. Keep each
+  id in `.state.md`.
 
-Write each round to the notes' **The debate**. Repeat until he says
-the proposal is closed. Then: `SendMessage` the architect to mark it
-closed with the date and his words. When the proposal grew during the
-debate by something he did not ask for (a part or a mechanism the
-architect added), the critic reads that delta once and the architect
-applies or rebuts its cuts, without a new presentation. Then D5 in the
-same turn.
+A document with nothing to carry (no table, no resource, no new access
+rule) gets no writer: write it yourself as one line,
+`None: <why>`.
 
-**A point that changes the doctrine** is written by you, now, so the
-writers can cite it: in a `git worktree` of the repo that holds the
-doctrine, on a branch `doctrine/<workstream>` (never by switching that
-repo's checkout), the why in the commit message with his words. It
-merges with the close commit.
+**The writers' questions** come back in their reports. Merge the ones
+that are one choice and answer each once, in the notes' "Questions
+answered", then to every writer it touches:
 
-## D5 — the documents
+| The question is… | You |
+|---|---|
+| answered by the proposal, the notes or the standards | answer it |
+| his class (product, scope, data format, contract shape, security posture) with a conservative option: keeps the lock, reversible, no new cost | decide it, `ruled: conductor` in `rulings.md`, a line in the Veto list |
+| changes a locked AC, adds a recurring cost, or cannot be undone | ask him, one question per decision, in one batch |
 
-Four `Agent` dispatches of **`design-writer (Sonnet 5.5, high)`**, in
-one message, one per document, in write mode, each with the same
-brief: the workstream path, `proposal.md` (the source of every
-decision and every name), `notes.md`, `recon/`, `research/`, the lock,
-its template, the shared rules
-([references/design-docs.md](references/design-docs.md)), the
-blueprint schema (`${CLAUDE_SKILL_DIR}/../../blueprint/schema/design.md`)
-and the language. Keep each writer's agent id: answers and fixes go
-back by `SendMessage`.
+A new domain name: add it to the proposal's names table yourself, with
+one `Edit`, then send it. A name of code (a component, a helper) is
+the implementer's.
 
-| Document | Template | Holds |
+Then `node ${CLAUDE_SKILL_DIR}/scripts/review-prep.mjs <workstream>`:
+a missing document, a missing "The implementer decides", an AC that
+`tests.md` does not cite, or an `(open: Q-n)` left goes back to its
+writer. A size warning goes to `dreaming-notes.md` and never stops the
+stage.
+
+## D6 · The review: four lenses, one round
+
+In one message, in parallel, each with the six documents, the lock,
+`proposal.md`, `notes.md`, the references it needs and the repos:
+
+| Lens | Asks |
+|---|---|
+| `design-consistency (Opus 5.5, medium)` | does any document contradict another, the proposal or the mock? does every screen in `screens.md` cover the states the mock reaches? |
+| `design-security (Opus 5.5, medium)` | scope, another user's data, personal data, secrets, identities, the floor cases |
+| `design-contracts (Sonnet 5.5, high)` | does each Contract hold against the code that exists and the code that will be generated? every field marked? |
+| `overengineering-guard (Opus 5.5, medium)` | what in the documents serves no AC and no real risk? |
+
+Save each return, as it came, in `reviews/`. AC coverage is not a lens:
+`review-prep.mjs` already proved it.
+
+**Rule** every finding in `reviews.md` before any fix moves, by
+`claude/references/judging.md`:
+
+- owner the writer (or the architect, for `solution.md`) → fixed
+  without asking him, by `SendMessage`;
+- his class with a conservative option → you decide, `ruled:
+  conductor`, Veto list;
+- a locked AC, a recurring cost, something that cannot be undone → one
+  question per decision, in one batch;
+- real latitude → one line in the document's "The implementer decides";
+- dismissed → with the quote that closes it.
+
+The guard's finding blocks only with a concrete quote of what serves no
+AC and no real risk; "could be simpler" is a note and never starts
+anything. Verify each fix by reading the changed lines, then
+`review-prep.mjs` again. **There is no second round.**
+
+## D7 · The report, the cleanup, the close
+
+**The report is finished before the stage closes.** In one message, in
+the background, as `claude/docs/stage-report.md` describes:
+
+| Tab | Builder | Brief |
 |---|---|---|
-| `solution.md` | [templates/solution.md](templates/solution.md) | the parts, the screens, the flows, the decisions, the security posture, where the architect disagreed with him and how it was settled, the evolution path |
-| `data-and-contracts.md` | [templates/data-and-contracts.md](templates/data-and-contracts.md) | the tables and migrations; **the Contract** per entry-sized feature: route, request and response JSON, errors |
-| `tests.md` | [templates/tests.md](templates/tests.md) | per AC of the discovery, cited by id, the layer that proves it (unit, API, journey): one AC, one primary proof |
-| `operations.md` | [templates/operations.md](templates/operations.md) | migration and rollout, flags, the alarms that would wake someone, rollback, the run cost |
+| Video | `video-builder (Sonnet 5.5, medium)` | D3's video stays, **unless** a "Changes per round" row added or removed a part: then re-render it from the closed proposal |
+| Deck | `slides-builder (Sonnet 5.5, medium)` | the final deck: the decisions (those against the recommendation first), the risks accepted, what the guard cut, the versions |
+| Explainer | `artifact-builder (Sonnet 5.5, medium)` | the architecture, interactive: the layers, the data moving through them, a v1 → v2 → v3 selector |
 
-**The writers' questions.** Merge the ones that are the same choice
-and answer each once, from `proposal.md` and the notes. A question of
-his class is not asked: rule it conservatively, `ruled: conductor`,
-for the veto list. Write each answer to the notes' "Questions
-answered", and send it to every writer it touches. A name that is
-not in `proposal.md` is added there first, by the architect, then
-copied.
+While they work, clean what this stage created (scratch folders, a
+stack brought up for a check). When they return: every number on a
+slide is checked against a document or the notes; the `.remotion/`
+cache is gone; `gitleaks dir <workstream>` is clean (a finding stops
+the publish); publish to the front's link with the label "design
+closed".
 
-**Before the review**, run
-`node ${CLAUDE_SKILL_DIR}/scripts/review-prep.mjs <workstream>`. It
-checks the four documents exist and end with "The implementer
-decides", lists every AC id of `stories.md` that `tests.md` does not
-cite, and weighs the documents: one over 40 KB, or the set over
-160 KB, is a warning (`--doc-budget-kb`, `--total-budget-kb` change
-the defaults). A missing AC or a missing section goes back to its
-writer. A warning never stops the stage: the document usually copies
-what another source holds; the writer cuts the copy, and the warning
-goes to `dreaming-notes.md`.
+Then `.state.md` to `stage: plan`, commit the workstream folder (push
+only on his word), and one message:
 
-**The review: one reviewer, one round.** Dispatch
-**`design-reviewer (Opus 5.5, medium)`** with the four documents,
-`proposal.md`, `notes.md`, the lock (`stories.md`, `journeys/`,
-`prototype/` with its `frames/`), the doctrine's path and the
-reviewer contract
-([docs/standards/reviewer-contract.md](../../docs/standards/reviewer-contract.md)).
-It checks three things: every AC is proved in `tests.md`; the four
-documents agree with each other, with `proposal.md` and with the
-locked mock; the security posture (pack §3 D7, the doctrine). It
-returns blocking findings only, each with a quote and its
-`<file>:<line>`. Save the return, as it came, to
-`01-design/reviews/review.json`, and write `01-design/reviews.md`
-([template](templates/reviews.md)).
+| | |
+|---|---|
+| The link | the front's report, Design tab |
+| The design | the solution in one sentence · documents · review (found · sustained · dismissed) |
+| Decided in your place | the Veto list, one line each (to veto, answer before the next stage) |
+| Next | `/clear`, then `/stage-plan <slug>` |
 
-**Judge** every finding by [references/judging.md](references/judging.md):
-sustained or dismissed, one row each in `reviews.md` before any fix
-moves. A sustained fix of one or two lines you apply yourself with
-`Edit`; a larger one goes to its writer (`SendMessage`, apply mode).
-A fix that renames, revalues or removes something runs
-`node ${CLAUDE_SKILL_DIR}/scripts/propagation-check.mjs <workstream> <old term> …`
-before and after it: every hit is changed, or stays only as a
-negation. Verify every fix on disk. **There is no second round.**
-
-## D6 — the report and the close
-
-Write the conductor's JSON under `blueprint/design/`
-(schema: `${CLAUDE_SKILL_DIR}/../../blueprint/schema/design.md`):
-`proposal.json` (the debate: his idea, the rounds, the disagreements
-and how each was settled, his closing words), `decisions.json` (his
-rulings from the debate and every `ruled: conductor` line, each with
-the recommendation and the pick), `design-review.json` from
-`reviews.md`, and `design-report.json`, the plain layer the tab opens
-with. Then `node "${CLAUDE_SKILL_DIR}/../../blueprint/build.mjs" <workstream>`.
-The build refuses with the field named; a refusal goes back to the
-writer of that JSON.
-
-**The stage report**: follow
-[docs/stage-report.md](../../docs/stage-report.md) (video, then
-slides, then blueprint), with the design's focus paragraph. Every
-number on a slide is quoted from a document, `notes.md` or
-`telemetry.json`, never summed by the scribe: check each before you
-publish.
-
-Close `telemetry.json` in the shared shape: a step row per D0–D6 with
-its wall-clock and his minutes (D1, D3–D4), the agents dispatched
-with their model and effort, hours and tokens as the harness reports
-them, the debate rounds, the documents' sizes in KB, the review's
-findings (found, sustained, dismissed), and the cost when the harness
-reports one.
-
-Then one message, after the three layers: the review in one line
-(found · sustained · dismissed), the **veto list** (every
-`ruled: conductor` line), the taste notes added, the telemetry in one
-line. The stage closes now: he approved the design when he closed the
-proposal. `.state.md` to `stage: plan`, the close commit of the
-workstream folder (never `report/**/.remotion/`, the video kit's
-browser cache; push only on his word), the doctrine branch merged. The
-message ends with the next play, and nothing runs until he types it:
-
-```
-/clear
-/model claude-opus-5-5
-/effort high
-/stage-plan <slug>
-```
-
-A veto he sends before he gives that play is applied by its writer,
-then the blueprint is rebuilt and republished.
-
-## How to write, in every file and every question
-
-Say what you mean. Literal sentences, concrete values, no metaphor.
-One idea per sentence. The user's words, in quotation marks, where
-they decide something. In the terminal: a table for parallel things,
-a flow in a code block for a sequence, short topics for lists; a
-paragraph only for the one argument that is prose.
+A veto he sends before the next stage is applied by its writer, and
+only the affected tab is rebuilt.
 
 ## Resuming
 
-Everything is in files. Read `.state.md`, then `notes.md` and
-`telemetry.json`. Continue from the first step whose output is
-missing: no `recon/` → D0; no "His idea" → D1; no `proposal.md` → D2;
-no `presentation/` deck → D3; `proposal.md` not marked closed → D4;
-a document missing → D5 (a writer redispatched with the list of what
-is on disk; it never rewrites a finished file); no
-`reviews/review.json` → the review; otherwise D6. The architect of a
-previous session is gone: a new `architect (Opus 5.5, high)` dispatch
-in update mode reads `proposal.md` and "Changes per round" and goes
-on. Never resume from memory of a previous session.
+`/stage-design <slug>`: the opening's steps 1–3, then `.state.md` and
+`notes.md`. Continue from the first step whose output is missing: no
+`recon/` → D0; no `proposal.md` → D2; no deck on the link → D3;
+`proposal.md` not closed → D4; a document missing → D5; no
+`reviews.md` rulings → D6; otherwise D7. The architect and the writers
+of an earlier session are gone: a fresh one reads its file (and
+`proposal.md` with "Changes per round") before acting, and never
+rewrites a finished file. Never resume from memory.
+
+## How to write
+
+Literal sentences, one idea each, concrete values, his words quoted
+where they decide something. In messages: a table for parallel things,
+a flow block for a sequence, short topics for a list. Every agent named
+carries its model and effort in parentheses. The documents are written
+in his language; ids, headings and keywords stay as the templates have
+them.
