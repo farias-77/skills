@@ -128,6 +128,8 @@ private: nothing goes outside the company without his approval.
 
 1. `.state.md` → `stage: closed`. Your line in `_coordination.md`:
    closed. Commit the workstream folder (push only on his word).
+   From here the folder is history, read only: nobody updates its
+   design documents; what must last lives in the feature map.
 2. One message and a `PushNotification`:
 
 | | |
