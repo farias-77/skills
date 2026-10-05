@@ -56,21 +56,20 @@ allowed-tools: Read, Write, Edit, Glob, Grep, Agent, AskUserQuestion, Artifact, 
 
 ## Unattended
 
-Nothing in this stage asks him. Do not end a turn to summarize, to
-offer to wait, or because one of the three jobs finished. A wait on the
-render ends the turn on a `ScheduleWakeup` sized to what is left. Keep
-`trace.md` current; it is the resume point.
+Nothing in this stage asks him. A wait on the render ends the turn on
+a `ScheduleWakeup` sized to what is left. Keep `trace.md` current; it
+is the resume point.
 
 ## Step 0 · Open
 
-1. Not on Opus 5.5 at high effort: say so in one line and go on.
-2. **The canary.** `git push origin a:b` must come back denied with a
-   reason starting `guard-canary`. Otherwise the stage does not open.
-3. **Preconditions.** `.state.md` says `stage: close`; the release's
+1. **The house rules.** Read the file that
+   `realpath ${CLAUDE_SKILL_DIR}/../../../CLAUDE.md` prints and run its
+   Open: the model line, then the canary.
+2. **Preconditions.** `.state.md` says `stage: close`; the release's
    trace ends with the tag in production (a short route or a hotfix
    closes inside lets-cook, with `templates/short-close.md` of that
    skill, not here).
-4. **The `/goal`**, then end the turn:
+3. **The `/goal`**, then end the turn:
 
 ```
 /goal Close <slug> with the stage-close skill, without asking me anything.

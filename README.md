@@ -189,9 +189,10 @@ ln -s ~/skills/claude/agents agents
 ln -s ~/skills/claude/workflows workflows
 ```
 
-Load the house rules from the project's `CLAUDE.md` with one line,
-`@~/skills/CLAUDE.md`, and name there the designs root (where each
-front's folder lives). Then, in Claude Code inside the project:
+Each stage reads the house rules (`CLAUDE.md` at the clone's root) at
+its opening, so the project does not import them. Name the designs
+root (where each front's folder lives) in the project's `CLAUDE.md`.
+Then, in Claude Code inside the project:
 `/pipeline-setup .`
 
 - **Claude Code** with the `gh` CLI authenticated: GitHub is the

@@ -51,17 +51,16 @@ allowed-tools: Read, Write, Edit, Glob, Grep, Agent, SendMessage, Workflow, AskU
 
 From his `/goal` to the notification, the only things that wait for him
 are his use (short route), his staging check (hotfix, unless
-delegated) and the release's stop list. Do not end a turn to summarize
-and announce the next step, to offer to wait, or because a step
-finished. A wait ends on a `ScheduleWakeup`. Keep
+delegated) and the release's stop list. A wait ends on a
+`ScheduleWakeup`. Keep
 `<designs-root>/<slug>/trace.md` current, one line per step, `date -u`.
 
 ## 1 · Open
 
-1. Not on Opus 5.5 at high effort: say so in one line and go on.
-2. **The canary.** `git push origin a:b` must come back denied with a
-   reason starting `guard-canary`. Otherwise stop; say why in one line.
-3. **Scouts, in the background, from his first sentence.** One
+1. **The house rules.** Read the file that
+   `realpath ${CLAUDE_SKILL_DIR}/../../../CLAUDE.md` prints and run its
+   Open: the model line, then the canary.
+2. **Scouts, in the background, from his first sentence.** One
    `scout (Sonnet 5.5, low)` per question: where this lives (the
    feature map, the files); which fronts are open
    (`_coordination.md`) and whether one touches this area; is it in a

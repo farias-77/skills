@@ -34,12 +34,8 @@ Never decide in his place, never put in the mock a rule he did not say
 or confirm (a guess goes to Inferred, visible, and is asked).
 
 **Autonomous** (D0, D4, D5, D7): he waits. Dispatch, run, rule, write,
-publish, without asking permission. Do not stop to summarize and
-announce the next step, to offer to wait, to list non-blocking choices,
-or because a step finished: go on to the next step in the same turn.
-Stop only for: a question that is his (through the question tool), a
-background agent you must wait on (end the turn on the status table;
-it wakes you), or the close.
+publish, without asking permission. The house rules' "Under a `/goal`"
+holds in these steps, with the close as the "done".
 
 ## The flow
 
@@ -105,22 +101,19 @@ from its header and keep interviewing.
 1. **The kit.** `realpath ${CLAUDE_SKILL_DIR}/../..` is the pipeline's
    `claude/` folder; write it in `.state.md` as `kit:` and give agents
    resolved paths.
-2. **The model.** Not on Opus 5.5 at high effort: one line recommending
-   the switch, and go on without waiting.
-3. **The guard canary.** `git push origin a:b` must come back denied by
-   the guard hook. No denial: the stage does not open; say why in one
-   line.
-4. **One front at a time.** Read the designs root's coordination file.
+2. **The house rules.** Read `<kit>/../CLAUDE.md` and run its Open:
+   the model line, then the canary.
+3. **One front at a time.** Read the designs root's coordination file.
    When another front holds his attention in a discovery or a design
    debate, say so once and queue this one: message that front's
    session (`SendMessage`) to tell this one when it frees him, and
    wait on its answer.
-5. **New:** the slug `YYYY-MM-DD-<short-kebab-name>` (the project's
+4. **New:** the slug `YYYY-MM-DD-<short-kebab-name>` (the project's
    naming rule wins), the folder, `.state.md` (`stage: discovery`,
    `step: D1`), `.gitignore`, and `00-discovery/notes.md` from
    [templates/notes.md](templates/notes.md). What `/lets-cook` already
    heard goes in as Confirmed. **Resume:** see the last section.
-6. Start D0 in the same turn.
+5. Start D0 in the same turn.
 
 The host may lack a tool; say what is missing in one line and run on:
 
@@ -328,7 +321,7 @@ Nothing runs until he types it.
 ## Resuming
 
 Everything is in files. `/stage-discovery <slug>`: run the opening's
-steps 1–4, then read `.state.md` (its step, `kit:`, `mode:`, the mock's
+steps 1–3, then read `.state.md` (its step, `kit:`, `mode:`, the mock's
 URL and version) and `notes.md` (Coverage map, Journeys, Mock log,
 Open). From D2 on, read the unanswered comments before you speak. The
 builder of an earlier session is gone: a fresh `prototype-builder`
@@ -339,8 +332,6 @@ Never resume from memory of an earlier session.
 ## How to write
 
 Literal sentences, one idea each, concrete values, his words in
-quotation marks where they decide something. In messages: a table for
-parallel things, a flow block for a sequence, short topics for a list.
-Every agent named carries its model and effort in parentheses. The
-files are written in his language; ids and keywords (GIVEN, WHEN,
-THEN) stay as the templates have them.
+quotation marks where they decide something. The files are written in
+his language; ids and keywords (GIVEN, WHEN, THEN) stay as the
+templates have them.

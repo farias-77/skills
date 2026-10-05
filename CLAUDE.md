@@ -1,12 +1,12 @@
 # Pipeline house rules
 
-Rules that cross every stage. Stage skills point here instead of
-repeating them; a consuming project loads these rules alongside the
-skills. Paths: `claude/…` is the kit (`realpath
-${CLAUDE_SKILL_DIR}/../..`, written as `kit:` in `.state.md`); `docs/…`
-sits beside it in the pipeline repo; `<designs-root>` is the folder the
-project's `CLAUDE.md` names for the fronts' folders and
-`_coordination.md`.
+Rules that cross every stage. Every stage skill (and `lets-cook`)
+reads this file at its opening, at `<kit>/../CLAUDE.md`, instead of
+repeating it; a consuming project does not import it. Paths: `claude/…`
+is the kit (`realpath ${CLAUDE_SKILL_DIR}/../..`, written as `kit:` in
+`.state.md`); `docs/…` sits beside it in the pipeline repo;
+`<designs-root>` is the folder the project's `CLAUDE.md` names for the
+fronts' folders and `_coordination.md`.
 
 ## One door, six stages, what each asks of him
 

@@ -35,12 +35,6 @@ tool, so the goal never blocks on a plain reply. He is in the loop for
 the debate (D3–D4) and, rarely, for a D6 decision that changes a locked
 AC, adds a recurring cost or cannot be undone.
 
-Do not stop to summarize and announce the next step, to offer to wait,
-to list decisions you can take, or because a step finished: go on in
-the same turn. Stop only for: a question through the question tool, a
-background agent you wait on (end the turn on a status table: agent ·
-task · state; it wakes you), or the close.
-
 ## The flow
 
 ```
@@ -98,12 +92,10 @@ mock) goes to a scout.
    `.state.md` as `kit:`. **Preconditions**: `.state.md` says
    `stage: design`; `00-discovery/` has `LOCK.json`, `stories.md` and
    the notes' "For the design". Missing: stop, back to stage 1.
-2. **The model**: not on Opus 5.5 at high effort, one line recommending
-   it; go on without waiting.
-3. **The guard canary**: `git push origin a:b` must come back denied
-   by the guard hook. No denial, no stage.
-4. **D0 starts now**, in the background, before the goal (below).
-5. **The goal.** One message with the scouts' status and the command
+2. **The house rules**: read `<kit>/../CLAUDE.md` and run its Open:
+   the model line, then the canary.
+3. **D0 starts now**, in the background, before the goal (below).
+4. **The goal.** One message with the scouts' status and the command
    to paste, written in his language:
 
 ```
@@ -321,7 +313,7 @@ only the affected tab is rebuilt.
 
 ## Resuming
 
-`/stage-design <slug>`: the opening's steps 1–3, then `.state.md` and
+`/stage-design <slug>`: the opening's steps 1–2, then `.state.md` and
 `notes.md`. Continue from the first step whose output is missing: no
 `recon/` → D0; no `proposal.md` → D2; no deck on the link → D3;
 `proposal.md` not closed → D4; a document missing → D5; no
@@ -333,8 +325,6 @@ rewrites a finished file. Never resume from memory.
 ## How to write
 
 Literal sentences, one idea each, concrete values, his words quoted
-where they decide something. In messages: a table for parallel things,
-a flow block for a sequence, short topics for a list. Every agent named
-carries its model and effort in parentheses. The documents are written
-in his language; ids, headings and keywords stay as the templates have
+where they decide something. The documents are written in his
+language; ids, headings and keywords stay as the templates have
 them.

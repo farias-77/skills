@@ -67,13 +67,12 @@ Missing a design document: stop, and say which stage owns it.
 
 ## Open
 
-1. If the session is not on Opus 5.5 at high effort, one line
-   recommending it; do not wait.
-2. **The guard canary**: run `git push origin a:b` in the product repo.
-   It must come back denied by the guard. Not denied: the stage does
-   not open; say so in one line.
-3. Read `.state.md`; dispatch P0 in the background.
-4. Hand him the goal, filled in, in one code block:
+1. **The house rules.** Read the file that
+   `realpath ${CLAUDE_SKILL_DIR}/../../../CLAUDE.md` prints and run its
+   Open: the model line, then the canary (in the product
+   repo).
+2. Read `.state.md`; dispatch P0 in the background.
+3. Hand him the goal, filled in, in one code block:
 
 ```
 /goal Plan <slug> with the stage-plan skill, asking me nothing.
@@ -216,12 +215,7 @@ workstream folder, and the message:
 
 ## Running alone
 
-Under the goal, nothing waits for him. These are not reasons to stop:
-a finished step, a summary, a list of decisions to confirm, a
-milestone. Stop only when the goal's "done" holds, or when something
-needs him in person (a pre-flight item is not that: it waits for
-stage 4). Every reply while agents run carries a status table (agent ·
-task · state).
+A pre-flight item never stops this stage: it waits for stage 4.
 
 ## Resuming
 

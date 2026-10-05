@@ -79,14 +79,14 @@ environment exists (the bar, `docs/project-contract.md`).
 
 ## Open
 
-1. If the session is not on Opus 5.5 at high effort, one line
-   recommending it; do not wait.
-2. **The guard canary:** `git push origin a:b` in the product repo must
-   come back denied. Not denied: the stage does not open.
-3. The pre-flight was checked at plan. List only the items he must run
+1. **The house rules.** Read the file that
+   `realpath ${CLAUDE_SKILL_DIR}/../../../CLAUDE.md` prints and run its
+   Open: the model line, then the canary (in the product
+   repo).
+2. The pre-flight was checked at plan. List only the items he must run
    himself (from `preflight.md`), each with its `!` command. An item
    still missing parks only the entries it blocks.
-4. Hand him the goal, filled in, in the same message:
+3. Hand him the goal, filled in, in the same message:
 
 ```
 /goal Build the whole plan of <slug> with the stage-execute skill, from the contract
@@ -237,11 +237,9 @@ his place, and `/clear` then `/stage-release <slug>`.
 
 ## Running alone
 
-Under the goal the tech lead runs through the night on its own. These
-are not reasons to stop: a merged entry, a finished wave, a summary, a
-list of decisions to confirm, a milestone. It stops only when the
-goal's "done" holds, or for what is his: a decision of product, scope,
-an AC, a new recurring cost, something irreversible, his hands-on.
+What is his, and so stops the goal before its "done": a decision of
+product, scope, an AC, a new recurring cost, something irreversible,
+his hands-on.
 
 ## Resuming
 

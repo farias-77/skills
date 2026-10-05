@@ -55,32 +55,28 @@ lists a migration.
 
 ## Unattended
 
-Inside the `/goal` nothing waits for him but the stop list. Do not end
-a turn to summarize and announce the next step, to offer to wait, or
-because a step finished (the merge, a green staging). A wait on the CI
-ends the turn on a `ScheduleWakeup` sized to it (a staging deploy
+Inside the `/goal` nothing waits for him but the stop list. A wait on
+the CI ends the turn on a `ScheduleWakeup` sized to it (a staging deploy
 ~20 min, production plus the watch ~35 min), never on a question. Keep
 `trace.md` current: it is your checklist and your resume point.
 
 ## Step 0 · Open
 
-1. If the session is not on Opus 5.5 at high effort, say so in one line
-   and go on.
-2. **The canary.** Run `git push origin a:b`. It must come back denied
-   by the guard with a reason starting `guard-canary`. Anything else:
-   the stage does not open; say why in one line.
-3. **Preconditions.** `.state.md` says `stage: release`; the execute
+1. **The house rules.** Read the file that
+   `realpath ${CLAUDE_SKILL_DIR}/../../../CLAUDE.md` prints and run its
+   Open: the model line, then the canary.
+2. **Preconditions.** `.state.md` says `stage: release`; the execute
    recorded his ok; `04-release/plan.md` exists; the PR
    `feat/<slug>` → `main` is open and ready. Missing: stop and send him
    back to the stage that owns it.
-4. **The authorization.** `cat .claude/hooks/irreversible.allow` and
+3. **The authorization.** `cat .claude/hooks/irreversible.allow` and
    find a live `auth release <slug>` line (the execute's ok handed him
    the command). Missing or expired: the message below carries, first,
    the exact command for him to run:
    `! .claude/hooks/authorize.sh release <slug> feat/<slug>@<the head he said ok to>`.
-5. **Coordination.** Edit your line in `_coordination.md`: stage
+4. **Coordination.** Edit your line in `_coordination.md`: stage
    `release`, branch, this session's name.
-6. **The `/goal`.** Fill it from `plan.md` and end the turn:
+5. **The `/goal`.** Fill it from `plan.md` and end the turn:
 
 ```
 /goal Release <slug> with the stage-release skill, without asking me anything outside its stop list.
