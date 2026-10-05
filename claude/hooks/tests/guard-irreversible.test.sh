@@ -171,6 +171,15 @@ run deny Bash 'gcloud logging read "severity>=ERROR" --account owner@example.com
 run deny Bash 'gcloud auth login'
 run deny Bash 'gh auth token'
 run none Bash 'gh auth status'
+run deny Bash 'cat ~/.config/local-ci/token'
+run deny Bash 'GH_TOKEN=$(cat $HOME/.config/local-ci/token) gh api user'
+run deny Bash 'head -c 4 < ~/.config/local-ci/token'
+run deny Bash 'cat ~/.config/gh/hosts.yml'
+run deny Bash 'echo $LABS_CI_TOKEN'
+run deny Bash 'printenv ACME_CI_TOKEN'
+run deny Bash 'LOCAL_CI_TOKEN_FILE=/tmp/t bash claude/scripts/local-ci.sh --ref feat/x'
+run none Bash 'bash claude/scripts/local-ci.sh --repo . --ref feat/x'
+run none Bash 'tooling/local-ci abc1234 --dry-run'
 
 echo "-- the guard protects itself"
 run deny Bash 'echo "auth release x merge=feat/x tag=1 until=2099-01-01T00:00Z" >> .claude/hooks/irreversible.allow'

@@ -9,7 +9,8 @@
 #          than story/* and evidence/*; a merge into a protected branch, or
 #          a v* tag push, that no live authorization covers; creating a
 #          release or writing refs, tags, statuses or check runs through
-#          the GitHub API; switching the agent's identity; editing the
+#          the GitHub API; switching the agent's identity; reading the CI
+#          token or the gh and cloud credentials; editing the
 #          guard, the authorization script, the allow file or the settings
 #   ask    writing or reading a secret's value; a merge or a tag the guard
 #          cannot resolve (GitHub silent for 20 s, a PR it cannot read)
@@ -212,6 +213,8 @@ has "${S}(export[[:space:]]+)?(GH_CONFIG_DIR|GH_TOKEN|GITHUB_TOKEN|GH_ENTERPRISE
 has "${S}gcloud[[:space:]][^;&|]*--(account|impersonate-service-account)([=[:space:]]|$)" && deny "switching the identity the agent runs as"
 has "${S}gcloud[[:space:]]+(auth[[:space:]]+(login|activate-service-account|print-access-token)|config[[:space:]]+set[[:space:]]+(account|auth/))" && deny "switching or printing the agent's cloud credentials"
 has "${S}gh[[:space:]]+auth[[:space:]]+(login|switch|token|refresh)" && deny "switching or printing the agent's GitHub credentials"
+has "${S}(cat|head|tail|less|more|cp|mv|scp|base64|xxd|od|strings|grep|rg|awk|sed|jq|curl|tar|zip)[[:space:]][^;&|]*(local-ci/token|\.config/(gh|gcloud)/)|<[[:space:]]*[^;&|[:space:]]*(local-ci/token|\.config/(gh|gcloud)/)" && deny "reading a credential the agent does not hold: the CI token is the signoff command's, the gh and cloud configs are the identity's"
+has "\\\$\{?[A-Z0-9_]*CI_TOKEN|${S}(printenv|env)[[:space:]]+[A-Z0-9_]*CI_TOKEN|${S}LOCAL_CI_TOKEN_FILE=" && deny "the CI token is the signoff command's alone"
 
 # --- infrastructure: destroy and state surgery ------------------------------
 has "${S}(terraform|tofu|terragrunt)([[:space:]]+-[^[:space:]]+)*[[:space:]]+(destroy|apply[^;&|]*-destroy)" && deny "destroying infrastructure"
