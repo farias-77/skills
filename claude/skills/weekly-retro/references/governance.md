@@ -65,6 +65,7 @@ removes, or why nothing can go.
 | time per front | from `/lets-cook` to the close, with the agents' active time beside it |
 | cost per front | tokens per model × list price: an estimate, marked as one |
 | his touches | `/goal`s, answers and messages from him (from `metrics.json`); the retro names apart the ones that unblocked a stop |
+| dismissed per lens | each review lens's findings ruled dismissed, over its findings (from `rulings.md`); a lens above 50% across 3 fronts is proposed for a cut or a script |
 
 No target before measuring: the first fronts are the baseline. A
 median per route only after 10 fronts on it.
