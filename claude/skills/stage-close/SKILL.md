@@ -1,308 +1,156 @@
 ---
 name: stage-close
-description: Conducts stage 6 (Close) — finishes one workstream and produces two different things for two different readers. For the pipeline, a short retro that changes nothing: the session (Opus 5.5, medium) sums every stage's telemetry.json into the numbers (time and cost per stage, entries, rounds and findings, compared with the previous workstream), one close-harvester (Sonnet 5.5, medium) reads the frictions, the dreaming notes and the rulings, the session measures what the workstream did to the structure of main, sweeps the branches and worktrees, and writes 05-close/retro.md in a fixed format — the numbers, went well ×3, got stuck ×3 with where the time went, at most 3 ideas — a record in the workstream for the weekly-retro; no issue is opened anywhere. For the people, the launch package: launch-director (Opus 5.5, high) plans the film from the locked mock, the delivery page and the release record, footage-recorder (Sonnet 5.5, medium) records the real app journey by journey, the video kit renders it in launch mode (3D cold open, zoom-to-cursor tutorial per feature, captions, music bed) as one 16:9 film, plus a "what's new" text and a changelog line per feature. Delivers the film on a launch page (web copies on the Artifact asset store; local files when the tool is missing) and ends with one message: the film's link to forward, the text to paste, the retro's link. Use when a workstream's .state.md says stage close, or to resume a close in progress.
-disable-model-invocation: false
+description: Conducts stage 6 (Close) of the pipeline under one /goal, and closes on its own. It delivers the video for users (1–3 min, a motion piece recorded in staging, no technical words) as an .mp4 plus a "what's new" text for the user to forward; writes the front's retro (at most 5 items per section, numbers from claude/scripts/telemetry.mjs, slowness counted as something that went wrong); proves nothing of the front is left on the machine with claude/scripts/cleanup.sh; and publishes its report (video, deck, explainer). A scout harvests the frictions. The retro changes nothing in the pipeline: the weekly retro does. The session runs on Opus 5.5, high. Use when a front's .state.md says stage close, or to resume a close by its slug.
 argument-hint: "<workstream-slug>"
-allowed-tools: Read, Write, Edit, Glob, Grep, Agent, Workflow, AskUserQuestion, Artifact, Bash
+allowed-tools: Read, Write, Edit, Glob, Grep, Agent, AskUserQuestion, Artifact, PushNotification, ScheduleWakeup, Bash
 ---
 
 # Stage 6: Close
 
-The workstream is in production. This stage marks it finished and does
-the whole closing properly, for two readers who want different things:
+## The bar
 
-| Output | For | What it is |
-|---|---|---|
-| **The launch package** | the users and the employees, through him | the film that explains the need, what is new and how to use every new feature, step by step on the real product, one 16:9 film; a "what's new" text to paste; a changelog line per feature |
-| **The retro** | the pipeline (the weekly retro) | how it went, in a fixed short format: the numbers, three things that went well, three where it got stuck and where the time went, at most three ideas — a record in the workstream, not his report |
-
-The film matters most: people ask him for features that already exist
-because nobody showed them. It is the most elaborate video the pipeline
-makes, and it is built to the bar of a designer's portfolio.
-
-The retro is **a retro, not a change**: nothing in the pipeline repo is
-edited, no issue is opened anywhere, no idea is decided here. The ideas
-stay as a record in the workstream (`05-close/retro.md`). Once a week
-the user runs `weekly-retro` over every workstream closed that week
-and decides there what changes; a friction seen in three workstreams
-weighs more than one seen once, and only a week's view shows it.
-
-The session is **Opus 5.5 at medium effort**. It reads neither the
-record nor the footage whole: the numbers come from the stages'
-`telemetry.json` by a script, the harvester reads the notes, the
-director and the recorder make the film, and the session assembles,
-checks and talks. The stage starts on his play (house rule "Every stage
-starts on his play"): `/clear`, `/model claude-opus-5-5`,
-`/effort medium`, `/stage-close <slug>`. It needs nothing from him at
-the start and runs on its own to the delivery. It is the last stage:
-it ends with no next play.
-
-## The pattern
-
-```
-0. Open      model checked · .state.md says close, the release is closed → L1 dispatched at once, in the background
-1. Numbers   telemetry-sum.mjs over every stage's telemetry.json → metrics.json · the previous workstream's
-             · the structure of main before and after
-2. Harvest   one close-harvester (Sonnet 5.5, medium): the frictions, dreaming-notes.md, rulings.md
-3. Sweep     worktrees, branches and stacks left behind
-4. Retro     numbers · went well ×3 · got stuck ×3 · ideas ≤3 → 05-close/retro.md, retro.json
-                                                       ┐ in parallel with 1–4
-   L1 Plan   launch-director (Opus 5.5, high), plan mode → brief, shots.json, whats-new.md, changelog.md
-   L2 Shoot  footage-recorder (Sonnet 5.5, medium) → footage/<journey>/ (footage.mp4 + log.json)
-   L3 Film   launch-director (Opus 5.5, high), film mode → storyboard, stills, render-launch.sh,
-             six frames checked → launch.mp4 · launch.srt
-   L4 Check  the session reads the director's frames and the text; the package is complete
-                                                       ┘
-5. Deliver   web copies ≤ 19 MB → the launch page (Artifact, asset store) · local paths without the tool
-   Message   one message: the film to forward, the text to paste, the retro's link
-6. Close     his notes verbatim · .state.md → closed · the commit
-```
-
-He is in the room only at step 5: he watches the film, forwards it, and
-says anything he wants about the film or the retro. Nothing is ruled.
+1. The users get a 1–3 minute video, in motion, with no technical
+   word, and a "what's new" text ready to paste.
+2. The retro has at most 5 items per section; its numbers come from
+   the script; time lost counts as something that went wrong.
+3. Nothing of the front is left on the machine, proven by a script.
+4. It closes on its own. What he says later goes into the retro,
+   verbatim.
+5. It is the one stage that waits for its own video: the video for
+   users is what the close delivers.
 
 ## The team
 
-| Agent | Model, effort | Does |
+| Who (model, effort) | Does |
+|---|---|
+| you, the session (Opus 5.5, high) | the retro, the cleanup, the checks, the delivery |
+| `video-builder (Sonnet 5.5, medium)` | the video for users, started at the release's green staging |
+| `scout (Sonnet 5.5, low)` | the harvest of frictions, with `templates/harvest.md` |
+| `slides-builder (Sonnet 5.5, medium)` | the Close deck |
+
+## The flow
+
+```
+0 open            canary · preconditions · the /goal → he pastes it
+1 in parallel ┌── the video for users: wait for what is left of its render (or dispatch it now)
+              ├── harvest: scout + templates/harvest.md ──► telemetry.mjs ──► retro.md
+              └── cleanup.sh --check → --apply → --check empty
+2 report          Video (the users' video) · Deck (retro, numbers, what's new) · Explainer (the numbers)
+3 deliver         the .mp4, the text, the link · PushNotification · closed
+```
+
+| Read | When |
+|---|---|
+| [references/user-video.md](references/user-video.md) | before you brief or check the video |
+| [references/retro.md](references/retro.md) | before you write the retro |
+| [references/cleanup.md](references/cleanup.md) | before the cleanup |
+
+```
+<designs-root>/<slug>/05-close/
+├── video.mp4 · whats-new.md     the delivery for users (templates/whats-new.md)
+├── retro.md                     templates/retro.md
+└── trace.md                     one line per step (templates/trace.md)
+<designs-root>/<slug>/metrics.json   written by telemetry.mjs
+```
+
+## Unattended
+
+Nothing in this stage asks him. Do not end a turn to summarize, to
+offer to wait, or because one of the three jobs finished. A wait on the
+render ends the turn on a `ScheduleWakeup` sized to what is left. Keep
+`trace.md` current; it is the resume point.
+
+## Step 0 · Open
+
+1. Not on Opus 5.5 at high effort: say so in one line and go on.
+2. **The canary.** `git push origin a:b` must come back denied with a
+   reason starting `guard-canary`. Otherwise the stage does not open.
+3. **Preconditions.** `.state.md` says `stage: close`; the release's
+   trace ends with the tag in production (a short route or a hotfix
+   closes inside lets-cook, with `templates/short-close.md` of that
+   skill, not here).
+4. **The `/goal`**, then end the turn:
+
+```
+/goal Close <slug> with the stage-close skill, without asking me anything.
+Done when: the video for users and the "what's new" text are ready; retro.md is written with the
+script's numbers; cleanup.sh --check comes back empty; the Close tab is on the front's link; and I
+got the notification with the video, the text and the link.
+```
+
+## Step 1 · Three jobs at once
+
+Start all three in one turn.
+
+**The video for users.** The release dispatched the
+`video-builder (Sonnet 5.5, medium)` at its green staging. Read its
+state: done, rendering (wake when it should end), or never started
+(dispatch it now with `references/user-video.md` and the stories; it
+records in staging). When it returns, check it as that reference says.
+
+**The retro.**
+1. Dispatch one `scout (Sonnet 5.5, low)` with `templates/harvest.md`
+   and these paths: `dreaming-notes.md`, `rulings.md`, every stage's
+   board or trace (`03-execution/` board and parked list,
+   `04-release/trace.md`), and the reviews files. It returns each
+   friction with `path:line`, the quote and the time it cost; nothing
+   is written to a file.
+2. Run `node claude/scripts/telemetry.mjs <slug>`. It writes
+   `metrics.json`: time, cost and his touches per stage, with `gaps`
+   for what it could not measure.
+3. Write `05-close/retro.md` from `templates/retro.md`, as
+   `references/retro.md` says.
+
+**The cleanup.** Follow `references/cleanup.md`:
+`cleanup.sh <slug> --check`, decide what is his (unmerged work),
+`--apply`, then `--check` until it comes back empty. Paste the final
+`--check` output into `trace.md`: it is the proof.
+
+## Step 2 · The report, finished before the close
+
+Dispatch `slides-builder (Sonnet 5.5, medium)` as
+`claude/docs/stage-report.md` describes, into `report/close/`:
+
+| Tab | Who | What |
 |---|---|---|
-| the session | Opus 5.5, medium | the numbers, the sweep, the retro, the package's check, the message |
-| `close-harvester` × 1 | Sonnet 5.5, medium | reads the frictions, `dreaming-notes.md` and `rulings.md`; returns each friction with `file:line`, the quote and the time it cost; decides nothing |
-| `launch-director` | Opus 5.5, high | plans the film and writes its text (plan mode); writes the storyboard from the real footage, renders and checks it (film mode) |
-| `footage-recorder` | Sonnet 5.5, medium | records the real app from the shot list, journey by journey, and checks every take |
+| Video | the users' video itself | 1–3 min, for users |
+| Deck | `slides-builder (Sonnet 5.5, medium)` | the retro (at most 5 per section), the numbers per stage, the "what's new" text |
+| Explainer | the report template from `metrics.json` | the front's time, cost and touches per stage, beside the earlier fronts' `metrics.json` |
 
-## Preconditions
+Check every number on a slide against `metrics.json`. Run
+`gitleaks dir <designs-root>/<slug>`; a finding stops the publish.
+Publish to the front's link with the label "closed". The page stays
+private: nothing goes outside the company without his approval.
 
-`.state.md` says `stage: close`; `blueprint/release/release.json` has
-`closed` set. Missing: halt, back to stage 5.
+## Step 3 · Deliver and close
 
-For the film, the project's contract (`docs/project-contract.md`)
-names: a browser-drivable app (role 10) on staging or production, an
-actor for it (a demo account's session file, or read-only journeys),
-the verify maps (role 14) and the video toolchain (role 21). Missing:
-the film is not made; the retro lists it where it got stuck and the
-message says what is missing. The close never waits on the film.
+1. `.state.md` → `stage: closed`. Your line in `_coordination.md`:
+   closed. Commit the workstream folder (push only on his word).
+2. One message and a `PushNotification`:
 
-```
-designs-root/<workstream>/05-close/
-├── harvest.json            # the harvester's answer, verbatim
-├── structure/              # the structure check before and after, and their comparison
-├── metrics.json            # the numbers from every stage's telemetry, in the shape references/metrics.md fixes
-├── telemetry.json          # the close's own measures (claude/docs/telemetry.md)
-├── retro.md                # the retro, in its fixed format
-├── trace.md                # one line per step, `date -u`
-└── launch/
-    ├── brief.md            # the director's plan: need, features, chapters, what is cut and why
-    ├── shots.json          # the shot list
-    ├── footage/<journey>/  # footage.mp4 + log.json per journey (not committed over 50 MB)
-    ├── launch.storyboard.json
-    ├── stills/             # the director's stills and frames
-    ├── launch.mp4          # 1920x1080, ~50 MB budget, with its audio
-    ├── launch.srt          # the captions, from the step data
-    ├── whats-new.md        # the text he pastes, in the workstream's language
-    ├── changelog.md        # one line per feature
-    ├── credits.md          # the music's licence line, when there is music
-    └── web/                # the launch page: index.html + the web copy (≤ 19 MB), committed
-blueprint/close/retro.json  # the retro in the fixed shape weekly-retro reads
-```
+| | |
+|---|---|
+| For users | the `.mp4` path (≤ 15 MB, ready to forward) |
+| What's new | the text, in full, ready to paste |
+| The link | the front's report, Close tab |
+| The numbers | time · cost (estimate) · his touches, one line |
+| Known issue | only if the video has one he should know before forwarding |
 
-## Step 0 — open, and start the film
+It is the last stage: no next command. When he comments later, append
+his words verbatim at the end of `retro.md`, marked `[user]`, and
+commit.
 
-If the session is not on **Opus 5.5 at medium effort**, ask him once to
-switch (`/model claude-opus-5-5`, `/effort medium`) and wait; a
-non-interactive run goes on with what it has and writes one line in
-`dreaming-notes.md`. Read `.state.md` and the release's closed record.
-Then, before anything else, dispatch `launch-director (Opus 5.5, high)` in **plan mode**, in
-the background, by [references/launch.md](references/launch.md): the
-film is the long pole (recording, then up to an hour of rendering on a
-loaded machine), so it runs while the retro is written. The
-music bed is his to give: a track he licensed, with its licence line;
-none given, the film has no music and says nothing about it. Create
-`05-close/telemetry.json` with `openedAt` and the session's model
-([claude/docs/telemetry.md](../../docs/telemetry.md)); a step row as
-each step ends.
+## When the render fails
 
-## Step 1 — the numbers
-
-By [references/metrics.md](references/metrics.md). The numbers come
-from each stage's `telemetry.json`, never from a reading:
-`scripts/telemetry-sum.mjs` sums them into `05-close/metrics.json`
-(time, his hours, agent hours, tokens, cost, rounds and findings per
-stage, the totals, the slowest steps, the stages that did not measure
-themselves). The entries come from `execution.json`. A number the
-record does not carry is `null`, never estimated.
-
-**The previous workstream.** The last workstream closed before this
-one in the designs root (its `.state.md` says `closed`) gives its
-`05-close/metrics.json`; its totals go beside this one's. None: the
-comparison says "first workstream".
-
-**The structure of main.** The fear is code that works and that nobody
-can extend later, so every close measures what this workstream did to
-`main`. Run the project's structure check (the role
-`docs/project-contract.md` names; the doctrine names its command) in a
-throwaway worktree at the `main` the workstream started from (the
-merge-base of `feat/<workstream>` with `main`) and at the release's
-merge sha, compare the two with the project's comparison command, save
-the outputs to `05-close/structure/`, and remove the worktrees. Five
-numbers go into `metrics.json`, before → after: duplication,
-complexity, boundary violations, the gate's runtime and the reverts
-the release-scribes listed. A measure past its threshold
-([references/metrics.md](references/metrics.md), "The structure of
-main") is a place it got stuck, with
-its numbers and the files the check names; the weekly decides the
-refactor. A project with no structure check: "not measured".
-
-## Step 2 — the harvest
-
-By [references/harvest.md](references/harvest.md): one
-`close-harvester (Sonnet 5.5, medium)` with the paths of
-`dreaming-notes.md`, `taste-notes.md`, `rulings.md`, and the files
-where the stages wrote their frictions (each review's `reviews.md`,
-`03-execution/board.md`, `parked.md` and `audit.md`,
-`04-release/trace.md`), plus the slowest steps from `metrics.json`.
-It returns every friction with where it was seen, the quote and the
-time it cost, his `[user]` notes marked. Save its answer as it came to
-`05-close/harvest.json`.
-
-## Step 3 — sweep
-
-What the workstream left behind, so the next one starts clean: the
-entry worktrees and their branches merged or abandoned, a local stack
-still up, a feature branch already in `main`, a stale lock. Remove
-what is safely removable (merged branches, dead worktrees, stopped
-stacks) and list the rest for the user with the command that removes
-it, in `trace.md`. Never delete a branch that is not merged, never touch `main` or
-the staging branch. The film's footage is not swept: it is kept until
-he has the film.
-
-## Step 4 — the retro
-
-By [references/retro.md](references/retro.md), in a fixed short
-format, from the numbers and the harvest:
-
-- **Numbers** — time and cost per stage, entries, rounds and findings,
-  beside the previous workstream's.
-- **Went well ×3** — the three things that went smoothest, each with
-  its evidence.
-- **Got stuck ×3** — the three places that cost the most, each with
-  where the time went (the step, the hours, the evidence).
-- **Ideas, at most 3** — what could change so it does not come back:
-  the stage, the file it would touch, the change, the stuck item
-  behind it.
-
-Write `05-close/retro.md` from [templates/retro.md](templates/retro.md)
-and `blueprint/close/retro.json` in the shape the schema fixes; build
-and publish the blueprint (its Close tab is the retro's link). The
-ideas stay there, as the workstream's record; nothing is opened
-anywhere. The retro is not presented to him on its own: it goes in the
-step-5 message as a link.
-
-## The launch package — L1 to L4
-
-By [references/launch.md](references/launch.md). In short:
-
-1. **L1 · plan.** The director's plan-mode return: the brief, the shot
-   list, `whats-new.md`, `changelog.md`, the features, what is cut and
-   why, and what it needs from him. A need only he can meet (a demo
-   account, the music) goes in the step-5 message, never as a stop:
-   the film is made with what exists.
-2. **L2 · shoot.** Dispatch `footage-recorder (Sonnet 5.5, medium)`
-   with the shot list, the environment and its mode (`read-only` on
-   production; a demo account's session file otherwise). It returns
-   the footage folders, the takes it checked, the selectors it
-   repaired, and the journeys that failed. A failed journey goes back
-   to the director once (re-plan or cut); the rest of the film goes
-   on.
-3. **L3 · film.** Dispatch the director in **film mode**, in the
-   background, with the footage folders. It writes the storyboard from
-   the recorded timings, checks the stills, renders
-   with `claude/video/render-launch.sh` (it queues on the machine's
-   render lock by itself), checks six frames, fixes once, and returns
-   the paths, the sizes and what is still wrong.
-4. **L4 · check.** The session reads the director's six frames and
-   `whats-new.md`, and rules on them as
-   the last eye before him: a caption in the wrong language, a frame
-   with personal data, a feature from the release record missing from
-   both the film and the cut list. One more director pass at most;
-   what remains goes in the message as a known flaw.
-
-## Step 5 — deliver, then the message
-
-**Deliver** by [references/launch.md](references/launch.md), "Delivery":
-the master (~50 MB) is too big for the blueprint and for one artifact
-file, so `scripts/web-copy.sh` makes a copy under the asset cap
-(19 MB), the session publishes the launch page from
-`templates/launch-page.html` with the `assets` capability, uploads the
-copy to its asset store and publishes the page again with its URL. Without the Artifact tool, or when a publish is refused or the
-film is too long for one asset, the film goes out as local files and
-the message says why.
-
-One message, in his language (the labels below are the English form),
-and nothing before it:
-
-```
-▶ Launch film   <launch page URL>                  <m:ss> · to forward (inside the organization)
-▣ Master        <abs>/05-close/launch/launch.mp4   <MB> MB · launch.srt
-◧ Retro         <blueprint URL>#close              for the weekly retro
-```
-
-Without the page, the first line is the master's absolute path and the
-reason there is no link.
-
-Then `whats-new.md` in a code block, ready to paste, and the changelog
-lines under it. Then, in at most three lines: the features cut from the
-film and why, a known flaw, what the film still needs from him (a
-licensed track, a demo account) if anything. The paths are absolute.
-A film redone after his notes is copied and uploaded again, and the
-same page republished with the new URLs.
-
-He forwards the film; anything he says goes on record:
-
-- about the **film** (a label, a cut, a feature missing): the director
-  in film mode again, once per round of his notes; the same paths;
-- about the **retro**: his words verbatim into `retro.md` and
-  `retro.json` as his notes, with the idea or stuck item they refer to
-  when he names one. Nothing is ruled; his notes are the input the
-  weekly weighs first.
-
-## Step 6 — close
-
-When he says it is closed, it is: close `05-close/telemetry.json`, add
-its row to `metrics.json` (run `telemetry-sum.mjs` again and take its
-`stages` and `totals`), rebuild the blueprint, `.state.md` →
-`stage: closed`, and commit the workstream folder (the footage only
-when it is under 50 MB in all; the films always), push only with his
-explicit approval. The close's stage report is this package:
-the launch page replaces the stage video (`claude/docs/stage-report.md`), the
-retro's tab is its blueprint layer, and there are no slides: the retro
-is the weekly's, not his. The last message says the workstream is
-closed; there is no next play. The pipeline's next step is the
-`weekly-retro`, which he runs once a week over every closed
-workstream.
-
-## How to write
-
-Say what you mean. Literal sentences, concrete values, the user's
-words verbatim. The format is fixed and short: three went well, three
-got stuck, three ideas at most; fewer only when the record has fewer.
-An idea names the file it would touch and the stuck item behind it; an
-idea with no evidence is not written. The film's words
-and the "what's new" are in the workstream's language, for people who
-were not in the room: the product's own names, no pipeline term.
+Run the cleanup first (it frees `.remotion/` and the front's images),
+then render **once more** if the failure was the machine's (disk,
+memory). A second failure: deliver the text alone, mark the Video tab
+"failed", and write one line in `dreaming-notes.md`. A problem seen in
+the finished video goes in the message as a known issue; it is
+rendered again only on his note.
 
 ## Resuming
 
-Everything is in files. Read `.state.md`, `05-close/trace.md`,
-`05-close/metrics.json`, `05-close/harvest.json`, `retro.md`,
-`05-close/launch/`. Continue from the
-first step with no trace line; a launch step whose output exists (the
-brief, a journey's `log.json`, `launch.mp4`, the launch page's URL in
-`trace.md`) is not redone.
-
-## Boundaries
-
-No edit to the pipeline repo, no issue opened, no idea decided: the
-weekly retro does that. No edit to product code. No write to
-production: the footage is recorded read-only or on a demo account.
-The sweep never deletes unmerged work. Music only with its licence
-line.
+`/stage-close <slug>`: the canary, then `.state.md` and `trace.md`. A
+retro already written is not rewritten; a cleanup is re-checked, never
+assumed.

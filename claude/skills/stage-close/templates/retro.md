@@ -1,52 +1,33 @@
-# Retro — <workstream>
+# Retro · <slug>
 
-<!--
-  Written by the SESSION at stage 6, in this fixed format and nothing
-  more. The numbers come from 05-close/metrics.json (every stage's
-  telemetry.json); the rest from 05-close/harvest.json. The same
-  content goes to blueprint/close/retro.json. Nothing here is a
-  decision, and nothing is opened anywhere: this file is the record.
--->
+<!-- Written by the close from metrics.json and the scout's harvest, in his
+     language. At most 5 items per section. Closed on its own; his later
+     comments are appended at the end, verbatim. -->
 
-**In one sentence:** <what this workstream delivered and how it went>
+- **Route:** full \| short \| hotfix · **Version:** vX.Y.Z · **Closed:** <date>
+- **Pipeline:** `<pipelineSha>` (from metrics.json)
 
 ## Numbers
 
-| Stage | Wall-clock (h) | His (h) | Agents (h) | Tokens (M) | Cost | Rounds | Findings (found → sustained) |
-|---|---|---|---|---|---|---|---|
-| discovery | | | | | | | |
-| … | | | | | | | |
-| **total** | | | | | | | |
-| previous: `<workstream>` \| first workstream | | | | | | | |
+| Stage | Clock | Agents active | His touches | Wait on him | Cost (estimate) |
+|---|---|---|---|---|---|
+| <stage> | <min> | <min> | <n> | <min> | US$ <n> |
+| **total** | <calendar min> | <min> | <n> | <min> | US$ <n> |
 
-Entries: <n> (previous <n>) · structure of main: <duplication, complexity, boundary violations, gate runtime: before → after> | not measured
+Not measured: <the gaps, one line each> \| nothing
 
 ## Went well
 
-1. <what> — <evidence: `file:line` or a number>
-2. <what> — <evidence>
-3. <what> — <evidence>
+1. <what, with its evidence (`path:line` or the number)>
 
 ## Got stuck
 
-### S-1 · <title>
+1. <what> · <minutes it cost> · <`path:line`>
 
-- **Stage:** <stage> · **Where the time went:** <step> · <h> h
-- **Evidence:** `<file:line>` — "<quote, verbatim>"
+## Ideas for the pipeline
 
-### S-2 · <title>
-
-### S-3 · <title>
-
-## Ideas
-
-### I-1 · <title>
-
-- **Stage:** <stage> · **Would touch:** `<file>`
-- **Change:** <one or two sentences>
-- **Why:** <the time it gives back>
-- **Behind it:** S-1
+1. <the change, in one line> · moves: <time \| cost \| touches> · from: <the "Got stuck" it answers>
 
 ## His notes
 
-- "<his words, verbatim>" — on <I-n | S-n | general>
+<!-- [user] <date> · "<his words, verbatim>" -->

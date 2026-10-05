@@ -1,120 +1,115 @@
 ---
 name: weekly-retro
-description: Runs the weekly retro of the pipeline over the workstreams closed in the chosen week. One weekly-reader (Opus 5.5, medium) reads each closed workstream's record (05-close/retro.md, metrics.json and each stage's telemetry, rulings.md, dreaming-notes.md, taste-notes.md) and returns what went wrong in each and the patterns across them, each with a proposed change to the pipeline. The session (Opus 5.5, medium) writes the week's board and asks the user to rule each proposal (apply, park, drop); it applies the approved ones to the pipeline repo, verifies them, and commits with his word. No issue is opened anywhere. The only place where the pipeline changes. Use once a week, or when the user asks to review the pipeline's lessons.
-disable-model-invocation: false
-argument-hint: "[week, e.g. 2026-W40; defaults to the week that just ended]"
-allowed-tools: Read, Write, Edit, Glob, Grep, Agent, AskUserQuestion, Artifact, Bash
+description: The weekly retro, the only place where the pipeline changes. Once a week the session (Opus 5.5, high) reads the retro and the rulings of every front closed that week, writes the week's board (raw numbers per front and route, last week's changes beside them, proposals each with its evidence and exact edit, the live fixes to ratify, the fixed items), asks the user one question per proposal (apply, park, drop), applies what he approved in a separate worktree of the pipeline repo, verifies it, and lands it by fast-forward with his word. No video, no slides. Use once a week, or when the user asks to review the pipeline's lessons.
+argument-hint: "[ISO week, e.g. 2026-W41; default: the week that just ended]"
+allowed-tools: Read, Write, Edit, Glob, Grep, Agent, AskUserQuestion, Bash
 ---
 
 # The weekly retro
 
-Every workstream closes with a retro that changes nothing (stage 6):
-its numbers, three things that went well, three where it got stuck,
-at most three ideas, all kept in the workstream. Once a week this
-skill reads the workstreams closed that week together and turns what
-repeats into changes to the pipeline, with the user ruling each one.
-A friction seen once may be chance; seen in three workstreams it is
-the pipeline.
+Every front closes with a retro that changes nothing. Once a week this
+session reads them together and turns what repeats into changes to the
+pipeline, with him ruling each one. A friction seen once may be
+chance; seen in three fronts, it is the pipeline.
 
-The session is **Opus 5.5 at medium effort**. It does not read the
-records itself: the reader does, and the session writes the board,
-asks, and edits.
-
-## The pattern
+## The flow
 
 ```
-0 Open     the week (argument, or the one that just ended) · the workstreams closed in it
-1 Read     weekly-reader (Opus 5.5, medium) over every closed workstream's record
-           → per workstream what went wrong · the patterns across · a proposal each
-2 Board    _retros/<YYYY>-W<ww>.md: the week in numbers, the patterns ranked, each with its edit
-3 Rule     apply · park · drop, one question per proposal, four per call
-4 Apply    each approved edit into the pipeline repo, verified, shown as a diff
-5 Commit   with his word, one commit per proposal; the record closed with the shas
+0 open    the week · the fronts closed in it · last week's board
+1 read    retro.md + rulings.md of each front (you) · numbers by jq · the rest by scout
+2 board   _retros/<YYYY>-W<ww>.md: numbers · last week's changes · proposals · live fixes · fixed items
+3 rule    one question per proposal and per live fix, four per call
+4 apply   a separate worktree · the exact edit · verified · diff shown
+5 land    with his word: one commit per proposal · fast-forward the live main · the board closed
 ```
 
-## Step 0 — open
+Read [references/governance.md](references/governance.md) before step
+2: who decides what, how a proposal is shaped, how the pipeline is
+versioned and rolled back.
 
-The consuming project's `CLAUDE.md` names the designs root. The week
-is ISO (`YYYY-Www`), Monday to Sunday, the one given or the one that
-just ended. A workstream belongs to the week when its
-`blueprint/close/retro.json` has `closed` inside it. A workstream
-closed without a retro is listed and skipped. The weekly records live
-in the designs root under `_retros/`; the pipeline repo is the one
-this skill is installed from (`${CLAUDE_SKILL_DIR}/../../..`).
+## Step 0 · Open
 
-## Step 1 — read
+The week is ISO (`YYYY-Www`), Monday to Sunday: the one given, or the
+one that just ended. A front belongs to it when its `.state.md` says
+`closed` with a date inside the week. Short routes and hotfixes count
+(their record is `close.md`). The boards live in
+`<designs-root>/_retros/`; the pipeline repo is the one this skill is
+installed from.
 
-Dispatch one `weekly-reader (Opus 5.5, medium)` with the week, the
-pipeline repo's path, the earlier weekly records under `_retros/` (for
-what he parked and dropped), and per workstream the paths of its
-record:
+No front closed: the board holds only the live fixes and the fixed
+items that are due. Nothing due either: say so in one line and stop.
 
-| Path | What it holds |
-|---|---|
-| `05-close/retro.md` | the numbers, went well, got stuck, the ideas, his notes |
-| `05-close/metrics.json` and each stage's `telemetry.json` | time and cost per stage, the slowest steps, the structure of main before and after |
-| `rulings.md` | his rulings and the ones taken in his place |
-| `dreaming-notes.md` | the frictions noted on the spot, his `[user]` notes |
-| `taste-notes.md` | the patterns in his rulings |
+## Step 1 · Read
 
-It returns what went wrong in each workstream and the patterns across
-them, each pattern with its evidence and a proposed edit. A group
-parked at an earlier weekly comes back here with whatever this week
-adds.
+- **You read**, whole: each front's `05-close/retro.md` (or `close.md`)
+  and `rulings.md`. They are short, and they are what you rule on.
+- **Numbers by `jq`**, never by reading: from each front's
+  `metrics.json`, the totals (calendar and clock minutes, cost, his
+  touches, waits on him) and the per-stage rows.
+- **The rest by `scout (Sonnet 5.5, low)`**: a quote you need from a
+  front's `dreaming-notes.md`, a line of a board, the earlier boards'
+  "dropped" and "parked" lists.
+- **Live fixes:** `git log` of the pipeline repo's `main` since last
+  week's board (its sha is in the board). Every commit not applied at a
+  weekly is a live fix to ratify.
+- **Incidents:** the week's `incident` issues of the project
+  (`gh issue list --label incident`).
 
-## Step 2 — the board
+## Step 2 · The board
 
-Write `_retros/<YYYY>-W<ww>.md`:
+Write `_retros/<YYYY>-W<ww>.md` from `templates/board.md`:
 
-- **The week in numbers**: one row per workstream (time, his hours,
-  cost, entries, rounds, findings), and the week against the earlier
-  weekly records.
-- **The patterns, ranked** (his notes first, then how many workstreams
-  saw it, then the time it cost). Each opens with one plain sentence of
-  what would change in practice, then the evidence (the workstreams and
-  a quote), his notes verbatim, the **edit proposed** (the file and the
-  exact change) and what it would cost. A pattern he cannot picture
-  from its first sentence is dropped on the spot.
-- **Not for the pipeline**: a pattern that belongs to the project's
-  doctrine, listed for him to take there. A structure-of-main measure
-  past its threshold is listed here as a refactor the project builds
-  as its next demand.
-- **Dropped before**: a proposal he dropped at an earlier weekly is
-  listed with the week and his words, not asked again; he may pull one
-  back by naming it.
+1. **The week in numbers.** One row per front: route, clock, cost
+   (estimate), his touches. Raw numbers; a median per route only
+   after 10 fronts on that route.
+2. **Last week's changes**, beside the numbers, so he sees their
+   effect.
+3. **Proposals**, ranked: his `[user]` notes first, then how many
+   fronts saw it, then the time it cost. Each opens with one plain
+   sentence of what changes in practice, then the evidence (the fronts,
+   a quote), the exact edit (the file and the change) and what it
+   costs. A proposal he could not picture from its first sentence is
+   dropped on the spot.
+4. **Live fixes to ratify**: each commit, its dreaming line, keep or
+   revert.
+5. **Not for the pipeline**: what belongs to the project's standards
+   (a PR there, his), listed for him.
+6. **Fixed items** that are due (governance.md).
+7. **Dropped before**: his earlier "drop", with the week; never asked
+   again unless he names it.
 
-Publish it as an artifact and give him the link.
+## Step 3 · Rule
 
-## Step 3 — rule
+Through the question tool, four per call, in rank order: one question
+per proposal (apply, recommended when two or more fronts saw it or he
+noted it · park, it returns next week · drop) and one per live fix
+(keep · revert). The question carries the plain sentence, the evidence
+in one line and the edit. He may change an edit in "Other"; the
+changed edit is the one applied. His answers go into the board with
+his words.
 
-Through the question tool, one question per proposal, four per call,
-in rank order: the plain sentence, the evidence in one line, the edit.
-The answers: **apply** (recommended when two or more workstreams saw
-it, or he noted it), **park** (it returns next week) and **drop**. He
-may change an edit in "Other"; the changed edit is the one applied.
-Each ruling goes into the weekly record with his words.
+## Step 4 · Apply
 
-## Step 4 — apply
+In a separate worktree of the pipeline repo, never in the live
+checkout the sessions read:
 
-For each approved proposal, edit the target file in the pipeline
-repo: the change proposed, nothing around it. Keep the pipeline
-generic: no company, stack or product in its files. After each edit,
-verify what can be verified (`node --check` on a workflow, the
-dry-runs in `scripts/`, the blueprint build on a fixture when the
-blueprint changed, `node scripts/check-models.mjs` when an agent
-changed) and show the diff.
+1. The approved edit, nothing around it. The pipeline stays generic:
+   no company, product or private name in its files.
+2. Verify what can be verified: `node --check` on a workflow or script,
+   `bash -n` on a shell file, `bash claude/hooks/tests/guard-irreversible.test.sh`
+   when the guard changed, the dry-runs under `scripts/`, the model
+   check when an agent changed.
+3. Show him the diff.
 
-## Step 5 — commit
+## Step 5 · Land
 
-The pipeline repo is shared: commit only with his word, one commit per
-proposal, the message saying what changed and why, with the
-workstreams that taught it. Push only when he says so. No issue is
-opened anywhere: the weekly record is the index. The record gets the
-shas and is closed. Then the week's report: follow
-claude/docs/stage-report.md (video, slides; the board is its page).
+With his word: one commit per proposal (what changed, why, the fronts
+that taught it), then fast-forward the live `main`. A front in flight
+picks the change up at its next stage. Push only on his word. Write
+the shas into the board and close it.
 
 ## Boundaries
 
 This skill changes the pipeline and nothing else: no product code, no
-project doctrine, no workstream folder but the weekly record. Never an
-edit he did not approve.
+project standard, no front's folder but the board. Never an edit he
+did not approve.

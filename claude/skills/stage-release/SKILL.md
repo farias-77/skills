@@ -1,496 +1,216 @@
 ---
 name: stage-release
-description: Conducts stage 5 (Release). It takes the audited feature branch into main and production on its own, from the user's play to done. The session (Opus 5.5, medium) writes the release plan, with the rollback triggers, the stop list, the migrations and the toggles, and checks the project's permissions and guard hook. It sends him, in one message, every action only he can run plus the play line that authorizes the merge. His play is his "go". Then it runs alone. It does not re-test the feature: stage 4 owns working. It merges into main behind the local-CI signoff, deploys staging and runs a smoke of the read-only journeys. Production goes out progressively where the platform allows (a candidate at 0% smoked on its tag, then the traffic shift), otherwise straight; then a smoke and a 15-minute watch of errors and latency against the previous revision, with automatic rollback on the plan's triggers. It tags the versions from one release-scribe (Sonnet 5.5, medium) per artifact and closes with the stage report (slides and blueprint; no video). A red smoke after a deploy gets one fix, an entry R.n through the stage-4 pipeline; a second red stops and reports. After a production rollback the fix is built and smoked on staging, but the new production deploy asks him first. It stops and asks only on its written list: what cannot be undone, and a new production deploy after a rollback. Also runs a hotfix while the workstream is not closed. Use when a workstream's .state.md says stage release, to resume a release in progress, or with `hotfix` for a regression found in production.
-disable-model-invocation: false
-argument-hint: "<workstream-slug> [hotfix]"
-allowed-tools: Read, Write, Edit, Glob, Grep, Agent, Workflow, Skill, AskUserQuestion, Artifact, PushNotification, ScheduleWakeup, Bash
+description: Conducts stage 5 (Release) of the pipeline under one /goal. It merges the finished front (feat/<slug>) into main under the user's authorization, follows the CI's staging deploy and smoke, tags vX.Y.Z so the CI promotes the same image to production with a smoke and a 15-minute watch that rolls back on its own, and closes with its report (video, deck, explainer). A red gets one fix entry through the stage-4 pipeline, then it stops. It stops for the user only on its stop list. The short route and the hotfix follow the same path from lets-cook. The session runs on Opus 5.5, high. Use when a front's .state.md says stage release, or to resume a release by its slug.
+argument-hint: "<workstream-slug>"
+allowed-tools: Read, Write, Edit, Glob, Grep, Agent, SendMessage, Workflow, AskUserQuestion, Artifact, PushNotification, ScheduleWakeup, Skill, Bash
 ---
 
 # Stage 5: Release
 
-Stage 4 left `feat/<workstream>` merged, gated, reviewed, audited and
-used by him on screen. **This stage assumes it works.** It does not
-re-test the feature; it puts it in `main` and in production, proves
-each environment serves it with a smoke, watches production for 15
-minutes, and reports once.
+## The bar
 
-**Mode: autonomous under his play.** He presses play once. **His play
-is his "go"** (reports render the word in the workstream's
-language). From then on the session conducts every step alone:
-the merge into `main`, the deploys, the smokes, the progressive
-rollout, the watch, the rollback, the fix. It asks him only for
-what it cannot reach (a key, an account, a DNS record, all in one
-message up front) and for what is on the stop list below. Merge and
-deploy permissions are granted by the project's settings. In
-exchange, the session owes him responsibility, and here that means
-five concrete things:
-
-- every step is confirmed by reading its result, never by an exit
-  code;
-- the rollback triggers are written before the play and fire on their
-  own;
-- nothing runs that the plan does not name;
-- the guard hook holds whatever cannot be undone;
-- the session stops on its written list.
-
-**How** code reaches each environment is the project's. The
-engineering doctrine that the project's `CLAUDE.md` names has a
-delivery standard: the environments, what deploys each, the read-only
-check of each, the production diff, the rollback, the migrations
-policy (`docs/project-contract.md`, role 11). The session follows it.
-It never deploys by hand what the doctrine says the CI deploys.
-
-| Word | What it is here |
-|---|---|
-| **the play** | his one action: he runs the `!` line that writes the merge authorization into the guard's allow file, and says go in his own words. Quoted verbatim in the trace, in `rulings.md` and in the PR into `main` |
-| **the plan** | `04-release/plan.md`: what ships, the pre-flight, every step with its command and its read-only check, the rollback triggers, the migrations, the toggles, the stop list. Written before the play |
-| **the guard** | the project's `.claude/hooks/guard-irreversible.sh` (the pipeline's `claude/hooks/guard-irreversible.sh`, installed by pipeline-setup). It denies what cannot be undone and asks before a merge into a protected branch that the play did not authorize |
-| **staging** | the environment the doctrine deploys before production (a project may call it alpha) |
-| **the smoke** | health, the sha served, and the plan's **read-only journeys** (the ones that write nothing in that environment) run by the project's journey command against the environment's URL with its test actors (role 23 of `docs/project-contract.md`; missing, it joins the pre-flight). A command the session runs, not an agent |
-| **candidate** | the new production revision, deployed with no traffic under a tag URL |
-| **the watch** | 15 minutes with the new revision serving: errors and latency read against the previous revision in the same window, and the alarms the release touches. A trigger rolls back on its own |
-| **entry `R.n`** | a fix built through the stage-4 pipeline (`exec-entry`). The session never writes or reviews code |
+1. From the `/goal` to production without him, except an irreversible
+   step nobody planned.
+2. Production runs the image staging ran. A red production goes back
+   to the previous tag by itself, through the CI.
+3. His authorization covers one front and dies at its tag.
+4. A red gets one fix. A second red stops.
+5. The report (Video, Deck, Explainer) is finished before the stage
+   closes.
 
 ## The team
 
-| Agent | Does |
+| Who (model, effort) | Does |
 |---|---|
-| the session (Opus 5.5, medium) | the plan, the pre-flight, the merges, the deploys, the smokes, the watch, the rollback, the record |
-| `release-scribe (Sonnet 5.5, medium)` | one per versioned artifact: the version, the notes, the reverts |
-| the stage-4 pipeline | an `R.n` fix: `builder (Opus 5.5, medium)`, `exec-gate (Sonnet 5.5, low)`, `reviewer (Opus 5.5, high)`, and `qa-frontend (Opus 5.5, medium)` or `qa-backend (Opus 5.5, medium)` by its surface |
-| `scout (Sonnet 5.5, low)` | whatever the session needs to look up, by the house rule |
-| `slides-scribe (Sonnet 5.5, high)` | the stage report's slides (no video at this stage) |
+| you, the session (Opus 5.5, high) | every step below; you never write or review code |
+| the CI (GitHub Actions) | push to `main`: staging deploy + smoke. Tag `v*`: the same image to production, smoke, 15-minute watch, rollback, then the GitHub release |
+| `claude/scripts/local-ci.sh` | the project's whole gate on this machine or a cloud VM, in a fresh worktree; the only writer of the required `local-ci` status, posted under the bot identity on green |
+| the stage-4 cast through `exec-entry-workflow.js` mode `fix` | an `X.n` fix: `builder-backend` · `builder-frontend (Opus 5.5, medium)`, `exec-gate (Sonnet 5.5, low)`, `reviewer (Opus 5.5, high)`, the QAs by surface (Opus 5.5, medium) |
+| `scout (Sonnet 5.5, low)` | anything you need to look up |
+| `video-builder` · `slides-builder` · `artifact-builder (Sonnet 5.5, medium)` | the report's tabs; `video-builder` also starts the close's video for users |
 
-**Packs.** At step 0 the session loads `pack-release` and `pack-ops`
-with the Skill tool. They hold the checklists and recipes this skill
-points to: the go/no-go per step, the candidate commands per platform,
-the thresholds, the migration rules and the toggle rules.
-
-The session is **Opus 5.5 at medium effort**. It runs the steps
-in order and has no workers. Every reply that dispatches or waits
-carries a status table (what · state). A wait on something outside (a
-CI run, a deploy, the watch, a proof's hour) ends the turn on a wakeup
-sized to it. It never loops to check early.
-
-## The pattern
+## The flow
 
 ```
-0 open      preconditions · model · permissions and guard checked · packs loaded
-            → 04-release/plan.md (steps, rollback triggers, migrations, toggles, stop list)
-1 play      ONE message + one PushNotification: every pre-flight item as a ready ! command,
-            the play line last → he runs them and says go → each item read back, the play quoted
-2 main      PR feat/<ws> → main · the local-CI signoff on its head · merge commit,
-            --match-head-commit · the guard checks the head against the play
-            ‖ release-scribe (Sonnet 5.5, medium) per artifact on the merge sha
-3 staging   the doctrine's deploy of that sha → read-only: staging serves it · migrations ran
-            → the smoke: the read-only journeys against staging
-4 prod      progressive: candidate at 0% + tag → smoke on the tag → shift (a share, or 100%)
-            straight:    deploy
-            → the smoke against production
-5 watch     15 min: errors and latency vs the previous revision, the alarms the release touches
-            green → the share to 100%
-            a trigger fires → automatic rollback
-            a red smoke or a rollback → ONE fix R.n through exec-entry → main → 3 again
-            after a production rollback: 3 runs, then ASK him before 4 (a new production deploy)
-            a second red → stop and report
-6 done      tags + releases on the released sha · release.json · .state.md · PushNotification
-7 report    claude/docs/stage-report.md: slides → blueprint (no video)
+0 open        canary · preconditions · the authorization line read back · the /goal → he pastes it
+1 main        main moved? merge main into feat + local CI · local-ci green on the head · merge
+2 staging     the CI deploys and smokes · green → peers told, the users' video starts recording
+3 tag         vX.Y.Z on the merge, notes from the stories → push (the authorization is spent)
+4 production  the CI: same image → smoke → 15-min watch → GitHub release · red → rollback by itself
+5 close       trace · telemetry · report (3 tabs) · cleanup · .state.md → close · the message
 ```
 
-**When a merge into `main` deploys production by itself** (the
-doctrine says so), the order changes. Step 3 runs first, from
-`feat/<workstream>` or the staging branch the doctrine names. Step 2
-then *is* the production deploy, and step 4 follows the CI's rollout,
-progressive when the CI does it that way.
-
-## Preconditions
-
-- `.state.md` says `stage: release`.
-- `03-execution/audit.md` is approved, and
-  `blueprint/execution/execution.json` has `closed` set.
-- Every entry is merged or was ruled at the audit.
-
-If any is missing, halt and send the user back to stage 4.
-
-The stage opens on his invocation (house rule "Every stage starts on
-his play"): `/clear`, `/model claude-opus-5-5`, `/effort medium`,
-`/stage-release <slug>`. That opens the stage; the play below (Step 1)
-is still what authorizes the merge. If the session is not on Opus 5.5
-at medium effort, ask him once to switch (`/model claude-opus-5-5`,
-`/effort medium`) and wait; a non-interactive run goes on with what it
-has and writes one line in `dreaming-notes.md`.
+Read [references/release.md](references/release.md) before step 1. It
+holds the trunk, the authorization, how fronts take turns on `main`, the
+smoke and the watch, the hotfix and the legacy repos. Read
+[references/migrations.md](references/migrations.md) when `plan.md`
+lists a migration.
 
 ```
-designs-root/<workstream>/04-release/
-├── plan.md        # the whole stage, written before the play
-├── trace.md       # one line per step as it ends, `date -u`
-├── notes/         # per versioned artifact: <artifact>.md (the notes) and <artifact>.json (the scribe's return)
-├── entries/R.<n>/ # the fix entries' run-*.json and evidence
-├── proof/         # CI summaries, the smokes, the watch's reads, the alarms, the later proofs
-└── telemetry.json # the stage's measures, shared shape (claude/docs/telemetry.md)
+<designs-root>/<slug>/04-release/
+├── plan.md      written at execute, during his use (templates/plan.md)
+├── trace.md     one line per step as it ends, `date -u` (templates/trace.md)
+└── notes.md     the tag's annotation
 ```
 
-## Step 0 — open: the permissions, then the plan
+## Unattended
 
-Create `04-release/telemetry.json` with `openedAt` and the session's
-model, in the shape every stage shares
-([claude/docs/telemetry.md](../../docs/telemetry.md)); a step row as
-each step of the pattern ends (the play is the step where `hisMin`
-lives; a watch row's wait is wall-clock, not his).
+Inside the `/goal` nothing waits for him but the stop list. Do not end
+a turn to summarize and announce the next step, to offer to wait, or
+because a step finished (the merge, a green staging). A wait on the CI
+ends the turn on a `ScheduleWakeup` sized to it (a staging deploy
+~20 min, production plus the watch ~35 min), never on a question. Keep
+`trace.md` current: it is your checklist and your resume point.
 
-**Permissions first.** These checks are read-only, by
-[references/permissions.md](references/permissions.md):
+## Step 0 · Open
 
-- the project's `.claude/settings.json` registers the guard on
-  `PreToolUse`;
-- `.claude/hooks/guard-irreversible.sh --self-test` passes;
-- the allow rules cover the merge, deploy and migration commands the
-  plan will run (role 18 of `docs/project-contract.md`);
-- branch protection on `main` requires the local-CI signoff (role 13).
-
-A missing guard halts the release before the plan. The user installs
-it with `/pipeline-setup`, which carries the settings template and
-the hook. A merge or deploy command left under **ask** still works,
-but it prompts him each time, so the pre-flight message says which
-ones will. A `main` without the signoff requirement merges behind the
-hosted checks, and the report says so.
-
-**The plan.** The session reads the audit, the execution record, the
-design's `operations.md` and `data-and-contracts.md`, and the
-doctrine's delivery standard (through a scout where it only needs a
-fact). It then writes `04-release/plan.md` from
-[templates/plan.md](templates/plan.md) by
-[references/plan.md](references/plan.md):
-
-- what ships and the versioned artifacts;
-- the pre-flight;
-- every step with its command and the read-only check of its result;
-- the rollout mode, progressive or straight, by
-  [references/rollout.md](references/rollout.md);
-- the **rollback triggers** with this project's thresholds and
-  commands;
-- the migrations, each one an expansion;
-- the toggles;
-- the read-only journeys and the smoke command;
-- the watch and its triggers, and the later proofs;
-- the stop list.
-
-The plan is complete before the play, because the play authorizes
-exactly what the plan says.
-
-## Step 1 — the play
-
-**Everything only he can run goes in one message, with one
-PushNotification.** That covers:
-
-- the pre-flight items: a secret's value, an account, DNS or TLS, an
-  infrastructure apply the CI cannot run;
-- every action the harness's classifier reserves for him: an apply,
-  writing a secret's value, reading a credential or a person's data,
-  dispatching an agent whose job is a production deploy;
-- any command the plan names that the guard denies, as a verbatim line
-  for the allow file;
-- last, **the play line**:
+1. If the session is not on Opus 5.5 at high effort, say so in one line
+   and go on.
+2. **The canary.** Run `git push origin a:b`. It must come back denied
+   by the guard with a reason starting `guard-canary`. Anything else:
+   the stage does not open; say why in one line.
+3. **Preconditions.** `.state.md` says `stage: release`; the execute
+   recorded his ok; `04-release/plan.md` exists; the PR
+   `feat/<slug>` → `main` is open and ready. Missing: stop and send him
+   back to the stage that owns it.
+4. **The authorization.** `cat .claude/hooks/irreversible.allow` and
+   find a live `auth release <slug>` line (the execute's ok handed him
+   the command). Missing or expired: the message below carries, first,
+   the exact command for him to run:
+   `! .claude/hooks/authorize.sh release <slug> feat/<slug>@<the head he said ok to>`.
+5. **Coordination.** Edit your line in `_coordination.md`: stage
+   `release`, branch, this session's name.
+6. **The `/goal`.** Fill it from `plan.md` and end the turn:
 
 ```
-! printf 'merge-from %s  # release <slug> <date>\n' <audited head of feat/<slug>> >> .claude/hooks/irreversible.allow
+/goal Release <slug> with the stage-release skill, without asking me anything outside its stop list.
+Authorized in this release: the merge of feat/<slug> into main, its fix/<slug>/X.n fixes, one tag
+vX.Y.Z, and these known irreversible steps from plan.md: <list, or "none">.
+Goes live for real people: <from plan.md, or "nothing">.
+Done when: the tag is in production with the smoke and the 15-minute watch green, the GitHub release
+exists, the report's three tabs are published, and I got the notification with the link and the next command.
 ```
 
-Each command is ready to run and final when sent. A secret goes
-through a scratchpad script that pipes the value from where it lives,
-so the message never holds one. The play authorizes the audited head
-and the release's own fixes, because they descend from it and pass
-the local-CI signoff. A project that wants every fix to ask writes
-`merge-head` instead; the reference explains the difference.
+The irreversible steps the `/goal` names were his call already (in
+`plan.md`); they never stop the release. Only what it does not name
+does.
 
-He runs the lines and says go. His words, verbatim, are the play. If
-a goal of his already authorized this release by name ("deploy to
-production and merge into main, following the standard procedure"),
-the goal is quoted as his words, and the play line is still his to
-run, because the session cannot write the allow file. Then the
-session reads back each item with its read-only check, including
-`cat .claude/hooks/irreversible.allow`, which the guard allows. It
-writes the trace line and the `rulings.md` line
-(`<date> · release · play · ruled: go · "<his words>"`). While he
-works through the list, the session goes on with whatever does not
-depend on it: the PR into `main` and its signoff. A pre-flight item
-still missing parks the release before the merge, with one line
-saying which.
+## Step 1 · Into main
 
-## Step 2 — main
+1. **Take the turn.** One front at a time sits between its merge and
+   its green staging. GitHub is the truth: a staging deploy running on
+   `main` means another front is there; wait it out on a wakeup. Tell
+   the release sessions named in `_coordination.md` that you are
+   merging (`SendMessage`). A hotfix that says it goes first, goes
+   first (references/release.md, "Taking turns").
+2. **`main` moved since his ok?** Merge `origin/main` into
+   `feat/<slug>` (a merge, never a rebase), renumber the migrations if
+   the project has a command for it, push, and run `claude/scripts/local-ci.sh --repo <repo> --ref feat/<slug>`. A red
+   here is an `X.n` on `feat`, exactly as at execute.
+3. **The merge.** The PR's head has `local-ci` green, and the code
+   owner's approval when the PR touches the gate's paths (asked at the
+   execute's ok). Then
+   `gh pr merge <n> --merge --match-head-commit <head>`. The guard lets
+   it through when the head is, or descends from, the authorized sha.
+   A guard denial is a stop: record it and ask, the authorize command
+   ready.
 
-1. Open the PR from `feat/<workstream>` into `main`. The body carries
-   the plan's summary and the play, verbatim.
-2. Confirm the local-CI signoff on its head sha (role 13): the
-   context `local-ci`, which only the whole gate posts, at the end of
-   execute — a `local-ci/affected` status from a merge of the queue
-   does not count. If it is missing, run the project's local CI with
-   the whole gate in a clean worktree at that head, which posts it. Never post a status by hand: the guard denies that.
-3. When the required checks are green, merge:
-   `gh pr merge <n> --merge --match-head-commit <head>`. It is a merge
-   commit. `--match-head-commit` makes the merge refuse a head that
-   moved after the check. The guard reads the PR's base and head and
-   lets the merge through only when the head is the one the play
-   authorized. An "ask" from the guard here means the head is not the
-   one the play named: the session stops, it does not route around it.
-4. Record the merge sha.
+## Step 2 · Staging
 
-**The versions.** Right after the merge, dispatch one
-`release-scribe (Sonnet 5.5, medium)` per versioned artifact the
-doctrine names, all in one message. Each one gets:
+The push to `main` runs the staging deploy and its smoke. Wake when it
+should be done and read the run (`gh run view <id>`); never poll.
 
-- the artifact's name, repo, paths and tag prefix;
-- the merge sha;
-- the plan's path;
-- the doctrine folder, for its commit convention;
-- `04-release/notes/<artifact>.md` and `.json`.
+- **Green:** tell the peers `main` is free. Dispatch the close's video
+  for users now, in the background: `video-builder (Sonnet 5.5, medium)`
+  with `stage-close/references/user-video.md` and the stories; it
+  records in staging while you go on (on the short route only when a
+  screen users see changed).
+- **Red:** the red rule below.
 
-Each derives the version and writes the notes, and creates nothing. A
-scribe with no valid version is dispatched once more. After a second
-failure the session derives it by the same rules and never guesses.
-When an `R.n` changes the sha that goes to production, the scribes
-run again on the new sha.
+## Step 3 · The tag
 
-## Step 3 — staging
+1. **Version.** A front is a minor, the short route and a hotfix a
+   patch, a major only on his word. No `v*` tag yet: `v1.0.0`.
+2. **Notes**, in `04-release/notes.md`: the version and date, then one
+   line per story (id + what changed for its user), then what goes
+   live for real people. The CI publishes them with the release.
+3. `git tag -a vX.Y.Z <the merge sha on main> -F 04-release/notes.md`,
+   then `git push origin vX.Y.Z`. The guard spends the authorization on
+   this push; the same tag pushed again still passes. The CI holds the
+   tag until the previous tag's watch ends.
 
-The doctrine's staging deploy of the merge sha runs: the CI on the
-merge, a staging branch fast-forwarded, or a command. The session
-follows it (`gh run watch`, or a wakeup sized to the run) and saves
-the summary under `proof/`. It then reads, read-only, that staging
-serves that sha (the build sha the health endpoint exposes, or the
-image digest). It also confirms each migration ran and that the
-previous revision still serves through it, by
-[references/rollout.md](references/rollout.md). The plan also names
-any rollback path that has never run. That path runs once here, back
-and forward, before production relies on it.
+## Step 4 · Production
 
-**The smoke on staging.** The plan's smoke command: health, the sha
-served, and the read-only journeys against staging's URL with the
-test actors the doctrine names for staging (never a production actor,
-never a token). Its summary goes under `proof/`. Green: production.
-A red goes to [the one fix](#a-red-one-fix-then-stop).
+The tag runs production: the image staging ran, the smoke, the
+15-minute watch, then the GitHub release. A red smoke or watch moves
+the traffic back to the previous tag, alarms him by email, and
+creates no release. Wake when it should be done and read the run.
 
-## Step 4 — production
+- **Green:** the release exists. Go to step 5.
+- **Rolled back:** the red rule.
 
-The previous revision, job image and front release are recorded
-first: they are the rollback target. Production deploys the artifact
-staging proved, the same digest, never a rebuild. It deploys the way
-the doctrine says: a workflow the session dispatches or follows, or a
-command the settings allow. Migrations run before the new code
-serves, and they only expand. The mode comes from the plan, by
-[references/rollout.md](references/rollout.md):
+## The red rule: one fix, then stop
 
-- **Progressive, where the platform allows it** (role 19: a tagged
-  revision, a traffic split, a canary):
-  1. Deploy the candidate with no traffic, under a tag.
-  2. The smoke on the tag URL: the plan's smoke command against it,
-     plus the digest served. Red: never promoted.
-  3. Shift the traffic. When production gives a signal (≥ 100 requests
-     expected in 15 minutes), shift a share (10% by default); the
-     smoke and the watch run on it, and a green watch promotes it to
-     100%. When it does not, go to 100% at once and write the watch's
-     verdict as "no signal".
-  4. At 100%, clear any sticky split.
-- **Straight, otherwise:** deploy.
+| Red | What happens |
+|---|---|
+| staging (deploy, migrate, smoke) | one `X.n`: `exec-entry-workflow.js` mode `fix` on `fix/<slug>/X.n` from `main` (the `reviewer (Opus 5.5, high)` always) → PR → `local-ci` → merge (the authorization covers it) → staging again |
+| `local-ci` on the PR at step 1 | one `X.n` on `feat/<slug>`, as at execute |
+| production rolled back | one `X.n` → staging and smoke → **ask** before the new production deploy, with a new `! authorize` line ready (the old one died at the tag) → a patch tag |
+| the environment (runner, network, a quota) | run it again once; it does not count. Never a production `migrate`: that is a stop |
+| a second red of code, anywhere | stop |
 
-Then **the smoke against production**, the same command, and **the
-watch**.
+## The stop list (only these stop)
 
-## Step 5 — the watch
+| Stop and ask | Why |
+|---|---|
+| a contract migration (drop, rename) or deleting data not named in the `/goal` | cannot be undone |
+| a red `migrate` in production: never run again by you | production's schema may be half-applied |
+| turning on an effect for real people the `/goal` did not name | real people |
+| a new paid resource, a DNS switch | cost and cutover |
+| a new production deploy after a rollback | a real incident: he decides |
+| a second red of code | it does not loop |
+| a guard denial | something is outside what he authorized |
 
-Fifteen minutes with the new revision serving, read once at the end
-(a wakeup, never a loop): the 5xx ratio and the p95 latency of the new
-revision against the previous one **in the same window** (against the
-absolute thresholds when there is no previous one serving), start
-failures and memory kills, and the first evaluation of each alarm the
-release touches, written exactly as read (OK with data, "no
-datapoints", firing, "not evaluated yet"; "no datapoints" is never
-healthy). From then on the alarms watch on their own.
+A stop is a `PushNotification` plus the question tool: what happened,
+the evidence in one line, the options with yours first, and the
+`! authorize` command ready when "yes" needs one. Everything that does
+not depend on the answer goes on (the report's pieces, the trace).
 
-**The rollback triggers are automatic.** They are written in the plan
-before the play. When one fires, the session runs the rollback the
-plan names (traffic back to the previous revision, the job's image
-back, the front's release back; never a down migration), verifies
-read-only that production serves the previous revision, and traces it.
-The default triggers, which the doctrine's values override:
+## Step 5 · Close
 
-- the candidate's smoke is red, or its digest is not the release's:
-  it is never promoted;
-- the smoke after the shift or the straight deploy is red;
-- the 5xx ratio is above 2× the previous revision's and above 1%;
-- p95 latency is above 1.5× the previous revision's;
-- start failures or memory kills;
-- an alarm the release touches fires;
-- a job run on the new image fails.
+1. **Trace and numbers.** `trace.md` complete; run
+   `node claude/scripts/telemetry.mjs <slug> --stage release`.
+2. **The report, finished before the close.** Dispatch the builders in
+   one message, in the background, with the stage's files and
+   `report/release/`, as `claude/docs/stage-report.md` describes:
 
-**The later proofs.** Some proofs have an hour of their own: the first
-scheduled run, or the first real data. Each one is a wakeup at that
-hour, by [references/watch.md](references/watch.md). A proof more than
-48 h out becomes a pendency with an owner.
+| Tab | Builder | Brief |
+|---|---|---|
+| Video | `video-builder (Sonnet 5.5, medium)` | `main` → staging → tag → production, the smokes and the watch, 30–45 s |
+| Deck | `slides-builder (Sonnet 5.5, medium)` | the version and notes, the smokes, a rollback if one happened, what went live for real people, the stage's numbers |
+| Explainer | the report template from `trace.md`; with an incident, `artifact-builder (Sonnet 5.5, medium)` draws it | the release's timeline |
 
-## A red: one fix, then stop
+   The short route and the hotfix: the Deck only. When they return,
+   check every number against `trace.md` and the CI runs, run
+   `gitleaks dir <designs-root>/<slug>` (a finding stops the publish),
+   and publish to the front's link with the label "release closed".
+3. **Cleanup.** Remove what this stage created: the `X.n` worktrees and
+   their stacks (`claude/scripts/cleanup.sh <slug> --check` shows what
+   is left; the full sweep is the close's).
+4. **Records.** `.state.md` → `stage: close`. Your line in
+   `_coordination.md`: "out in vX.Y.Z"; this front's file claims
+   dropped. Commit the workstream folder.
+5. **The message**, with a `PushNotification`:
 
-A red smoke on staging or production, or a rollback trigger, is read
-before anything: the failing case, its log, the environment.
-
-- **A red caused by the environment** (a missing pre-flight item, a
-  flaky provider) is traced and the step runs once more; a missing
-  item of his parks the release with one line.
-- **A red in the code gets one fix, `R.n`.** The session writes the
-  brief: the failure, the evidence, the design section it breaks. It
-  runs the entry through
-  `${CLAUDE_SKILL_DIR}/../../workflows/exec-entry.js` with `main` as
-  its base, merges the PR into `main` exactly as in step 2, and goes
-  back to step 3: staging, the smoke, production, the watch.
-- **After a production rollback, the new production deploy asks him
-  first.** The fix is built and merged, staging deploys it and its
-  smoke runs, all without him. Then, before step 4, one question
-  through the question tool with one PushNotification: the trigger
-  that fired and its value, the revision production serves now, what
-  `R.n` changed, the staging smoke. His answer is a ruling
-  (`rulings.md`, the trace, and a new `ask` in `release.json`); until
-  it comes, production stays on the previous revision. A rollback on
-  staging, or a red that never reached production traffic (the
-  candidate's smoke on its tag), does not ask.
-- **A second red**, on any step, stops the release. Production stays
-  on the last revision that passed (rolled back when a trigger fired).
-  The session traces it, writes `release.json`, and sends one
-  PushNotification with what failed, the evidence and the state of
-  each environment. It does not ask; he decides what comes next.
-
-## Step 6 — done
-
-1. Tag each versioned artifact on the released sha with its version,
-   and create the release with its notes, as the doctrine says.
-2. Write `blueprint/release/release.json` (schema:
-   `${CLAUDE_SKILL_DIR}/../../blueprint/schema/release.md`). The play
-   is the `ask`, with `words` set to his words; `merge`, `rollout`
-   (candidate, shifts, the watch as `bake`), `rollbacks`, `alarms` and `numbers` come
-   from the trace (rates and 5xx in %, p95 in ms, `revertRate` =
-   reverts ÷ commits).
-3. Build and publish with
-   `node "${CLAUDE_SKILL_DIR}/../../blueprint/build.mjs" <workstream>`.
-4. Write the numbers line in the trace, by
-   [templates/trace.md](templates/trace.md).
-5. `telemetry.json` closed (`closedAt`, the totals, the fix entries'
-   rounds and findings by class), then `.state.md` → `stage: close`,
-   once no later proof is still waiting.
-   Until then, it stays `stage: release` with the hours of the
-   waiting proofs.
-6. Commit the workstream folder and send one **PushNotification**:
-   what is in production, the versions, the pendencies with their
-   owners.
-
-## Step 7 — the stage report
-
-Follow `claude/docs/stage-report.md`: slides, then the blueprint, in
-one message by [templates/report.md](templates/report.md). This stage
-makes no video. When `.state.md` says `stage: close`, the message ends
-with the next play; while later proofs keep it on `stage: release`, the
-play comes with the update that moves it. The release never starts
-stage 6; nothing runs until he types:
-
-```
-/clear
-/model claude-opus-5-5
-/effort medium
-/stage-close <slug>
-``` A later proof read after the report updates
-`release.json` and the blueprint. The slides are not redone.
-
-## Migrations: expand in this release, contract in a later one
-
-Every migration in a release only **expands**: a new table, a
-nullable column or one with a constant default, an index built
-concurrently, a constraint added `NOT VALID` and validated later. The
-previous revision must keep working on the expanded schema, because
-that is what makes a rollback just a traffic move. A **contract**
-(drop, rename, type change, `NOT NULL` on what the previous release
-reads) ships at least one release after no deployed code reads the
-old shape, and it is on the stop list. Each migration sets a short
-lock timeout and a statement timeout. A failed migration leaves the
-old revision serving and stops the release. No down migration ever
-runs in production: the guard denies it. The recipes are in
-`pack-release`.
-
-## Release toggles
-
-A toggle the plan names is a config value with its own change. Off
-is the old behavior. Stage 4 tested both states. The plan gives each
-toggle its state at release, who flips it, and when. A flip the plan
-names is a step like any other. A flip it does not name is outside
-the plan, so the session asks. An **ops kill switch** (an e-mail sink,
-a paused schedule) flips on a red as a rollback action, without a
-deploy. Every toggle carries its removal task, and the report lists
-it for the close. A release toggle lives a week or two.
-
-## When the session stops and asks
-
-The session stops and asks only before what cannot be undone, and
-before a new production deploy after a rollback. One
-question goes through the question tool, with one PushNotification,
-and whatever does not depend on the answer goes on:
-
-- a contract migration, or a rollback the plan marks not safe for data;
-- a deletion or replacement of a stateful resource in the production
-  diff;
-- **a new production deploy after a production rollback**: the fix is
-  built and smoked on staging, then the deploy waits for his go
-  ([A red: one fix, then stop](#a-red-one-fix-then-stop));
-- anything the guard asks. A guard "deny" is never retried another way;
-- anything outside the plan: a command, an environment, an artifact or
-  a toggle it does not name.
-
-It **stops and reports**, without a question, on a failed migration
-(the old revision keeps serving), on the second red, and on a
-pre-flight item found missing (a secret, IAM, DNS, TLS).
-
-His answer is a ruling: it goes to `rulings.md` and the trace,
-verbatim.
-
-## Hotfix
-
-`/stage-release <slug> hotfix`, while `.state.md` is not `closed`,
-handles a regression found in production. His invocation is the play.
-
-1. Write the trace line with what was seen and where.
-2. Cut `hotfix/<slug>` from `main`.
-3. Build the fix as `R.n` through exec-entry, with that branch as its
-   base.
-4. Merge the PR into `main` behind the signoff. The play's
-   `merge-from` covers it because it descends from the audited head.
-5. Run steps 3 to 6.
-
-A hotfix the session starts on its own, from the watch, asks him
-first, because it is a new artifact. After `closed`, a regression is
-a new demand: say so and stop.
-
-## How to write
-
-- Say what you mean, in literal sentences with concrete values.
-- A trace line carries the command's summary and the file under
-  `proof/`, never the whole output.
-- Every agent named carries its model and effort.
-- No token, password or key goes in a rule, a prompt, the trace or a
-  PR body.
+| | |
+|---|---|
+| In production | vX.Y.Z, the GitHub release's link |
+| The link | the front's report, Release tab |
+| Watch | green, or the rollback and what came after |
+| Next | `/clear`, then `/stage-close <slug>` |
 
 ## Resuming
 
-Everything is in files. Read `.state.md`, `plan.md`, `trace.md`,
-`proof/` and `entries/`. The first plan step with no trace line is
-where to resume. A CI run, a deploy or the watch in flight is followed
-from where it is, never redone. A candidate left at 0% is either
-smoked or removed by the plan's rollback, never promoted unread.
-
-## Boundaries
-
-- The session writes no product code and reviews none. A fix is an
-  entry through the stage-4 pipeline.
-- It deploys only the way the doctrine says, and nothing before the
-  play.
-- It never pushes straight to `main` or a protected branch, never
-  force-pushes, and never rewrites a published tag.
-- It never edits the settings, the guard or its allow file. Those are
-  his.
-- Frictions worth learning from go to the workstream's
-  `dreaming-notes.md` on the spot.
+`/stage-release <slug>`: run the canary, then read `.state.md`,
+`trace.md` and the CI runs of `main` and of the tags. The trace's last
+line is where you are; never resume from memory.
