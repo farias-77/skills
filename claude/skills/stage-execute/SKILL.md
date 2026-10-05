@@ -95,7 +95,8 @@ Done when: board.md has every entry merged into feat/<slug>, or stopped with its
 reason and evidence and already decided by me; local-ci is green on the head of the
 PR feat/<slug> → main and the PR is ready; the app was up for my hands-on and I said
 ok through the question tool; the release plan is written; the execute report is
-published. Never merge into main.
+published. Never merge into main. Never loosen this done to call it met; stop early only
+when truly stuck (two fixes on one premise failed at the same gate), with why in board.md.
 ```
 
 ## 1 · Prepare

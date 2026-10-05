@@ -110,7 +110,8 @@ small on the wrong thing builds the wrong thing.
 I authorize the merge into main and one patch tag; the authorization expires at the tag.
 Done when: the entry passed its gate and review; local-ci is green on the PR; <I used it and said ok
 through the question tool | my staging check is delegated>; the tag is in production with the smoke and
-the watch green; cleanup.sh --check came back empty; I got the notification.
+the watch green; cleanup.sh --check came back empty; I got the notification. Never loosen this done
+to call it met; stop early only when truly stuck, with why in trace.md.
 ```
 
 In a legacy repo the first line is

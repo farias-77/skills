@@ -33,7 +33,7 @@ overlap: settle it now, before it is a conflict.
 | A conflict in a generated file | take the base's version, run the generator, commit |
 | Red on the merged tree (a semantic conflict) | exec-entry `resume` with a fresh gate-fix budget; the reviewer reads the delta |
 | A migration older than `feat`'s last | `make restamp` (the project's command), a mechanical commit, the affected gate |
-| `parked: round-cap` | read the blocking items. A clear fix inside the design → **one** resume with a fresh budget, the why on the board. A brief too big → split it in two entries. Product or scope → it waits for him |
+| `parked: round-cap` | read the blocking items. A clear fix inside the design → **one** resume with a fresh budget, the why on the board. A brief too big → split it in two entries. Product or scope → it waits for him. Two fixes on the same premise already failed at the same gate: write the premise on the board and check it before a third; a premise that fails changes the attack, never the done |
 | `parked: gate-red` | the log's failing lines decide: a code fix → one resume; a broken environment → fix the environment, resume; the contract commit is always resumed, it never parks |
 | `parked: machine` | wait for the load, resume with the same check |
 | `parked: inconclusive` | a seat could not run its check: fix the cause it names (the stack, an actor), resume once with `check: whole`. Inconclusive again: rule it, `ruled: conductor`, the untried case named on the PR for his hands-on; never reported as green |
