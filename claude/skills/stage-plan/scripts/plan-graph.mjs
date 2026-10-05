@@ -5,297 +5,214 @@
  *   node plan-graph.mjs <02-plan/plan.graph.json> [--briefs <02-plan/briefs>]
  *                       [--json <out.json>] [--mermaid <out.mmd>] [--quiet]
  *
- * Reads the machine-readable graph the planner writes at P1
- * (templates/plan.graph.json) and answers, with no judgement:
+ * FAIL  an AC carried by no node, by two, or unknown · an entry over the AC
+ *       cap · a file owned by two nodes · a shared file owned or extended
+ *       outside the contract commit · an extended file its owner builds in
+ *       parallel · a used name nothing provides before the user · a cycle ·
+ *       an edge to nothing, without a class (ui | side-effect) or without a
+ *       need · not exactly one contract commit · an entry with no AC · an
+ *       HTML comment in a plan file · with --briefs, a brief that disagrees
+ *       with its node or a two-sided node with no Contract.
+ * WARN  an entry over the AC warning line · a file extended by two nodes ·
+ *       a node owning a file another front changes · an integration entry
+ *       that is not last.
+ * REPORT the waves (a child starts when its parents merged), the width, the
+ *       depth, the critical path, the start order and, with --briefs, the
+ *       briefs the plan-review workflow reads (path and keys).
  *
- *   FAIL  a cycle · an edge to nothing · an edge whose need is not real
- *         behaviour (class other than `ui` or `side-effect`) · an
- *         acceptance criterion no node carries (orphan), carried twice, or
- *         unknown · a file with two owners · a shared (frozen) file owned
- *         or extended outside the foundation · a shared file with no
- *         foundation owner · an extended file whose owner builds it in
- *         parallel · a used name nothing provides, or provided by a node
- *         with no path to the user · a size over the cap · a node name
- *         over 8 words (the blueprint's cap) · a slice or integration node
- *         that carries no AC · `sides` other than back and/or front · an
- *         HTML comment in a plan file (plan.md, preflight.md, reviews.md,
- *         a brief) · with --briefs, a brief whose Owns, Extends, Uses,
- *         Provides or Acceptance disagree with the graph, whose Uses table
- *         names a producer other than the graph's, or whose node has both
- *         sides and no Contract (stage 4 runs two builders only on one).
- *   WARN  depth after the foundation over the target · a file extended by
- *         two or more nodes (a hot file: make it cold, or declare it in
- *         `appendSafe` with why the additions never meet) · a slice over
- *         the AC guide (target.maxAcs, default 8 at one AC per rule or
- *         behavior) · a lane that is not a leaf · an integration node that
- *         is not last · a node other than the foundation owning a file a
- *         running front changes (`fronts`) · with --briefs, a Contract on
- *         a node with one side.
- *
- *   REPORT the waves (levels after the foundation), the width (widest wave),
- *         the depth, the critical path with its weight, the total weight,
- *         the parallelism (total / critical), the start order (bottom
- *         level, descending: what stage 4 starts first) and, with
- *         --briefs, `reviewBriefs`: per brief its path and the keys its
- *         blind reader judges (the plan-review workflow's `briefs` arg).
- *
- * Exit 0 when nothing fails, 1 when something fails, 2 on a bad call.
- * No dependencies; Node 18+.
+ * Exit 0 green, 1 on a FAIL, 2 on a bad call. Node 18+, no dependencies.
  */
 
 import { readFileSync, writeFileSync, existsSync, readdirSync } from 'node:fs'
 import { join, dirname, resolve } from 'node:path'
 
-// ---------- arguments ----------
+const KINDS = ['contract', 'entry', 'integration']
+const EDGE_CLASSES = ['ui', 'side-effect']
+const SIDES = ['back', 'front']
+const AC_WARN = 10
+const AC_CAP = 12
 
-const argv = process.argv.slice(2)
-const opt = (name) => { const i = argv.indexOf(name); return i >= 0 ? argv[i + 1] : null }
-const graphPath = argv.find((a, i) => !a.startsWith('--') && !(i > 0 && argv[i - 1].startsWith('--') && argv[i - 1] !== '--quiet'))
-if (!graphPath) { console.error('usage: plan-graph.mjs <plan.graph.json> [--briefs <dir>] [--json <out>] [--mermaid <out>] [--quiet]'); process.exit(2) }
-const briefsDir = opt('--briefs'), jsonOut = opt('--json'), mermaidOut = opt('--mermaid'), quiet = argv.includes('--quiet')
+const list = (x) => (Array.isArray(x) ? x : [])
 
+function parseArgs(argv) {
+  const value = (name) => { const i = argv.indexOf(name); return i >= 0 ? argv[i + 1] : null }
+  const flagged = new Set(['--briefs', '--json', '--mermaid'].map(f => argv.indexOf(f) + 1).filter(i => i > 0))
+  const graphPath = argv.find((a, i) => !a.startsWith('--') && !flagged.has(i))
+  return { graphPath, briefsDir: value('--briefs'), jsonOut: value('--json'), mermaidOut: value('--mermaid'), quiet: argv.includes('--quiet') }
+}
+
+const opts = parseArgs(process.argv.slice(2))
+if (!opts.graphPath) {
+  console.error('usage: plan-graph.mjs <plan.graph.json> [--briefs <dir>] [--json <out>] [--mermaid <out>] [--quiet]')
+  process.exit(2)
+}
 let G
-try { G = JSON.parse(readFileSync(graphPath, 'utf8')) } catch (e) { console.error(`cannot read ${graphPath}: ${e.message}`); process.exit(2) }
+try { G = JSON.parse(readFileSync(opts.graphPath, 'utf8')) } catch (e) { console.error(`cannot read ${opts.graphPath}: ${e.message}`); process.exit(2) }
 
 const fails = [], warns = []
 const fail = (code, msg) => fails.push({ code, msg })
 const warn = (code, msg) => warns.push({ code, msg })
 
-const target = { depth: 2, sizeCap: 'L', ...(G.target || {}) }
-const weights = { S: 1, M: 2, L: 3, ...(G.weights || {}) }
-const SIZES = Object.keys(weights)
-const capRank = SIZES.indexOf(target.sizeCap)
-const universe = new Set(G.acs || [])
-// The pack's guide: 8 ACs per slice, at one AC per rule or behavior.
-if (target.maxAcs == null) target.maxAcs = 8
-const appendSafe = G.appendSafe || {}
-const fronts = Array.isArray(G.fronts) ? G.fronts : []
-const shared = G.shared || []
-const nodes = Array.isArray(G.nodes) ? G.nodes : []
-const KINDS = ['foundation', 'lane', 'slice', 'integration']
-const EDGE_CLASSES = ['ui', 'side-effect']
-const SIDES = ['back', 'front']
-const list = (x) => Array.isArray(x) ? x : []
+// ---------- paths ----------
+
+const esc = (s) => s.replace(/[.+^${}()|[\]\\]/g, '\\$&')
+const norm = (p) => String(p).replace(/^\.\//, '').replace(/\/$/, '/**')
+const isGlob = (p) => /[*?]/.test(p)
+const toRe = (p) => new RegExp('^' + esc(p).replace(/\*\*\/?/g, '\u0000').replace(/\*/g, '[^/]*').replace(/\?/g, '[^/]').replace(/\u0000/g, '.*') + '$')
+function overlap(a, b) {
+  a = norm(a); b = norm(b)
+  if (a === b) return true
+  if (!isGlob(a) && !isGlob(b)) return false
+  if (!isGlob(a)) return toRe(b).test(a)
+  if (!isGlob(b)) return toRe(a).test(b)
+  const pa = a.split(/[*?]/)[0], pb = b.split(/[*?]/)[0]
+  if (!(pa.startsWith(pb) || pb.startsWith(pa))) return false
+  const sa = a.split(/[*?]/).at(-1), sb = b.split(/[*?]/).at(-1)
+  return sa.endsWith(sb) || sb.endsWith(sa)
+}
 
 // ---------- shape ----------
 
+const nodes = list(G.nodes)
 const byId = new Map()
 for (const n of nodes) {
   if (!n.id) { fail('shape', 'a node has no id'); continue }
   if (byId.has(n.id)) fail('shape', `${n.id}: duplicate id`)
   byId.set(n.id, n)
   if (!KINDS.includes(n.kind)) fail('shape', `${n.id}: kind "${n.kind}" is not one of ${KINDS.join(', ')}`)
-  n.after = list(n.after).map(e => typeof e === 'string' ? { id: e } : e)
+  n.after = list(n.after).map(e => (typeof e === 'string' ? { id: e } : e))
   for (const k of ['acs', 'owns', 'extends', 'provides', 'uses', 'sides']) n[k] = list(n[k])
-  for (const s of n.sides) if (!SIDES.includes(s)) fail('shape', `${n.id}: side "${s}" is not one of ${SIDES.join(', ')}`)
-  const words = String(n.name || '').trim().split(/\s+/).filter(Boolean).length
-  if (!words) fail('shape', `${n.id}: no name`)
-  else if (words > 8) fail('shape', `${n.id}: name "${n.name}" has ${words} words; the blueprint caps entries[].name at 8 — one short name, the same in plan.md, the brief and the blueprint`)
+  for (const s of n.sides) if (!SIDES.includes(s)) fail('shape', `${n.id}: side "${s}" is not back or front`)
+  if (!String(n.name ?? '').trim()) fail('shape', `${n.id}: no name`)
 }
-const isF = (n) => n && n.kind === 'foundation'
-const foundation = nodes.filter(isF)
-const rest = nodes.filter(n => !isF(n))
-if (!foundation.length) fail('shape', 'no foundation node (kind "foundation")')
+const isC = (n) => n?.kind === 'contract'
+const contracts = nodes.filter(isC)
+if (contracts.length !== 1) fail('shape', `${contracts.length} contract commits: the plan has exactly one (C)`)
+const C = contracts[0]
+const rest = nodes.filter(n => !isC(n))
 
-// ---------- edges ----------
+// ---------- edges and cycles ----------
 
 for (const n of nodes) for (const e of n.after) {
   const to = byId.get(e.id)
   if (!to) { fail('edge', `${n.id}: after names ${e.id}, which is not a node`); continue }
-  if (isF(n)) {
-    if (!isF(to)) fail('edge', `${n.id}: a foundation node waits for ${e.id}, which is not foundation`)
-    continue
-  }
-  if (isF(to)) { fail('edge', `${n.id}: after names the foundation ${e.id}; the foundation precedes every node and is never listed`); continue }
-  if (!EDGE_CLASSES.includes(e.class)) {
-    const why = { data: 'a factory seeds data', interface: 'an interface plus a fake and its contract suite stand in', shared: 'a shared file belongs to the foundation' }[e.class]
-    fail('edge', `${n.id} → ${e.id}: class "${e.class ?? 'none'}" is not real behaviour (${EDGE_CLASSES.join(' | ')})${why ? `: ${why}, so no edge` : ''}`)
-  }
-  if (!e.need || !String(e.need).trim()) fail('edge', `${n.id} → ${e.id}: the edge does not name the behaviour it consumes`)
+  if (isC(n)) { fail('edge', `${n.id}: the contract commit waits for nothing`); continue }
+  if (isC(to)) { fail('edge', `${n.id}: after names the contract commit; it precedes every node and is never listed`); continue }
+  if (!EDGE_CLASSES.includes(e.class)) fail('edge', `${n.id} → ${e.id}: class "${e.class ?? 'none'}" is not real behaviour (ui | side-effect); data is a factory, an interface is a fake`)
+  if (!String(e.need ?? '').trim()) fail('edge', `${n.id} → ${e.id}: the edge does not name the behaviour it consumes`)
 }
 
-// ---------- cycles ----------
-
-const state = new Map(), cycles = []
-const visit = (id, stack) => {
-  if (state.get(id) === 2) return
-  if (state.get(id) === 1) { cycles.push([...stack.slice(stack.indexOf(id)), id].join(' → ')); return }
-  state.set(id, 1)
-  for (const e of byId.get(id)?.after || []) if (byId.has(e.id)) visit(e.id, [...stack, id])
-  state.set(id, 2)
+const parentsOf = (n) => n.after.map(e => byId.get(e.id)).filter(p => p && !isC(p))
+const cycles = []
+{
+  const state = new Map()
+  const visit = (n, stack) => {
+    if (state.get(n.id) === 2) return
+    if (state.get(n.id) === 1) { cycles.push([...stack.slice(stack.indexOf(n.id)), n.id].join(' → ')); return }
+    state.set(n.id, 1)
+    parentsOf(n).forEach(p => visit(p, [...stack, n.id]))
+    state.set(n.id, 2)
+  }
+  rest.forEach(n => visit(n, []))
 }
-nodes.forEach(n => n.id && visit(n.id, []))
 cycles.forEach(c => fail('cycle', `cycle: ${c}`))
 const acyclic = cycles.length === 0
 
-// ---------- levels, depth, waves ----------
+// ---------- waves, critical path, start order ----------
 
-// The foundation is a chain (F, then F-b when split), ordered by its own edges.
-const fOrder = []
-if (acyclic) {
-  const seen = new Set()
-  const walk = (n) => { if (seen.has(n.id)) return; seen.add(n.id); n.after.forEach(e => byId.has(e.id) && walk(byId.get(e.id))); fOrder.push(n) }
-  foundation.forEach(walk)
-}
-const level = new Map()
-const levelOf = (n) => {
-  if (level.has(n.id)) return level.get(n.id)
-  const ups = n.after.map(e => byId.get(e.id)).filter(x => x && !isF(x))
-  const l = ups.length ? 1 + Math.max(...ups.map(levelOf)) : 1
-  level.set(n.id, l); return l
-}
+const memo = (fn) => { const m = new Map(); return (n) => (m.has(n.id) ? m.get(n.id) : (m.set(n.id, fn(n)), m.get(n.id))) }
+const childrenOf = (n) => rest.filter(c => c.after.some(e => e.id === n.id))
+const level = memo(n => { const ps = parentsOf(n); return ps.length ? 1 + Math.max(...ps.map(level)) : 1 })
+const tail = memo(n => { const cs = childrenOf(n); return 1 + (cs.length ? Math.max(...cs.map(tail)) : 0) })
+
 const waves = []
-let depth = 0
+let depth = 0, width = 0
+const critical = []
+let startOrder = []
 if (acyclic) {
-  rest.forEach(n => { const l = levelOf(n); (waves[l - 1] ||= []).push(n.id); depth = Math.max(depth, l) })
-  if (depth > target.depth) {
-    const deep = rest.filter(n => level.get(n.id) > target.depth).map(n => n.id)
-    warn('depth', `depth after the foundation is ${depth}, target ${target.depth}: ${deep.join(', ')} sit past it — can the edge be faked behind an interface, or stacked?`)
-  }
-}
-const width = Math.max(0, ...waves.map(w => w.length))
-
-// ---------- critical path ----------
-
-const w = (n) => weights[n.size] ?? 0
-const succ = new Map(nodes.map(n => [n.id, []]))
-rest.forEach(n => n.after.forEach(e => byId.has(e.id) && succ.get(e.id)?.push(n.id)))
-const bottom = new Map()
-const bottomOf = (id) => {
-  if (bottom.has(id)) return bottom.get(id)
-  const n = byId.get(id), s = succ.get(id) || []
-  const b = w(n) + (s.length ? Math.max(...s.map(bottomOf)) : 0)
-  bottom.set(id, b); return b
-}
-let critical = [], criticalWeight = 0
-if (acyclic && nodes.length) {
-  const fWeight = fOrder.reduce((a, n) => a + w(n), 0)
-  const roots = rest.filter(n => !n.after.some(e => byId.has(e.id) && !isF(byId.get(e.id))))
-  let cur = roots.sort((a, b) => bottomOf(b.id) - bottomOf(a.id))[0]
-  const tail = []
-  while (cur) {
-    tail.push(cur.id)
-    const s = (succ.get(cur.id) || []).map(id => byId.get(id)).sort((a, b) => bottomOf(b.id) - bottomOf(a.id))
-    cur = s[0]
-  }
-  critical = [...fOrder.map(n => n.id), ...tail]
-  criticalWeight = fWeight + (tail.length ? bottomOf(tail[0]) : 0)
-}
-const totalWeight = nodes.reduce((a, n) => a + w(n), 0)
-const startOrder = acyclic ? rest.map(n => n.id).sort((a, b) => bottomOf(b) - bottomOf(a) || a.localeCompare(b)) : []
-
-// ---------- size ----------
-
-for (const n of nodes) {
-  const r = SIZES.indexOf(n.size)
-  if (r < 0) fail('size', `${n.id}: size "${n.size}" is not one of ${SIZES.join(', ')}`)
-  else if (r > capRank) fail('size', `${n.id}: size ${n.size} is over the cap ${target.sizeCap} — split it into thinner vertical slices`)
-  if (n.kind === 'slice' && n.acs.length > target.maxAcs) warn('acs', `${n.id}: carries ${n.acs.length} ACs, over the guide ${target.maxAcs}: check its size by screens, server flows and lines, and split it if it is over ${target.sizeCap}`)
-  if ((n.kind === 'slice' || n.kind === 'integration') && !n.acs.length) fail('ac', `${n.id}: a ${n.kind} that carries no acceptance criterion builds what nothing forces`)
+  rest.forEach(n => { (waves[level(n) - 1] ||= []).push(n.id) })
+  depth = waves.length
+  width = Math.max(0, ...waves.map(w => w.length))
+  let cur = rest.filter(n => !parentsOf(n).length).sort((a, b) => tail(b) - tail(a))[0]
+  while (cur) { critical.push(cur.id); cur = childrenOf(cur).sort((a, b) => tail(b) - tail(a))[0] }
+  if (C) critical.unshift(C.id)
+  startOrder = [...rest].sort((a, b) => tail(b) - tail(a) || b.acs.length - a.acs.length || a.id.localeCompare(b.id)).map(n => n.id)
 }
 
-// ---------- acceptance criteria: each carried exactly once ----------
+// ---------- acceptance criteria ----------
 
+const universe = new Set(list(G.acs))
 const carriers = new Map()
 for (const n of nodes) for (const ac of n.acs) {
-  if (!universe.has(ac)) fail('ac', `${n.id}: carries ${ac}, which is not in the graph's acs (the discovery's AC ids)`)
-  carriers.set(ac, [...(carriers.get(ac) || []), n.id])
+  if (!universe.has(ac)) fail('ac', `${n.id}: carries ${ac}, which is not in the graph's acs`)
+  carriers.set(ac, [...(carriers.get(ac) ?? []), n.id])
 }
 for (const ac of universe) {
-  const c = carriers.get(ac) || []
+  const c = carriers.get(ac) ?? []
   if (!c.length) fail('orphan-ac', `${ac}: no node carries it`)
-  else if (c.length > 1) fail('ac', `${ac}: carried by ${c.join(' and ')} — one owner only`)
+  else if (c.length > 1) fail('ac', `${ac}: carried by ${c.join(' and ')}; one carrier only`)
 }
+for (const n of rest) {
+  if (!n.acs.length) fail('ac', `${n.id}: an ${n.kind} with no AC builds what nothing asks for`)
+  else if (n.acs.length > AC_CAP) fail('cap', `${n.id}: ${n.acs.length} ACs, over the cap of ${AC_CAP}; split it into two whole behaviours`)
+  else if (n.acs.length > AC_WARN) warn('cap', `${n.id}: ${n.acs.length} ACs, over ${AC_WARN}; check it fits ~45 min of builder`)
+}
+if (C?.acs.length) fail('ac', `${C.id}: the contract commit carries no AC`)
 
 // ---------- ownership ----------
 
-const esc = (s) => s.replace(/[.+^${}()|[\]\\]/g, '\\$&')
-const toRe = (p) => new RegExp('^' + esc(p).replace(/\*\*\/?/g, '\u0000').replace(/\*/g, '[^/]*').replace(/\?/g, '[^/]').replace(/\u0000/g, '.*') + '$')
-const isGlob = (p) => /[*?]/.test(p)
-const staticPrefix = (p) => p.split(/[*?]/)[0]
-const staticSuffix = (p) => { const parts = p.split(/[*?]/); return parts[parts.length - 1] }
-const norm = (p) => String(p).replace(/^\.\//, '').replace(/\/$/, '/**')
-const overlap = (a, b) => {
-  a = norm(a); b = norm(b)
-  if (a === b) return true
-  if (!isGlob(a) && !isGlob(b)) return false
-  if (!isGlob(a)) return toRe(b).test(a)
-  if (!isGlob(b)) return toRe(a).test(b)
-  const pa = staticPrefix(a), pb = staticPrefix(b)
-  if (!(pa.startsWith(pb) || pb.startsWith(pa))) return false
-  const sa = staticSuffix(a), sb = staticSuffix(b)
-  return sa.endsWith(sb) || sb.endsWith(sa)
-}
+const ancestorsOf = memo(n => { const s = new Set(); parentsOf(n).forEach(p => { s.add(p.id); ancestorsOf(p).forEach(x => s.add(x)) }); return s })
+const before = (producer, user) => isC(producer) || (acyclic && ancestorsOf(user).has(producer.id))
 
-const ancestors = new Map()
-const ancestorsOf = (id) => {
-  if (ancestors.has(id)) return ancestors.get(id)
-  const set = new Set()
-  ancestors.set(id, set)
-  for (const e of byId.get(id)?.after || []) if (byId.has(e.id)) { set.add(e.id); ancestorsOf(e.id).forEach(x => set.add(x)) }
-  return set
-}
-const before = (producer, user) => isF(producer) || (acyclic && ancestorsOf(user.id).has(producer.id))
-
-const owners = []
-nodes.forEach(n => n.owns.forEach(p => owners.push({ node: n, path: p })))
+const owners = nodes.flatMap(n => n.owns.map(path => ({ node: n, path })))
 for (let i = 0; i < owners.length; i++) for (let j = i + 1; j < owners.length; j++) {
   const a = owners[i], b = owners[j]
-  if (a.node.id !== b.node.id && overlap(a.path, b.path)) fail('owner', `two owners: ${a.node.id} owns \`${a.path}\` and ${b.node.id} owns \`${b.path}\``)
+  if (a.node !== b.node && overlap(a.path, b.path)) fail('owner', `two owners: ${a.node.id} owns \`${a.path}\` and ${b.node.id} owns \`${b.path}\``)
 }
-for (const n of rest) {
-  for (const p of n.owns) for (const s of shared) if (overlap(p, s)) fail('shared', `${n.id} owns \`${p}\`, a shared file (\`${s}\`): shared files belong only to the foundation`)
-  for (const p of n.extends) for (const s of shared) if (overlap(p, s)) fail('shared', `${n.id} extends \`${p}\`, a shared file (\`${s}\`): frozen after the foundation — a change there is a foundation amendment`)
+const shared = list(G.shared)
+for (const n of rest) for (const [what, paths] of [['owns', n.owns], ['extends', n.extends]]) for (const p of paths) for (const s of shared) {
+  if (overlap(p, s)) fail('shared', `${n.id} ${what} \`${p}\`, a shared file (\`${s}\`): only the contract commit writes it`)
 }
-for (const s of shared) if (!foundation.some(f => f.owns.some(p => overlap(p, s)))) fail('shared', `shared \`${s}\` has no foundation owner`)
+for (const s of shared) if (!C?.owns.some(p => overlap(p, s))) fail('shared', `shared \`${s}\` is not owned by the contract commit`)
 
 const extenders = new Map()
 for (const n of nodes) for (const p of n.extends) {
   const own = owners.find(o => overlap(o.path, p))
-  if (own && own.node.id !== n.id && !before(own.node, n)) fail('extends', `${n.id} extends \`${p}\`, which ${own.node.id} creates in parallel (no edge): the file does not exist when ${n.id} starts`)
-  if (own && own.node.id === n.id) fail('extends', `${n.id} both owns and extends \`${p}\``)
-  extenders.set(norm(p), [...(extenders.get(norm(p)) || []), n.id])
+  if (own?.node === n) fail('extends', `${n.id} both owns and extends \`${p}\``)
+  else if (own && !before(own.node, n)) fail('extends', `${n.id} extends \`${p}\`, which ${own.node.id} creates in parallel: the file does not exist when ${n.id} starts`)
+  extenders.set(norm(p), [...(extenders.get(norm(p)) ?? []), n.id])
 }
-const declaredSafe = (p) => Object.keys(appendSafe).some(s => overlap(s, p))
-for (const [p, ids] of extenders) if (ids.length > 1 && !declaredSafe(p)) warn('hot', `\`${p}\` is extended by ${ids.join(', ')}: a hot file — split it into one file per thing plus a generated aggregate, or keep the additions append-only`)
+for (const [p, ids] of extenders) if (ids.length > 1) warn('hot', `\`${p}\` is extended by ${ids.join(', ')}: keep each addition additive and apart, or split the file`)
 
-// ---------- uses → provides ----------
+for (const f of list(G.fronts)) for (const p of list(f.files)) for (const n of rest) for (const o of n.owns) {
+  if (overlap(o, p)) warn('front', `${n.id} owns \`${o}\`, which the front ${f.front ?? '?'} changes (\`${p}\`): additive only, or wait for its merge; the agreement goes in plan.md`)
+}
+for (const n of rest) if (n.kind === 'integration' && childrenOf(n).length) warn('integration', `${n.id} is an integration entry with children: it merges last`)
+
+// ---------- names that cross a boundary ----------
 
 const providers = new Map()
-nodes.forEach(n => n.provides.forEach(name => providers.set(name, [...(providers.get(name) || []), n])))
-for (const [name, ps] of providers) if (ps.length > 1) fail('provides', `\`${name}\` is provided by ${ps.map(p => p.id).join(' and ')} — one producer only`)
+nodes.forEach(n => n.provides.forEach(name => providers.set(name, [...(providers.get(name) ?? []), n])))
+for (const [name, ps] of providers) if (ps.length > 1) fail('provides', `\`${name}\` is provided by ${ps.map(p => p.id).join(' and ')}; one producer only`)
 for (const n of nodes) for (const name of n.uses) {
   const ps = providers.get(name)
-  if (!ps) { fail('uses', `${n.id} uses \`${name}\`, which nothing provides`); continue }
-  if (!ps.some(p => p.id !== n.id && before(p, n))) fail('uses', `${n.id} uses \`${name}\`, provided by ${ps.map(p => p.id).join(', ')} with no path to ${n.id}: put it in the foundation, or the edge is missing`)
+  if (!ps) fail('uses', `${n.id} uses \`${name}\`, which nothing provides`)
+  else if (!ps.some(p => p !== n && before(p, n))) fail('uses', `${n.id} uses \`${name}\`, provided by ${ps.map(p => p.id).join(', ')} with no path to ${n.id}: put it in the contract commit, or the edge is missing`)
 }
 
-// ---------- other fronts: a file a running front changes is merged once, in the foundation ----------
+// ---------- briefs ----------
 
-for (const f of fronts) for (const p of list(f.files)) for (const n of rest) for (const o of n.owns) {
-  if (overlap(o, p)) warn('front', `${n.id} owns \`${o}\`, which the front ${f.front ?? f.branch ?? '?'} changes (\`${p}\`): move it into the foundation so the merge with that front happens once, or name the merge order in plan.md`)
-}
-
-// ---------- shape warnings ----------
-
-for (const n of rest) {
-  const s = succ.get(n.id) || []
-  if (n.kind === 'lane' && s.some(id => byId.get(id)?.kind !== 'integration')) warn('lane', `${n.id} is a foundation lane that ${s.join(', ')} wait for: what an entry waits for belongs in the foundation`)
-  if (n.kind === 'integration' && s.length) warn('integration', `${n.id} is an integration node with successors (${s.join(', ')}): it should merge last`)
-}
-
-// ---------- briefs agree with the graph ----------
-
-const section = (md, title) => {
-  const lines = md.split('\n'), out = []
+function section(md, title) {
+  const out = []
   let on = false
-  for (const l of lines) {
-    if (/^## /.test(l)) { on = l.replace(/^## /, '').trim().toLowerCase() === title.toLowerCase(); continue }
+  for (const l of md.split('\n')) {
+    if (/^## /.test(l)) { on = l.slice(3).trim().toLowerCase() === title.toLowerCase(); continue }
     if (on) out.push(l)
   }
-  return out.join('\n').replace(/<!--[\s\S]*?-->/g, '')
+  return out.join('\n')
 }
-// The first column of a table row, or the first `code` of a bullet: the item's key.
+
+// A table row's first cell (its backticked items) or a bullet's first `code`.
 const firstColumn = (text) => text.split('\n').map(l => l.trim()).flatMap(l => {
   if (l.startsWith('|')) {
     const cell = l.split('|')[1]?.trim() ?? ''
@@ -303,120 +220,88 @@ const firstColumn = (text) => text.split('\n').map(l => l.trim()).flatMap(l => {
     const ticks = [...cell.matchAll(/`([^`]+)`/g)].map(m => m[1])
     return ticks.length ? ticks : [cell]
   }
-  if (/^[-*] /.test(l)) { const m = l.match(/`([^`]+)`/); return m ? [m[1]] : [] }
-  return []
+  const m = /^[-*] /.test(l) && l.match(/`([^`]+)`/)
+  return m ? [m[1]] : []
 })
-// The Uses table's Producer column names the graph's producer: a stale
-// owner after a graph change shows here before any lens reads it.
-const NODE_ID = /\b(F(?:-b|-x\d+)?|E-(?:\d+|int))\b/
-const producers = (n, text) => {
-  const rows = text.split('\n').map(l => l.trim()).filter(l => l.startsWith('|'))
-  if (!rows.length) return
-  const cells = (l) => l.split('|').slice(1, -1).map(c => c.trim())
-  const col = cells(rows[0]).findIndex(c => /^(produc|produt)/i.test(c))
-  if (col < 0) return
-  for (const l of rows.slice(1)) {
-    const c = cells(l)
-    if (!c[0] || /^:?-+:?$/.test(c[0])) continue
-    const said = (c[col] || '').match(NODE_ID)?.[1]
-    for (const name of [...c[0].matchAll(/`([^`]+)`/g)].map(m => m[1])) {
-      const real = (providers.get(name) || []).find(p => p.id !== n.id && before(p, n))?.id
-      if (real && said && said !== real) fail('brief', `${n.id}.md §Uses: \`${name}\` names producer ${said}; the graph's producer is ${real}`)
-    }
-  }
-}
-const same = (id, what, graphList, briefList, filter = () => true) => {
-  const g = new Set(graphList), b = new Set(briefList.filter(filter))
+
+function sameItems(id, what, graphList, briefList) {
+  const g = new Set(graphList), b = new Set(briefList)
   const missing = [...g].filter(x => !b.has(x)), extra = [...b].filter(x => !g.has(x))
-  if (missing.length) fail('brief', `${id}.md ${what}: missing ${missing.map(x => `\`${x}\``).join(', ')} (in the graph)`)
-  if (extra.length) fail('brief', `${id}.md ${what}: ${extra.map(x => `\`${x}\``).join(', ')} not in the graph`)
+  if (missing.length) fail('brief', `${id}.md §${what}: missing ${missing.map(x => `\`${x}\``).join(', ')}`)
+  if (extra.length) fail('brief', `${id}.md §${what}: ${extra.map(x => `\`${x}\``).join(', ')} not in the graph`)
 }
+
 const reviewBriefs = []
-if (briefsDir) for (const n of nodes) {
-  const file = join(briefsDir, `${n.id}.md`)
-  if (!existsSync(file)) { fail('brief', `${n.id}: no brief at ${file}`); continue }
+function checkBrief(n) {
+  const file = join(opts.briefsDir, `${n.id}.md`)
+  if (!existsSync(file)) { fail('brief', `${n.id}: no brief at ${file}`); return }
   const md = readFileSync(file, 'utf8')
-  same(n.id, '§Owns', n.owns, firstColumn(section(md, 'Owns')))
-  same(n.id, '§Extends', n.extends, firstColumn(section(md, 'Extends')))
-  if (isF(n) || n.kind === 'lane') same(n.id, '§Provides', n.provides, firstColumn(section(md, 'Provides')).filter(x => !/^name$/i.test(x)))
-  if (!isF(n)) {
-    const uses = section(md, 'Uses from the foundation')
-    same(n.id, '§Uses', n.uses, firstColumn(uses).filter(x => !/^name/i.test(x)))
-    producers(n, uses)
+  const header = (x) => /^(name|path|ac|route)$/i.test(x)
+  sameItems(n.id, 'Owns', n.owns, firstColumn(section(md, 'Owns')))
+  sameItems(n.id, 'Extends', n.extends, firstColumn(section(md, 'Extends')))
+  if (isC(n)) sameItems(n.id, 'Provides', n.provides, firstColumn(section(md, 'Provides')).filter(x => !header(x)))
+  else {
+    sameItems(n.id, 'Uses', n.uses, firstColumn(section(md, 'Uses')).filter(x => !header(x)))
+    sameItems(n.id, 'Acceptance', n.acs, firstColumn(section(md, 'Acceptance')).filter(x => universe.has(x)))
   }
-  same(n.id, '§Acceptance', n.acs, firstColumn(section(md, 'Acceptance')), x => universe.has(x))
-  const contract = /^## Contract\s*$/m.test(md) && firstColumn(section(md, 'Contract')).filter(x => !/^route$/i.test(x)).length > 0
-  const twoSides = SIDES.every(s => n.sides.includes(s))
-  if (twoSides && !contract) fail('contract', `${n.id}.md: the node has a back and a front side and no Contract (routes, request and response JSON, errors, copied from data-and-contracts.md) — stage 4 runs two builders only on a Contract`)
-  if (!twoSides && contract) warn('contract', `${n.id}.md: a Contract on a node with ${n.sides.length ? 'one side' : 'no sides declared'} — stage 4 would run two builders; declare both sides in the graph or drop the section`)
-  reviewBriefs.push({ id: n.id, path: resolve(file), keys: isF(n) || n.kind === 'lane' ? ['provides', 'proof'] : [...n.acs, ...(contract ? ['contract'] : [])] })
+  const contract = firstColumn(section(md, 'Contract')).filter(x => !header(x)).length > 0
+  if (SIDES.every(s => n.sides.includes(s)) && !contract) fail('contract', `${n.id}.md: back and front sides and no Contract section; both builders build against it`)
+  reviewBriefs.push({ id: n.id, path: resolve(file), keys: isC(n) ? ['provides', 'proof'] : [...n.acs, ...(contract ? ['contract'] : [])] })
 }
+if (opts.briefsDir) nodes.forEach(checkBrief)
 
 // ---------- no HTML comment in an output ----------
 
-// A template's comments are instructions to its author; none reaches a plan file.
-const planDir = dirname(graphPath)
-const mdIn = (d) => existsSync(d) ? readdirSync(d).filter(f => f.endsWith('.md')).map(f => join(d, f)) : []
-for (const file of [...mdIn(planDir), ...(briefsDir ? mdIn(briefsDir) : [])]) {
+const planDir = dirname(opts.graphPath)
+const mdIn = (d) => (d && existsSync(d) ? readdirSync(d).filter(f => f.endsWith('.md')).map(f => join(d, f)) : [])
+for (const file of [...mdIn(planDir), ...mdIn(opts.briefsDir)]) {
   let fence = false
   const at = readFileSync(file, 'utf8').split('\n').findIndex(l => {
     if (/^\s*(```|~~~)/.test(l)) { fence = !fence; return false }
     return !fence && l.replace(/`[^`]*`/g, '').includes('<!--')
   })
-  if (at >= 0) fail('comment', `${file}:${at + 1}: an HTML comment — a template's comments are instructions, never output; delete it`)
+  if (at >= 0) fail('comment', `${file}:${at + 1}: an HTML comment; a template's comments are instructions, never output`)
 }
 
-// ---------- mermaid ----------
+// ---------- output ----------
 
-const mid = (id) => id.replace(/[^A-Za-z0-9]/g, '_')
-const mermaid = () => {
-  const onPath = new Set(critical)
+function mermaid() {
+  const mid = (id) => id.replace(/[^A-Za-z0-9]/g, '_')
   const out = ['flowchart LR']
-  for (const n of nodes) out.push(`  ${mid(n.id)}["${n.id} · ${String(n.name || '').replace(/"/g, "'")} · ${n.size}"]`)
-  const fIds = fOrder.map(n => n.id)
-  const lastF = fIds[fIds.length - 1]
-  const roots = rest.filter(n => !n.after.some(e => byId.has(e.id) && !isF(byId.get(e.id))))
-  const edges = []
-  for (let i = 1; i < fIds.length; i++) edges.push([fIds[i - 1], fIds[i], ''])
-  if (lastF) roots.forEach(n => edges.push([lastF, n.id, '']))
-  rest.forEach(n => n.after.forEach(e => byId.has(e.id) && edges.push([e.id, n.id, [e.class, e.stacked && 'stacked'].filter(Boolean).join(' · ')])))
-  edges.forEach(([a, b, l]) => out.push(`  ${mid(a)} ${l ? `-- ${l} -->` : '-->'} ${mid(b)}`))
+  nodes.forEach(n => out.push(`  ${mid(n.id)}["${n.id} · ${String(n.name).replace(/"/g, "'")} · ${n.acs.length} AC"]`))
+  rest.forEach(n => {
+    if (!parentsOf(n).length && C) out.push(`  ${mid(C.id)} --> ${mid(n.id)}`)
+    n.after.filter(e => byId.has(e.id)).forEach(e => out.push(`  ${mid(e.id)} -- ${e.class} --> ${mid(n.id)}`))
+  })
   out.push('  classDef crit stroke-width:3px')
-  if (onPath.size) out.push(`  class ${[...onPath].map(mid).join(',')} crit`)
+  if (critical.length) out.push(`  class ${critical.map(mid).join(',')} crit`)
   return out.join('\n')
 }
 
-// ---------- report ----------
-
 const summary = {
-  graph: graphPath,
-  ok: fails.length === 0,
-  nodes: { total: nodes.length, ...Object.fromEntries(KINDS.map(k => [k, nodes.filter(n => n.kind === k).length])) },
-  foundation: fOrder.map(n => n.id),
-  waves, width, depth, target,
-  criticalPath: critical, criticalWeight, totalWeight,
-  parallelism: criticalWeight ? Math.round((totalWeight / criticalWeight) * 100) / 100 : 0,
+  graph: opts.graphPath, ok: fails.length === 0,
+  nodes: nodes.length, waves, width, depth, criticalPath: critical,
+  parallelism: critical.length ? Math.round((nodes.length / critical.length) * 100) / 100 : 0,
   startOrder,
-  ...(briefsDir ? { reviewBriefs } : {}),
   acs: { total: universe.size, carried: [...carriers.keys()].filter(a => universe.has(a)).length },
+  ...(opts.briefsDir ? { reviewBriefs } : {}),
   fails, warns,
 }
-if (jsonOut) writeFileSync(jsonOut, JSON.stringify(summary, null, 2) + '\n')
-if (mermaidOut && acyclic) writeFileSync(mermaidOut, mermaid() + '\n')
+if (opts.jsonOut) writeFileSync(opts.jsonOut, JSON.stringify(summary, null, 2) + '\n')
+if (opts.mermaidOut && acyclic) writeFileSync(opts.mermaidOut, mermaid() + '\n')
 
-if (!quiet) {
-  const p = (s = '') => console.log(s)
-  p(`plan-graph · ${graphPath}`)
-  p(`  nodes      ${nodes.length} (${KINDS.map(k => `${summary.nodes[k]} ${k}`).join(', ')})`)
+if (!opts.quiet) {
+  const p = (s) => console.log(s)
+  p(`plan-graph · ${opts.graphPath}`)
   if (acyclic) {
-    p(`  foundation ${summary.foundation.join(' → ') || '—'}`)
-    waves.forEach((wv, i) => p(`  wave ${i + 1}     ${wv.join(' · ')}`))
-    p(`  width ${width} · depth ${depth} (target ≤ ${target.depth}) · ACs ${summary.acs.carried}/${summary.acs.total} · AC guide per slice ${target.maxAcs}`)
-    p(`  critical   ${critical.join(' → ')}  (weight ${criticalWeight} of ${totalWeight}; parallelism ×${summary.parallelism})`)
+    p(`  contract   ${C?.id ?? '—'}`)
+    waves.forEach((w, i) => p(`  wave ${i + 1}     ${w.join(' · ')}`))
+    p(`  width ${width} · depth ${depth} · ACs ${summary.acs.carried}/${summary.acs.total}`)
+    p(`  critical   ${critical.join(' → ')}  (parallelism ×${summary.parallelism})`)
     p(`  start      ${startOrder.join(', ')}`)
   }
-  warns.forEach(x => p(`  WARN ${x.code.padEnd(9)} ${x.msg}`))
-  fails.forEach(x => p(`  FAIL ${x.code.padEnd(9)} ${x.msg}`))
+  warns.forEach(x => p(`  WARN ${x.code.padEnd(11)} ${x.msg}`))
+  fails.forEach(x => p(`  FAIL ${x.code.padEnd(11)} ${x.msg}`))
   p(fails.length ? `✕ ${fails.length} failure(s), ${warns.length} warning(s)` : `✓ graph holds · ${warns.length} warning(s)`)
 }
 process.exit(fails.length ? 1 : 0)

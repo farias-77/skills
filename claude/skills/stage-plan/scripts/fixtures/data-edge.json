@@ -60,13 +60,7 @@
         "back",
         "front"
       ],
-      "after": [
-        {
-          "id": "E-int",
-          "class": "ui",
-          "need": "the list link"
-        }
-      ],
+      "after": [],
       "acs": [
         "S1.1",
         "S1.2"
@@ -91,7 +85,13 @@
       "sides": [
         "back"
       ],
-      "after": [],
+      "after": [
+        {
+          "id": "E-01",
+          "class": "data",
+          "need": "an order to list"
+        }
+      ],
       "acs": [
         "S2.1",
         "S2.2",

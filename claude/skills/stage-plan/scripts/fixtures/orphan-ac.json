@@ -1,207 +1,138 @@
 {
-  "workstream": "example-orphan-ac",
-  "target": {
-    "depth": 2,
-    "sizeCap": "L",
-    "maxAcs": 8
-  },
-  "weights": {
-    "S": 1,
-    "M": 2,
-    "L": 3
-  },
+  "workstream": "orders",
   "acs": [
-    "J01.s1.1",
-    "J01.s2.1",
-    "J01.s2.2",
-    "J01.s3.1",
-    "J02.s1.1",
-    "J02.s1.2",
-    "J03.s1.1",
-    "J03.s2.1",
-    "J03.s2.2",
-    "J03.s3.1"
+    "S1.1",
+    "S1.2",
+    "S2.1",
+    "S2.2",
+    "S2.3",
+    "S2.4",
+    "S2.5",
+    "S2.6",
+    "S2.7",
+    "S2.8",
+    "S2.9",
+    "S2.10",
+    "S2.11",
+    "S3.1",
+    "S9.9"
   ],
   "shared": [
-    "api/openapi/**",
-    "db/migrations/**",
-    "internal/gen/**",
-    "cmd/server/registry.go"
+    "backend/api/openapi.yaml",
+    "backend/internal/gen/**"
+  ],
+  "fronts": [
+    {
+      "front": "billing",
+      "session": "billing-execute",
+      "files": [
+        "frontend/app/e2e/**"
+      ],
+      "agreed": "additive only: a new spec file, no edit to theirs"
+    }
   ],
   "nodes": [
     {
-      "id": "F",
-      "kind": "foundation",
-      "name": "Contract and seams",
-      "size": "M",
+      "id": "C",
+      "kind": "contract",
+      "name": "Orders contract and skeleton",
       "after": [],
       "acs": [],
       "owns": [
-        "api/openapi/**",
-        "db/migrations/**",
-        "internal/gen/**",
-        "cmd/server/registry.go",
-        "internal/orders/events.go",
-        "internal/orders/eventsfake/**",
-        "internal/testkit/factory/**",
-        "internal/menu/module.go",
-        "web/src/pages/_exemplar/**"
+        "backend/api/openapi.yaml",
+        "backend/internal/gen/**",
+        "backend/database/migrations/20261005120000_orders.sql",
+        "backend/internal/orders/http/stubs.go",
+        "backend/tests/factory/order.go"
       ],
       "extends": [],
       "provides": [
         "POST /orders",
-        "GET /menu",
-        "GET /orders/today",
-        "POST /orders/{id}/ready",
-        "orders.ReadyEvents",
-        "eventsfake.ReadyEvents",
-        "factory.Order",
-        "factory.Bread",
-        "actors.Baker",
-        "actors.Customer"
+        "GET /orders",
+        "factory.Order"
       ],
-      "uses": []
-    },
-    {
-      "id": "F-x1",
-      "kind": "lane",
-      "name": "Deploy skeleton",
-      "size": "S",
-      "after": [],
-      "acs": [],
-      "owns": [
-        "deploy/orders/**",
-        "docs/features/orders/**"
-      ],
-      "extends": [],
-      "provides": [],
       "uses": []
     },
     {
       "id": "E-01",
-      "kind": "slice",
+      "kind": "entry",
       "name": "Place an order",
-      "size": "M",
+      "sides": [
+        "back",
+        "front"
+      ],
       "after": [],
       "acs": [
-        "J01.s1.1",
-        "J01.s2.1",
-        "J01.s2.2",
-        "J01.s3.1"
+        "S1.1",
+        "S1.2"
       ],
       "owns": [
-        "internal/orders/place/**",
-        "web/src/pages/orders/new/**",
-        "e2e/journeys/j01-place-order.spec.ts"
+        "backend/internal/orders/app/place_order.go",
+        "frontend/app/src/features/orders/new/**"
       ],
       "extends": [
-        "web/src/tokens.css"
+        "backend/internal/orders/http/stubs.go"
       ],
       "provides": [],
       "uses": [
         "POST /orders",
-        "GET /menu",
-        "factory.Bread",
-        "actors.Customer"
+        "factory.Order"
       ]
     },
     {
       "id": "E-02",
-      "kind": "slice",
-      "name": "The menu",
-      "size": "S",
+      "kind": "entry",
+      "name": "List orders by day",
+      "sides": [
+        "back"
+      ],
       "after": [],
       "acs": [
-        "J02.s1.1"
+        "S2.1",
+        "S2.2",
+        "S2.3",
+        "S2.4",
+        "S2.5",
+        "S2.6",
+        "S2.7",
+        "S2.8",
+        "S2.9",
+        "S2.10",
+        "S2.11"
       ],
       "owns": [
-        "internal/menu/list/**",
-        "web/src/pages/menu/**",
-        "e2e/journeys/j02-menu.spec.ts"
+        "backend/internal/orders/app/list_orders.go"
       ],
       "extends": [],
       "provides": [],
       "uses": [
-        "GET /menu",
-        "factory.Bread",
-        "actors.Customer"
-      ]
-    },
-    {
-      "id": "E-03",
-      "kind": "slice",
-      "name": "Baker's panel",
-      "size": "M",
-      "after": [],
-      "acs": [
-        "J03.s1.1",
-        "J03.s2.1"
-      ],
-      "owns": [
-        "internal/orders/panel/**",
-        "web/src/pages/panel/**",
-        "e2e/journeys/j03-panel.spec.ts"
-      ],
-      "extends": [],
-      "provides": [],
-      "uses": [
-        "GET /orders/today",
-        "POST /orders/{id}/ready",
-        "orders.ReadyEvents",
-        "factory.Order",
-        "actors.Baker"
-      ]
-    },
-    {
-      "id": "E-04",
-      "kind": "slice",
-      "name": "Ready e-mail",
-      "size": "S",
-      "after": [],
-      "acs": [
-        "J03.s2.2"
-      ],
-      "owns": [
-        "internal/notify/ready/**"
-      ],
-      "extends": [],
-      "provides": [],
-      "uses": [
-        "orders.ReadyEvents",
-        "eventsfake.ReadyEvents",
+        "GET /orders",
         "factory.Order"
       ]
     },
     {
       "id": "E-int",
       "kind": "integration",
-      "name": "Order to e-mail",
-      "size": "S",
+      "name": "Place then see it listed",
+      "sides": [
+        "front"
+      ],
       "after": [
         {
-          "id": "E-03",
+          "id": "E-01",
           "class": "ui",
-          "need": "the journey clicks 'Mark ready', which E-03 builds",
-          "stacked": true
-        },
-        {
-          "id": "E-04",
-          "class": "side-effect",
-          "need": "the check reads the real ready e-mail E-04 sends",
-          "stacked": true
+          "need": "the journey submits the order form E-01 builds"
         }
       ],
       "acs": [
-        "J03.s3.1"
+        "S3.1"
       ],
       "owns": [
-        "e2e/journeys/j03-order-to-email.spec.ts"
+        "frontend/app/e2e/orders-place-and-list.spec.ts"
       ],
       "extends": [],
       "provides": [],
       "uses": [
-        "actors.Baker",
-        "actors.Customer",
         "factory.Order"
       ]
     }

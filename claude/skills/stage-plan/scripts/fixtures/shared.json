@@ -60,13 +60,7 @@
         "back",
         "front"
       ],
-      "after": [
-        {
-          "id": "E-int",
-          "class": "ui",
-          "need": "the list link"
-        }
-      ],
+      "after": [],
       "acs": [
         "S1.1",
         "S1.2"
@@ -106,7 +100,8 @@
         "S2.11"
       ],
       "owns": [
-        "backend/internal/orders/app/list_orders.go"
+        "backend/internal/orders/app/list_orders.go",
+        "backend/internal/gen/orders.go"
       ],
       "extends": [],
       "provides": [],

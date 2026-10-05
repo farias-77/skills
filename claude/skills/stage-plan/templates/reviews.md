@@ -1,38 +1,26 @@
-# Plan review — <workstream>
+# Plan review · <workstream>
 
 <!--
-  Written by THE CONDUCTOR (Opus 5.5, high) from 02-plan/reviews/round-1.json
-  (the workflow's return, the authority), in one pass, the rulings
-  written before any fix leaves. One round: the fixes are applied and
-  verified by reading, never re-reviewed. Nobody is asked.
-
-  These comments are instructions to you: none of them reaches
-  reviews.md (the plan's checker refuses an HTML comment).
+  Written by the conductor from 02-plan/reviews/round-1.json, the rulings
+  before any fix leaves. One round; fixes verified by reading and by the
+  checker. Nobody is asked. These comments never reach the file.
 -->
 
-## Round 1 — <date> · run <id>
+## Round 1 · <date> · run <id>
 
-**Checker before the round:** `<✓ graph holds · width n · depth n · critical F → … (weight n)>`
+**Checker before:** `<✓ graph holds · width n · depth n>` · findings <n> · dropped <n> · unread <briefs or none>
 
-| Lens | Verdict | Findings | Dropped by the filter | Unread |
-|---|---|---|---|---|
-| plan-reviewer | | | — | — |
-| plan-blind-reader | | | <n> | <briefs, or none> |
-
-## Findings and rulings
-
-| Id | Brief | Finding | Ruling | Owner | Why |
-|---|---|---|---|---|---|
-| <plan-reviewer#1> | <E-02> | <the false edge to E-01> | sustained | planner | <factory.Order seeds the order> |
-| <plan-blind-reader#1> | <E-01> | <the 422 code of a past day is missing> | sustained | writer | <data-and-contracts.md §Orders gives `day_in_past`> |
-| <plan-reviewer#2> | — | <…> | dismissed | — | <the sentence that forecloses it, quoted> |
+| Id | Source | Brief | Finding | Ruling | Owner | Why |
+|---|---|---|---|---|---|---|
+| <P1> | plan-reviewer · edge | E-02 | <the false edge to E-01> | sustained | planner | <a factory seeds the order> |
+| <P2> | blind-judge · diverge | E-04 | <"archived" read two ways> | sustained | writer | <screens.md: hidden for everyone> |
+| <P3> | blind-judge · undecidable | E-02 | <the list's size> | decided in his place | writer | <the 200 most recent, by date: conservative, reversible> |
+| <P4> | plan-reviewer · buildable | E-05 | <…> | dismissed | — | <the sentence that settles it, quoted> |
 
 ## Applied and verified
 
-| Id | What changed | Verified (file:line) |
+| Id | What changed | Read at |
 |---|---|---|
-| <plan-reviewer#1> | <edge dropped; checker green> | `plan.graph.json:42` · `<✓ graph holds …>` |
+| <P1> | <edge dropped> | `plan.graph.json:<line>` · checker `<line>` |
 
-## Close
-
-sustained <n> (writer <n> · planner <n>) · dismissed <n> · unread <briefs, or none> · the checker with --briefs: `<summary line>`
+**Checker after:** `<✓ … with --briefs>`

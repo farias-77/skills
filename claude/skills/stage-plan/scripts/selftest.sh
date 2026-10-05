@@ -1,41 +1,37 @@
 #!/usr/bin/env bash
-# selftest.sh — runs plan-graph.mjs on the fixtures and checks each verdict.
-#   valid.json                        → holds (exit 0)
-#   cycle.json                        → fails: E-03 and E-int wait for each other
-#   orphan-ac.json                    → fails: J02.s1.2 is carried by no node
-#   double-owner.json                 → fails: E-01 and E-03 both own web/src/pages/orders/new/**
-#   briefs.json --briefs briefs       → holds: a "## Provides, in detail" heading is not read as Provides
-#   briefs.json --briefs briefs-stale → fails: a Uses row names a stale producer, and an HTML comment
-#   briefs.json --briefs briefs-no-contract → fails: E-01 has a back and a front side and no Contract
-#   briefs.json --json                → carries reviewBriefs, E-01 with its contract key
-#   fixtures/blueprint over a copy of the blueprint example → the Plan tab builds
+# Runs plan-graph.mjs on the fixtures and checks each verdict.
 set -uo pipefail
 here="$(cd "$(dirname "$0")" && pwd)"
 bad=0
-check() { # fixture expected-exit expected-codes [briefs-dir]
-  out="$(node "$here/plan-graph.mjs" "$here/fixtures/$1.json" ${4:+--briefs "$here/fixtures/$4"})"; rc=$?
-  echo "=== $1${4:+ --briefs $4} (exit $rc)"; echo "$out"
-  local miss=""
-  for code in $3; do grep -q "FAIL $code" <<<"$out" || miss="$miss $code"; done
-  if [[ $rc -ne $2 ]] || [[ -n "$miss" ]]; then
-    echo "SELFTEST FAILED: $1 expected exit $2${3:+ and FAIL $3}${miss:+ (missing:$miss)}"; bad=1
+
+expect() { # fixture exit "fail codes" "warn codes" [briefs-dir]
+  local out rc miss=""
+  out="$(node "$here/plan-graph.mjs" "$here/fixtures/$1.json" ${5:+--briefs "$here/fixtures/$5"})"; rc=$?
+  for code in $3; do grep -q "FAIL $code" <<<"$out" || miss="$miss FAIL:$code"; done
+  for code in $4; do grep -q "WARN $code" <<<"$out" || miss="$miss WARN:$code"; done
+  if [[ $rc -ne $2 || -n "$miss" ]]; then
+    echo "FAIL  $1${5:+ --briefs $5}: exit $rc, expected $2${miss:+, missing$miss}"; echo "$out" | sed 's/^/      /'; bad=1
+  else
+    echo "ok    $1${5:+ --briefs $5} (exit $rc${3:+; FAIL $3}${4:+; WARN $4})"
   fi
 }
-check valid 0 ""
-check cycle 1 cycle
-check orphan-ac 1 orphan-ac
-check double-owner 1 owner
-check briefs 0 "" briefs
-check briefs 1 "brief comment" briefs-stale
-check briefs 1 contract briefs-no-contract
-reviewed="$(node "$here/plan-graph.mjs" "$here/fixtures/briefs.json" --briefs "$here/fixtures/briefs" --json /dev/stdout --quiet)"
-grep -q '"keys": \[' <<<"$reviewed" && grep -q '"contract"' <<<"$reviewed" \
-  || { echo "SELFTEST FAILED: --json lacks reviewBriefs with E-01's contract key"; bad=1; }
-ws="$(mktemp -d)"
-cp -r "$here/../../../blueprint/example/." "$ws/" && rm -f "$ws/blueprint.html" && cp -r "$here/fixtures/blueprint/." "$ws/"
-built="$(node "$here/../../../blueprint/build.mjs" "$ws" 2>&1)"; rc=$?
-echo "=== blueprint build (exit $rc)"; echo "$built"
-[[ $rc -eq 0 ]] && grep -q "plan: 3 entries" <<<"$built" || { echo "SELFTEST FAILED: the plan fixture does not build"; bad=1; }
-rm -rf "$ws"
-[[ $bad -eq 0 ]] && echo "selftest: all nine verdicts as expected"
+
+expect valid        0 ""          "cap front"
+expect cycle        1 "cycle"     ""
+expect orphan-ac    1 "orphan-ac" ""
+expect double-owner 1 "owner"     ""
+expect over-cap     1 "cap"       ""
+expect shared       1 "shared"    ""
+expect data-edge    1 "edge"      ""
+expect valid        0 ""          ""             briefs
+expect valid        1 "brief contract comment" "" briefs-stale
+
+json="$(node "$here/plan-graph.mjs" "$here/fixtures/valid.json" --briefs "$here/fixtures/briefs" --json /dev/stdout --quiet)"
+if grep -q '"contract"' <<<"$json" && grep -q '"provides"' <<<"$json" && grep -q '"criticalPath"' <<<"$json"; then
+  echo "ok    --json carries reviewBriefs (E-01 with contract, C with provides) and the critical path"
+else
+  echo "FAIL  --json lacks reviewBriefs or the critical path"; bad=1
+fi
+
+[[ $bad -eq 0 ]] && echo "selftest: every verdict as expected" || echo "selftest: FAILED"
 exit $bad

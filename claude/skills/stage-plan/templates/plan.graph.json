@@ -1,58 +1,55 @@
 {
   "$comment": [
-    "02-plan/plan.graph.json — the build graph in machine form. The PLANNER writes it at P1 and keeps it in step with plan.md; scripts/plan-graph.mjs checks it (cycle, orphan or doubled AC, a file with two owners, a shared file outside the foundation, a used name with no producer, an edge that is not real behaviour, a size over the cap; with --briefs, every brief equal to its node and a Contract on every node with two sides) and reports the waves, the width, the depth, the critical path and the start order. Stage 4 reads it for the start order and the owners.",
-    "acs: every AC id of 00-discovery/stories.md, exactly as written there. Every one is carried by exactly one node.",
-    "shared: the doctrine's shared files (migrations, the contract, the generated code, the registry) and every file the generators write, as globs. Only the foundation owns them.",
-    "nodes[].kind: foundation (F; F-b only when F splits) · slice (E-<nn>: one whole behaviour, data to screen) · integration (E-int: the journeys that cross entries, merges last) · lane (F-x<n>: foundation work nobody waits for; rare).",
-    "nodes[].sides: back and/or front. Both only when data-and-contracts.md gives the node's Contract: its brief copies it, and stage 4 runs two builders.",
-    "nodes[].after: only what nothing can fake. class 'ui' = a journey drives the other node's screen; class 'side-effect' = a check reads that node's real side effect. need = the behaviour, in words. stacked: true = the node may start on the other's branch as soon as it is ready.",
-    "nodes[].owns: the paths the node creates or edits (literal paths or dir/** globs; no two nodes overlap). extends: append-only additions to a file the foundation or an ancestor created; filling a stub F left is an extends of exactly one node.",
-    "nodes[].provides / uses: the names that cross a node boundary, exactly as code imports or calls them, copied from data-and-contracts.md. Every used name has one producer: the foundation, or an ancestor behind an edge.",
-    "appendSafe: optional, the files several nodes extend on lines that never meet, each with why.",
-    "fronts: optional, the other running workstreams that change files this plan touches: the front, its branch, the files, and the merge point and order plan.md names. A node other than the foundation owning one of those files is a warning.",
-    "size: S · M · L, and L is the cap (one screen with its states and one server flow). weights turn sizes into the critical path's length and the start order.",
-    "name: at most 8 words, the same in plan.md, the brief and the blueprint.",
-    "checker: written at the close, never before: the path of the checker and its git blob sha (git hash-object), the version whose green closed the plan. Stage 4 never re-judges a closed plan with a newer one.",
-    "target: depth is the warning threshold (the typical shape is F → every entry at once → E-int); maxAcs the AC guide per slice (default 8, at one AC per rule or behavior)."
+    "02-plan/plan.graph.json — the build graph. The planner writes it and keeps it in step with plan.md; scripts/plan-graph.mjs checks it. Stage 4 reads it for the start order, the edges and the owners.",
+    "acs: every AC id of the stories, exactly as written there. Each one is carried by exactly one node.",
+    "shared: the files only the contract commit writes (the API spec, the generated code). Never the migrations folder: each entry owns its own migration files.",
+    "nodes[].kind: contract (C: spec, the DDL two or more entries use, generated code, compile stubs, shared factories, the skeleton of a new module) · entry (E-nn: one whole behaviour, at most 12 ACs) · integration (E-int: only the journeys that cross entries, last).",
+    "nodes[].sides: back and/or front. Both only when the design gives the Contract; the brief copies it and stage 4 runs builder-backend and builder-frontend in parallel.",
+    "nodes[].after: only what nothing can fake. class ui = a journey drives the other entry's screen; class side-effect = a check reads its real effect. need = that behaviour in words. A child starts when its parent has merged into feat.",
+    "nodes[].owns: every path the node creates or edits, one owner per path. extends: an addition to a file the contract commit or an ancestor created (a stub filled, a route registered).",
+    "nodes[].provides / uses: the names that cross a node boundary, exactly as code imports or calls them.",
+    "fronts: the other running fronts that change files this plan touches, with the agreement reached by message (coordination.md)."
   ],
   "workstream": "<workstream-slug>",
-  "checker": { "path": "claude/skills/stage-plan/scripts/plan-graph.mjs", "blob": "<git hash-object of plan-graph.mjs, at the close>" },
-  "target": { "depth": 2, "sizeCap": "L" },
-  "weights": { "S": 1, "M": 2, "L": 3 },
-  "acs": ["<J1.s1.1>", "<J1.s2.1>", "<J3.s3.1>"],
-  "shared": ["<api/openapi/**>", "<db/migrations/**>", "<internal/gen/**>", "<cmd/server/registry.go>"],
+  "acs": ["<S1.1>", "<S1.2>", "<S2.1>", "<S3.1>"],
+  "shared": ["<backend/api/openapi.yaml>", "<backend/internal/gen/**>"],
   "fronts": [
-    { "front": "<other-workstream-slug>", "branch": "<feat/other-workstream>", "files": ["<db/migrations/**>"], "merge": "<its branch merges into the base before F; F takes the next migration number>" }
+    { "front": "<other-slug>", "session": "<its session name>", "files": ["<Makefile>"], "agreed": "<additive only: a new target at the end; it merges first>" }
   ],
   "nodes": [
     {
-      "id": "F", "kind": "foundation", "name": "<Contract and seams>", "size": "M",
+      "id": "C", "kind": "contract", "name": "<Orders contract and skeleton>",
       "after": [], "acs": [],
-      "owns": ["<api/openapi/**>", "<db/migrations/**>", "<internal/gen/**>", "<cmd/server/registry.go>", "<internal/orders/port.go>", "<internal/orders/fake/**>", "<internal/testkit/factory/**>"],
+      "owns": ["<backend/api/openapi.yaml>", "<backend/internal/gen/**>", "<backend/database/migrations/20261005120000_orders.sql>", "<backend/internal/orders/module.go>", "<backend/internal/orders/http/stubs.go>", "<backend/tests/factory/order.go>"],
       "extends": [],
-      "provides": ["<POST /orders>", "<orders.Store>", "<fake.Store>", "<factory.Order>", "<actors.Customer>"],
+      "provides": ["<POST /orders>", "<GET /orders>", "<factory.Order>"],
       "uses": []
     },
     {
-      "id": "E-01", "kind": "slice", "name": "<Place an order>", "size": "M",
-      "sides": ["back", "front"],
+      "id": "E-01", "kind": "entry", "name": "<Place an order>", "sides": ["back", "front"],
       "after": [],
-      "acs": ["<J1.s1.1>", "<J1.s2.1>"],
-      "owns": ["<internal/orders/place/**>", "<web/src/pages/orders/new/**>", "<e2e/journeys/j1-place-order.spec.ts>"],
-      "extends": [],
-      "provides": [],
-      "uses": ["<POST /orders>", "<fake.Store>", "<factory.Order>", "<actors.Customer>"]
+      "acs": ["<S1.1>", "<S1.2>"],
+      "owns": ["<backend/internal/orders/app/place_order.go>", "<frontend/app/src/features/orders/new/**>"],
+      "extends": ["<backend/internal/orders/http/stubs.go>"],
+      "provides": [], "uses": ["<POST /orders>", "<factory.Order>"]
     },
     {
-      "id": "E-int", "kind": "integration", "name": "<Order to e-mail>", "size": "S",
-      "sides": ["front"],
+      "id": "E-02", "kind": "entry", "name": "<List orders by day>", "sides": ["back", "front"],
+      "after": [],
+      "acs": ["<S2.1>"],
+      "owns": ["<backend/internal/orders/app/list_orders.go>", "<frontend/app/src/features/orders/list/**>"],
+      "extends": [],
+      "provides": [], "uses": ["<GET /orders>", "<factory.Order>"]
+    },
+    {
+      "id": "E-int", "kind": "integration", "name": "<Place then see it listed>", "sides": ["front"],
       "after": [
-        { "id": "<E-03>", "class": "ui", "need": "<the journey clicks 'Mark ready', which E-03 builds>", "stacked": true }
+        { "id": "E-01", "class": "ui", "need": "<the journey submits the order form E-01 builds>" },
+        { "id": "E-02", "class": "ui", "need": "<the journey reads the list E-02 builds>" }
       ],
-      "acs": ["<J3.s3.1>"],
-      "owns": ["<e2e/journeys/j3-order-to-email.spec.ts>"],
-      "extends": [], "provides": [],
-      "uses": ["<actors.Customer>", "<factory.Order>"]
+      "acs": ["<S3.1>"],
+      "owns": ["<frontend/app/e2e/orders-place-and-list.spec.ts>"],
+      "extends": [], "provides": [], "uses": ["<factory.Order>"]
     }
   ]
 }

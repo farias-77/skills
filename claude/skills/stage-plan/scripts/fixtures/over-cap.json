@@ -14,7 +14,9 @@
     "S2.9",
     "S2.10",
     "S2.11",
-    "S3.1"
+    "S3.1",
+    "S2.12",
+    "S2.13"
   ],
   "shared": [
     "backend/api/openapi.yaml",
@@ -60,13 +62,7 @@
         "back",
         "front"
       ],
-      "after": [
-        {
-          "id": "E-int",
-          "class": "ui",
-          "need": "the list link"
-        }
-      ],
+      "after": [],
       "acs": [
         "S1.1",
         "S1.2"
@@ -103,7 +99,9 @@
         "S2.8",
         "S2.9",
         "S2.10",
-        "S2.11"
+        "S2.11",
+        "S2.12",
+        "S2.13"
       ],
       "owns": [
         "backend/internal/orders/app/list_orders.go"

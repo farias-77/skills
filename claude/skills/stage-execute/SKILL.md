@@ -1,472 +1,257 @@
 ---
 name: stage-execute
-description: Conducts stage 4 (Execute) — turns a closed plan into merged code on the feature branch, from one "play" to one call. Step 0 shows the plan's pre-flight once, waits until every item is handed over, and gives the user the /goal text to paste; from then on nobody asks him anything. One session (Opus 5.5, high) orchestrates without writing code: the foundation first, then every node of plan.graph.json whose edges are merged or ready, in the graph's start order, each through the exec-entry workflow: by default each in its own Claude Code cloud session when the project has a cloud environment (as many at once as are ready, bounded only by the account's rate limits; the session watches the pushed evidence branch with a git loop, restarts a lost run once in the cloud, then runs it locally), otherwise locally up to the measured cap — builder (Opus 5.5, medium) writes the code and the tests for the entry's ACs, running only the fast checks and trying a changed screen or endpoint once against the local stack (two builders, back and front in parallel, when the brief carries a Contract); exec-gate (Sonnet 5.5, low) runs the gate once, the only place the suites run; then, in parallel, reviewer (Opus 5.5, high) with a closed scope, the QAs that make sense for the change, trying to break it: qa-frontend (Opus 5.5, medium) when screen behaviour changed (not for a pure visual, copy or asset tweak) and qa-backend (Opus 5.5, medium) when the API, data or permissions changed; a mechanical triage (blocking only on an AC not met, a reproduced bug, a security hole or a written rule broken; the rest are notes on the PR); at most one review fix pass (a gate-fix pass on a code red is apart, two at most) and a delta by the agents that blocked, then ready or parked. Done = the plan's ACs met and the gate green. The session is the local CI: its serial queue merges the base into each ready entry, tests the merged tree (skipped when the base has not moved since the entry's green gate), merges, and signs off; the whole gate runs once at the end. Then it calls him once, for his hands-on: it runs the environment, he uses the app and sends adjustments in plain words, each built as a small entry A.<n> (builder → gate → merge; the reviewer only on auth, permissions or personal data) until he says ok. Then the stage report. Use when a workstream's .state.md says stage execute, or to resume an execution in progress.
-disable-model-invocation: false
+description: Conducts stage 4 (Execute) as the tech lead, under one /goal - builds the whole plan from the contract commit to the user's hands-on. Every ready entry runs through the exec-entry workflow (builder-backend ∥ builder-frontend → exec-gate → reviewer ∥ the QAs the surface calls for → one fix pass → the delta), in its own cloud session when the project has one; the session orchestrates the graph, the merge queue and the migration order, settles overlaps and conflicts, coordinates with other fronts by message, runs the whole gate as local CI (the local-ci status), opens the PR to main, brings the app up for his hands-on, builds his adjustments as A.n rounds, and closes on his ok with its report (Video, Deck, Explainer). Use when a workstream's .state.md says stage execute, or to resume one in progress.
 argument-hint: "<workstream-slug>"
-allowed-tools: Read, Write, Edit, Glob, Grep, Agent, Workflow, AskUserQuestion, Artifact, PushNotification, Bash
+allowed-tools: Read, Write, Edit, Glob, Grep, Agent, SendMessage, Workflow, AskUserQuestion, Artifact, PushNotification, Monitor, Bash
 ---
 
-# Stage 4: Execute
+# Stage 4 · Execute
 
-A closed plan comes in: the build graph (`plan.graph.json`: the
-foundation, the lanes, the slices, the integration node, their edges
-and the files each owns) and a brief per node. Merged code comes out
-on `feat/<workstream>`.
+A closed plan comes in: the graph, a brief per node, the pre-flight. A
+finished `feat/<slug>` comes out, with the PR to `main` ready, local CI
+green on its head, and his "ok" after using the app.
 
-**Done means the plan's ACs are met and the gate is green. Nothing
-else blocks.** Each entry gets the build, one review fix pass, and a
-target of 30 to 60 minutes. A pass that fixes a code-red gate is part
-of building and does not spend the review fix pass; at most two of them
-per entry, then it parks `gate-red`. It never loops: past its budget it
-parks and the session reports it.
+The session is the **tech lead** (Opus 5.5, high). It writes no product
+code and reviews none. It runs the team and owns everything that goes
+wrong in between: [references/tech-lead.md](references/tech-lead.md) is
+its playbook.
 
-**No code enters without review.** Every commit that reaches an entry
-branch passes the gate and agents that never wrote it. The session
-never merges anything that did not come back `ready` from the
-exec-entry workflow.
+## The bar
 
-**The queue is the CI.** Nothing reaches `feat/<workstream>` that was
-not tested, on this machine, as the tree it becomes; the session signs
-each merged head off and the whole gate signs off the top once.
+1. From the goal to his hands-on, no question that is not his.
+2. Nothing enters `feat/<slug>` without a green gate and a reader who
+   did not write it.
+3. No entry parks in silence: the tech lead resolves it; only what is
+   his waits for him.
+4. The entry gate stays under 5 minutes; the whole gate runs as local
+   CI on the top of `feat`, while he uses the app.
+5. It closes on his "ok".
 
-The session is the orchestrator, **Opus 5.5 at high effort**. It does
-not write product code and does not review it. The user hands over the
-pre-flight, pastes one goal and leaves; the session calls him once, at
-the end, to use the app himself. The stage starts on his play (house
-rule "Every stage starts on his play"): `/clear`,
-`/model claude-opus-5-5`, `/effort high`, `/stage-execute <slug>`; the
-pre-flight and the goal are its interaction at the start. It never
-starts stage 5. **Stage 5 assumes everything is
-implemented and working**: what he wants changed is built here.
-
-## The pipeline of one entry
+## The flow
 
 ```
-            ┌─ builder (back) ──┐   two builders in parallel only when the brief carries a Contract
-entry ──────┤                   ├─► gate ─┬─► reviewer                         ─┐
-            └─ builder (front) ─┘         ├─► qa-frontend (when it makes sense) ├─► at most 1 review fix pass ─► ready ─► the queue
-                                          └─► qa-backend  (when it makes sense)─┘
+open ──► prepare (feat, board, keep the machine awake) ──► C ──► every ready entry at once
+           exec-entry: builders → gate → reviewer ∥ QAs → triage → one fix → delta
+     ──► the queue: base in → restamp → signoff → merge → worktree and stack gone
+     ──► PR draft + local-ci on the top ──► his hands-on (A.n rounds; X.n on a red) ──► "ok"
+     ──► report ∥ cleanup ──► the message: the link + /clear + /stage-release <slug>
 ```
-
-| Step | Who | What |
-|---|---|---|
-| build | `builder (Opus 5.5, medium)` | the code and the tests its ACs need (one primary proof each, by judgment); only the fast checks (types, lint, unit tests) while it builds; a changed screen or endpoint tried once against the local stack (`tried`, one line); a file outside Owns is allowed and listed (`outsideOwns`) |
-| gate | `exec-gate (Sonnet 5.5, low)` | the gate commands once, as given (the check and the affected tests, sized to the change); each failure `code` or `machine`; a machine red runs again after a load wait (2×), then parks `machine`; a code red takes a gate-fix pass (not the review budget; at most 2 per entry, then parks `gate-red`); green brings the stack up for the QAs |
-| check | `reviewer (Opus 5.5, high)` ∥ `qa-frontend (Opus 5.5, medium)` ∥ `qa-backend (Opus 5.5, medium)` | the reviewer always; each QA when it makes sense (below), trying to break the feature like a real user or attacker, never adding tests |
-| triage | the workflow, in code | blocking = marked blocking, basis `ac` · `bug` · `security` · `rule`, and a proof. The rest are notes |
-| fix | `builder (Opus 5.5, medium)` | the one review fix pass over every blocking item, then the gate (a code red there may take one gate-fix pass, within the 2), then the delta: only the agents that blocked re-check their own items. Still blocking → parked `round-cap` |
-
-**Which QAs run** is decided per entry, from the gate's surface and
-the builder's `screenChange`, and recorded in the run's result as `qa:
-{ frontend: run | skipped, backend: run | skipped, why }`:
-
-| QA | Runs when | Skipped when |
-|---|---|---|
-| `qa-frontend (Opus 5.5, medium)` | what a person can do on a screen changed: logic, forms, routes, state, permissions on screen | no screen changed, or only styling, copy or an asset |
-| `qa-backend (Opus 5.5, medium)` | the API, the data or the permissions changed | none of them changed |
-
-When in doubt, it runs. A QA that finds nothing worth breaking returns
-quickly with `pass`. The session may call either one itself with the
-run's `qa` argument (a style change that could hide an action at phone
-width, say); the result records its reason too.
-
-**Tests are guidance, not a gate.** The builder verifies that it
-works: the tests its ACs need, by the builder's "How you test", and
-one try against the local stack. Nothing about how the tests are cut
-blocks an entry; only an AC with no proof at all does.
-
-The blocking rule is [references/judging.md](references/judging.md).
-Every agent stamps its start and end; the run returns `steps`, one
-line per agent with its minutes, and the session keeps them.
 
 ## The team
 
-| Agent | Model, effort | Does |
+| Who | Model, effort | Does |
 |---|---|---|
-| the session | Opus 5.5, high | pre-flight, the goal, worktrees, runs (cloud sessions by default, with their watcher and fallback), the machine's load, the merge queue, its migration ordering and its signoff, the environment for his hands-on and its adjustments, the record, the stage report |
-| `builder` | Opus 5.5, medium | the code and the tests of an entry, back and front or one side against the Contract; the fix pass |
-| `exec-gate` | Sonnet 5.5, low | the gate commands once, code or machine, the surface, the stack |
-| `reviewer` | Opus 5.5, high | the ACs implemented, bugs and races, the security checklist, operations, a written rule broken |
-| `qa-frontend` | Opus 5.5, medium | when screen behaviour changed: the screens used like a person, trying to break them; the ACs' journeys, the states, mobile width |
-| `qa-backend` | Opus 5.5, medium | when the API, data or permissions changed: the API called like a client and like an attacker, the data read back |
-| `slides-scribe` | Sonnet 5.5, high | the stage report's slides (no video at this stage: his hands-on is the validation) |
+| the session, the tech lead | Opus 5.5, high | the graph, the runs, the queue, the migrations, overlaps and conflicts, local CI, the PR, his hands-on, the report |
+| `builder-backend` | Opus 5.5, medium | the entry's server side, its proofs, one try on the stack |
+| `builder-frontend` | Opus 5.5, medium | the entry's screens, with taste, its proofs, one try on the stack |
+| `exec-gate` | Sonnet 5.5, low | the entry gate once; each red code or machine; a test outside the diff run again once |
+| `reviewer` | Opus 5.5, high | every diff: the six classes and the security checklist |
+| `qa-frontend` | Opus 5.5, medium | uses the screens and tries to break them, when screen behaviour changed |
+| `qa-backend` | Opus 5.5, medium | calls the API as client and attacker, when API, data or permissions changed |
+| `scout` | Sonnet 5.5, low | finds and quotes what the session needs to know |
+| `video-builder` · `slides-builder` | Sonnet 5.5, medium | the report's Video and Deck |
 
-## Preconditions
+The builders read [builders.md](references/builders.md) with
+[backend.md](references/backend.md) or
+[frontend.md](references/frontend.md); the reviewer reads
+[review.md](references/review.md); the QAs read [qa.md](references/qa.md).
+The product's own standards and golden paths are the "how"; these are
+the roles.
 
-`.state.md` says `stage: execute` (the plan closes on its own; this
-stage waits for his play); `02-plan/plan.md` with its gate commands; `02-plan/plan.graph.json` is the build graph the
-plan's checker passed, and `02-plan/graph.json` its last output (the
-`startOrder`, the critical path); a brief per node in
-`02-plan/briefs/`; `02-plan/preflight.md`; discovery's locked mock in
-`00-discovery/prototype/frames/`. The consuming project's `CLAUDE.md`
-(or, in a two-root layout, the session root's `CLAUDE.md` and the
-doctrine's contract table) names the codebase root, its doctrine, its
-**golden paths**, its **fast checks**, its **gate commands** (the check
-and the affected tests against a base), its **whole gate** and its
-**signoff** command (the project contract's local-CI signoff). A
-missing role joins the pre-flight. Missing plan: halt, back to stage 3.
-
-**The gate is sized to the change** (the project contract's role 24).
-The per-entry gate, on every builder pass and every merge's affected
-signoff, runs what the change can break: usually the check and the
-affected tests at the primary width plus the specs tagged width-aware,
-evidence capture off, the server suites once. The whole gate at the
-end runs everything: every width, the visual tests, the full server
-suites, evidence on. Sizing, not a straitjacket: when a change really
-needs more, the session runs more. A project that
-does not meet role 24 yet still runs this stage, only slower: its gate
-commands run as the project names them, and `/pipeline-setup` proposes
-the fix.
+## Inputs and outputs
 
 ```
-designs-root/<workstream>/
-├── .state.md                  # stage: execute
-├── 02-plan/plan.md            # the Status column is this stage's to fill
+<designs-root>/<slug>/
+├── .state.md                   stage: execute
+├── 00-discovery/ · 01-design/  read by the agents
+├── 02-plan/                    plan.graph.json · graph.json (start order) · plan.md (Status is filled here) · briefs/ · preflight.md
 └── 03-execution/
-    ├── board.md               # one line per entry: state, sha, passes, minutes, the run id
-    ├── parked.md              # what did not merge, with the evidence
-    ├── entries/<id>/          # run-<n>.json (never overwritten), notes.md, the QAs' screenshots
-    ├── explain.md             # at the end: what was built, for the intern
-    └── audit.md               # at the end: what was decided in the user's place
+    ├── board.md                one row per entry (templates/board.md)
+    ├── entries/<id>/           run-<n>.json · beats.jsonl · notes.md · fixes-<n>.json · the QAs' evidence
+    └── adjust/<A.n|X.n>.md     the briefs of his adjustments and of the fixes
 ```
 
-**The ids.**
+The product's `CLAUDE.md` names: the fast check, the entry gate
+(`make check`, `make test-affected base=…`), the whole gate (`make
+verify`), the stack up and down, `make restamp`, the worktrees root,
+the code-owner paths, and whether a cloud environment exists.
 
-| Id | What | When it starts |
-|---|---|---|
-| `F` | the foundation, from the plan | first, alone |
-| `F-b` | the foundation's second half, only when the plan split it | after `F` merges, alone |
-| `F-x<n>` | a foundation lane nobody waits for | with wave 1, once the foundation merged |
-| `E-<nn>` | a slice | by its edges, in the start order |
-| `E-int` | the integration node | when its edges are `ready` (stacked); merges last |
-| `X.<n>` | a fix entry of this stage: the whole gate red at the end, or a "fix" he rules at the audit | at the end |
-| `A.<n>` | an adjustment he asks for at the hands-on (Step 6) | while he uses the app |
+## Open
 
-## Step 0 — pre-flight, then play
-
-If the session is not on **Opus 5.5 at high effort**, ask the user
-once to switch (`/model claude-opus-5-5`, `/effort high`) and wait; a
-non-interactive run goes on with what it has and writes one line in
-`dreaming-notes.md`. Read `plan.md`, `plan.graph.json`,
-`graph.json`, `preflight.md`, the pipeline's `docs/project-contract.md`
-and the project's `CLAUDE.md`; the briefs, the recon and the doctrine
-are read by the agents that use them.
-
-**1. The pre-flight, once.** Show `02-plan/preflight.md` whole, as one
-table: item · why · the ready `!` command to paste · what it blocks ·
-status. Add what the session checks itself: the golden paths file, the
-gate commands, the whole gate and the signoff command named; `gh auth
-status` able to post a commit status; the stack-up command bringing a
-stack up on `main`; the permission mode (auto mode, or an allow list
-that covers the gate, the stack, the merges and the signoff). When the
-doctrine names a **cloud environment for entries** (the project
-contract's role 20): `claude --version` takes `--cloud`; the vendored
-pipeline under the project's `.claude/pipeline/` is at the tag this
-pipeline runs (else the VM runs another version: refresh it with
-`/pipeline-setup`); the remote is GitHub. A cloud environment that
-fails these checks is not a halt: the stage runs locally and says so. Then
-wait. As he hands each item over, run its **Check** command and mark
-it. An item he cannot give now parks the nodes it **Blocks** as `user`
-from the start; everything else goes on.
-
-**2. Play.** Give him the goal to paste, filled in, in one code block:
+1. If the session is not on Opus 5.5 at high effort, one line
+   recommending it; do not wait.
+2. **The guard canary:** `git push origin a:b` in the product repo must
+   come back denied. Not denied: the stage does not open.
+3. The pre-flight was checked at plan. List only the items he must run
+   himself (from `preflight.md`), each with its `!` command. An item
+   still missing parks only the entries it blocks.
+4. Hand him the goal, filled in, in the same message:
 
 ```
-/goal Build the whole plan of <workstream> with the stage-execute skill,
-from the foundation to my hands-on, without asking me anything.
-Done means, each shown in this conversation: board.md has every entry
-merged into feat/<workstream>, or parked with its reason and evidence;
-the whole gate ran once on the top of feat/<workstream> in a fresh
-worktree and exited 0, and the signoff posted local-ci = success on
-that sha (paste its line); audit.md is written; the environment is up
-on that sha with the local URLs and the test actors' logins pasted for
-my hands-on. Decide what is mine conservatively and list it in the
-audit for my veto. Then notify me.
+/goal Build the whole plan of <slug> with the stage-execute skill, from the contract
+commit to my hands-on, asking me only what is mine.
+Done when: board.md has every entry merged into feat/<slug>, or stopped with its
+reason and evidence and already decided by me; local-ci is green on the head of the
+PR feat/<slug> → main and the PR is ready; the app was up for my hands-on and I said
+ok through the question tool; the release plan is written; the execute report is
+published. Never merge into main.
 ```
 
-**3. Prepare the codebase.** `feat/<workstream>` cut from `main` and
-pushed; the start order from `graph.json`; `board.md` with every node
-`waiting`; the cap:
+## 1 · Prepare
 
-| The project has | Where entries run | The cap |
-|---|---|---|
-| a cloud environment (role 20) | each entry in its own cloud session, by [references/cloud.md](references/cloud.md); local is the fallback, entry by entry | the plan's width: every ready node starts, bounded only by the account's rate limits |
-| none | here, in worktrees | the plan's widest wave, held by the load below |
+- `feat/<slug>` from `main`, or merge `main` into it if it exists;
+  pushed.
+- `board.md` from the template, every node `waiting`, the start order
+  from `graph.json`.
+- Keep the machine awake while anything is in flight:
+  `systemd-inhibit --what=sleep:idle --why="<slug> execute" sleep infinity`
+  in the background.
+- Read `_coordination.md` (by scout): the other fronts in execute and
+  their session names.
 
-Whatever the column, the queue, every signoff, the whole gate and his
-hands-on run here.
+## 2 · The contract commit
 
-**The machine is the session's.** Before it starts a local run, the session
-reads `cat /proc/loadavg`; above the threshold (`nproc`), the start waits for
-the next run to finish. On a machine other work shares, the session
-reads the load once before its first run, writes it on the board as
-the outside load, and holds the cap at the threshold plus that load.
-One run always goes: with none of its own running, the next one starts
-whatever the load. The cap does not grow to go faster: past the
-measured cap every run gets slower and the stage does not.
+C runs alone, through exec-entry with `kind: 'contract'`: one builder,
+the gate, the reviewer once (only security blocks), no QA. Its proof:
+the fast check green with the stubs, the generator with no diff, the
+migrations from empty. It never parks: any stop is resumed until it
+merges.
 
-## Step 1 — the foundation
+## 3 · The entries
 
-The foundation is an entry like the others, built alone. Run
-exec-entry for `F` (Step 2's arguments). When it returns `ready`, it
-goes through the merge queue. `F-b`, when the plan split it, runs the
-same way right after `F` merges. Nothing else starts until the
-foundation is merged.
+Every time something merges or returns, start **every** node whose
+parents are in `feat`, in start order. No cap: a rate limit is waited
+out (tech-lead.md). For each:
 
-## Step 2 — the fan-out
+1. **The branch** `story/<slug>/<id>` from the top of `feat`, in a
+   worktree under the product's worktrees root
+   (`<root>/<slug>/<id>`), pushed when it runs in the cloud.
+2. **Run** exec-entry by `scriptPath`
+   (`${CLAUDE_SKILL_DIR}/../../workflows/exec-entry-workflow.js`), in
+   the background, or in a cloud session by
+   [references/cloud.md](references/cloud.md). The args:
 
-Every time something merges or comes back `ready`, start every node
-whose `after` nodes are merged or `ready`, in `startOrder`, up to the
-cap and under the load. A node whose one unmerged `after` node is
-`ready` is **stacked**: it starts on that node's branch and takes
-`feat/<workstream>` in by a merge in the queue. With two or more
-`after` entries unmerged, it waits until at most one is left. For each:
+   | Arg | Value |
+   |---|---|
+   | `mode` · `entry` · `kind` | `build` · the id · `contract` for C, else `entry` |
+   | `briefPath` · `sides` | the brief · the node's `sides` |
+   | `designDir` · `storiesPath` · `mockDir` | the design, the stories, the locked mock frames |
+   | `projectDocs` · `referencesDir` | the product's `CLAUDE.md` · `${CLAUDE_SKILL_DIR}/references` |
+   | `fastCheck` · `gateCommands` · `gatePaths` | from `plan.md` and the product's `CLAUDE.md` (gate paths = the code-owner paths) |
+   | `worktree` · `branch` · `base` | the entry's worktree, its branch, `feat/<slug>` |
+   | `evidenceDir` · `priorRuns` · `trailer` | `03-execution/entries/<id>/`, earlier `run-*.json`, the commit trailer |
+   | `heartbeat` | always: `bash ${CLAUDE_SKILL_DIR}/scripts/heartbeat.sh <evidenceDir>` (in the cloud, its copy under `input/pipeline/`) |
+   | `loadThreshold` | local runs only, `nproc` |
+   | `inlineAgents` · `agentsDir` | while the agents are not installed |
 
-1. **The worktree.** From the top of `feat/<workstream>` (or of the
-   branch it stacks on): one worktree on `story/<workstream>/<id>`,
-   under the codebase's `.worktrees/`. In the cloud, push it.
-2. **Run** the workflow by `scriptPath`, in the background (in the
-   cloud: the same arguments sent on the evidence branch and the run
-   prompt of [references/cloud.md](references/cloud.md), started with
-   `claude --cloud` from that worktree):
-   `${CLAUDE_SKILL_DIR}/../../workflows/exec-entry.js` with `mode:
-   'build'`, the entry id, the brief, `contract: true` when the brief
-   has a **Contract** section (two builders; without it, one), the
-   design, discovery, recon and doctrine folders, `goldenPathsPath`,
-   `fastChecks`, `gateCommands` (the check and the affected tests
-   against the entry's base), `rulings.md`, `agentsDir:
-   ${CLAUDE_SKILL_DIR}/../../agents`, `packsDir: ${CLAUDE_SKILL_DIR}/..`,
-   the evidence folder `03-execution/entries/<id>/`, the worktree, the
-   branch, the base, `priorRuns`, `loadThreshold`, and the commit
-   trailer. While the agents are not installed in the running Claude
-   Code, pass `inlineAgents: true`.
-3. **Record** the run id and `building` in `board.md`; in the cloud,
-   `building (cloud)` with the attempt, the session id and its URL.
+3. **Record** on the board: `building`, where, the run.
 
-The session does not poll. A local run's completion wakes it; cloud
-runs wake it through the watcher of references/cloud.md (`git
-ls-remote` on the evidence branches in a shell loop under Monitor or a
-background shell, never model turns). A cloud run that fails to start
-or stops is restarted once in the cloud, then run here. Every reply
-while runs are in flight carries the board as a table (entry · state ·
-where · pass · minutes · run, the cloud session's URL for a cloud
-run).
+The session does not poll: a local run's end wakes it; cloud runs wake
+it through the watcher. Every reply while runs are in flight carries the
+board as a table.
 
-## Step 3 — what comes back
+## 4 · What comes back
 
-Save the return as `entries/<id>/run-<n>.json` (a cloud run's comes
-from its evidence branch, copied with the rest of its evidence). Write its `notes` to
-`entries/<id>/notes.md` (agent · where · what · the fix it suggests);
-they go into the merge commit's body and never open work. Its
-`decided`, `choices` and `outsideOwns` go to the audit; its `steps` to
-the board (the entry's minutes, and the slowest step); its `qa`
-decision and the builder's `tried` line to the entry's line in
-`notes.md`. Then act on
-`status`:
+Save the return as `entries/<id>/run-<n>.json`; its notes to
+`notes.md` (they go in the merge body, never open work); its `decided`
+and `outsideOwns` to the board's log. Then act by
+[tech-lead.md](references/tech-lead.md):
 
-- **`ready`** → the merge queue (Step 4).
-- **`interrupted`** → an agent returned nothing (the API, the network,
-  the quota). Relaunch the same run with `resumeFromRunId`; if it fails
-  again at once, wait until the reset the limit message names (or 30
-  minutes) and relaunch. Never a new build.
-- **`blocked`** → the builder found a true impossibility. A missing
-  secret or account: parked `user`, one line in `parked.md`. A
-  contradiction in the plan: the session decides it by the design,
-  conservatively, writes `rulings.md` (`ruled: session`) and
-  `entries/<id>/fixes-<n>.json` (`{ "fixes": [ { id, fix } ] }`), and
-  resumes once (`mode: 'resume'`, `resume: { head, passesUsed,
-  reviewFixes, gateFixes, fixesFile, check: 'whole' }`, the counts
-  from the parked return).
-- **`parked`**, by its `reason`, one line in `parked.md` with the
-  evidence; the entries that depend on it wait; everything else goes
-  on.
-  - **`user`** — a question only he can answer in person. It waits for
-    him; his answer becomes a fixes file and one resume.
-  - **`machine`** — red only for the machine after two load waits. Wait
-    until the load is under the threshold, then resume with `check`
-    `'whole'` when the run parked before its check, or `'delta'` with
-    the parked run's blocking items (`resume.items`) when it parked
-    after the fix.
-  - **`gate-red`** and **`round-cap`** — the budget is spent. The
-    session does not resume them: the entry stays out of the feature
-    branch, goes to the audit with its blocking items and evidence,
-    and the stage goes on. He rules it at the audit.
+| Status | Next |
+|---|---|
+| `ready` | the merge queue |
+| `interrupted` | `resumeFromRunId` after the reset |
+| `parked` (`round-cap`, `gate-red`, `machine`, `user`) · `blocked` | the playbook's row for it |
 
-## Step 4 — the merge queue is the local CI
+## 5 · The merge queue
 
-The session is the **queue host**: the only process that merges into
-`feat/<workstream>` and the only one that runs the project's
-**signoff** command (one gate command on one commit in a fresh
-worktree, its result posted as a commit status on that sha:
-`gh api repos/:owner/:repo/statuses/<sha> -f state=success -f
-context=local-ci`). No agent posts a status. Hosted CI is not on the
-merge path.
+By [references/queue.md](references/queue.md): one at a time, the
+critical path first; base in (merge, never rebase), restamp, signoff,
+merge `--no-ff`, the worktree and stack removed at once, then start what
+unblocked. Between two merges, a `main` that moved (another front, a
+hotfix) is merged into `feat`.
 
-```
-for each ready entry, one at a time (the critical path first, then in the order they came back)
-  1 base in        feat moved? merge it into the entry branch (never a rebase); a conflict → exec-entry 'update'
-  2 merged tree    the paths outside Owns ∪ Extends listed; signoff, the affected gate, on the entry head; red → parked gate-red
-                   (feat unmoved since the entry's green gate → skipped: "gate skipped: base unchanged since <sha>")
-  2b migrations    the entry's migrations against feat's; a number or order clash → renumbered on the entry branch, merge-prep commit, the gate again
-  3 merge          git merge --no-ff into feat/<workstream>, the notes in the body, push; the entry's stack down, its worktree removed
-  4 sign off       signoff, the same gate, on the new feat head — same tree, its record reused, status posted
-  5 record         plan.md Status, board.md merged, start what it unblocked
-once, at the end (Step 5)
-  whole gate       signoff, the whole gate, on the top of feat — the status main requires
-```
+## 6 · The end: PR, local CI, his hands-on
 
-1. **The base in.** If `feat/<workstream>` moved since the entry was
-   cut, merge it into the entry branch (`git merge --no-ff
-   feat/<workstream>`) and push. A conflict: `git merge --abort`, then
-   exec-entry `mode: 'update'`; anything but `ready` is parked.
-2. **The merged-tree test.** `git diff --name-only
-   feat/<workstream>...<entry branch>` against the node's `owns` and
-   `extends`: each path outside them is listed in the merge body and
-   the audit, with the run's `outsideOwns` reason or "unlisted". It
-   does not block: the reviewer read the whole diff. Then signoff with
-   the affected gate on the entry's head, with the per-merge context
-   (`local-ci/affected`, or the one the project names): that head holds
-   the base, so its tree is the tree the merge will make. Red → the
-   entry is parked `gate-red` with the log's path and failing lines.
-   **The base has not moved: skip it.** When the entry's head is the
-   head its green gate ran on (`gate.head` in its last `run-<n>.json`)
-   and that head already contains the top of `feat/<workstream>` (`git
-   merge-base --is-ancestor feat/<workstream> <head>`), nothing merged
-   in step 1 and the merged tree is the tested tree: the result would be
-   identical. Skip the affected signoff and merge, and record "gate
-   skipped: base unchanged since <feat sha>" where the signoff's line
-   would go; no per-merge status is posted for it. A merge in step 1, a
-   migration renumbered or any other commit moves the head, and the
-   gate runs as above.
-   **Migrations are the session's.** Entries run in parallel and each
-   may add a migration; two can take the same number, which is no text
-   conflict, so nothing above catches it. Before the merge, list the
-   migrations the entry adds (`git diff --name-only --diff-filter=A
-   feat/<workstream>...<entry branch>` under the project's migrations
-   folder) and the ones already on `feat/<workstream>`. On a number or
-   order clash, renumber the entry's migration on the entry branch to
-   follow the last one on feat (and every reference to it), commit that
-   as a merge-prep commit, and run the signoff with the affected gate on
-   the new head again before the merge. Red → parked `gate-red`.
-3. **Merge** with a merge commit whose body carries the entry's notes,
-   push, bring the entry's stack down (the doctrine's stack-down
-   command) and remove its worktree.
-4. **Sign off** the merged head: same gate and context on the new top
-   of `feat/<workstream>`; the record is reused, the status posted
-   (after a skipped gate, the skip line is the record and no status is
-   posted; the whole gate signs the top at the end, as always).
-5. **Record.** `plan.md` Status: date · entry · sha · passes · minutes
-   · the signoff's line (or the skip line). `board.md` to `merged`. Start what it
-   unblocked.
+1. **What waits for him first.** Entries parked on something only he
+   can decide go in one question per decision. What he says to fix
+   becomes an `X.n` now.
+2. **The PR and local CI.** With the queue empty: the PR `feat/<slug> →
+   main` as a draft, and `claude/scripts/local-ci.sh` on the top of
+   `feat` in the background (queue.md). It posts `local-ci` on that sha
+   only when the whole gate is green.
+3. **His hands-on.** In a fresh worktree on the top of `feat`, the
+   stack up and the seed loaded. A PushNotification and the same in the
+   conversation: the URLs, the test actors, what merged, what stayed out
+   and why. Mark the PR ready. If he is busy in another conversation,
+   the environment stays up and the notice goes once.
+4. **His adjustments** come back as one answer. One answer = one round
+   `A.n`: one brief (`templates/brief-adjust.md`) with every adjustment
+   of that answer, each with one AC, run with exec-entry `fix` (the
+   reviewer always; `qa: 'backend'` when it touches auth, permissions or
+   personal data; else `qa: 'none'`). Then the queue, one push, local-ci
+   again, the environment up again on the new top.
+5. **Local CI red** → `X.n` by queue.md. An `X.n` that changes something
+   he already used asks "still ok?"; the others do not call him.
+6. **Meanwhile** the tech lead writes the release plan
+   (`04-release/plan.md`, by the release stage's template) from
+   `operations.md`.
+7. **The ok.** One question, through the question tool: **"Ok, close
+   it"** · **"I have adjustments"**. When the diff touches a code-owner
+   path, it carries the PR link and "approve it on GitHub with your ok"
+   (an approval is dismissed by every push, so it comes after the last
+   round). It also carries the release authorization line he runs
+   (`! autoriza release <slug> feat/<slug>@<sha>`, from the guard) and
+   the release's `/goal`.
 
-## Step 5 — the whole gate
+His "ok" closes the hands-on: one line in `rulings.md`. Local CI may
+still be running on the last head; the release waits for its green.
 
-When every entry is merged or parked:
+## 7 · Close
 
-1. **The whole gate, once**, on the top of `feat/<workstream>`:
-   signoff with the whole gate and the context `main` requires
-   (`local-ci`), on this machine (never in the cloud), in a fresh
-   worktree with its own stack: every width,
-   the visual tests, the full server suites, the evidence flag on. Green: the status is posted. Red: the
-   session triggers the fixes itself, with no question: one fix entry
-   `X.<n>` per failing area (failures whose files do not overlap run in
-   parallel), each brief written by the session with the log's path and
-   its failing lines, run on the fast path (`mode: 'adjust'`: builder →
-   gate → merge, no panel; the reviewer only on auth, permissions or
-   personal data), merged through the queue; then the whole gate again.
-   Still red after two such cycles: the failures go to the audit for him.
-2. `audit.md` by [references/audit.md](references/audit.md).
+All at once:
 
-## Step 6 — his hands-on
+1. **The report**, by `claude/docs/stage-report.md`, finished before the
+   stage closes: the Video by `video-builder (Sonnet 5.5, medium)` (what
+   was built, the real screens captured from his hands-on environment),
+   the Deck by `slides-builder (Sonnet 5.5, medium)` (per entry: ACs →
+   proofs, findings, the A.n, what stayed out and why), the Explainer by
+   template (the board replayed on a timeline from `run-*.json` and
+   `beats.jsonl`). Published on the front's link.
+2. **Telemetry**: `node claude/scripts/telemetry.mjs <slug> --stage
+   execute` reads the runs, beats and commits. Nothing by hand.
+3. **Cleanup**: every entry worktree and its stack down (`make down`
+   removes the images too), the hands-on environment down after the
+   video's capture, local `story/<slug>/*` branches, remote
+   `story/<slug>/*` and `evidence/<slug>/*` (their evidence is already
+   copied), the `_run/` copies, the `systemd-inhibit` process.
 
-Every entry merged or parked and the whole gate green: he uses the
-app himself. This is the stage's visual check, live: no agent compares
-the screens with the mock; he does, on the real thing.
+Then `.state.md` to `stage: release`, this front's line in
+`_coordination.md`, the close commit of the workstream folder, and the
+message: the report link, the board in one table, what was decided in
+his place, and `/clear` then `/stage-release <slug>`.
 
-```
-up ─► he uses it ─► "make the button say Save" ─► A.1 builder → gate → merge ─┐
-         ▲                                                                     │
-         └──────────────── the environment again on the new top ◄─────────────┘
-he says ok ─► Step 7
-```
+## Running alone
 
-Everything in this step runs on this machine, cloud environment or
-not: he uses the app here.
-
-1. **The environment.** In a fresh worktree on the top of
-   `feat/<workstream>`, the project's stack-up command (the project
-   contract's item 5: app, API and local data with the seed), then its
-   env command. **PushNotification** to him, and the same in the
-   conversation: the local URL(s), the test actors' logins the way the
-   project provides them (the env command's output, or where the
-   project keeps them; never a secret pasted), what merged, what
-   parked, and `audit.md`'s path. The first call since the pre-flight.
-2. **He uses it** and sends adjustments in plain words. He may also
-   rule the audit here (Step 8 records it).
-3. **Each adjustment is an entry `A.<n>`.** The session writes its
-   brief under `03-execution/entries/A.<n>/brief.md`: his words quoted,
-   one AC written from them, the files it expects to touch. Then
-   exec-entry with `mode: 'adjust'` (Step 2's arguments; `security:
-   true` when the request touches authentication, permissions or
-   personal data): builder, gate, and the reviewer only on that
-   surface (the gate also reports it). No QA: it is his request and he
-   is looking at it. `ready` goes through the merge queue (Step 4);
-   anything else, the session tells him what blocked and asks how to
-   go on. Adjustments whose files do not overlap run in parallel.
-4. **The environment follows the top.** After each merge, bring the
-   stack up again on the new top of `feat/<workstream>` and tell him
-   it is there.
-5. **He says ok** (or words to that effect): the hands-on closes. One
-   line in `rulings.md` (`execute hands-on · ok · <the A.<n> merged>`),
-   and the whole gate once more on the top when any `A.<n>` merged.
-
-## Step 7 — the stage report
-
-1. `explain.md` from [templates/explain.md](templates/explain.md).
-2. `audit.md` brought up to date with the `A.<n>` entries.
-3. `blueprint/execution/execution.json` (schema:
-   `${CLAUDE_SKILL_DIR}/../../blueprint/schema/execution.md`).
-4. **The stage report**: follow
-   `${CLAUDE_SKILL_DIR}/../../docs/stage-report.md`: slides, then the
-   blueprint. No video: his hands-on with the running app is the
-   validation, and nothing is recorded while he uses it.
-
-## Step 8 — the audit
-
-He rules the parked entries and anything in the audit he wants
-changed, if he has not at the hands-on. Each ruling goes next to its
-item in `audit.md`, in `execution.json` and in `rulings.md`. A "fix"
-becomes one fix entry `X.<n>` through exec-entry, like any other code.
-When he approves: `.state.md` to `stage: release`, the close commit of
-the workstream folder, and one message that ends with the next play.
-Nothing runs until he types it:
-
-```
-/clear
-/model claude-opus-5-5
-/effort medium
-/stage-release <slug>
-```
-
-The release's own play (the pre-flight and the line that authorizes
-the merge) comes inside stage 5, at its Step 1.
+Under the goal the tech lead runs through the night on its own. These
+are not reasons to stop: a merged entry, a finished wave, a summary, a
+list of decisions to confirm, a milestone. It stops only when the
+goal's "done" holds, or for what is his: a decision of product, scope,
+an AC, a new recurring cost, something irreversible, his hands-on.
 
 ## Resuming
 
-Everything is in files. Read `.state.md`, `board.md`, `parked.md`,
-`plan.md`'s Status and `entries/*/run-*.json`. An entry `building` with
-no live run restarts from its branch with `mode: 'resume'`, `check:
-'whole'`: its worktree exists and the builder reads what is on disk.
-An entry `building (cloud)` is resumed by references/cloud.md's
-"Resuming the stage": its evidence branch first, then the watcher.
+Everything is in files: `.state.md`, `board.md`, `plan.md` Status, the
+`run-*.json`. An entry `building` locally with no live run resumes
+from its branch (`mode: 'resume'`, `check: 'whole'`). A cloud entry:
+read its evidence branch first, then restart the watcher.
 
 ## Boundaries
 
-The session writes no product code and reviews none, not even an
-adjustment's. No deploy. No
-merge of anything that did not come back `ready` and pass the
-merged-tree test. No commit status posted by anything but the signoff
-command, run by the session. No re-decision of the design or the plan.
-No work opened from a note: notes are read, not built. Frictions worth
-learning from go to the workstream's `dreaming-notes.md` on the spot.
-Every agent named carries its model and effort.
+No product code and no review by the session. No merge into `main`
+(that is the release's step 1). Nothing merges that did not come back
+`ready` and pass the queue's signoff. No status posted except by
+`local-ci.sh`. No re-decision of the design or the plan: a node that
+cannot be built as designed parks with the quote, and he decides. Notes
+are read, never built. Frictions go to `dreaming-notes.md` as they
+happen. Every agent named carries its model and effort.
