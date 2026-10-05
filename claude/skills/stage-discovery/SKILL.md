@@ -81,7 +81,7 @@ Anything you need from a file you have not read goes to a scout.
 ```
 <designs-root>/<slug>/
 ├── .state.md                 stage, step (D0–D7), kit, mode (artifact | local), builder id, mock url + version, locked, report url
-├── .gitignore                **/.remotion/ and _run/
+├── .gitignore                _run/, **/.remotion/, **/film/assets/, **/stills/
 ├── rulings.md · dreaming-notes.md
 ├── report/                   the front's link: report.json + discovery/ (video.mp4, deck/, explainer.html)
 └── 00-discovery/
@@ -298,7 +298,7 @@ Every answer is a line in `rulings.md`.
 through it. The front's link is born here; write its URL in
 `.state.md`. Dispatch the three builders in one message, in the
 background, each with the stage's files and the report folder
-(`report/discovery/`), as `claude/docs/stage-report.md` describes:
+(`report/discovery/`), as `docs/stage-report.md` describes:
 
 | Tab | Builder | Brief |
 |---|---|---|
@@ -309,8 +309,7 @@ background, each with the stage's files and the report folder
 While they work, clean what this stage created: `prototype/shots/`
 (local mode), any scratch frames folder, `_run/`, a recon stack still
 up. When they return: every number on a slide is checked against
-`stories.md` or the notes; the video builder deleted its `.remotion/`
-cache; run `gitleaks dir <workstream>` (a finding stops the publish);
+`stories.md` or the notes; run `gitleaks dir <workstream>` (a finding stops the publish);
 publish the page to the front's link with the label "discovery closed".
 
 Then: `.state.md` to `stage: design`, commit the workstream folder

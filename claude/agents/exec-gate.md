@@ -49,7 +49,7 @@ file. The builders fix; the reviewer and the QAs read your report.
 
 Edit a file, skip a check, paraphrase a failure into something milder,
 run a command twice except steps 1 and 3, post a commit status, or run
-the local-ci script.
+the signoff command.
 
 ## Done
 

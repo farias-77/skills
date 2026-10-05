@@ -24,7 +24,7 @@ allowed-tools: Read, Write, Edit, Glob, Grep, Agent, SendMessage, Workflow, AskU
 |---|---|
 | you, the session (Opus 5.5, high) | every step below; you never write or review code |
 | the CI (GitHub Actions) | push to `main`: staging deploy + smoke. Tag `v*`: the same image to production, smoke, 15-minute watch, rollback, then the GitHub release |
-| `claude/scripts/local-ci.sh` | the project's whole gate on this machine or a cloud VM, in a fresh worktree; the only writer of the required `local-ci` status, posted under the bot identity on green |
+| the project's signoff command (`claude/scripts/local-ci.sh` when it names none) | the project's whole gate on this machine or a cloud VM, in a fresh worktree; the only writer of the required `local-ci` status, posted under the bot identity on green |
 | the stage-4 cast through `exec-entry-workflow.js` mode `fix` | an `X.n` fix: `builder-backend` · `builder-frontend (Opus 5.5, medium)`, `exec-gate (Sonnet 5.5, low)`, `reviewer (Opus 5.5, high)`, the QAs by surface (Opus 5.5, medium) |
 | `scout (Sonnet 5.5, low)` | anything you need to look up |
 | `video-builder` · `slides-builder` · `artifact-builder (Sonnet 5.5, medium)` | the report's tabs; `video-builder` also starts the close's video for users |
@@ -105,7 +105,8 @@ does.
    first (references/release.md, "Taking turns").
 2. **`main` moved since his ok?** Merge `origin/main` into
    `feat/<slug>` (a merge, never a rebase), renumber the migrations if
-   the project has a command for it, push, and run `claude/scripts/local-ci.sh --repo <repo> --ref feat/<slug>`. A red
+   the project has a command for it (`make restamp`), push, and run the
+   signoff command on the new head. A red
    here is an `X.n` on `feat`, exactly as at execute.
 3. **The merge.** The PR's head has `local-ci` green, and the code
    owner's approval when the PR touches the gate's paths (asked at the
@@ -155,7 +156,7 @@ creates no release. Wake when it should be done and read the run.
 |---|---|
 | staging (deploy, migrate, smoke) | one `X.n`: `exec-entry-workflow.js` mode `fix` on `fix/<slug>/X.n` from `main` (the `reviewer (Opus 5.5, high)` always) → PR → `local-ci` → merge (the authorization covers it) → staging again |
 | `local-ci` on the PR at step 1 | one `X.n` on `feat/<slug>`, as at execute |
-| production rolled back | one `X.n` → staging and smoke → **ask** before the new production deploy, with a new `! authorize` line ready (the old one died at the tag) → a patch tag |
+| production rolled back | one `X.n` on `fix/<slug>/X.n`, its PR green on `local-ci` → **ask** him before it goes anywhere: the old line died at the tag, so its merge and its patch tag need his new `! .claude/hooks/authorize.sh release <slug> fix/<slug>/X.n@<sha>` → merge → staging and smoke → a patch tag |
 | the environment (runner, network, a quota) | run it again once; it does not count. Never a production `migrate`: that is a stop |
 | a second red of code, anywhere | stop |
 
@@ -182,7 +183,7 @@ not depend on the answer goes on (the report's pieces, the trace).
    `node claude/scripts/telemetry.mjs <slug> --stage release`.
 2. **The report, finished before the close.** Dispatch the builders in
    one message, in the background, with the stage's files and
-   `report/release/`, as `claude/docs/stage-report.md` describes:
+   `report/release/`, as `docs/stage-report.md` describes:
 
 | Tab | Builder | Brief |
 |---|---|---|

@@ -17,8 +17,10 @@ This skill needs the pipeline around it: the agents `builder-backend`,
 `builder-frontend`, `exec-gate`, `reviewer`, `qa-frontend`,
 `qa-backend`, `scout`, `video-builder` and `slides-builder` in
 `claude/agents/`; the workflow `claude/workflows/exec-entry-workflow.js`;
-the scripts `claude/scripts/local-ci.sh` and `claude/scripts/telemetry.mjs`;
-and a product repo whose `CLAUDE.md` names its gate commands and stack.
+the scripts `claude/scripts/telemetry.mjs` and `claude/scripts/local-ci.sh`
+(the fallback signoff); `claude/references/judging.md`; and a product
+repo whose `CLAUDE.md` names its gate commands, its stack and its
+signoff command.
 Copy `claude/` into the project's `.claude/` (or symlink this folder into
 `~/.claude/skills/stage-execute` with the rest of the pipeline beside
 it), then run `/stage-execute <workstream-slug>`.

@@ -74,7 +74,8 @@ the roles.
 The product's `CLAUDE.md` names: the fast check, the entry gate
 (`make check`, `make test-affected base=…`), the whole gate (`make
 verify`), the stack up and down, `make restamp`, the worktrees root,
-the code-owner paths, and whether a cloud environment exists.
+the code-owner paths, the signoff command, and whether a cloud
+environment exists (the bar, `docs/project-contract.md`).
 
 ## Open
 
@@ -177,8 +178,9 @@ hotfix) is merged into `feat`.
    can decide go in one question per decision. What he says to fix
    becomes an `X.n` now.
 2. **The PR and local CI.** With the queue empty: the PR `feat/<slug> →
-   main` as a draft, and `claude/scripts/local-ci.sh` on the top of
-   `feat` in the background (queue.md). It posts `local-ci` on that sha
+   main` as a draft, and the project's signoff command on the top of
+   `feat` in the background (queue.md; `claude/scripts/local-ci.sh` when
+   the project names none). It posts `local-ci` on that sha
    only when the whole gate is green.
 3. **His hands-on.** In a fresh worktree on the top of `feat`, the
    stack up and the seed loaded. A PushNotification and the same in the
@@ -201,7 +203,7 @@ hotfix) is merged into `feat`.
    path, it carries the PR link and "approve it on GitHub with your ok"
    (an approval is dismissed by every push, so it comes after the last
    round). It also carries the release authorization line he runs
-   (`! autoriza release <slug> feat/<slug>@<sha>`, from the guard) and
+   (`! .claude/hooks/authorize.sh release <slug> feat/<slug>@<sha>`) and
    the release's `/goal`.
 
 His "ok" closes the hands-on: one line in `rulings.md`. Local CI may
@@ -211,7 +213,7 @@ still be running on the last head; the release waits for its green.
 
 All at once:
 
-1. **The report**, by `claude/docs/stage-report.md`, finished before the
+1. **The report**, by `docs/stage-report.md`, finished before the
    stage closes: the Video by `video-builder (Sonnet 5.5, medium)` (what
    was built, the real screens captured from his hands-on environment),
    the Deck by `slides-builder (Sonnet 5.5, medium)` (per entry: ACs →
@@ -251,7 +253,7 @@ read its evidence branch first, then restart the watcher.
 No product code and no review by the session. No merge into `main`
 (that is the release's step 1). Nothing merges that did not come back
 `ready` and pass the queue's signoff. No status posted except by
-`local-ci.sh`. No re-decision of the design or the plan: a node that
+the signoff command. No re-decision of the design or the plan: a node that
 cannot be built as designed parks with the quote, and he decides. Notes
 are read, never built. Frictions go to `dreaming-notes.md` as they
 happen. Every agent named carries its model and effort.

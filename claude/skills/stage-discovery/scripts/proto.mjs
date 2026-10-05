@@ -31,7 +31,7 @@
  *         /regex/> let a logged-in SPA settle after a click; a fill value `env:NAME` is read from the
  *         environment (or from the KEY=VALUE lines --env-cmd prints: the project's env command, role 8)
  *         and never printed, so a test actor's password never sits on the command line. --page opens
- *         a whole HTML page or a file:// URL as it is (no artifact skeleton): a blueprint, a report.
+ *         a whole HTML page or a file:// URL as it is (no artifact skeleton): a report page.
  * shots   the pictures he looks at when the mock is not published (local mode): one PNG per state
  *         token, or per step of a journey (J2 → J2.s0.png, J2.s1.png …), into --out (default
  *         <mock dir>/shots/v<N>/); prints the paths.

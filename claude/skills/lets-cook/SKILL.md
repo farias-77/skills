@@ -125,7 +125,8 @@ In a legacy repo the first line is
   `brief.md`. The `reviewer (Opus 5.5, high)` always runs; on a hotfix, with the security
   pass.
 - As soon as the entry's gate is green, open the PR ready and start
-  `claude/scripts/local-ci.sh` on the head; it runs while the `reviewer (Opus 5.5, high)` and the QAs (Opus 5.5, medium) work.
+  the project's signoff command on the head (`claude/scripts/local-ci.sh`
+  when it names none); it runs while the `reviewer (Opus 5.5, high)` and the QAs (Opus 5.5, medium) work.
   The merge waits for all three. A fix pushes again and the local CI
   runs on the new head.
 
@@ -155,7 +156,7 @@ users' video only when a screen users see changed.
 3. `claude/scripts/cleanup.sh <slug> --check` → `--apply` → `--check`
    empty (`stage-close/references/cleanup.md`).
 4. **The minimal report**, finished before the message, as
-   `claude/docs/stage-report.md` describes. The rail is Build · Release
+   `docs/stage-report.md` describes. The rail is Build · Release
    · Close:
 
 | Stage | Video | Deck | Explainer |

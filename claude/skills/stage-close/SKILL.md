@@ -47,10 +47,11 @@ allowed-tools: Read, Write, Edit, Glob, Grep, Agent, AskUserQuestion, Artifact, 
 
 ```
 <designs-root>/<slug>/05-close/
-├── video.mp4 · whats-new.md     the delivery for users (templates/whats-new.md)
+├── whats-new.md                 the text for users (templates/whats-new.md)
 ├── retro.md                     templates/retro.md
 └── trace.md                     one line per step (templates/trace.md)
-<designs-root>/<slug>/metrics.json   written by telemetry.mjs
+<designs-root>/<slug>/report/close/video.mp4   the video for users, also the Close tab's Video
+<designs-root>/<slug>/metrics.json             written by telemetry.mjs
 ```
 
 ## Unattended
@@ -109,7 +110,7 @@ records in staging). When it returns, check it as that reference says.
 ## Step 2 · The report, finished before the close
 
 Dispatch `slides-builder (Sonnet 5.5, medium)` as
-`claude/docs/stage-report.md` describes, into `report/close/`:
+`docs/stage-report.md` describes, into `report/close/`:
 
 | Tab | Who | What |
 |---|---|---|
@@ -142,7 +143,7 @@ commit.
 
 ## When the render fails
 
-Run the cleanup first (it frees `.remotion/` and the front's images),
+Run the cleanup first (it frees the render caches and the front's images),
 then render **once more** if the failure was the machine's (disk,
 memory). A second failure: deliver the text alone, mark the Video tab
 "failed", and write one line in `dreaming-notes.md`. A problem seen in

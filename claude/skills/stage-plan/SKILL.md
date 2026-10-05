@@ -136,8 +136,9 @@ and the language.
 **While they write**, write `02-plan/preflight.md` from
 [templates/preflight.md](templates/preflight.md). Run every check that
 does not need him yourself: the gate commands on `main`, the stack
-coming up, `gh` acting as the bot identity, the local-ci token in place
-(`claude/scripts/local-ci.sh --dry-run` on `main`), the cloud
+coming up, `gh` acting as the bot identity, the signoff command ready
+(`<the signoff command> --dry-run` on `main`, or
+`claude/scripts/local-ci.sh --dry-run` when the project names none), the cloud
 environment, the canary. Only what he must do in person stays as an
 item, with a ready `!` command, a `!` check, and what it blocks.
 
@@ -192,7 +193,7 @@ All three run at once:
 1. **Coordination.** This front's line in `_coordination.md`: stage
    `execute`, branch `feat/<slug>`, this session's name, the shared
    files it will touch and what was agreed.
-2. **The report**, by `claude/docs/stage-report.md`, finished before
+2. **The report**, by `docs/stage-report.md`, finished before
    the stage closes: the Video by `video-builder (Sonnet 5.5, medium)`
    (the graph assembling: C, the entries in parallel, the critical
    path), the Deck by `slides-builder (Sonnet 5.5, medium)` (entries,

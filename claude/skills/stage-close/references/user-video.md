@@ -26,7 +26,9 @@ one render.
 - The audience: users and employees. No technical word: no endpoint,
   table, deploy, flag, migration. A clever script: the problem first,
   then how to use it, then where it is.
-- Where to put things: `05-close/video.mp4`, `05-close/whats-new.md`,
+- Where to put things: the video at `report/close/video.mp4` (the Close
+  tab plays it; rendered with `--size 1080 --max-mb 15`), the text at
+  `05-close/whats-new.md`,
   its scratch under `05-close/_scratch/` (removed by the cleanup).
 
 ## Recorded in staging, never in production
@@ -48,8 +50,7 @@ one render.
 
 The builder checks the key frames as stills **before** rendering: the
 right screen, the actors' rows only, captions readable, nothing
-technical on screen. Then it renders once and deletes its `.remotion/`
-cache.
+technical on screen. Then it renders once.
 
 You check the finished video by its stills and its length, never by
 watching it whole: duration 1–3 min, size ≤ 15 MB, the stills match

@@ -289,7 +289,7 @@ anything. Verify each fix by reading the changed lines, then
 ## D7 · The report, the cleanup, the close
 
 **The report is finished before the stage closes.** In one message, in
-the background, as `claude/docs/stage-report.md` describes:
+the background, as `docs/stage-report.md` describes:
 
 | Tab | Builder | Brief |
 |---|---|---|
@@ -299,8 +299,8 @@ the background, as `claude/docs/stage-report.md` describes:
 
 While they work, clean what this stage created (scratch folders, a
 stack brought up for a check). When they return: every number on a
-slide is checked against a document or the notes; the `.remotion/`
-cache is gone; `gitleaks dir <workstream>` is clean (a finding stops
+slide is checked against a document or the notes; `gitleaks dir
+<workstream>` is clean (a finding stops
 the publish); publish to the front's link with the label "design
 closed".
 

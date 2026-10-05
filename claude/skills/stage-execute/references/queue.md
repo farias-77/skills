@@ -1,8 +1,9 @@
 # The merge queue and local CI
 
-The tech lead is the only one that merges into `feat/<slug>`, and
-`claude/scripts/local-ci.sh` is the only thing that posts the `local-ci`
-status `main` requires. No agent merges, and nothing posts a status by
+The tech lead is the only one that merges into `feat/<slug>`, and the
+project's **signoff command** (its `CLAUDE.md` names it; the fallback is
+`claude/scripts/local-ci.sh`) is the only thing that posts the
+`local-ci` status `main` requires. No agent merges, and nothing posts a status by
 hand (the guard denies the raw call).
 
 ## The queue: one entry at a time, the critical path first
@@ -52,7 +53,8 @@ decided by him):
    background:
 
    ```
-   bash claude/scripts/local-ci.sh --repo <product repo> --ref feat/<slug>
+   <the signoff command> <the head of feat/<slug>>
+   bash claude/scripts/local-ci.sh --repo <product repo> --ref feat/<slug>   # the fallback
    ```
 
    It runs the project's whole gate (`make verify`) in a fresh worktree
