@@ -189,7 +189,10 @@ ln -s ~/skills/claude/agents agents
 ln -s ~/skills/claude/workflows workflows
 ```
 
-Then, in Claude Code inside the project: `/pipeline-setup .`
+Load the house rules from the project's `CLAUDE.md` with one line,
+`@~/skills/CLAUDE.md`, and name there the designs root (where each
+front's folder lives). Then, in Claude Code inside the project:
+`/pipeline-setup .`
 
 - **Claude Code** with the `gh` CLI authenticated: GitHub is the
   source of record and the signoff's target.

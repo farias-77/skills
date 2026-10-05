@@ -61,7 +61,9 @@ when the user says so ([the skill](../claude/skills/pipeline-setup/SKILL.md)).
 frontend, code, testing, security and data, delivery), each rule with
 an id a reviewer can cite, plus an index; and in `CLAUDE.md` the
 commands table that names the command, file or folder of every role
-here, the worktrees root, and whether a cloud environment exists.
+here, the worktrees root, the designs root (the folder that holds each
+front's folder and `_coordination.md`), and whether a cloud environment
+exists.
 
 **Why.** The pipeline carries no taste of its own. A reviewer's
 finding blocks on a `rule` basis only when it cites a written rule.
