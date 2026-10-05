@@ -25,7 +25,8 @@ question costs his attention.
 3. **The questions** go through the question tool: at most four in one
    call, each one decision, your pick first and marked.
 4. Never an obvious question. Never a question the code or the scouts
-   already answered.
+   already answered, or a fact a short run would show (a timing, a
+   library's behaviour): run it.
 
 ## Hotfix
 

@@ -196,7 +196,9 @@ Each round:
 2. An instruction ("drop the queue") is applied as given. A question
    for the architect ("why not a cron?") goes to it and comes back to
    him in one line. A choice goes through the question tool, the
-   architect's pick first and marked.
+   architect's pick first and marked. A fact a short run would show (a
+   timing, a library's behaviour, a layout) is never his question: the
+   architect spikes it and the result goes into the proposal.
 3. One `SendMessage` to the architect with every ruled point and his
    words: it edits `proposal.md` in place and adds a row to "Changes
    per round".

@@ -45,6 +45,9 @@ not land goes back once. Nothing opens a second round.
    the question tool.
 5. **Dismissed** findings die with the quote, frame or line that closes
    them.
+6. **A fact you could observe by running something** (a timing, a
+   library's behaviour, a layout) is neither his question nor a finding
+   to rule: a spike settles it, and the result is the ruling.
 
 Every ruling is one line of the workstream's `rulings.md`:
 
