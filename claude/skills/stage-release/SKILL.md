@@ -25,7 +25,7 @@ allowed-tools: Read, Write, Edit, Glob, Grep, Agent, SendMessage, Workflow, AskU
 | you, the session (Opus 5.5, high) | every step below; you never write or review code |
 | the CI (GitHub Actions) | push to `main`: staging deploy + smoke. Tag `v*`: the same image to production, smoke, 15-minute watch, rollback, then the GitHub release |
 | the project's signoff command (`claude/scripts/local-ci.sh` when it names none) | the project's whole gate on this machine or a cloud VM, in a fresh worktree; the only writer of the required `local-ci` status, posted under the bot identity on green |
-| the stage-4 cast through `exec-entry-workflow.js` mode `fix` | an `X.n` fix: `builder-backend` · `builder-frontend (Opus 5.5, medium)`, `exec-gate (Sonnet 5.5, low)`, `reviewer (Opus 5.5, high)`, the QAs by surface (Opus 5.5, medium) |
+| the stage-4 cast through `exec-entry-workflow.js` mode `fix` | an `X.n` fix: `builder-backend` · `builder-frontend (Opus 5.5, medium)`, `exec-gate (Sonnet 5.5, low)`, `reviewer (Opus 5.5, high)`; no QA unless the fix asks for one (`qa: 'backend'` when it touches auth, permissions or personal data) |
 | `scout (Sonnet 5.5, low)` | anything you need to look up |
 | `video-builder` · `slides-builder` · `artifact-builder (Sonnet 5.5, medium)` | the report's tabs; `video-builder` also starts the close's video for users |
 
@@ -180,7 +180,7 @@ not depend on the answer goes on (the report's pieces, the trace).
 ## Step 5 · Close
 
 1. **Trace and numbers.** `trace.md` complete; run
-   `node claude/scripts/telemetry.mjs <slug> --stage release`.
+   `node claude/scripts/telemetry.mjs <slug> --stage release --ws <designs-root>/<slug>`.
 2. **The report, finished before the close.** Dispatch the builders in
    one message, in the background, with the stage's files and
    `report/release/`, as `docs/stage-report.md` describes:
@@ -199,8 +199,7 @@ not depend on the answer goes on (the report's pieces, the trace).
    their stacks (`claude/scripts/cleanup.sh <slug> --check` shows what
    is left; the full sweep is the close's).
 4. **Records.** `.state.md` → `stage: close`. Your line in
-   `_coordination.md`: "out in vX.Y.Z"; this front's file claims
-   dropped. Commit the workstream folder.
+   `_coordination.md`: "out in vX.Y.Z". Commit the workstream folder.
 5. **The message**, with a `PushNotification`:
 
 | | |

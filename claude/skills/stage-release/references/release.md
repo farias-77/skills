@@ -35,8 +35,8 @@ file, live until its tag or for 3 days:
 | Route | Command | Lets through |
 |---|---|---|
 | release | `authorize.sh release <slug> feat/<slug>@<sha>` | the merge of `feat/<slug>` at a head that is or descends from `<sha>` (so merging `main` in after his ok stays covered), every `fix/<slug>/*`, one `v*` tag |
-| short | `authorize.sh short <slug> feat/<slug>` | the merge of `feat/<slug>`, one `v*` tag |
-| hotfix | `authorize.sh hotfix <slug> hotfix/<slug>` | the merge of `hotfix/<slug>` and of a `revert/*` PR, one `v*` tag |
+| short | `authorize.sh short <slug> feat/<slug>` | the merge of `feat/<slug>` and of every `fix/<slug>/*`, one `v*` tag |
+| hotfix | `authorize.sh hotfix <slug> hotfix/<slug>` | the merge of `hotfix/<slug>`, of every `fix/<slug>/*` and of a `revert/*` PR, one `v*` tag |
 | legacy | `authorize.sh legacy <repo> <branch>` | the merge of `<branch>` in that repo only; no tag |
 
 - The guard writes `merged=<head>` on the line when it lets a merge
