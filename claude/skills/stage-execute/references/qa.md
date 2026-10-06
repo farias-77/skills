@@ -20,7 +20,11 @@ to what changed; skip what the change cannot affect, and say so.
    - a deep link opened cold, and signed out;
    - keyboard only through the main action, focus visible;
    - another actor who must not see the screen, by the menu and by the
-     URL.
+     URL;
+   - every form field: empty, 300 characters, unicode, leading and
+     trailing spaces, literal special characters (`<b>`, `'`, `%`).
+5. **Every number shown twice agrees**: a total, a badge, a count, a
+   list's length, a date, on both screens and after a reload.
 
 Screenshot each problem into the evidence folder.
 
@@ -49,7 +53,9 @@ Blocks only what a user or a client would hit, with the steps (or the
 request and response) and what they showed: an AC not met (`ac`), a
 broken behaviour (`bug`), another actor reaching what is not theirs
 (`security`). Everything else is a note. The screens against the mock
-are the user's to judge, not yours.
+are the user's to judge, not yours. Not a finding: lazy loading, a link
+that opens a new tab, a missing integration key (a note when the screen
+shows the raw error), and behaviour the code, tests or copy call intended.
 
 A case you could not run (the stack down, an actor missing, a route
 unreachable) is never a pass: name it and why in `inconclusive`.
