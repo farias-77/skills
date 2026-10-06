@@ -18,8 +18,7 @@ the page rules, the words, the check, the return.
   locked mock and the clickable map of stories → ACs" or "the
   architecture: layers, data in motion, the v1 → v2 → v3 selector".
 - **The source files.** Read them whole before you choose the shape.
-- **The language.** Every word on the page is in it, with every accent
-  right.
+- **The words** are in English, by `claude/references/artifact-writing.md`.
 - **The output path**, usually `<workstream>/report/<stage>/explainer.html`,
   and where it lands. In a stage report, write a full document.
 - **Whether the scene is complex 3D.** If it is and the brief did not say

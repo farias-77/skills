@@ -141,7 +141,6 @@
 <script>
 const STRINGS = {
   en: {notices: 'Operations', stages: 'Stages', video: 'Video', deck: 'Deck', explainer: 'Explainer', closed: 'closed', running: 'running', todo: 'not yet', failed: 'failed', building: 'being made', rendering: 'rendering', none: 'not in this stage', time: 'time', cost: 'cost', touches: 'your touches', prev: 'Previous', next: 'Next', notes: 'Notes', open: 'Open on its own', updated: 'updated', auto: 'Auto', light: 'Light', dark: 'Dark', noData: 'The report data (report.json) could not be loaded.', notYet: 'This stage has not started.'},
-  'pt-BR': {notices: 'Avisos da operação', stages: 'Estágios', video: 'Vídeo', deck: 'Deck', explainer: 'Explainer', closed: 'fechado', running: 'rodando', todo: 'ainda não', failed: 'falhou', building: 'sendo feito', rendering: 'renderizando', none: 'não tem neste estágio', time: 'tempo', cost: 'custo', touches: 'seus toques', prev: 'Anterior', next: 'Próximo', notes: 'Notas', open: 'Abrir sozinho', updated: 'atualizado', auto: 'Auto', light: 'Claro', dark: 'Escuro', noData: 'Não foi possível carregar os dados do relatório (report.json).', notYet: 'Este estágio ainda não começou.'},
 };
 const TABS = ['video', 'deck', 'explainer'];
 let R = null, S = STRINGS.en, cur = {stage: null, tab: null, slide: 0}, deckCache = {};

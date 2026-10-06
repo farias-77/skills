@@ -50,8 +50,9 @@ cost, his touches) come from the telemetry.
 | Publishing | the stage session (Opus 5.5, high) | Artifact, always to the same URL |
 
 The builders run **in parallel** and never read each other's work. Each
-brief carries the stage's line of the table above, the source files, the
-language and the output path.
+brief carries the stage's line of the table above, the source files and
+the output path. Every piece is in English, by
+`claude/references/artifact-writing.md`.
 
 ## The order, at every stage's close
 
@@ -121,7 +122,7 @@ per version.
 
 ```json
 {
-  "title": "Orders", "slug": "2026-10-05-orders", "lang": "pt-BR", "route": "full", "updatedAt": "05/10 16:40",
+  "title": "Orders", "slug": "2026-10-05-orders", "lang": "en", "route": "full", "updatedAt": "05/10 16:40",
   "notices": [{"tone": "warn", "text": "Design video renders after the plan's."}],
   "stages": [
     {"id": "design", "name": "Design", "state": "closed", "closedAt": "05/10 14:20",
@@ -138,7 +139,7 @@ per version.
 - `state`: `closed` · `running` · `todo`.
 - A tab's `state`: `ready` · `building` · `failed` (with `why`) · `none`
   (not made for this stage, with `why`).
-- `lang`: `en` or `pt-BR` (the shell's own words).
+- `lang`: always `en`.
 - `notices` are the operations lines on the rail; drop them when they are
   no longer true.
 
@@ -147,7 +148,7 @@ A deep link opens a stage and a tab: `…#design` or `…#design-deck`.
 ## explainer.json (plan, execute, release, close)
 
 ```json
-{"title": "The build graph", "lede": "One sentence.", "lang": "pt-BR",
+{"title": "The build graph", "lede": "One sentence.", "lang": "en",
  "blocks": [
    {"kind": "numbers", "items": [{"label": "entries", "value": "5", "sub": "3 start together"}]},
    {"kind": "graph", "title": "…", "select": "E-01", "legend": [{"group": "done", "label": "merged"}],

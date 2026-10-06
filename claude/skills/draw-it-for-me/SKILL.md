@@ -87,9 +87,7 @@ to the reader, with no error.
 
 ## The words
 
-- Write in the reader's language, with every accent right.
-- Use plain words and short sentences. Use a technical name only when it
-  is the name of the thing.
+- Write in English, by `claude/references/artifact-writing.md`.
 - Every number is the number in the source, exactly. When a number is
   not in the source, leave it out and say so in your return.
 - A decision someone took in the reader's place is marked as such, with

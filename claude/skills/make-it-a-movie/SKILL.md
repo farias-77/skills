@@ -167,7 +167,7 @@ cut a scene before you lower the reading time. The details are in
 - **No real person's data.** Names, emails and documents on screen are
   synthetic, recorded on a test or staging account, never production. A
   real person's name never appears, even as an example.
-- **Language.** Every word on screen in the brief's language, with every
+- **Language.** Every word on screen is English, by `claude/references/artifact-writing.md`, with every
   accent right. The kit has no words of its own.
 
 ## The look

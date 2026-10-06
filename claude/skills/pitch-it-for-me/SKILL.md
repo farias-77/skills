@@ -17,8 +17,6 @@ source files.
 - **The story to tell:** what the deck is for and who reads it. In a
   stage report, this is the stage's paragraph in `docs/stage-report.md`.
 - **The sources:** the files the facts come from.
-- **The language** the deck is written in. Identifiers, paths and file
-  names stay as they are.
 - **The output folder**, usually `<stage>/deck/`.
 - **The date**, for the cover.
 
@@ -84,8 +82,7 @@ you were given.
   verbatim, in his language.
 - **Honest.** A risk accepted, a failure or an open point is shown as one,
   with the same weight as the good news.
-- **Plain words.** Short sentences. Use a technical name only when it is
-  the name of the thing.
+- **English** on the slides and in the notes, by `claude/references/artifact-writing.md`.
 - **No real person's name** unless the source is about that person's own
   role and the brief allows it.
 
