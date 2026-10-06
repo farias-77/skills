@@ -49,8 +49,8 @@ decided by him):
 1. **Open the PR** `feat/<slug> → main` as a draft, as the bot identity
    (`gh pr create --draft`). Body: the entries (a cloud entry with its
    session url), the notes, what stayed out and why.
-2. **Run the whole gate** on the top of `feat`, on this machine, in the
-   background:
+2. **Run the whole gate** on the top of `feat`, on this machine (or in
+   the cloud, `cloud.md`), in the background:
 
    ```
    <the signoff command> <the head of feat/<slug>>

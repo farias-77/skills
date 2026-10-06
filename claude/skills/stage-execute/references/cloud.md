@@ -6,7 +6,8 @@ fixes. This machine keeps the tech lead, the queue, local CI and his
 hands-on. Local runs are the fallback, entry by entry.
 
 A cloud session builds and checks one entry and pushes it. It never
-merges, never posts a status, never opens a pull request.
+merges, never posts a status, never opens a pull request. The one
+exception is the whole gate, below.
 
 ```
 this session (tech lead)                         cloud session (one per entry)
@@ -101,6 +102,20 @@ branch**, `story/<slug>/<id>-r2`, from the last pushed commit, with
 `mode: 'resume'` and `check: 'whole'`: two sessions never write the
 same branch. Once more in the cloud; a second failure runs it here,
 locally, and the board and `dreaming-notes.md` say why.
+
+## The whole gate in the cloud
+
+When the project's cloud environment holds the bot's token as `GH_TOKEN`
+and its smoke showed a VM holds the whole gate, the gate for the queue's
+head runs in the cloud too: a dedicated cloud session (or a follow-up
+into a finished entry's session) whose prompt is only "run `<the signoff
+command> <sha>` in the background, wait for it, push nothing, then
+stop". The signoff command reads the token from inside and posts the
+status as the bot; the guard denies any other read of the token. The
+tech lead never watches that session: it reads the status posted on the
+sha (the PR's checks), and a red, or no status within 90 minutes, runs
+the gate here, on this machine. Without that environment, the gate
+always runs here.
 
 ## Rate limits
 

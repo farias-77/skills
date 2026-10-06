@@ -11,7 +11,8 @@
 #          release or writing refs or tags through the GitHub API; writing
 #          a commit status or a check run with any HTTP client; switching
 #          or unsetting the agent's identity; naming the CI token, the gh
-#          and cloud configs or the agent's identity folder; editing the
+#          and cloud configs or the agent's identity folder; reading a token
+#          from the environment or dumping the environment; editing the
 #          guard, the authorization script, the allow file or the settings
 #   ask    writing or reading a secret's value; a merge or a tag the guard
 #          cannot resolve (GitHub silent for 20 s, a PR it cannot read)
@@ -220,9 +221,14 @@ has "${S}(export[[:space:]]+)?($ids)=" && deny "switching the identity the agent
 has "${S}(unset[[:space:]]+([^;&|]*[[:space:]])?|env[[:space:]]+([^;&|]*[[:space:]])?(-u[[:space:]]*|--unset[=[:space:]]))($ids)([^A-Za-z0-9_]|$)|${S}env[[:space:]]+(-[a-zA-Z]*i[a-zA-Z]*|--ignore-environment|-)([[:space:]]|$)" && deny "dropping the identity the agent runs as falls back to the user's own login"
 has "${S}gcloud[[:space:]][^;&|]*--(account|impersonate-service-account)([=[:space:]]|$)" && deny "switching the identity the agent runs as"
 has "${S}gcloud[[:space:]]+(auth[[:space:]]+(login|activate-service-account|print-access-token)|config[[:space:]]+set[[:space:]]+(account|auth/))" && deny "switching or printing the agent's cloud credentials"
-has "${S}gh[[:space:]]+auth[[:space:]]+(login|switch|token|refresh)" && deny "switching or printing the agent's GitHub credentials"
+has "${S}gh[[:space:]]+auth[[:space:]]+(login|switch|token|refresh|status[^;&|]*[[:space:]](-t|--show-token)([[:space:]]|$))" && deny "switching or printing the agent's GitHub credentials"
 has "local-ci/token|(\.config/(gh|gcloud)|$identity_dir)([/\"'[:space:]]|$)|\\\$\{?(GH_CONFIG_DIR|CLOUDSDK_CONFIG|GOOGLE_APPLICATION_CREDENTIALS)([^A-Za-z0-9_]|$)" && deny "naming a credential the agent does not hold: the CI token is the signoff command's; the gh and cloud configs and the identity folder are the identity's"
 has "\\\$\{?[A-Z0-9_]*CI_TOKEN|${S}(printenv|env)[[:space:]]+[A-Z0-9_]*CI_TOKEN|${S}LOCAL_CI_TOKEN_FILE=" && deny "the CI token is the signoff command's alone"
+# A token in the environment (GH_TOKEN on a cloud VM) is read only by the gate
+# script, from inside: no command expands it, prints it or dumps the environment.
+tok='(GH_TOKEN|GITHUB_TOKEN|GH_ENTERPRISE_TOKEN)([^A-Za-z0-9_]|$)'
+C='(^|[;&|({`"'"'"'][[:space:]]*)(sudo[[:space:]]+)?([^[:space:];&|]*/)?'
+has "\\\$\{?$tok|(printenv|environ([^a-z]|$)|[Gg]etenv|env\.|ENV|declare|typeset)[^;&|]*$tok|/proc/[^[:space:];&|]*environ|${C}((env|printenv|export|declare|typeset)([[:space:]]+-[A-Za-z0-9-]+)*|set)[[:space:]]*([;&|)>\`\"']|$)" && deny "reading the environment's token or dumping the environment: only the gate script reads the token, from inside"
 
 # --- infrastructure: destroy and state surgery ------------------------------
 has "${S}(terraform|tofu|terragrunt)([[:space:]]+-[^[:space:]]+)*[[:space:]]+(destroy|apply[^;&|]*-destroy)" && deny "destroying infrastructure"
