@@ -49,7 +49,8 @@ open ──► prepare (feat, board, keep the machine awake) ──► C ──�
 | `qa-frontend` | Opus 5.5, medium | uses the screens and tries to break them, when screen behaviour changed |
 | `qa-backend` | Opus 5.5, medium | calls the API as client and attacker, when API, data or permissions changed |
 | `scout` | Sonnet 5.5, low | finds and quotes what the session needs to know |
-| `video-builder` · `slides-builder` | Sonnet 5.5, medium | the report's Video and Deck |
+| `video-builder` | Sonnet 5.5, high | the report's Video |
+| `slides-builder` | Sonnet 5.5, medium | the report's Deck |
 
 The builders read [builders.md](references/builders.md) with
 [backend.md](references/backend.md) or
@@ -215,7 +216,7 @@ still be running on the last head; the release waits for its green.
 All at once:
 
 1. **The report**, by `docs/stage-report.md`, finished before the
-   stage closes: the Video by `video-builder (Sonnet 5.5, medium)` (what
+   stage closes: the Video by `video-builder (Sonnet 5.5, high)` (what
    was built, the real screens captured from his hands-on environment),
    the Deck by `slides-builder (Sonnet 5.5, medium)` (per entry: ACs →
    proofs, findings, the A.n, what stayed out and why), the Explainer by

@@ -25,7 +25,7 @@ frontmatter together.
 | Agent | Stage | Model | Effort | Evidence |
 |---|---|---|---|---|
 | `scout` | all | Sonnet 5.5 | low | Lookups, not writing: literal, fast, < $0.4 a task |
-| `video-builder` | every stage's report, the close's users' video | Sonnet 5.5 | medium | One film from a fixed brief on a motion library, checked with stills; medium holds the guide |
+| `video-builder` | every stage's report, the close's users' video | Sonnet 5.5 | high | One film from a fixed brief on a motion library, scored from its own frames; composition and scale are visual judgment, so high |
 | `slides-builder` | every stage's report | Sonnet 5.5 | medium | A deck from a layout guide and the stage's files; medium follows a fixed guide well |
 | `artifact-builder` | discovery, design, a release incident | Sonnet 5.5 | medium | One explainer page from the draw-it-for-me references |
 | `blind-reader` | discovery, plan | Sonnet 5.5 | low | A blind reader must read literally; low keeps it cheap |

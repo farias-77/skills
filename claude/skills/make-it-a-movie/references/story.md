@@ -1,8 +1,12 @@
 # The story
 
-A film is 6 to 14 scenes. The first says what this is in one line. The
-last says what to remember, in three lines at most. In between comes
-the order a newcomer needs, one idea per scene.
+A film is 6 to 14 scenes. The first two seconds are the hook: the
+largest type of the film (140 px or more) says what this is as a plain
+statement, and the film's protagonist (the object the viewer will
+follow) is already on screen and moving at frame 0. Never open on an
+empty frame, a lone line or a title that only fades in. The last scene
+says what to remember, in three lines at most. In between comes the
+order a newcomer needs, one idea per scene.
 
 ## For a reviewer (stage videos)
 

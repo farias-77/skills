@@ -32,7 +32,7 @@ Runtime needs: Node 20+, `playwright-core` and a Chromium for
 | `disc-lens (Sonnet 5.5, medium)` × 3 | in-out · coverage and error paths · acceptance |
 | `blind-reader (Sonnet 5.5, low)` × 2 per story | reads one story and walks the mock, blind |
 | `blind-judge (Sonnet 5.5, medium)` per story | compares the two readings, reports ambiguity |
-| `video-builder` · `slides-builder` · `artifact-builder` (Sonnet 5.5, medium) | the report's three tabs |
+| `video-builder (Sonnet 5.5, high)` · `slides-builder` · `artifact-builder` (Sonnet 5.5, medium) | the report's three tabs |
 
 ## Files
 

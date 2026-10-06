@@ -50,11 +50,11 @@ D0 reading → D1 his idea → D2 architect → guard → your ruling
 | D0 reading | `scout (Sonnet 5.5, low)` × N | `recon/<topic>.md`, each written by its scout |
 | D1 his idea | you (Opus 5.5, high) | `notes.md` · His idea |
 | D2 proposal | `architect (Opus 5.5, high)` → `overengineering-guard (Opus 5.5, medium)` | `proposal.md` |
-| D3 present | `slides-builder (Sonnet 5.5, medium)` first; `video-builder (Sonnet 5.5, medium)` beside it | deck + video on the front's link (Design, running) |
+| D3 present | `slides-builder (Sonnet 5.5, medium)` first; `video-builder (Sonnet 5.5, high)` beside it | deck + video on the front's link (Design, running) |
 | D4 debate | you + **him** + the same `architect` by `SendMessage` | `proposal.md` closed, his words |
 | D5 documents | `architect` (solution) ∥ `design-writer (Sonnet 5.5, high)` × up to 5 | six documents, `review-prep.mjs` green |
 | D6 review | `design-consistency (Opus 5.5, medium)` ∥ `design-security (Opus 5.5, medium)` ∥ `design-contracts (Sonnet 5.5, high)` ∥ `overengineering-guard (Opus 5.5, medium)` | `reviews.md`, fixes verified |
-| D7 report | `slides-builder` ∥ `artifact-builder (Sonnet 5.5, medium)`; `video-builder` only if the system's figure changed | the Design tab of the front's link |
+| D7 report | `slides-builder` ∥ `artifact-builder (Sonnet 5.5, medium)`; `video-builder (Sonnet 5.5, high)` only if the system's figure changed | the Design tab of the front's link |
 
 ## What you read
 
@@ -171,7 +171,7 @@ In one message, both in the background:
   where the architect disagrees with him and why, what the guard cut;
   the **last slide is the open points**. It is published first, to the
   front's link, Design tab, marked running.
-- `video-builder (Sonnet 5.5, medium)`: **60 s at most**, 720p, 24 fps:
+- `video-builder (Sonnet 5.5, high)`: **60 s at most**, 720p, 24 fps:
   the system's figure first, the main flow, the versions. It jumps the
   render queue: it is the one video someone waits for live.
 
@@ -287,7 +287,7 @@ the background, as `docs/stage-report.md` describes:
 
 | Tab | Builder | Brief |
 |---|---|---|
-| Video | `video-builder (Sonnet 5.5, medium)` | D3's video stays, **unless** a "Changes per round" row added or removed a part: then re-render it from the closed proposal |
+| Video | `video-builder (Sonnet 5.5, high)` | D3's video stays, **unless** a "Changes per round" row added or removed a part: then re-render it from the closed proposal |
 | Deck | `slides-builder (Sonnet 5.5, medium)` | the final deck: the decisions (those against the recommendation first), the risks accepted, what the guard cut, the versions |
 | Explainer | `artifact-builder (Sonnet 5.5, medium)` | the architecture, interactive: the layers, the data moving through them, a v1 → v2 → v3 selector |
 

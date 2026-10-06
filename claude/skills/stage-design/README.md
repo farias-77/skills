@@ -32,7 +32,7 @@ for the scan before the report is published.
 | `design-consistency (Opus 5.5, medium)` | documents vs each other, the proposal and the mock; screen states |
 | `design-security (Opus 5.5, medium)` | scope, personal data, secrets, identities |
 | `design-contracts (Sonnet 5.5, high)` | each Contract against the code that exists and will be generated |
-| `video-builder` · `slides-builder` · `artifact-builder` (Sonnet 5.5, medium) | the deck and video of the debate, and the report's three tabs |
+| `video-builder (Sonnet 5.5, high)` · `slides-builder` · `artifact-builder` (Sonnet 5.5, medium) | the deck and video of the debate, and the report's three tabs |
 
 ## Files
 

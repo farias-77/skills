@@ -57,7 +57,7 @@ holds in these steps, with the close as the "done".
 | D4 stories | `story-writer (Sonnet 5.5, high)` | `journeys/*.yaml`, `stories.md`, `trace` green |
 | D5 review | `discovery-review-workflow.js`: `disc-lens (Sonnet 5.5, medium)` × 3 ∥ per story `blind-reader (Sonnet 5.5, low)` × 2 → `blind-judge (Sonnet 5.5, medium)`; you rule | `reviews/round-1.json`, `reviews.md` |
 | D6 playback | you + **him**, question tool | `rulings.md`, confirmed stories, his answer for the design |
-| D7 report | `video-builder (Sonnet 5.5, medium)` ∥ `slides-builder (Sonnet 5.5, medium)` ∥ `artifact-builder (Sonnet 5.5, medium)` | the Discovery tab of the front's link |
+| D7 report | `video-builder (Sonnet 5.5, high)` ∥ `slides-builder (Sonnet 5.5, medium)` ∥ `artifact-builder (Sonnet 5.5, medium)` | the Discovery tab of the front's link |
 
 ## What you read
 
@@ -296,7 +296,7 @@ background, each with the stage's files and the report folder
 
 | Tab | Builder | Brief |
 |---|---|---|
-| Video | `video-builder (Sonnet 5.5, medium)` | the problem and the solution told through the stories, 60–90 s, a motion piece; **not** the mock in use; the fixtures are invented names (`meta.fixtures`) |
+| Video | `video-builder (Sonnet 5.5, high)` | the problem and the solution told through the stories, 60–90 s, a motion piece; **not** the mock in use; the fixtures are invented names (`meta.fixtures`) |
 | Deck | `slides-builder (Sonnet 5.5, medium)` | the story map, the rules with their numbers, what stays out, his decisions |
 | Explainer | `artifact-builder (Sonnet 5.5, medium)` | the locked mock beside a clickable map: story → its ACs → the step or frame each one anchors on |
 

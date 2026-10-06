@@ -83,8 +83,11 @@ Each class of object moves its own way. Never make everything overshoot.
 | the one thing that lands | the scene's only small bounce, if any |
 | stagger between siblings | 0.25–0.6 s |
 | an arrow drawing | 0.5–0.6 s |
-| hold after the last item lands | at least 45% of the scene |
-| scene fade | built in (7 frames in, 6 out); a dip, never a crossfade |
+| hold after the last item lands | as long as the read needs; during it the camera keeps a slow push (3–6% over the hold), never an idle wobble, breathe or pulse |
+| between an action and its result | a 0.3–0.75 s pause, so the result lands as its own read |
+| a cursor | at least 130 px tall; it enters from off-frame, and its click starts the next move on the same frame |
+| beats inside a scene | the protagonist carries the cut: the old state leaves moving (about 230 px, accelerating) and the new one arrives moving the same way; no frame shows both |
+| scene fade | built in (7 frames in, 6 out); a dip, never a crossfade; keep it for chapter breaks by putting a chapter's beats in one scene |
 
 ## Themes
 

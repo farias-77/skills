@@ -26,7 +26,7 @@ Two audiences:
 3. Ask: "make it a movie: what changed in checkout, for our users", and
    give the kit's path.
 
-In the pipeline, `video-builder (Sonnet 5.5, medium)` preloads this skill
+In the pipeline, `video-builder (Sonnet 5.5, high)` preloads this skill
 and makes the Video tab of the stage report. It renders; the brief and
 the shot list come from the session that asks for the film.
 
@@ -35,7 +35,7 @@ the shot list come from the session that asks for the film.
 - `SKILL.md`: the gates, the sizes, the rules on screen and the return.
 - `references/production-contract.md`: the five layers, the gates, the
   contact sheet, the critique and the known traps.
-- `templates/`: `brief.md`, `style-guide.md` and `shotlist.md`.
+- `templates/`: `brief.md`, `style-guide.md`, `shotlist.md` and `contact-film.tsx`.
 - `references/motion.md`: the motion library, scene by scene: its parts,
   your own motion, timing, themes, music.
 - `references/story.md`: the arcs for a reviewer (per stage) and for

@@ -58,15 +58,23 @@ brief → assets → style guide + shot list → film.tsx + check → contact sh
 3. **Style guide and shot list.** Write `style-guide.md` (the palette in
    hex, the type, the pacing, the motion, the texture). Write or complete
    `shotlist.md`: per beat, the entry state, the exit state, why it
-   exists, and the words on screen. A beat without a reason is cut. The
+   exists, the words on screen and the reads (what the viewer must find
+   and understand, one at a time). A beat without a reason is cut. The
    arcs are in `references/story.md`.
+   For a film whose viewers do not know the work (users, newcomers), the
+   session that owns the brief gives the shot list's on-screen text, in
+   order and nothing else, to a fresh agent with no context, and asks it
+   to explain the subject back in five sentences and to list every word
+   that blocked it. The text is fixed until the explanation is right.
 4. **Film.** Write `film.tsx` with the library (`references/motion.md`),
    starting from `claude/video/example/film.tsx`. Then run
    `node <kit>/film.mjs check film.tsx`, which bundles the film and lists
    the scenes and seconds. Fix any error it prints.
-5. **Contact sheet.** Run `node <kit>/film.mjs stills film.tsx stills/`,
-   then again at scale `0.33`. Read every PNG against the contract's
-   checklist: readable at phone size, inside the safe area, real assets,
+5. **Contact sheet.** Run `node <kit>/film.mjs stills film.tsx stills/`
+   (one still per beat: `templates/contact-film.tsx` when a scene holds
+   several), then make the 360 px phone sheet. Read every PNG against the
+   contract's checklist: readable at 360 px wide, the subject filling the
+   frame, inside the safe area, real assets,
    one type scale and one palette, the subject read by 2 s, and a last
    frame that works as a poster. Fix it all in one pass, then redo only
    the stills you changed (`--scene <id>`).
@@ -74,13 +82,19 @@ brief → assets → style guide + shot list → film.tsx + check → contact sh
    the table below. It waits for the machine (`queued on …` means wait,
    not failure). Never start a render another way, never run two of yours
    at once, and never render again to polish.
-7. **Critique.** Judge only the rendered file. Take three frames and
-   strips around the fastest transitions, and write
-   `reviews/critique.md` with the 3 largest defects: timestamp,
-   evidence, and a local fix.
-8. **Repair.** When a defect breaks the film, fix only the scenes it
-   names and render one more time. That is the only second render, and
-   it goes in your return.
+7. **Critique.** Judge only the rendered file. Take a sheet at 2 frames
+   a second at 360 px wide
+   (`ffmpeg -nostdin -i out.mp4 -vf "fps=2,scale=360:-1,tile=8x8" stills/phone-%02d.png`)
+   and strips around the fastest transitions. Score 1 to 10, from those
+   frames only: the hook in the first 2 s, readability at phone size,
+   frame fill, motion that explains (no dead frame, one read at a time),
+   continuity across cuts, plain words. Write `reviews/critique.md`:
+   the six scores, then the 3 largest defects with timestamp, evidence
+   and a local fix.
+8. **Repair.** When any score is under 8, or a defect breaks the film,
+   fix the scenes the defects name and render one more time. That is the
+   only second render. Score again from the new frames and put both sets
+   of scores in your return.
 9. **Clean up.** Delete `<film>/stills/` by its full path. Never `rm` a
    glob, and never delete anything under `/tmp` or `$TMPDIR`: other
    renders keep their bundles there. The kit removes its own run folders.
@@ -118,12 +132,24 @@ cut a scene before you lower the reading time. The details are in
   toward the target, `Screen` follows the clicks).
 - **One focus at a time.** One thing moves while the rest waits. Ease
   out, never linear (except a progress bar).
+- **Fill the frame.** Each beat has one subject: the thing its caption
+  talks about. It spans at least half the frame's width or 45% of its
+  height. When a state is small (a button, a card, a line), the camera
+  zooms in until it fills the frame, then pulls back for the next state.
+  A wide shot, with the subject under a quarter of the width, is for one
+  beat of context at most, and then the frame needs company around it.
+  Centre the picture on the true centre (y 540); never leave a dead band
+  at the top or the foot.
 - **Picture first.** Prefer a `Flow`, `Numbers`, `Bars`, `Gantt`, a
   `DecisionCard` or the real screen to a sentence. Use a sentence only
   for the one claim that is the point.
 - **Twelve words on screen at most** per scene, in big type. The library
   holds each scene at least 1 s per 4 words. Over the length, cut a
   scene, never the reading time.
+- **Type floors on the 1920 canvas:** the hook and the peaks 140 px or
+  more; the caption 88 px; any label inside the picture 56 px (mono
+  52 px). Text meant to be read is never under 66% opacity. A label that
+  does not fit at its floor is cut or shortened, never shrunk.
 - **Exact numbers, real screens.** Every number on screen is the number
   in the source; list each with its `path:line` in your return. Never
   invent a product screen, a metric, a logo or a quote.
@@ -156,7 +182,10 @@ where to look.
 Avoid these template defaults: big centred text on every scene,
 everything fading in the same way, everything overshooting, a gradient
 for its own sake, a logo sting at the end, a whoosh on every cut, bouncing
-text, 3D text spinning for no reason, and word-by-word karaoke captions.
+text, 3D text spinning for no reason, word-by-word karaoke captions, a
+caption that rises and fades the same way on every beat, a corner label
+on every scene, and a frame where nothing moves and nothing is being
+read.
 Any background beyond the theme's `bgKind` is a pre-rendered image, never
 a live full-screen SVG or gradient, which glitches under software GL.
 

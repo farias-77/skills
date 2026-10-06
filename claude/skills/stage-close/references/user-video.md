@@ -15,7 +15,7 @@ video is the showing.
 
 Screens are ingredients; the piece is motion. 1–3 minutes, an `.mp4`
 of at most 15 MB that he forwards himself. Built with the
-`make-it-a-movie` skill by `video-builder (Sonnet 5.5, medium)`, in
+`make-it-a-movie` skill by `video-builder (Sonnet 5.5, high)`, in
 one render.
 
 ## The brief the builder gets

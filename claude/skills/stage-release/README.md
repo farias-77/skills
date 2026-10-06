@@ -32,7 +32,7 @@ guard installed with the settings wrapper.
 |---|---|
 | `scout (Sonnet 5.5, low)` | lookups |
 | the stage-4 cast, through `exec-entry-workflow.js` mode `fix` | an `X.n` fix |
-| `video-builder (Sonnet 5.5, medium)` | the Release video; starts the close's video for users at the green staging |
+| `video-builder (Sonnet 5.5, high)` | the Release video; starts the close's video for users at the green staging |
 | `slides-builder (Sonnet 5.5, medium)` | the Release deck |
 | `artifact-builder (Sonnet 5.5, medium)` | the Explainer, only when there was an incident |
 

@@ -16,7 +16,7 @@ each in its own file, with a gate between each one and the next.
 | Renderer | `film.tsx`, `assets/` | the builder |
 | Critic: what the frames show | `reviews/critique.md` | the builder, from rendered frames only |
 
-`video-builder (Sonnet 5.5, medium)` renders and criticises. It never
+`video-builder (Sonnet 5.5, high)` renders and criticises. It never
 decides what the film says. The three planning files start from
 `templates/`.
 
@@ -36,10 +36,10 @@ decides what the film says. The three planning files start from
 2 assets         every asset the brief lists is in assets/; a missing one stops the work
 3 plan           style-guide.md and shotlist.md written; a beat without a reason is cut
 4 film           film.tsx; `film.mjs check` passes, the total inside the length
-5 contact sheet  one still per beat, read against the checklist; fixed in one pass
+5 contact sheet  one still per beat, read at 360 px against the checklist; fixed in one pass
 6 render         render.sh, once
-7 critique       frames and transition strips; the 3 largest defects in reviews/critique.md
-8 repair         only those scenes; one more render when a defect breaks the film
+7 critique       phone sheet and transition strips; six scores and the 3 largest defects in reviews/critique.md
+8 repair         the scenes named; one more render when a score is under 8 or a defect breaks the film
 9 deliver        the .mp4 and the text; stills/ deleted
 ```
 
@@ -64,20 +64,21 @@ asset is missing, stop and ask for it. Never draw a convincing stand-in.
 Write the look down before `film.tsx`:
 
 - the palette in hex;
-- the type: faces, sizes, weights;
-- the composition: where the eye sits, and the margins;
+- the type: faces, sizes, weights, at the floors in `SKILL.md`;
+- the composition: the subject's size, where the eye sits, and the margins;
 - the pacing: seconds between meaningful changes;
 - the motion per class of object (`motion.md`);
 - the texture: the theme's `bgKind`, an image, or none.
 
-When the brief gives a reference film or site, the guide also lists what
+A reference is named, or 2–3 frames in `assets/ref-*.png`, matched for
+scale and density only. When the brief gives one, the guide also lists what
 to take from it and a **DO NOT COPY** list: its logo, its words, its
 exact layout.
 
 ## The shot list
 
 Write one row per beat: the entry state, the exit state, the reason the
-beat exists, its seconds, the words on screen, and its cue. For UI motion,
+beat exists, its seconds, the words on screen, its reads and its cue. For UI motion,
 list the screen's states first, then the moves between them. If you
 cannot write the reason for a beat, cut the beat.
 
@@ -87,19 +88,26 @@ scenes' `secs` come from the grid. Stage videos have no music.
 
 ## The contact sheet, before the render
 
-`node <kit>/film.mjs stills film.tsx stills/` writes one PNG per scene.
-Run it once more at scale `0.33` (640 px wide, a phone held sideways).
+`node <kit>/film.mjs stills film.tsx stills/` writes one PNG per scene;
+with more than one beat per scene, use `templates/contact-film.tsx` for
+one still per beat. Then make the phone sheet: the same stills at 360 px
+wide, `ffmpeg -nostdin -pattern_type glob -i 'stills/*.png' -vf "scale=360:-1,tile=5x7" -frames:v 1 stills/phone.png`.
 Read every PNG against this list:
 
-- the text is readable at 0.33; a word you cannot read there is too
-  small;
+- the text is readable on the phone sheet (360 px wide); a word you
+  cannot read there is too small, whatever its size in the code;
+- nothing meant to be read is dimmed under 66% opacity;
+- the subject of each beat fills the frame: at least half the width or
+  45% of the height, centred on y 540; a still with a small subject in a
+  big empty frame is a defect, not a style;
 - everything is inside the safe area: 96 px from the sides and 54 px
   from the top and the bottom of the 1920×1080 canvas (the kit's own
   corner label and progress bar aside);
 - only real assets, and nothing drawn to look like the product;
 - one type scale and one palette, the style guide's;
 - by 2 s the viewer has read what the film is about, as a plain
-  statement and never a teaser;
+  statement and never a teaser, in the film's largest type, with the
+  protagonist already on screen; frame 0 is never empty;
 - the last frame works as a poster: it says what to remember and is
   readable on its own.
 
@@ -111,22 +119,26 @@ Fix everything in one pass. Then redo only the stills you changed
 The critique judges the rendered file only, never what the code meant
 to do. Put every PNG in `stills/`.
 
-1. **Frames:** `ffmpeg -nostdin -ss <t> -i out.mp4 -frames:v 1 stills/frame-<t>.png`,
-   one near the start, one in the middle, one on the end card.
+1. **Frames:** the sheet at 2 frames a second and 360 px wide,
+   `ffmpeg -nostdin -i out.mp4 -vf "fps=2,scale=360:-1,tile=8x8" stills/phone-%02d.png`.
 2. **Strips** around the 2 or 3 fastest transitions in the shot list,
    8 frames in one image:
    `ffmpeg -nostdin -ss <t-0.4> -t 0.8 -i out.mp4 -vf "fps=10,scale=384:-1,tile=8x1" -frames:v 1 stills/strip-<t>.png`.
    Look for a ghosted or doubled layer, a half-faded frame where nothing
    reads, and two things that move at once. With music, take one strip at
    each cue and check that the cut lands on it.
-3. **`reviews/critique.md`:** the 3 largest defects, no more. Give each
+3. **`reviews/critique.md`:** the scores (below), then the 3 largest defects, no more. Give each
    one its timestamp, the evidence (the PNG and what it shows) and a local
    fix (the scene id and the change). When there are fewer than 3, write
    fewer and never pad the list.
-4. **Repair:** when a defect breaks the film (unreadable text, a glitch,
-   a wrong or invented asset, a wrong number), fix only the scenes it names
-   and render one more time. Anything smaller goes in the return as still
-   wrong.
+4. **Scores:** before the defects, score 1 to 10 from the frames only:
+   hook (2 s), readability at 360 px, frame fill, motion that explains,
+   continuity, plain words. Be a harsh director, not a proud author.
+5. **Repair:** when a score is under 8 or a defect breaks the film
+   (unreadable text, a glitch, a wrong or invented asset, a wrong
+   number), fix the scenes it names and render one more time. Score
+   again. What is still under 8 goes in the return as still wrong, with
+   its score.
 
 ## Known traps
 

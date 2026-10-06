@@ -136,8 +136,8 @@ The stage's `reviews.md` keeps the detail; `rulings.md` and
 Each front has **one report link**: a rail of stages, each with three
 tabs, **Video · Deck · Explainer**. The page is the fixed shell
 `claude/report/shell.html` plus `report.json`; the tabs are built by
-`video-builder`, `slides-builder` and `artifact-builder` (all Sonnet
-5.5, medium), or an Explainer filled from a template where the stage's
+`video-builder (Sonnet 5.5, high)`, `slides-builder` and
+`artifact-builder` (both Sonnet 5.5, medium), or an Explainer filled from a template where the stage's
 data is a graph or a timeline. **A stage closes only when its three
 tabs are published**: he validates through them. Before each publish,
 `gitleaks dir <workstream>` must be clean. The page stays private;

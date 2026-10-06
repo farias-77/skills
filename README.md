@@ -84,7 +84,8 @@ and templated writing, never above high.
 | Stage | Agent | Model, effort |
 |---|---|---|
 | all | `scout` | Sonnet 5.5, low |
-| every report | `video-builder` · `slides-builder` · `artifact-builder` | Sonnet 5.5, medium |
+| every report | `video-builder` | Sonnet 5.5, high |
+| every report | `slides-builder` · `artifact-builder` | Sonnet 5.5, medium |
 | discovery, plan | `blind-reader` | Sonnet 5.5, low |
 |  | `blind-judge` | Sonnet 5.5, medium |
 | discovery | `prototype-builder` | Sonnet 5.5, medium |

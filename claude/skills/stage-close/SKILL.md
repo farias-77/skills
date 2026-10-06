@@ -24,7 +24,7 @@ allowed-tools: Read, Write, Edit, Glob, Grep, Agent, AskUserQuestion, Artifact, 
 | Who (model, effort) | Does |
 |---|---|
 | you, the session (Opus 5.5, high) | the retro, the cleanup, the checks, the delivery |
-| `video-builder (Sonnet 5.5, medium)` | the video for users, started at the release's green staging |
+| `video-builder (Sonnet 5.5, high)` | the video for users, started at the release's green staging |
 | `scout (Sonnet 5.5, low)` | the harvest of frictions, with `templates/harvest.md` |
 | `slides-builder (Sonnet 5.5, medium)` | the Close deck |
 
@@ -83,7 +83,7 @@ got the notification with the video, the text and the link.
 Start all three in one turn.
 
 **The video for users.** The release dispatched the
-`video-builder (Sonnet 5.5, medium)` at its green staging. Read its
+`video-builder (Sonnet 5.5, high)` at its green staging. Read its
 state from the machine: `report/close/video.mp4` exists → done; a
 render of it still running (`pgrep -af 'render.sh.*<slug>'`) → wake
 when it should end; neither → dispatch it now with

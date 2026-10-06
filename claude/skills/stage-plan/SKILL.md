@@ -37,7 +37,7 @@ open ──► P0 recon ──► P1 cut ──► P2 briefs ∥ pre-flight ─�
 | P1 cut | `planner (Opus 5.5, high)` + `plan-graph.mjs` | `plan.graph.json`, `plan.md` |
 | P2 briefs | `plan-writer (Sonnet 5.5, high)` × node, all at once; the session writes `preflight.md` | `briefs/<id>.md`, `preflight.md` |
 | P3 review | `plan-review-workflow.js`: `plan-reviewer (Opus 5.5, medium)` ∥ per brief `blind-reader (Sonnet 5.5, low)` × 2 → `blind-judge (Sonnet 5.5, medium)` | `reviews/round-1.json`, `reviews.md` |
-| P4 close | the session; `video-builder (Sonnet 5.5, medium)` ∥ `slides-builder (Sonnet 5.5, medium)`; the Explainer by template | the report, `_coordination.md`, the message |
+| P4 close | the session; `video-builder (Sonnet 5.5, high)` ∥ `slides-builder (Sonnet 5.5, medium)`; the Explainer by template | the report, `_coordination.md`, the message |
 
 The session is the conductor: Opus 5.5, high. It dispatches, rules,
 writes `preflight.md` and `reviews.md`, and never reads to look
@@ -193,7 +193,7 @@ All three run at once:
    `execute`, branch `feat/<slug>`, this session's name, the shared
    files it will touch and what was agreed.
 2. **The report**, by `docs/stage-report.md`, finished before
-   the stage closes: the Video by `video-builder (Sonnet 5.5, medium)`
+   the stage closes: the Video by `video-builder (Sonnet 5.5, high)`
    (the graph assembling: C, the entries in parallel, the critical
    path), the Deck by `slides-builder (Sonnet 5.5, medium)` (entries,
    edges and why, the agreements with other fronts, what was decided in

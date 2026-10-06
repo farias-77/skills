@@ -42,7 +42,7 @@ cost, his touches) come from the telemetry.
 
 | Piece | Who | How |
 |---|---|---|
-| Video | `video-builder (Sonnet 5.5, medium)` | `make-it-a-movie`, one render (`claude/video/render.sh`) |
+| Video | `video-builder (Sonnet 5.5, high)` | `make-it-a-movie`, one render (`claude/video/render.sh`) |
 | Deck | `slides-builder (Sonnet 5.5, medium)` | `pitch-it-for-me`, HTML slides paged inside the report |
 | Explainer · discovery, design, a release incident | `artifact-builder (Sonnet 5.5, medium)` | `draw-it-for-me` |
 | Explainer · plan, execute, release, close | **no agent**: the template `claude/report/explainer.html` + an `explainer.json` the session fills | from `plan.graph.json`, the board, `trace.md` or the telemetry |

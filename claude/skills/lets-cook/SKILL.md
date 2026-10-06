@@ -45,7 +45,7 @@ allowed-tools: Read, Write, Edit, Glob, Grep, Agent, SendMessage, Workflow, AskU
 | `scout (Sonnet 5.5, low)` × 2–4 | the area's map, the other fronts, legacy or not, broken in production or not | all |
 | the stage-4 cast through `exec-entry-workflow.js` | `builder-backend` · `builder-frontend (Opus 5.5, medium)` → `exec-gate (Sonnet 5.5, low)` → `reviewer (Opus 5.5, high)` ∥ `qa-frontend` · `qa-backend (Opus 5.5, medium)` by surface | short, hotfix |
 | `slides-builder (Sonnet 5.5, medium)` | the minimal report's decks | short, hotfix |
-| `video-builder (Sonnet 5.5, medium)` | the users' video, only when a screen users see changed | short, hotfix |
+| `video-builder (Sonnet 5.5, high)` | the users' video, only when a screen users see changed | short, hotfix |
 
 ## Unattended, after the `/goal`
 

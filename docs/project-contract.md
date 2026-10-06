@@ -277,7 +277,7 @@ environment serves it; the users' video needs a logged-in actor on
 staging, never production.
 
 **How the stages use it.** The CI's smoke; `video-builder (Sonnet 5.5,
-medium)` records the close's users' video on staging as those actors.
+high)` records the close's users' video on staging as those actors.
 
 ### 14 · Permissions, the guard and the authorization
 
