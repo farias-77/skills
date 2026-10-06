@@ -47,8 +47,8 @@ When the queue is empty (every entry merged, or parked and already
 decided by him):
 
 1. **Open the PR** `feat/<slug> → main` as a draft, as the bot identity
-   (`gh pr create --draft`). Body: the entries, the notes, what stayed
-   out and why.
+   (`gh pr create --draft`). Body: the entries (a cloud entry with its
+   session url), the notes, what stayed out and why.
 2. **Run the whole gate** on the top of `feat`, on this machine, in the
    background:
 

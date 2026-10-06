@@ -39,7 +39,7 @@ overlap: settle it now, before it is a conflict.
 | `parked: inconclusive` | a seat could not run its check: fix the cause it names (the stack, an actor), resume once with `check: whole`. Inconclusive again: rule it, `ruled: conductor`, the untried case named on the PR for his hands-on; never reported as green |
 | `parked: user` / `blocked` | a credential or account only he has: it waits for him, everything else goes on. A contradiction in the plan: decide by the design, conservatively, write a fixes file, resume once; `ruled: conductor` in `rulings.md` |
 | `interrupted` (rate limit, network) | `resumeFromRunId` after the reset the message names (or 30 minutes); the critical path's entry first, the others 5 minutes later; never a new build. Expect about one per stage |
-| A cloud entry gone silent | `cloud.md`: past its agent's ceiling with no beat → relaunch on a new branch `-r2` from its last commit; once more in the cloud, then local |
+| A cloud entry gone silent | `cloud.md`: past its agent's ceiling with no beat → first a follow-up into its session (`claude -p "…" --cloud <session id>`); the send fails or still no beat → relaunch on a new branch `-r2` from its last commit; once more in the cloud, then local |
 | Another front (or a hotfix) merged into `main` | merge `main` into `feat` between two queue merges (never a rebase), `make restamp`, the affected gate |
 | A shared file another front also changes | message that front's session (its name is in `_coordination.md`); agree additive or who goes first; one line in `_coordination.md`. No answer in 15 minutes → the conservative choice, noted |
 | A hotfix needs the cloud now | it starts before any new entry of this front |

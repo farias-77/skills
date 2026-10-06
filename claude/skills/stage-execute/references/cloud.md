@@ -38,10 +38,14 @@ evidence/<slug>/<id>
 Before any push to the cloud: `gitleaks` over the inputs; a finding
 stops the send.
 
+If the project's smoke shows a session on `story/*` cannot push
+`evidence/*`, the evidence goes out inside the entry branch, under
+`.evidence/<id>/`, and the tech lead removes it before the merge.
+
 ## The run prompt
 
 ```
-claude --cloud "$(cat <<'EOF'
+claude --cloud --output-format json "$(cat <<'EOF'
 You run one stage-4 entry alone; nobody will answer a question.
 Entry <id>, front <slug>, run <n>.
 1. git fetch origin feat/<slug>:feat/<slug> evidence/<slug>/<id>:evidence/<slug>/<id>
@@ -59,7 +63,10 @@ EOF
 )"
 ```
 
-Record on the board: `cloud · <session id> · <url> · run <n>`.
+Record its `session_id` and `url` on the board, `cloud · <session id> · <url> · run <n>`,
+and the url next to the entry in the PR body. The JSON is documented for
+follow-ups; if the launch prints text, its `Session ID:` and `View:` lines
+give the same, and every commit's `Claude-Session` trailer carries the url.
 
 ## The watcher and the heartbeat
 
@@ -83,9 +90,13 @@ whole run has a ceiling of 240 minutes.
 | `run-<n>.json` | copy the evidence into `03-execution/entries/<id>/`, fetch the entry branch, act on the return |
 | nothing past the deadline | dead: relaunch |
 
-## Relaunch
+## Follow-up, then relaunch
 
-A dead or failed-to-start session is relaunched **always on a new
+A stalled or dead session first gets a follow-up queued into it:
+`claude -p "<what the beats show; resume the entry>" --cloud <session id> --output-format json`.
+Reopening restores the conversation on a fresh VM (background work is
+lost). Only if the send fails (`ok: false`) or no beat follows within
+the agent's ceiling is it relaunched, **always on a new
 branch**, `story/<slug>/<id>-r2`, from the last pushed commit, with
 `mode: 'resume'` and `check: 'whole'`: two sessions never write the
 same branch. Once more in the cloud; a second failure runs it here,
@@ -102,12 +113,14 @@ run at once.
 
 - `claude --cloud "<task>"` clones the GitHub remote at the current
   branch: push first.
-- A cloud session cannot message back: git is its channel.
+- This session can message a cloud session (`claude -p "…" --cloud <session id>`
+  queues a follow-up); a cloud session cannot message back: git is its channel.
 - Each VM: about 4 vCPUs, 16 GB, Docker; browsers come from the setup
   script.
 - Committed `.claude/` (settings, hooks) loads in a one-repo session;
   user-level `~/.claude` does not.
-- Foreground commands get up to 10 minutes; longer ones run in the
-  background with their exit code in a file.
+- Foreground commands time out after 2 minutes by default (10 at most)
+  and then keep running in the background for up to 30 more; the
+  environment's `BASH_*_TIMEOUT_MS` variables raise both.
 - An idle VM pauses and loses its background processes; the heartbeat
   is how a pause is noticed.

@@ -42,6 +42,7 @@ cross".
 ## What messages can and cannot do
 
 - A message lands at the receiver's next tool round.
-- A cloud session cannot message back; git is its channel.
+- A local session can message a cloud session (`claude -p "…" --cloud <session id>`);
+  a cloud session cannot message back; git is its channel.
 - A session in another permission mode may hold the message.
 - An offline session cannot answer: hence the 15-minute rule.
