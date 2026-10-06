@@ -73,6 +73,8 @@ The locked mock is the reference and the user is the judge, using it.
 - Monochrome base; colour only for meaning (status green, yellow, red),
   never alone: each status also has a label or an icon. Both themes
   correct.
+- Frequent actions do not animate: hover, nav items, rows, tabs and
+  shortcut toggles change at once; only the rare or spatial animates.
 - One primary button per region; labels are a verb and an object
   ("Save changes"), never "Submit".
 - No card inside a card; borders and shadows only on separate objects.
