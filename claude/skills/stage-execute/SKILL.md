@@ -23,8 +23,8 @@ its playbook.
    did not write it.
 3. No entry parks in silence: the tech lead resolves it; only what is
    his waits for him.
-4. The entry gate stays under 5 minutes; the whole gate runs as local
-   CI on the top of `feat`, while he uses the app.
+4. The entry gate stays under 5 minutes; the whole gate runs once, as
+   local CI on the final head of `feat`, after his ok.
 5. It closes on his "ok".
 
 ## The flow
@@ -33,7 +33,7 @@ its playbook.
 open ──► prepare (feat, board, keep the machine awake) ──► C ──► every ready entry at once
            exec-entry: builders → gate → reviewer ∥ QAs → triage → one fix → delta
      ──► the queue: base in → restamp → signoff → merge → worktree and stack gone
-     ──► PR draft + local-ci on the top ──► his hands-on (A.n rounds; X.n on a red) ──► "ok"
+     ──► PR draft ──► his hands-on (A.n rounds) ──► "ok" ──► local-ci once on the final head (red → X.n → again)
      ──► report ∥ cleanup ──► the message: the link + /clear + /stage-release <slug>
 ```
 
@@ -179,11 +179,9 @@ hotfix) is merged into `feat`.
 1. **What waits for him first.** Entries parked on something only he
    can decide go in one question per decision. What he says to fix
    becomes an `X.n` now.
-2. **The PR and local CI.** With the queue empty: the PR `feat/<slug> →
-   main` as a draft, and the project's signoff command on the top of
-   `feat` in the background (queue.md; `claude/scripts/local-ci.sh` when
-   the project names none). It posts `local-ci` on that sha
-   only when the whole gate is green.
+2. **The PR.** With the queue empty: the PR `feat/<slug> → main` as a
+   draft (queue.md). Until his ok, every push is checked by the
+   affected gate only; the whole gate waits for the end.
 3. **His hands-on.** In a fresh worktree on the top of `feat`, the
    stack up and the seed loaded. A PushNotification and the same in the
    conversation: the URLs, the test actors, what merged, what stayed out
@@ -193,8 +191,8 @@ hotfix) is merged into `feat`.
    `A.n`: one brief (`templates/brief-adjust.md`) with every adjustment
    of that answer, each with one AC, run with exec-entry `fix` (the
    reviewer always; `qa: 'backend'` when it touches auth, permissions or
-   personal data; else `qa: 'none'`). Then the queue, one push, local-ci
-   again, the environment up again on the new top.
+   personal data; else `qa: 'none'`). Then the queue (the affected gate), one push, the
+   environment up again on the new top.
 5. **Local CI red** → `X.n` by queue.md. An `X.n` that changes something
    he already used asks "still ok?"; the others do not call him.
 6. **Meanwhile** the tech lead writes the release plan
@@ -208,8 +206,12 @@ hotfix) is merged into `feat`.
    (`! .claude/hooks/authorize.sh release <slug> feat/<slug>@<sha>`);
    the release's `/goal` comes from `/stage-release` itself.
 
-His "ok" closes the hands-on: one line in `rulings.md`. Local CI may
-still be running on the last head; the release waits for its green.
+His "ok" closes the hands-on: one line in `rulings.md`. Then the
+project's signoff command runs the whole gate once on the final head,
+in the background (queue.md; `claude/scripts/local-ci.sh` when the
+project names none); it posts `local-ci` on that sha only on green. A
+red is an `X.n` by queue.md, then the whole gate once more. The close
+starts meanwhile; the stage ends on its green.
 
 ## 7 · Close
 

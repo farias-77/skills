@@ -129,10 +129,13 @@ In a legacy repo the first line is
   `designDir`, `storiesPath` and `mockDir` none, `base` = `main`. The
   `reviewer (Opus 5.5, high)` always runs; on a hotfix, with the
   security pass.
-- When the entry comes back `ready`, push, open the PR ready and run
-  the project's signoff command on the head (`claude/scripts/local-ci.sh`
-  when it names none). The merge waits for its `local-ci`. A fix pushes
-  again and the local CI runs on the new head.
+- When the entry comes back `ready`, push and open the PR ready. Fixes
+  and rounds are checked by the entry gate only. The whole gate runs
+  once, on the final head, before it ships: the project's signoff
+  command (`claude/scripts/local-ci.sh` when it names none), after his
+  ok on the short route, right away on a hotfix. A red there is one
+  fix, checked by the entry gate, then the whole gate once more. The
+  merge waits for its `local-ci`.
 
 ## 6 · His use
 

@@ -224,7 +224,7 @@ retros get short.
 
 | Change | Why |
 |---|---|
-| After every entry merged and the whole gate is green, the session brings the environment up (the project's stack with its seed) and gives him the local URLs and the test actors' logins; he uses the app and says what to change in plain words | the visual check is his, on the real thing, not screenshots beside the mock in a report |
+| After every entry merged, the session brings the environment up (the project's stack with its seed) and gives him the local URLs and the test actors' logins; he uses the app and says what to change in plain words | the visual check is his, on the real thing, not screenshots beside the mock in a report |
 | Each adjustment is an entry `A.<n>` on exec-entry's fast path (`mode: 'adjust'`): `builder (Opus 5.5, medium)` → `exec-gate (Sonnet 5.5, low)` → the merge queue; no QA, and `reviewer (Opus 5.5, high)` only when the change touches authentication, permissions or personal data (the session marks it, or the gate's `surface.sensitive`); adjustments whose files do not overlap run in parallel | it is his own request on a screen he is looking at; the security checklist still holds |
 | His "ok" closes the hands-on; then the stage report and the audit | stage 5 assumes everything is implemented and working |
 

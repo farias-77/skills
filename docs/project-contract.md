@@ -129,9 +129,11 @@ own stack, on the station or a cloud session VM.
 
 **Why.** There is no hosted CI gate: this command is the gate.
 
-**How the stages use it.** The signoff command (role 6) runs it once on
-the top of `feat/<slug>` while he uses the app, and again after each
-`A.n` or `X.n` push.
+**How the stages use it.** The signoff command (role 6) runs it once,
+at the end: after his final ok, on the final head of `feat/<slug>`.
+While the front iterates (entries, `A.n`, `X.n`) only the entry gate
+runs; a red at the end opens an `X.n`, checked by the entry gate, then
+the whole gate once more on the new head.
 
 ### 6 · The signoff command and the `local-ci` status
 

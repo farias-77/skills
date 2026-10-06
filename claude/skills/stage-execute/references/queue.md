@@ -49,8 +49,12 @@ decided by him):
 1. **Open the PR** `feat/<slug> → main` as a draft, as the bot identity
    (`gh pr create --draft`). Body: the entries (a cloud entry with its
    session url), the notes, what stayed out and why.
-2. **Run the whole gate** on the top of `feat`, on this machine (or in
-   the cloud, `cloud.md`), in the background:
+2. **Mark the PR ready** when his hands-on starts. While the front
+   iterates (his `A.n` rounds, the `X.n` fixes), each push is checked
+   by the affected gate only, as in the queue.
+3. **Run the whole gate once, at the end**: after his final ok, on the
+   final head of `feat`, on this machine (or in the cloud, `cloud.md`),
+   in the background:
 
    ```
    <the signoff command> <the head of feat/<slug>>
@@ -60,16 +64,17 @@ decided by him):
    It runs the project's whole gate (`make verify`) in a fresh worktree
    with its own stack, and posts `local-ci = success` on that sha, as the
    bot, only on exit 0. A red posts nothing and prints the failing lines.
-3. **Mark the PR ready** when his hands-on starts.
-4. **Every push after that** (an A.n round, an X.n) runs local-ci again
-   on the new head. One push per round, so one run per round.
+4. **A red there** opens an `X.n` (below), verified with the affected
+   gate; then the whole gate runs once more on the new head. `main`
+   requires `local-ci` on the head that merges, so the last run is
+   always on the final head.
 
 ## Local CI red
 
 | Red | What happens |
 |---|---|
-| a test **outside** the diff | run local-ci once more. Green: flaky; the front goes on, an `X.n` fixes it in the next push. A flaky seen for the first time in this front is this front's: fixed, never deleted |
-| anything else | one `X.n` per failing area (failures with no file in common run in parallel): exec-entry `fix`, the reviewer reading it, then the queue and local-ci again |
+| a test **outside** the diff | run local-ci once more. Green: flaky; an `X.n` fixes it, as below. A flaky seen for the first time in this front is this front's: fixed, never deleted |
+| anything else | one `X.n` per failing area (failures with no file in common run in parallel): exec-entry `fix`, the reviewer reading it, then the queue (the affected gate) and the whole gate once more on the new head |
 | red twice on the same area | the tech lead decides: a smaller fix, a re-cut, or it goes to him with the evidence |
 
 Never a retry setting, a quarantine tag or a skip to get green.

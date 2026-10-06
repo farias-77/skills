@@ -106,7 +106,7 @@ locally, and the board and `dreaming-notes.md` say why.
 ## The whole gate in the cloud
 
 When the project's cloud environment holds the bot's token as `GH_TOKEN`
-and its smoke showed a VM holds the whole gate, the gate for the queue's
+and its smoke showed a VM holds the whole gate, the whole gate on the final
 head runs in the cloud too: a dedicated cloud session (or a follow-up
 into a finished entry's session) whose prompt is only "run `<the signoff
 command> <sha>` in the background, wait for it, push nothing, then

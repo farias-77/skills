@@ -44,7 +44,7 @@ is here, it uses this one.
 | **E-int** | the integration entry, last |
 | **brief** | the whole instruction an entry's builders get; ends with "The builder decides" |
 | **entry gate** | the per-entry checks `exec-gate` runs once per builder pass: the fast check plus the affected tests |
-| **whole gate** | the project's full gate (`make verify` or its name), run once on the top of `feat/<slug>` by the signoff command, which posts `local-ci` |
+| **whole gate** | the project's full gate (`make verify` or its name), run once at the end, on the final head of `feat/<slug>` after his ok, by the signoff command, which posts `local-ci` |
 | **the signoff command** | the project's command that runs the whole gate in a clean worktree and, only on exit 0 and under the bot identity, posts the `local-ci` commit status; `claude/scripts/local-ci.sh` is the fallback |
 | **`local-ci`** | the commit status `main`'s ruleset requires; no agent posts it by hand |
 | **gate paths** · `gatePaths` | the code-owner paths: what decides green (the gate's config, the CI, the floor's tests). A fix touching one is re-read by the reviewer; a PR touching one needs his approval on GitHub |

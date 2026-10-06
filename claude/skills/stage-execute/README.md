@@ -8,7 +8,7 @@ gate as local CI, the PR to `main`, and the user's hands-on with his
 adjustments. It closes on his "ok".
 
 ```
-C ──► entries at once (builders → gate → reviewer ∥ QAs → one fix) ──► queue ──► PR + local-ci ──► his hands-on ──► ok
+C ──► entries at once (builders → gate → reviewer ∥ QAs → one fix) ──► queue ──► PR ──► his hands-on ──► ok ──► local-ci once
 ```
 
 ## Install

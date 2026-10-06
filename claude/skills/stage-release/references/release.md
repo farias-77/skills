@@ -86,7 +86,7 @@ Production is broken or data is wrong now. It enters through
 
 ```
 hotfix/<slug> from main → a test that reproduces it: red, then green
-→ entry gate green → PR ready: local-ci ∥ `reviewer (Opus 5.5, high)` with the security pass ∥ the QAs by surface (Opus 5.5, medium)
+→ entry gate green → `reviewer (Opus 5.5, high)` with the security pass ∥ the QAs by surface (Opus 5.5, medium) → PR ready: local-ci once, on the final head
 → merge → staging + smoke → his check on staging, unless he delegated it in the interview
 → patch tag → production, the same image → smoke + watch → GitHub release
 ```
