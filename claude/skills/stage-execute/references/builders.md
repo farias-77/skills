@@ -49,9 +49,14 @@ primary proof, at the cheapest layer that really proves it.**
 - **Look before you add.** A test that already owns the behaviour is
   extended, not duplicated.
 - **Never:** a screenshot or a recorded red for the record, mutation
-  scaffolding, fuzz outside a public decoder, a test that pins a stub,
-  copy pinned unless the AC is about the copy, an assert loosened to
-  fit the code.
+  scaffolding, fuzz or property tests outside a public decoder, a test
+  that pins a stub, copy pinned unless the AC is about the copy, an
+  assert loosened to fit the code.
+- **One exception:** a "never" AC (an invariant: "a total is never
+  negative", "two units never share an item") may take a property-based
+  test as its one proof. It runs with a fixed seed, so it never flakes,
+  and it replaces the example tests for that AC; it does not add to them.
+  Use the library the stack already has; never add one for this.
 
 The gate measures coverage by function: every new or changed function
 runs in some test. That is a floor, not a target.
