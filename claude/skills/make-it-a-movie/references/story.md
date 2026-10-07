@@ -23,7 +23,7 @@ The general arc:
    (`Choices`), or "nothing of yours here".
 7. **End.** What to remember.
 
-By stage, as `docs/stage-report.md` sets it:
+By stage, as `claude/docs/stage-report.md` sets it:
 
 | Stage | The film |
 |---|---|

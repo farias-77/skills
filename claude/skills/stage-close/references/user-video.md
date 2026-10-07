@@ -30,7 +30,10 @@ one render.
 - Where to put things: the video at `report/close/video.mp4` (the Close
   tab plays it; rendered with `--size 1080 --max-mb 15`), the text at
   `05-close/whats-new.md`,
-  its scratch under `05-close/_scratch/` (removed by the cleanup).
+  its scratch under `05-close/_scratch/` (removed by the cleanup). On
+  the short route and the hotfix: the stories are the ACs of `brief.md`,
+  the text is the "what's new" of `close.md`, and the scratch is
+  `report/close/film/`.
 
 ## Recorded in staging, never in production
 

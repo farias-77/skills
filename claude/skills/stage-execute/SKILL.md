@@ -219,7 +219,7 @@ starts meanwhile; the stage ends on its green.
 
 All at once:
 
-1. **The report**, by `docs/stage-report.md`, finished before the
+1. **The report**, by `claude/docs/stage-report.md`, finished before the
    stage closes: the Video by `video-builder (Sonnet 5.5, high)` (what
    was built, the real screens captured from his hands-on environment),
    the Deck by `slides-builder (Sonnet 5.5, medium)` (per entry: ACs →

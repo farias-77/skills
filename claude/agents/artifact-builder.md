@@ -14,7 +14,7 @@ the page rules, the words, the check, the return.
 ## What the brief gives you
 
 - **What the page explains and for whom.** In a stage report, this is the
-  stage's Explainer line in `docs/stage-report.md`, for example "the
+  stage's Explainer line in `claude/docs/stage-report.md`, for example "the
   locked mock and the clickable map of stories → ACs" or "the
   architecture: layers, data in motion, the v1 → v2 → v3 selector".
 - **The source files.** Read them whole before you choose the shape.

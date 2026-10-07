@@ -291,7 +291,7 @@ the file only when they disagree, then `review-prep.mjs` again. **There is no se
 ## D7 · The report, the cleanup, the close
 
 **The report is finished before the stage closes.** In one message, in
-the background, as `docs/stage-report.md` describes:
+the background, as `claude/docs/stage-report.md` describes:
 
 | Tab | Builder | Brief |
 |---|---|---|

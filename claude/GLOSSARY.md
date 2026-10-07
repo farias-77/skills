@@ -7,7 +7,7 @@ is here, it uses this one.
 
 | Term | Meaning |
 |---|---|
-| **front** · **workstream** | one demand end to end: one folder `<designs-root>/<slug>/`, one report link, one line in `_coordination.md` |
+| **front** (the docs' old name: workstream; never in an artifact) | one demand end to end: one folder `<designs-root>/<slug>/`, one report link, one line in `_coordination.md` |
 | **slug** | the front's id, `YYYY-MM-DD-<short-kebab-name>`; every stage resumes by it |
 | **route** | how a demand travels: **full** (the six stages), **short** (one behaviour, one entry), **hotfix** (production broken now); `repo: legacy` marks either of the last two in an old repository |
 | **the play** | what he types to start a stage: `/clear`, then `/stage-<name> <slug>` (or `/lets-cook <idea>`) |
@@ -58,7 +58,7 @@ is here, it uses this one.
 
 | Term | Meaning |
 |---|---|
-| **the report** · **the front's link** | one private page per front: a rail of stages, each with Video · Deck · Explainer, finished before the stage closes (`docs/stage-report.md`) |
+| **the report** · **the front's link** | one private page per front: a rail of stages, each with Video · Deck · Explainer, finished before the stage closes (`claude/docs/stage-report.md`) |
 | **`rulings.md`** | one line per ruling (his, or `ruled: conductor`), at the front's root |
 | **`dreaming-notes.md`** | the frictions each stage notes as they happen; his own words marked `[user]`, a pattern of his choices marked `[taste]` |
 | **`metrics.json`** | the front's numbers, written by `claude/scripts/telemetry.mjs` |

@@ -46,6 +46,7 @@ allowed-tools: Read, Write, Edit, Glob, Grep, Agent, SendMessage, Workflow, AskU
 | the stage-4 cast through `exec-entry-workflow.js` | `builder-backend` · `builder-frontend (Opus 5.5, medium)` → `exec-gate (Sonnet 5.5, low)` → `reviewer (Opus 5.5, high)` ∥ `qa-frontend` · `qa-backend (Opus 5.5, medium)` by surface | short, hotfix |
 | `slides-builder (Sonnet 5.5, medium)` | the minimal report's decks | short, hotfix |
 | `video-builder (Sonnet 5.5, high)` | the users' video, only when a screen users see changed | short, hotfix |
+| `artifact-builder (Sonnet 5.5, medium)` | the Release explainer, only with an incident | short, hotfix |
 
 ## Unattended, after the `/goal`
 
@@ -177,7 +178,7 @@ users' video only when a screen users see changed.
 3. `claude/scripts/cleanup.sh <slug> --check` → `--apply` → `--check`
    empty (`stage-close/references/cleanup.md`).
 4. **The minimal report**, finished before the message, as
-   `docs/stage-report.md` describes. The rail is Build · Release
+   `claude/docs/stage-report.md` describes. The rail is Build · Release
    · Close:
 
 | Stage | Video | Deck | Explainer |

@@ -18,7 +18,7 @@ render it once, and check the result.
 - **The shot list** (`shotlist.md`), and the style guide when the caller
   fixes the look.
 - **For a stage report**, the brief is the stage's line in
-  `docs/stage-report.md` with its source files, and the shot list is the
+  `claude/docs/stage-report.md` with its source files, and the shot list is the
   stage's arc in `references/story.md`. You write both files from them
   and add nothing they do not hold.
 - **The audience:**

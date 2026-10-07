@@ -112,7 +112,7 @@ When it returns, check it as that reference says.
 ## Step 2 · The report, finished before the close
 
 Dispatch `slides-builder (Sonnet 5.5, medium)` as
-`docs/stage-report.md` describes, into `report/close/`:
+`claude/docs/stage-report.md` describes, into `report/close/`:
 
 | Tab | Who | What |
 |---|---|---|

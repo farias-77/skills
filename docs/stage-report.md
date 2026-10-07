@@ -33,10 +33,10 @@ when its three tabs are published, and that message carries the link.
 | Release | main → staging → tag → production, smokes and the watch, 30–45 s | versions, notes, smokes, rollback if any | the release timeline; with an incident, the incident drawn |
 | Close | **for users**: a tutorial of the new screens, or a motion piece of the idea if only the backend changed, 1–3 min, recorded on staging | the retro (up to 5 per section) + the numbers + the "what's new" text to paste | the workstream's numbers: time, cost and touches per stage, against earlier workstreams |
 
-**Short route and hotfix:** the rail is **Build · Release · Close**. Build
-and Release have only the Deck. The Close makes the users' video only when
-a screen users see changed. Under each stage, its three numbers (time,
-cost, his touches) come from the telemetry.
+**Short route and hotfix:** the rail is **Build · Release · Close**. What
+each of their tabs holds is the table in `lets-cook` §8 "The short close",
+and only there. Under each stage, its three numbers (time, cost, his
+touches) come from the telemetry.
 
 ## Who builds what
 
@@ -126,7 +126,7 @@ per version.
   "notices": [{"tone": "warn", "text": "Design video renders after the plan's."}],
   "stages": [
     {"id": "design", "name": "Design", "state": "closed", "closedAt": "05/10 14:20",
-     "numbers": {"time": "2 h 05 min", "cost": "US$ 5,80", "touches": "3"},
+     "numbers": {"time": "2 h 05 min", "cost": "US$ 5.80", "touches": "3"},
      "tabs": {"video": {"state": "ready", "file": "design/video.mp4", "seconds": 74},
               "deck": {"state": "ready", "dir": "design/deck"},
               "explainer": {"state": "ready", "file": "design/explainer.html"}}}

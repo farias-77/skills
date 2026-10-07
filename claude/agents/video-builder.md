@@ -19,7 +19,7 @@ the brief and the shot list, and they come from the session that sent you.
 
 - **The brief and the shot list** (`brief.md`, `shotlist.md`, and
   `style-guide.md` when the session fixes the look). In a stage report,
-  the stage's Video line in `docs/stage-report.md` stands for the brief
+  the stage's Video line in `claude/docs/stage-report.md` stands for the brief
   and the stage's arc in the skill's `references/story.md` stands for the
   shot list: write both files from them and add nothing they do not
   hold. For the close, the users' video: what is new, for the people who

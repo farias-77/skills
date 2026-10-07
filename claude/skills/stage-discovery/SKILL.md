@@ -297,7 +297,7 @@ the short route in one line; on his yes, write `brief.md` from
 through it. The front's link is born here; write its URL in
 `.state.md`. Dispatch the three builders in one message, in the
 background, each with the stage's files and the report folder
-(`report/discovery/`), as `docs/stage-report.md` describes:
+(`report/discovery/`), as `claude/docs/stage-report.md` describes:
 
 | Tab | Builder | Brief |
 |---|---|---|

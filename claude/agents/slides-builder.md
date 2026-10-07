@@ -14,7 +14,7 @@ format, the story, the rules on every slide, the check, the return.
 ## What the brief gives you
 
 - **What the deck shows.** In a stage report, this is the stage's Deck
-  line in `docs/stage-report.md`, for example "decisions (the ones against
+  line in `claude/docs/stage-report.md`, for example "decisions (the ones against
   the recommendation first), risks accepted, what the guard cut".
 - **The source files**, with the stage's `rulings.md` when it has one.
   Who decided what comes from there.

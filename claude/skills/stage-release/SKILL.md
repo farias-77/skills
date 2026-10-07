@@ -184,7 +184,7 @@ not depend on the answer goes on (the report's pieces, the trace).
    `node claude/scripts/telemetry.mjs <slug> --stage release --ws <designs-root>/<slug> --out -`.
 2. **The report, finished before the close.** Dispatch the builders in
    one message, in the background, with the stage's files and
-   `report/release/`, as `docs/stage-report.md` describes:
+   `report/release/`, as `claude/docs/stage-report.md` describes:
 
 | Tab | Builder | Brief |
 |---|---|---|
@@ -192,10 +192,13 @@ not depend on the answer goes on (the report's pieces, the trace).
 | Deck | `slides-builder (Sonnet 5.5, medium)` | the version and notes, the smokes, a rollback if one happened, what went live for real people, the stage's numbers |
 | Explainer | the report template from `trace.md`; with an incident, `artifact-builder (Sonnet 5.5, medium)` draws it | the release's timeline |
 
-   The short route and the hotfix: the Deck only. When they return,
-   check every number against `trace.md` and the CI runs, run
+   When they return, check every number against `trace.md` and the CI
+   runs, run
    `gitleaks dir <designs-root>/<slug>` (or `make gitleaks dir=…` when gitleaks is not on PATH; a finding stops the publish),
    and publish to the front's link with the label "release closed".
+   The short route and the hotfix stop at step 4 (`lets-cook` §7): their
+   Release tab is built and published at the short close, by the table
+   in `lets-cook` §8, because their link exists only from then.
 3. **Cleanup.** Remove what this stage created: the `X.n` worktrees and
    their stacks (`claude/scripts/cleanup.sh <slug> --check` shows what
    is left; the full sweep is the close's).

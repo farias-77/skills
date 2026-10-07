@@ -197,7 +197,7 @@ All three run at once:
 1. **Coordination.** This front's line in `_coordination.md`: stage
    `execute`, branch `feat/<slug>`, this session's name, the shared
    files it will touch and what was agreed.
-2. **The report**, by `docs/stage-report.md`, finished before
+2. **The report**, by `claude/docs/stage-report.md`, finished before
    the stage closes: the Video by `video-builder (Sonnet 5.5, high)`
    (the graph assembling: C, the entries in parallel, the critical
    path), the Deck by `slides-builder (Sonnet 5.5, medium)` (entries,

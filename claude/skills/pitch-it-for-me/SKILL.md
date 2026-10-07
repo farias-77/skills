@@ -15,7 +15,7 @@ source files.
 ## What you receive
 
 - **The story to tell:** what the deck is for and who reads it. In a
-  stage report, this is the stage's paragraph in `docs/stage-report.md`.
+  stage report, this is the stage's paragraph in `claude/docs/stage-report.md`.
 - **The sources:** the files the facts come from.
 - **The output folder**, usually `<stage>/deck/`.
 - **The date**, for the cover.
