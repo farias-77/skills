@@ -90,7 +90,7 @@ mock) goes to a scout.
 
 1. **The kit**: `realpath ${CLAUDE_SKILL_DIR}/../..`, written in
    `.state.md` as `kit:`. **Preconditions**: `.state.md` says
-   `stage: design`; `00-discovery/` has `LOCK.json`, `stories.md` and
+   `stage: design`; `00-discovery/` has `prototype/LOCK.json`, `stories.md` and
    the notes' "For the design". Missing: stop, back to stage 1.
 2. **The house rules**: read `<kit>/../CLAUDE.md` and run its Open:
    the canary.
@@ -156,7 +156,9 @@ premise (a vendor's API, a limit, a price) itself, with the source
 cited.
 
 Then `overengineering-guard (Opus 5.5, medium)` in proposal mode reads
-`proposal.md` and cuts; save its return to `reviews/guard-proposal.md`.
+`proposal.md` and cuts, with these paths in its brief:
+`references/right-sizing.md`, `notes.md`, `stories.md`, `recon/` and
+the standards; save its return to `reviews/guard-proposal.md`.
 Send the cuts to the architect: it applies each or rebuts it with the
 AC or real risk the mechanism serves. Read `proposal.md` whole and rule
 each rebuttal (right-sizing §3 E): a rebuttal without a requirement
@@ -251,7 +253,10 @@ stage.
 ## D6 · The review: four lenses, one round
 
 In one message, in parallel, each with the six documents, the lock,
-`proposal.md`, `notes.md`, the references it needs and the repos:
+`proposal.md`, `notes.md` and the repos, plus its own paths:
+consistency `references/documents.md` and `<kit>/skills/stage-discovery/scripts/proto.mjs`;
+security and the guard `references/right-sizing.md` and the security
+standard; contracts `references/contracts.md`:
 
 | Lens | Asks |
 |---|---|
