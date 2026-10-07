@@ -49,7 +49,7 @@ for (const s of slides) {
 }
 
 async function playwright() {
-  for (const base of [process.env.PLAYWRIGHT_DIR, process.cwd(), path.dirname(new URL(import.meta.url).pathname)].filter(Boolean))
+  for (const base of [process.env.PLAYWRIGHT_DIR, path.resolve(path.dirname(fs.realpathSync(new URL(import.meta.url).pathname)), '../../../video'), process.cwd(), path.dirname(new URL(import.meta.url).pathname)].filter(Boolean))
     for (const name of ['playwright-core', 'playwright']) {
       try {
         return createRequire(path.join(base, 'noop.js'))(name);

@@ -1,8 +1,8 @@
 // One look at a page: 1280 and 390 px wide, light and dark. Saves four PNGs, prints console
 // errors, failed loads and sideways overflow.
 //   node look.mjs <page.html> <out-dir>
-// Needs playwright-core (or playwright) with a Chromium: found from this folder up, or in
-// PLAYWRIGHT_DIR (a folder whose node_modules has it).
+// Needs playwright-core (or playwright) with a Chromium: found in PLAYWRIGHT_DIR, the kit's
+// claude/video (npm ci there), the working directory, or from this folder up.
 import fs from 'node:fs';
 import http from 'node:http';
 import path from 'node:path';
@@ -18,14 +18,14 @@ const root = path.dirname(page);
 fs.mkdirSync(outArg, {recursive: true});
 
 async function playwright() {
-  const bases = [process.env.PLAYWRIGHT_DIR, process.cwd(), path.dirname(new URL(import.meta.url).pathname)].filter(Boolean);
+  const bases = [process.env.PLAYWRIGHT_DIR, path.resolve(path.dirname(fs.realpathSync(new URL(import.meta.url).pathname)), '../../../video'), process.cwd(), path.dirname(new URL(import.meta.url).pathname)].filter(Boolean);
   for (const base of bases)
     for (const name of ['playwright-core', 'playwright']) {
       try {
         return createRequire(path.join(base, 'noop.js'))(name);
       } catch {}
     }
-  console.error('look.mjs: playwright-core not found; set PLAYWRIGHT_DIR to a folder whose node_modules has it');
+  console.error('look.mjs: playwright-core not found; run npm ci in the kit claude/video, or set PLAYWRIGHT_DIR to a folder whose node_modules has it');
   process.exit(1);
 }
 
