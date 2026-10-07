@@ -199,8 +199,10 @@ Then, in Claude Code inside the project:
 - **Claude Code** with the `gh` CLI authenticated: GitHub is the
   source of record and the signoff's target.
 - The Workflow tool resolves the symlink: add the clone to the
-  project's settings (`permissions.additionalDirectories: ["~/skills"]`),
-  or the workflows refuse to start (each stage also knows how to copy
+  project's `.claude/settings.local.json`
+  (`permissions.additionalDirectories: ["~/skills"]`; a machine path,
+  so never in the committed `settings.json`), in every directory a
+  session opens in, or the workflows refuse to start (each stage also knows how to copy
   the script into the workstream and run the copy).
 - On the station: Node (current LTS), `ffmpeg` and `npm ci` in
   `claude/video/` for the reports; `playwright-core` and a Chromium for

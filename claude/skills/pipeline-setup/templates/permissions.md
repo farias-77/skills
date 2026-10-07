@@ -15,6 +15,12 @@ command later touches.
 | one repository | that repository |
 | two roots: `CLAUDE.md`, the standards and `.claude/skills/` in a root, the product in a child repository | the root, and the product repository too when sessions open there (a cloud entry always does) |
 
+Each session root also needs the README's install, which stays out of
+git: the `skills`, `agents` and `workflows` symlinks in `.claude/`, and
+the clone in `permissions.additionalDirectories` of
+`.claude/settings.local.json`. The audit reports them missing; Step 3
+never commits them.
+
 At the root, a command into the product names it (`git -C <product> …`,
 `make -C <product> …`); the allow rules carry that form. Each copy is
 committed in its own repository, on that repository's setup branch.
