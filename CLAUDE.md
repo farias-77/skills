@@ -152,7 +152,9 @@ anything published outside the company needs his approval. The
 procedure is [docs/stage-report.md](docs/stage-report.md).
 
 The stage files (`*.md` under the front) are written for the machine,
-complete and exact. The report is for a person: a picture first, short
+complete and exact, in his language (his words verbatim; ids, keywords
+and headings as the templates have them); the `language` a writer's
+brief names is that language. The report is for a person: a picture first, short
 sentences, only what would change a decision, and the file named as
 the authority for the rest. The report and every other artifact are in
 simplified English, by
