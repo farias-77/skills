@@ -218,7 +218,7 @@ claude/
   skills/               one folder per skill: SKILL.md, README.md, references/, templates/, scripts/
   agents/               every agent, its model and effort in the frontmatter
   workflows/            <name>-workflow.js: the multi-agent rounds, plain JS
-  hooks/                guard-irreversible.sh, authorize.sh, their tests
+  hooks/                guard-irreversible.sh, authorize.sh, remind-scout.sh, their tests
   scripts/              local-ci.sh (the fallback signoff), telemetry.mjs, cleanup.sh
   report/               the report shell, the template explainer, a working example
   video/                the video kit (Remotion): the motion library, render.sh

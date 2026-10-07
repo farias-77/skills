@@ -26,8 +26,10 @@ committed in its own repository, on that repository's setup branch.
 | `claude/hooks/guard-irreversible.sh` | `.claude/hooks/`, `chmod +x` | the guard |
 | `claude/hooks/authorize.sh` | `.claude/hooks/`, `chmod +x` | the user's authorization lines; the guard denies it to agents |
 | `claude/hooks/tests/guard-irreversible.test.sh` | `.claude/hooks/tests/` | proves the copy, with the project's own rules added as cases |
+| `claude/hooks/remind-scout.sh` | `.claude/hooks/`, `chmod +x` | the PostToolUse reminder: after 4 reads in a row, the main session is told to send the scout; never blocks, behind a fail-open wrapper |
+| `claude/hooks/tests/remind-scout.test.sh` | `.claude/hooks/tests/` | proves the reminder's copy |
 
-All three keep their header comments. A standards rule against code
+All of them keep their header comments. A standards rule against code
 comments, or a linter that enforces one, excludes `.claude/hooks/`, in
 the same commit.
 

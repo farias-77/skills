@@ -89,7 +89,7 @@ calibration before golden paths).
 
 | # | Role | Usual fix | Cost | Template |
 |---|---|---|---|---|
-| 14 | permissions, guard, authorization | in **every session root**: `.claude/settings.json` merged (lists unioned, the stricter rule wins), with the PreToolUse **fail-closed wrapper** on `Bash\|Edit\|Write\|MultiEdit\|NotebookEdit`, timeout 60; `guard-irreversible.sh`, `authorize.sh` and the guard's test copied to `.claude/hooks/`; credential reads denied; dead rules pruned; a no-comment rule excludes `.claude/hooks/` | S | [settings.json](templates/settings.json), [permissions.md](templates/permissions.md), the pipeline's `claude/hooks/` |
+| 14 | permissions, guard, authorization | in **every session root**: `.claude/settings.json` merged (lists unioned, the stricter rule wins), with the PreToolUse **fail-closed wrapper** on `Bash\|Edit\|Write\|MultiEdit\|NotebookEdit`, timeout 60, and the PostToolUse **fail-open wrapper** of `remind-scout.sh`, timeout 5; `guard-irreversible.sh`, `authorize.sh`, `remind-scout.sh` and their tests copied to `.claude/hooks/`; credential reads denied; dead rules pruned; a no-comment rule excludes `.claude/hooks/` | S | [settings.json](templates/settings.json), [permissions.md](templates/permissions.md), the pipeline's `claude/hooks/` |
 | 1 | standards and the commands table | the index, and the commands table in `CLAUDE.md` naming what exists (a role with no command is written as missing, never invented) | S | — |
 | 6 | the signoff command | when the project has none: `claude/scripts/local-ci.sh` copied into its tooling, with its gate and down commands set, and named in the commands table; the bot token and the ruleset go to the user | S | the pipeline's `claude/scripts/local-ci.sh` |
 | 7 | gate paths and the floor | `CODEOWNERS` narrowed to the gate paths; the floor target is L | S · L | — |
@@ -129,7 +129,7 @@ standards' repository, the root of a two-root layout) gets its own
 
 | Step | The check |
 |---|---|
-| permissions | in each session root: `jq . .claude/settings.json`; every target rule probed with `make -n` (or the runner's equivalent), the missing ones removed; `bash .claude/hooks/tests/guard-irreversible.test.sh` all green; `.claude/hooks/guard-irreversible.sh --self-test`; the canary `git push origin a:b` comes back denied in a session there |
+| permissions | in each session root: `jq . .claude/settings.json`; every target rule probed with `make -n` (or the runner's equivalent), the missing ones removed; `bash .claude/hooks/tests/guard-irreversible.test.sh` and `bash .claude/hooks/tests/remind-scout.test.sh` all green; `.claude/hooks/guard-irreversible.sh --self-test`; the canary `git push origin a:b` comes back denied in a session there |
 | signoff | `<the signoff command> --dry-run` on the default branch: "would post"; no worktree left behind |
 | structure check | `--calibrate origin/<default> --write`, then `--summary origin/<default>` shows `boundary_violations: 0`; a fence that fires on today's code goes to the team as a question |
 | golden paths | each exemplar listed by `git ls-tree -r --name-only <sha> -- <path>` and under p95 by `structure-check.sh --measure` |
