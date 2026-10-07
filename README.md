@@ -197,7 +197,10 @@ behind `cp --parents`) and turn the gate red for no change of yours.
 
 Each stage reads the house rules (`CLAUDE.md` at the clone's root) at
 its opening, so the project does not import them. Name the designs
-root (where each front's folder lives) in the project's `CLAUDE.md`.
+root (where each front's folder lives) with the line
+`designs-root: <absolute path>` in the project's `CLAUDE.md` (or its
+`CLAUDE.local.md` when the path is per machine); every stage stops
+without it.
 Then, in Claude Code inside the project:
 `/pipeline-setup .`
 
