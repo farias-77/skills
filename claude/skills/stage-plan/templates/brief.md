@@ -31,7 +31,7 @@
 
 | AC | The criterion (stories, verbatim) | Proved at (tests.md) |
 |---|---|---|
-| `<S1.1>` | <GIVEN … WHEN … THEN …> | <unit · integration · journey> |
+| `<J1.s2.1>` | <GIVEN … WHEN … THEN …> | <unit · integration · journey> |
 
 ## Contract
 

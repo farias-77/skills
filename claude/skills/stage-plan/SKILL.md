@@ -71,7 +71,8 @@ Missing a design document: stop, and say which stage owns it.
    `realpath ${CLAUDE_SKILL_DIR}/../../../CLAUDE.md` prints and run its
    Open: the canary (in the product
    repo).
-2. Read `.state.md`; dispatch P0 in the background.
+2. Read `.state.md`: it says `stage: plan` (else stop, the stage it
+   names owns the front); dispatch P0 in the background.
 3. Hand him the goal, filled in, in one code block:
 
 ```
@@ -110,8 +111,9 @@ references (`${CLAUDE_SKILL_DIR}/references/`), the checker
 checker green:
 
 ```
-node "${CLAUDE_SKILL_DIR}/scripts/plan-graph.mjs" 02-plan/plan.graph.json \
-     --json 02-plan/graph.json --mermaid 02-plan/graph.mmd
+node "${CLAUDE_SKILL_DIR}/scripts/plan-graph.mjs" <ws>/02-plan/plan.graph.json \
+     --stories <ws>/00-discovery/stories.md \
+     --json <ws>/02-plan/graph.json --mermaid <ws>/02-plan/graph.mmd
 ```
 
 Then rule the cut against [references/cut.md](references/cut.md): a
@@ -136,8 +138,9 @@ and the language.
 [templates/preflight.md](templates/preflight.md). Run every check that
 does not need him yourself: the gate commands on `main`, the stack
 coming up, `gh` acting as the bot identity, the signoff command ready
-(`<the signoff command> --dry-run` on `main`, or
-`claude/scripts/local-ci.sh --dry-run` when the project names none), the cloud
+(it exists and `<the signoff command> --help` answers, or
+`claude/scripts/local-ci.sh --help` when the project names none; the
+whole gate runs once, at the end), the cloud
 environment, the canary. Only what he must do in person stays as an
 item, with a ready `!` command, a `!` check, and what it blocks.
 
@@ -151,8 +154,9 @@ changes what he will see goes under "Decided in his place" in
 Then the checker with the briefs, until green:
 
 ```
-node "${CLAUDE_SKILL_DIR}/scripts/plan-graph.mjs" 02-plan/plan.graph.json \
-     --briefs 02-plan/briefs --json 02-plan/graph.json --mermaid 02-plan/graph.mmd
+node "${CLAUDE_SKILL_DIR}/scripts/plan-graph.mjs" <ws>/02-plan/plan.graph.json \
+     --stories <ws>/00-discovery/stories.md --briefs <ws>/02-plan/briefs \
+     --json <ws>/02-plan/graph.json --mermaid <ws>/02-plan/graph.mmd
 ```
 
 ## P3 · Review, one round

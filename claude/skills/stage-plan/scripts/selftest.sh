@@ -26,6 +26,15 @@ expect data-edge    1 "edge"      ""
 expect valid        0 ""          ""             briefs
 expect valid        1 "brief contract comment" "" briefs-stale
 
+for f in valid:0 orphan-ac:1; do
+  out="$(node "$here/plan-graph.mjs" "$here/fixtures/${f%:*}.json" --stories "$here/fixtures/stories.md")"; rc=$?
+  if [[ $rc -ne ${f#*:} ]] || { [[ $rc -eq 1 ]] && ! grep -q 'FAIL stories' <<<"$out"; }; then
+    echo "FAIL  ${f%:*} --stories: exit $rc, expected ${f#*:}"; bad=1
+  else
+    echo "ok    ${f%:*} --stories (exit $rc)"
+  fi
+done
+
 json="$(node "$here/plan-graph.mjs" "$here/fixtures/valid.json" --briefs "$here/fixtures/briefs" --json /dev/stdout --quiet)"
 if grep -q '"contract"' <<<"$json" && grep -q '"provides"' <<<"$json" && grep -q '"criticalPath"' <<<"$json"; then
   echo "ok    --json carries reviewBriefs (E-01 with contract, C with provides) and the critical path"

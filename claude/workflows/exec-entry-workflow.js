@@ -99,7 +99,7 @@ const REVIEW = obj({
 const mode = ['build', 'resume', 'update', 'fix'].includes(args?.mode) ? args.mode : 'build'
 const entry = args?.entry ?? '?'
 const contractCommit = args?.kind === 'contract'
-const sides = (Array.isArray(args?.sides) && args.sides.length ? args.sides : ['back', 'front']).filter(s => BUILDER_OF[s])
+const sides = (Array.isArray(args?.sides) && args.sides.length ? args.sides : contractCommit ? ['back'] : ['back', 'front']).filter(s => BUILDER_OF[s])
 const gatePaths = Array.isArray(args?.gatePaths) ? args.gatePaths : []
 const qaMode = () => args?.qa ?? (contractCommit || mode === 'fix' ? 'none' : 'surface')
 

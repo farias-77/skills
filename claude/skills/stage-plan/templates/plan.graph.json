@@ -1,24 +1,24 @@
 {
   "$comment": [
     "02-plan/plan.graph.json — the build graph. The planner writes it and keeps it in step with plan.md; scripts/plan-graph.mjs checks it. Stage 4 reads it for the start order, the edges and the owners.",
-    "acs: every AC id of the stories, exactly as written there. Each one is carried by exactly one node.",
+    "acs: every AC id of the stories, exactly as written there (J1.s2.1, frame:<token>.<n>); plan-graph.mjs --stories checks the two lists match. Each one is carried by exactly one node.",
     "shared: the files only the contract commit writes (the API spec, the generated code). Never the migrations folder: each entry owns its own migration files.",
     "nodes[].kind: contract (C: spec, the DDL two or more entries use, generated code, compile stubs, shared factories, the skeleton of a new module) · entry (E-nn: one whole behaviour, at most 12 ACs) · integration (E-int: only the journeys that cross entries, last).",
-    "nodes[].sides: back and/or front. Both only when the design gives the Contract; the brief copies it and stage 4 runs builder-backend and builder-frontend in parallel.",
+    "nodes[].sides: back and/or front. C has one builder, [\"back\"]. Both only when the design gives the Contract; the brief copies it and stage 4 runs builder-backend and builder-frontend in parallel.",
     "nodes[].after: only what nothing can fake. class ui = a journey drives the other entry's screen; class side-effect = a check reads its real effect. need = that behaviour in words. A child starts when its parent has merged into feat.",
     "nodes[].owns: every path the node creates or edits, one owner per path. extends: an addition to a file the contract commit or an ancestor created (a stub filled, a route registered).",
     "nodes[].provides / uses: the names that cross a node boundary, exactly as code imports or calls them.",
     "fronts: the other running fronts that change files this plan touches, with the agreement reached by message (coordination.md)."
   ],
   "workstream": "<workstream-slug>",
-  "acs": ["<S1.1>", "<S1.2>", "<S2.1>", "<S3.1>"],
+  "acs": ["<J1.s1.1>", "<J1.s1.2>", "<frame:orders.empty.1>", "<J2.s3.1>"],
   "shared": ["<backend/api/openapi.yaml>", "<backend/internal/gen/**>"],
   "fronts": [
     { "front": "<other-slug>", "session": "<its session name>", "files": ["<Makefile>"], "agreed": "<additive only: a new target at the end; it merges first>" }
   ],
   "nodes": [
     {
-      "id": "C", "kind": "contract", "name": "<Orders contract and skeleton>",
+      "id": "C", "kind": "contract", "name": "<Orders contract and skeleton>", "sides": ["back"],
       "after": [], "acs": [],
       "owns": ["<backend/api/openapi.yaml>", "<backend/internal/gen/**>", "<backend/database/migrations/20261005120000_orders.sql>", "<backend/internal/orders/module.go>", "<backend/internal/orders/http/stubs.go>", "<backend/tests/factory/order.go>"],
       "extends": [],
@@ -28,7 +28,7 @@
     {
       "id": "E-01", "kind": "entry", "name": "<Place an order>", "sides": ["back", "front"],
       "after": [],
-      "acs": ["<S1.1>", "<S1.2>"],
+      "acs": ["<J1.s1.1>", "<J1.s1.2>"],
       "owns": ["<backend/internal/orders/app/place_order.go>", "<frontend/app/src/features/orders/new/**>"],
       "extends": ["<backend/internal/orders/http/stubs.go>"],
       "provides": [], "uses": ["<POST /orders>", "<factory.Order>"]
@@ -36,7 +36,7 @@
     {
       "id": "E-02", "kind": "entry", "name": "<List orders by day>", "sides": ["back", "front"],
       "after": [],
-      "acs": ["<S2.1>"],
+      "acs": ["<frame:orders.empty.1>"],
       "owns": ["<backend/internal/orders/app/list_orders.go>", "<frontend/app/src/features/orders/list/**>"],
       "extends": [],
       "provides": [], "uses": ["<GET /orders>", "<factory.Order>"]
@@ -47,7 +47,7 @@
         { "id": "E-01", "class": "ui", "need": "<the journey submits the order form E-01 builds>" },
         { "id": "E-02", "class": "ui", "need": "<the journey reads the list E-02 builds>" }
       ],
-      "acs": ["<S3.1>"],
+      "acs": ["<J2.s3.1>"],
       "owns": ["<frontend/app/e2e/orders-place-and-list.spec.ts>"],
       "extends": [], "provides": [], "uses": ["<factory.Order>"]
     }

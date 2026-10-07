@@ -3,6 +3,7 @@
  * plan-graph.mjs — the mechanical check of a stage-3 build graph.
  *
  *   node plan-graph.mjs <02-plan/plan.graph.json> [--briefs <02-plan/briefs>]
+ *                       [--stories <00-discovery/stories.md>]
  *                       [--json <out.json>] [--mermaid <out.mmd>] [--quiet]
  *
  * FAIL  an AC carried by no node, by two, or unknown · an entry over the AC
@@ -12,7 +13,8 @@
  *       an edge to nothing, without a class (ui | side-effect) or without a
  *       need · not exactly one contract commit · an entry with no AC · an
  *       HTML comment in a plan file · with --briefs, a brief that disagrees
- *       with its node or a two-sided node with no Contract.
+ *       with its node or a two-sided node with no Contract · with --stories,
+ *       an AC id of stories.md missing from the graph's acs, or the reverse.
  * WARN  an entry over the AC warning line · a file extended by two nodes ·
  *       a node owning a file another front changes · an integration entry
  *       that is not last.
@@ -36,14 +38,14 @@ const list = (x) => (Array.isArray(x) ? x : [])
 
 function parseArgs(argv) {
   const value = (name) => { const i = argv.indexOf(name); return i >= 0 ? argv[i + 1] : null }
-  const flagged = new Set(['--briefs', '--json', '--mermaid'].map(f => argv.indexOf(f) + 1).filter(i => i > 0))
+  const flagged = new Set(['--briefs', '--stories', '--json', '--mermaid'].map(f => argv.indexOf(f) + 1).filter(i => i > 0))
   const graphPath = argv.find((a, i) => !a.startsWith('--') && !flagged.has(i))
-  return { graphPath, briefsDir: value('--briefs'), jsonOut: value('--json'), mermaidOut: value('--mermaid'), quiet: argv.includes('--quiet') }
+  return { graphPath, briefsDir: value('--briefs'), storiesPath: value('--stories'), jsonOut: value('--json'), mermaidOut: value('--mermaid'), quiet: argv.includes('--quiet') }
 }
 
 const opts = parseArgs(process.argv.slice(2))
 if (!opts.graphPath) {
-  console.error('usage: plan-graph.mjs <plan.graph.json> [--briefs <dir>] [--json <out>] [--mermaid <out>] [--quiet]')
+  console.error('usage: plan-graph.mjs <plan.graph.json> [--briefs <dir>] [--stories <stories.md>] [--json <out>] [--mermaid <out>] [--quiet]')
   process.exit(2)
 }
 let G
@@ -158,6 +160,14 @@ for (const n of rest) {
   else if (n.acs.length > AC_WARN) warn('cap', `${n.id}: ${n.acs.length} ACs, over ${AC_WARN}; check it fits ~45 min of builder`)
 }
 if (C?.acs.length) fail('ac', `${C.id}: the contract commit carries no AC`)
+
+if (opts.storiesPath) {
+  let text
+  try { text = readFileSync(opts.storiesPath, 'utf8') } catch (e) { console.error(`cannot read ${opts.storiesPath}: ${e.message}`); process.exit(2) }
+  const told = new Set([...text.matchAll(/^\s*- \*\*`([^`\s]+)`\*\*/gm)].map(m => m[1]))
+  for (const ac of told) if (!universe.has(ac)) fail('stories', `${ac}: in stories.md, missing from the graph's acs`)
+  for (const ac of universe) if (!told.has(ac)) fail('stories', `${ac}: in the graph's acs, not in stories.md`)
+}
 
 // ---------- ownership ----------
 
