@@ -94,7 +94,7 @@ small on the wrong thing builds the wrong thing.
 
 1. Write `<designs-root>/<slug>/brief.md` from `templates/brief.md`.
    Hotfix: its first AC is the one that reproduces the bug.
-2. `gitleaks dir <designs-root>/<slug>`: a finding stops everything
+2. `gitleaks dir <designs-root>/<slug>` (or `make gitleaks dir=…` when gitleaks is not on PATH): a finding stops everything
    (a secret in a brief is an incident).
 3. `.state.md`: route, `repo` (legacy or not), step. Your line in
    `_coordination.md`: slug, route, branch, this session's name. A

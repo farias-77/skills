@@ -338,7 +338,8 @@ bot; every push, PR and status comes from it.
 **What it is.** On the machine that runs the sessions: Node (current
 LTS); `playwright-core` and a Chromium for discovery's mock
 (`PLAYWRIGHT_DIR`, `PROTO_CHROME`); `ffmpeg` and `npm ci` in
-`claude/video/` for the reports' videos; `gitleaks`, which every report
+`claude/video/` for the reports' videos; `gitleaks` on PATH, or a project
+target `make gitleaks dir=<path>` that runs it, which every report
 publish runs first.
 
 **Why.** The mock is proved by walking it headless; every stage's

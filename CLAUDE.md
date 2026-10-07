@@ -146,7 +146,8 @@ tabs, **Video · Deck · Explainer**. The page is the fixed shell
 `artifact-builder` (both Sonnet 5.5, medium), or an Explainer filled from a template where the stage's
 data is a graph or a timeline. **A stage closes only when its three
 tabs are published**: he validates through them. Before each publish,
-`gitleaks dir <workstream>` must be clean. The page stays private;
+`gitleaks dir <workstream>` must be clean (where gitleaks is not on
+PATH, the project's own target: `make gitleaks dir=<workstream>`). The page stays private;
 anything published outside the company needs his approval. The
 procedure is [docs/stage-report.md](docs/stage-report.md).
 

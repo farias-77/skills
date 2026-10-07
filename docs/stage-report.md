@@ -62,7 +62,7 @@ stage work done
     node claude/scripts/telemetry.mjs <slug> --stage <stage> --ws <workstream> --out -
   → in parallel: video-builder · slides-builder · artifact-builder (or the session fills explainer.json)
   → wait for all three (renders queue on the machine, one at a time)
-  → gitleaks dir <workstream>; a finding stops the publish (a leak, per the security standard)
+  → gitleaks dir <workstream> (or make gitleaks dir=<workstream>); a finding stops the publish (a leak, per the security standard)
   → the session reads the new text files, then publishes to the SAME url: index.html, report.json and this stage's files only
   → report.json: the stage "closed" with closedAt, each tab "ready" (or "failed" with why); publish once more
   → the closing message: the link (…#<stage>), then what the stage asks of him

@@ -76,7 +76,7 @@ One-line commands, quoted in the readiness file:
 
 | Probe | For |
 |---|---|
-| `node --version`, `ffmpeg -version \| head -1`, `gitleaks version` | role 16 |
+| `node --version`, `ffmpeg -version \| head -1`, `gitleaks version` (or `make -n gitleaks dir=.`) | role 16 |
 | `ls "$PLAYWRIGHT_DIR"/node_modules/playwright-core/package.json`, then `proto.mjs look` on a file holding `<p>probe</p>` with `--shot` (`proto.mjs` adds the page skeleton itself and refuses a full page) | role 16, the mock |
 | `git -C <project> remote get-url origin` | the remote's kind |
 | GitHub only: `gh api repos/<owner>/<repo>/rulesets` and `.../branches/<default>/protection` (read-only) | roles 6 and 7 |

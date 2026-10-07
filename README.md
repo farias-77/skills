@@ -204,7 +204,8 @@ Then, in Claude Code inside the project:
   the script into the workstream and run the copy).
 - On the station: Node (current LTS), `ffmpeg` and `npm ci` in
   `claude/video/` for the reports; `playwright-core` and a Chromium for
-  discovery's mock (`PLAYWRIGHT_DIR`, `PROTO_CHROME`); `gitleaks`.
+  discovery's mock (`PLAYWRIGHT_DIR`, `PROTO_CHROME`); `gitleaks` on PATH, or the
+  project's `make gitleaks dir=<path>`.
 - Project specifics (environments, credentials, deploy targets) live
   in **your** project's `CLAUDE.md` and standards, never in these files.
 

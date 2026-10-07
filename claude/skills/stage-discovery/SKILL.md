@@ -2,7 +2,7 @@
 name: stage-discovery
 description: Conducts stage 1 (Discovery) of the pipeline. The user talks; a prototype-builder (Sonnet 5.5, medium) turns each answer into a visible edit of a live mock on his second screen; the conductor locks the mock when nothing is open; a story-writer (Sonnet 5.5, high) writes the stories with one acceptance criterion per rule or behavior; one review round (three lenses and two blind readers plus a judge per story) runs as a workflow; he confirms story by story in a playback; the stage closes with its report (video, deck, explainer). A conversation, never a /goal. The session runs on Opus 5.5, high. Use when /lets-cook routes a demand to the full pipeline, or to resume a discovery by its slug.
 argument-hint: "[workstream-slug]"
-allowed-tools: Read, Write, Edit, Glob, Grep, Agent, SendMessage, Workflow, AskUserQuestion, Artifact, ArtifactComments, Skill, Bash(mkdir *), Bash(date *), Bash(ls *), Bash(cp *), Bash(rm *), Bash(git *), Bash(node *), Bash(gitleaks *), Bash(realpath *), Bash(sha256sum *)
+allowed-tools: Read, Write, Edit, Glob, Grep, Agent, SendMessage, Workflow, AskUserQuestion, Artifact, ArtifactComments, Skill, Bash(mkdir *), Bash(date *), Bash(ls *), Bash(cp *), Bash(rm *), Bash(git *), Bash(node *), Bash(gitleaks *), Bash(make gitleaks *), Bash(realpath *), Bash(sha256sum *)
 ---
 
 # Stage 1: Discovery
@@ -305,7 +305,7 @@ background, each with the stage's files and the report folder
 While they work, clean what this stage created: `prototype/shots/`
 (local mode), any scratch frames folder, `_run/`, a recon stack still
 up. When they return: every number on a slide is checked against
-`stories.md` or the notes; run `gitleaks dir <workstream>` (a finding stops the publish);
+`stories.md` or the notes; run `gitleaks dir <workstream>` (or `make gitleaks dir=<workstream>` when gitleaks is not on PATH; a finding stops the publish);
 publish the page to the front's link with the label "discovery closed".
 
 Then: `.state.md` to `stage: design`, commit the workstream folder

@@ -2,7 +2,7 @@
 name: stage-design
 description: Conducts stage 2 (Design) of the pipeline, under one /goal. Takes the locked discovery (the mock, its stories and ACs) and produces one proposal sized to the problem, with its evolution path (v1 → v2 → v3), debated with the user until he says it is closed, then six documents the plan cuts without asking. Scouts (Sonnet 5.5, low) read the system; an architect (Opus 5.5, high) proposes and later writes solution.md; an overengineering-guard (Opus 5.5, medium) cuts what serves no AC and no real risk; he watches a deck and a short video and debates through the question tool; five design-writers (Sonnet 5.5, high) write the other documents; four lenses review once; the stage closes with its report (video, deck, explainer). The session runs on Opus 5.5, high. Use after a discovery closes, or to resume a design by its slug.
 argument-hint: "<workstream-slug>"
-allowed-tools: Read, Write, Edit, Glob, Grep, Agent, SendMessage, AskUserQuestion, Artifact, Skill, Bash(mkdir *), Bash(date *), Bash(ls *), Bash(cp *), Bash(rm *), Bash(git *), Bash(node *), Bash(gitleaks *), Bash(realpath *)
+allowed-tools: Read, Write, Edit, Glob, Grep, Agent, SendMessage, AskUserQuestion, Artifact, Skill, Bash(mkdir *), Bash(date *), Bash(ls *), Bash(cp *), Bash(rm *), Bash(git *), Bash(node *), Bash(gitleaks *), Bash(make gitleaks *), Bash(realpath *)
 ---
 
 # Stage 2: Design
@@ -295,7 +295,7 @@ the background, as `docs/stage-report.md` describes:
 While they work, clean what this stage created (scratch folders, a
 stack brought up for a check). When they return: every number on a
 slide is checked against a document or the notes; `gitleaks dir
-<workstream>` is clean (a finding stops
+<workstream>` (or `make gitleaks dir=<workstream>` when gitleaks is not on PATH) is clean (a finding stops
 the publish); publish to the front's link with the label "design
 closed".
 

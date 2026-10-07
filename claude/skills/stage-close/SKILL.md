@@ -120,7 +120,7 @@ Dispatch `slides-builder (Sonnet 5.5, medium)` as
 | Explainer | the report template from `metrics.json` | the front's time, cost and touches per stage, beside the earlier fronts' `metrics.json` |
 
 Check every number on a slide against `metrics.json`. Run
-`gitleaks dir <designs-root>/<slug>`; a finding stops the publish.
+`gitleaks dir <designs-root>/<slug>` (or `make gitleaks dir=…` when gitleaks is not on PATH); a finding stops the publish.
 Publish to the front's link with the label "closed". The page stays
 private: nothing goes outside the company without his approval.
 

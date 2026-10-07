@@ -189,7 +189,7 @@ not depend on the answer goes on (the report's pieces, the trace).
 
    The short route and the hotfix: the Deck only. When they return,
    check every number against `trace.md` and the CI runs, run
-   `gitleaks dir <designs-root>/<slug>` (a finding stops the publish),
+   `gitleaks dir <designs-root>/<slug>` (or `make gitleaks dir=…` when gitleaks is not on PATH; a finding stops the publish),
    and publish to the front's link with the label "release closed".
 3. **Cleanup.** Remove what this stage created: the `X.n` worktrees and
    their stacks (`claude/scripts/cleanup.sh <slug> --check` shows what
