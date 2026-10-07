@@ -30,7 +30,7 @@ Runtime needs: Node 20+, git, Docker (for the cleanup), `gitleaks`.
 | Agent | Does |
 |---|---|
 | `video-builder (Sonnet 5.5, high)` | the video for users (dispatched by the release, or here when it was not) |
-| `scout (Sonnet 5.5, low)` | the harvest of frictions, with `templates/harvest.md` |
+| `scout (Haiku 5.5, medium)` | the harvest of frictions, with `templates/harvest.md` |
 | `slides-builder (Sonnet 5.5, medium)` | the Close deck |
 
 ## Files

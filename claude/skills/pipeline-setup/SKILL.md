@@ -1,6 +1,6 @@
 ---
 name: pipeline-setup
-description: Brings a project to the pipeline's bar (docs/project-contract.md, 20 roles in three levels). Six scouts (Sonnet 5.5, low) read a detached worktree at the default branch's sha; the session rates every role, writes pipeline-readiness.md on a pipeline-setup branch (✓ present, ~ partial, ✗ missing, each with its path:line evidence), proposes the gaps cheapest first, and, on the user's word, applies the generic pieces on that branch, one commit per gap - the settings with the fail-closed guard wrapper, the guard and authorize.sh, the structure check, golden paths, the drive sections of the feature maps, the tokens export, the cloud-environment templates - closing with one run of the whole gate. Never on main, never a secret, never branch protection. The session runs on Opus 5.5, high. Use when adopting the pipeline, when a stage halted for a missing role, or to re-audit.
+description: Brings a project to the pipeline's bar (docs/project-contract.md, 20 roles in three levels). Six scouts (Haiku 5.5, medium) read a detached worktree at the default branch's sha; the session rates every role, writes pipeline-readiness.md on a pipeline-setup branch (✓ present, ~ partial, ✗ missing, each with its path:line evidence), proposes the gaps cheapest first, and, on the user's word, applies the generic pieces on that branch, one commit per gap - the settings with the fail-closed guard wrapper, the guard and authorize.sh, the structure check, golden paths, the drive sections of the feature maps, the tokens export, the cloud-environment templates - closing with one run of the whole gate. Never on main, never a secret, never branch protection. The session runs on Opus 5.5, high. Use when adopting the pipeline, when a stage halted for a missing role, or to re-audit.
 argument-hint: "<path-to-project>"
 allowed-tools: Read, Write, Edit, Glob, Grep, Agent, AskUserQuestion, Bash
 ---
@@ -28,7 +28,7 @@ the cheap gaps itself, on a branch.
 | Who | Does |
 |---|---|
 | you, the session (Opus 5.5, high) | rate every role from the scouts' quotes, write the readiness file and the plan, apply the templates, run each check |
-| `scout (Sonnet 5.5, low)` × 6 | one per group of `references/audit.md`; quotes with `path:line`, where it looked, what it did not find |
+| `scout (Haiku 5.5, medium)` × 6 | one per group of `references/audit.md`; quotes with `path:line`, where it looked, what it did not find |
 
 You never read the project to look something up: a scout does. You
 open a project file only to rate an ambiguous quote or to write it.

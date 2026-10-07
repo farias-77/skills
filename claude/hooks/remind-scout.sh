@@ -7,7 +7,7 @@
 # conversation, and every file it reads is paid again on every later turn.
 # This hook counts the main session's Read, Grep and Glob calls in a row. At
 # the Nth (SCOUT_REMINDER_AFTER, default 4) it adds one line of context:
-# send scout (Sonnet 5.5, low) with the question, or go on if you are about
+# send scout (Haiku 5.5, medium) with the question, or go on if you are about
 # to rule on that text. One reminder per streak; a Write, Edit, MultiEdit,
 # NotebookEdit, Agent or Task call ends the streak. A Read of a file the
 # session wrote earlier does not count.
@@ -70,7 +70,7 @@ case $tool in
     save "$count"
     if [ "$count" -eq "$after" ]; then
       jq -cn --arg n "$count" '{hookSpecificOutput: {hookEventName: "PostToolUse", additionalContext:
-        ("remind-scout: " + $n + " reads in a row. If you are looking something up, send scout (Sonnet 5.5, low) with the question and work from the lines it quotes. If you are about to rule on this text, go on.")}}'
+        ("remind-scout: " + $n + " reads in a row. If you are looking something up, send scout (Haiku 5.5, medium) with the question and work from the lines it quotes. If you are about to rule on this text, go on.")}}'
     fi
     ;;
 esac

@@ -26,7 +26,7 @@ allowed-tools: Read, Write, Edit, Glob, Grep, Agent, SendMessage, Workflow, AskU
 | the CI (GitHub Actions) | push to `main`: staging deploy + smoke. Tag `v*`: the same image to production, smoke, 15-minute watch, rollback, then the GitHub release |
 | the project's signoff command (`claude/scripts/local-ci.sh` when it names none) | the project's whole gate on this machine or a cloud VM, in a fresh worktree; the only writer of the required `local-ci` status, posted under the bot identity on green |
 | the stage-4 cast through `exec-entry-workflow.js` mode `fix` | an `X.n` fix: `builder-backend` · `builder-frontend (Opus 5.5, medium)`, `exec-gate (Sonnet 5.5, low)`, `reviewer (Opus 5.5, high)`; no QA unless the fix asks for one (`qa: 'backend'` when it touches auth, permissions or personal data) |
-| `scout (Sonnet 5.5, low)` | anything you need to look up |
+| `scout (Haiku 5.5, medium)` | anything you need to look up |
 | `video-builder (Sonnet 5.5, high)` · `slides-builder` · `artifact-builder (Sonnet 5.5, medium)` | the report's tabs; `video-builder` also starts the close's video for users |
 
 ## The flow

@@ -2,12 +2,13 @@
 // check-models.mjs — every agent's frontmatter against docs/models.md.
 //
 // Fails (exit 1) on:
-//   - a model outside Opus 5.5 / Sonnet 5.5 (Haiku 5.5 is recognised and
-//     refused with its reason until a blinded A/B on past tasks admits it);
+//   - a model outside Opus 5.5 / Sonnet 5.5 / Haiku 5.5;
 //   - an agent in claude/agents/ with no row in docs/models.md;
 //   - a model or effort that differs from the agent's row;
 //   - a description whose "(Model 5.5, effort)" mention differs from the frontmatter;
-//   - a workflow's AGENTS map entry that differs from the row;
+//   - a workflow's AGENTS or OVERRIDES entry that differs from the row, or from
+//     that workflow's row under "Per-call overrides";
+//   - a per-call override row that its workflow does not carry;
 //   - a file in claude/workflows/ not named <name>-workflow.js.
 // Warns on a row with no agent file (an agent planned or removed).
 //
@@ -19,16 +20,20 @@ import { fileURLToPath } from 'node:url';
 
 const root = resolve(process.argv[2] || join(dirname(fileURLToPath(import.meta.url)), '..'));
 const agentsDir = join(root, 'claude/agents');
-const MODELS = { 'claude-opus-5-5': 'Opus 5.5', 'claude-sonnet-5-5': 'Sonnet 5.5' };
-const PENDING = { 'claude-haiku-5-5': 'Haiku 5.5', haiku: 'Haiku 5.5' };
-const pending = (id) => `${PENDING[id]} (${id}) is known but not admitted yet: docs/models.md allows Opus 5.5 and Sonnet 5.5 only, until a blinded A/B on past tasks shows Haiku 5.5 ties for this role`;
+const MODELS = { 'claude-opus-5-5': 'Opus 5.5', 'claude-sonnet-5-5': 'Sonnet 5.5', 'claude-haiku-5-5': 'Haiku 5.5' };
 const EFFORTS = ['low', 'medium', 'high', 'xhigh', 'max'];
 
-// The table: | `name` | stage | Model | effort ... | evidence |
-const rows = new Map();
+// "The agents": | `name` | stage | Model | effort ... | evidence |
+// "Per-call overrides": | `file` | `agent` | Model | effort | evidence |
+const rows = new Map(), overrides = new Map();
+let section = '';
 for (const line of readFileSync(join(root, 'docs/models.md'), 'utf8').split('\n')) {
-  const m = line.match(/^\|\s*`([a-z0-9-]+)`\s*\|[^|]*\|\s*([^|]+?)\s*\|\s*([^|]+?)\s*\|/);
-  if (m) rows.set(m[1], { model: m[2], effort: m[3].split(/[\s;(]/)[0] });
+  if (line.startsWith('## ')) { section = line.slice(3).trim(); continue; }
+  const m = line.match(/^\|\s*`([a-z0-9.-]+)`\s*\|\s*([^|]*?)\s*\|\s*([^|]+?)\s*\|\s*([^|]+?)\s*\|/);
+  if (!m) continue;
+  const pick = { model: m[3], effort: m[4].split(/[\s;(]/)[0] };
+  if (section === 'The agents') rows.set(m[1], pick);
+  if (section === 'Per-call overrides') overrides.set(`${m[1]} ${m[2].replace(/`/g, '')}`, { ...pick, used: false });
 }
 
 const frontmatter = (text) => {
@@ -48,7 +53,7 @@ for (const file of readdirSync(agentsDir).filter((f) => f.endsWith('.md')).sort(
   const name = fm.name || file.replace(/\.md$/, '');
   seen.add(name);
   const model = MODELS[fm.model];
-  if (!model) { errors.push(`${file}: ${PENDING[fm.model] ? pending(fm.model) : `model "${fm.model ?? '(none)'}" is not Opus 5.5 or Sonnet 5.5`}`); continue; }
+  if (!model) { errors.push(`${file}: model "${fm.model ?? '(none)'}" is not Opus 5.5, Sonnet 5.5 or Haiku 5.5`); continue; }
   if (!EFFORTS.includes(fm.effort)) errors.push(`${file}: effort "${fm.effort ?? '(none)'}" is not one of ${EFFORTS.join(', ')}`);
   if (model === 'Sonnet 5.5' && ['xhigh', 'max'].includes(fm.effort)) errors.push(`${file}: Sonnet 5.5 never above high`);
   const row = rows.get(name);
@@ -59,22 +64,27 @@ for (const file of readdirSync(agentsDir).filter((f) => f.endsWith('.md')).sort(
   if (said && (`${said[1]} ${said[2]}` !== model || said[3] !== fm.effort))
     errors.push(`${file}: description says ${said[1]} ${said[2]}, ${said[3]} ≠ frontmatter ${model}, ${fm.effort}`);
 }
-// The workflows' AGENTS maps (used when agents run inline) must agree too.
+// The workflows' AGENTS maps (used when agents run inline) and OVERRIDES maps
+// (per call, in both modes) must agree too: an entry matches its agent row, or
+// this workflow's per-call override row.
 const wfDir = join(root, 'claude/workflows');
-const SHORT = { opus: 'Opus 5.5', sonnet: 'Sonnet 5.5' };
+const SHORT = { opus: 'Opus 5.5', sonnet: 'Sonnet 5.5', haiku: 'Haiku 5.5' };
 for (const file of readdirSync(wfDir).filter((f) => !/^[a-z0-9-]+-workflow\.js$/.test(f)))
   errors.push(`workflows/${file}: a workflow file is named <name>-workflow.js`);
 for (const file of readdirSync(wfDir).filter((f) => f.endsWith('.js')).sort()) {
   const text = readFileSync(join(wfDir, file), 'utf8');
   for (const m of text.matchAll(/^\s*'?([a-z][a-z0-9-]*)'?:\s*\{\s*model:\s*'(\w+)',\s*effort:\s*'(\w+)'/gm)) {
     const [, name, short, effort] = m;
-    const row = rows.get(name);
-    if (!SHORT[short]) { errors.push(`workflows/${file}: ${name} ${PENDING[short] ? pending(short) : `model "${short}" is not opus or sonnet`}`); continue; }
+    const row = rows.get(name), over = overrides.get(`${file} ${name}`);
+    if (!SHORT[short]) { errors.push(`workflows/${file}: ${name} model "${short}" is not opus, sonnet or haiku`); continue; }
     if (!row) { errors.push(`workflows/${file}: "${name}" has no row in docs/models.md`); continue; }
-    if (row.model !== SHORT[short] || row.effort !== effort)
-      errors.push(`workflows/${file}: ${name} ${SHORT[short]}, ${effort} ≠ docs/models.md ${row.model}, ${row.effort}`);
+    const same = (r) => r && r.model === SHORT[short] && r.effort === effort;
+    if (same(over)) { over.used = true; continue; }
+    if (!same(row))
+      errors.push(`workflows/${file}: ${name} ${SHORT[short]}, ${effort} ≠ docs/models.md ${row.model}, ${row.effort}${over ? ` (or its override ${over.model}, ${over.effort})` : ''}`);
   }
 }
+for (const [key, o] of overrides) if (!o.used) errors.push(`docs/models.md: the override ${key} (${o.model}, ${o.effort}) is not in that workflow`);
 for (const name of rows.keys()) if (!seen.has(name)) warnings.push(`docs/models.md: "${name}" has no file in claude/agents/`);
 
 for (const w of warnings) console.log(`warn  ${w}`);

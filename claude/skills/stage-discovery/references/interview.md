@@ -35,7 +35,7 @@ the implementer decides it.
 
 | Never ask | Instead |
 |---|---|
-| a fact the code, the docs or `rulings.md` hold | a `scout (Sonnet 5.5, low)` finds it |
+| a fact the code, the docs or `rulings.md` hold | a `scout (Haiku 5.5, medium)` finds it |
 | something he will recognize when he sees it (a layout, a density, a tone, which of two flows) | put it in the mock, as variants (three at most) in the debug bar |
 | the obvious ("should the button say Save?") | the mock answers it |
 | a hypothetical ("would managers use this?") | the last real case ("when did one last…?") |

@@ -33,10 +33,10 @@ open ──► P0 recon ──► P1 cut ──► P2 briefs ∥ pre-flight ─�
 
 | Step | Who | Produces |
 |---|---|---|
-| P0 recon | `scout (Sonnet 5.5, low)` × N, all at once | `02-plan/recon/<topic>.md` |
+| P0 recon | `scout (Haiku 5.5, medium)` × N, all at once | `02-plan/recon/<topic>.md` |
 | P1 cut | `planner (Opus 5.5, high)` + `plan-graph.mjs` | `plan.graph.json`, `plan.md` |
 | P2 briefs | `plan-writer (Sonnet 5.5, high)` × node, all at once; the session writes `preflight.md` | `briefs/<id>.md`, `preflight.md` |
-| P3 review | `plan-review-workflow.js`: `plan-reviewer (Opus 5.5, medium)` ∥ per brief `blind-reader (Sonnet 5.5, low)` × 2 → `blind-judge (Sonnet 5.5, medium)` | `reviews/round-1.json`, `reviews.md` |
+| P3 review | `plan-review-workflow.js`: `plan-reviewer (Opus 5.5, medium)` ∥ per brief `blind-reader (Haiku 5.5, high)` × 2 → `blind-judge (Sonnet 5.5, medium)` | `reviews/round-1.json`, `reviews.md` |
 | P4 close | the session; `video-builder (Sonnet 5.5, high)` ∥ `slides-builder (Sonnet 5.5, medium)`; the Explainer by template | the report, `_coordination.md`, the message |
 
 The session is the conductor: Opus 5.5, high. It dispatches, rules,
@@ -85,7 +85,7 @@ the last message lists what was decided in my place and the next command.
 
 ## P0 · Recon
 
-One `scout (Sonnet 5.5, low)` per question, all in one message. Each
+One `scout (Haiku 5.5, medium)` per question, all in one message. Each
 answer opens with `<repo>@<branch> <sha>` and quotes `path:line`. Save
 each as it came to `02-plan/recon/<topic>.md`.
 

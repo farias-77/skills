@@ -37,6 +37,7 @@ run none s1 Grep
 run none s1 Glob
 run remind s1 Read /r/d.md
 printf '%s' "$last" | jq -e '.hookSpecificOutput.hookEventName == "PostToolUse"' >/dev/null; check 0 $? "the reminder is PostToolUse additionalContext JSON"
+printf '%s' "$last" | jq -e '.hookSpecificOutput.additionalContext | contains("send scout (Haiku 5.5, medium)")' >/dev/null; check 0 $? "the reminder names scout (Haiku 5.5, medium)"
 run none s1 Read /r/e.md
 run none s1 Read /r/f.md
 

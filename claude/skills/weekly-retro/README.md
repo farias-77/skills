@@ -24,7 +24,7 @@ incident issues.
 
 | Agent | Does |
 |---|---|
-| `scout (Sonnet 5.5, low)` | a quote or a line from a front's notes or an earlier board |
+| `scout (Haiku 5.5, medium)` | a quote or a line from a front's notes or an earlier board |
 
 ## Files
 

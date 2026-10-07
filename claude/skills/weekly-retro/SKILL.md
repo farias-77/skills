@@ -47,7 +47,7 @@ items that are due. Nothing due either: say so in one line and stop.
 - **Numbers by `jq`**, never by reading: from each front's
   `metrics.json`, the totals (calendar and clock minutes, cost, his
   touches, waits on him) and the per-stage rows.
-- **The rest by `scout (Sonnet 5.5, low)`**: a quote you need from a
+- **The rest by `scout (Haiku 5.5, medium)`**: a quote you need from a
   front's `dreaming-notes.md`, a line of a board, the earlier boards'
   "dropped" and "parked" lists.
 - **Live fixes:** `git log` of the pipeline repo's `main` since last

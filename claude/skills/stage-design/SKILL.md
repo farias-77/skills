@@ -1,6 +1,6 @@
 ---
 name: stage-design
-description: Conducts stage 2 (Design) of the pipeline, under one /goal. Takes the locked discovery (the mock, its stories and ACs) and produces one proposal sized to the problem, with its evolution path (v1 → v2 → v3), debated with the user until he says it is closed, then six documents the plan cuts without asking. Scouts (Sonnet 5.5, low) read the system; an architect (Opus 5.5, high) proposes and later writes solution.md; an overengineering-guard (Opus 5.5, medium) cuts what serves no AC and no real risk; he watches a deck and a short video and debates through the question tool; five design-writers (Sonnet 5.5, high) write the other documents; four lenses review once; the stage closes with its report (video, deck, explainer). The session runs on Opus 5.5, high. Use after a discovery closes, or to resume a design by its slug.
+description: Conducts stage 2 (Design) of the pipeline, under one /goal. Takes the locked discovery (the mock, its stories and ACs) and produces one proposal sized to the problem, with its evolution path (v1 → v2 → v3), debated with the user until he says it is closed, then six documents the plan cuts without asking. Scouts (Haiku 5.5, medium) read the system; an architect (Opus 5.5, high) proposes and later writes solution.md; an overengineering-guard (Opus 5.5, medium) cuts what serves no AC and no real risk; he watches a deck and a short video and debates through the question tool; five design-writers (Sonnet 5.5, high) write the other documents; four lenses review once; the stage closes with its report (video, deck, explainer). The session runs on Opus 5.5, high. Use after a discovery closes, or to resume a design by its slug.
 argument-hint: "<workstream-slug>"
 allowed-tools: Read, Write, Edit, Glob, Grep, Agent, SendMessage, AskUserQuestion, Artifact, Skill, Bash(mkdir *), Bash(date *), Bash(ls *), Bash(cp *), Bash(rm *), Bash(git *), Bash(node *), Bash(gitleaks *), Bash(make gitleaks *), Bash(realpath *)
 ---
@@ -47,7 +47,7 @@ D0 reading → D1 his idea → D2 architect → guard → your ruling
 
 | Step | Who (model, effort) | Produces |
 |---|---|---|
-| D0 reading | `scout (Sonnet 5.5, low)` × N | `recon/<topic>.md`, each written by its scout |
+| D0 reading | `scout (Haiku 5.5, medium)` × N | `recon/<topic>.md`, each written by its scout |
 | D1 his idea | you (Opus 5.5, high) | `notes.md` · His idea |
 | D2 proposal | `architect (Opus 5.5, high)` → `overengineering-guard (Opus 5.5, medium)` | `proposal.md` |
 | D3 present | `slides-builder (Sonnet 5.5, medium)` first; `video-builder (Sonnet 5.5, high)` beside it | deck + video on the front's link (Design, running) |
@@ -118,7 +118,7 @@ first.
 ## D0 · Reading
 
 Read `stories.md` whole. Create `01-design/notes.md` from the
-template. Then one `scout (Sonnet 5.5, low)` per question, all in
+template. Then one `scout (Haiku 5.5, medium)` per question, all in
 parallel, each writing its answer (quotes with `path:line`, the base as
 `<repo>@<branch> <sha>`) to `recon/<topic>.md`:
 

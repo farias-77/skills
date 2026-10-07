@@ -20,7 +20,7 @@ weekly.
 | Source | What it gives |
 |---|---|
 | `metrics.json` (`telemetry.mjs`) | the numbers; the stage that took longest; the wait on him |
-| the harvest of `scout (Sonnet 5.5, low)` | each friction with `path:line`, the quote, the time it cost |
+| the harvest of `scout (Haiku 5.5, medium)` | each friction with `path:line`, the quote, the time it cost |
 | `dreaming-notes.md` | frictions noted on the spot; his `[user]` notes; `[taste]` patterns in his rulings |
 | `rulings.md` | what he ruled, and where he ruled against the recommendation |
 

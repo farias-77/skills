@@ -1,6 +1,6 @@
 export const meta = {
   name: 'plan-review',
-  description: 'Stage-3 review in one round: plan-reviewer (Opus 5.5, medium) over the graph and every brief, in parallel with two blind-readers (Sonnet 5.5, low) and one blind-judge (Sonnet 5.5, medium) per brief; only quoted findings come back, for the conductor to rule',
+  description: 'Stage-3 review in one round: plan-reviewer (Opus 5.5, medium) over the graph and every brief, in parallel with two blind-readers (Haiku 5.5, high) and one blind-judge (Sonnet 5.5, medium) per brief; only quoted findings come back, for the conductor to rule',
   whenToUse: 'Called by the stage-plan session after plan-graph.mjs --briefs is green; args carry paths, never text',
   phases: [
     { title: 'Review', detail: 'plan-reviewer: buildable without asking, real edges, a thin contract commit, the other fronts' },
@@ -12,6 +12,10 @@ const AGENTS = {
   'plan-reviewer': { model: 'opus', effort: 'medium' },
   'blind-reader': { model: 'sonnet', effort: 'low' },
   'blind-judge': { model: 'sonnet', effort: 'medium' },
+}
+// Per call, in both modes (docs/models.md, "Per-call overrides"): briefs are read on Haiku; the agent file stays Sonnet for discovery stories.
+const OVERRIDES = {
+  'blind-reader': { model: 'haiku', effort: 'high' },
 }
 const MIN_QUOTE = 12
 
@@ -55,8 +59,8 @@ const VERDICT = obj({
 // ---------- calling an agent ----------
 
 function call(name, prompt, opts) {
-  if (args?.inlineAgents !== true) return agent(prompt, { ...opts, agentType: name })
-  const { model, effort } = AGENTS[name]
+  if (args?.inlineAgents !== true) return agent(prompt, { ...opts, agentType: name, ...OVERRIDES[name] })
+  const { model, effort } = OVERRIDES[name] ?? AGENTS[name]
   return agent(`Your instructions are ${args.agentsDir}/${name}.md: read it first and follow it.\n\n${prompt}`, { ...opts, model, effort })
 }
 

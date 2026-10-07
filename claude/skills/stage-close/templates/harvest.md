@@ -1,6 +1,6 @@
 # Harvest brief (for the scout)
 
-<!-- The close sends this to scout (Sonnet 5.5, low) with the paths filled.
+<!-- The close sends this to scout (Haiku 5.5, medium) with the paths filled.
      The return goes straight into the retro; nothing is written to a file. -->
 
 Read these files whole, and nothing else. A path that does not exist goes

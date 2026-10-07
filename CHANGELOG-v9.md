@@ -320,3 +320,13 @@ supersedes the earlier ones where they differ.
 | `[taste]` lines go to `dreaming-notes.md`; `taste-notes.md`, the knowledge packs, the reviewer contract and the old agents (`prototyper`, `journey-scribe`, `disc-reviewer`, `design-reviewer`, `overengineering-critic`, `design-researcher`, `builder`, the scribes, `launch-director`, `footage-recorder`, `close-harvester`, `weekly-reader`) are gone | fewer files to keep true |
 | The bar (`docs/project-contract.md`) is 20 roles: the commands table, the fast check, the sized entry gate, the whole gate, the signoff, gate paths and the floor, the stack with the sweep, timestamped migrations with restamp, delivery, the smoke and staging actors, the guard and authorization, agent identities, the station; `/pipeline-setup` audits them and installs the guard behind a fail-closed wrapper with `authorize.sh` | the project's side of the factory, written down |
 | Every skill folder has a README; workflows are named `<name>-workflow.js` (checked by `scripts/check-models.mjs`) | each skill can be taken alone |
+
+## Haiku 5.5 where it ties
+
+A blinded A/B on real past dispatches; a role switches only where Haiku ties (no worse on the blind verdict, no worse on false greens). The numbers are in `docs/models.md`.
+
+| Change | Why |
+|---|---|
+| `scout (Haiku 5.5, medium)`, everywhere a scout is named, and the scout reminder hook | won 20 of 30 pairs, 0 false greens against Sonnet's 2, about 8× cheaper |
+| `blind-reader (Haiku 5.5, high)` on plan briefs, as a per-call override in `plan-review-workflow.js`; discovery stories stay on `blind-reader (Sonnet 5.5, low)`. `check-models.mjs` admits Haiku 5.5 and checks the overrides table | briefs: 9 wins, 1 tie; stories: Haiku passed a known defect twice |
+| `exec-gate` stays on Sonnet 5.5, low until a live check at the first front: 2–3 real entries' gates on Haiku 5.5, medium beside it (`stage-execute/references/tech-lead.md`) | it won the A/B, but a gate miss is costly; one live check first |

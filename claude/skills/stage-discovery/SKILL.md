@@ -50,7 +50,7 @@ holds in these steps, with the close as the "done".
 
 | Step | Who (model, effort) | Produces |
 |---|---|---|
-| D0 recon | `scout (Sonnet 5.5, low)` × N, background | `recon/<topic>.md`, `recon/screens/*.png` |
+| D0 recon | `scout (Haiku 5.5, medium)` × N, background | `recon/<topic>.md`, `recon/screens/*.png` |
 | D1 interview | you (Opus 5.5, high) | `notes.md`, every turn |
 | D2 live mock | `prototype-builder (Sonnet 5.5, medium)`, one agent, edit orders by `SendMessage` | `prototype/index.html`, published to one URL |
 | D3 lock | you | `LOCK.json`, `versions/v<N>.html`, `frames/` |
@@ -125,7 +125,7 @@ The host may lack a tool; say what is missing in one line and run on:
 
 ## D0 · Recon, in the background
 
-From his first sentences, one `scout (Sonnet 5.5, low)` per question,
+From his first sentences, one `scout (Haiku 5.5, medium)` per question,
 in parallel, in the background; never wait on them to talk to him.
 Each writes its answer, quotes with `path:line`, to
 `00-discovery/recon/<topic>.md`:

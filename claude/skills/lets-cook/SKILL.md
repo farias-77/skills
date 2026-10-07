@@ -42,7 +42,7 @@ allowed-tools: Read, Write, Edit, Glob, Grep, Agent, SendMessage, Workflow, AskU
 | Who (model, effort) | Does | Route |
 |---|---|---|
 | you, the session (Opus 5.5, high) | the interview, the route, the brief, the release, the short close | all |
-| `scout (Sonnet 5.5, low)` × 2–4 | the area's map, the other fronts, legacy or not, broken in production or not | all |
+| `scout (Haiku 5.5, medium)` × 2–4 | the area's map, the other fronts, legacy or not, broken in production or not | all |
 | the stage-4 cast through `exec-entry-workflow.js` | `builder-backend` · `builder-frontend (Opus 5.5, medium)` → `exec-gate (Sonnet 5.5, low)` → `reviewer (Opus 5.5, high)` ∥ `qa-frontend` · `qa-backend (Opus 5.5, medium)` by surface | short, hotfix |
 | `slides-builder (Sonnet 5.5, medium)` | the minimal report's decks | short, hotfix |
 | `video-builder (Sonnet 5.5, high)` | the users' video, only when a screen users see changed | short, hotfix |
@@ -62,7 +62,7 @@ delegated) and the release's stop list. A wait ends on a
    `realpath ${CLAUDE_SKILL_DIR}/../../../CLAUDE.md` prints and run its
    Open: the canary.
 2. **Scouts, in the background, from his first sentence.** One
-   `scout (Sonnet 5.5, low)` per question: where this lives (the
+   `scout (Haiku 5.5, medium)` per question: where this lives (the
    feature map, the files); which fronts are open
    (`_coordination.md`) and whether one touches this area; is it in a
    legacy repo.

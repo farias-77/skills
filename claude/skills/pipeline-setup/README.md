@@ -27,7 +27,7 @@ for a GitHub remote.
 
 | Agent | Does |
 |---|---|
-| `scout (Sonnet 5.5, low)` × 6 | one per group of roles; quotes with `path:line`, where it looked, what it did not find |
+| `scout (Haiku 5.5, medium)` × 6 | one per group of roles; quotes with `path:line`, where it looked, what it did not find |
 
 ## Files
 

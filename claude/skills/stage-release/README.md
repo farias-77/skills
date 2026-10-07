@@ -30,7 +30,7 @@ guard installed with the settings wrapper.
 
 | Agent | Does |
 |---|---|
-| `scout (Sonnet 5.5, low)` | lookups |
+| `scout (Haiku 5.5, medium)` | lookups |
 | the stage-4 cast, through `exec-entry-workflow.js` mode `fix` | an `X.n` fix |
 | `video-builder (Sonnet 5.5, high)` | the Release video; starts the close's video for users at the green staging |
 | `slides-builder (Sonnet 5.5, medium)` | the Release deck |

@@ -27,7 +27,7 @@ README).
 
 | Agent | Does |
 |---|---|
-| `scout (Sonnet 5.5, low)` × 2–4 | the area's map, the other fronts, legacy or not, broken in production or not |
+| `scout (Haiku 5.5, medium)` × 2–4 | the area's map, the other fronts, legacy or not, broken in production or not |
 | the stage-4 cast, through `exec-entry-workflow.js` | the one entry and its adjustments |
 | `slides-builder (Sonnet 5.5, medium)` | the minimal report's decks |
 | `video-builder (Sonnet 5.5, high)` | the users' video, only when a screen users see changed |

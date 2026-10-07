@@ -92,7 +92,7 @@ A stage's session is an expensive model in a long conversation: a file
 it opens is paid again on every turn after. **When it needs something
 it has not read** (what a document says, what a repo has, what a
 standard requires, what a past front recorded), **it dispatches
-`scout (Sonnet 5.5, low)`**, which quotes the literal lines with
+`scout (Haiku 5.5, medium)`**, which quotes the literal lines with
 `path:line`, says where it looked and what it did not find, and writes
 its answer to the file the session names (`recon/<topic>.md`). The
 session opens a file itself only when it is about to rule on it, when

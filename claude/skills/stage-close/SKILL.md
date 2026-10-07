@@ -25,7 +25,7 @@ allowed-tools: Read, Write, Edit, Glob, Grep, Agent, AskUserQuestion, Artifact, 
 |---|---|
 | you, the session (Opus 5.5, high) | the retro, the cleanup, the checks, the delivery |
 | `video-builder (Sonnet 5.5, high)` | the video for users, started at the release's green staging |
-| `scout (Sonnet 5.5, low)` | the harvest of frictions, with `templates/harvest.md` |
+| `scout (Haiku 5.5, medium)` | the harvest of frictions, with `templates/harvest.md` |
 | `slides-builder (Sonnet 5.5, medium)` | the Close deck |
 
 ## The flow
@@ -92,7 +92,7 @@ none of these → dispatch it now with
 When it returns, check it as that reference says.
 
 **The retro.**
-1. Dispatch one `scout (Sonnet 5.5, low)` with `templates/harvest.md`
+1. Dispatch one `scout (Haiku 5.5, medium)` with `templates/harvest.md`
    and these paths: `dreaming-notes.md`, `rulings.md`, every stage's
    board or trace (`03-execution/` board and parked list,
    `04-release/trace.md`), and the reviews files. It returns each

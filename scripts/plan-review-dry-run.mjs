@@ -42,16 +42,17 @@ const scenarios = [
     reader: () => reading([]), expect: { valid: false, unread: ['C', 'E-01', 'E-02'], judges: 0 } },
   { title: 'a lazy reviewer (nothing found, nothing verified) twice → invalid round',
     reviewer: () => ({ verified: [], findings: [] }), expect: { valid: false, reviewers: 2 } },
-  { title: 'inline agents: the prompt points at the definition and the model comes from the map',
+  { title: 'inline agents: the prompt points at the definition and the model comes from the map (the blind-reader on its Haiku override)',
     args: { inlineAgents: true, agentsDir: '/p/agents' }, expect: { valid: true, inline: true } },
 ]
 
 let bad = 0
 for (const sc of scenarios) {
-  const counts = {}, logs = [], models = new Set()
+  const counts = {}, logs = [], models = new Set(), readerModels = new Set()
   const agent = async (prompt, o) => {
     const name = o.agentType ?? prompt.match(/agents\/([a-z-]+)\.md/)?.[1]
     if (!o.agentType) models.add(`${name}:${o.model}/${o.effort}`)
+    if (name === 'blind-reader') readerModels.add(`${o.model}/${o.effort}`)
     counts[name] = (counts[name] ?? 0) + 1
     const brief = prompt.match(/Brief (\S+?)[,.]/)?.[1]
     const keys = prompt.match(/The keys: (.*)/)?.[1].split(', ') ?? []
@@ -78,6 +79,7 @@ for (const sc of scenarios) {
   if ('judges' in e && (counts['blind-judge'] ?? 0) !== e.judges) got.push(`judges ${counts['blind-judge'] ?? 0}`)
   if ('reviewers' in e && counts['plan-reviewer'] !== e.reviewers) got.push(`reviewers ${counts['plan-reviewer']}`)
   if (e.inline && !models.has('plan-reviewer:opus/medium')) got.push(`inline models ${[...models]}`)
+  if ([...readerModels].some(m => m !== 'haiku/high')) got.push(`blind-reader not on haiku/high: ${[...readerModels]}`)
   if (r.findings.some(f => !f.quote || !f.id)) got.push('a finding without quote or id')
   console.log(`${got.length ? 'FAIL' : 'ok  '}  ${sc.title}${got.length ? `  (${got.join(', ')})` : ''}`)
   if (verbose || got.length) logs.forEach(l => console.log(`        log: ${l}`))

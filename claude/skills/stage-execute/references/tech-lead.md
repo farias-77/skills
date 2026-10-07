@@ -47,6 +47,7 @@ overlap: settle it now, before it is a conflict.
 | A flaky test outside the diff | the gate already ran it again once; it goes on the board and an `X.n` fixes it in the next push that was happening anyway |
 | The same file conflicting again and again | resolve it, and note the hot file in `dreaming-notes.md` |
 | Disk under 10 GB free | no new local stack starts; under 5 GB, stop and clean (worktrees and stacks of merged entries first) |
+| The first front after the Haiku A/B (`exec-gate` live check, `docs/models.md`) | on 2–3 real entries, right after the entry's gate returns, dispatch `exec-gate` once more on the same head with Haiku 5.5, medium, without the stack; record both results (green, each `code`/`machine` tag, the surface) on the board and act only on the Sonnet one. They agree → note in `dreaming-notes.md` that `exec-gate` switches to Haiku 5.5, medium |
 | Nothing in flight and nothing can start | decide what is the session's; only what is his becomes a notification and one question. Never stand still in silence |
 
 ## Night and limits

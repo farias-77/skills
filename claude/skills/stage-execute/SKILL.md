@@ -48,7 +48,7 @@ open ──► prepare (feat, board, keep the machine awake) ──► C ──�
 | `reviewer` | Opus 5.5, high | every diff: the six classes and the security checklist |
 | `qa-frontend` | Opus 5.5, medium | uses the screens and tries to break them, when screen behaviour changed |
 | `qa-backend` | Opus 5.5, medium | calls the API as client and attacker, when API, data or permissions changed |
-| `scout` | Sonnet 5.5, low | finds and quotes what the session needs to know |
+| `scout` | Haiku 5.5, medium | finds and quotes what the session needs to know |
 | `video-builder` | Sonnet 5.5, high | the report's Video |
 | `slides-builder` | Sonnet 5.5, medium | the report's Deck |
 

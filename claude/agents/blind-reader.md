@@ -1,6 +1,6 @@
 ---
 name: blind-reader
-description: A blind reader, shared by stage 1 (Discovery) and stage 3 (Plan). Reads one text with no other context - one story and the locked mock, or one brief exactly as its builder will get it - and writes down, key by key, what it understood and how it would judge or build it. It does not hunt for problems; it reads. Two run per text, never seeing each other, and a blind-judge compares them. Sonnet 5.5, low.
+description: A blind reader, shared by stage 1 (Discovery) and stage 3 (Plan). Reads one text with no other context - one story and the locked mock, or one brief exactly as its builder will get it - and writes down, key by key, what it understood and how it would judge or build it. It does not hunt for problems; it reads. Two run per text, never seeing each other, and a blind-judge compares them. Sonnet 5.5, low for discovery stories; plan-review-workflow.js runs it on Haiku 5.5, high for plan briefs (docs/models.md).
 model: claude-sonnet-5-5
 effort: low
 tools: Read, Bash(node *)
