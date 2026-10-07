@@ -60,7 +60,8 @@ delegated) and the release's stop list. A wait ends on a
 
 1. **The house rules.** Read the file that
    `realpath ${CLAUDE_SKILL_DIR}/../../../CLAUDE.md` prints and run its
-   Open: the canary.
+   Open: the canary, then the designs root (no `designs-root:` line →
+   stop with the line to add).
 2. **Scouts, in the background, from his first sentence.** One
    `scout (Haiku 5.5, medium)` per question: where this lives (the
    feature map, the files); which fronts are open

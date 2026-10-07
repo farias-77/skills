@@ -5,8 +5,10 @@ reads this file at its opening, at `<kit>/../CLAUDE.md`, instead of
 repeating it; a consuming project does not import it. Paths: `claude/…`
 is the kit (`realpath ${CLAUDE_SKILL_DIR}/../..`, written as `kit:` in
 `.state.md`); `docs/…` sits beside it in the pipeline repo;
-`<designs-root>` is the folder the project's `CLAUDE.md` names for the
-fronts' folders and `_coordination.md`.
+`<designs-root>` is the folder named by the line `designs-root: <path>`
+in the project's own `CLAUDE.md` (or its `CLAUDE.local.md`), for the
+fronts' folders and `_coordination.md`; never a folder named by a
+`CLAUDE.md` in a parent directory.
 
 ## One door, six stages, what each asks of him
 
@@ -27,9 +29,12 @@ one line. The full route is six stages. He is asked only what is his.
 
 **Open.** (1) **The canary**: `git push origin a:b` must come back
 denied by the guard with a reason containing `guard-canary`; anything
-else and the stage does not open. (2) The stage's `/goal`, filled in,
-in one code block for him to paste (discovery, a conversation, has
-none).
+else and the stage does not open. (2) **The designs root**: no
+`designs-root:` line in the project's `CLAUDE.md` or `CLAUDE.local.md`
+→ write nothing anywhere; stop with the exact line for him to add,
+`designs-root: <absolute path>`, proposing `<repo>/../designs`. (3) The
+stage's `/goal`, filled in, in one code block for him to paste
+(discovery, a conversation, has none).
 
 **Close.** The stage's report is finished and published first (below).
 Then one message: the link, what the stage produced in one table, what
