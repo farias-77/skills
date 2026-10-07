@@ -31,7 +31,7 @@ when its three tabs are published, and that message carries the link.
 | Plan | the graph assembling: contract commit, entries in parallel, critical path | entries, edges and why, merge points with other fronts, what was decided in his place | the clickable DAG (each node: ACs, files, dependencies) |
 | Execute | what was built, real screens in motion | per entry: ACs → proofs, findings, A.n, what is parked | the replay of the DAG on a timeline: what ran when, where the time went |
 | Release | main → staging → tag → production, smokes and the watch, 30–45 s | versions, notes, smokes, rollback if any | the release timeline; with an incident, the incident drawn |
-| Close | **for users**: a tutorial of the new screens, or a motion piece of the idea if only the backend changed, 1–3 min, recorded on staging | the retro (up to 5 per section) + the numbers + the "what's new" text to paste | the workstream's numbers: time, cost and touches per stage, against earlier workstreams |
+| Close | **for users**: a tutorial of the new screens, or a motion piece of the idea if only the backend changed, 30 s – 3 min, recorded on staging | the retro (up to 5 per section) + the numbers + the "what's new" text to paste | the workstream's numbers: time, cost and touches per stage, against earlier workstreams |
 
 **Short route and hotfix:** the rail is **Build · Release · Close**. What
 each of their tabs holds is the table in `lets-cook` §8 "The short close",

@@ -13,7 +13,8 @@ video is the showing.
 | a screen someone uses | a **tutorial** of the new screens, recorded in staging, cut into a motion piece |
 | only backend | a **motion piece** that explains the idea in the users' words ("your leads arrive on their own at 6 am") |
 
-Screens are ingredients; the piece is motion. 1–3 minutes, an `.mp4`
+Screens are ingredients; the piece is motion. 30 s – 3 min (a one-label
+change is 30–45 s), an `.mp4`
 of at most 15 MB that he forwards himself. Built with the
 `make-it-a-movie` skill by `video-builder (Sonnet 5.5, high)`, in
 one render.
@@ -57,7 +58,7 @@ right screen, the actors' rows only, captions readable, nothing
 technical on screen. Then it renders once.
 
 You check the finished video by its stills and its length, never by
-watching it whole: duration 1–3 min, size ≤ 15 MB, the stills match
+watching it whole: duration 30 s – 3 min, size ≤ 15 MB, the stills match
 the stories. A problem seen after the render goes in the delivery
 message as a known issue.
 

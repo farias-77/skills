@@ -61,11 +61,15 @@ brief → assets → style guide + shot list → film.tsx + check → contact sh
    exists, the words on screen and the reads (what the viewer must find
    and understand, one at a time). A beat without a reason is cut. The
    arcs are in `references/story.md`.
-   For a film whose viewers do not know the work (users, newcomers), the
-   session that owns the brief gives the shot list's on-screen text, in
-   order and nothing else, to a fresh agent with no context, and asks it
-   to explain the subject back in five sentences and to list every word
-   that blocked it. The text is fixed until the explanation is right.
+   For a film whose viewers do not know the work (users, newcomers),
+   whoever writes the shot list (you, in a stage report) runs the blind
+   text test: the on-screen text, in order and nothing else, goes in
+   `reviews/blind-text.md`, then
+   `node <kit>/blind.mjs reviews/blind-text.md reviews/blind.md`. A fresh
+   Sonnet 5.5 (low) session with no context explains the subject back in
+   five sentences and lists every word that blocked it. Fix the text and
+   run it again until the explanation matches your three to five things,
+   three runs at most; what is still wrong goes in your return.
 4. **Film.** Write `film.tsx` with the library (`references/motion.md`),
    starting from `claude/video/example/film.tsx`. Then run
    `node <kit>/film.mjs check film.tsx`, which bundles the film and lists
@@ -75,8 +79,9 @@ brief → assets → style guide + shot list → film.tsx + check → contact sh
    several), then make the 360 px phone sheet. Read every PNG against the
    contract's checklist: readable at 360 px wide, the subject filling the
    frame, inside the safe area, real assets,
-   one type scale and one palette, the subject read by 2 s, and a last
-   frame that works as a poster. Fix it all in one pass, then redo only
+   one type scale and one palette, the subject read by 2 s, the caption
+   treatment changing with the beat's role (hook, step, end) instead of
+   one band on every beat, and a last frame that works as a poster. Fix it all in one pass, then redo only
    the stills you changed (`--scene <id>`).
 6. **Render once:** `<kit>/render.sh film.tsx out.mp4` with the flags in
    the table below. It waits for the machine (`queued on …` means wait,
@@ -109,7 +114,7 @@ files or docs that weren't asked for.
 | a stage video for the reviewer | 45–90 s | `--size 720` (default), 30 fps, `--max-mb 10` |
 | the release video for the reviewer | 30–45 s | `--size 720`, 30 fps, `--max-mb 10` |
 | the design debate's video, watched live | ≤ 60 s | `--size 720`, `fps: 24`, `--first` (goes ahead of the queue) |
-| the users' video (what is new) | 1–3 min | `--size 1080` when it shows real screens, else 720; `--max-mb 15` |
+| the users' video (what is new) | 30 s – 3 min; a one-label change 30–45 s | `--size 1080` when it shows real screens, else 720; `--max-mb 15` |
 
 **One format:** 1920×1080, horizontal. A vertical or square cut is never
 made from it by cropping.
@@ -137,6 +142,8 @@ cut a scene before you lower the reading time. The details are in
   talks about. It spans at least half the frame's width or 45% of its
   height. When a state is small (a button, a card, a line), the camera
   zooms in until it fills the frame, then pulls back for the next state.
+  A label-sized subject (a count, a button) may zoom up to 3 on its
+  source (`references/footage.md`), so its key number reads on a phone.
   A wide shot, with the subject under a quarter of the width, is for one
   beat of context at most, and then the frame needs company around it.
   Centre the picture on the true centre (y 540); never leave a dead band
@@ -197,7 +204,8 @@ a live full-screen SVG or gradient, which glitches under software GL.
 ## What you return
 
 - The paths of `film.tsx`, `brief.md`, `style-guide.md`, `shotlist.md`,
-  `reviews/critique.md` and the `.mp4`.
+  `reviews/critique.md`, `reviews/blind.md` (when the blind test ran) and
+  the `.mp4`.
 - The seconds and the MB, from `render.sh`'s last line.
 - The beats, one line each.
 - The frames and strips you checked, and what they showed.

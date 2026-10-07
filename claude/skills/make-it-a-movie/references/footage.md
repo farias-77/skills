@@ -31,7 +31,10 @@ import {Shot, Caption} from '@kit/motion';
 ```
 
 The shot enters, drifts from the whole screen to `focus`, then draws the
-ring around the target. Keep `zoom` at 1.5 or less on a 1080p source.
+ring around the target. Keep `zoom` at 1.5 or less for a region of the
+screen. For a label-sized subject (a count, a button, one line), zoom up
+to 3, so it spans half the frame and its key number reads at 360 px wide;
+capture that screen at `uiScale` 1.5 so the text stays sharp.
 
 ## Footage with `record.mjs` and `Screen`
 

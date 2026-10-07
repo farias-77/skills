@@ -1,6 +1,6 @@
 ---
 name: stage-close
-description: Conducts stage 6 (Close) of the pipeline under one /goal, and closes on its own. It delivers the video for users (1–3 min, a motion piece recorded in staging, no technical words) as an .mp4 plus a "what's new" text for the user to forward; writes the front's retro (at most 5 items per section, numbers from claude/scripts/telemetry.mjs, slowness counted as something that went wrong); proves nothing of the front is left on the machine with claude/scripts/cleanup.sh; and publishes its report (video, deck, explainer). A scout harvests the frictions. The retro changes nothing in the pipeline: the weekly retro does. The session runs on Opus 5.5, high. Use when a front's .state.md says stage close, or to resume a close by its slug.
+description: Conducts stage 6 (Close) of the pipeline under one /goal, and closes on its own. It delivers the video for users (30 s – 3 min, a motion piece recorded in staging, no technical words) as an .mp4 plus a "what's new" text for the user to forward; writes the front's retro (at most 5 items per section, numbers from claude/scripts/telemetry.mjs, slowness counted as something that went wrong); proves nothing of the front is left on the machine with claude/scripts/cleanup.sh; and publishes its report (video, deck, explainer). A scout harvests the frictions. The retro changes nothing in the pipeline: the weekly retro does. The session runs on Opus 5.5, high. Use when a front's .state.md says stage close, or to resume a close by its slug.
 argument-hint: "<workstream-slug>"
 allowed-tools: Read, Write, Edit, Glob, Grep, Agent, AskUserQuestion, Artifact, PushNotification, ScheduleWakeup, Bash
 ---
@@ -9,7 +9,7 @@ allowed-tools: Read, Write, Edit, Glob, Grep, Agent, AskUserQuestion, Artifact, 
 
 ## The bar
 
-1. The users get a 1–3 minute video, in motion, with no technical
+1. The users get a 30 s – 3 min video, in motion, with no technical
    word, and a "what's new" text ready to paste.
 2. The retro has at most 5 items per section; its numbers come from
    the script; time lost counts as something that went wrong.
@@ -116,7 +116,7 @@ Dispatch `slides-builder (Sonnet 5.5, medium)` as
 
 | Tab | Who | What |
 |---|---|---|
-| Video | the users' video itself | 1–3 min, for users |
+| Video | the users' video itself | 30 s – 3 min, for users |
 | Deck | `slides-builder (Sonnet 5.5, medium)` | the retro (at most 5 per section), the numbers per stage, the "what's new" text |
 | Explainer | the report template from `metrics.json` | the front's time, cost and touches per stage, beside the earlier fronts' `metrics.json` |
 

@@ -9,6 +9,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import {fileURLToPath} from 'node:url';
+import {createRequire} from 'node:module';
 import {bundle} from '@remotion/bundler';
 import {renderMedia, renderStill, selectComposition} from '@remotion/renderer';
 
@@ -25,6 +26,24 @@ if (!fs.existsSync(film)) {
   process.exit(1);
 }
 const filmDir = path.dirname(film);
+
+// The browser: VIDEO_BROWSER, else Playwright's Chrome Headless Shell, else a copy Remotion already has in
+// node_modules/.remotion. The kit never downloads one: without any, it stops and prints the install command.
+function findBrowser() {
+  if (process.env.VIDEO_BROWSER) return process.env.VIDEO_BROWSER;
+  try {
+    const m = createRequire(path.join(KIT, 'noop.js'))('playwright-core').chromium.executablePath().match(/^(.*)[\\/]chromium-(\d+)[\\/]/);
+    const dir = m && path.join(m[1], `chromium_headless_shell-${m[2]}`);
+    for (const sub of dir && fs.existsSync(dir) ? fs.readdirSync(dir) : []) {
+      const exe = path.join(dir, sub, process.platform === 'win32' ? 'chrome-headless-shell.exe' : 'chrome-headless-shell');
+      if (fs.existsSync(exe)) return exe;
+    }
+  } catch {}
+  if (fs.existsSync(path.join(KIT, 'node_modules', '.remotion', 'chrome-headless-shell'))) return null;
+  console.error(`film.mjs: no Chrome Headless Shell found, and the kit never downloads one on its own. Install it once (about 250 MB, needs the network):\n  cd ${KIT} && npx playwright-core install chromium-headless-shell\nor point VIDEO_BROWSER at a Chrome Headless Shell binary.`);
+  process.exit(1);
+}
+const browserExecutable = findBrowser();
 
 const run = fs.mkdtempSync(path.join(KIT, '.run-'));
 let out = null;
@@ -50,7 +69,7 @@ try {
     webpackOverride: (c) => ({...c, resolve: {...c.resolve, alias: {...(c.resolve?.alias || {}), '@kit/motion': path.join(KIT, 'src', 'motion', 'index.ts')}}}),
   });
   const gl = process.env.VIDEO_GL || 'swangle';
-  const comp = await selectComposition({serveUrl: out, id: 'film', inputProps: {}, chromiumOptions: {gl}});
+  const comp = await selectComposition({serveUrl: out, id: 'film', inputProps: {}, chromiumOptions: {gl}, browserExecutable});
   const scenes = comp.props.scenes || [];
   const secs = comp.durationInFrames / comp.fps;
   if (cmd === 'check') {
@@ -63,7 +82,7 @@ try {
       const s = scenes[i];
       if (only && s.id !== only) continue;
       const output = path.join(path.resolve(outArg), `${String(i).padStart(2, '0')}-${s.id}.png`);
-      await renderStill({composition: comp, serveUrl: out, frame: s.from + Math.floor(s.len * 0.7), output, inputProps: {}, scale: Number(rest.find((a, j) => /^[\d.]+$/.test(a) && rest[j - 1] !== '--scene') || 0.5), chromiumOptions: {gl}});
+      await renderStill({composition: comp, serveUrl: out, frame: s.from + Math.floor(s.len * 0.7), output, inputProps: {}, scale: Number(rest.find((a, j) => /^[\d.]+$/.test(a) && rest[j - 1] !== '--scene') || 0.5), chromiumOptions: {gl}, browserExecutable});
       console.log(output);
     }
   } else {
@@ -79,6 +98,7 @@ try {
       scale: size / 1080,
       concurrency: Number(process.env.VIDEO_CONCURRENCY || 3),
       chromiumOptions: {gl},
+      browserExecutable,
       timeoutInMilliseconds: 180000,
     });
     console.log(`${path.resolve(outArg)}\t${secs.toFixed(1)} s`);

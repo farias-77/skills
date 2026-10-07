@@ -1,7 +1,7 @@
 // The real product on screen. `Screen` plays footage recorded by record.mjs inside a
 // window, the camera following the clicks and the cursor drawn in post from the log.
-// `Shot` holds a screenshot and drifts toward what matters. Both never zoom a
-// 1920x1080 source past 1.5x, so the text stays sharp.
+// `Shot` holds a screenshot and drifts toward what matters. Keep the zoom of a
+// 1920x1080 source at 1.5x or less, up to 3x for a label-sized subject (footage.md).
 import React from 'react';
 import {AbsoluteFill, Img, OffthreadVideo, Freeze, spring, Easing, staticFile, useCurrentFrame, useVideoConfig} from 'remotion';
 import {useTheme, useSec, prog, rgba, ease, lin} from './core';

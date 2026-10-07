@@ -10,6 +10,7 @@ node claude/video/film.mjs check  <film.tsx>                         # bundles i
 node claude/video/film.mjs stills <film.tsx> <dir> [0.5] [--scene id]  # one PNG per scene, at 70% of it
 claude/video/render.sh <film.tsx> <out.mp4> [--size 720|1080] [--max-mb N] [--first]
 node claude/video/record.mjs <shots.json> <footage-dir>              # real product footage (Playwright)
+node claude/video/blind.mjs <text.md> <out.md>                       # the blind text test (claude CLI, Sonnet 5.5 low)
 ```
 
 | What | How |
@@ -21,6 +22,7 @@ node claude/video/record.mjs <shots.json> <footage-dir>              # real prod
 | The queue | One render at a time on the machine: `render.sh` takes a `flock` on `$TMPDIR/pipeline-video-render.lock`; the others wait (`queued on …` means wait, not failure). `--first` goes ahead of the waiting ones: only for a video someone is watching for live. |
 | The budget | `--max-mb` (default 10): CRF 20 capped at the bitrate the budget allows, a two-pass when the cap is not enough. Audio is kept when the film has it. |
 | Cleanup | Each run bundles in a private `.run-*` folder and a temp dir, both deleted at the end; the bundler cache is off, so nothing grows between renders. |
+| The browser | `film.mjs` uses `VIDEO_BROWSER`, else Playwright's Chrome Headless Shell, else a copy Remotion already has in `node_modules/.remotion`. It never downloads one: without any, it stops and prints the one install command, `cd claude/video && npx playwright-core install chromium-headless-shell` (about 250 MB, once per machine). |
 | The machine | Renders run under `nice`, 3 browser tabs (`VIDEO_CONCURRENCY`), `--gl=swangle` (`VIDEO_GL`). |
 
 `render.sh` prints `path · seconds · MB` on its last line.

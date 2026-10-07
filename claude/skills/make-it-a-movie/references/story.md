@@ -44,7 +44,8 @@ words for their work.
 1. **Cold open, 3–6 s:** the feature's name over a `Shot` of the new
    screen drifting in.
 2. **The need, 10–20 s:** what was hard before, in their words, with one
-   number or one "before" shot.
+   number. A "before" shot only from a recording made before the merge;
+   otherwise state the need in words, never over the new screen.
 3. **One chapter per feature:** where it lives (`Settings › Rules`), then
    one action per step on the real screen (`Screen` or a `Shot` per step),
    each step captioned in 3–6 words ("2/4 · Choose the trigger"), the
@@ -56,7 +57,7 @@ words for their work.
 the person notices now ("your report arrives in a minute, not an hour"),
 told with a `Flow` or `Numbers` and no architecture.
 
-Length 1–3 min. Real screens come from staging or a test account with
+Length 30 s – 3 min; a one-label change is 30–45 s. Real screens come from staging or a test account with
 synthetic data, never production. Real names never appear.
 
 ## Writing the words
