@@ -205,12 +205,18 @@ S='(^|[;&|({`"'"'"'[:space:]/])'
 [ "$want" = "git push origin a:b" ] && deny "guard-canary: the guard is live"
 
 # --- the guard protects itself ----------------------------------------------
+# Naming them is fine (a grep, a heredoc that quotes the path); writing them or running them is not.
 if has "$guarded_path|authorize\.sh"; then
-  reads='^[[:space:]]*(cat|head|tail|less|more|grep|rg|ls|stat|wc|diff|jq|file|sha256sum|shasum|md5sum)[[:space:]]'
-  gitreads='^[[:space:]]*git[[:space:]]+(diff|log|show|status|blame)([[:space:]]|$)'
-  selftest='^[[:space:]]*(bash[[:space:]]+)?[^[:space:];&|]*guard-irreversible\.sh[[:space:]]+--self-test[[:space:]]*$'
-  if ! { has "$reads" || has "$gitreads" || has "$selftest"; } || has '[>;&|`]|\$\('; then
-    deny "the guard, the authorization script, the allow file and the settings are the user's; an agent may only read them"
+  own="($guarded_path|authorize\.sh)"
+  word='(^|[;&|(`]|\$\()[[:space:]]*([A-Za-z_][A-Za-z0-9_]*=[^[:space:]]*[[:space:]]+)*((bash|sh|source|exec|\.)[[:space:]]+)?'
+  writes=">[[:space:]]*[\"']?[^[:space:];&|]*$own|${S}(cp|mv|rm|ln|install|chmod|chown|touch|truncate|tee|dd|rsync|patch)[[:space:]][^;&|]*$own|${S}sed[[:space:]]([^;&|]*[[:space:]])?-[a-zA-Z]*i|${S}perl[[:space:]]([^;&|]*[[:space:]])?-[a-zA-Z]*i|${S}git[[:space:]]+(checkout|restore|rm|mv|apply|reset)[[:space:]][^;&|]*$own"
+  scripts="${S}(python3?|node|ruby|perl|awk|eval)[[:space:]]|${S}(ba)?sh[[:space:]]+-c"
+  runs="${word}[^[:space:];&|]*(authorize\\.sh|\\.claude/hooks/)"
+  selftest="${word}[^[:space:];&|]*(guard-irreversible\\.sh[[:space:]]+--self-test|\\.claude/hooks/tests/[^[:space:];&|]*\\.test\\.sh)[[:space:]]*($|[;&|])"
+  rest=$c
+  while [[ $rest =~ $selftest ]]; do rest=${rest/"${BASH_REMATCH[0]}"/;}; done
+  if has "$writes" || has "$scripts" || [[ $rest =~ $runs ]]; then
+    deny "the guard, the authorization script, the allow file and the settings are the user's; an agent may read them, never write or run them"
   fi
 fi
 

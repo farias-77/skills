@@ -240,6 +240,12 @@ run deny Write '/work/shop/.claude/hooks/irreversible.allow'
 run none Bash 'cat .claude/hooks/irreversible.allow'
 run none Bash 'cat .claude/hooks/authorize.sh'
 run none Bash '.claude/hooks/guard-irreversible.sh --self-test'
+run none Bash 'grep -n deny .claude/hooks/guard-irreversible.sh | head -5'
+run none Bash $'cat > notes.md <<\'EOF\'\nthe guard lives in .claude/hooks/guard-irreversible.sh\nEOF'
+run none Bash 'bash .claude/hooks/tests/guard-irreversible.test.sh'
+run deny Bash 'echo x | tee .claude/settings.json'
+run deny Bash 'bash .claude/hooks/tests/guard-irreversible.test.sh; .claude/hooks/authorize.sh short a feat/a'
+run deny Bash 'python3 -c "open(\".claude/settings.json\", \"w\")"'
 
 echo "-- secrets ask"
 run ask Bash 'gh secret set PAYMENTS_KEY < key.txt'
