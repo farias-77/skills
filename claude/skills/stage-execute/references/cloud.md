@@ -132,6 +132,12 @@ run at once.
   branch: push first.
 - This session can message a cloud session (`claude -p "…" --cloud <session id>`
   queues a follow-up); a cloud session cannot message back: git is its channel.
+- A print-mode session that runs tools here (`claude -p` without
+  `--cloud`) needs `--settings .claude/settings.json` (it ignores an
+  untrusted workspace's allow entries), `--add-dir` for the designs root
+  and the kit, and `CLAUDE_CODE_PRINT_BG_WAIT_CEILING_MS=0` (it kills
+  background work 10 minutes after the last turn: an entry's workflow
+  dies mid-build).
 - Each VM: about 4 vCPUs, 16 GB, Docker; browsers come from the setup
   script.
 - Committed `.claude/` (settings, hooks) loads in a one-repo session;

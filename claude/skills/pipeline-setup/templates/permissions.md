@@ -16,9 +16,10 @@ command later touches.
 | two roots: `CLAUDE.md`, the standards and `.claude/skills/` in a root, the product in a child repository | the root, and the product repository too when sessions open there (a cloud entry always does) |
 
 Each session root also needs the README's install, which stays out of
-git: the `skills`, `agents` and `workflows` symlinks in `.claude/`, and
-the clone in `permissions.additionalDirectories` of
-`.claude/settings.local.json`. The audit reports them missing; Step 3
+git: the `skills`, `agents` and `workflows` symlinks in `.claude/`,
+listed in `.git/info/exclude` (untracked, they break a secret scan of
+the untracked files), and the clone in
+`permissions.additionalDirectories` of `.claude/settings.local.json`. The audit reports them missing; Step 3
 never commits them.
 
 At the root, a command into the product names it (`git -C <product> …`,

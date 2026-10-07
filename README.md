@@ -188,7 +188,12 @@ cd <your-project>/.claude
 ln -s ~/skills/claude/skills skills
 ln -s ~/skills/claude/agents agents
 ln -s ~/skills/claude/workflows workflows
+printf '.claude/skills\n.claude/agents\n.claude/workflows\n' >> "$(git rev-parse --git-common-dir)/info/exclude"
 ```
+
+The links stay out of git through `.git/info/exclude`: untracked, they
+would trip a secret scan that copies the untracked files (`gitleaks`
+behind `cp --parents`) and turn the gate red for no change of yours.
 
 Each stage reads the house rules (`CLAUDE.md` at the clone's root) at
 its opening, so the project does not import them. Name the designs
@@ -208,6 +213,12 @@ Then, in Claude Code inside the project:
   `claude/video/` for the reports; `playwright-core` and a Chromium for
   discovery's mock (`PLAYWRIGHT_DIR`, `PROTO_CHROME`); `gitleaks` on PATH, or the
   project's `make gitleaks dir=<path>`.
+- Headless (`claude -p`, a script, a test harness): pass
+  `--settings .claude/settings.json` (print mode ignores the allow
+  entries of a workspace never trusted interactively), `--add-dir` for
+  the designs root and the clone, and set
+  `CLAUDE_CODE_PRINT_BG_WAIT_CEILING_MS=0` (print mode kills background
+  agents and workflows 10 minutes after the last turn).
 - Project specifics (environments, credentials, deploy targets) live
   in **your** project's `CLAUDE.md` and standards, never in these files.
 
