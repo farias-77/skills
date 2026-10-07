@@ -2,43 +2,9 @@
 <title>Stage Report</title>
 <meta name="description" content="One link per workstream: every stage, with its video, its deck and its explainer.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="tokens.css">
 <style>
   /* layout: a 248px rail of stages beside one column; the rail becomes a top bar under 860px */
-  :root {
-    --bg: #fbfbfb; --surface: #ffffff; --surface-2: #f7f7f8; --surface-3: #f0f0f2;
-    --line: #ececef; --line-strong: #dcdce0;
-    --ink-1: #111113; --ink-2: #52525a; --ink-3: #6b6b72;
-    --focus: #111113; --ring: rgba(17, 17, 19, .12);
-    --ok: #16a34a; --warn: #ca8a04; --bad: #dc2626; --idle: #a1a1a8;
-    --ok-tint: rgba(22, 163, 74, .10); --warn-tint: rgba(202, 138, 4, .12); --bad-tint: rgba(220, 38, 38, .08);
-    --dot: rgba(17, 17, 19, .30);
-    --f-sans: 'Geist', 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
-    --f-mono: 'Geist Mono', ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
-    --r-chip: 5px; --r-control: 6px; --r-card: 10px;
-  }
-  @media (prefers-color-scheme: dark) {
-    :root:not([data-theme="light"]) {
-      --bg: #09090a; --surface: #0e0e10; --surface-2: #131316; --surface-3: #1a1a1e;
-      --line: #1e1e22; --line-strong: #2a2a2f;
-      --ink-1: #ededef; --ink-2: #a1a1a8; --ink-3: #85858c;
-      --focus: #ededef; --ring: rgba(237, 237, 239, .18);
-      --ok: #22c55e; --warn: #eab308; --bad: #ef4444; --idle: #6b6b72;
-      --ok-tint: rgba(34, 197, 94, .12); --warn-tint: rgba(234, 179, 8, .12); --bad-tint: rgba(239, 68, 68, .12);
-      --dot: rgba(236, 236, 239, .40);
-      color-scheme: dark;
-    }
-  }
-  :root[data-theme="dark"] {
-    --bg: #09090a; --surface: #0e0e10; --surface-2: #131316; --surface-3: #1a1a1e;
-    --line: #1e1e22; --line-strong: #2a2a2f;
-    --ink-1: #ededef; --ink-2: #a1a1a8; --ink-3: #85858c;
-    --focus: #ededef; --ring: rgba(237, 237, 239, .18);
-    --ok: #22c55e; --warn: #eab308; --bad: #ef4444; --idle: #6b6b72;
-    --ok-tint: rgba(34, 197, 94, .12); --warn-tint: rgba(234, 179, 8, .12); --bad-tint: rgba(239, 68, 68, .12);
-    --dot: rgba(236, 236, 239, .40);
-    color-scheme: dark;
-  }
   * { box-sizing: border-box; }
   html, body { height: 100%; overflow-x: clip; }
   body { margin: 0; background: var(--bg); color: var(--ink-1); font: 15px/22px var(--f-sans); letter-spacing: -.003em; -webkit-font-smoothing: antialiased; }
@@ -53,6 +19,7 @@
   .brand { display: flex; flex-direction: column; gap: 2px; padding: 4px 8px 0; min-width: 0; }
   .brand b { font-size: 15px; line-height: 22px; font-weight: 600; letter-spacing: -.02em; overflow-wrap: anywhere; }
   .notices { display: flex; flex-direction: column; gap: 6px; padding: 10px 12px; border: 1px solid var(--line); border-radius: var(--r-card); background: var(--surface-2); }
+  .notices[hidden] { display: none; }
   .notice { display: flex; gap: 8px; align-items: baseline; font-size: 13px; line-height: 18px; color: var(--ink-2); }
   .stages { display: flex; flex-direction: column; gap: 2px; }
   .stages .ov { padding: 0 10px 6px; }
@@ -148,9 +115,13 @@ const $ = (id) => document.getElementById(id);
 const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'}[c]));
 const store = {get(k) { try { return localStorage.getItem(k); } catch { return null; } }, set(k, v) { try { v == null ? localStorage.removeItem(k) : localStorage.setItem(k, v); } catch {} }};
 
+function paint(f) {
+  try { const d = f.contentDocument.documentElement, t = document.documentElement.getAttribute('data-theme'); t ? d.setAttribute('data-theme', t) : d.removeAttribute('data-theme'); } catch {}
+}
 function theme(choice) {
   if (choice) document.documentElement.setAttribute('data-theme', choice); else document.documentElement.removeAttribute('data-theme');
   store.set('report-theme', choice);
+  document.querySelectorAll('iframe').forEach(paint);
   $('theme').innerHTML = [['', S.auto], ['light', S.light], ['dark', S.dark]].map(([v, l]) => `<button type="button" aria-pressed="${(choice || '') === v}" data-v="${v}">${l}</button>`).join('');
 }
 $('theme').addEventListener('click', (e) => { const b = e.target.closest('button'); if (b) theme(b.dataset.v || null); });
@@ -230,6 +201,7 @@ async function render() {
   const body = await panel(st);
   $('main').innerHTML = `<header class="head"><div class="state"><span class="dot ${st.state}"></span><span class="ov">${esc(state)}</span></div><h1>${esc(st.name)}</h1></header>
     <div class="tabs" role="tablist">${tabs}</div><section class="body">${body}${nums}</section>`;
+  $('main').querySelectorAll('iframe').forEach((f) => f.addEventListener('load', () => paint(f)));
   fit();
 }
 

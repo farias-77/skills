@@ -49,6 +49,11 @@ touches) come from the telemetry.
 | The page (rail + tabs) | the fixed template `claude/report/shell.html` + `report.json` | no build step |
 | Publishing | the stage session (Opus 5.5, high) | Artifact, always to the same URL |
 
+**The look** is the report's, one set of tokens in `claude/report/tokens.css`
+(Geist, greys, the status colours, light and dark). The decks and the
+explainers link it and follow the report's theme; the films take its
+palette. Each skill's "The look" says how.
+
 The builders run **in parallel** and never read each other's work. Each
 brief carries the stage's line of the table above, the source files and
 the output path. Every piece follows
@@ -99,7 +104,8 @@ path, and republished with a label ("design · adjusted").
 
 ```
 <workstream>/report/
-├── index.html            the shell, copied from claude/report/shell.html at discovery, <title> set to the workstream's name
+├── index.html            the shell, copied from claude/report/shell.html when report/ is made, <title> set to the workstream's name
+├── tokens.css            the report's look, copied from claude/report/tokens.css with the shell; the decks and explainers link it
 ├── report.json           stages, states, numbers, tabs
 └── <stage>/
     ├── video.mp4         video-builder's render; its source is film/film.tsx (assets/ deleted after the render)
@@ -109,8 +115,9 @@ path, and republished with a label ("design · adjusted").
 ```
 
 **The first publish** (discovery; on the short route and the hotfix,
-the short close, which publishes all three stages at once): copy the shell to `report/index.html`,
-set its `<title>`, then publish it with `icon: "report"` and the label
+the short close, which publishes all three stages at once): copy the shell to `report/index.html`
+and `claude/report/tokens.css` to `report/tokens.css` (if they are not there yet),
+set its `<title>`, then publish both with `icon: "report"` and the label
 "discovery closed" (or "closed"). Save the URL in `.state.md`. Every later stage
 publishes to that `url`. It sends only its own files, because files left
 out of a publish are kept, and it uses a label ("plan closed"), so the

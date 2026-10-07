@@ -13,6 +13,8 @@ if (!deckArg) {
   process.exit(2);
 }
 const dir = path.resolve(deckArg);
+const here = path.dirname(fs.realpathSync(new URL(import.meta.url).pathname));
+const tokens = () => [path.join(dir, '..', '..', 'tokens.css'), path.resolve(here, '../../../report/tokens.css')].find((f) => fs.existsSync(f));
 const ALLOWED = ['fonts.googleapis.com', 'fonts.gstatic.com', 'cdnjs.cloudflare.com', 'cdn.jsdelivr.net', 'unpkg.com'];
 let deck;
 try {
@@ -61,8 +63,10 @@ const pw = await playwright();
 if (!pw) console.log('note: no playwright found; the canvas checks did not run (set PLAYWRIGHT_DIR)');
 else {
   const server = http.createServer((req, res) => {
-    const file = path.join(dir, decodeURIComponent(req.url.split('?')[0]));
-    if (!file.startsWith(dir) || !fs.existsSync(file) || fs.statSync(file).isDirectory()) return res.writeHead(404).end();
+    let file = path.join(dir, decodeURIComponent(req.url.split('?')[0]));
+    if (req.url.split('?')[0] === '/tokens.css' && !fs.existsSync(file)) file = tokens() || file;
+    else if (!file.startsWith(dir)) return res.writeHead(404).end();
+    if (!fs.existsSync(file) || fs.statSync(file).isDirectory()) return res.writeHead(404).end();
     res.writeHead(200, {'content-type': file.endsWith('.css') ? 'text/css' : file.endsWith('.html') ? 'text/html; charset=utf-8' : 'application/octet-stream'});
     fs.createReadStream(file).pipe(res);
   });

@@ -99,6 +99,14 @@ for the whole deck), one accent, two typefaces and a five-step type scale
 same look. Avoid the template looks: gradient blobs, glass cards, emoji as
 icons, everything centred, or an accent stripe on every card.
 
+**In a stage report, the look is the report's.** `theme.css` starts with
+`@import url("../../tokens.css");` and takes every colour, face and
+radius from its tokens (`claude/report/tokens.css`): `--bg` for the
+ground, `--ink-1`…`--ink-3`, `--line`, `--ok` `--warn` `--bad` for status,
+`--f-sans` and `--f-mono`. Never copy the values, so the deck follows the
+report's light or dark theme. The accent is `--ink-1`, or a status colour
+when the slide is about one.
+
 ## Check before you hand back
 
 Run `node scripts/check-deck.mjs <deck-folder> <png-folder>` once. It

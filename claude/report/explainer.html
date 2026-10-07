@@ -5,20 +5,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Explainer</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="../tokens.css">
 <style>
   /* the routine stages' explainer: one column of blocks read from explainer.json beside this file */
-  :root {
-    --bg: #fbfbfb; --surface: #ffffff; --surface-2: #f7f7f8; --surface-3: #f0f0f2;
-    --line: #ececef; --line-strong: #dcdce0; --ink-1: #111113; --ink-2: #52525a; --ink-3: #6b6b72;
-    --ok: #16a34a; --warn: #ca8a04; --bad: #dc2626; --idle: #a1a1a8; --hot: #111113;
-    --f-sans: 'Geist', 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
-    --f-mono: 'Geist Mono', ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
-  }
-  @media (prefers-color-scheme: dark) {
-    :root:not([data-theme="light"]) { --bg: #09090a; --surface: #0e0e10; --surface-2: #131316; --surface-3: #1a1a1e; --line: #1e1e22; --line-strong: #2a2a2f; --ink-1: #ededef; --ink-2: #a1a1a8; --ink-3: #85858c; --ok: #22c55e; --warn: #eab308; --bad: #ef4444; --idle: #6b6b72; --hot: #ededef; color-scheme: dark; }
-  }
-  :root[data-theme="dark"] { --bg: #09090a; --surface: #0e0e10; --surface-2: #131316; --surface-3: #1a1a1e; --line: #1e1e22; --line-strong: #2a2a2f; --ink-1: #ededef; --ink-2: #a1a1a8; --ink-3: #85858c; --ok: #22c55e; --warn: #eab308; --bad: #ef4444; --idle: #6b6b72; --hot: #ededef; color-scheme: dark; }
+  :root { --hot: var(--ink-1); }
   * { box-sizing: border-box; }
   html, body { overflow-x: clip; }
   body { margin: 0; background: var(--bg); color: var(--ink-1); font: 16px/1.6 var(--f-sans); -webkit-font-smoothing: antialiased; padding-inline: 16px; padding-block: 28px 48px; }

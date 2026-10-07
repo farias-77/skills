@@ -174,8 +174,11 @@ cut a scene before you lower the reading time. The details are in
 
 ## The look
 
-The look is the style guide. Without one from the caller, choose it for
-the subject: start from `THEMES.ink` or `THEMES.paper`, then change the
+The look is the style guide. In a stage report, the style guide takes
+the report's palette from `claude/report/tokens.css` (the dark set: the
+ground, the greys, the status colours as the one accent) and the kit's
+closest faces (Inter Tight, IBM Plex Mono). Without one from the caller,
+choose it for the subject: start from `THEMES.ink` or `THEMES.paper`, then change the
 accent, the fonts (the kit's local faces) and the background. Keep one
 accent for the one thing that matters in each scene. Each object moves by
 its class (`references/motion.md`), and after every move the viewer knows
