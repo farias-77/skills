@@ -46,9 +46,10 @@ h1 { margin: 12px 0 0; font-size: 76px; line-height: 1.05; font-weight: 700; let
 
 ```html
 <div class="fill">
-  <div class="kicker in">Orders · design · 05/10/2026</div>
+  <div class="kicker in">The Orders design</div>
   <div class="big in d1">How an order moves</div>
   <div class="body in d2">The proposal the debate starts from.</div>
+  <div class="body in d2">5 October 2026</div>
 </div>
 ```
 
@@ -128,7 +129,7 @@ h1 { margin: 12px 0 0; font-size: 76px; line-height: 1.05; font-weight: 700; let
 ## Decided in your place
 
 ```html
-<div><div class="kicker">Decided in your place · veto if you want</div><h1>Two calls you did not make</h1></div>
+<div><div class="kicker">Decided in your place</div><h1>Two calls you did not make. You can veto them.</h1></div>
 <div class="fill" style="gap:28px">
   <div class="in d1" style="display:grid;grid-template-columns:1fr 1fr 360px;gap:32px;font-size:36px;padding:28px 0;border-top:2px solid var(--line)"><b>One queue, no event bus</b><span style="color:var(--mute)">or a bus for ten consumers</span><span style="font:500 26px var(--f-mono);color:var(--accent)">the architect</span></div>
   <div class="in d2" style="display:grid;grid-template-columns:1fr 1fr 360px;gap:32px;font-size:36px;padding:28px 0;border-top:2px solid var(--line)"><b>3 retries, then a person</b><span style="color:var(--mute)">or retry forever</span><span style="font:500 26px var(--f-mono);color:var(--accent)">the conductor</span></div>
@@ -141,7 +142,7 @@ h1 { margin: 12px 0 0; font-size: 76px; line-height: 1.05; font-weight: 700; let
 <div class="fill">
   <div class="kicker">Your ruling</div>
   <div class="in" style="font-size:72px;line-height:1.2;font-weight:500;max-width:1500px">“A charge can wait. An order cannot be lost.”</div>
-  <div class="body in d2">design round 1 · rulings.md</div>
+  <div class="body in d2">From rulings.md, design round 1</div>
 </div>
 ```
 
@@ -150,9 +151,9 @@ h1 { margin: 12px 0 0; font-size: 76px; line-height: 1.05; font-weight: 700; let
 ```html
 <div class="kicker">What to remember</div>
 <div class="fill" style="gap:36px">
-  <div class="in d1" style="font-size:56px;font-weight:700">1 · Saved first, charged after</div>
-  <div class="in d2" style="font-size:56px;font-weight:700">2 · Three retries, then a person</div>
-  <div class="in d3" style="font-size:56px;font-weight:700">3 · Two calls are yours to veto</div>
+  <div class="in d1" style="font-size:56px;font-weight:700"><span style="color:var(--accent)">1</span> Saved first, charged after</div>
+  <div class="in d2" style="font-size:56px;font-weight:700"><span style="color:var(--accent)">2</span> Three retries, then a person</div>
+  <div class="in d3" style="font-size:56px;font-weight:700"><span style="color:var(--accent)">3</span> Two calls are yours to veto</div>
 </div>
 <div class="foot"><span>The detail: 01-design/solution.md</span><span>12 / 12</span></div>
 ```

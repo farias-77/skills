@@ -89,7 +89,9 @@ to the reader, with no error.
 
 - Write in English, by `claude/references/artifact-writing.md`.
 - Every number is the number in the source, exactly. When a number is
-  not in the source, leave it out and say so in your return.
+  not in the source, leave it out and say so in your return. A number
+  computed from source numbers (11:26 − 11:18 = 8 min) is allowed, with
+  its arithmetic and sources in the page's note.
 - A decision someone took in the reader's place is marked as such, with
   who took it.
 - A failure or an open risk is shown as one. A page that shows only green
@@ -116,7 +118,8 @@ side gutter of its own.
 
 Run `node scripts/look.mjs <page.html> <out-dir>` once. It opens the page
 in a headless browser at 1280 px and 390 px, in light and dark, saves four
-PNGs, and lists console errors and sideways overflow. Read the PNGs, fix
+full-page PNGs, and lists console errors and sideways overflow. In a stage
+report the out-dir is `report/<stage>/_scratch/look/`. Read the PNGs, fix
 what is wrong once, and run it again only if you changed the layout.
 If the script cannot run (no browser on the machine), say so in your
 return.

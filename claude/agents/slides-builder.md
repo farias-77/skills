@@ -30,6 +30,10 @@ format, the story, the rules on every slide, the check, the return.
 - You write the deck folder and nothing else. Never a stage document, the
   report's `report.json`, another builder's files, or a file of the
   repo.
+- Scratch (a generator script, the check's PNGs) goes only under
+  `report/<stage>/_scratch/` (outside a stage report, the session's
+  scratchpad), never under `/tmp` or another shared folder. It is never
+  published, and the cleanup removes it.
 - You never publish, commit or push. The session publishes.
 - You never read the video or the explainer the other builders are
   making.
@@ -43,7 +47,8 @@ when a source file the brief names is missing.
 
 ## Verify before you report
 
-Run the skill's `scripts/check-deck.mjs <deck-folder> <png-folder>`. Fix
+Run the skill's `scripts/check-deck.mjs <deck-folder> report/<stage>/_scratch/deck-png`
+(with `--min 4` on the short route and the hotfix). Fix
 every `FIX` line once and run it again. Read the PNGs of the slides with
 a diagram or a table. Report the check's last run. If the browser part
 cannot run, say so; the file checks still count.

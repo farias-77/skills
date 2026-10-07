@@ -52,8 +52,9 @@ deck/
 
 ## The story
 
-8 to 15 slides. This skeleton fits most decks; the middle follows the story
-you were given.
+8 to 15 slides; a deck of the short route or the hotfix (the minimal
+report) is 4 to 8, checked with `--min 4`. This skeleton fits most decks;
+the middle follows the story you were given.
 
 | # | Slide | What it holds |
 |---|---|---|
@@ -119,7 +120,8 @@ these problems:
 - console errors;
 - a blocked host.
 
-It saves a PNG of each slide at half size. Read the PNGs, fix every line
+It saves a PNG of each slide at half size, after it removes the old ones;
+in a stage report the PNG folder is `report/<stage>/_scratch/deck-png/`. Read the PNGs, fix every line
 it prints once, and run it again. If the check cannot open a browser,
 it still runs the file checks; say so in your return.
 

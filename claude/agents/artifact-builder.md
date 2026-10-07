@@ -30,6 +30,10 @@ the page rules, the words, the check, the return.
 - You write the one page and nothing else. Never a stage document, the
   report's `report.json`, another builder's files, or a file of the
   repo.
+- Scratch (a generator script, the check's PNGs) goes only under
+  `report/<stage>/_scratch/` (outside a stage report, the session's
+  scratchpad), never under `/tmp` or another shared folder. It is never
+  published, and the cleanup removes it.
 - You never publish, commit or push. The session publishes.
 - You never read the deck or the video the other builders are making.
 - A fact the source does not state does not go on the page. Name the gap
@@ -40,7 +44,8 @@ when a source file the brief names is missing.
 
 ## Verify before you report
 
-Run the skill's `scripts/look.mjs` once on the page. Read the four PNGs,
+Run the skill's `scripts/look.mjs` once on the page, into
+`report/<stage>/_scratch/look/`. Read the four full-page PNGs,
 fix what they show once, and report the result. If the script cannot run,
 say which part failed and why.
 

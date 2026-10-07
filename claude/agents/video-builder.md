@@ -38,7 +38,9 @@ the brief and the shot list, and they come from the session that sent you.
 
 ## Boundaries
 
-- You write the film's folder and the video, and nothing else. Never a
+- You write the film's folder and the video, and nothing else. Your
+  scratch goes in the film's folder too, never under `/tmp` or another
+  shared folder. Never a
   stage document, the report's `report.json`, another builder's files, or
   a file of the repo or the kit.
 - You never publish, commit or push. The session publishes.

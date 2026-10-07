@@ -69,7 +69,7 @@ stage work done
   → in parallel: video-builder · slides-builder · artifact-builder (or the session fills explainer.json)
   → wait for all three (renders queue on the machine, one at a time)
   → gitleaks dir <workstream> (or make gitleaks dir=<workstream>); a finding stops the publish (a leak, per the security standard)
-  → the session reads the new text files, then publishes to the SAME url: index.html, report.json and this stage's files only
+  → the session reads the new text files, then publishes to the SAME url: index.html, report.json and this stage's files only (never _scratch/)
   → report.json: the stage "closed" with closedAt, each tab "ready" (or "failed" with why); publish once more
   → the closing message: the link (…#<stage>), then what the stage asks of him
 ```
@@ -111,7 +111,8 @@ path, and republished with a label ("design · adjusted").
     ├── video.mp4         video-builder's render; its source is film/film.tsx (assets/ deleted after the render)
     ├── deck/             deck.json, theme.css, 01.html …
     ├── explainer.html    artifact-builder's page, or a copy of claude/report/explainer.html
-    └── explainer.json    (template stages only)
+    ├── explainer.json    (template stages only)
+    └── _scratch/         the builders' scratch and check PNGs (deck-png/, look/); never published, removed by the cleanup
 ```
 
 **The first publish** (discovery; on the short route and the hotfix,

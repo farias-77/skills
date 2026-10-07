@@ -1,5 +1,7 @@
 // Checks a deck folder: deck.json, every slide file, and (with a browser) every slide on its canvas.
-//   node check-deck.mjs <deck-folder> [png-folder]
+//   node check-deck.mjs <deck-folder> [png-folder] [--min 4]
+// --min lowers the slide floor (8 by default) for the short route's and the hotfix's decks. The PNG folder
+// is emptied of old slide PNGs first.
 // Prints one line per slide (ok, or FIX with the reasons) and exits 1 when a slide needs a fix.
 // The browser part needs playwright-core (or playwright) with a Chromium, found from here up or in PLAYWRIGHT_DIR.
 import fs from 'node:fs';
@@ -7,9 +9,11 @@ import http from 'node:http';
 import path from 'node:path';
 import {createRequire} from 'node:module';
 
-const [deckArg, pngArg] = process.argv.slice(2);
-if (!deckArg) {
-  console.error('usage: node check-deck.mjs <deck-folder> [png-folder]');
+const args = process.argv.slice(2);
+const min = args.includes('--min') ? Number(args.splice(args.indexOf('--min'), 2)[1]) : 8;
+const [deckArg, pngArg] = args;
+if (!deckArg || !(min >= 1)) {
+  console.error('usage: node check-deck.mjs <deck-folder> [png-folder] [--min 4]');
   process.exit(2);
 }
 const dir = path.resolve(deckArg);
@@ -28,7 +32,7 @@ const fix = (f, why) => (fixes[f] ||= []).push(why);
 if (!deck.title) fix('deck.json', 'no title');
 if (!Array.isArray(deck.slides) || !deck.slides.length) fix('deck.json', 'no slides');
 const slides = deck.slides || [];
-if (slides.length && (slides.length < 8 || slides.length > 15)) fix('deck.json', `${slides.length} slides (8 to 15)`);
+if (slides.length && (slides.length < min || slides.length > 15)) fix('deck.json', `${slides.length} slides (${min} to 15)`);
 const listed = new Set(slides.map((s) => s.file));
 for (const f of fs.readdirSync(dir)) if (/^\d+\.html$/.test(f) && !listed.has(f)) fix('deck.json', `${f} is not in slides`);
 
@@ -72,7 +76,10 @@ else {
   });
   await new Promise((r) => server.listen(0, '127.0.0.1', r));
   const browser = await pw.chromium.launch();
-  if (pngArg) fs.mkdirSync(pngArg, {recursive: true});
+  if (pngArg) {
+    fs.mkdirSync(pngArg, {recursive: true});
+    for (const f of fs.readdirSync(pngArg)) if (/^\d+\.png$/.test(f)) fs.rmSync(path.join(pngArg, f));
+  }
   try {
     for (const s of slides) {
       if (!s.file || !fs.existsSync(path.join(dir, s.file))) continue;

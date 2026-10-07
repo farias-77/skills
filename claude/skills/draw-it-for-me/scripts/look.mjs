@@ -1,5 +1,5 @@
-// One look at a page: 1280 and 390 px wide, light and dark. Saves four PNGs, prints console
-// errors, failed loads and sideways overflow.
+// One look at a page: 1280 and 390 px wide, light and dark. Saves four full-page PNGs (scrolled
+// through first, so what appears on scroll is drawn), prints console errors, failed loads and sideways overflow.
 //   node look.mjs <page.html> <out-dir>
 // Needs playwright-core (or playwright) with a Chromium: found in PLAYWRIGHT_DIR, the kit's
 // claude/video (npm ci there), the working directory, or from this folder up.
@@ -57,8 +57,16 @@ try {
       await p.waitForTimeout(1500);
       const over = await p.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
       if (over > 1) problems.push(`${w}/${scheme} overflow: the page scrolls sideways by ${over}px`);
+      await p.evaluate(async () => {
+        for (let y = 0; y < document.documentElement.scrollHeight; y += innerHeight) {
+          scrollTo(0, y);
+          await new Promise((r) => setTimeout(r, 150));
+        }
+        scrollTo(0, 0);
+      });
+      await p.waitForTimeout(500);
       const out = path.join(outArg, `${w}-${scheme}.png`);
-      await p.screenshot({path: out, fullPage: false});
+      await p.screenshot({path: out, fullPage: true});
       console.log(out);
       await p.close();
     }
