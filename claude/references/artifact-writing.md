@@ -4,8 +4,10 @@ For `artifact-builder (Sonnet 5.5, medium)`, `slides-builder (Sonnet 5.5,
 medium)`, `video-builder (Sonnet 5.5, high)` and the skills
 `draw-it-for-me`, `pitch-it-for-me` and `make-it-a-movie`.
 
-Every artifact is in English: the report's Video, Deck and Explainer,
-and every page, deck or film a session asks for. The chat with the user
+This file is the one place that sets an artifact's language; the skills
+and agents point here. Every artifact is in English: the report's Video,
+Deck and Explainer, and every page, deck or film a session asks for. The
+exceptions are under "What stays as it is" below. The chat with the user
 stays in the user's language. The English is simplified, about 80% of
 ASD-STE100, because the reader may read English as a second language.
 
@@ -50,6 +52,7 @@ ASD-STE100, because the reader may read English as a second language.
 ## What stays as it is
 
 - A verbatim quote stays in its own language.
-- The close's video for users and the "what's new" text use the users'
-  language, like the product they show.
+- The close's video for users (every word on screen) and the "what's
+  new" text, also on its Close deck slide, use the users' language:
+  they are product copy, like the product they show.
 - Identifiers, paths and file names.

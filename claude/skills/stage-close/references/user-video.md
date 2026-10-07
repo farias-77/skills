@@ -63,7 +63,8 @@ message as a known issue.
 
 ## What's new
 
-`templates/whats-new.md`, in the users' language: a title, two or three
+`templates/whats-new.md`, in the language
+`claude/references/artifact-writing.md` sets for it: a title, two or three
 sentences of what changed for them, one line per thing they can now
 do, and where to find it. No version numbers, no technical words. It
 goes in the Close deck and, in full, in the final message.

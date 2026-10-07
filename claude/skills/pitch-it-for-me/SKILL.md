@@ -82,7 +82,8 @@ you were given.
   verbatim, in his language.
 - **Honest.** A risk accepted, a failure or an open point is shown as one,
   with the same weight as the good news.
-- **English** on the slides and in the notes, by `claude/references/artifact-writing.md`.
+- **The language** of the slides and the notes is set by
+  `claude/references/artifact-writing.md`.
 - **No real person's name** unless the source is about that person's own
   role and the brief allows it.
 

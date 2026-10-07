@@ -26,7 +26,9 @@ the brief and the shot list, and they come from the session that sent you.
   use the product.
 - **The source files.** For the users' video, also the staging URL, the
   demo account's session file and the journeys to show.
-- **The words** on screen are in English, by `claude/references/artifact-writing.md`.
+- **The words** on screen: their language and style are set by
+  `claude/references/artifact-writing.md`, including its exception for
+  the close's video for users.
 - **The output:** the film's folder (`<workstream>/report/<stage>/film/`)
   and the video path (`<workstream>/report/<stage>/video.mp4`).
 - **The kit:** `claude/video/` of the pipeline repo.

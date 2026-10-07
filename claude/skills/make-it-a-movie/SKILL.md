@@ -168,7 +168,8 @@ cut a scene before you lower the reading time. The details are in
 - **No real person's data.** Names, emails and documents on screen are
   synthetic, recorded on a test or staging account, never production. A
   real person's name never appears, even as an example.
-- **Language.** Every word on screen is English, by `claude/references/artifact-writing.md`, with every
+- **Language.** `claude/references/artifact-writing.md` sets it, with
+  its one exception for a film: the close's video for users. Every
   accent right. The kit has no words of its own.
 
 ## The look

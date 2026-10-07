@@ -18,8 +18,8 @@ format, the story, the rules on every slide, the check, the return.
   the recommendation first), risks accepted, what the guard cut".
 - **The source files**, with the stage's `rulings.md` when it has one.
   Who decided what comes from there.
-- **The words** on the slides and in the notes are in English, by
-  `claude/references/artifact-writing.md`.
+- **The words** on the slides and in the notes: their language and
+  style are set by `claude/references/artifact-writing.md`.
 - **The output folder**, usually `<workstream>/report/<stage>/deck/`.
 - **The date**, for the cover.
 - **For the close only: the "what's new" text.** It goes on its own slide,

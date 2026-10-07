@@ -158,7 +158,7 @@ and headings as the templates have them); the `language` a writer's
 brief names is that language. The report is for a person: a picture first, short
 sentences, only what would change a decision, and the file named as
 the authority for the rest. The report and every other artifact are in
-simplified English, by
+simplified English, with the exceptions it lists, by
 [`claude/references/artifact-writing.md`](claude/references/artifact-writing.md);
 the chat with him stays in his language.
 

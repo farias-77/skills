@@ -51,8 +51,9 @@ touches) come from the telemetry.
 
 The builders run **in parallel** and never read each other's work. Each
 brief carries the stage's line of the table above, the source files and
-the output path. Every piece is in English, by
-`claude/references/artifact-writing.md`.
+the output path. Every piece follows
+`claude/references/artifact-writing.md`, which sets the language of each,
+including the exception for the Close's users' video.
 
 ## The order, at every stage's close
 
