@@ -27,8 +27,9 @@ one line. The full route is six stages. He is asked only what is his.
 
 ## Every stage opens and closes the same way
 
-**Open.** (1) **The canary**: `git push origin a:b` must come back
-denied by the guard with a reason containing `guard-canary`; anything
+**Open.** (1) **The canary**: `git push origin a:b`, run alone (no
+`cd`, nothing chained), must come back denied by the guard with a
+reason containing `guard-canary`; anything
 else and the stage does not open. (2) **The designs root**: no
 `designs-root:` line in the project's `CLAUDE.md` or `CLAUDE.local.md`
 → write nothing anywhere; stop with the exact line for him to add,
