@@ -27,17 +27,21 @@ import path from 'node:path'
 import { execFileSync } from 'node:child_process'
 import { fileURLToPath } from 'node:url'
 
-// USD per million tokens, first-party list prices (2026-09). Cache writes
-// cost 1.25× input (5 min) or 2× input (1 h).
+// USD per million tokens, first-party list prices (2026-10). Cache writes
+// cost 1.25× input (5 min) or 2× input (1 h). A model with `longAbove`
+// costs `longFactor`× on every request whose prompt (input + cache read +
+// cache write) passes that many tokens; those requests are summed under
+// `<model> >Nk`.
 const PRICES = {
   'claude-fable-5-1': { in: 10, out: 50, read: 0.25 },
   'claude-fable-5': { in: 10, out: 50, read: 1 },
   'claude-opus-5-5': { in: 4, out: 20, read: 0.2 },
   'claude-opus-5': { in: 5, out: 25, read: 0.5 },
   'claude-opus-4-8': { in: 5, out: 25, read: 0.5 },
-  'claude-sonnet-5-5': { in: 2, out: 10, read: 0.2 },
+  'claude-sonnet-5-5': { in: 2, out: 10, read: 0.1 },
   'claude-sonnet-5': { in: 2, out: 10, read: 0.2 },
   'claude-sonnet-4-6': { in: 3, out: 15, read: 0.3 },
+  'claude-haiku-5-5': { in: 0.1, out: 0.5, read: 0.01, longAbove: 100_000, longFactor: 5 },
   'claude-haiku-4-5': { in: 1, out: 5, read: 0.1 },
 }
 const STAGE_SKILLS = ['stage-discovery', 'stage-design', 'stage-plan', 'stage-execute', 'stage-release', 'stage-close', 'lets-cook', 'weekly-retro']
@@ -110,7 +114,10 @@ function addUsage(acc, row, seen) {
   if (seen.has(id)) return
   seen.add(id)
   const u = m.usage
-  const model = m.model.replace(/\[.*\]$/, '').replace(/-\d{8}$/, '')
+  const base = m.model.replace(/\[.*\]$/, '').replace(/-\d{8}$/, '')
+  const p = PRICES[base]
+  const prompt = (u.input_tokens ?? 0) + (u.cache_read_input_tokens ?? 0) + (u.cache_creation_input_tokens ?? 0)
+  const model = p?.longAbove && prompt > p.longAbove ? `${base} >${p.longAbove / 1000}k` : base
   const t = (acc[model] ??= { input: 0, output: 0, cacheWrite5m: 0, cacheWrite1h: 0, cacheRead: 0 })
   t.input += u.input_tokens ?? 0
   t.output += u.output_tokens ?? 0
@@ -123,9 +130,11 @@ function addUsage(acc, row, seen) {
 function cost(tokens) {
   let usd = 0
   for (const [model, t] of Object.entries(tokens)) {
-    const p = PRICES[model]
+    const [base, long] = model.split(' ')
+    const p = PRICES[base]
     if (!p) { gaps.push(`no price for ${model}; its tokens are left out of the cost`); continue }
-    usd += (t.input * p.in + t.output * p.out + t.cacheRead * p.read + t.cacheWrite5m * p.in * 1.25 + t.cacheWrite1h * p.in * 2) / 1e6
+    const x = long ? p.longFactor : 1
+    usd += x * (t.input * p.in + t.output * p.out + t.cacheRead * p.read + t.cacheWrite5m * p.in * 1.25 + t.cacheWrite1h * p.in * 2) / 1e6
   }
   return round2(usd)
 }
@@ -302,7 +311,7 @@ const result = {
     tokens: allTokens,
     costUsd: cost(allTokens),
   },
-  cost: { estimate: true, basis: 'tokens × first-party list price per model; cache writes 1.25× (5 min) or 2× (1 h) input' },
+  cost: { estimate: true, basis: 'tokens × first-party list price per model; cache writes 1.25× (5 min) or 2× (1 h) input; a model with a long-prompt tier (Haiku 5.5 over 100k) at its factor' },
   gaps: [...new Set(gaps)],
 }
 

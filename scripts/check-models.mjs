@@ -2,7 +2,8 @@
 // check-models.mjs — every agent's frontmatter against docs/models.md.
 //
 // Fails (exit 1) on:
-//   - a model outside Opus 5.5 / Sonnet 5.5;
+//   - a model outside Opus 5.5 / Sonnet 5.5 (Haiku 5.5 is recognised and
+//     refused with its reason until a blinded A/B on past tasks admits it);
 //   - an agent in claude/agents/ with no row in docs/models.md;
 //   - a model or effort that differs from the agent's row;
 //   - a description whose "(Model 5.5, effort)" mention differs from the frontmatter;
@@ -19,6 +20,8 @@ import { fileURLToPath } from 'node:url';
 const root = resolve(process.argv[2] || join(dirname(fileURLToPath(import.meta.url)), '..'));
 const agentsDir = join(root, 'claude/agents');
 const MODELS = { 'claude-opus-5-5': 'Opus 5.5', 'claude-sonnet-5-5': 'Sonnet 5.5' };
+const PENDING = { 'claude-haiku-5-5': 'Haiku 5.5', haiku: 'Haiku 5.5' };
+const pending = (id) => `${PENDING[id]} (${id}) is known but not admitted yet: docs/models.md allows Opus 5.5 and Sonnet 5.5 only, until a blinded A/B on past tasks shows Haiku 5.5 ties for this role`;
 const EFFORTS = ['low', 'medium', 'high', 'xhigh', 'max'];
 
 // The table: | `name` | stage | Model | effort ... | evidence |
@@ -45,7 +48,7 @@ for (const file of readdirSync(agentsDir).filter((f) => f.endsWith('.md')).sort(
   const name = fm.name || file.replace(/\.md$/, '');
   seen.add(name);
   const model = MODELS[fm.model];
-  if (!model) { errors.push(`${file}: model "${fm.model ?? '(none)'}" is not Opus 5.5 or Sonnet 5.5`); continue; }
+  if (!model) { errors.push(`${file}: ${PENDING[fm.model] ? pending(fm.model) : `model "${fm.model ?? '(none)'}" is not Opus 5.5 or Sonnet 5.5`}`); continue; }
   if (!EFFORTS.includes(fm.effort)) errors.push(`${file}: effort "${fm.effort ?? '(none)'}" is not one of ${EFFORTS.join(', ')}`);
   if (model === 'Sonnet 5.5' && ['xhigh', 'max'].includes(fm.effort)) errors.push(`${file}: Sonnet 5.5 never above high`);
   const row = rows.get(name);
@@ -66,7 +69,7 @@ for (const file of readdirSync(wfDir).filter((f) => f.endsWith('.js')).sort()) {
   for (const m of text.matchAll(/^\s*'?([a-z][a-z0-9-]*)'?:\s*\{\s*model:\s*'(\w+)',\s*effort:\s*'(\w+)'/gm)) {
     const [, name, short, effort] = m;
     const row = rows.get(name);
-    if (!SHORT[short]) { errors.push(`workflows/${file}: ${name} model "${short}" is not opus or sonnet`); continue; }
+    if (!SHORT[short]) { errors.push(`workflows/${file}: ${name} ${PENDING[short] ? pending(short) : `model "${short}" is not opus or sonnet`}`); continue; }
     if (!row) { errors.push(`workflows/${file}: "${name}" has no row in docs/models.md`); continue; }
     if (row.model !== SHORT[short] || row.effort !== effort)
       errors.push(`workflows/${file}: ${name} ${SHORT[short]}, ${effort} ≠ docs/models.md ${row.model}, ${row.effort}`);
