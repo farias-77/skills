@@ -64,7 +64,7 @@ delegated) and the release's stop list. A wait ends on a
    `scout (Sonnet 5.5, low)` per question: where this lives (the
    feature map, the files); which fronts are open
    (`_coordination.md`) and whether one touches this area; is it in a
-   legacy repo; is it broken in production now (the read-only logs).
+   legacy repo.
    Hotfix and short route skip the attention queue; a full route waits
    its turn inside stage-discovery.
 

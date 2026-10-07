@@ -37,8 +37,9 @@ Ask, in one call when the scouts have not answered it:
 3. "Can I ship without you checking staging?" Asked once, here, so the
    `/goal` never waits on him at night. His answer goes in the `/goal`.
 
-The scouts (Sonnet 5.5, low) read the production logs with the read-only identity; what
-they found goes in the brief as the evidence of the bug.
+The session reads the production logs itself, with the read-only
+identity: one `gcloud logging read` command, its output quoted in the
+brief as the evidence of the bug. The scout never calls the cloud.
 
 ## When it grows
 
