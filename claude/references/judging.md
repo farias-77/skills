@@ -24,9 +24,9 @@ with a concrete quote of what serves no AC and no real risk. "Could be
 simpler" is a note: it never blocks, never starts a round, never loops.
 The design that works stands.
 
-**One round.** Every stage reviews once. The fixes are verified by
-reading the changed lines (and at execute by the delta); a fix that did
-not land goes back once. Nothing opens a second round.
+**One round.** Every stage reviews once. A fix is verified by its
+diff against the finding (at execute, by the delta), never by
+re-reading the file; a fix that did not land goes back once. Nothing opens a second round.
 
 ## Ruling, everywhere
 

@@ -181,9 +181,10 @@ leaves:
 | a gap the design should have decided | the session, in his place | the conservative option; `ruled: conductor`; listed for veto |
 
 Then send the fixes, in one message (the planner's first; then the
-writers', with what the planner moved). **Verify by reading** each
-changed line, run the checker with `--briefs` once more, and record
-what you read in `reviews.md`. There is no second round.
+writers', with what the planner moved), the files staged (`git add`)
+first. Verify each fix by `git diff -- <file>` against the finding,
+opening the file only when they disagree; run the checker with
+`--briefs` once more, and record each verdict in `reviews.md`. There is no second round.
 
 ## P4 · Close
 

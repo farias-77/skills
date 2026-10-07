@@ -262,7 +262,8 @@ and `claude/references/judging.md`, in `reviews.md`
 ([template](templates/reviews.md)), before any fix moves:
 
 - owner `story-writer` → one apply batch, by `SendMessage`, without
-  asking him; you verify each changed line and rerun `trace`;
+  asking him, the files staged (`git add`) first; you verify each fix
+  by `git diff -- <file>` against the finding and rerun `trace`;
 - his → into the playback, one question per decision;
 - for the design → `reviews.md`, never asked;
 - dismissed → with the quote or frame that closes it.

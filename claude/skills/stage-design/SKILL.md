@@ -277,8 +277,9 @@ Save each return, as it came, in `reviews/`. AC coverage is not a lens:
 
 The guard's finding blocks only with a concrete quote of what serves no
 AC and no real risk; "could be simpler" is a note and never starts
-anything. Verify each fix by reading the changed lines, then
-`review-prep.mjs` again. **There is no second round.**
+anything. Stage the documents (`git add`) before the fixes go out;
+verify each fix by `git diff -- <file>` against the finding, opening
+the file only when they disagree, then `review-prep.mjs` again. **There is no second round.**
 
 ## D7 · The report, the cleanup, the close
 
