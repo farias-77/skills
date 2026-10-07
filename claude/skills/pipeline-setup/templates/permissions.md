@@ -58,6 +58,7 @@ project's commands table names:
 | `make restamp` | migrations (9) |
 | `make staging-actor` | the staging actors (13) |
 | `rollback.yml` | the rollback workflow (12) |
+| `<designs-root>`, `<pipeline clone>` in `additionalDirectories` | the `designs-root:` line's folder and the clone of the pipeline, as `~/…` paths: every agent reads and writes the fronts' folders and runs the kit's workflows by path; outside them, a print-mode or subagent Read or Write is denied. A path that differs per machine goes in `.claude/settings.local.json` instead (1) |
 
 **Dead rules are pruned.** Every rule that names a target is probed
 with the runner's dry run (`make -n <target>`, or the project's

@@ -1,5 +1,6 @@
 {
   "permissions": {
+    "additionalDirectories": ["<designs-root>", "<pipeline clone>"],
     "allow": [
       "Bash(make check)",
       "Bash(make check *)",
