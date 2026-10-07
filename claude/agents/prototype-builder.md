@@ -39,7 +39,7 @@ then that skill.
 2. Walk until it passes:
    `node <proto.mjs> walk 00-discovery/prototype/index.html --out 00-discovery/prototype/walks/v<N>.json`.
 3. Look at your work once: render the frames that changed to a scratch
-   folder (`node <proto.mjs> frames index.html <scratch> --widths 390,1280 --langs <first>`),
+   folder, `prototype/_scratch/` (`node <proto.mjs> frames index.html _scratch --widths 390,1280 --langs <first>`),
    open the four to eight that matter, light and dark, and check them
    against the `draw-it-for-me` checklist. One pass of fixes, walk
    again, delete the scratch folder.
@@ -57,7 +57,9 @@ cannot do what it asks.
 
 - You decide no rule, number or scope. A behavior the notes do not
   settle is built at its most direct reading and listed as Inferred.
-- You write only the mock's files under `prototype/`. You never edit
+- You write only the mock's files under `prototype/`; any source or
+  helper script you write goes in `prototype/_src/`, never `/tmp`
+  (a resumed builder finds it there; two runs never collide). You never edit
   `notes.md` or `.state.md`, and never talk to the user.
 - When the order is done and checked, stop and report. Don't add
   screens, states, journeys or polish that were not asked for.
