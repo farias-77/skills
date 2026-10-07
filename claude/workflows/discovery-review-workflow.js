@@ -8,6 +8,11 @@ export const meta = {
   ],
 }
 
+const AGENTS = {
+  'disc-lens': { model: 'sonnet', effort: 'medium' },
+  'blind-reader': { model: 'sonnet', effort: 'low' },
+  'blind-judge': { model: 'sonnet', effort: 'medium' },
+}
 const LENSES = ['in-out', 'coverage', 'acceptance']
 const AC_ID = /^(J\d+\.s\d+\.\d+|frame:[A-Za-z0-9_.-]+\.\d+)$/
 const MIN_QUOTE = 12
@@ -115,6 +120,12 @@ The locked mock: ${args?.mock}
 The tool: node ${args?.proto}
 Language of the documents: ${language}`
 
+function call(name, prompt, opts) {
+  if (args?.inlineAgents !== true) return agent(prompt, { ...opts, agentType: name })
+  const { model, effort } = AGENTS[name]
+  return agent(`Your instructions are ${args.agentsDir}/${name}.md: read it first and follow it.\n\n${prompt}`, { ...opts, model, effort })
+}
+
 async function once(dispatch, isValid, name) {
   const first = await dispatch()
   if (isValid(first)) return first
@@ -134,7 +145,7 @@ function keepLensFinding(lens, f) {
 
 async function runLens(lens) {
   const report = await once(
-    () => agent(`Lens: ${lens}.\n${sources}`, { label: lens, phase: 'Lenses', agentType: 'disc-lens', schema: LENS_REPORT }),
+    () => call('disc-lens', `Lens: ${lens}.\n${sources}`, { label: lens, phase: 'Lenses', schema: LENS_REPORT }),
     (r) => r && (r.findings.length > 0 || r.verified.length > 0),
     `disc-lens ${lens}`,
   )
@@ -160,7 +171,7 @@ const coversEvery = (s) => (r) => {
 
 async function readTwice(s) {
   const read = (who) => once(
-    () => agent(`Reader ${who}, of one story.\n${storyInputs(s)}`, { label: `${s.id}·${who}`, phase: 'Double-blind', agentType: 'blind-reader', schema: READING }),
+    () => call('blind-reader', `Reader ${who}, of one story.\n${storyInputs(s)}`, { label: `${s.id}·${who}`, phase: 'Double-blind', schema: READING }),
     coversEvery(s),
     `${s.id} reader ${who}`,
   )
@@ -199,7 +210,7 @@ ${JSON.stringify(onlyGiven(s, pair.a), null, 1)}
 Reading B:
 ${JSON.stringify(onlyGiven(s, pair.b), null, 1)}`
   const verdict = await once(
-    () => agent(prompt, { label: `${s.id}·judge`, phase: 'Double-blind', agentType: 'blind-judge', schema: JUDGMENT }),
+    () => call('blind-judge', prompt, { label: `${s.id}·judge`, phase: 'Double-blind', schema: JUDGMENT }),
     (r) => r && Array.isArray(r.findings),
     `${s.id} judge`,
   )

@@ -213,7 +213,7 @@ map. Then announce in one line ("locked v6: 4 journeys, 11 rules") and
 run:
 
 ```
-node proto.mjs lock 00-discovery/prototype --words "<your announcement>" [--gap "<where>::<what>" …]
+node <kit>/skills/stage-discovery/scripts/proto.mjs lock <workstream>/00-discovery/prototype --words "<your announcement>" [--gap "<where>::<what>" …]
 ```
 
 It walks once more, copies `versions/v<N>.html`, renders `frames/`,
@@ -240,14 +240,15 @@ lines match the notes. A miss goes back to the writer in one message.
 ## D5 · The review: one round
 
 ```
-node proto.mjs split 00-discovery/stories.md 00-discovery/reviews/stories
+node <kit>/skills/stage-discovery/scripts/proto.mjs split <workstream>/00-discovery/stories.md <workstream>/00-discovery/reviews/stories
 ```
 
 prints the index. Run the workflow by `scriptPath`
 (`<kit>/workflows/discovery-review-workflow.js`), with `args`:
 `discoveryDir`, `mock` (the locked version), `proto` (absolute paths),
-`language`, and `index` (the JSON `split` printed, as a value, never a
-string). It returns `.result` inside an envelope; save the result as
+`language`, `index` (the JSON `split` printed, as a value, never a
+string), and `inlineAgents: true` with `agentsDir` (`<kit>/agents`)
+while the agents are not installed. It returns `.result` inside an envelope; save the result as
 `reviews/round-1.json`.
 
 | Section | Who | Asks |

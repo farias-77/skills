@@ -111,9 +111,9 @@ references (`${CLAUDE_SKILL_DIR}/references/`), the checker
 checker green:
 
 ```
-node "${CLAUDE_SKILL_DIR}/scripts/plan-graph.mjs" <ws>/02-plan/plan.graph.json \
-     --stories <ws>/00-discovery/stories.md \
-     --json <ws>/02-plan/graph.json --mermaid <ws>/02-plan/graph.mmd
+node "${CLAUDE_SKILL_DIR}/scripts/plan-graph.mjs" <designs-root>/<slug>/02-plan/plan.graph.json \
+     --stories <designs-root>/<slug>/00-discovery/stories.md \
+     --json <designs-root>/<slug>/02-plan/graph.json --mermaid <designs-root>/<slug>/02-plan/graph.mmd
 ```
 
 Then rule the cut against [references/cut.md](references/cut.md): a
@@ -154,9 +154,9 @@ changes what he will see goes under "Decided in his place" in
 Then the checker with the briefs, until green:
 
 ```
-node "${CLAUDE_SKILL_DIR}/scripts/plan-graph.mjs" <ws>/02-plan/plan.graph.json \
-     --stories <ws>/00-discovery/stories.md --briefs <ws>/02-plan/briefs \
-     --json <ws>/02-plan/graph.json --mermaid <ws>/02-plan/graph.mmd
+node "${CLAUDE_SKILL_DIR}/scripts/plan-graph.mjs" <designs-root>/<slug>/02-plan/plan.graph.json \
+     --stories <designs-root>/<slug>/00-discovery/stories.md --briefs <designs-root>/<slug>/02-plan/briefs \
+     --json <designs-root>/<slug>/02-plan/graph.json --mermaid <designs-root>/<slug>/02-plan/graph.mmd
 ```
 
 ## P3 · Review, one round
