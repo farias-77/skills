@@ -113,8 +113,18 @@ the watch green; cleanup.sh --check came back empty; I got the notification. Nev
 to call it met; stop early only when truly stuck, with why in trace.md.
 ```
 
-In a legacy repo the first line is
-`! .claude/hooks/authorize.sh legacy <repo> <branch>`.
+In a legacy repo there is no tag (`stage-release/references/release.md`,
+"Legacy repos"):
+
+```
+! .claude/hooks/authorize.sh legacy <repo> <branch>
+/goal Ship <slug> in the legacy repo <repo> with the lets-cook skill, from <designs-root>/<slug>/brief.md.
+I authorize the merge of <branch> into <repo>'s main, no tag; the authorization expires in 3 days.
+Done when: the entry passed its gate and review; <I said ok through the question tool (before production
+when the repo has no staging) | my check is delegated>; the repo's own CI deployed it; the 15-minute watch
+is green; the parity line is in the feature map; cleanup.sh --check came back empty; I got the
+notification. Never loosen this done to call it met; stop early only when truly stuck, with why in trace.md.
+```
 
 ## 5 · The entry
 
