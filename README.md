@@ -189,6 +189,7 @@ ln -s ~/skills/claude/skills skills
 ln -s ~/skills/claude/agents agents
 ln -s ~/skills/claude/workflows workflows
 printf '.claude/skills\n.claude/agents\n.claude/workflows\n' >> "$(git rev-parse --git-common-dir)/info/exclude"
+npm ci --prefix ~/skills/claude/video   # the reports' renderer and playwright-core for discovery's mock
 ```
 
 The links stay out of git through `.git/info/exclude`: untracked, they

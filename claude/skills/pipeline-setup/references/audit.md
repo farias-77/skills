@@ -77,7 +77,7 @@ One-line commands, quoted in the readiness file:
 | Probe | For |
 |---|---|
 | `node --version`, `ffmpeg -version \| head -1`, `gitleaks version` (or `make -n gitleaks dir=.`) | role 16 |
-| `ls "$PLAYWRIGHT_DIR"/node_modules/playwright-core/package.json`, then `proto.mjs look` on a file holding `<p>probe</p>` with `--shot` (`proto.mjs` adds the page skeleton itself and refuses a full page) | role 16, the mock |
+| `ls "${PLAYWRIGHT_DIR:-<clone>/claude/video}"/node_modules/playwright-core/package.json` (missing: `npm ci --prefix <clone>/claude/video`), then `proto.mjs look` on a file holding `<p>probe</p>` with `--shot` (`proto.mjs` adds the page skeleton itself and refuses a full page) | role 16, the mock |
 | in each session root: `ls -L .claude/skills/lets-cook/SKILL.md .claude/agents .claude/workflows`, `jq .permissions.additionalDirectories .claude/settings.local.json`, `git status --short .claude` empty (the links in `.git/info/exclude`) | the README's install (role 14) |
 | `git -C <project> remote get-url origin` | the remote's kind |
 | GitHub only: `gh api repos/<owner>/<repo>/rulesets` and `.../branches/<default>/protection` (read-only) | roles 6 and 7 |
