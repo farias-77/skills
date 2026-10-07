@@ -109,8 +109,11 @@ Every question goes through the question tool, in one shape. The
 question text carries the context (what this is about, the quote, the
 gap, why it matters) and asks one thing. Each option's label is the
 answer in his words; its description is what that answer costs and
-buys. Your pick comes first and says so. One question per decision;
-four questions to a call, at most. Never a board he answers in prose.
+buys, checked before the question is asked (a scout when the code
+holds it): an option that implies a migration, a recurring cost or an
+irreversible change says so in its description. Your pick comes first
+and says so. One question per decision; four questions to a call, at
+most. Never a board he answers in prose.
 
 ## Every reply is built for a reader who skims
 

@@ -38,6 +38,7 @@ the implementer decides it.
 | a fact the code, the docs or `rulings.md` hold | a `scout (Haiku 5.5, medium)` finds it |
 | something he will recognize when he sees it (a layout, a density, a tone, which of two flows) | put it in the mock, as variants (three at most) in the debug bar |
 | the obvious ("should the button say Save?") | the mock answers it |
+| a look or naming item: a colour, a contrast, a file name, a label, the states a control already implies | an order to the `prototype-builder`; he sees it in the mock and comments if he minds |
 | a hypothetical ("would managers use this?") | the last real case ("when did one last…?") |
 | two questions in one | split it, or drop the weaker |
 
@@ -46,7 +47,15 @@ the implementer decides it.
 Propose the behavior you believe is right: "I assume an expired invite
 stays in the list, marked expired; confirm?". Confirmed, it is a fact.
 Not discussed, it goes to the notes' Inferred block, is visible in the
-mock, and is asked before the lock. Never inferred silently.
+mock, and is asked before the lock. Never inferred silently. An
+inferred look, copy or naming item is never asked: it is the builder's
+pick, shown in the mock.
+
+**Check before you ask.** Before an option goes to him, know what it
+costs: an inferred data order, format or field gets a scout's answer
+to "does the system already store this?". An option that needs a
+migration, a recurring cost or an irreversible change says so in its
+description.
 
 ## Anchor on the concrete
 
