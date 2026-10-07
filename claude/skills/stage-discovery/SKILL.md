@@ -171,7 +171,8 @@ its agent id in `.state.md`.
 `SendMessage` (it keeps its context): one line per change, each with
 its source (`batch 3 · Q2`, `comment <id>`, `chat`), his words, and your
 restatement. One batch of his answers is one order, published once.
-Sort each item first:
+Send the next order only after the builder's return; answers that
+arrive meanwhile join that order. Sort each item first:
 
 | Item | Path |
 |---|---|
