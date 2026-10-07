@@ -20,7 +20,8 @@ one render.
 
 ## The brief the builder gets
 
-- The stories (`00-discovery/stories.md`) and the tag's notes.
+- The stories (`00-discovery/stories.md`, or the ACs of `brief.md` on
+  the short route and the hotfix) and the tag's notes.
 - The staging URLs and the journeys to record, one per story a user
   touches.
 - The audience: users and employees. No technical word: no endpoint,

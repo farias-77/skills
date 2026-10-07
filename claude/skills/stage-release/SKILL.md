@@ -121,7 +121,8 @@ should be done and read the run (`gh run view <id>`); never poll.
   for users now, in the background: `video-builder (Sonnet 5.5, high)`
   with `stage-close/references/user-video.md` and the stories; it
   records in staging while you go on (on the short route only when a
-  screen users see changed).
+  screen users see changed). Write its agent id in `.state.md` as
+  `video:`.
 - **Red:** the red rule below.
 
 ## Step 3 · The tag
@@ -155,6 +156,10 @@ creates no release. Wake when it should be done and read the run.
 | production rolled back | one `X.n` on `fix/<slug>/X.n`, its PR green on `local-ci` → **ask** him before it goes anywhere: the old line died at the tag, so its merge and its patch tag need his new `! .claude/hooks/authorize.sh release <slug> fix/<slug>/X.n@<sha>` → merge → staging and smoke → a patch tag |
 | the environment (runner, network, a quota) | run it again once; it does not count. Never a production `migrate`: that is a stop |
 | a second red of code, anywhere | stop |
+
+An `X.n` runs exec-entry by `scriptPath`; when the Workflow tool refuses
+the kit's path, copy it into `<slug>/_run/`, check both `sha256sum`s
+match, and run the copy.
 
 ## The stop list (only these stop)
 

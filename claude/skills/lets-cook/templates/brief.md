@@ -20,6 +20,14 @@ Hotfix: broken since <version or hour> · who is blocked: <who> · evidence: <lo
 
 <!-- hotfix: AC-1 is the one that reproduces the bug -->
 
+## Owns
+
+- <every path the entry creates or edits; the builders stay inside it>
+
+## Done
+
+- <the ACs green at their layer, the gate green, nothing outside Owns>
+
 ## Assumed
 
 - <what you decided without asking; he sees it when he uses it>

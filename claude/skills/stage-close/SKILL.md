@@ -85,8 +85,9 @@ Start all three in one turn.
 **The video for users.** The release dispatched the
 `video-builder (Sonnet 5.5, high)` at its green staging. Read its
 state from the machine: `report/close/video.mp4` exists → done; a
-render of it still running (`pgrep -af 'render.sh.*<slug>'`) → wake
-when it should end; neither → dispatch it now with
+render of it still running (`pgrep -af 'render.sh.*<slug>'`), or the
+`video:` agent of `.state.md` still running → wake when it should end;
+none of these → dispatch it now with
 `references/user-video.md` and the stories (it records in staging).
 When it returns, check it as that reference says.
 

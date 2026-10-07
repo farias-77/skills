@@ -84,10 +84,9 @@ Decide by `references/routes.md` and say it in one line:
 irreversible". When in doubt between short and full, go full: going
 small on the wrong thing builds the wrong thing.
 
-- **Full:** create the slug (`YYYY-MM-DD-<name>`) and
-  `<designs-root>/<slug>/`, write what he said as Confirmed lines for
-  the discovery's notes, and load `stage-discovery` with the Skill
-  tool. This skill ends there.
+- **Full:** create nothing. Load `stage-discovery` with the Skill tool,
+  with what he said as Confirmed lines for its notes; its Open creates
+  the slug, the folder and `.state.md`. This skill ends there.
 - **Short or hotfix:** go on.
 
 ## 4 · The brief and the authorization
@@ -107,8 +106,8 @@ small on the wrong thing builds the wrong thing.
 ! .claude/hooks/authorize.sh <short | hotfix> <slug> <feat/<slug> | hotfix/<slug>>
 /goal Ship <slug> by the <short route | hotfix> with the lets-cook skill, from <designs-root>/<slug>/brief.md.
 I authorize the merge into main and one patch tag; the authorization expires at the tag.
-Done when: the entry passed its gate and review; local-ci is green on the PR; <I used it and said ok
-through the question tool | my staging check is delegated>; the tag is in production with the smoke and
+Done when: the entry passed its gate and review; <I used it and said ok through the question tool | my
+staging check is delegated>; local-ci is green on the PR's final head; the tag is in production with the smoke and
 the watch green; cleanup.sh --check came back empty; I got the notification. Never loosen this done
 to call it met; stop early only when truly stuck, with why in trace.md.
 ```
@@ -136,7 +135,12 @@ notification. Never loosen this done to call it met; stop early only when truly 
 - Run `exec-entry-workflow.js` mode `build`, one entry, with the args
   of stage-execute's table (its step 3): `briefPath` = `brief.md`,
   `sides` = the sides its ACs touch (`['back']`, `['front']` or both),
-  `designDir`, `storiesPath` and `mockDir` none, `base` = `main`. The
+  `designDir`, `storiesPath` and `mockDir` none, `base` = `main`,
+  `referencesDir` = `${CLAUDE_SKILL_DIR}/../stage-execute/references`,
+  `heartbeat` = `bash ${CLAUDE_SKILL_DIR}/../stage-execute/scripts/heartbeat.sh <designs-root>/<slug>/entry/`,
+  `evidenceDir` = `<designs-root>/<slug>/entry/`. When the Workflow tool
+  refuses the kit's path, copy the workflow into `<slug>/_run/`, check
+  both `sha256sum`s match, and run the copy. The
   `reviewer (Opus 5.5, high)` always runs; on a hotfix, with the
   security pass.
 - When the entry comes back `ready`, push and open the PR ready. Fixes
@@ -151,8 +155,8 @@ notification. Never loosen this done to call it met; stop early only when truly 
 
 - **Short route:** bring the local environment up with the brief's
   "The seed shows", and ask through the question tool: ok, or what to
-  adjust. One round of adjustments (`A.n`, mode `fix`, the `reviewer (Opus 5.5, high)` on
-  every round), then ask again. His ok closes the build.
+  adjust. Each answer is one `A.n` round (mode `fix`, the `reviewer (Opus 5.5, high)` on
+  every round), then ask again, until his ok. His ok closes the build.
 - **Hotfix:** his check is on staging, after the merge (step 7),
   unless he delegated it.
 
@@ -182,7 +186,7 @@ users' video only when a screen users see changed.
 | Release | — | version, notes, smokes | only with an incident |
 | Close | only if a screen users see changed | numbers and "what's new" | — |
 
-5. `.state.md` → `closed`; your `_coordination.md` line: "out in
+5. `.state.md` → `stage: closed`; your `_coordination.md` line: "out in
    vX.Y.Z". Commit the folder. One message and a `PushNotification`:
    the version, the link, the "what's new" text, the video if any.
 
@@ -191,10 +195,11 @@ users' video only when a screen users see changed.
 | Switch | What happens |
 |---|---|
 | short → full, any time | the brief and your notes become Confirmed lines of the discovery's notes; a branch already built stays, and the plan names it as an entry's base. Load `stage-discovery` |
-| full → short, until the design closes | the discovery or design conductor proposes it in one line when one story is left |
+| full → short, until the design closes | the discovery or design conductor proposes it in one line when one story is left; on his yes it writes `brief.md` from `templates/brief.md` with that story's ACs and loads `lets-cook` (`/lets-cook <slug>` resumes from the brief) |
 | he says "switch" | switch; never argue the route twice |
 
 ## Resuming
 
 `/lets-cook <slug>` with an existing folder: the canary, then
-`.state.md` and `trace.md`. The trace's last line is where you are.
+`.state.md` and `trace.md`, and from the release on `04-release/trace.md`
+(the release steps write there). The last line written is where you are.

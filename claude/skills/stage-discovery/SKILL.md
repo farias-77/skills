@@ -287,7 +287,9 @@ question. About ten stories, three calls.
   propose · I have an idea · I have a constraint). His answer goes,
   verbatim, to the notes' "For the design".
 
-Every answer is a line in `rulings.md`.
+Every answer is a line in `rulings.md`. When one story is left, propose
+the short route in one line; on his yes, write `brief.md` from
+`<kit>/skills/lets-cook/templates/brief.md` and load `lets-cook`.
 
 ## D7 · The report, the cleanup, the close
 

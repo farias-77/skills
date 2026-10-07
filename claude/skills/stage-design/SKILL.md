@@ -204,7 +204,9 @@ Each round:
 Every ruling is a line in `rulings.md`; one against the architect's
 pick is also a `[taste]` line in `dreaming-notes.md`. A design that
 needs a change to the project's standards is his to decide, always as
-a question.
+a question. When one story is left, propose the short route in one
+line; on his yes, write `brief.md` from
+`<kit>/skills/lets-cook/templates/brief.md` and load `lets-cook`.
 
 When he says closed: `SendMessage` the architect to set `Status:
 closed` with the date and his words. If the proposal grew during the
