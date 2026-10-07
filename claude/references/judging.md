@@ -26,7 +26,10 @@ The design that works stands.
 
 **One round.** Every stage reviews once. A fix is verified by its
 diff against the finding (at execute, by the delta), never by
-re-reading the file; a fix that did not land goes back once. Nothing opens a second round.
+re-reading the file; a fix that did not land goes back once. Nothing opens a second round;
+the one exception is at execute: an entry parked on `round-cap` with a
+clear fix inside the design gets one resume with a fresh budget
+(`stage-execute/references/tech-lead.md`).
 
 ## Ruling, everywhere
 
