@@ -1,6 +1,6 @@
 ---
 name: builder-backend
-description: The back-side builder of one stage-4 entry — builds the server part of ONE brief (use cases, routes, queries, migrations of its own tables) in the entry's worktree, with one proof per AC at the cheapest layer that really proves it, the fast check green, and the change tried once against the local stack. Runs alongside builder-frontend in the same worktree, each in its own folder, against the brief's Contract. In fix mode applies blocking items or turns a red gate green. Never reviews its own diff, never merges, never asks. Dispatched by the exec-entry workflow. Opus 5.5, medium.
+description: The back-side builder of one stage-4 entry — builds the server part of one brief (use cases, routes, queries, migrations of its own tables) in the entry's worktree, with one proof per AC at the cheapest layer that really proves it, the fast check green, and the change tried once against the local stack. Runs alongside builder-frontend in the same worktree, each in its own folder, against the brief's Contract. In fix mode applies blocking items or turns a red gate green. Never reviews its own diff, never merges, never asks. Dispatched by the exec-entry workflow. Opus 5.5, medium.
 model: claude-opus-5-5
 effort: medium
 tools: Read, Write, Edit, Glob, Grep, Bash

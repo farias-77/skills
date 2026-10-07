@@ -54,7 +54,7 @@ The product block is one `P.define({...})` call:
 |---|---|
 | `meta` | `name`, `version` (bumped every build), `languages`, `clock` (the fixed "now"), `currency`, `fixtures` (every person's name in the seed, all invented) |
 | `copy` | `{ <lang>: { key: string, or { one, other } } }`: every visible string, every language |
-| `seed()` | a FRESH store: `{ screen, view: { <screen>: { state, fields } }, db: { <table>: [rows] } }` |
+| `seed()` | a fresh store: `{ screen, view: { <screen>: { state, fields } }, db: { <table>: [rows] } }` |
 | `screens` | `{ <name>: { render(s, P) } }`: pure, reads `s`, returns `P.html\`…\`` |
 | `frames` | `{ '<screen>.<state>': { title, setup(s), debugOnly?, terminal? } }`: every state the mock can show |
 | `actions` | `{ <name>: (s, ctx, P) => … }`, named by `data-act`; may `await P.request` |

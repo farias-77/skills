@@ -20,7 +20,7 @@ the cheap gaps itself, on a branch.
   0 open      the project, its default sha, the session roots, the standards, the remote; an audit worktree
   1 audit     six scouts in parallel on the audit worktree → the session rates each role
   2 propose   the gaps cheapest first → pipeline-readiness.md committed on branch pipeline-setup
-              → ONE question: apply the S and M steps, pick, or stop at the plan
+              → one question: apply the S and M steps, pick, or stop at the plan
   3 apply     one commit per gap, each checked by a command; never main, never pushed
   4 close     the whole gate once; no placeholder left; push and PR only on his word
 ```

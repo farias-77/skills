@@ -53,7 +53,7 @@ Good:
 
 ### 3. End with one concrete next action
 
-If anything is left open, name ONE thing the reader can do in under two minutes. Even "open the file" counts.
+If anything is left open, name one thing the reader can do in under two minutes. Even "open the file" counts.
 
 Bad: "Hope that helps. Let me know if you want to dig deeper."
 Good: "Next: run `npm test` and paste the first failing line."
@@ -145,6 +145,7 @@ If yes, send.
 3. Detail lives in a file or an artifact. Link it; never paste it.
 4. A table that compares options has at most 5 rows and 3 columns; a status board shows every row.
 5. Restate where we are in one line: the topic and the step.
+6. Under a `/goal`, a reply ends on the next action already started or on the status table, never on an offer.
 
 ## Credit
 

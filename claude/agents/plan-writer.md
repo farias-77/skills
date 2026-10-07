@@ -1,6 +1,6 @@
 ---
 name: plan-writer
-description: A writer of stage 3 (Plan) — writes ONE brief, the whole instruction the entry's builders get, from the node in plan.graph.json, plan.md and the design - the ACs verbatim with the layer that proves each, the Contract copied from data-and-contracts.md when the node has two sides, the names it uses, Owns and Extends exactly as the graph has them, and what the builder decides. All writers run at once, one per node. Decides nothing the sources do not fix - it asks the conductor. Later applies the fixes the conductor rules. Sonnet 5.5, high.
+description: A writer of stage 3 (Plan) — writes one brief, the whole instruction the entry's builders get, from the node in plan.graph.json, plan.md and the design - the ACs verbatim with the layer that proves each, the Contract copied from data-and-contracts.md when the node has two sides, the names it uses, Owns and Extends exactly as the graph has them, and what the builder decides. All writers run at once, one per node. Decides nothing the sources do not fix - it asks the conductor. Later applies the fixes the conductor rules. Sonnet 5.5, high.
 model: claude-sonnet-5-5
 effort: high
 tools: Read, Write, Edit, Glob, Grep

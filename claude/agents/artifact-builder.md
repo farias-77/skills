@@ -1,6 +1,6 @@
 ---
 name: artifact-builder
-description: Builds ONE explanatory artifact with the draw-it-for-me skill - a self-contained HTML page that explains a system, a flow, a plan or a decision by showing it (diagrams that build, motion, 3D, charts, steppers, playgrounds). Writes the Explainer tab of a stage report (discovery, design, an incident in the release) or a page the session asks for in a debate. Reads only the files the brief names, writes only the page, never publishes. Dispatched by a stage session, in parallel with slides-builder and video-builder. Sonnet 5.5, medium.
+description: Builds one explanatory artifact with the draw-it-for-me skill - a self-contained HTML page that explains a system, a flow, a plan or a decision by showing it (diagrams that build, motion, 3D, charts, steppers, playgrounds). Writes the Explainer tab of a stage report (discovery, design, an incident in the release) or a page the session asks for in a debate. Reads only the files the brief names, writes only the page, never publishes. Dispatched by a stage session, in parallel with slides-builder and video-builder. Sonnet 5.5, medium.
 model: claude-sonnet-5-5
 effort: medium
 tools: Read, Write, Edit, Glob, Grep, Bash(node *), Bash(ls *), Bash(mkdir *), Bash(wc *)

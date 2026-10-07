@@ -1,6 +1,6 @@
 ---
 name: draw-it-for-me
-description: Builds an explanatory artifact, one self-contained HTML page that explains ONE thing (a system, a flow, a plan, a decision, a set of numbers) by showing it - diagrams that build, motion, 3D, charts, steppers, playgrounds - so a reader who skims understands it without a wall of text. Use when asked to explain, visualize, illustrate or "draw" something as a page, and for the Explainer tab of a stage report.
+description: Builds an explanatory artifact, one self-contained HTML page that explains one thing (a system, a flow, a plan, a decision, a set of numbers) by showing it - diagrams that build, motion, 3D, charts, steppers, playgrounds - so a reader who skims understands it without a wall of text. Use when asked to explain, visualize, illustrate or "draw" something as a page, and for the Explainer tab of a stage report.
 ---
 
 # draw-it-for-me

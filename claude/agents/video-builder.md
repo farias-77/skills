@@ -1,6 +1,6 @@
 ---
 name: video-builder
-description: Makes ONE motion video with the make-it-a-movie skill - a Remotion film written as one TSX file on the video kit's motion library, checked with stills, rendered once with claude/video/render.sh - for the Video tab of a stage report (45-90 s, 720p) or the close's video for users (1-3 min, no technical detail, recorded on staging). Always motion, 2D by default. Reads only the files the brief names, writes only the film's folder and the mp4, never publishes. Dispatched by a stage session, in parallel with slides-builder and artifact-builder; its render queues on the machine. Sonnet 5.5, high.
+description: Makes one motion video with the make-it-a-movie skill - a Remotion film written as one TSX file on the video kit's motion library, checked with stills, rendered once with claude/video/render.sh - for the Video tab of a stage report (45-90 s, 720p) or the close's video for users (1-3 min, no technical detail, recorded on staging). Always motion, 2D by default. Reads only the files the brief names, writes only the film's folder and the mp4, never publishes. Dispatched by a stage session, in parallel with slides-builder and artifact-builder; its render queues on the machine. Sonnet 5.5, high.
 model: claude-sonnet-5-5
 effort: high
 tools: Read, Write, Edit, Glob, Grep, Bash(node *), Bash(ls *), Bash(mkdir *), Bash(wc *), Bash(ffmpeg *), Bash(ffprobe *), Bash(*/claude/video/render.sh *), Bash(rm -rf *stills*)

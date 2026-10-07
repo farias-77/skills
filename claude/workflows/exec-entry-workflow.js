@@ -267,7 +267,7 @@ const blocks = (f) => f.severity === 'blocks' && f.proof.trim() !== '' &&
 function checkPrompt(name, kind, since, own, diffCmd) {
   const diff = diffCmd ?? (kind === 'delta' ? `git diff ${since} HEAD` : `git diff ${args?.base}...HEAD`)
   const scope = kind === 'delta'
-    ? `\nTHIS IS A DELTA. ${own.length ? `Re-check only your items below; return the closed ids in \`closed\`, an open one again as a finding with its id in the title:\n${own.map(itemText).join('\n')}` : 'Read only this delta: a fix pass changed tests or gate files; block only if it weakens a proof or the gate.'}`
+    ? `\nThis is a delta. ${own.length ? `Re-check only your items below; return the closed ids in \`closed\`, an open one again as a finding with its id in the title:\n${own.map(itemText).join('\n')}` : 'Read only this delta: a fix pass changed tests or gate files; block only if it weakens a proof or the gate.'}`
     : ''
   const fix = mode === 'fix' ? '\nThis is a fix entry.' : ''
   const files = name === 'reviewer' && result.outsideOwns.length ? `\nFiles changed outside the brief's Owns (read them whole): ${result.outsideOwns.map(o => `${o.path} (${o.why})`).join('; ')}` : ''

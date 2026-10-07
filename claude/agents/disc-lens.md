@@ -1,6 +1,6 @@
 ---
 name: disc-lens
-description: A review lens of stage 1 (Discovery). Reads the stories written from the locked mock through ONE lens per call - in-out (every capability In or Out, nothing in limbo), coverage (every rule has its AC, and each story walks through limit, dependency failure, permission and repeat), or acceptance (a stranger can decide pass or fail on every AC) - and returns findings with a verbatim quote each. Three run in parallel inside the discovery-review workflow. Sonnet 5.5, medium.
+description: A review lens of stage 1 (Discovery). Reads the stories written from the locked mock through one lens per call - in-out (every capability In or Out, nothing in limbo), coverage (every rule has its AC, and each story walks through limit, dependency failure, permission and repeat), or acceptance (a stranger can decide pass or fail on every AC) - and returns findings with a verbatim quote each. Three run in parallel inside the discovery-review workflow. Sonnet 5.5, medium.
 model: claude-sonnet-5-5
 effort: medium
 tools: Read, Glob, Grep, Bash(node *)
