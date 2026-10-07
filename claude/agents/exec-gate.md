@@ -45,11 +45,10 @@ file. The builders fix; the reviewer and the QAs read your report.
    head, then its env command; report the URLs and the actors by role,
    never a token. Leave it up.
 
-## Never
+## Limits
 
-Edit a file, skip a check, paraphrase a failure into something milder,
-run a command twice except steps 1 and 3, post a commit status, or run
-the signoff command.
+Commit statuses and the signoff command belong to the session's
+signoff step; you only report.
 
 ## Done
 

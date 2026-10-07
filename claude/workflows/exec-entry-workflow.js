@@ -154,7 +154,7 @@ function routeItems(items) {
 }
 
 function builderPrompt(side, task, items) {
-  const other = sides.length > 1 ? `\nThe other side is built at the same time in this worktree by ${BUILDER_OF[side === 'back' ? 'front' : 'back']}: stay in your folder, commit only your paths (\`git add -- <paths>\`), never stash, reset or check out.` : ''
+  const other = sides.length > 1 ? `\nThe other side is built at the same time in this worktree by ${BUILDER_OF[side === 'back' ? 'front' : 'back']}: stay in your folder.` : ''
   return `Entry ${entry}, side ${side}. ${task}${items.length ? `\n${items.map(itemText).join('\n')}` : ''}${other}
 ${where}
 ${sources}
@@ -269,7 +269,7 @@ function checkPrompt(name, kind, since, own, diffCmd) {
   const scope = kind === 'delta'
     ? `\nTHIS IS A DELTA. ${own.length ? `Re-check only your items below; return the closed ids in \`closed\`, an open one again as a finding with its id in the title:\n${own.map(itemText).join('\n')}` : 'Read only this delta: a fix pass changed tests or gate files; block only if it weakens a proof or the gate.'}`
     : ''
-  const fix = mode === 'fix' ? '\nThis is a fix entry: an assert or a gate never loosens to turn green.' : ''
+  const fix = mode === 'fix' ? '\nThis is a fix entry.' : ''
   const files = name === 'reviewer' && result.outsideOwns.length ? `\nFiles changed outside the brief's Owns (read them whole): ${result.outsideOwns.map(o => `${o.path} (${o.why})`).join('; ')}` : ''
   const stack = name.startsWith('qa-') ? `\nThe running stack: ${result.stack ?? '(not up)'}` : ''
   return `Entry ${entry}${contractCommit ? ' (the contract commit: only a security hole blocks)' : ''}. ${kind === 'delta' ? 'Delta' : 'Check'}.

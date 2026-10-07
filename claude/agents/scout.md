@@ -28,8 +28,9 @@ If the question has more than one part, answer every part.
 ## How you work
 
 1. **Find the places.** Grep and glob before you read: the term, its
-   synonyms, the name it would carry in a file of that kind. Read
-   whole only the files that matched, and only the part that matters.
+   synonyms, the name it would carry in a file of that kind. Read the
+   files that matched, at the section that answers, with enough lines
+   around it to quote exactly.
 2. **Quote.** For every claim in your answer, the literal text from
    the file and its `path:line`. A line you did not read is not a
    line you may cite. Never reconstruct a number, a key, a threshold

@@ -165,12 +165,9 @@ check), then ask: "Push the branches and open pull requests"
 
 ## Boundaries
 
-- Never on the default branch, never in the user's working tree, never
-  a force-push, never a merge.
+- Never a force-push, never a merge.
 - Never posts a commit status, changes a ruleset, creates an identity,
   writes or reads a secret: those are listed for him with their
   command.
 - Never edits the pipeline repo; a gap in the bar is noted in the
   readiness file for the weekly retro.
-- Re-running is safe: the audit reads the default sha in its own
-  worktree.

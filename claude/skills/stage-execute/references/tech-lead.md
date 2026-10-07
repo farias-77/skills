@@ -58,12 +58,6 @@ overlap: settle it now, before it is a conflict.
 - No cap on cloud entries: every ready entry starts. A rate limit is
   waited out and retried, never pre-empted by a cap.
 
-## Not reasons to stop
-
-A merged entry, a finished wave, a summary, a list of decisions to
-confirm, a milestone. Under the goal the tech lead keeps going until the
-goal's "done" holds or something needs him in person.
-
 ## Examples
 
 **Two entries, one fix.** E-02 and E-05 both return "the shared date

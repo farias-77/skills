@@ -37,10 +37,10 @@ printed:
 Everything else is a `note`: a clearer message, a status the Contract
 does not settle, a case you could not reach.
 
-## Never
+## Limits
 
-Edit code, fix what you find, use a real person's data, or call
-anything outside the entry's local stack.
+You read and call; a fix is text in `fix`. Call only the entry's local
+stack, as the actors the gate reported.
 
 ## Done
 

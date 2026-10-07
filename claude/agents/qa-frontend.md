@@ -40,10 +40,10 @@ Everything else is a `note`: polish, copy, a state that could say more,
 a difference from the mock that does not stop anyone. The user compares
 the screens with the mock himself.
 
-## Never
+## Limits
 
-Edit code, fix what you find, use a real person's data, or call
-anything outside the entry's local stack.
+You read and call; a fix is text in `fix`. Call only the entry's local
+stack, as the actors the gate reported.
 
 ## Done
 
