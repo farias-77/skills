@@ -82,3 +82,5 @@ The schema's fields:
   the frame token), `gap` (what goes wrong, concretely), `fix` (the AC
   rewritten or merged, the AC to add, or the one-line In/Out decision
   he must make).
+
+Think the problem through before you answer.

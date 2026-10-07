@@ -51,3 +51,5 @@ plausible product choices, say so in the gap: then the choice is the
 user's, not the writer's.
 
 When every key is judged, stop and answer in your caller's schema.
+
+Think the problem through before you answer.
