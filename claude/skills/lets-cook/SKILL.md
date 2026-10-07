@@ -59,7 +59,7 @@ delegated) and the release's stop list. A wait ends on a
 
 1. **The house rules.** Read the file that
    `realpath ${CLAUDE_SKILL_DIR}/../../../CLAUDE.md` prints and run its
-   Open: the model line, then the canary.
+   Open: the canary.
 2. **Scouts, in the background, from his first sentence.** One
    `scout (Sonnet 5.5, low)` per question: where this lives (the
    feature map, the files); which fronts are open

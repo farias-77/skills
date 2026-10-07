@@ -64,7 +64,7 @@ is the resume point.
 
 1. **The house rules.** Read the file that
    `realpath ${CLAUDE_SKILL_DIR}/../../../CLAUDE.md` prints and run its
-   Open: the model line, then the canary.
+   Open: the canary.
 2. **Preconditions.** `.state.md` says `stage: close`; the release's
    trace ends with the tag in production (a short route or a hotfix
    closes inside lets-cook, with `templates/short-close.md` of that

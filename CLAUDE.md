@@ -25,11 +25,9 @@ one line. The full route is six stages. He is asked only what is his.
 
 ## Every stage opens and closes the same way
 
-**Open.** (1) Not on Opus 5.5 at high effort: one line recommending
-the switch, and go on without waiting. (2) **The canary**: `git push
-origin a:b` must come back denied by the guard with a reason starting
-`guard-canary`; anything else and the stage does not open. (3) The
-stage's `/goal`, filled in, in one code block for him to paste
+**Open.** (1) **The canary**: `git push origin a:b` must come back
+denied by the guard with a reason starting `guard-canary`; anything
+else and the stage does not open. (2) The stage's `/goal`, filled in, in one code block for him to paste
 (discovery, a conversation, has none).
 
 **Close.** The stage's report is finished and published first (below).

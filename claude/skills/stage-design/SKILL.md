@@ -93,7 +93,7 @@ mock) goes to a scout.
    `stage: design`; `00-discovery/` has `LOCK.json`, `stories.md` and
    the notes' "For the design". Missing: stop, back to stage 1.
 2. **The house rules**: read `<kit>/../CLAUDE.md` and run its Open:
-   the model line, then the canary.
+   the canary.
 3. **D0 starts now**, in the background, before the goal (below).
 4. **The goal.** One message with the scouts' status and the command
    to paste, written in his language:

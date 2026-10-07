@@ -102,7 +102,7 @@ from its header and keep interviewing.
    `claude/` folder; write it in `.state.md` as `kit:` and give agents
    resolved paths.
 2. **The house rules.** Read `<kit>/../CLAUDE.md` and run its Open:
-   the model line, then the canary.
+   the canary.
 3. **One front at a time.** Read the designs root's coordination file.
    When another front holds his attention in a discovery or a design
    debate, say so once and queue this one: message that front's

@@ -35,12 +35,11 @@ open a project file only to rate an ambiguous quote or to write it.
 
 ## Step 0 · Open
 
-1. Not on Opus 5.5 at high effort: one line recommending it; go on.
-2. `<path>` must be a git repository. Record the default branch and its
+1. `<path>` must be a git repository. Record the default branch and its
    sha, and create the **audit worktree**:
    `git -C <path> worktree add --detach <path>-audit <sha>`. The scouts
    read there, never the user's working tree.
-3. **Session roots.** Claude Code loads `.claude/settings.json` and its
+2. **Session roots.** Claude Code loads `.claude/settings.json` and its
    hooks from the directory a session opens in. Find the `CLAUDE.md`
    that names the standards: in `<path>`, or in the nearest directory
    above with a `CLAUDE.md` or `.claude/skills/` (a **two-root
@@ -48,12 +47,12 @@ open a project file only to rate an ambiguous quote or to write it.
    where sessions open: the root (recommended), the product, or both.
    Role 14 is installed in each session root; a cloud entry always
    opens in the product repository.
-4. **The standards' repository**, when it is not the product's, gets
+3. **The standards' repository**, when it is not the product's, gets
    its own branch in Step 3 and its own detached worktree for the
    scouts.
-5. **The remote.** GitHub gives the owner and repo for the ruleset
+4. **The remote.** GitHub gives the owner and repo for the ruleset
    probe. Anything else: never call `gh` for this project.
-6. Read `references/audit.md`, `templates/README.md` and the bar's
+5. Read `references/audit.md`, `templates/README.md` and the bar's
    roles table. A `pipeline-setup` branch already there is a re-run:
    ask whether to continue it or start again; keep its "Applied".
 

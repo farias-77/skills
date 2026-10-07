@@ -82,7 +82,7 @@ environment exists (the bar, `docs/project-contract.md`).
 
 1. **The house rules.** Read the file that
    `realpath ${CLAUDE_SKILL_DIR}/../../../CLAUDE.md` prints and run its
-   Open: the model line, then the canary (in the product
+   Open: the canary (in the product
    repo).
 2. The pre-flight was checked at plan. List only the items he must run
    himself (from `preflight.md`), each with its `!` command. An item

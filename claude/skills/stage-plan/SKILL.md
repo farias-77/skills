@@ -69,7 +69,7 @@ Missing a design document: stop, and say which stage owns it.
 
 1. **The house rules.** Read the file that
    `realpath ${CLAUDE_SKILL_DIR}/../../../CLAUDE.md` prints and run its
-   Open: the model line, then the canary (in the product
+   Open: the canary (in the product
    repo).
 2. Read `.state.md`; dispatch P0 in the background.
 3. Hand him the goal, filled in, in one code block:

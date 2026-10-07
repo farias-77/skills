@@ -64,7 +64,7 @@ the CI ends the turn on a `ScheduleWakeup` sized to it (a staging deploy
 
 1. **The house rules.** Read the file that
    `realpath ${CLAUDE_SKILL_DIR}/../../../CLAUDE.md` prints and run its
-   Open: the model line, then the canary.
+   Open: the canary.
 2. **Preconditions.** `.state.md` says `stage: release`; the execute
    recorded his ok; `04-release/plan.md` exists; the PR
    `feat/<slug>` → `main` is open and ready. Missing: stop and send him
