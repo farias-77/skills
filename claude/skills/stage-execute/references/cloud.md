@@ -31,7 +31,7 @@ evidence/<slug>/<id>
 │                          inlineAgents: true, agentsDir and referencesDir under {evidence}/input/pipeline/;
 │                          heartbeat: HEARTBEAT_PUSH=1 bash {evidence}/input/pipeline/skills/stage-execute/scripts/heartbeat.sh {evidence}
 ├── input/brief.md · design/ · discovery/ (the entry's mock frames only) · rulings.md
-├── input/pipeline/        this pipeline at the session's version: workflows/, agents/, skills/stage-execute/
+├── input/pipeline/        this pipeline at the session's version: workflows/, agents/, references/, skills/stage-execute/
 ├── beats.jsonl            one line per agent start and end (heartbeat.sh)
 ├── run-<n>.json           the workflow's return
 └── notes.md, screenshots, logs/

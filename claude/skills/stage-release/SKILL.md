@@ -181,7 +181,7 @@ not depend on the answer goes on (the report's pieces, the trace).
 ## Step 5 · Close
 
 1. **Trace and numbers.** `trace.md` complete; run
-   `node claude/scripts/telemetry.mjs <slug> --stage release --ws <designs-root>/<slug>`.
+   `node claude/scripts/telemetry.mjs <slug> --stage release --ws <designs-root>/<slug> --out -`.
 2. **The report, finished before the close.** Dispatch the builders in
    one message, in the background, with the stage's files and
    `report/release/`, as `docs/stage-report.md` describes:

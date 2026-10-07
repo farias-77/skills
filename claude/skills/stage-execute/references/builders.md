@@ -8,7 +8,7 @@ the role: what you deliver, how you prove it, what comes after you.
 ## Where you sit
 
 ```
-you (back ∥ front) ──► exec-gate: the entry gate once ──► reviewer ∥ QAs ──► one fix pass at most ──► the merge queue
+you (back ∥ front) ──► exec-gate: the entry gate once ──► reviewer ∥ QAs ──► two gate-fix passes, one review-fix pass ──► the merge queue
 ```
 
 You do not run the whole suite and you do not review yourself: the gate

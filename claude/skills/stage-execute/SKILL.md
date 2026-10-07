@@ -227,8 +227,8 @@ All at once:
    template (the board replayed on a timeline from `run-*.json` and
    `beats.jsonl`). Published on the front's link.
 2. **Telemetry**: `node claude/scripts/telemetry.mjs <slug> --stage
-   execute --ws <designs-root>/<slug>` reads the runs, beats and
-   commits. Nothing by hand.
+   execute --ws <designs-root>/<slug> --out -` reads the transcripts and
+   the runs. Nothing by hand.
 3. **Cleanup**: every entry worktree and its stack down (`make down`
    removes the images too), the hands-on environment down after the
    video's capture, local `story/<slug>/*` branches, remote

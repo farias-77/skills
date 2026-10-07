@@ -140,7 +140,8 @@ The stage's `reviews.md` keeps the detail; `rulings.md` and
 ## One link per front, finished before the stage closes
 
 Each front has **one report link**: a rail of stages, each with three
-tabs, **Video · Deck · Explainer**. The page is the fixed shell
+tabs, **Video · Deck · Explainer** (the short route's exceptions are in
+[docs/stage-report.md](docs/stage-report.md)). The page is the fixed shell
 `claude/report/shell.html` plus `report.json`; the tabs are built by
 `video-builder (Sonnet 5.5, high)`, `slides-builder` and
 `artifact-builder` (both Sonnet 5.5, medium), or an Explainer filled from a template where the stage's
@@ -191,14 +192,13 @@ infrastructure, deleting data, force-push, a forged status, switching
 identity, edits to itself or the settings) and any merge into a
 protected branch or `v*` tag that no live **authorization line**
 covers. Only he writes that line, as a `!` command:
-`! .claude/hooks/authorize.sh <release|short|hotfix|legacy> <slug> <branch>[@<sha>]`.
+`! .claude/hooks/authorize.sh <release|short|hotfix|legacy> <slug> <branch>[@<sha>]` (legacy: `<repo>` in place of `<slug>`).
 It dies at its tag or in 3 days.
 
 ## Every stage measures itself, by script
 
 Nothing is recorded by hand. `node claude/scripts/telemetry.mjs <slug>`
-reads the transcripts, the entries' `run-*.json` and `beats.jsonl`,
-and writes the front's `metrics.json` (time, cost as an estimate, his
+reads the transcripts and the entries' `run-*.json`, and writes the front's `metrics.json` (time, cost as an estimate, his
 touches per stage); a value it cannot measure is `null` with a line in
 `gaps`. The retro and the weekly retro use those numbers.
 

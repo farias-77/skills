@@ -20,7 +20,7 @@ round.
 1. **One** proposal the size of the problem, with the evolution path
    (v1 → v2 → v3) and the signal that triggers each step.
 2. He understands it from the video and the deck in 15 minutes or
-   less, and closes it in one to three rounds.
+   less, and aims to close it in one to three rounds; there is no cap.
 3. Six documents stage 3 cuts without asking: every AC with its layer
    and proof; every Contract field marked required · optional ·
    nullable; every cloud resource with an owner.

@@ -1,6 +1,6 @@
 # Release plan · <slug>
 
-<!-- Written at execute, while he uses the app, and finished before his ok.
+<!-- Written at execute, while he uses the app; the head is filled at his ok.
      The release /goal is filled from this file. Timestamps from `date -u`. -->
 
 - **Head he said ok to:** `feat/<slug>` @ `<sha>` · <date>

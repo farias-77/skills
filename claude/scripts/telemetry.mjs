@@ -259,7 +259,7 @@ let runTokensSeen = false
 for (const f of runs) {
   let j
   try { j = JSON.parse(fs.readFileSync(f, 'utf8')) } catch { gaps.push(`${path.relative(ws, f)} is not JSON`); continue }
-  if (Array.isArray(j.rounds)) entries.rounds += j.rounds.length
+  entries.rounds += (j.passes?.gateFixes ?? 0) + (j.passes?.reviewFixes ?? 0)
   const visit = (v) => {
     if (Array.isArray(v)) return v.forEach(visit)
     if (!v || typeof v !== 'object') return

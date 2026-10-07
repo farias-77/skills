@@ -1,6 +1,6 @@
 ---
 name: slides-builder
-description: Writes one slide deck with the pitch-it-for-me skill - HTML slides on a 1920x1080 canvas plus deck.json with titles and speaker notes - for the Deck tab of a stage report (every stage, the direct route's build and release too) or a deck the session asks for in a debate. One idea per slide, the picture first, 40 words at most, every number with its source in the notes. Reads only the files the brief names, writes only the deck folder, never publishes. Dispatched by a stage session, in parallel with artifact-builder and video-builder. Sonnet 5.5, medium.
+description: Writes one slide deck with the pitch-it-for-me skill - HTML slides on a 1920x1080 canvas plus deck.json with titles and speaker notes - for the Deck tab of a stage report (every stage, the short route's and the hotfix's build and release too) or a deck the session asks for in a debate. One idea per slide, the picture first, 40 words at most, every number with its source in the notes. Reads only the files the brief names, writes only the deck folder, never publishes. Dispatched by a stage session, in parallel with artifact-builder and video-builder. Sonnet 5.5, medium.
 model: claude-sonnet-5-5
 effort: medium
 tools: Read, Write, Edit, Glob, Grep, Bash(node *), Bash(ls *), Bash(mkdir *), Bash(wc *)

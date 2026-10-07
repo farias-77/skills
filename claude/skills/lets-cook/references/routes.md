@@ -4,7 +4,7 @@
 
 | Route | When | His touches |
 |---|---|---|
-| **short** | one behavior that fits one entry: at most ~6 ACs, ~45 min of builder; no big new screen; no new table (a nullable column is fine); nothing irreversible | the idea · the authorization + `/goal` · his ok |
+| **short** | one behavior that fits one entry: at most ~6 ACs (half the plan's cap: no plan and no design review stand behind it), ~45 min of builder; no big new screen; no new table (a nullable column is fine); nothing irreversible | the idea · the authorization + `/goal` · his ok |
 | **hotfix** | production is broken, or data is wrong, now | the idea (with the staging delegation) · the authorization + `/goal` · his staging check unless delegated |
 | **full** | several new rules, a new screen, new data, an integration with something outside, or doubt about **what** to build | the whole discovery |
 
