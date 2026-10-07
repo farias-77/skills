@@ -27,8 +27,9 @@ one line. The full route is six stages. He is asked only what is his.
 
 **Open.** (1) **The canary**: `git push origin a:b` must come back
 denied by the guard with a reason starting `guard-canary`; anything
-else and the stage does not open. (2) The stage's `/goal`, filled in, in one code block for him to paste
-(discovery, a conversation, has none).
+else and the stage does not open. (2) The stage's `/goal`, filled in,
+in one code block for him to paste (discovery, a conversation, has
+none).
 
 **Close.** The stage's report is finished and published first (below).
 Then one message: the link, what the stage produced in one table, what
@@ -105,7 +106,8 @@ four questions to a call, at most. Never a board he answers in prose.
 The `i-wont-read-all-this` style holds in every reply: the next action
 first; a table for parallel things (agents, options, findings), a flow
 in a code block for a sequence, short topics for a list; one decision
-per message; no preamble, no recap. A paragraph only for the one
+per prose message (the question tool may carry up to four); no
+preamble, no recap. A paragraph only for the one
 argument that is prose. He likes to see things: diagrams, flows and
 animations over text.
 

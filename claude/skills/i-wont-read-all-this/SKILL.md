@@ -141,9 +141,9 @@ If yes, send.
 ## House additions
 
 1. Write in the reader's language, with correct accents.
-2. One decision or question per message during a debate.
+2. One decision per prose message during a debate; the question tool may carry up to four.
 3. Detail lives in a file or an artifact. Link it; never paste it.
-4. A small table is fine when it compares options; keep it to at most 5 rows and 3 columns.
+4. A table that compares options has at most 5 rows and 3 columns; a status board shows every row.
 5. Restate where we are in one line: the topic and the step.
 
 ## Credit
