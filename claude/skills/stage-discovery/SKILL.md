@@ -176,7 +176,7 @@ arrive meanwhile join that order. Sort each item first:
 
 | Item | Path |
 |---|---|
-| look, copy, layout, motion, a missing state | straight to the builder |
+| look, copy, layout, motion, a missing state, a name (a colour, a file name, a label) | straight to the builder; never a question to him |
 | a rule, a number, scope, the data shown, a journey added or cut | restated and confirmed by him first, written to the notes as Confirmed, then ordered |
 
 The builder edits, runs `proto.mjs walk` until it passes, copies the
@@ -190,8 +190,9 @@ a state; `~dark`, `~pt-BR`, `~phone` add to either.
 **His feedback** comes by chat and by comments on the mock. Watch the
 artifact with `ArtifactComments` after the first publish; each comment
 becomes a line of the next edit order and is answered once its change
-is published ("done in v4"). The builder's Inferred entries go to the
-notes' Inferred block and into a later batch.
+is published ("done in v4"). The builder's Inferred entries on look,
+copy or naming stay its picks, never asked; the rest go to the notes'
+Inferred block and into a later batch.
 
 **A builder that cannot publish** (the tool is not given to
 subagents): you publish its file yourself, reading it first, and say
