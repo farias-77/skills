@@ -13,7 +13,7 @@ for each ready entry
   1 base in       feat moved since the entry's gate? merge feat into story/<slug>/<id> (never a rebase)
                   a text conflict → exec-entry update · a generated file → the base's version + the generator
   2 migrations    make restamp when one of the entry's migrations is older than feat's last
-  3 signoff       the affected gate on the entry head (skipped when nothing moved since its green gate)
+  3 affected gate on the entry head (skipped when nothing moved since its green gate)
                   red → exec-entry resume (gate-fix budget; the reviewer reads the delta)
   4 merge         git merge --no-ff into feat, the notes in the body, push
                   the entry's stack down, its worktree removed, its local branch deleted, now
@@ -29,7 +29,7 @@ for each ready entry
    that lands older than the newest on `feat` is restamped by the
    project's command (`make restamp`), committed as a mechanical commit,
    and the affected gate runs again.
-3. **Signoff** is the project's affected gate (`make test-affected
+3. **The affected gate** is the project's (`make test-affected
    base=feat/<slug>`) on the merged head, in the entry's worktree.
 4. **Paths outside Owns ∪ Extends** go in the merge body with the run's
    reason; they do not block (the reviewer read them).

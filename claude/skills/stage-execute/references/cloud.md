@@ -28,7 +28,8 @@ product's history.
 ```
 evidence/<slug>/<id>
 ├── input/args.json        the exec-entry args; paths as {repo}/… and {evidence}/…; no loadThreshold;
-│                          inlineAgents: true, agentsDir and referencesDir under {evidence}/input/pipeline/
+│                          inlineAgents: true, agentsDir and referencesDir under {evidence}/input/pipeline/;
+│                          heartbeat: HEARTBEAT_PUSH=1 bash {evidence}/input/pipeline/skills/stage-execute/scripts/heartbeat.sh {evidence}
 ├── input/brief.md · design/ · discovery/ (the entry's mock frames only) · rulings.md
 ├── input/pipeline/        this pipeline at the session's version: workflows/, agents/, skills/stage-execute/
 ├── beats.jsonl            one line per agent start and end (heartbeat.sh)
@@ -51,14 +52,15 @@ You run one stage-4 entry alone; nobody will answer a question.
 Entry <id>, front <slug>, run <n>.
 1. git fetch origin feat/<slug>:feat/<slug> evidence/<slug>/<id>:evidence/<slug>/<id>
    (first `git fetch --unshallow` if the clone is shallow)
-   git worktree add ../evidence evidence/<slug>/<id>
-2. Read ../evidence/input/args.json; replace {repo} with this repository's path and
-   {evidence} with ../evidence's path.
-3. export HEARTBEAT_PUSH=1. Run the Workflow tool with scriptPath
-   ../evidence/input/pipeline/workflows/exec-entry-workflow.js and those args.
-4. Write the workflow's return, verbatim, to ../evidence/run-<n>.json
+   git worktree add ../evidence-<id> evidence/<slug>/<id>
+2. Read ../evidence-<id>/input/args.json; replace {repo} with this repository's path and
+   {evidence} with ../evidence-<id>'s path.
+3. Run the Workflow tool with scriptPath
+   ../evidence-<id>/input/pipeline/workflows/exec-entry-workflow.js and those args.
+4. Write the workflow's return, verbatim, to ../evidence-<id>/run-<n>.json
    (if it could not start: {"status":"interrupted","reason":"<one line>"}).
-5. git push origin <the entry branch>; then in ../evidence commit everything and push.
+5. git push origin <the entry branch>; then git -C ../evidence-<id> add -A, commit, and
+   git -C ../evidence-<id> push origin evidence/<slug>/<id>.
 Never merge, never push another branch, never open a pull request, never post a status. Then stop.
 EOF
 )"

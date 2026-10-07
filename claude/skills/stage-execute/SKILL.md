@@ -32,7 +32,7 @@ its playbook.
 ```
 open ──► prepare (feat, board, keep the machine awake) ──► C ──► every ready entry at once
            exec-entry: builders → gate → reviewer ∥ QAs → triage → one fix → delta
-     ──► the queue: base in → restamp → signoff → merge → worktree and stack gone
+     ──► the queue: base in → restamp → affected gate → merge → worktree and stack gone
      ──► PR draft ──► his hands-on (A.n rounds) ──► "ok" ──► local-ci once on the final head (red → X.n → again)
      ──► report ∥ cleanup ──► the message: the link + /clear + /stage-release <slug>
 ```
@@ -143,9 +143,11 @@ out (tech-lead.md). For each:
    | `fastCheck` · `gateCommands` · `gatePaths` | from `plan.md` and the product's `CLAUDE.md` (gate paths = the code-owner paths) |
    | `worktree` · `branch` · `base` | the entry's worktree, its branch, `feat/<slug>` |
    | `evidenceDir` · `priorRuns` · `trailer` | `03-execution/entries/<id>/`, earlier `run-*.json`, the commit trailer |
-   | `heartbeat` | always: `bash ${CLAUDE_SKILL_DIR}/scripts/heartbeat.sh <evidenceDir>` (in the cloud, its copy under `input/pipeline/`) |
+   | `heartbeat` | always: `bash ${CLAUDE_SKILL_DIR}/scripts/heartbeat.sh <evidenceDir>` (in the cloud, `HEARTBEAT_PUSH=1` and its copy under `input/pipeline/`, `cloud.md`) |
    | `loadThreshold` | local runs only, `nproc` |
    | `inlineAgents` · `agentsDir` | while the agents are not installed |
+   | `qa` | omitted (the surface decides), or `'backend'` · `'none'` to force it |
+   | `resume` | mode `resume` only: `{head, check: 'whole' \| 'delta', fixesFile, items}`; `check` is read only inside it |
 
 3. **Record** on the board: `building`, where, the run.
 
@@ -169,7 +171,7 @@ and `outsideOwns` to the board's log. Then act by
 ## 5 · The merge queue
 
 By [references/queue.md](references/queue.md): one at a time, the
-critical path first; base in (merge, never rebase), restamp, signoff,
+critical path first; base in (merge, never rebase), restamp, the affected gate,
 merge `--no-ff`, the worktree and stack removed at once, then start what
 unblocked. Between two merges, a `main` that moved (another front, a
 hotfix) is merged into `feat`.
@@ -248,14 +250,14 @@ his hands-on.
 
 Everything is in files: `.state.md`, `board.md`, `plan.md` Status, the
 `run-*.json`. An entry `building` locally with no live run resumes
-from its branch (`mode: 'resume'`, `check: 'whole'`). A cloud entry:
+from its branch (`mode: 'resume'`, `resume: {head, check: 'whole'}`). A cloud entry:
 read its evidence branch first, then restart the watcher.
 
 ## Boundaries
 
 No product code and no review by the session. No merge into `main`
 (that is the release's step 1). Nothing merges that did not come back
-`ready` and pass the queue's signoff. No status posted except by
+`ready` and pass the queue's affected gate. No status posted except by
 the signoff command. No re-decision of the design or the plan: a node that
 cannot be built as designed parks with the quote, and he decides. Notes
 are read, never built. Frictions go to `dreaming-notes.md` as they
