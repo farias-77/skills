@@ -42,13 +42,13 @@ const BUILD = obj({
   commits: arr(obj({ sha: str, message: str })),
   fastCheck: obj({ green: { type: 'boolean' }, lastLine: str }),
   proofs: arr(obj({ ac: str, proof: { type: 'string', description: 'the test that fails if the AC breaks, as file:name' } })),
-  tried: { type: 'string', description: 'what you saw running the change once against the local stack; "" when it has no screen or endpoint' },
+  tried: { type: 'string', description: 'what you saw running the change once against the local stack; the empty string (no quotes, no "none") when it has no screen or endpoint' },
   screenChange: { type: 'string', enum: ['behaviour', 'visual', 'none'] },
   files: strs,
   outsideOwns: arr(obj({ path: str, why: str })),
   decided: arr(obj({ question: str, pick: str, why: str })),
   questions: arr(obj({ question: str, why: { type: 'string', description: 'why only the user can answer it, in person' } })),
-  blocked: { type: 'string', description: 'a true impossibility, quoted; "" otherwise' },
+  blocked: { type: 'string', description: 'a true impossibility, quoted; otherwise the empty string (no quotes, no "none")' },
   applied: arr(obj({ id: str, commit: str, why: str })),
 })
 
@@ -91,7 +91,7 @@ const REVIEW = obj({
   verified: strs,
   findings: arr(FINDING),
   closed: { ...strs, description: 'in a delta: the ids of your items now closed' },
-  inconclusive: { type: 'string', description: 'what you could not run and why; "" when you ran everything your check needed' },
+  inconclusive: { type: 'string', description: 'what you could not run and why; the empty string (no quotes, no "none") when you ran everything your check needed' },
 })
 
 // ---------- the run ----------
@@ -109,6 +109,8 @@ const result = {
   blocking: [], notes: [], flaky: [], outsideOwns: [], decided: [], questions: [], blocked: null,
   tried: [], qa: null, gate: null, stack: null, inconclusive: [],
 }
+
+const said = (s) => { const v = (s ?? '').trim(); return /^(""|''|none|null|n\/a|-)$/i.test(v) ? '' : v }
 
 const finish = (status, reason, why) => {
   result.status = status
@@ -167,10 +169,10 @@ function absorb(outs) {
   for (const b of outs) {
     result.outsideOwns.push(...b.outsideOwns)
     result.decided.push(...b.decided)
-    if (b.tried.trim()) result.tried.push(b.tried.trim())
+    if (said(b.tried)) result.tried.push(said(b.tried))
   }
   result.head = outs.at(-1).head
-  const blocked = outs.map(b => b.blocked.trim()).filter(Boolean)
+  const blocked = outs.map(b => said(b.blocked)).filter(Boolean)
   if (blocked.length) { result.blocked = blocked.join(' · '); return finish('blocked', 'blocked', result.blocked) }
   const questions = outs.flatMap(b => b.questions)
   if (questions.length) { result.questions = questions; return finish('parked', 'user', `${questions.length} question(s) only the user can answer`) }
@@ -261,7 +263,7 @@ function qaSeats(surface) {
   return [...(front ? ['qa-frontend'] : []), ...(back ? ['qa-backend'] : [])]
 }
 
-const blocks = (f) => f.severity === 'blocks' && f.proof.trim() !== '' &&
+const blocks = (f) => f.severity === 'blocks' && said(f.proof) !== '' &&
   (!contractCommit || f.basis === 'security') && f.level >= MIN_LEVEL[f.basis]
 
 function checkPrompt(name, kind, since, own, diffCmd) {
@@ -288,7 +290,7 @@ async function check(seats, kind, since, ownBySeat = {}, diffCmd = null) {
   seats.forEach((name, i) => {
     const items = outs[i].findings.map((f, k) => ({ id: `${name}#${kind}.${k + 1}`, agent: name, ...f }))
     const notes = items.filter(f => !blocks(f))
-    if (outs[i].inconclusive.trim()) result.inconclusive.push({ seat: name, why: outs[i].inconclusive.trim() })
+    if (said(outs[i].inconclusive)) result.inconclusive.push({ seat: name, why: said(outs[i].inconclusive) })
     blocking.push(...items.filter(blocks))
     if (notes.length > NOTES_PER_SEAT) log(`${entry}: ${name} gave ${notes.length} notes; the first ${NOTES_PER_SEAT} kept`)
     result.notes.push(...notes.slice(0, NOTES_PER_SEAT))

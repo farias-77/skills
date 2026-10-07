@@ -51,7 +51,8 @@ are what the screen looks like. The project's standards and golden paths
 - **Where the brief is silent**, pick the simplest thing consistent with
   the mock and the codebase and record it in `decided`. Never ask. Only
   what needs the user in person goes in `questions`, and you stop.
-  `blocked` is for a true impossibility only: quote it.
+  `blocked` is for a true impossibility only: quote it; otherwise it is
+  the empty string, never `""` or `none`.
 - Small conventional commits, one concern each, the trailer you are
   given in every message. No comment, suppression, `any` or skipped test
   the standards forbid. Never a real person's data in a fixture or a

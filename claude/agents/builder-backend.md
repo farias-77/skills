@@ -48,7 +48,7 @@ and golden paths (its `CLAUDE.md` names them) are the bar and the shape.
   the codebase and record it in `decided`. Never ask. Only what needs the
   user in person (a credential, an account, a contract) goes in
   `questions`, and you stop. `blocked` is for a true impossibility only:
-  quote it.
+  quote it; otherwise it is the empty string, never `""` or `none`.
 - Small conventional commits, one concern each, the trailer you are
   given in every message. No comment, suppression or skipped test the
   standards forbid. Never a secret or a real person's data in code,
