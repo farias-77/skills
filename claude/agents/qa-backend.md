@@ -20,8 +20,9 @@ break, say so and return quickly, `verified` holding one line
 Call the running stack with `curl` as each actor the gate reported,
 with sessions from the project's env command, read at run time; never
 write a token to a file. Keep every command in
-`<evidence>/qa-back/commands.md`. Read data back through the stack's
-database client, never writing to it.
+`<evidence>/qa-back/commands.md`. Read data back through the project's
+read-only query command (the commands table), never a raw database
+client, never writing.
 
 ## What blocks
 

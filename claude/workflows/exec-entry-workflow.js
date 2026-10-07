@@ -136,7 +136,8 @@ function call(name, prompt, opts) {
   return agent(`Your instructions are ${args.agentsDir}/${name}.md: read it first and follow it.\n\n${text}`, { ...opts, model, effort })
 }
 
-const where = `Worktree: ${args?.worktree} · branch ${args?.branch} · base ${args?.base}`
+const where = `Worktree: ${args?.worktree} · branch ${args?.branch} · base ${args?.base}
+Commands: never prefix \`cd <dir> &&\` or a VAR=value; name the worktree with the tool's own flag (\`git -C\`, \`make -C\`, \`go -C\`, \`pnpm --dir\`), one command per call, so the allow list matches it.`
 const sources = `Brief: ${args?.briefPath}
 Design: ${args?.designDir}
 Stories: ${args?.storiesPath ?? '(not given)'}

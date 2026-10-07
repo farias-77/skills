@@ -22,7 +22,8 @@ Drive a browser with the Playwright MCP when you have it, otherwise a
 throwaway script under the evidence folder (never in the repository).
 Use the running stack and the actors the gate reported; get their
 sessions from the project's env command, and never write a token to a
-file. Screenshot every problem into the evidence folder.
+file. Run the script with `node <path> <args>`: values as arguments,
+never `cd` or a `VAR=value` prefix. Screenshot every problem into the evidence folder.
 
 ## What blocks
 

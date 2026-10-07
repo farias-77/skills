@@ -18,7 +18,9 @@ builders changed outside the brief's Owns.
 You never write to the worktree and never move it: read other revisions
 with `git show` or `git diff`. A reproduction you need runs in a
 throwaway `git worktree add` under the system temp folder, removed
-after. `git status` is as you found it when you return.
+after; a test runs through the project's one-test command
+(`make -C <worktree> test-backend …` or its equivalent), never `cd` or
+a `VAR=value` prefix. `git status` is as you found it when you return.
 
 ## What blocks
 

@@ -52,6 +52,8 @@ project's commands table names:
 | `tooling/local-ci` | the signoff command (6); `claude/scripts/local-ci.sh` when the project has none |
 | `make floor` | the floor (7) |
 | `make up`, `make env`, `make down`, `make sweep` | the stack per worktree and the sweep (8) |
+| `make qa-seed`, `make db-query` | the test actors, and a read-only query on the stack's database (8) |
+| `make test-backend`, `make test-journey` | one server package, one browser spec (4) |
 | `make restamp` | migrations (9) |
 | `make staging-actor` | the staging actors (13) |
 | `rollback.yml` | the rollback workflow (12) |
@@ -67,7 +69,12 @@ and the readiness file lists it.
 signoff command, read-only `git` and `gh`, commits and pushes of
 `feat/*`, `fix/*`, `story/*` and `evidence/*`, deleting remote
 `story/*` and `evidence/*` (the guard allows no other deletion), a `v*`
-tag push, `gh pr merge`, re-running a run, the rollback workflow. The
+tag push, `gh pr merge`, re-running a run, the rollback workflow; and
+what the check seats run, or every entry ends `inconclusive`: one test,
+one spec, the env, the seed, the read-only query, `curl` to `127.0.0.1`,
+a QA script under the evidence folder, `nproc`, `/proc/loadavg` and the
+heartbeat. Each in the bare form and the `-C <worktree>` form, because
+the agents never prefix `cd`. The
 merge and the tag sit in allow because the guard checks each against
 his authorization line. Keep each rule as narrow as the command: a
 broad `Bash(gh *)` or `Bash(gcloud *)` covers an irreversible command
