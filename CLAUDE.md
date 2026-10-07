@@ -51,12 +51,18 @@ always by slug; the stage resumes from its files, never from memory.
 Inside a `/goal` nothing waits for him but what is his. These are not
 reasons to stop: a finished step, a summary and the next step
 announced, an offer to wait, a list of decisions he could take, a
-milestone. Stop only for a question that is his (through the question
-tool), a background agent you wait on (end the turn on a status table:
-agent · task · state; it wakes you), or the goal's "done". The factory
-runs through the night on its own: keep the machine awake while work
-is in flight, and on a rate limit wait and retry, never stop. There is
-no fixed cap on parallel work.
+milestone. A status note or a recommendation goes in the same message
+as the next tool call; carry on with whatever does not depend on his
+answer. An offer to wait that you notice in a draft is deleted, and
+the next thing is done. Stop only for a question that is his (through
+the question tool), a background agent you wait on (end the turn on a
+status table: agent · task · state; it wakes you), or the goal's
+"done". Time matters here: do not spend time that can be avoided, and
+the earlier a correct result is obtained, the better. The factory runs
+through the night on its own: keep the machine awake while work is in
+flight. On a rate limit, wait for the reset and retry; an entry
+interrupted a third time parks with the reason, and the rest goes on.
+There is no fixed cap on parallel work.
 
 ## "Note this for the dreaming"
 
