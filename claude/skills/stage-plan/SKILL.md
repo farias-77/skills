@@ -167,8 +167,7 @@ Run `plan-review-workflow.js` by `scriptPath`
 `referencesDir` (`${CLAUDE_SKILL_DIR}/references`), `language`, and
 `briefs` = `graph.json`'s `reviewBriefs`. While the agents are not
 installed, add `inlineAgents: true` and `agentsDir`. If the Workflow
-tool refuses a path outside the working directories, copy the file into
-`<slug>/_run/` and run the copy.
+tool refuses a path outside the working directories, pass the file's whole content as `script` (same `args`).
 
 Save `.result` as `02-plan/reviews/round-1.json`. `valid: false` is not
 a round: fix the cause, run it again.
@@ -205,7 +204,7 @@ All three run at once:
    his place, the pre-flight), the Explainer by template from
    `plan.graph.json` (the clickable graph). Published on the front's
    link.
-3. **Cleanup.** The `_run/` copies and any scratch this stage made.
+3. **Cleanup.** Any scratch this stage made.
 
 Then `.state.md` to `stage: execute`, the close commit of the
 workstream folder, and the message:

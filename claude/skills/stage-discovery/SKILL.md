@@ -121,7 +121,7 @@ The host may lack a tool; say what is missing in one line and run on:
 |---|---|
 | `Artifact` (headless or cloud) | **local mode**, `mode: local`: the builder runs `proto.mjs shots`; your message gives the PNG paths; comments come by chat; the report stays in `report/` for the next local session to publish |
 | the question tool | the questions go as text, same shape: numbered, lettered options, your pick first and marked |
-| `Workflow` accepting the kit's path (a symlink outside the working directories) | copy the workflow into `<workstream>/_run/`, check both `sha256sum`s match, run the copy |
+| `Workflow` accepting the kit's path (outside the working directories and the added ones) | pass the file's whole content as `script` (same `args`) |
 
 ## D0 · Recon, in the background
 

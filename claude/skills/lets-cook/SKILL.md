@@ -141,8 +141,7 @@ notification. Never loosen this done to call it met; stop early only when truly 
   `referencesDir` = `${CLAUDE_SKILL_DIR}/../stage-execute/references`,
   `heartbeat` = `bash ${CLAUDE_SKILL_DIR}/../stage-execute/scripts/heartbeat.sh <designs-root>/<slug>/entry/`,
   `evidenceDir` = `<designs-root>/<slug>/entry/`. When the Workflow tool
-  refuses the kit's path, copy the workflow into `<slug>/_run/`, check
-  both `sha256sum`s match, and run the copy. The
+  refuses the kit's path, pass the file's whole content as `script` (same `args`). The
   `reviewer (Opus 5.5, high)` always runs; on a hotfix, with the
   security pass.
 - When the entry comes back `ready`, push and open the PR ready. Fixes

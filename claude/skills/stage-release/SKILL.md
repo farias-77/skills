@@ -158,8 +158,7 @@ creates no release. Wake when it should be done and read the run.
 | a second red of code, anywhere | stop |
 
 An `X.n` runs exec-entry by `scriptPath`; when the Workflow tool refuses
-the kit's path, copy it into `<slug>/_run/`, check both `sha256sum`s
-match, and run the copy.
+the kit's path, pass the file's whole content as `script` (same `args`).
 
 ## The stop list (only these stop)
 

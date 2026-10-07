@@ -233,7 +233,7 @@ All at once:
    removes the images too), the hands-on environment down after the
    video's capture, local `story/<slug>/*` branches, remote
    `story/<slug>/*` and `evidence/<slug>/*` (their evidence is already
-   copied), the `_run/` copies, the `systemd-inhibit` process.
+   copied), the `systemd-inhibit` process.
 
 Then `.state.md` to `stage: release`, this front's line in
 `_coordination.md`, the close commit of the workstream folder, and the
