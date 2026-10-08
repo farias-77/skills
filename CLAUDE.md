@@ -6,9 +6,10 @@ repeating it; a consuming project does not import it. Paths: `claude/…`
 is the kit (`realpath ${CLAUDE_SKILL_DIR}/../..`, written as `kit:` in
 `.state.md`); `docs/…` sits beside it in the pipeline repo;
 `<designs-root>` is the folder named by the line `designs-root: <path>`
-in the project's own `CLAUDE.md` (or its `CLAUDE.local.md`), for the
-fronts' folders and `_coordination.md`; never a folder named by a
-`CLAUDE.md` in a parent directory. A workflow runs by `scriptPath`;
+in the project's own `CLAUDE.md`, in git, for the fronts' folders and
+`_coordination.md`; a relative path resolves from the project's repo
+root (`git rev-parse --show-toplevel`), an absolute one stands as
+written; never a folder named by a `CLAUDE.md` in a parent directory. A workflow runs by `scriptPath`;
 when the Workflow tool refuses the kit's path, pass the file's whole
 content as `script` (same `args`).
 
@@ -33,9 +34,9 @@ one line. The full route is six stages. He is asked only what is his.
 `cd`, nothing chained), must come back denied by the guard with a
 reason containing `guard-canary`; anything
 else and the stage does not open. (2) **The designs root**: no
-`designs-root:` line in the project's `CLAUDE.md` or `CLAUDE.local.md`
-→ write nothing anywhere; stop with the exact line for him to add,
-`designs-root: <absolute path>`, proposing `<repo>/../designs`. (3) The
+`designs-root:` line in the project's `CLAUDE.md` → write nothing
+anywhere; stop and propose exactly `designs-root: ../designs` for the
+project's `CLAUDE.md`. (3) The
 stage's `/goal`, filled in, in one code block for him to paste
 (discovery, a conversation, has none).
 

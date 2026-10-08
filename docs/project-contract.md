@@ -62,10 +62,10 @@ frontend, code, testing, security and data, delivery), each rule with
 an id a reviewer can cite, plus an index; and in `CLAUDE.md` the
 commands table that names the command, file or folder of every role
 here, the worktrees root, and whether a cloud environment exists; and
-the line `designs-root: <absolute path>` (the folder that holds each
-front's folder and `_coordination.md`), in `CLAUDE.md` or, when the
-path is per machine, `CLAUDE.local.md`. Without it every stage stops at
-its open.
+the line `designs-root: ../designs` (the folder that holds each
+front's folder and `_coordination.md`) in `CLAUDE.md`, in git, relative
+to the repo root (an absolute path is accepted too). Without it every
+stage stops at its open.
 
 **Why.** The pipeline carries no taste of its own. A reviewer's
 finding blocks on a `rule` basis only when it cites a written rule.

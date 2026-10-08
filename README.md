@@ -188,7 +188,7 @@ cd <your-project>/.claude
 ln -s ~/skills/claude/skills skills
 ln -s ~/skills/claude/agents agents
 ln -s ~/skills/claude/workflows workflows
-printf '.claude/skills\n.claude/agents\n.claude/workflows\nCLAUDE.local.md\n.claude/settings.local.json\n' >> "$(git rev-parse --git-common-dir)/info/exclude"
+printf '.claude/skills\n.claude/agents\n.claude/workflows\n.claude/settings.local.json\n' >> "$(git rev-parse --git-common-dir)/info/exclude"
 npm ci --prefix ~/skills/claude/video   # the reports' renderer and playwright-core for discovery's mock
 ```
 
@@ -199,9 +199,9 @@ behind `cp --parents`) and turn the gate red for no change of yours.
 Each stage reads the house rules (`CLAUDE.md` at the clone's root) at
 its opening, so the project does not import them. Name the designs
 root (where each front's folder lives) with the line
-`designs-root: <absolute path>` in the project's `CLAUDE.md` (or its
-`CLAUDE.local.md` when the path is per machine); every stage stops
-without it.
+`designs-root: ../designs` in the project's `CLAUDE.md`, in git (a
+relative path resolves from the repo root; an absolute one is accepted
+too); every stage stops without it.
 Then, in Claude Code inside the project:
 `/pipeline-setup .`
 
