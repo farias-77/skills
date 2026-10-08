@@ -28,7 +28,7 @@ const build = (n, o = {}) => ({
   fastCheck: { green: true, lastLine: 'ok' }, proofs: [{ ac: 'S1.1', proof: 'place_order_test.go:TestPlaceOrder' }],
   tried: 'POST /orders as leader → 201', screenChange: 'behaviour', files: [], outsideOwns: [], decided: [], questions: [], blocked: '', applied: [], ...o,
 })
-const review = (findings = [], closed = [], inconclusive = '') => ({ verified: ['S1.1 at place_order.go:30'], findings, closed, inconclusive })
+const review = (findings = [], closed = [], inconclusive = []) => ({ verified: ['S1.1 at place_order.go:30'], findings, closed, inconclusive })
 const BUG = { severity: 'blocks', basis: 'bug', title: 'a double submit writes two orders', where: 'place_order.go:41', says: 'no key', fix: 'idempotency key', proof: 'two POSTs → two rows', level: 4, side: 'back' }
 const HOLE = { ...BUG, basis: 'security', title: 'another unit reads the order by id', proof: 'GET /orders/ord_2 as another unit → 200', level: 3 }
 const NOTE = { severity: 'note', basis: 'other', title: 'the empty list could name the next step', where: 'List.tsx:12', says: 'No orders', fix: 'name the action', proof: '', level: 1, side: 'front' }
@@ -67,16 +67,24 @@ const scenarios = [
   { title: 'a bug only read, never run (level 2), is a note', surface: SCREEN, args: { sides: ['front'] },
     reviewer: () => review([{ ...BUG, level: 2 }]),
     expect: { status: 'ready', notes: 1, reviewFixes: 0 } },
-  { title: 'qa-backend could not run its cases → parked inconclusive, never ready', surface: API, args: { sides: ['back'] },
-    qaBack: () => review([], [], 'the stack did not come up: port 5432 taken'),
+  { title: 'qa-backend could not run an AC\'s case → parked inconclusive, never ready', surface: API, args: { sides: ['back'] },
+    qaBack: () => review([], [], [{ ac: 'S1.1', check: 'POST /orders as leader', why: 'the stack did not come up: port 5432 taken' }]),
     expect: { status: 'parked', reason: 'inconclusive' } },
+  { title: 'the reviewer did not run the whole gate (no AC needs it) → a note, ready (t1b run-1)', surface: SCREEN, args: { sides: ['front'] },
+    reviewer: () => review([], [], [{ ac: '', check: 'make check and make test-affected', why: 'make status needed approval' }]),
+    expect: { status: 'ready', notes: 1 } },
+  { title: 'qa-frontend did not run a case outside the ACs → a note, never inconclusive (t1b run-2)', surface: SCREEN, args: { sides: ['front'] },
+    qaFront: () => review([], [], [{ ac: 'none', check: 'the count updates after a manager is deactivated', why: 'not to change the seed' }]),
+    expect: { status: 'ready', notes: 1, calls: 'builder-frontend exec-gate reviewer qa-frontend' } },
+  { title: 'the seats get the gate\'s result for the head and never re-run the gate', surface: SCREEN, args: { sides: ['front'] },
+    expect: { status: 'ready', prompt: ['reviewer', 'The entry gate ran green at h1: green. Never run the whole gate again'] } },
   { title: 'the contract commit: reviewer only; a bug is a note, a hole blocks and is fixed', surface: API, args: { kind: 'contract', entry: 'C', sides: ['back'] },
     reviewer: (n) => (n === 1 ? review([BUG, HOLE]) : review([], ['reviewer#whole.2'])),
     expect: { status: 'ready', notes: 1, reviewFixes: 1, calls: 'builder-backend exec-gate reviewer builder-backend exec-gate reviewer' } },
   { title: 'the builder is blocked (a missing secret) → blocked, no gate', surface: API, args: { sides: ['back'] },
     build: (n) => build(n, { blocked: 'the payment sandbox key is not in the env' }), expect: { status: 'blocked', calls: 'builder-backend' } },
-  { title: 'the builder writes a literal "" (or none) for blocked, a QA "" for inconclusive → not a block, the entry goes on → ready', surface: BOTH,
-    build: (n) => build(n, { blocked: n === 1 ? '""' : 'none' }), qaBack: () => review([], [], '""'),
+  { title: 'the builder writes a literal "" (or none) for blocked → not a block, the entry goes on → ready', surface: BOTH,
+    build: (n) => build(n, { blocked: n === 1 ? '""' : 'none' }),
     expect: { status: 'ready', calls: 'builder-backend builder-frontend exec-gate reviewer qa-frontend qa-backend' } },
   { title: 'a question only the user can answer → parked user', surface: API, args: { sides: ['back'] },
     build: (n) => build(n, { questions: [{ question: 'which provider account?', why: 'a contract only he signs' }] }), expect: { status: 'parked', reason: 'user' } },
@@ -123,8 +131,9 @@ for (const sc of scenarios) {
     throw new Error(`unknown agent ${name}`)
   }
   const parallel = (thunks) => Promise.all(thunks.map(t => t().catch(() => null)))
-  const r = await run({ ...ARGS, ...(sc.args ?? {}) }, agent, parallel, null, (m) => logs.push(m), () => {})
   const e = sc.expect, got = []
+  const r = await run({ ...ARGS, ...(sc.args ?? {}) }, agent, parallel, null, (m) => logs.push(m), () => {})
+    .catch((err) => { got.push(`threw ${err.message}`); return { passes: {}, blocking: [], notes: [], flaky: [] } })
   if (r.status !== e.status) got.push(`status ${r.status}`)
   if ('reason' in e && r.reason !== e.reason) got.push(`reason ${r.reason}`)
   if ('calls' in e && names.join(' ') !== e.calls) got.push(`calls ${names.join(' ')}`)

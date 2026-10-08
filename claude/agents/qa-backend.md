@@ -56,5 +56,5 @@ built or changed, stop and report.
 `findings` (severity `blocks` | `note` · basis · title · where (the
 route) · says (request and response, verbatim) · fix · proof (the
 command and what it printed) · level (4 when you ran it) · side) ·
-`closed` (in a delta) · `inconclusive` (what you could not run and why,
-or "").
+`closed` (in a delta) · `inconclusive` (only an AC's case you could not run: the AC
+id, the case, why; or []; a case outside the ACs is a note).

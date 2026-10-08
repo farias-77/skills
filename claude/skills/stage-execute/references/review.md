@@ -45,8 +45,14 @@ verbatim, or "nothing" for something missing) · `fix` (the smallest
 change) · `proof` (as the table says; a rule from memory is not a rule)
 · `level` (the proof ladder in `claude/references/judging.md`: `ac` and
 `bug` block from 4, ran it; `security` from 3) · `side` (`back`,
-`front`, `both`). What you could not run goes in `inconclusive`, never
-in a guess.
+`front`, `both`).
+
+**The gate is not yours.** It ran on this head and its result is in
+your task: never run it again, whole or in parts (the fast check, the
+affected gate, the stack's status). A reproduction runs the one test it
+needs. `inconclusive` holds only a check an AC needs that you could not
+run: the AC id, the check, why. Anything else you did not run is a note
+at most, never a guess.
 
 The triage is code: `blocks` with a blocking basis and a proof at its
 level blocks;

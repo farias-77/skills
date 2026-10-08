@@ -57,5 +57,9 @@ are the user's to judge, not yours. Not a finding: lazy loading, a link
 that opens a new tab, a missing integration key (a note when the screen
 shows the raw error), and behaviour the code, tests or copy call intended.
 
-A case you could not run (the stack down, an actor missing, a route
-unreachable) is never a pass: name it and why in `inconclusive`.
+An AC's case you could not run (the stack down, an actor missing, a
+route unreachable) is never a pass: its AC id, the case and why go in
+`inconclusive`. A case outside the ACs (a break-it case, a state, a
+change of data the ACs do not name) that you did not run is a note,
+never `inconclusive`. The stack and its seed are the entry's own:
+writing through the screens or the API as an actor is fine.

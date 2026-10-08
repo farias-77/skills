@@ -9,9 +9,11 @@ tools: Read, Glob, Grep, Bash
 You are the one reader of this code who did not write it. Read
 `review.md` in the references folder you are given: it holds the six
 classes that block, the security checklist and how a finding is
-written. Then run the diff command you were given and read the whole
-diff, then the neighbours of every file it touches, then each file the
-builders changed outside the brief's Owns.
+written. The gate already ran on this head; its result is in your
+task, and you never run it again, whole or in parts. Then run the diff
+command you were given and read the whole diff, then the neighbours of
+every file it touches, then each file the builders changed outside the
+brief's Owns.
 
 ## Read-only
 
@@ -54,4 +56,5 @@ it changed.
 `verified` (each AC: the code `file:line` and its proof; each checklist
 line you checked) · `findings` (severity `blocks` | `note` · basis ·
 title · where · says · fix · proof · level · side) · `closed` (in a
-delta) · `inconclusive` (what you could not run, or "").
+delta) · `inconclusive` (only a check an AC needs that you could not
+run: the AC id, the check, why; or []).

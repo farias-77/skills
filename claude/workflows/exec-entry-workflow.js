@@ -91,7 +91,7 @@ const REVIEW = obj({
   verified: strs,
   findings: arr(FINDING),
   closed: { ...strs, description: 'in a delta: the ids of your items now closed' },
-  inconclusive: { type: 'string', description: 'what you could not run and why; the empty string (no quotes, no "none") when you ran everything your check needed' },
+  inconclusive: { ...arr(obj({ ac: { type: 'string', description: 'the id of the AC that needs this check' }, check: str, why: str })), description: 'only a check an AC of the brief needs that you could not run; [] when you ran them all. A case outside the ACs that you did not run is a note, never here' },
 })
 
 // ---------- the run ----------
@@ -120,7 +120,7 @@ const finish = (status, reason, why) => {
 }
 const interrupted = (who) => finish('interrupted', 'interrupted', `${who} returned nothing; relaunch with resumeFromRunId`)
 const ready = () => result.inconclusive.length
-  ? finish('parked', 'inconclusive', result.inconclusive.map(i => `${i.seat}: ${i.why}`).join(' · '))
+  ? finish('parked', 'inconclusive', result.inconclusive.map(i => `${i.seat} on ${i.ac}: ${i.why}`).join(' · '))
   : finish('ready', null, `at ${result.head}, ${result.notes.length} note(s) for the PR`)
 
 // ---------- calling an agent ----------
@@ -275,10 +275,11 @@ function checkPrompt(name, kind, since, own, diffCmd) {
   const fix = mode === 'fix' ? '\nThis is a fix entry.' : ''
   const files = name === 'reviewer' && result.outsideOwns.length ? `\nFiles changed outside the brief's Owns (read them whole): ${result.outsideOwns.map(o => `${o.path} (${o.why})`).join('; ')}` : ''
   const stack = name.startsWith('qa-') ? `\nThe running stack: ${result.stack ?? '(not up)'}` : ''
+  const gate = `\nThe entry gate ran green at ${result.gate?.head ?? result.head}: ${result.gate?.summary ?? '(no summary)'}. Never run the whole gate again (the fast check, the affected gate, the stack's status); run only the one test or spec a check of yours needs.`
   return `Entry ${entry}${contractCommit ? ' (the contract commit: only a security hole blocks)' : ''}. ${kind === 'delta' ? 'Delta' : 'Check'}.
 ${where}
 ${sources}
-The diff: \`${diff}\` in the worktree.${files}${stack}${fix}${scope}`
+The diff: \`${diff}\` in the worktree.${gate}${files}${stack}${fix}${scope}`
 }
 
 async function check(seats, kind, since, ownBySeat = {}, diffCmd = null) {
@@ -290,8 +291,11 @@ async function check(seats, kind, since, ownBySeat = {}, diffCmd = null) {
   const blocking = []
   seats.forEach((name, i) => {
     const items = outs[i].findings.map((f, k) => ({ id: `${name}#${kind}.${k + 1}`, agent: name, ...f }))
+    for (const x of outs[i].inconclusive ?? []) {
+      if (said(x.ac)) result.inconclusive.push({ seat: name, ac: said(x.ac), why: `${x.check}: ${said(x.why)}` })
+      else items.push({ id: `${name}#${kind}.n${items.length + 1}`, agent: name, severity: 'note', basis: 'other', title: `not run: ${x.check}`, where: '', says: said(x.why), fix: '', proof: '', level: 1, side: 'both' })
+    }
     const notes = items.filter(f => !blocks(f))
-    if (said(outs[i].inconclusive)) result.inconclusive.push({ seat: name, why: said(outs[i].inconclusive) })
     blocking.push(...items.filter(blocks))
     if (notes.length > NOTES_PER_SEAT) log(`${entry}: ${name} gave ${notes.length} notes; the first ${NOTES_PER_SEAT} kept`)
     result.notes.push(...notes.slice(0, NOTES_PER_SEAT))
