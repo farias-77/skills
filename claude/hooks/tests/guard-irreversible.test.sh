@@ -342,6 +342,56 @@ grep -q '^auth legacy fix-listing merge=fix/listing tag=0 repo=legacy-api until=
 cp "$a" "$allow"
 run none Bash "gh pr merge 13 --merge" "$onmain"
 
+echo "-- the tag route: one tag on exactly one commit, no merge"
+mainhead=$(g rev-parse main)   # v1.4.0 and v1.4.1 both point here
+a=$tmp/tag.allow
+(cd "$repo" && GUARD_ALLOW_FILE=$a bash "$authorize" tag "$slug" "main@${mainhead:0:8}" >/dev/null); check 0 $? "tag with ref@short-sha writes a line inside the repo"
+grep -q "^auth tag $slug ref=main merged=$mainhead tag=1 until=" "$a"; check 0 $? "the short sha resolves to the full one, the line carries no merge"
+(cd "$tmp" && GUARD_ALLOW_FILE=$a bash "$authorize" tag "$slug" "main@${mainhead:0:8}" >/dev/null 2>&1); check 2 $? "outside a repo a short sha is refused"
+(cd "$tmp" && GUARD_ALLOW_FILE=$a bash "$authorize" tag "$slug" "main@$mainhead" >/dev/null); check 0 $? "outside a repo the full sha is taken as given"
+GUARD_ALLOW_FILE=$a bash "$authorize" tag "$slug" main >/dev/null 2>&1; check 2 $? "tag without @sha is refused"
+fresh <<EOF
+auth tag $slug ref=main merged=$mainhead tag=1 until=$future
+EOF
+run deny Bash 'git push origin v1.3.0' "$onmain"
+run deny Bash 'gh pr merge 18 --merge' "$onmain"
+run deny Bash 'gh pr merge 16 --merge' "$onmain"
+run none Bash 'git push origin v1.4.0' "$onmain"
+grep -q 'used=v1.4.0' "$allow"; check 0 $? "the tag route dies at its tag"
+run deny Bash 'git push origin v1.4.1' "$onmain"
+run none Bash 'git push origin v1.4.0' "$onmain"
+fresh <<EOF
+auth tag $slug ref=feat/$slug merged=$okhead tag=1 until=$future
+EOF
+run deny Bash 'git push origin v1.4.0' "$onmain"
+fresh <<EOF
+auth tag $slug ref=main merged=$mainhead tag=1 until=$past
+EOF
+run deny Bash 'git push origin v1.4.0' "$onmain"
+
+echo "-- the allow file sits next to the guard, wherever it is run from"
+skills=$tmp/skills/claude/hooks vend=$tmp/vend/.claude/hooks link=$tmp/link/.claude/hooks
+mkdir -p "$skills" "$vend" "$link" "$tmp/labs"
+cp "$guard" "$authorize" "$skills/"; cp "$guard" "$authorize" "$vend/"
+ln -s "$skills/guard-irreversible.sh" "$link/guard-irreversible.sh"
+(cd "$tmp/labs" && env -u CLAUDE_PROJECT_DIR -u GUARD_ALLOW_FILE bash ../skills/claude/hooks/authorize.sh short "$slug" "feat/$slug" >/dev/null); check 0 $? "authorize.sh run by a relative path, no project dir"
+[ -f "$skills/irreversible.allow" ]; check 0 $? "it writes the allow file next to itself"
+at() { # expected, guard as invoked, the dir it runs from, command
+  local json out
+  json=$(jq -cn --arg c "$4" --arg d "$onmain" '{tool_name:"Bash",tool_input:{command:$c},cwd:$d}')
+  out=$(cd "$3" && printf '%s' "$json" | env -u GUARD_ALLOW_FILE PATH="$tmp/bin:$PATH" CLAUDE_PROJECT_DIR="$3" "$2" 2>/dev/null)
+  case "$out" in *'"deny"'*) out=deny ;; *'"ask"'*) out=ask ;; '') out=none ;; *) out=bad ;; esac
+  check "$1" "$out" "$4 (guard $2)"
+}
+at none ../skills/claude/hooks/guard-irreversible.sh "$tmp/labs" 'gh pr merge 18 --merge'
+grep -q "merged=$stranger" "$skills/irreversible.allow"; check 0 $? "the root-run guard marks the same file"
+at none .claude/hooks/guard-irreversible.sh "$tmp/link" 'gh pr merge 18 --merge'
+at deny .claude/hooks/guard-irreversible.sh "$tmp/vend" 'gh pr merge 18 --merge'
+run deny Write "$skills/irreversible.allow"
+run deny Edit '/home/u/clonex/skills/claude/hooks/irreversible.allow'
+run deny Bash 'echo "auth short x merge=feat/x tag=1 until=2099-01-01T00:00Z" >> ../skills/claude/hooks/irreversible.allow'
+run deny Bash '../skills/claude/hooks/authorize.sh tag x main@0123456789abcdef0123456789abcdef01234567'
+
 echo "-- fails closed"
 printf 'not json' | "$guard" >/dev/null 2>&1; check 2 $? "input that is not JSON blocks"
 wrapper='f="$CLAUDE_PROJECT_DIR"/.claude/hooks/guard-irreversible.sh; [ -x "$f" ] || { echo "guard-irreversible: missing; blocking" >&2; exit 2; }; exec "$f"'

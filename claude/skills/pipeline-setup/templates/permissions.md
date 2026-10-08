@@ -135,8 +135,14 @@ test case.
 
 ## The allow file and the authorization lines
 
-`.claude/hooks/irreversible.allow`, written only by the user (a `!`
-command), never by an agent. One entry per line:
+`irreversible.allow` in the guard's own directory (symlinks followed),
+the file the `authorize.sh` beside it writes: `.claude/hooks/` in a
+copy install; next to the pipeline clone's guard when a root runs it by
+path (`../skills/claude/hooks/`), and there the `!` commands below name
+that `authorize.sh`. `GUARD_ALLOW_FILE` overrides both. Written only by
+the user (a `!` command), never by an agent: the guard denies a write
+to any path named `irreversible.allow`, and the settings deny Edit and
+Write on it anywhere. One entry per line:
 
 | Line | Meaning |
 |---|---|
@@ -144,6 +150,7 @@ command), never by an agent. One entry per line:
 | `protected <branch>` | one more protected branch (`main`, `master`, `production`, `prod` always are) |
 | `default-branch <branch>` | the repository's default branch, protected too |
 | `auth <route> <slug> merge=<branch>[@<sha>] tag=<0\|1> until=<UTC>` | written by `authorize.sh` |
+| `auth tag <slug> ref=<ref> merged=<sha> tag=1 until=<UTC>` | written by `authorize.sh tag` |
 
 He authorizes a front with one of:
 
@@ -152,6 +159,7 @@ He authorizes a front with one of:
 ! .claude/hooks/authorize.sh short   <slug> feat/<slug>         # one merge, one patch tag
 ! .claude/hooks/authorize.sh hotfix  <slug> hotfix/<slug>       # one merge and a revert/* PR, one patch tag
 ! .claude/hooks/authorize.sh legacy  <repo> <branch>            # one merge in that repository, no tag
+! .claude/hooks/authorize.sh tag     <slug> main@<sha>          # no merge, one v* tag on exactly <sha>: a release with no front
 ```
 
 The guard marks `merged=<sha>` when it lets a merge through and

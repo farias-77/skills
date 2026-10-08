@@ -28,7 +28,8 @@ feat/<slug> ──PR (local-ci, his ok)──► main ──push──► stagin
 
 He writes it with `! .claude/hooks/authorize.sh <route> ...` (the
 guard denies the script to agents). One line in the guard's allow
-file, live until its tag or for 3 days:
+file, `irreversible.allow` next to the guard and `authorize.sh`, live
+until its tag or for 3 days:
 
 | Route | Command | Lets through |
 |---|---|---|
@@ -36,10 +37,11 @@ file, live until its tag or for 3 days:
 | short | `authorize.sh short <slug> feat/<slug>` | the merge of `feat/<slug>` and of every `fix/<slug>/*`, one `v*` tag |
 | hotfix | `authorize.sh hotfix <slug> hotfix/<slug>` | the merge of `hotfix/<slug>`, of every `fix/<slug>/*` and of a `revert/*` PR, one `v*` tag |
 | legacy | `authorize.sh legacy <repo> <branch>` | the merge of `<branch>` in that repo only; no tag |
+| tag | `authorize.sh tag <slug> <ref>@<sha>` | no merge; one `v*` tag whose commit is exactly `<sha>` (full, or 7+ resolved in the repo it runs in): a release with no front |
 
 - The guard writes `merged=<head>` on the line when it lets a merge
   through, and `used=<tag>` when it lets the tag through. A tag must
-  carry a merge the line allowed. After the tag the line is dead: a
+  carry a merge the line allowed (the tag route: sit on its commit). After the tag the line is dead: a
   new merge or a new tag needs a new line from him.
 
 ## Taking turns on main

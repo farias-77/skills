@@ -206,8 +206,9 @@ infrastructure, deleting data, force-push, a forged status, switching
 identity, edits to itself or the settings) and any merge into a
 protected branch or `v*` tag that no live **authorization line**
 covers. Only he writes that line, as a `!` command:
-`! .claude/hooks/authorize.sh <release|short|hotfix|legacy> <slug> <branch>[@<sha>]` (legacy: `<repo>` in place of `<slug>`).
-It dies at its tag or in 3 days.
+`! .claude/hooks/authorize.sh <release|short|hotfix|legacy> <slug> <branch>[@<sha>]` (legacy: `<repo>` in place of `<slug>`),
+or `! .claude/hooks/authorize.sh tag <slug> main@<sha>` for a release with no front (one tag on that commit, no merge).
+It dies at its tag or in 3 days. The line lands in `irreversible.allow` beside the script, the file the guard beside it reads.
 
 ## Every stage measures itself, by script
 
