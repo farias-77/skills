@@ -17,7 +17,7 @@ You get the node id, `plan.graph.json`, `plan.md`, the design folder,
 the stories and the brief template. Fill the template for your node:
 
 1. **Header** from the graph: kind, sides, after (with the need).
-2. **Builds**: back and front in the design's names, with the section of
+2. **Builds**: backend and frontend in the design's names, with the section of
    `solution.md`, the screen in `screens.md`, the mock frames.
 3. **Acceptance**: one row per AC id the node carries, exactly; the
    criterion copied verbatim from the stories; the layer `tests.md`

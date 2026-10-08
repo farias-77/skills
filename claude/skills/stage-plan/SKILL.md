@@ -1,6 +1,6 @@
 ---
 name: stage-plan
-description: Conducts stage 3 (Plan) on its own, under one /goal - cuts the closed design into a build graph stage 4 runs as wide as it can (a thin contract commit C, entries that are each one whole behaviour of at most 12 ACs, front and back in parallel on the Contract, an edge only where nothing can be faked, E-int last), writes one brief per entry, checks the pre-flight, runs one review round (plan-reviewer ∥ two blind readers and a judge per brief), rules every finding itself, coordinates with the other fronts by message, and closes with its report (Video, Deck, Explainer) and the next command. Asks the user nothing. Use when a workstream's .state.md says stage plan, or to resume a plan in progress.
+description: Conducts stage 3 (Plan) on its own, under one /goal - cuts the closed design into a build graph stage 4 runs as wide as it can (a thin contract commit C, entries that are each one whole behaviour of at most 12 ACs, frontend and backend in parallel on the Contract, an edge only where nothing can be faked, E-int last), writes one brief per entry, checks the pre-flight, runs one review round (plan-reviewer ∥ two blind readers and a judge per brief), rules every finding itself, coordinates with the other workstreams by message, and closes with its report (Video, Deck, Explainer) and the next command. Asks the user nothing. Use when a workstream's .state.md says stage plan, or to resume a plan in progress.
 argument-hint: "<workstream-slug>"
 allowed-tools: Read, Write, Edit, Glob, Grep, Agent, SendMessage, Workflow, Artifact, Bash
 ---
@@ -70,14 +70,14 @@ Missing a design document: stop, and say which stage owns it.
    `realpath ${CLAUDE_SKILL_DIR}/../../../CLAUDE.md` prints and run its
    Open: the canary (in the product repo).
 2. Read `.state.md`: it says `stage: plan` (else stop, the stage it
-   names owns the front); dispatch P0 in the background.
+   names owns the workstream); dispatch P0 in the background.
 3. Hand him the goal, filled in, in one code block:
 
 ```
 /goal Plan <slug> with the stage-plan skill, asking me nothing.
 Done when: plan-graph.mjs --briefs is green; one plan-review round is ruled and
-applied; the other fronts are coordinated and _coordination.md has this front's
-line; the plan's report (Video, Deck, Explainer) is published on the front's link;
+applied; the other workstreams are coordinated and _coordination.md has this workstream's
+line; the plan's report (Video, Deck, Explainer) is published on the workstream's link;
 the last message lists what was decided in my place and the next command.
 ```
 
@@ -92,7 +92,7 @@ each as it came to `02-plan/recon/<topic>.md`.
   kind of code it adds; the gate commands; the hot files
   (`git log --since=60.days --name-only --format= -- <area>`).
 - **The generators:** each command and every path it writes.
-- **The other fronts:** `_coordination.md` (each front's stage, branch
+- **The other workstreams:** `_coordination.md` (each workstream's stage, branch
   and session name), their `.state.md`, every unmerged branch's changed
   files, shared files first (migrations, the spec, build files).
 
@@ -119,8 +119,8 @@ false edge, a fat C, a layer posing as an entry, an entry near the cap
 on the critical path go back to the planner (`SendMessage`, apply mode)
 until they hold.
 
-**Overlap with another front** (the recon or the checker's `front`
-warning): message that front's session now, by
+**Overlap with another workstream** (the recon or the checker's `workstream`
+warning): message that workstream's session now, by
 [references/coordination.md](references/coordination.md). Its answer,
 or the conservative rule after 15 minutes of silence, goes to the
 planner as a fix.
@@ -190,16 +190,16 @@ opening the file only when they disagree; run the checker with
 
 All three run at once:
 
-1. **Coordination.** This front's line in `_coordination.md`: stage
+1. **Coordination.** This workstream's line in `_coordination.md`: stage
    `execute`, branch `feat/<slug>`, this session's name, the shared
    files it will touch and what was agreed.
 2. **The report**, by `claude/docs/stage-report.md`, finished before
    the stage closes: the Video by `video-builder (Sonnet 5.5, high)`
    (the graph assembling: C, the entries in parallel, the critical
    path), the Deck by `slides-builder (Sonnet 5.5, medium)` (entries,
-   edges and why, the agreements with other fronts, what was decided in
+   edges and why, the agreements with other workstreams, what was decided in
    his place, the pre-flight), the Explainer by template from
-   `plan.graph.json` (the clickable graph). Published on the front's
+   `plan.graph.json` (the clickable graph). Published on the workstream's
    link.
 3. **Cleanup.** Any scratch this stage made.
 
@@ -208,7 +208,7 @@ workstream folder, and the message:
 
 | Part | Content |
 |---|---|
-| the link | the front's report |
+| the link | the workstream's report |
 | the graph | a flow in a code block, the critical path marked |
 | decided in his place | one line each, the veto it allows |
 | pre-flight | what he runs (item · blocks), or "nothing" |

@@ -14,7 +14,7 @@ feat/<slug> ──PR (local-ci, his ok)──► main ──push──► stagin
                                                  → rollback to the previous tag (red)
 ```
 
-1. `main` is always releasable: a front merges only when finished.
+1. `main` is always releasable: a workstream merges only when finished.
 2. Staging runs on every push to `main`. The image is keyed by the
    hash of what builds it, so a commit that does not touch it reuses
    the image, and every sha of `main` gets a green staging.
@@ -37,7 +37,7 @@ until its tag or for 3 days:
 | short | `authorize.sh short <slug> feat/<slug>` | the merge of `feat/<slug>` and of every `fix/<slug>/*`, one `v*` tag |
 | hotfix | `authorize.sh hotfix <slug> hotfix/<slug>` | the merge of `hotfix/<slug>`, of every `fix/<slug>/*` and of a `revert/*` PR, one `v*` tag |
 | legacy | `authorize.sh legacy <repo> <branch>` | the merge of `<branch>` in that repo only; no tag |
-| tag | `authorize.sh tag <slug> <ref>@<sha>` | no merge; one `v*` tag whose commit is exactly `<sha>` (full, or 7+ resolved in the repo it runs in): a release with no front |
+| tag | `authorize.sh tag <slug> <ref>@<sha>` | no merge; one `v*` tag whose commit is exactly `<sha>` (full, or 7+ resolved in the repo it runs in): a release with no workstream |
 
 - The guard writes `merged=<head>` on the line when it lets a merge
   through, and `used=<tag>` when it lets the tag through. A tag must
@@ -46,15 +46,15 @@ until its tag or for 3 days:
 
 ## Taking turns on main
 
-Fronts coordinate by talking (`SendMessage` to the session named in
+Workstreams coordinate by talking (`SendMessage` to the session named in
 `_coordination.md`), and GitHub's state is the tiebreaker.
 
-1. Only one front sits between its merge and its green staging. A
+1. Only one workstream sits between its merge and its green staging. A
    staging deploy running on `main` means someone is there: wait on a
    wakeup, then look again.
 2. Before merging, message the sessions in release: "merging <slug>".
    After the green staging: "main is free".
-3. **Waiting is not idle.** When another front lands on `main`, merge
+3. **Waiting is not idle.** When another workstream lands on `main`, merge
    `main` into `feat/<slug>` right away and let the local CI run while
    you wait.
 4. A peer silent for 15 minutes: the conservative choice is to wait
@@ -66,9 +66,9 @@ Fronts coordinate by talking (`SendMessage` to the session named in
 
 | | Checks |
 |---|---|
-| smoke | health and readiness; the sha served; the migrations applied; the read-only journeys; a browser on each front's entry routes: zero page errors, a root that is not empty |
+| smoke | health and readiness; the sha served; the migrations applied; the read-only journeys; a browser on each frontend's entry routes: zero page errors, a root that is not empty |
 | watch, 15 min | every minute: server errors of the new revision, restarts and out-of-memory, readiness, the entry routes answering. It sends its own probes, so low traffic is never read as healthy |
-| rollback | traffic and job images back to the previous tag's image, fronts rebuilt from that tag, a smoke. Never the old tag's infrastructure code, never a down migration: the schema only expands, so the old code runs on it |
+| rollback | traffic and job images back to the previous tag's image, frontends rebuilt from that tag, a smoke. Never the old tag's infrastructure code, never a down migration: the schema only expands, so the old code runs on it |
 
 Alarms go to him by email, P1 and P2 alike. The rollback workflow can
 also be run by hand (`gh workflow run rollback.yml -f tag=<tag>`): it
@@ -89,9 +89,9 @@ hotfix/<slug> from main → a test that reproduces it: red, then green
 
 1. It always branches from `main`.
 2. **It goes first.** Message the release sessions: "hotfix merging
-   first". A front that has not merged yet waits, then merges `main`
+   first". A workstream that has not merged yet waits, then merges `main`
    into its `feat` again.
-3. A front already merged whose release stopped red, or that has been
+3. A workstream already merged whose release stopped red, or that has been
    silent 60 minutes: the hotfix reverts it through a `revert/<that
    slug>` PR (the hotfix authorization covers it), with one line in
    `_coordination.md`. A revert, never a release branch.

@@ -35,7 +35,7 @@ true:
 One script, run by the export command, **written in the language the
 repo's own tooling uses** and placed where that tooling lives, so its
 lint, formatting and file-layout rules already apply (a new TypeScript
-file inside a front end with strict file boundaries would fail them; a
+file inside a frontend with strict file boundaries would fail them; a
 Go, Python or shell tool beside the repo's other tools does not). It
 reads the source of truth, flattens the token tree into `--group-name`
 custom properties, and writes the two token files. Give it a test when

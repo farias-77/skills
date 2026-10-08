@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# authorize.sh: the user's authorization for one front to reach main and
+# authorize.sh: the user's authorization for one workstream to reach main and
 # production. Only the user runs it, as a `!` command in the session (the
 # guard denies it to agents). It writes one `auth` line into the guard's
 # allow file; guard-irreversible.sh reads it.

@@ -29,7 +29,7 @@ and golden paths (its `CLAUDE.md` names them) are the bar and the shape.
   same worktree at the same time: commit only your paths
   (`git add -- <paths>`), never stash, reset, check out or `add -A`.
 - **The Contract is exact.** Every route, field, status and error code
-  as the brief's Contract writes it; the front builds against the same
+  as the brief's Contract writes it; the frontend builds against the same
   table.
 - **Proofs, not a test suite.** One primary proof per AC, at the
   cheapest layer that proves it, as `builders.md` says. The floor tests

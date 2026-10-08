@@ -37,7 +37,7 @@ Where the conductor disagrees, with its ground: <an AC it fails, a floor item, a
 
 ## The debate
 
-- Deck and video: <the front's link, Design tab>
+- Deck and video: <the workstream's link, Design tab>
 
 ### Round <n> — <date>
 

@@ -15,7 +15,7 @@ to be consumed, not admired.
 | 3 | `tests.md` | each AC by id → the layer that proves it and what the proof asserts; one walk per journey, one test step per AC; the floor tests the demand touches | the AC's text (cited by id only); status codes or JSON fields as the proof | `design-writer` |
 | 4 | `operations.md` | migration and rollout order, flags (usually "None."), the alarms that would wake someone, rollback per step, and the **Resources** table | dashboards nobody decides from | `design-writer` |
 | 5 | `security-and-access.md` | who can do what and where it is checked, another user's or scope's data, secrets, personal data (what is stored, who sees it, how long), the floor cases this demand touches | generic security advice | `design-writer` |
-| 6 | `screens.md` | each screen of the locked mock mapped onto the real front: the route, the component it extends, the states it reaches, the mock frames it follows, the data it shows (the contract that serves it), what the mock fakes | copy rewritten (the mock's copy is the copy) | `design-writer` |
+| 6 | `screens.md` | each screen of the locked mock mapped onto the real frontend: the route, the component it extends, the states it reaches, the mock frames it follows, the data it shows (the contract that serves it), what the mock fakes | copy rewritten (the mock's copy is the copy) | `design-writer` |
 
 **A document with nothing to carry** (a landing section with no table,
 no resource, no new access rule) is one line written by the conductor,

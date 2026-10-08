@@ -49,7 +49,7 @@ If the project's smoke shows a session on `story/*` cannot push
 ```
 claude --cloud --output-format json "$(cat <<'EOF'
 You run one stage-4 entry alone; nobody will answer a question.
-Entry <id>, front <slug>, run <n>.
+Entry <id>, workstream <slug>, run <n>.
 1. git fetch origin feat/<slug>:feat/<slug> evidence/<slug>/<id>:evidence/<slug>/<id>
    (first `git fetch --unshallow` if the clone is shallow)
    git worktree add ../evidence-<id> evidence/<slug>/<id>

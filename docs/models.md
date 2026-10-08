@@ -47,7 +47,7 @@ frontmatter together.
 | `plan-reviewer` | plan | Opus 5.5 | medium | One reader of the cut and every brief: buildable, edges real, the contract commit thin |
 | `builder-backend` | execute | Opus 5.5 | medium | FrontierCode peaks at Opus medium (54.6%); the fix pass too |
 | `builder-frontend` | execute | Opus 5.5 | medium | The same; the screens with taste, faithful to the locked mock |
-| `exec-gate` | execute | Sonnet 5.5 | low | Runs the gate commands once and reads logs: no judgment. Haiku 5.5, medium won the A/B (11/0/5, 0 false greens against 5); it switches only after a live check: at the first front, 2–3 real entries' gates run on Haiku beside Sonnet, and it switches if they agree |
+| `exec-gate` | execute | Sonnet 5.5 | low | Runs the gate commands once and reads logs: no judgment. Haiku 5.5, medium won the A/B (11/0/5, 0 false greens against 5); it switches only after a live check: at the first workstream, 2–3 real entries' gates run on Haiku beside Sonnet, and it switches if they agree |
 | `reviewer` | execute | Opus 5.5 | high | One reader carries the whole closed scope; hardest bugs: Opus caught them at 67% precision, Sonnet at 41% |
 | `qa-frontend` | execute | Opus 5.5 | medium | Drives the screens in a browser: Opus beats Sonnet on OSWorld at every cost |
 | `qa-backend` | execute | Opus 5.5 | medium | Calls the API and reads the store: judgment on what a customer would hit |

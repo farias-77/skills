@@ -16,7 +16,7 @@ and the tokens; the examples here give way to its choice.
 3. **Effects only for things outside React** (focus, an observer, an
    animation), each with its cleanup.
 4. **One component, one job**; a route file stays thin.
-5. **The front formats; the server decides** money, scope and
+5. **The frontend formats; the server decides** money, scope and
    eligibility.
 6. **Every action answers, never duplicates, and leaves focus somewhere
    meaningful.**

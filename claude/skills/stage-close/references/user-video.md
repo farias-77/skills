@@ -6,7 +6,7 @@ problem this solves for them, how to use it, and where it is.
 
 ## Which piece
 
-| The front has | The video is |
+| The workstream has | The video is |
 |---|---|
 | a screen someone uses | a **tutorial** of the new screens, recorded in staging, cut into a motion piece |
 | only backend | a **motion piece** that explains the idea in the users' words ("your leads arrive on their own at 6 am") |
@@ -38,7 +38,7 @@ one render.
    created and deleted with the project's staging-actor command. The
    agents' identity may do that in staging only. The builder saves one
    browser session per journey in its scratch.
-2. **Only the front's actors' rows appear.** The builder filters the
+2. **Only the workstream's actors' rows appear.** The builder filters the
    screens to the actors it created and checks, on the stills, that no
    visible row came from anyone else. A copy of production data used
    in a cutover rehearsal never stays in staging; if one is there, the

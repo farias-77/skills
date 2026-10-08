@@ -7,17 +7,17 @@ is here, it uses this one.
 
 | Term | Meaning |
 |---|---|
-| **front** (the docs' old name: workstream; never in an artifact) | one demand end to end: one folder `<designs-root>/<slug>/`, one report link, one line in `_coordination.md` |
-| **slug** | the front's id, `YYYY-MM-DD-<short-kebab-name>`; every stage resumes by it |
+| **workstream** (never "front" in an artifact) | one demand end to end: one folder `<designs-root>/<slug>/`, one report link, one line in `_coordination.md` |
+| **slug** | the workstream's id, `YYYY-MM-DD-<short-kebab-name>`; every stage resumes by it |
 | **route** | how a demand travels: **full** (the six stages), **short** (one behaviour, one entry), **hotfix** (production broken now); `repo: legacy` marks either of the last two in an old repository |
 | **the play** | what he types to start a stage: `/clear`, then `/stage-<name> <slug>` (or `/lets-cook <idea>`) |
 | **`/goal`** | the one message, handed to him at a stage's open, that lets the stage run to its close on its own; discovery, a conversation, has none |
 | **the canary** | `git push origin a:b`, run at every stage's open: the guard must deny it with a reason containing `guard-canary`, or the stage does not open |
-| **the authorization line** | `! .claude/hooks/authorize.sh <release\|short\|hotfix\|legacy\|tag> …`, run by him only; one line in the guard's allow file that lets one front merge into `main` and push one tag (`tag`: no merge, one tag on one commit); dies at its tag or in 3 days |
+| **the authorization line** | `! .claude/hooks/authorize.sh <release\|short\|hotfix\|legacy\|tag> …`, run by him only; one line in the guard's allow file that lets one workstream merge into `main` and push one tag (`tag`: no merge, one tag on one commit); dies at its tag or in 3 days |
 | **pre-flight** | what only he can hand over (a key, an account, a DNS record), each with a ready `!` command; checked at plan, handed over at execute's open |
 | **veto list** | what the conductor decided in his place (`ruled: conductor`), one line each, in the close message; he may undo any before the next stage |
-| **designs root** (`<designs-root>`) | the folder named by the line `designs-root: <path>` in the project's `CLAUDE.md` (relative to the main checkout, or absolute), for every front's folder, `_coordination.md` and `_retros/` |
-| **`_coordination.md`** | the designs root's one line per front: stage, branch, the session's name, shared files, what was agreed. Sessions talk by `SendMessage`; the file records the outcome |
+| **designs root** (`<designs-root>`) | the folder named by the line `designs-root: <path>` in the project's `CLAUDE.md` (relative to the main checkout, or absolute), for every workstream's folder, `_coordination.md` and `_retros/` |
+| **`_coordination.md`** | the designs root's one line per workstream: stage, branch, the session's name, shared files, what was agreed. Sessions talk by `SendMessage`; the file records the outcome |
 
 ## Discovery and design
 
@@ -40,7 +40,7 @@ is here, it uses this one.
 |---|---|
 | **node** | one unit of the build graph: `C`, an `E-nn`, or `E-int` |
 | **C** | the contract commit: thin, first, alone; lays down what two entries would both write (the contract, migrations, stubs) |
-| **E-nn** | an entry: one whole behaviour, at most 12 ACs, front and back in parallel on the Contract |
+| **E-nn** | an entry: one whole behaviour, at most 12 ACs, frontend and backend in parallel on the Contract |
 | **E-int** | the integration entry, last |
 | **brief** | the whole instruction an entry's builders get; ends with "The builder decides" |
 | **entry gate** | the per-entry checks `exec-gate` runs once per builder pass: the fast check plus the affected tests |
@@ -58,8 +58,8 @@ is here, it uses this one.
 
 | Term | Meaning |
 |---|---|
-| **the report** · **the front's link** | one private page per front: a rail of stages, each with Video · Deck · Explainer, finished before the stage closes (`claude/docs/stage-report.md`) |
-| **`rulings.md`** | one line per ruling (his, or `ruled: conductor`), at the front's root |
+| **the report** · **the workstream's link** | one private page per workstream: a rail of stages, each with Video · Deck · Explainer, finished before the stage closes (`claude/docs/stage-report.md`) |
+| **`rulings.md`** | one line per ruling (his, or `ruled: conductor`), at the workstream's root |
 | **`dreaming-notes.md`** | the frictions each stage notes as they happen; his own words marked `[user]`, a pattern of his choices marked `[taste]` |
-| **`metrics.json`** | the front's numbers, written by `claude/scripts/telemetry.mjs` |
-| **weekly retro** | the only place the pipeline changes: the week's closed fronts read together, he rules each proposal (apply · park · drop) |
+| **`metrics.json`** | the workstream's numbers, written by `claude/scripts/telemetry.mjs` |
+| **weekly retro** | the only place the pipeline changes: the week's closed workstreams read together, he rules each proposal (apply · park · drop) |

@@ -1,6 +1,6 @@
 ---
 name: plan-reviewer
-description: The reviewer of stage 3 (Plan) — reads the graph, plan.md and every brief once, against the design and the codebase, and checks what the checker cannot - each entry buildable without asking, every edge real, the contract commit thin and sufficient, the other fronts coordinated. Only quoted findings. Text ambiguity is the blind readers' job, not this one. Dispatched by the plan-review workflow, one round. Opus 5.5, medium.
+description: The reviewer of stage 3 (Plan) — reads the graph, plan.md and every brief once, against the design and the codebase, and checks what the checker cannot - each entry buildable without asking, every edge real, the contract commit thin and sufficient, the other workstreams coordinated. Only quoted findings. Text ambiguity is the blind readers' job, not this one. Dispatched by the plan-review workflow, one round. Opus 5.5, medium.
 model: claude-opus-5-5
 effort: medium
 tools: Read, Glob, Grep
@@ -35,8 +35,8 @@ readers' scope, not yours.
 3. **C is thin and enough** (`contract-commit`). Every item in C serves
    two or more entries or is generated. Behaviour, or a piece one entry
    alone uses, moves to that entry. Every stub an entry fills exists.
-4. **The other fronts** (`fronts`). Every overlap the recon found with a
-   running front has its agreement in `plan.md`: additive, or wait for
+4. **The other workstreams** (`workstreams`). Every overlap the recon found with a
+   running workstream has its agreement in `plan.md`: additive, or wait for
    its merge.
 
 ## Every finding carries

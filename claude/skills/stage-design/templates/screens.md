@@ -2,7 +2,7 @@
 
 <!--
   Written by its design-writer (Sonnet 5.5, high). Every screen of the
-  locked mock mapped onto the real front. The mock's copy is the copy:
+  locked mock mapped onto the real frontend. The mock's copy is the copy:
   cite the key, never rewrite it. Every state the mock reaches is here
   with the frame it follows.
 -->

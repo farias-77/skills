@@ -1,4 +1,4 @@
-# The front's retro
+# The workstream's retro
 
 A short record for the weekly retro. It changes nothing in the
 pipeline: an idea here is only an idea until he rules on it at the
@@ -30,7 +30,7 @@ weekly.
    "Got stuck" or an "Idea", in his words.
 2. **Time is an error.** A step that took long, a wait on a render, a
    rate-limit pause, a red that cost a round: each is a "Got stuck"
-   with its minutes. What would have made the front faster is an idea.
+   with its minutes. What would have made the workstream faster is an idea.
 3. **Numbers, never memory.** A number not in `metrics.json` is not in
    the retro. A `null` is written as "not measured" with the gap.
 4. **At most 5 per section.** Pick what would change a decision at the

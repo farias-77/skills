@@ -42,7 +42,7 @@ allowed-tools: Read, Write, Edit, Glob, Grep, Agent, SendMessage, Workflow, AskU
 | Who (model, effort) | Does | Route |
 |---|---|---|
 | you, the session (Opus 5.5, high) | the interview, the route, the brief, the release, the short close | all |
-| `scout (Haiku 5.5, medium)` × 2–4 | the area's map, the other fronts, legacy or not, broken in production or not | all |
+| `scout (Haiku 5.5, medium)` × 2–4 | the area's map, the other workstreams, legacy or not, broken in production or not | all |
 | the stage-4 cast through `exec-entry-workflow.js` | `builder-backend` · `builder-frontend (Opus 5.5, medium)` → `exec-gate (Sonnet 5.5, low)` → `reviewer (Opus 5.5, high)` ∥ `qa-frontend` · `qa-backend (Opus 5.5, medium)` by surface | short, hotfix |
 | `slides-builder (Sonnet 5.5, medium)` | the minimal report's decks | short, hotfix |
 | `video-builder (Sonnet 5.5, high)` | the users' video, only when a screen users see changed | short, hotfix |
@@ -65,7 +65,7 @@ with the time `date -u +%FT%TZ` printed; never rewrite a line.
    Open: the canary, then the designs root.
 2. **Scouts, in the background, from his first sentence.** One
    `scout (Haiku 5.5, medium)` per question: where this lives (the
-   feature map, the files); which fronts are open
+   feature map, the files); which workstreams are open
    (`_coordination.md`) and whether one touches this area; is it in a
    legacy repo.
    Hotfix and short route skip the attention queue; a full route waits
@@ -102,7 +102,7 @@ builds the wrong thing.
    stage: open | closed
    ```
 
-   Your row in `_coordination.md` (`| Front | Route · stage | Branch |
+   Your row in `_coordination.md` (`| Workstream | Route · stage | Branch |
    Session |`): `| <slug> | <route> · <step> | <branch> | <session> |`. A
    hotfix also tells every session named there, by `SendMessage`:
    "hotfix <slug> in flight, it merges first".

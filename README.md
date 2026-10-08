@@ -15,7 +15,7 @@ rewriting these files as reality pushes back.
 
 A software factory for a team of one: a person says what to build, and
 a crew of agents turns it into tested, reviewed, released code, with a
-report he can watch at every stage. Several fronts run at once, through
+report he can watch at every stage. Several workstreams run at once, through
 the night, and he is asked only what is his.
 
 | Rule | What it means |
@@ -24,7 +24,7 @@ the night, and he is asked only what is his.
 | **Right size** | one proposal sized to the problem, an overengineering guard whose only job is to cut, an evolution path for what was left out; "could be simpler" never blocks |
 | **One round** | every review runs once; a fix is verified by reading or by the delta, never by a second round |
 | **He is asked only what is his** | the conductor decides his class conservatively and lists it for veto; only a locked AC changed, a new recurring cost or something irreversible becomes a question |
-| **A report he can watch** | one link per front: each stage gets a Video, a Deck and an Explainer, finished before the stage closes |
+| **A report he can watch** | one link per workstream: each stage gets a Video, a Deck and an Explainer, finished before the stage closes |
 | **Local CI, one guard** | the whole gate runs on our compute and posts the status `main` requires; a hook denies what cannot be undone |
 | **It measures itself** | a script reads time, cost and his touches per stage; the weekly retro turns what repeats into changes he rules |
 
@@ -63,12 +63,12 @@ runs on Opus 5.5, high.
 |---|---|---|
 | **1 · Discovery** | while he talks, `prototype-builder (Sonnet 5.5, medium)` turns each answer into a visible edit of a live mock; the conductor locks it when nothing is open; `story-writer (Sonnet 5.5, high)` writes the stories, one AC per rule; one review round (`discovery-review-workflow.js`: three `disc-lens (Sonnet 5.5, medium)` and, per story, two `blind-reader (Sonnet 5.5, low)` and a `blind-judge (Sonnet 5.5, medium)`) | the conversation; the playback, story by story |
 | **2 · Design** | scouts read the system; `architect (Opus 5.5, high)` writes one proposal with its v1 → v2 → v3 path; `overengineering-guard (Opus 5.5, medium)` cuts; after his "closed", the architect writes `solution.md` and five `design-writer (Sonnet 5.5, high)` the other documents; four lenses review once, called directly by the session: `design-consistency` and `design-security` (Opus 5.5, medium), `design-contracts (Sonnet 5.5, high)`, the guard again | the debate over a deck and a ≤60 s video, until "closed" |
-| **3 · Plan** | `planner (Opus 5.5, high)` cuts the widest graph: a thin contract commit C, entries of one whole behaviour (≤12 ACs) with front and back in parallel, E-int last; `plan-writer (Sonnet 5.5, high)` writes one brief per node; one round (`plan-review-workflow.js`: `plan-reviewer (Opus 5.5, medium)` and the double-blind per brief); the session rules everything and writes the pre-flight | nothing; a veto list at the close |
+| **3 · Plan** | `planner (Opus 5.5, high)` cuts the widest graph: a thin contract commit C, entries of one whole behaviour (≤12 ACs) with frontend and backend in parallel, E-int last; `plan-writer (Sonnet 5.5, high)` writes one brief per node; one round (`plan-review-workflow.js`: `plan-reviewer (Opus 5.5, medium)` and the double-blind per brief); the session rules everything and writes the pre-flight | nothing; a veto list at the close |
 | **4 · Execute** | the session is the tech lead. Every ready entry runs `exec-entry-workflow.js`, in its own cloud session when the project has one: `builder-backend` ∥ `builder-frontend (Opus 5.5, medium)` → `exec-gate (Sonnet 5.5, low)` → `reviewer (Opus 5.5, high)` ∥ `qa-frontend` · `qa-backend (Opus 5.5, medium)` by surface → one fix pass → the delta. A serial queue merges into `feat/<slug>`; the project's signoff command runs the whole gate once, after his ok, and posts `local-ci` | the pre-flight; his hands-on with the running app, each answer an `A.n` round, until "ok" |
 | **5 · Release** | merge into `main` behind `local-ci`; the CI deploys staging and smokes; a `vX.Y.Z` tag promotes the same image to production, smokes, watches 15 minutes and rolls back on its own. A red gets one fix entry; a second red stops | his authorization line; a question only on the stop list (a new production deploy after a rollback is one) |
-| **6 · Close** | the users' video (1–3 min, recorded on staging) and a "what's new" text he forwards; a short retro with the script's numbers; a script proves nothing of the front is left on the machine | nothing |
+| **6 · Close** | the users' video (1–3 min, recorded on staging) and a "what's new" text he forwards; a short retro with the script's numbers; a script proves nothing of the workstream is left on the machine | nothing |
 
-The **weekly retro** reads the week's closed fronts together and
+The **weekly retro** reads the week's closed workstreams together and
 proposes changes, each with its evidence and exact edit; he rules each
 one (apply · park · drop). It is the only place the pipeline changes.
 
@@ -110,7 +110,7 @@ and templated writing, never above high.
 |---|---|---|
 | `lets-cook` | session | the one door: interview, route, and the short route and hotfix end to end |
 | `stage-discovery` · `stage-design` · `stage-plan` · `stage-execute` · `stage-release` · `stage-close` | session | the six stages |
-| `weekly-retro` | session | the week's fronts read together; the only place the pipeline changes |
+| `weekly-retro` | session | the week's workstreams read together; the only place the pipeline changes |
 | `pipeline-setup` | session | audits a project against the bar and closes the cheap gaps on a branch |
 | `draw-it-for-me` | preloaded by `artifact-builder`, `prototype-builder` | explanatory pages: diagrams that build, motion, 3D, charts |
 | `pitch-it-for-me` | preloaded by `slides-builder` | HTML slide decks, one idea per slide |
@@ -133,7 +133,7 @@ directly.
 
 ## The report
 
-Each front has **one private link**: a rail of stages, each with
+Each workstream has **one private link**: a rail of stages, each with
 **Video · Deck · Explainer**, filled as each stage closes and finished
 before it does. The shell is `claude/report/shell.html` plus a
 `report.json`; the video kit (`claude/video/`) renders a TSX film on
@@ -198,7 +198,7 @@ behind `cp --parents`) and turn the gate red for no change of yours.
 
 Each stage reads the house rules (`CLAUDE.md` at the clone's root) at
 its opening, so the project does not import them. Name the designs
-root (where each front's folder lives) with the line
+root (where each workstream's folder lives) with the line
 `designs-root: ../designs` in the project's `CLAUDE.md`, in git (a
 relative path resolves from the main checkout, worktrees included; an
 absolute one is accepted too); every stage stops without it.
@@ -207,7 +207,7 @@ Then, in Claude Code inside the project:
 
 - **Claude Code** with the `gh` CLI authenticated: GitHub is the
   source of record and the signoff's target.
-- The Workflow tool resolves the symlink, and the fronts' folders sit
+- The Workflow tool resolves the symlink, and the workstreams' folders sit
   beside the repository: the clone and the designs root go in
   `permissions.additionalDirectories`, in every directory a session
   opens in (where exactly: `pipeline-setup/templates/permissions.md`,

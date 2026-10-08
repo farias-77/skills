@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# cleanup.sh: finds, and on --apply removes, what one front left on the
+# cleanup.sh: finds, and on --apply removes, what one workstream left on the
 # machine. A route ends only when `--check` comes back empty: the full route
 # at its close, the short route and the hotfix after their tag.
 #
@@ -8,9 +8,9 @@
 #
 #   --check     (default) list what is left; exit 1 when anything is
 #   --apply     remove it; then run --check again
-#   --repo      a git repo the front touched (repeatable); default: the
+#   --repo      a git repo the workstream touched (repeatable); default: the
 #               current repo, or every repo one level below the current dir
-#   --ws        the front's folder (default ./designs/<slug> when it exists)
+#   --ws        the workstream's folder (default ./designs/<slug> when it exists)
 #   --discard   unmerged work the user discarded: removed like merged work
 #   --keep      unmerged work the user kept for later: listed, never counted
 #
@@ -18,10 +18,10 @@
 #   worktrees    whose path or branch carries the slug
 #   branches     feat/<slug>, story/<slug>/*, evidence/<slug>/*, fix/<slug>/*,
 #                hotfix/<slug>[/*], revert/<slug>; local and on origin
-#   docker       `make sweep front=<slug>` when the repo has it; otherwise the
+#   docker       `make sweep workstream=<slug>` when the repo has it; otherwise the
 #                containers, volumes, networks and images named <slug>-* or
 #                <slug>_* (compose projects included)
-#   scratch      _run/, _scratch/ and .remotion/ under the front's folder
+#   scratch      _run/, _scratch/ and .remotion/ under the workstream's folder
 #
 # It never removes unmerged work by itself: a branch not in origin's default
 # branch, or a worktree with uncommitted changes, is listed as "unmerged"
@@ -64,7 +64,7 @@ found() { # kind, name, how to remove (a command string run on --apply)
   else say left "$1" "$2"; left=1; fi
 }
 in_list() { local x=$1; shift; for y in "$@"; do [ "$x" = "$y" ] && return 0; done; return 1; }
-ours() { # a branch name of this front
+ours() { # a branch name of this workstream
   case "$1" in
     "feat/$slug"|"hotfix/$slug"|"revert/$slug"|"story/$slug/"?*|"evidence/$slug/"?*|"fix/$slug/"?*|"hotfix/$slug/"?*) return 0 ;;
   esac
@@ -127,11 +127,12 @@ for r in ${repos[@]+"${repos[@]}"}; do
   done < <(git -C "$r" ls-remote --heads origin 2>/dev/null)
 
   # docker, through the project's own sweep when it has one
-  if make -C "$r" -n sweep front="$slug" check=1 >/dev/null 2>&1; then
+  # front= too, for a Makefile not yet renamed (one release; then drop it)
+  if make -C "$r" -n sweep workstream="$slug" front="$slug" check=1 >/dev/null 2>&1; then
     if [ "$mode" = apply ]; then
-      make -C "$r" sweep front="$slug" >/dev/null 2>&1 && say removed docker "make sweep front=$slug ($r)" || { say FAILED docker "make sweep front=$slug ($r)"; failed=1; }
+      make -C "$r" sweep workstream="$slug" front="$slug" >/dev/null 2>&1 && say removed docker "make sweep workstream=$slug ($r)" || { say FAILED docker "make sweep workstream=$slug ($r)"; failed=1; }
     else
-      make -C "$r" sweep front="$slug" check=1 >/dev/null 2>&1 || { say left docker "make sweep front=$slug check=1 ($r) found leftovers"; left=1; }
+      make -C "$r" sweep workstream="$slug" front="$slug" check=1 >/dev/null 2>&1 || { say left docker "make sweep workstream=$slug check=1 ($r) found leftovers"; left=1; }
     fi
     swept=1
   fi
@@ -148,7 +149,7 @@ if [ -z "${swept:-}" ] && command -v docker >/dev/null 2>&1 && docker info >/dev
   while read -r img id; do [[ $img =~ $pat ]] && found image "$img" "docker rmi -f $(q "$id")"; done < <(docker images --format '{{.Repository}}:{{.Tag}} {{.ID}}')
 fi
 
-# scratch under the front's folder
+# scratch under the workstream's folder
 if [ -n "$ws" ] && [ -d "$ws" ]; then
   while IFS= read -r d; do found scratch "$d" "rm -rf $(q "$d")"; done < <(find "$ws" -type d \( -name _run -o -name _scratch -o -name .remotion \) -prune -print 2>/dev/null)
 fi

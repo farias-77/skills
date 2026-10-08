@@ -50,11 +50,11 @@ D0 reading → D1 his idea → D2 architect → guard → your ruling
 | D0 reading | `scout (Haiku 5.5, medium)` × N | `recon/<topic>.md`, each written by its scout |
 | D1 his idea | you (Opus 5.5, high) | `notes.md` · His idea |
 | D2 proposal | `architect (Opus 5.5, high)` → `overengineering-guard (Opus 5.5, medium)` | `proposal.md` |
-| D3 present | `slides-builder (Sonnet 5.5, medium)` first; `video-builder (Sonnet 5.5, high)` beside it | deck + video on the front's link (Design, running) |
+| D3 present | `slides-builder (Sonnet 5.5, medium)` first; `video-builder (Sonnet 5.5, high)` beside it | deck + video on the workstream's link (Design, running) |
 | D4 debate | you + **him** + the same `architect` by `SendMessage` | `proposal.md` closed, his words |
 | D5 documents | `architect` (solution) ∥ `design-writer (Sonnet 5.5, high)` × up to 5 | six documents, `review-prep.mjs` green |
 | D6 review | `design-consistency (Opus 5.5, medium)` ∥ `design-security (Opus 5.5, medium)` ∥ `design-contracts (Sonnet 5.5, high)` ∥ `overengineering-guard (Opus 5.5, medium)` | `reviews.md`, fixes verified |
-| D7 report | `slides-builder` ∥ `artifact-builder (Sonnet 5.5, medium)`; `video-builder (Sonnet 5.5, high)` only if the system's figure changed | the Design tab of the front's link |
+| D7 report | `slides-builder` ∥ `artifact-builder (Sonnet 5.5, medium)`; `video-builder (Sonnet 5.5, high)` only if the system's figure changed | the Design tab of the workstream's link |
 
 ## What you read
 
@@ -98,12 +98,12 @@ D0 reading → D1 his idea → D2 architect → guard → your ruling
 ```
 /goal Conduct the design of <slug> with the stage-design skill to its close.
 Done when: the proposal is closed in my words; the six documents passed one round
-of the four lenses and review-prep; the Design tab of the front's link has its
+of the four lenses and review-prep; the Design tab of the workstream's link has its
 video, deck and explainer; the last message lists what you decided in my place
 and the next command. Every question to me goes through the question tool.
 ```
 
-The design debate holds his attention: when another front is in its
+The design debate holds his attention: when another workstream is in its
 discovery or its debate (the coordination file), D3 waits for it and
 says so once; D0–D2 run anyway.
 
@@ -122,11 +122,11 @@ parallel, each writing its answer (quotes with `path:line`, the base as
 - per area the lock touches: what exists today (routes, tables,
   screens, jobs) and the exemplary module of each kind of code it will
   need;
-- the front's components and tokens, for the screens;
+- the frontend's components and tokens, for the screens;
 - the project's standards for anything the lock adds (a table, a
   route, a job, a screen, an alarm);
 - the feature maps of those areas;
-- other fronts: the coordination file, each `.state.md`, the files
+- other workstreams: the coordination file, each `.state.md`, the files
   they share with this one.
 
 Write the notes' "What exists today" (one line per fact, its source)
@@ -169,7 +169,7 @@ In one message, both in the background:
   the problem, the system in one figure, the main flow, the versions,
   where the architect disagrees with him and why, what the guard cut;
   the **last slide is the open points**. It is published first, to the
-  front's link, Design tab, marked running.
+  workstream's link, Design tab, marked running.
 - `video-builder (Sonnet 5.5, high)`: **60 s at most**, 720p, 24 fps:
   the system's figure first, the main flow, the versions. It jumps the
   render queue: it is the one video someone waits for live.
@@ -295,14 +295,14 @@ While they work, clean what this stage created (scratch folders, a
 stack brought up for a check). When they return: every number on a
 slide is checked against a document or the notes; `gitleaks dir
 <workstream>` is clean (a finding stops the publish); publish to the
-front's link with the label "design closed".
+workstream's link with the label "design closed".
 
 Then `.state.md` to `stage: plan`, commit the workstream folder (push
 only on his word), and one message:
 
 | | |
 |---|---|
-| The link | the front's report, Design tab |
+| The link | the workstream's report, Design tab |
 | The design | the solution in one sentence · documents · review (found · sustained · dismissed) |
 | Decided in your place | the Veto list, one line each (to veto, answer before the next stage) |
 | Next | `/clear`, then `/stage-plan <slug>` |

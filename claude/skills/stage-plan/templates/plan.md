@@ -8,7 +8,7 @@
 
 ## From A to B
 
-**A (today):** <from recon/: what exists, and what the other fronts are changing>
+**A (today):** <from recon/: what exists, and what the other workstreams are changing>
 **B (the design):** <from solution.md: what exists when the last entry merges>
 
 ## The graph
@@ -46,9 +46,9 @@
 | `<spec, generated code>` | C | — |
 | `<backend/internal/orders/app/place_order.go>` | E-01 | — |
 
-## Other fronts
+## Other workstreams
 
-| Front (session) | Touches | Agreed |
+| Workstream (session) | Touches | Agreed |
 |---|---|---|
 | <slug (session name)> | <path> | <additive: a new target at the end · or: E-04 waits for its merge> |
 

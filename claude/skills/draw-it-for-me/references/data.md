@@ -73,8 +73,8 @@ On a theme change, update `Chart.defaults` and each chart's colours, then
   chart.setOption({
     textStyle: {color: css('--ink-2')},
     series: [{type: 'sankey', nodeGap: 14, lineStyle: {color: 'gradient', opacity: 0.35}, label: {color: css('--ink')},
-      data: [{name: 'Front'}, {name: 'Build'}, {name: 'Review'}, {name: 'Wait'}],
-      links: [{source: 'Front', target: 'Build', value: 120}, {source: 'Front', target: 'Review', value: 40}, {source: 'Front', target: 'Wait', value: 65}]}],
+      data: [{name: 'Workstream'}, {name: 'Build'}, {name: 'Review'}, {name: 'Wait'}],
+      links: [{source: 'Workstream', target: 'Build', value: 120}, {source: 'Workstream', target: 'Review', value: 40}, {source: 'Workstream', target: 'Wait', value: 65}]}],
   });
   addEventListener('resize', () => chart.resize());
 </script>

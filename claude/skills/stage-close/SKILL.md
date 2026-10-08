@@ -1,6 +1,6 @@
 ---
 name: stage-close
-description: Conducts stage 6 (Close) of the pipeline under one /goal, and closes on its own. It delivers the video for users (30 s – 3 min, a motion piece recorded in staging, no technical words) as an .mp4 plus a "what's new" text for the user to forward; writes the front's retro (at most 5 items per section, numbers from claude/scripts/telemetry.mjs, slowness counted as something that went wrong); proves nothing of the front is left on the machine with claude/scripts/cleanup.sh; and publishes its report (video, deck, explainer). A scout harvests the frictions. The retro changes nothing in the pipeline: the weekly retro does. The session runs on Opus 5.5, high. Use when a front's .state.md says stage close, or to resume a close by its slug.
+description: Conducts stage 6 (Close) of the pipeline under one /goal, and closes on its own. It delivers the video for users (30 s – 3 min, a motion piece recorded in staging, no technical words) as an .mp4 plus a "what's new" text for the user to forward; writes the workstream's retro (at most 5 items per section, numbers from claude/scripts/telemetry.mjs, slowness counted as something that went wrong); proves nothing of the workstream is left on the machine with claude/scripts/cleanup.sh; and publishes its report (video, deck, explainer). A scout harvests the frictions. The retro changes nothing in the pipeline: the weekly retro does. The session runs on Opus 5.5, high. Use when a workstream's .state.md says stage close, or to resume a close by its slug.
 argument-hint: "<workstream-slug>"
 allowed-tools: Read, Write, Edit, Glob, Grep, Agent, AskUserQuestion, Artifact, PushNotification, ScheduleWakeup, Bash
 ---
@@ -13,7 +13,7 @@ allowed-tools: Read, Write, Edit, Glob, Grep, Agent, AskUserQuestion, Artifact, 
    word, and a "what's new" text ready to paste.
 2. The retro has at most 5 items per section; its numbers come from
    the script; time lost counts as something that went wrong.
-3. Nothing of the front is left on the machine, proven by a script.
+3. Nothing of the workstream is left on the machine, proven by a script.
 4. It closes on its own. What he says later goes into the retro,
    verbatim.
 5. It is the one stage that waits for its own video: the video for
@@ -74,7 +74,7 @@ is the resume point.
 ```
 /goal Close <slug> with the stage-close skill, without asking me anything.
 Done when: the video for users and the "what's new" text are ready; retro.md is written with the
-script's numbers; cleanup.sh --check comes back empty; the Close tab is on the front's link; and I
+script's numbers; cleanup.sh --check comes back empty; the Close tab is on the workstream's link; and I
 got the notification with the video, the text and the link.
 ```
 
@@ -118,11 +118,11 @@ Dispatch `slides-builder (Sonnet 5.5, medium)` as
 |---|---|---|
 | Video | the users' video itself | 30 s – 3 min, for users |
 | Deck | `slides-builder (Sonnet 5.5, medium)` | the retro (at most 5 per section), the numbers per stage, the "what's new" text |
-| Explainer | the report template from `metrics.json` | the front's time, cost and touches per stage, beside the earlier fronts' `metrics.json` |
+| Explainer | the report template from `metrics.json` | the workstream's time, cost and touches per stage, beside the earlier workstreams' `metrics.json` |
 
 Check every number on a slide against `metrics.json`. Run
 `gitleaks dir <designs-root>/<slug>`; a finding stops the publish.
-Publish to the front's link with the label "closed".
+Publish to the workstream's link with the label "closed".
 
 ## Step 3 · Deliver and close
 
@@ -136,7 +136,7 @@ Publish to the front's link with the label "closed".
 |---|---|
 | For users | the `.mp4` path (≤ 15 MB, ready to forward) |
 | What's new | the text, in full, ready to paste |
-| The link | the front's report, Close tab |
+| The link | the workstream's report, Close tab |
 | The numbers | time · cost (estimate) · his touches, one line |
 | Known issue | only if the video has one he should know before forwarding |
 
@@ -146,7 +146,7 @@ commit.
 
 ## When the render fails
 
-Run the cleanup first (it frees the render caches and the front's images),
+Run the cleanup first (it frees the render caches and the workstream's images),
 then render **once more** if the failure was the machine's (disk,
 memory). A second failure: deliver the text alone, mark the Video tab
 "failed", and write one line in `dreaming-notes.md`. A problem seen in

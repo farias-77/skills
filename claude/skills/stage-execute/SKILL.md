@@ -1,6 +1,6 @@
 ---
 name: stage-execute
-description: Conducts stage 4 (Execute) as the tech lead, under one /goal - builds the whole plan from the contract commit to the user's hands-on. Every ready entry runs through the exec-entry workflow (builder-backend ∥ builder-frontend → exec-gate → reviewer ∥ the QAs the surface calls for → one fix pass → the delta), in its own cloud session when the project has one; the session orchestrates the graph, the merge queue and the migration order, settles overlaps and conflicts, coordinates with other fronts by message, runs the whole gate as local CI (the local-ci status), opens the PR to main, brings the app up for his hands-on, builds his adjustments as A.n rounds, and closes on his ok with its report (Video, Deck, Explainer). Use when a workstream's .state.md says stage execute, or to resume one in progress.
+description: Conducts stage 4 (Execute) as the tech lead, under one /goal - builds the whole plan from the contract commit to the user's hands-on. Every ready entry runs through the exec-entry workflow (builder-backend ∥ builder-frontend → exec-gate → reviewer ∥ the QAs the surface calls for → one fix pass → the delta), in its own cloud session when the project has one; the session orchestrates the graph, the merge queue and the migration order, settles overlaps and conflicts, coordinates with other workstreams by message, runs the whole gate as local CI (the local-ci status), opens the PR to main, brings the app up for his hands-on, builds his adjustments as A.n rounds, and closes on his ok with its report (Video, Deck, Explainer). Use when a workstream's .state.md says stage execute, or to resume one in progress.
 argument-hint: "<workstream-slug>"
 allowed-tools: Read, Write, Edit, Glob, Grep, Agent, SendMessage, Workflow, AskUserQuestion, Artifact, PushNotification, Monitor, Bash
 ---
@@ -106,7 +106,7 @@ when truly stuck (two fixes on one premise failed at the same gate), with why in
 - Keep the machine awake while anything is in flight:
   `systemd-inhibit --what=sleep:idle --why="<slug> execute" sleep infinity`
   in the background.
-- Read `_coordination.md` (by scout): the other fronts in execute and
+- Read `_coordination.md` (by scout): the other workstreams in execute and
   their session names.
 
 ## 2 · The contract commit
@@ -170,7 +170,7 @@ and `outsideOwns` to the board's log. Then act by
 By [references/queue.md](references/queue.md): one at a time, the
 critical path first; base in (merge, never rebase), restamp, the affected gate,
 merge `--no-ff`, the worktree and stack removed at once, then start what
-unblocked. Between two merges, a `main` that moved (another front, a
+unblocked. Between two merges, a `main` that moved (another workstream, a
 hotfix) is merged into `feat`.
 
 ## 6 · The end: PR, local CI, his hands-on
@@ -222,7 +222,7 @@ All at once:
    the Deck by `slides-builder (Sonnet 5.5, medium)` (per entry: ACs →
    proofs, findings, the A.n, what stayed out and why), the Explainer by
    template (the board replayed on a timeline from `run-*.json` and
-   `beats.jsonl`). Published on the front's link.
+   `beats.jsonl`). Published on the workstream's link.
 2. **Telemetry**: `node claude/scripts/telemetry.mjs <slug> --stage
    execute --ws <designs-root>/<slug> --out -` reads the transcripts and
    the runs. Nothing by hand.
@@ -232,7 +232,7 @@ All at once:
    `story/<slug>/*` and `evidence/<slug>/*` (their evidence is already
    copied), the `systemd-inhibit` process.
 
-Then `.state.md` to `stage: release`, this front's line in
+Then `.state.md` to `stage: release`, this workstream's line in
 `_coordination.md`, the close commit of the workstream folder, and the
 message: the report link, the board in one table, what was decided in
 his place, and `/clear` then `/stage-release <slug>`.

@@ -6,7 +6,7 @@ repeating it; a consuming project does not import it. Paths: `claude/…`
 is the kit (`realpath ${CLAUDE_SKILL_DIR}/../..`, written as `kit:` in
 `.state.md`); `docs/…` sits beside it in the pipeline repo;
 `<designs-root>` is the folder named by the line `designs-root: <path>`
-in the project's own `CLAUDE.md`, in git, for the fronts' folders and
+in the project's own `CLAUDE.md`, in git, for the workstreams' folders and
 `_coordination.md`. A relative path resolves from the project's main
 checkout, so a worktree resolves it the same as the checkout:
 `dirname "$(git rev-parse --path-format=absolute --git-common-dir)"`;
@@ -78,7 +78,7 @@ There is no fixed cap on parallel work.
 ## "Note this for the dreaming"
 
 When he says to note something for the dreaming (or words to that
-effect), append it to the front's `dreaming-notes.md` on the spot,
+effect), append it to the workstream's `dreaming-notes.md` on the spot,
 marked **`[user]`**: his words as close to verbatim as the entry
 allows, plus what he already wants changed. A pattern in his rulings
 (he keeps choosing against the recommendation on one kind of decision)
@@ -102,7 +102,7 @@ fails when a frontmatter, a workflow or the table disagree.
 A stage's session is an expensive model in a long conversation: a file
 it opens is paid again on every turn after. **When it needs something
 it has not read** (what a document says, what a repo has, what a
-standard requires, what a past front recorded), **it dispatches
+standard requires, what a past workstream recorded), **it dispatches
 `scout (Haiku 5.5, medium)`**, which quotes the literal lines with
 `path:line`, says where it looked and what it did not find, and writes
 its answer to the file the session names (`recon/<topic>.md`). The
@@ -139,7 +139,7 @@ scale (`blocks` · `note`), the owners per stage, and the one rule that
 turns his class into a conservative decision of yours. Only a locked
 AC changed, a new recurring cost, or something irreversible becomes a
 question to him. Every ruling, his or yours, is one line of the
-front's **`rulings.md`**:
+workstream's **`rulings.md`**:
 
 ```
 2026-10-05 · design D6 · design-security#S-2 · conductor: conservative · ruled: conductor · "keeps the lock, reversible"
@@ -151,9 +151,9 @@ you ruled in his place) · the reason, his verbatim where he gave one.
 The stage's `reviews.md` keeps the detail; `rulings.md` and
 `dreaming-notes.md` are what the retros read first.
 
-## One link per front, finished before the stage closes
+## One link per workstream, finished before the stage closes
 
-Each front has **one report link**: a rail of stages, each with three
+Each workstream has **one report link**: a rail of stages, each with three
 tabs, **Video · Deck · Explainer** (the short route's exceptions are in
 [docs/stage-report.md](docs/stage-report.md)). The page is the fixed shell
 `claude/report/shell.html` plus `report.json`; the tabs are built by
@@ -166,7 +166,7 @@ PATH, `make gitleaks dir=<workstream>`, here and in every stage). The
 page stays private; anything published outside the company needs his
 approval. The procedure is [docs/stage-report.md](docs/stage-report.md).
 
-The stage files (`*.md` under the front) are written for the machine,
+The stage files (`*.md` under the workstream) are written for the machine,
 complete and exact, in his language (his words verbatim; ids, keywords
 and headings as the templates have them); the `language` a writer's
 brief names is that language. The report is for a person: a picture first, short
@@ -176,13 +176,13 @@ simplified English, with the exceptions it lists, by
 [`claude/references/artifact-writing.md`](claude/references/artifact-writing.md);
 the chat with him stays in his language.
 
-## Fronts coordinate by talking
+## Workstreams coordinate by talking
 
-Several fronts run at once. Each front's line in `_coordination.md`
+Several workstreams run at once. Each workstream's line in `_coordination.md`
 names its stage, branch and session; sessions agree by `SendMessage`
 (release order, a shared file, a migration, a hotfix's priority) and
 write the outcome in one line. A peer silent for 15 minutes: proceed
-on the conservative choice and note it. One front at a time holds his
+on the conservative choice and note it. One workstream at a time holds his
 attention in a discovery or a design debate; the rest runs in
 parallel.
 
@@ -207,13 +207,13 @@ identity, edits to itself or the settings) and any merge into a
 protected branch or `v*` tag that no live **authorization line**
 covers. Only he writes that line, as a `!` command:
 `! .claude/hooks/authorize.sh <release|short|hotfix|legacy> <slug> <branch>[@<sha>]` (legacy: `<repo>` in place of `<slug>`),
-or `! .claude/hooks/authorize.sh tag <slug> main@<sha>` for a release with no front (one tag on that commit, no merge).
+or `! .claude/hooks/authorize.sh tag <slug> main@<sha>` for a release with no workstream (one tag on that commit, no merge).
 It dies at its tag or in 3 days. The line lands in `irreversible.allow` beside the script, the file the guard beside it reads.
 
 ## Every stage measures itself, by script
 
 Nothing is recorded by hand. `node claude/scripts/telemetry.mjs <slug>`
-reads the transcripts and the entries' `run-*.json`, and writes the front's `metrics.json` (time, cost as an estimate, his
+reads the transcripts and the entries' `run-*.json`, and writes the workstream's `metrics.json` (time, cost as an estimate, his
 touches per stage); a value it cannot measure is `null` with a line in
 `gaps`. The retro and the weekly retro use those numbers.
 

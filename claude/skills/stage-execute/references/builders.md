@@ -8,7 +8,7 @@ the role: what you deliver, how you prove it, what comes after you.
 ## Where you sit
 
 ```
-you (back ∥ front) ──► exec-gate: the entry gate once ──► reviewer ∥ QAs ──► two gate-fix passes, one review-fix pass ──► the merge queue
+you (backend ∥ frontend) ──► exec-gate: the entry gate once ──► reviewer ∥ QAs ──► two gate-fix passes, one review-fix pass ──► the merge queue
 ```
 
 You do not run the whole suite and you do not review yourself: the gate
@@ -22,7 +22,7 @@ primary proof, at the cheapest layer that really proves it.**
 | Layer | Proves | Not for |
 |---|---|---|
 | unit, server | a rule, a limit, a scope, a transition | SQL, HTTP |
-| unit, front | pure logic: a format, a displayed calculation, a language, a theme | what needs a screen |
+| unit, frontend | pure logic: a format, a displayed calculation, a language, a theme | what needs a screen |
 | integration (API in process, a real database) | SQL, permission, scope, idempotency, concurrency | what the user sees |
 | journey (browser) | one flow: action → result → reload → still there | the limits of a rule |
 | intercepted state | only what the API cannot produce on demand (a 500, a 429) | what the API produces |

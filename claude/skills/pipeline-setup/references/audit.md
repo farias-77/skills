@@ -41,7 +41,7 @@ that does not apply (no screens: 11, 18) is `n/a` with the reason.
 
 | Role | Look for | ✓ when | ~ when |
 |---|---|---|---|
-| 8 stack and sweep | compose files and stack scripts; names and ports derived from the worktree; a `down` and whether it removes images (`--rmi local`); a label per worktree and front; a `sweep` target with a check mode; seeded actors per role | up / env / down per worktree, images removed, labels, a sweep, actors | fixed ports or names, images kept, no labels or no sweep |
+| 8 stack and sweep | compose files and stack scripts; names and ports derived from the worktree; a `down` and whether it removes images (`--rmi local`); a label per worktree and workstream; a `sweep` target with a check mode; seeded actors per role | up / env / down per worktree, images removed, labels, a sweep, actors | fixed ports or names, images kept, no labels or no sweep |
 | 11 browser | `playwright.config.*` and its pinned version; a login helper or stored session | pinned, headless, an actor logs in without a human | logins need a human, or not pinned |
 
 ## Group D — delivery, permissions, identities (12, 13, 14, 15)

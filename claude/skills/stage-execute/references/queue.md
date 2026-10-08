@@ -33,7 +33,7 @@ for each ready entry
    reason; they do not block (the reviewer read them).
 5. **The merge body** carries the entry's notes; notes never open work.
 
-## Another front lands on main
+## Another workstream lands on main
 
 Between two queue merges: `git merge main` into `feat/<slug>`, `make
 restamp`, the affected gate, push. Lockfiles are regenerated, never
@@ -47,7 +47,7 @@ decided by him):
 1. **Open the PR** `feat/<slug> → main` as a draft, as the bot identity
    (`gh pr create --draft`). Body: the entries (a cloud entry with its
    session url), the notes, what stayed out and why.
-2. **Mark the PR ready** when his hands-on starts. While the front
+2. **Mark the PR ready** when his hands-on starts. While the workstream
    iterates (his `A.n` rounds, the `X.n` fixes), each push is checked
    by the affected gate only, as in the queue.
 3. **Run the whole gate once, at the end**: after his final ok, on the
@@ -71,7 +71,7 @@ decided by him):
 
 | Red | What happens |
 |---|---|
-| a test **outside** the diff | run local-ci once more. Green: flaky; an `X.n` fixes it, as below. A flaky seen for the first time in this front is this front's: fixed, never deleted |
+| a test **outside** the diff | run local-ci once more. Green: flaky; an `X.n` fixes it, as below. A flaky seen for the first time in this workstream is this workstream's: fixed, never deleted |
 | anything else | one `X.n` per failing area (failures with no file in common run in parallel): exec-entry `fix`, the reviewer reading it, then the queue (the affected gate) and the whole gate once more on the new head |
 | red twice on the same area | the tech lead decides: a smaller fix, a re-cut, or it goes to him with the evidence |
 
