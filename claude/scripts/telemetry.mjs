@@ -38,7 +38,7 @@ const PRICES = {
   'claude-opus-5-5': { in: 4, out: 20, read: 0.2 },
   'claude-opus-5': { in: 5, out: 25, read: 0.5 },
   'claude-opus-4-8': { in: 5, out: 25, read: 0.5 },
-  'claude-sonnet-5-5': { in: 2, out: 10, read: 0.1 },
+  'claude-sonnet-5-5': { in: 2, out: 10, read: 0.2 },
   'claude-sonnet-5': { in: 2, out: 10, read: 0.2 },
   'claude-sonnet-4-6': { in: 3, out: 15, read: 0.3 },
   'claude-haiku-5-5': { in: 0.1, out: 0.5, read: 0.01, longAbove: 100_000, longFactor: 5 },
@@ -111,14 +111,20 @@ function addUsage(acc, row, seen) {
   const m = row.message
   if (row.type !== 'assistant' || !m?.usage || !m.model || m.model.startsWith('<')) return
   const id = m.id ?? row.requestId ?? row.uuid
-  if (seen.has(id)) return
-  seen.add(id)
   const u = m.usage
+  // One message is written as several rows; the input is the same on each, the output grows to the last.
+  const prev = seen.get(id)
+  if (prev) {
+    const more = (u.output_tokens ?? 0) - prev.counted
+    if (more > 0) { prev.t.output += more; prev.counted += more }
+    return
+  }
   const base = m.model.replace(/\[.*\]$/, '').replace(/-\d{8}$/, '')
   const p = PRICES[base]
   const prompt = (u.input_tokens ?? 0) + (u.cache_read_input_tokens ?? 0) + (u.cache_creation_input_tokens ?? 0)
   const model = p?.longAbove && prompt > p.longAbove ? `${base} >${p.longAbove / 1000}k` : base
   const t = (acc[model] ??= { input: 0, output: 0, cacheWrite5m: 0, cacheWrite1h: 0, cacheRead: 0 })
+  seen.set(id, { t, counted: u.output_tokens ?? 0 })
   t.input += u.input_tokens ?? 0
   t.output += u.output_tokens ?? 0
   t.cacheRead += u.cache_read_input_tokens ?? 0
@@ -187,7 +193,7 @@ function measure(seg) {
   const stamped = seg.rows.filter((r) => r.timestamp)
   const start = stamped[0]?.timestamp ?? null
   const end = stamped.at(-1)?.timestamp ?? null
-  const seen = new Set()
+  const seen = new Map()
   const tokens = {}
   const askIds = new Set()
   let touches = 0
@@ -220,7 +226,7 @@ function measure(seg) {
     const last = rows.filter((r) => r.timestamp).at(-1).timestamp
     a.minutes = round2(a.minutes + (minutes(first, last) ?? 0))
     activeAgentMin += minutes(first, last) ?? 0
-    const s = new Set()
+    const s = new Map()
     for (const r of rows) addUsage(a.tokens, r, s)
   }
   return {
@@ -269,7 +275,7 @@ for (const f of runs) {
     }
     if (v.usage && typeof v.usage === 'object' && typeof v.model === 'string') {
       runTokensSeen = true
-      addUsage(entries.tokens, { type: 'assistant', message: { id: `${f}:${Math.random()}`, model: v.model, usage: v.usage } }, new Set())
+      addUsage(entries.tokens, { type: 'assistant', message: { id: `${f}:${Math.random()}`, model: v.model, usage: v.usage } }, new Map())
     }
     Object.values(v).forEach(visit)
   }

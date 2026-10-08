@@ -53,8 +53,10 @@ allowed-tools: Read, Write, Edit, Glob, Grep, Agent, SendMessage, Workflow, AskU
 From his `/goal` to the notification, the only things that wait for him
 are his use (short route), his staging check (hotfix, unless
 delegated) and the release's stop list. A wait ends on a
-`ScheduleWakeup`. Keep
-`<designs-root>/<slug>/trace.md` current, one line per step, `date -u`.
+`ScheduleWakeup`. Nobody answers a permission prompt either: every
+command you run follows `claude/references/commands.md`. Append one
+line to `<designs-root>/<slug>/trace.md` at each step, as it happens,
+with the time `date -u +%FT%TZ` printed; never rewrite a line.
 
 ## 1 · Open
 
@@ -97,8 +99,18 @@ small on the wrong thing builds the wrong thing.
    Hotfix: its first AC is the one that reproduces the bug.
 2. `gitleaks dir <designs-root>/<slug>` (or `make gitleaks dir=…` when gitleaks is not on PATH): a finding stops everything
    (a secret in a brief is an incident).
-3. `.state.md`: route, `repo` (legacy or not), step. Your line in
-   `_coordination.md`: slug, route, branch, this session's name. A
+3. `.state.md`, rewritten at each step:
+
+   ```
+   route: short | hotfix
+   repo: product | legacy <repo>
+   branch: feat/<slug> | hotfix/<slug> | <the legacy repo's branch>
+   step: <the step just done, as "5 · the entry">
+   stage: open | closed
+   ```
+
+   Your row in `_coordination.md` (`| Front | Route · stage | Branch |
+   Session |`): `| <slug> | <route> · <step> | <branch> | <session> |`. A
    hotfix also tells every session named there, by `SendMessage`:
    "hotfix <slug> in flight, it merges first".
 4. One message, then end the turn: the brief's link, the route line,
@@ -140,7 +152,20 @@ notification. Never loosen this done to call it met; stop early only when truly 
   `designDir`, `storiesPath` and `mockDir` none, `base` = `main`,
   `referencesDir` = `${CLAUDE_SKILL_DIR}/../stage-execute/references`,
   `heartbeat` = `bash ${CLAUDE_SKILL_DIR}/../stage-execute/scripts/heartbeat.sh <designs-root>/<slug>/entry/`,
-  `evidenceDir` = `<designs-root>/<slug>/entry/`. When the Workflow tool
+  `evidenceDir` = `<designs-root>/<slug>/entry/`. The args a full route
+  takes from `plan.md` come from here:
+
+  | Arg | Short route value |
+  |---|---|
+  | `entry` · `kind` | `E1` · `entry` |
+  | `worktree` · `branch` | a worktree of the branch under the product's worktrees root, `<root>/<slug>/E1` · `feat/<slug>` (hotfix: `hotfix/<slug>`) |
+  | `projectDocs` | the worktree's `CLAUDE.md` |
+  | `fastCheck` · `gateCommands` | the commands table's fast check, then it and the entry gate with `base=main`, each with `-C <worktree>` |
+  | `gatePaths` | the code-owner paths (`CODEOWNERS`) |
+  | `trailer` | the commit trailer your own commits carry |
+  | `loadThreshold` | `nproc` |
+
+  When the Workflow tool
   refuses the kit's path, pass the file's whole content as `script` (same `args`). The
   `reviewer (Opus 5.5, high)` always runs; on a hotfix, with the
   security pass.
@@ -164,7 +189,9 @@ notification. Never loosen this done to call it met; stop early only when truly 
 ## 7 · Release
 
 Follow steps 1–4 of `stage-release` with its `references/release.md`:
-take the turn on `main`, merge, staging, a **patch** tag, production,
+take the turn on `main`, merge, staging, a **patch** tag (`v1.0.0`
+when the repo has no `v*` tag yet: stage-release's first-tag rule
+wins), production,
 the watch. The release's red rule and stop list apply as they are. A
 hotfix goes first on `main` (release.md, "The hotfix"). In a legacy
 repo: release.md, "Legacy repos". At the green staging, dispatch the
@@ -187,9 +214,12 @@ users' video only when a screen users see changed.
 | Release | — | version, notes, smokes | only with an incident |
 | Close | only if a screen users see changed | numbers and "what's new" | — |
 
-5. `.state.md` → `stage: closed`; your `_coordination.md` line: "out in
-   vX.Y.Z". Commit the folder. One message and a `PushNotification`:
-   the version, the link, the "what's new" text, the video if any.
+5. `.state.md` → `stage: closed`; your `_coordination.md` row: "out in
+   vX.Y.Z", or, when the release stopped before production, "closed:
+   not out, <why, in a few words>" (the stop and its next commands are
+   in `04-release/trace.md`). Commit the folder. One message and a
+   `PushNotification`: the version (or "not out" and why), the link,
+   the "what's new" text, the video if any.
 
 ## Switching routes
 

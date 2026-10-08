@@ -68,7 +68,9 @@ message as a known issue.
 `claude/references/artifact-writing.md` sets for it: a title, two or three
 sentences of what changed for them, one line per thing they can now
 do, and where to find it. No version numbers, no technical words. It
-goes in the Close deck and, in full, in the final message.
+goes in full in the final message. In the Close deck a slide holds 40
+words at most (`check-deck.mjs`): the title and the sentences on one
+slide, the lines of what they can now do on the next.
 
 ## Nothing goes outside
 
