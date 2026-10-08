@@ -63,7 +63,7 @@ an id a reviewer can cite, plus an index; and in `CLAUDE.md` the
 commands table that names the command, file or folder of every role
 here, the worktrees root, and whether a cloud environment exists; and
 the line `designs-root: ../designs` (the folder that holds each
-front's folder and `_coordination.md`) in `CLAUDE.md`, in git, relative
+workstream's folder and `_coordination.md`) in `CLAUDE.md`, in git, relative
 to the main checkout, worktrees included (an absolute path is accepted
 too). Without it every stage stops at its open.
 
@@ -133,7 +133,7 @@ own stack, on the station or a cloud session VM.
 
 **How the stages use it.** The signoff command (role 6) runs it once,
 at the end: after his final ok, on the final head of `feat/<slug>`.
-While the front iterates (entries, `A.n`, `X.n`) only the entry gate
+While the workstream iterates (entries, `A.n`, `X.n`) only the entry gate
 runs; a red at the end opens an `X.n`, checked by the entry gate, then
 the whole gate once more on the new head.
 
@@ -189,9 +189,9 @@ current worktree (its own ports, containers, network, volumes and
 database, derived from the worktree), print its URLs and test actors
 (one login per role the permissions distinguish), and take only that
 stack down, **its images included**. Every container, volume and image
-carries a label with the worktree and the front. The **sweep**
-(`make sweep front=<slug> [check=1]`) lists (`check=1`) or removes
-everything labelled with a front. The commands table names the
+carries a label with the worktree and the workstream. The **sweep**
+(`make sweep workstream=<slug> [check=1]`) lists (`check=1`) or removes
+everything labelled with a workstream. The commands table names the
 worktrees root (`<root>/<slug>/<id>`).
 
 **Why.** Entries run side by side; a `down` that touches a neighbour,
@@ -213,7 +213,7 @@ the release run after `main` moves. Expand and contract across
 releases; no down migration.
 
 **Why.** Two parallel entries editing one file collide at merge; two
-fronts' migrations collide by order.
+workstreams' migrations collide by order.
 
 **How the stages use it.** The plan's C owns every change to them;
 execute's queue and release's step 1 run `make restamp` after merging
@@ -317,7 +317,7 @@ before them. The real limits sit outside the session too (role 15).
 **How the stages use it.** Every stage opens with the canary (`git push
 origin a:b`, denied). He authorizes a release with `! .claude/hooks/authorize.sh
 release <slug> feat/<slug>@<sha>` (or `short`, `hotfix`, `legacy`, or
-`tag <slug> main@<sha>` for a release with no front); the guard lets one
+`tag <slug> main@<sha>` for a release with no workstream); the guard lets one
 merge and one tag through, then the line is dead.
 
 ### 15 · Agent identities

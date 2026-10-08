@@ -25,7 +25,7 @@ for the scan before the report is published.
 
 | Agent | Does |
 |---|---|
-| `scout (Haiku 5.5, medium)` | reads the current system, the standards and the other fronts into `recon/` |
+| `scout (Haiku 5.5, medium)` | reads the current system, the standards and the other workstreams into `recon/` |
 | `architect (Opus 5.5, high)` | one proposal and its versions; the debate's edits; `solution.md` |
 | `overengineering-guard (Opus 5.5, medium)` | cuts what serves no AC and no real risk: the proposal, then the documents |
 | `design-writer (Sonnet 5.5, high)` × up to 5 | data-and-contracts, tests, operations, security-and-access, screens |

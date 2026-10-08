@@ -1,6 +1,6 @@
 # stage-release
 
-Stage 5 of the pipeline. One `/goal` takes a finished front from its
+Stage 5 of the pipeline. One `/goal` takes a finished workstream from its
 feature branch to production: the merge into `main` under the user's
 authorization, the CI's staging deploy and smoke, a `vX.Y.Z` tag that
 promotes the same image to production with a smoke and a 15-minute

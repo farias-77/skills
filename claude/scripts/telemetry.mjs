@@ -1,10 +1,10 @@
 #!/usr/bin/env node
-// telemetry.mjs: the numbers of one front, read from what already exists.
+// telemetry.mjs: the numbers of one workstream, read from what already exists.
 // No stage records telemetry by hand; the report and the close call this.
 //
 //   node telemetry.mjs <slug> [--stage <name>] [--ws <dir>] [--projects <dir>] [--out <file>]
 //
-//   --ws        the front's folder (default ./designs/<slug>); its entries'
+//   --ws        the workstream's folder (default ./designs/<slug>); its entries'
 //               run-*.json are read, and metrics.json is written there
 //   --projects  the Claude Code transcripts (default ~/.claude/projects)
 //   --stage     only that stage (discovery, design, plan, execute, release,
@@ -13,7 +13,7 @@
 //
 // Sources: each transcript is cut into segments at the commands that open a
 // stage (/stage-<x>, /lets-cook, /weekly-retro, a /goal naming one of those
-// skills, /clear). A segment belongs to the front when its command or /goal
+// skills, /clear). A segment belongs to the workstream when its command or /goal
 // names the slug, or when it writes a file under <slug>/. Its subagents
 // (subagents/**/*.jsonl, workflows included) are the ones that started
 // inside it. Entries run in the cloud bring their run-*.json.

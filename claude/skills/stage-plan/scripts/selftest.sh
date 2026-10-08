@@ -16,7 +16,7 @@ expect() { # fixture exit "fail codes" "warn codes" [briefs-dir]
   fi
 }
 
-expect valid        0 ""          "cap front"
+expect valid        0 ""          "cap workstream"
 expect cycle        1 "cycle"     ""
 expect orphan-ac    1 "orphan-ac" ""
 expect double-owner 1 "owner"     ""

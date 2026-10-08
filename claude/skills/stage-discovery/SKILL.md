@@ -57,7 +57,7 @@ holds in these steps, with the close as the "done".
 | D4 stories | `story-writer (Sonnet 5.5, high)` | `journeys/*.yaml`, `stories.md`, `trace` green |
 | D5 review | `discovery-review-workflow.js`: `disc-lens (Sonnet 5.5, medium)` × 3 ∥ per story `blind-reader (Sonnet 5.5, low)` × 2 → `blind-judge (Sonnet 5.5, medium)`; you rule | `reviews/round-1.json`, `reviews.md` |
 | D6 playback | you + **him**, question tool | `rulings.md`, confirmed stories, his answer for the design |
-| D7 report | `video-builder (Sonnet 5.5, high)` ∥ `slides-builder (Sonnet 5.5, medium)` ∥ `artifact-builder (Sonnet 5.5, medium)` | the Discovery tab of the front's link |
+| D7 report | `video-builder (Sonnet 5.5, high)` ∥ `slides-builder (Sonnet 5.5, medium)` ∥ `artifact-builder (Sonnet 5.5, medium)` | the Discovery tab of the workstream's link |
 
 ## What you read
 
@@ -78,7 +78,7 @@ You never read the mock's HTML: the builder owns it and publishes it.
 ├── .state.md                 stage, step (D0–D7), kit, mode (artifact | local), builder id, mock url + version, locked, report url
 ├── .gitignore                _run/, **/.remotion/, **/film/assets/, **/stills/
 ├── rulings.md · dreaming-notes.md
-├── report/                   the front's link: report.json + discovery/ (video.mp4, deck/, explainer.html)
+├── report/                   the workstream's link: report.json + discovery/ (video.mp4, deck/, explainer.html)
 └── 00-discovery/
     ├── notes.md              the conversation, every turn
     ├── recon/                <topic>.md (each scout writes its own), screens/*.png
@@ -102,9 +102,9 @@ from its header and keep interviewing.
    resolved paths.
 2. **The house rules.** Read `<kit>/../CLAUDE.md` and run its Open:
    the canary.
-3. **One front at a time.** Read the designs root's coordination file.
-   When another front holds his attention in a discovery or a design
-   debate, say so once and queue this one: message that front's
+3. **One workstream at a time.** Read the designs root's coordination file.
+   When another workstream holds his attention in a discovery or a design
+   debate, say so once and queue this one: message that workstream's
    session (`SendMessage`) to tell this one when it frees him, and
    wait on its answer.
 4. **New:** the slug `YYYY-MM-DD-<short-kebab-name>` (the project's
@@ -131,7 +131,7 @@ Each writes its answer, quotes with `path:line`, to
 - the feature map of each area he names;
 - the exported design tokens and components (paths, and the lines that
   name the typeface, radius and color roles);
-- other fronts: the coordination file and each running workstream's
+- other workstreams: the coordination file and each running workstream's
   `.state.md` that touches the same areas;
 - term collisions: each domain word he used that the product already
   uses for something else.
@@ -284,7 +284,7 @@ the short route in one line; on his yes, write `brief.md` from
 ## D7 · The report, the cleanup, the close
 
 **The report is finished before the stage closes**: he validates
-through it. The front's link is born here; write its URL in
+through it. The workstream's link is born here; write its URL in
 `.state.md`. Dispatch the three builders in one message, in the
 background, each with the stage's files and the report folder
 (`report/discovery/`), as `claude/docs/stage-report.md` describes:
@@ -299,14 +299,14 @@ While they work, clean what this stage created: `prototype/shots/`
 (local mode), any scratch frames folder, `_run/`, a recon stack still
 up. When they return: every number on a slide is checked against
 `stories.md` or the notes; run `gitleaks dir <workstream>` (a finding stops the publish);
-publish the page to the front's link with the label "discovery closed".
+publish the page to the workstream's link with the label "discovery closed".
 
 Then: `.state.md` to `stage: design`, commit the workstream folder
 (push only on his word), and one message:
 
 | | |
 |---|---|
-| The link | the front's report, Discovery tab |
+| The link | the workstream's report, Discovery tab |
 | The scope | stories · ACs · rules · what is out, one line |
 | For the design | his answer to the last question |
 | Next | `/clear`, then `/stage-design <slug>` |

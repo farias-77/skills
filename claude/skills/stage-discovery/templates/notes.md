@@ -24,7 +24,7 @@
 - **Feature maps read:** <path> · <path>
 - **Current screens:** `00-discovery/recon/screens/<name>.png` · …
 - **Tokens and components:** <tokens.css path · components list path> | <none exported: shell defaults, gap noted>
-- **Other fronts touching these areas:** <workstream · what it changes> | none
+- **Other workstreams touching these areas:** <workstream · what it changes> | none
 - **Term collisions:** <word · what it already means in the product · path:line> | none (each one is in the Vocabulary's "avoid")
 
 ## Coverage map

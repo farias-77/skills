@@ -8,13 +8,13 @@
     "nodes[].after: only what nothing can fake. class ui = a journey drives the other entry's screen; class side-effect = a check reads its real effect. need = that behaviour in words. A child starts when its parent has merged into feat.",
     "nodes[].owns: every path the node creates or edits, one owner per path. extends: an addition to a file the contract commit or an ancestor created (a stub filled, a route registered).",
     "nodes[].provides / uses: the names that cross a node boundary, exactly as code imports or calls them.",
-    "fronts: the other running fronts that change files this plan touches, with the agreement reached by message (coordination.md)."
+    "workstreams: the other running workstreams that change files this plan touches, with the agreement reached by message (coordination.md)."
   ],
   "workstream": "<workstream-slug>",
   "acs": ["<J1.s1.1>", "<J1.s1.2>", "<frame:orders.empty.1>", "<J2.s3.1>"],
   "shared": ["<backend/api/openapi.yaml>", "<backend/internal/gen/**>"],
-  "fronts": [
-    { "front": "<other-slug>", "session": "<its session name>", "files": ["<Makefile>"], "agreed": "<additive only: a new target at the end; it merges first>" }
+  "workstreams": [
+    { "workstream": "<other-slug>", "session": "<its session name>", "files": ["<Makefile>"], "agreed": "<additive only: a new target at the end; it merges first>" }
   ],
   "nodes": [
     {

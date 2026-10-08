@@ -4,7 +4,7 @@
   Written by plan-writer (Sonnet 5.5, high) from the node in plan.graph.json,
   plan.md and the design. It is the whole instruction the entry's builders
   get at stage 4: builder-backend (Opus 5.5, medium) for the back side,
-  builder-frontend (Opus 5.5, medium) for the front, in parallel when the
+  builder-frontend (Opus 5.5, medium) for the frontend, in parallel when the
   node has both sides. They have this file, the design, the codebase and
   nobody to ask.
 
@@ -25,7 +25,7 @@
 ## Builds
 
 - **Back:** <use case, rules, routes, in the design's names, or "none"> · `solution.md` §<part>
-- **Front:** <screen, its states, its actions, or "none"> · `screens.md` §<screen> · mock frames <names>
+- **Frontend:** <screen, its states, its actions, or "none"> · `screens.md` §<screen> · mock frames <names>
 
 ## Acceptance
 

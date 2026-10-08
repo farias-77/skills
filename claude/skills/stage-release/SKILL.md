@@ -1,6 +1,6 @@
 ---
 name: stage-release
-description: Conducts stage 5 (Release) of the pipeline under one /goal. It merges the finished front (feat/<slug>) into main under the user's authorization, follows the CI's staging deploy and smoke, tags vX.Y.Z so the CI promotes the same image to production with a smoke and a 15-minute watch that rolls back on its own, and closes with its report (video, deck, explainer). A red gets one fix entry through the stage-4 pipeline, then it stops. It stops for the user only on its stop list. The short route and the hotfix follow the same path from lets-cook. The session runs on Opus 5.5, high. Use when a front's .state.md says stage release, or to resume a release by its slug.
+description: Conducts stage 5 (Release) of the pipeline under one /goal. It merges the finished workstream (feat/<slug>) into main under the user's authorization, follows the CI's staging deploy and smoke, tags vX.Y.Z so the CI promotes the same image to production with a smoke and a 15-minute watch that rolls back on its own, and closes with its report (video, deck, explainer). A red gets one fix entry through the stage-4 pipeline, then it stops. It stops for the user only on its stop list. The short route and the hotfix follow the same path from lets-cook. The session runs on Opus 5.5, high. Use when a workstream's .state.md says stage release, or to resume a release by its slug.
 argument-hint: "<workstream-slug>"
 allowed-tools: Read, Write, Edit, Glob, Grep, Agent, SendMessage, Workflow, AskUserQuestion, Artifact, PushNotification, ScheduleWakeup, Skill, Bash
 ---
@@ -13,7 +13,7 @@ allowed-tools: Read, Write, Edit, Glob, Grep, Agent, SendMessage, Workflow, AskU
    step nobody planned.
 2. Production runs the image staging ran. A red production goes back
    to the previous tag by itself, through the CI.
-3. His authorization covers one front and dies at its tag.
+3. His authorization covers one workstream and dies at its tag.
 4. A red gets one fix. A second red stops.
 5. The report (Video, Deck, Explainer) is finished before the stage
    closes.
@@ -41,7 +41,7 @@ allowed-tools: Read, Write, Edit, Glob, Grep, Agent, SendMessage, Workflow, AskU
 ```
 
 Read [references/release.md](references/release.md) before step 1. It
-holds the trunk, the authorization, how fronts take turns on `main`, the
+holds the trunk, the authorization, how workstreams take turns on `main`, the
 smoke and the watch, the hotfix and the legacy repos. Read
 [references/migrations.md](references/migrations.md) when `plan.md`
 lists a migration.
@@ -120,7 +120,7 @@ should be done and read the run (`gh run view <id>`); never poll.
 
 ## Step 3 · The tag
 
-1. **Version.** A front is a minor, the short route and a hotfix a
+1. **Version.** A workstream is a minor, the short route and a hotfix a
    patch, a major only on his word. No `v*` tag yet: `v1.0.0`.
 2. **Notes**, in `04-release/notes.md`: the version and date, then one
    line per story (id + what changed for its user), then what goes
@@ -130,7 +130,7 @@ should be done and read the run (`gh run view <id>`); never poll.
    this push; the same tag pushed again still passes. The CI holds the
    tag until the previous tag's watch ends.
 
-**A release with no front: the tag route.** When the commit to ship is
+**A release with no workstream: the tag route.** When the commit to ship is
 already on `main` and no merge passed the guard under a line (a first
 release, a tag cut by hand), no `merged=` carries the tag and the guard
 denies it. He authorizes that one commit instead:
@@ -191,7 +191,7 @@ the evidence in one line, the options with yours first, and the
 
    When they return, check every number against `trace.md` and the CI
    runs, run `gitleaks dir <designs-root>/<slug>` (a finding stops the
-   publish), and publish to the front's link with the label "release
+   publish), and publish to the workstream's link with the label "release
    closed". The short route and the hotfix stop at step 4: their
    Release tab is published at the short close (`lets-cook` §8).
 3. **Cleanup.** Remove what this stage created: the `X.n` worktrees and
@@ -204,7 +204,7 @@ the evidence in one line, the options with yours first, and the
 | | |
 |---|---|
 | In production | vX.Y.Z, the GitHub release's link |
-| The link | the front's report, Release tab |
+| The link | the workstream's report, Release tab |
 | Watch | green, or the rollback and what came after |
 | Next | `/clear`, then `/stage-close <slug>` |
 

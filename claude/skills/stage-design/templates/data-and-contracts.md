@@ -4,7 +4,7 @@
   Written by its design-writer (Sonnet 5.5, high). Rules:
   references/documents.md and references/contracts.md. Each Contract
   section stands alone: stage 3 copies it whole into a brief, and the
-  back and front builders work from it in parallel.
+  backend and frontend builders work from it in parallel.
 -->
 
 ## Data

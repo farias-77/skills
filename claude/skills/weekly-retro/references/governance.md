@@ -4,15 +4,15 @@
    restraint.
 2. A rule lives in one file; the others point to it.
 3. Governance sized for one person editing prompts: no semver, no
-   changelog, no weekly branch, no median before there are fronts for
+   changelog, no weekly branch, no median before there are workstreams for
    it.
 
 ## The loop
 
 ```
 every stage ──► nothing to record by hand: transcripts, commits and run-*.json hold it
-close ──► telemetry.mjs ──► metrics.json ──► the front's retro, closed on its own
-weekly ──► retros + rulings of the closed fronts ──► the board
+close ──► telemetry.mjs ──► metrics.json ──► the workstream's retro, closed on its own
+weekly ──► retros + rulings of the closed workstreams ──► the board
 he rules ──► apply · park · drop ──► fast-forward on the pipeline repo's main
 ```
 
@@ -22,14 +22,14 @@ he rules ──► apply · park · drop ──► fast-forward on the pipeline 
 |---|---|
 | `dreaming-notes.md` | frictions noted on the spot by every stage, his `[user]` notes verbatim, and `[taste]` patterns in his rulings |
 | `rulings.md` | every ruling, one line |
-| `05-close/retro.md` (`close.md` on the short route) | the front's retro, with his notes and the harvest |
+| `05-close/retro.md` (`close.md` on the short route) | the workstream's retro, with his notes and the harvest |
 
 ## Who decides
 
 | Change | Example | Who | How |
 |---|---|---|---|
 | fixing something broken | a script that crashes, a stale reference | the agent | applies it; listed on the board for veto |
-| a fix that unblocks a front now | a workflow bug that parks entries | the front's session | another worktree, the smallest change, the repo's tests, fast-forward; a line in `dreaming-notes.md`; ratified at the weekly. **Never** the guard, `authorize.sh`, the hooks or the settings: those wait for his explicit ok |
+| a fix that unblocks a workstream now | a workflow bug that parks entries | the workstream's session | another worktree, the smallest change, the repo's tests, fast-forward; a line in `dreaming-notes.md`; ratified at the weekly. **Never** the guard, `authorize.sh`, the hooks or the settings: those wait for his explicit ok |
 | behavior | a step, an agent, a model, a rule | **him** | at the weekly |
 | the project's standards | tests, architecture | **him** | a PR to the project. A new lint or test check the weekly may open itself, for his approval, only with the proof that it fails on a real past commit (the sha and the failing line) |
 | the principles | — | **him** | a conversation of its own |
@@ -43,7 +43,7 @@ it? · **F4** is it not written already? (written and still missed: the
 problem is execution, not the text). A class counts once seen twice.
 
 - **What changes in practice**, one plain sentence.
-- **The evidence:** the fronts that hit it, a quote, the minutes or the
+- **The evidence:** the workstreams that hit it, a quote, the minutes or the
   cost it took.
 - **The edit:** the file and the exact change.
 - **The level**, the strongest that holds the lesson: architecture (the
@@ -62,13 +62,13 @@ removes, or why nothing can go.
 
 | Number | Definition |
 |---|---|
-| time per front | from `/lets-cook` to the close, with the agents' active time beside it |
-| cost per front | tokens per model × list price: an estimate, marked as one |
+| time per workstream | from `/lets-cook` to the close, with the agents' active time beside it |
+| cost per workstream | tokens per model × list price: an estimate, marked as one |
 | his touches | `/goal`s, answers and messages from him (from `metrics.json`); the retro names apart the ones that unblocked a stop |
-| dismissed per lens | each review lens's findings ruled dismissed, over its findings (from `rulings.md`); a lens above 50% across 3 fronts is proposed for a cut or a script |
+| dismissed per lens | each review lens's findings ruled dismissed, over its findings (from `rulings.md`); a lens above 50% across 3 workstreams is proposed for a cut or a script |
 
-No target before measuring: the first fronts are the baseline. A
-median per route only after 10 fronts on it.
+No target before measuring: the first workstreams are the baseline. A
+median per route only after 10 workstreams on it.
 
 ## Fixed items on the board
 
@@ -84,7 +84,7 @@ median per route only after 10 fronts on it.
 
 1. The live install is the pipeline repo's `main` (the skills are
    linked from it). Changes are made in another worktree and land by
-   fast-forward, so no front ever reads a half-edited file.
+   fast-forward, so no workstream ever reads a half-edited file.
 2. Each stage runs on whatever `main` was when it opened;
    `metrics.json` records the sha (`pipelineSha`).
 3. Rolling the pipeline back is resetting the live `main` to the

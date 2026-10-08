@@ -25,6 +25,6 @@
        {"label": "E-03", "start": 18, "end": 47},
        {"label": "E-int", "start": 70, "end": 92, "tone": "warn"}
      ]},
-    {"kind": "note", "tone": "warn", "text": "E-03 shares the orders table migration with another front; agreed by message: it merges second."}
+    {"kind": "note", "tone": "warn", "text": "E-03 shares the orders table migration with another workstream; agreed by message: it merges second."}
   ]
 }

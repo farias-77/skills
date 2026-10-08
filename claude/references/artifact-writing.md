@@ -13,7 +13,7 @@ ASD-STE100, because the reader may read English as a second language.
 
   | Say | It means | Never say |
   |---|---|---|
-  | front | one demand, from the idea to production | workstream |
+  | workstream | a unit of work: one demand, from the idea to production | front |
   | frontend | the screens and the browser code | front, FE |
   | backend | the server, the API and the data | back, BE |
 

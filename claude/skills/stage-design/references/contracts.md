@@ -2,7 +2,7 @@
 
 Read by the `design-writer (Sonnet 5.5, high)` of
 `data-and-contracts.md` and by `design-contracts (Sonnet 5.5, high)`.
-A Contract is what lets stage 4 build the back and the front of an
+A Contract is what lets stage 4 build the backend and the frontend of an
 entry in parallel: each builder works from it alone. So it is
 complete, or it is a question.
 

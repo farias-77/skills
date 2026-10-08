@@ -3,7 +3,7 @@ export const meta = {
   description: 'Stage-3 review in one round: plan-reviewer (Opus 5.5, medium) over the graph and every brief, in parallel with two blind-readers (Haiku 5.5, high) and one blind-judge (Sonnet 5.5, medium) per brief; only quoted findings come back, for the conductor to rule',
   whenToUse: 'Called by the stage-plan session after plan-graph.mjs --briefs is green; args carry paths, never text',
   phases: [
-    { title: 'Review', detail: 'plan-reviewer: buildable without asking, real edges, a thin contract commit, the other fronts' },
+    { title: 'Review', detail: 'plan-reviewer: buildable without asking, real edges, a thin contract commit, the other workstreams' },
     { title: 'Blind reads', detail: 'per brief: two blind-readers, then a blind-judge compares them' },
   ],
 }
@@ -28,11 +28,11 @@ const arr = (items) => ({ type: 'array', items })
 const REVIEW = obj({
   verified: arr({ type: 'string', description: 'one thing you checked and where you looked' }),
   findings: arr(obj({
-    check: { type: 'string', enum: ['buildable', 'edge', 'contract-commit', 'fronts'] },
+    check: { type: 'string', enum: ['buildable', 'edge', 'contract-commit', 'workstreams'] },
     brief: { type: 'string', description: 'the node id, or "graph"' },
     severity: { type: 'string', enum: ['blocks', 'note'] },
     quote: { type: 'string', description: 'the line of the brief, plan.md or plan.graph.json at issue, verbatim' },
-    gap: { type: 'string', description: 'what a builder would have to ask, or what the edge, the contract commit or the front gets wrong' },
+    gap: { type: 'string', description: 'what a builder would have to ask, or what the edge, the contract commit or the workstream gets wrong' },
     fix: { type: 'string', description: 'the smallest change' },
   })),
 })

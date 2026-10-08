@@ -27,7 +27,7 @@ with the rest of the pipeline beside it), then run
 | `SKILL.md` | the stage, step by step |
 | `references/cut.md` | the rules of the cut, the shape, the anti-patterns |
 | `references/contract-commit.md` | what goes in C and how it is proved |
-| `references/coordination.md` | talking to the other fronts' sessions; what counts as additive |
+| `references/coordination.md` | talking to the other workstreams' sessions; what counts as additive |
 | `templates/plan.graph.json` | the graph the planner writes and the checker reads |
 | `templates/plan.md` · `brief.md` · `preflight.md` · `reviews.md` | the stage's documents |
 | `scripts/plan-graph.mjs` | the checker: ACs carried once, the 12-AC cap, owners, edges, briefs equal to the graph |

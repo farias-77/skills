@@ -26,7 +26,7 @@ Runtime needs: Node 20+, `playwright-core` and a Chromium for
 
 | Agent | Does |
 |---|---|
-| `scout (Haiku 5.5, medium)` | recon: feature maps, tokens, other fronts, term collisions |
+| `scout (Haiku 5.5, medium)` | recon: feature maps, tokens, other workstreams, term collisions |
 | `prototype-builder (Sonnet 5.5, medium)` | builds and edits the mock, walks it, publishes it |
 | `story-writer (Sonnet 5.5, high)` | journeys and stories, one AC per rule or behavior |
 | `disc-lens (Sonnet 5.5, medium)` × 3 | in-out · coverage and error paths · acceptance |

@@ -21,9 +21,9 @@
     "backend/api/openapi.yaml",
     "backend/internal/gen/**"
   ],
-  "fronts": [
+  "workstreams": [
     {
-      "front": "billing",
+      "workstream": "billing",
       "session": "billing-execute",
       "files": [
         "frontend/app/e2e/**"

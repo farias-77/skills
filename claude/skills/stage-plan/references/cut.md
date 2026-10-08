@@ -13,12 +13,12 @@ conductor judge by them; `plan-graph.mjs` holds the mechanical ones.
 | The contract commit `C` first | see `contract-commit.md`. Thin, no QA, never parks |
 | A new app or module | `C` carries its skeleton; `E-01` builds on it. There is no foundation entry |
 | Edges | only where nothing can be faked: a journey drives another entry's screen (`ui`), or a check reads its real effect (`side-effect`). Data is a factory, an interface is a fake |
-| Front ∥ back | inside the entry, on the Contract the brief copies from the design |
+| Frontend ∥ backend | inside the entry, on the Contract the brief copies from the design |
 | Migrations | each entry owns its tables and its own migration file, named by timestamp; the merge queue restamps one that lands older than `feat`'s last |
 | Generated files | only `C` writes them; a conflict later is "take the base, run the generator" |
 | Hot files | one file per route; a registry as one line per entry, additive |
 | `E-int` | last, only for the journeys that cross entries |
-| Other fronts | additive only, or wait for their merge (`coordination.md`) |
+| Other workstreams | additive only, or wait for their merge (`coordination.md`) |
 | No stacking | a child starts when its parent has merged into `feat` |
 
 ## The shape

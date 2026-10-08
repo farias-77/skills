@@ -1,8 +1,8 @@
 # weekly-retro
 
 The only place where the pipeline changes. Once a week the session
-reads the retro and the rulings of every front closed that week, writes
-a board (raw numbers per front and route, last week's changes beside
+reads the retro and the rulings of every workstream closed that week, writes
+a board (raw numbers per workstream and route, last week's changes beside
 them, proposals with their evidence and exact edit, the live fixes to
 ratify, the fixed items that are due), asks the user to rule each
 proposal, and lands what he approved by fast-forward on the pipeline
@@ -24,7 +24,7 @@ incident issues.
 
 | Agent | Does |
 |---|---|
-| `scout (Haiku 5.5, medium)` | a quote or a line from a front's notes or an earlier board |
+| `scout (Haiku 5.5, medium)` | a quote or a line from a workstream's notes or an earlier board |
 
 ## Files
 

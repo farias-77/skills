@@ -16,7 +16,7 @@
  *       with its node or a two-sided node with no Contract · with --stories,
  *       an AC id of stories.md missing from the graph's acs, or the reverse.
  * WARN  an entry over the AC warning line · a file extended by two nodes ·
- *       a node owning a file another front changes · an integration entry
+ *       a node owning a file another workstream changes · an integration entry
  *       that is not last.
  * REPORT the waves (a child starts when its parents merged), the width, the
  *       depth, the critical path, the start order and, with --briefs, the
@@ -194,8 +194,9 @@ for (const n of nodes) for (const p of n.extends) {
 }
 for (const [p, ids] of extenders) if (ids.length > 1) warn('hot', `\`${p}\` is extended by ${ids.join(', ')}: keep each addition additive and apart, or split the file`)
 
-for (const f of list(G.fronts)) for (const p of list(f.files)) for (const n of rest) for (const o of n.owns) {
-  if (overlap(o, p)) warn('front', `${n.id} owns \`${o}\`, which the front ${f.front ?? '?'} changes (\`${p}\`): additive only, or wait for its merge; the agreement goes in plan.md`)
+// `fronts`/`front`: the old names, read for one release
+for (const f of list(G.workstreams ?? G.fronts)) for (const p of list(f.files)) for (const n of rest) for (const o of n.owns) {
+  if (overlap(o, p)) warn('workstream', `${n.id} owns \`${o}\`, which the workstream ${f.workstream ?? f.front ?? '?'} changes (\`${p}\`): additive only, or wait for its merge; the agreement goes in plan.md`)
 }
 for (const n of rest) if (n.kind === 'integration' && childrenOf(n).length) warn('integration', `${n.id} is an integration entry with children: it merges last`)
 
@@ -255,7 +256,7 @@ function checkBrief(n) {
     sameItems(n.id, 'Acceptance', n.acs, firstColumn(section(md, 'Acceptance')).filter(x => universe.has(x)))
   }
   const contract = firstColumn(section(md, 'Contract')).filter(x => !header(x)).length > 0
-  if (SIDES.every(s => n.sides.includes(s)) && !contract) fail('contract', `${n.id}.md: back and front sides and no Contract section; both builders build against it`)
+  if (SIDES.every(s => n.sides.includes(s)) && !contract) fail('contract', `${n.id}.md: backend and frontend sides and no Contract section; both builders build against it`)
   reviewBriefs.push({ id: n.id, path: resolve(file), keys: isC(n) ? ['provides', 'proof'] : [...n.acs, ...(contract ? ['contract'] : [])] })
 }
 if (opts.briefsDir) nodes.forEach(checkBrief)

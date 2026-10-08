@@ -47,7 +47,7 @@ Then:
   tag is a question.
 - **Per document:**
   - `data-and-contracts`: one Contract per feature, each complete
-    enough that the back and the front builders work from it alone:
+    enough that the backend and the frontend builders work from it alone:
     headers read and written, every field marked required · optional ·
     nullable, every error with its code; the OpenAPI fragment in a
     spec-first project.

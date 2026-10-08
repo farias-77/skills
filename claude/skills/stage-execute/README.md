@@ -30,7 +30,7 @@ it), then run `/stage-execute <workstream-slug>`.
 | File | What |
 |---|---|
 | `SKILL.md` | the stage, step by step |
-| `references/tech-lead.md` | the playbook: overlaps, conflicts, parked entries, rate limits, other fronts, the night |
+| `references/tech-lead.md` | the playbook: overlaps, conflicts, parked entries, rate limits, other workstreams, the night |
 | `references/queue.md` | the merge queue, migrations, `main` moving, the PR and local CI |
 | `references/cloud.md` | entries in cloud sessions: the evidence branch, the run prompt, heartbeat, relaunch |
 | `references/builders.md` | the builders' role and the testing rule |

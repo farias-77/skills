@@ -1,13 +1,13 @@
 # Weekly retro · <YYYY>-W<ww>
 
 <!-- Written by weekly-retro in his language. Raw numbers; a median per route
-     only after 10 fronts on it. Closed with the shas of what landed. -->
+     only after 10 workstreams on it. Closed with the shas of what landed. -->
 
-- **Pipeline at the start:** `<sha of main>` · **Fronts closed:** <n> (full <n> · short <n> · hotfix <n>)
+- **Pipeline at the start:** `<sha of main>` · **Workstreams closed:** <n> (full <n> · short <n> · hotfix <n>)
 
 ## The week in numbers
 
-| Front | Route | Clock | Cost (estimate) | His touches | Got stuck, top line |
+| Workstream | Route | Clock | Cost (estimate) | His touches | Got stuck, top line |
 |---|---|---|---|---|---|
 | <slug> | full | <h> | US$ <n> | <n> | <one line> |
 
@@ -21,7 +21,7 @@
 
 ### P1 · <what changes in practice, one sentence>
 
-- **Evidence:** <fronts> · "<quote>" · <minutes or cost>
+- **Evidence:** <workstreams> · "<quote>" · <minutes or cost>
 - **His notes:** "<[user] words, verbatim>" \| none
 - **Edit:** `<file>`: <the exact change>
 - **Level:** architecture \| type \| lint or CI \| test \| text · why not one up: <one line>
@@ -32,7 +32,7 @@
 
 | Commit | Why (the dreaming line) | Ruling |
 |---|---|---|
-| `<sha>` <subject> | <front · line> | keep \| revert |
+| `<sha>` <subject> | <workstream · line> | keep \| revert |
 
 ## Not for the pipeline
 

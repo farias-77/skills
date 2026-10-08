@@ -57,7 +57,7 @@ project's commands table names:
 | `make restamp` | migrations (9) |
 | `make staging-actor` | the staging actors (13) |
 | `rollback.yml` | the rollback workflow (12) |
-| `<designs-root>`, `<pipeline clone>` in `additionalDirectories` | the `designs-root:` line's folder (resolved from the main checkout when relative) and the clone of the pipeline, as `~/…` paths: every agent reads and writes the fronts' folders and runs the kit's workflows by path; outside them, a print-mode or subagent Read or Write is denied. A path that differs per machine goes in `.claude/settings.local.json` instead (1) |
+| `<designs-root>`, `<pipeline clone>` in `additionalDirectories` | the `designs-root:` line's folder (resolved from the main checkout when relative) and the clone of the pipeline, as `~/…` paths: every agent reads and writes the workstreams' folders and runs the kit's workflows by path; outside them, a print-mode or subagent Read or Write is denied. A path that differs per machine goes in `.claude/settings.local.json` instead (1) |
 
 **Dead rules are pruned.** Every rule that names a target is probed
 with the runner's dry run (`make -n <target>`, or the project's
@@ -155,14 +155,14 @@ Write on it anywhere. One entry per line:
 | `auth <route> <slug> merge=<branch>[@<sha>] tag=<0\|1> until=<UTC>` | written by `authorize.sh` |
 | `auth tag <slug> ref=<ref> merged=<sha> tag=1 until=<UTC>` | written by `authorize.sh tag` |
 
-He authorizes a front with one of:
+He authorizes a workstream with one of:
 
 ```
 ! .claude/hooks/authorize.sh release <slug> feat/<slug>@<sha>   # the head he said ok to, its fix/<slug>/* PRs, one v* tag
 ! .claude/hooks/authorize.sh short   <slug> feat/<slug>         # one merge, one patch tag
 ! .claude/hooks/authorize.sh hotfix  <slug> hotfix/<slug>       # one merge and a revert/* PR, one patch tag
 ! .claude/hooks/authorize.sh legacy  <repo> <branch>            # one merge in that repository, no tag
-! .claude/hooks/authorize.sh tag     <slug> main@<sha>          # no merge, one v* tag on exactly <sha>: a release with no front
+! .claude/hooks/authorize.sh tag     <slug> main@<sha>          # no merge, one v* tag on exactly <sha>: a release with no workstream
 ```
 
 The guard marks `merged=<sha>` when it lets a merge through and

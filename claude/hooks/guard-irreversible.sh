@@ -64,7 +64,7 @@
 #     authorization dies at its tag. Pushing the same tag again passes.
 #   - with repo=<name>, only PRs of that repository.
 # The guard records the head it let merge as merged=<sha> on the line.
-# The tag route (a release with no front) allows no merge: ONE v* tag whose
+# The tag route (a release with no workstream) allows no merge: ONE v* tag whose
 # commit is exactly its merged=<sha>, marked used= like the others.
 #
 # Matching reads the whole command string, so `bash -c '...'`, a full binary

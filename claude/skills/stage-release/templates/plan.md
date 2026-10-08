@@ -4,7 +4,7 @@
      The release /goal is filled from this file. Timestamps from `date -u`. -->
 
 - **Head he said ok to:** `feat/<slug>` @ `<sha>` · <date>
-- **Version:** vX.Y.Z (<minor: a front · patch: short route, hotfix>)
+- **Version:** vX.Y.Z (<minor: a workstream · patch: short route, hotfix>)
 
 ## Ships
 
@@ -34,4 +34,4 @@
 
 ## Smoke additions
 
-<read-only journeys this front adds to the smoke, if the CI's list does not cover them> | none
+<read-only journeys this workstream adds to the smoke, if the CI's list does not cover them> | none
