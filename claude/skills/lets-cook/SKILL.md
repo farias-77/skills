@@ -107,7 +107,8 @@ builds the wrong thing.
    hotfix also tells every session named there, by `SendMessage`:
    "hotfix <slug> in flight, it merges first".
 4. One message, then end the turn: the brief's link, the route line,
-   and the two commands he runs:
+   and the two commands he runs (where the root runs the pipeline
+   clone's guard by path, `authorize.sh` is the one beside that guard):
 
 ```
 ! .claude/hooks/authorize.sh <short | hotfix> <slug> <feat/<slug> | hotfix/<slug>>

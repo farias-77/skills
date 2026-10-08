@@ -127,7 +127,8 @@
       "Read(~/.config/local-ci/**)",
       "Edit(./.claude/settings.json)",
       "Edit(./.claude/settings.local.json)",
-      "Edit(./.claude/hooks/**)"
+      "Edit(./.claude/hooks/**)",
+      "Edit(//**/irreversible.allow)"
     ]
   },
   "hooks": {
