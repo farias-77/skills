@@ -21,7 +21,7 @@ that does not apply (no screens: 11, 18) is `n/a` with the reason.
 
 | Role | Look for | ✓ when | ~ when |
 |---|---|---|---|
-| 1 standards | `CLAUDE.md` naming a standards folder and an index; rules with ids; a commands table naming each role's command, the worktrees root and whether a cloud environment exists; the line `designs-root: <path>` in `CLAUDE.md` or `CLAUDE.local.md` | folder + index + ids + the table covering every required role | the table is missing or partial, no `designs-root:` line, rules have no ids, or `CLAUDE.md` does not point at them |
+| 1 standards | `CLAUDE.md` naming a standards folder and an index; rules with ids; a commands table naming each role's command, the worktrees root and whether a cloud environment exists; the line `designs-root: <path>` in `CLAUDE.md` | folder + index + ids + the table covering every required role | the table is missing or partial, no `designs-root:` line, rules have no ids, or `CLAUDE.md` does not point at them |
 | 2 golden paths | a `golden-paths*` file or an "exemplars" section | one exemplar per kind, each present at the audited sha (`git ls-tree`) | kinds missing, or paths that no longer exist |
 | 9 shared files and migrations | a list of the shared files; the migrations' naming (timestamp or sequence); a `restamp` target; a down-migration rule | the list, timestamped migrations, a restamp command, expand and contract written | sequence-numbered migrations, or no restamp |
 | 10 feature maps | `docs/features/` or the folder the standards name; per map, rules one per line and a section on how to drive the feature | one per feature or domain, each with its drive section when something is built | maps without drive sections, or features without maps |

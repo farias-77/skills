@@ -16,7 +16,7 @@ is here, it uses this one.
 | **the authorization line** | `! .claude/hooks/authorize.sh <release\|short\|hotfix\|legacy> …`, run by him only; one line in the guard's allow file that lets one front merge into `main` and push one tag; dies at its tag or in 3 days |
 | **pre-flight** | what only he can hand over (a key, an account, a DNS record), each with a ready `!` command; checked at plan, handed over at execute's open |
 | **veto list** | what the conductor decided in his place (`ruled: conductor`), one line each, in the close message; he may undo any before the next stage |
-| **designs root** (`<designs-root>`) | the folder named by the line `designs-root: <path>` in the project's `CLAUDE.md` (or `CLAUDE.local.md`), for every front's folder, `_coordination.md` and `_retros/` |
+| **designs root** (`<designs-root>`) | the folder named by the line `designs-root: <path>` in the project's `CLAUDE.md` (relative to the main checkout, or absolute), for every front's folder, `_coordination.md` and `_retros/` |
 | **`_coordination.md`** | the designs root's one line per front: stage, branch, the session's name, shared files, what was agreed. Sessions talk by `SendMessage`; the file records the outcome |
 
 ## Discovery and design
