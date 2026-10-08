@@ -62,3 +62,5 @@ One JSON object:
   `quote` (verbatim), `where` (`file:line`), `gap` (who could do what
   they must not, and how), `fix` (the line to change and what it should
   say; the smallest change that closes it).
+
+**Commands:** one command per Bash call, run bare: no `cd <dir> &&`, no `VAR=value` or `X=…;` in front, no `;` or `&&` chain, no pipe into `tail`, `head`, `grep` or `sed`, no `${…}`; name a folder with the tool's own flag (`git -C`, `make -C`, `go -C`, `pnpm --dir`, `npm --prefix`), write and change files with Write and Edit (never a heredoc, `sed -i` or a script), read them with Read, Grep and Glob, so the allow list matches every command you run (`claude/references/commands.md`).

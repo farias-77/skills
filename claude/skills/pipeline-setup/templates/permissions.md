@@ -17,10 +17,11 @@ command later touches.
 
 Each session root also needs the README's install, which stays out of
 git: the `skills`, `agents` and `workflows` symlinks in `.claude/`,
-listed in `.git/info/exclude` (untracked, they break a secret scan of
-the untracked files), and the clone in
-`permissions.additionalDirectories` of `.claude/settings.local.json`. The audit reports them missing; Step 3
-never commits them.
+`CLAUDE.local.md` and `.claude/settings.local.json`, listed in
+`.git/info/exclude` (untracked, they break a secret scan of the
+untracked files). The clone and the designs root go in
+`additionalDirectories` as the placeholders table below says. The audit
+reports them missing; Step 3 never commits them.
 
 At the root, a command into the product names it (`git -C <product> …`,
 `make -C <product> …`); the allow rules carry that form. Each copy is
@@ -69,14 +70,19 @@ and the readiness file lists it.
 
 **allow** — what the stages run all day: the gates, the stack, the
 signoff command, read-only `git` and `gh`, commits and pushes of
-`feat/*`, `fix/*`, `story/*` and `evidence/*`, deleting remote
+`feat/*`, `fix/*`, `hotfix/*`, `revert/*`, `story/*` and `evidence/*`, deleting remote
 `story/*` and `evidence/*` (the guard allows no other deletion), a `v*`
 tag push, `gh pr merge`, re-running a run, the rollback workflow; and
 what the check seats run, or every entry ends `inconclusive`: one test,
 one spec, the env, the seed, the read-only query, `curl` to `127.0.0.1`,
 a QA script under the evidence folder, `nproc`, `/proc/loadavg` and the
-heartbeat. Each in the bare form and the `-C <worktree>` form, because
-the agents never prefix `cd`. The
+heartbeat; the stack's `up`, `status` and `down`, `gitleaks`, the load
+wait, `cleanup.sh`, the kit's `node` scripts, `ffmpeg`, `ffprobe` and
+`render.sh`, the stills' removal, `systemd-inhibit`. Each in the bare
+form and the `-C <worktree>` form, because every agent runs one bare
+command per call (`claude/references/commands.md`): in print mode and
+in a subagent nobody answers a prompt, and a frontmatter `Bash(…)`
+grants nothing there, so a command the list misses is denied. The
 merge and the tag sit in allow because the guard checks each against
 his authorization line. Keep each rule as narrow as the command: a
 broad `Bash(gh *)` or `Bash(gcloud *)` covers an irreversible command
@@ -96,6 +102,18 @@ editing the settings and the hooks.
 Rules match prefixes and are not a boundary on their own: one
 reordered flag or a `bash -c` escapes them. That is why the hook
 exists.
+
+**A deny that shadows an allow.** A deny wins over every allow, so a
+project's broad deny can switch a route off: `Bash(gh *)` denies `gh pr
+create`, `Bash(git tag *)` the release tag, `Bash(git push origin
+feat/*)` or `hotfix/*` the push, `Bash(git push origin v*)` the tag
+push. The audit fills each template allow's `*` with a sample (`gh pr
+create x`, `git push origin feat/x`, `git tag -a v1.0.0`) and matches it
+against every project deny; each hit is named in the readiness file,
+and Step 3 removes that deny and keeps the template's narrow denies
+above. The guard, not the list, is the boundary: it still denies the
+push to a protected branch and the merge or tag no authorization
+covers.
 
 ## The guard hook
 

@@ -54,7 +54,7 @@ that does not apply (no screens: 11, 18) is `n/a` with the reason.
 |---|---|---|---|
 | 12 delivery | the deploy workflows: staging on `main`, production on a `v*` tag with the same image, a smoke, a watch, a rollback workflow, the release created after the watch; the alarm channel; backups and a restore drill in the delivery document | every row of the bar's table | a hosted gate still required, production built separately, no rollback, or no restore drill |
 | 13 smoke and staging actors | the journey command's base URL and selection; read-only journeys marked; a staging-actor command | a read-only smoke against a URL and a staging-only actor command | the smoke is a health check only, or actors are hand-made |
-| 14 permissions and guard | `.claude/settings.json` and `.claude/hooks/` **in every session root**: the guard, `authorize.sh`, the fail-closed wrapper, deny rules for credential reads | the template's shape in every session root, the test green | rules but no hook; a hook registered without the wrapper; no `authorize.sh`; or only in a repository no session opens in |
+| 14 permissions and guard | `.claude/settings.json` and `.claude/hooks/` **in every session root**: the guard, `authorize.sh`, the fail-closed wrapper, deny rules for credential reads | the template's shape in every session root, the test green | rules but no hook; a hook registered without the wrapper; no `authorize.sh`; a project deny that shadows a template allow the routes need (`Bash(gh *)`, `Bash(git tag *)`, `Bash(git push origin feat/*)`), each one named; or only in a repository no session opens in |
 | 15 identities | how `gh` and the cloud CLI are authenticated for the agents (`gh api user`, the active cloud account); a bot account; the cloud identity's roles | the agents run as a bot and a read-only cloud identity with a staging-only role | the agents run as the user |
 
 ## Group E — design and observability (18, 19)
@@ -78,7 +78,7 @@ One-line commands, quoted in the readiness file:
 |---|---|
 | `node --version`, `ffmpeg -version \| head -1`, `gitleaks version` (or `make -n gitleaks dir=.`) | role 16 |
 | `ls "${PLAYWRIGHT_DIR:-<clone>/claude/video}"/node_modules/playwright-core/package.json` (missing: `npm ci --prefix <clone>/claude/video`), then `proto.mjs look` on a file holding `<p>probe</p>` with `--shot` (`proto.mjs` adds the page skeleton itself and refuses a full page) | role 16, the mock |
-| in each session root: `ls -L .claude/skills/lets-cook/SKILL.md .claude/agents .claude/workflows`, `jq .permissions.additionalDirectories .claude/settings.local.json`, `git status --short .claude` empty (the links in `.git/info/exclude`) | the README's install (role 14) |
+| in each session root: `ls -L .claude/skills/lets-cook/SKILL.md .claude/agents .claude/workflows`, `jq .permissions.additionalDirectories .claude/settings.json .claude/settings.local.json`, `git status --short .claude` empty (the links in `.git/info/exclude`) | the README's install (role 14) |
 | `git -C <project> remote get-url origin` | the remote's kind |
 | GitHub only: `gh api repos/<owner>/<repo>/rulesets` and `.../branches/<default>/protection` (read-only) | roles 6 and 7 |
 | GitHub only: `gh api user --jq .login` | role 15: who the agents are |

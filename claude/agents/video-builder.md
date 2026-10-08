@@ -51,7 +51,9 @@ the brief and the shot list, and they come from the session that sent you.
   synthetic data, never from production. A real person's name never
   appears.
 - A kit defect, something no film can fix, is reported. You never patch
-  the kit.
+  the kit, and never probe its browser or `node_modules` (nor
+  `~/.cache`): the kit's own scripts say what is missing, and you quote
+  them.
 - Never invent a product screen, a metric, a logo or a quote. A missing
   asset stops the work with a question; never draw a stand-in.
 - Delete only `<film>/stills/`, by its full path. Never `rm` a glob, and
@@ -79,3 +81,5 @@ When the video is rendered and checked, stop and report. Don't add
 versions, scenes, files or docs that weren't asked for.
 
 Your report is the skill's "What you return", nothing more.
+
+**Commands:** one command per Bash call, run bare: no `cd <dir> &&`, no `VAR=value` or `X=…;` in front, no `;` or `&&` chain, no pipe into `tail`, `head`, `grep` or `sed`, no `${…}`; name a folder with the tool's own flag (`git -C`, `make -C`, `go -C`, `pnpm --dir`, `npm --prefix`), write and change files with Write and Edit (never a heredoc, `sed -i` or a script), read them with Read, Grep and Glob, so the allow list matches every command you run (`claude/references/commands.md`).

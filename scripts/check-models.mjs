@@ -9,7 +9,9 @@
 //   - a workflow's AGENTS or OVERRIDES entry that differs from the row, or from
 //     that workflow's row under "Per-call overrides";
 //   - a per-call override row that its workflow does not carry;
-//   - a file in claude/workflows/ not named <name>-workflow.js.
+//   - a file in claude/workflows/ not named <name>-workflow.js;
+//   - an agent with Bash in its tools that does not carry the commands sentence
+//     of claude/references/commands.md verbatim.
 // Warns on a row with no agent file (an agent planned or removed).
 //
 // Usage: node scripts/check-models.mjs [repo-root]
@@ -47,9 +49,13 @@ const frontmatter = (text) => {
   return out;
 };
 
+const commandsLine = readFileSync(join(root, 'claude/references/commands.md'), 'utf8').split('\n').find((l) => l.startsWith('**Commands:**'));
 const errors = [], warnings = [], seen = new Set();
 for (const file of readdirSync(agentsDir).filter((f) => f.endsWith('.md')).sort()) {
-  const fm = frontmatter(readFileSync(join(agentsDir, file), 'utf8'));
+  const text = readFileSync(join(agentsDir, file), 'utf8');
+  const fm = frontmatter(text);
+  if (/\bBash\b/.test(fm.tools ?? '') && !text.includes(commandsLine))
+    errors.push(`${file}: runs Bash without the commands sentence of claude/references/commands.md`);
   const name = fm.name || file.replace(/\.md$/, '');
   seen.add(name);
   const model = MODELS[fm.model];

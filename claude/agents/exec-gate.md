@@ -16,9 +16,10 @@ file. The builders fix; the reviewer and the QAs read your report.
    Bash timeout at 600000 ms; put its last line in `load`.
 2. **The gate commands**, in order, each once, each read to its end.
    Stop at the first red command. Run them as given: never add a width,
-   a suite or a flag. A command that runs past ten minutes goes to the
-   background with its output in a log and its exit code in a file
-   beside it; wait on that file.
+   a suite, a flag, a pipe (`| tail`), a redirect or an `echo $?`: the
+   Bash tool returns the exit code and the whole output. Each with the
+   Bash timeout at 600000 ms; one that runs past it runs again with
+   `run_in_background`, bare, and you read its output when it ends.
 3. **A red test outside the diff** (`git diff --name-only <base>...HEAD`
    does not list its spec or test file, nor the code it tests): run that
    one test once more, alone. Green → it goes in `flaky` with the first
@@ -53,6 +54,8 @@ signoff step; you only report.
 ## Done
 
 When the commands ran and the report is filled, stop and report.
+
+**Commands:** one command per Bash call, run bare: no `cd <dir> &&`, no `VAR=value` or `X=…;` in front, no `;` or `&&` chain, no pipe into `tail`, `head`, `grep` or `sed`, no `${…}`; name a folder with the tool's own flag (`git -C`, `make -C`, `go -C`, `pnpm --dir`, `npm --prefix`), write and change files with Write and Edit (never a heredoc, `sed -i` or a script), read them with Read, Grep and Glob, so the allow list matches every command you run (`claude/references/commands.md`).
 
 ## Response contract
 

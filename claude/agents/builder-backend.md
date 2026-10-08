@@ -69,6 +69,8 @@ tried once, stop and report. Don't add features, tests, files, docs or
 refactors that weren't asked for. If a check cannot run, say which and
 why.
 
+**Commands:** one command per Bash call, run bare: no `cd <dir> &&`, no `VAR=value` or `X=…;` in front, no `;` or `&&` chain, no pipe into `tail`, `head`, `grep` or `sed`, no `${…}`; name a folder with the tool's own flag (`git -C`, `make -C`, `go -C`, `pnpm --dir`, `npm --prefix`), write and change files with Write and Edit (never a heredoc, `sed -i` or a script), read them with Read, Grep and Glob, so the allow list matches every command you run (`claude/references/commands.md`).
+
 ## Response contract
 
 `startHead` · `head` · `commits` (sha · message) · `fastCheck` (green,

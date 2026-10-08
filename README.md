@@ -188,7 +188,7 @@ cd <your-project>/.claude
 ln -s ~/skills/claude/skills skills
 ln -s ~/skills/claude/agents agents
 ln -s ~/skills/claude/workflows workflows
-printf '.claude/skills\n.claude/agents\n.claude/workflows\n' >> "$(git rev-parse --git-common-dir)/info/exclude"
+printf '.claude/skills\n.claude/agents\n.claude/workflows\nCLAUDE.local.md\n.claude/settings.local.json\n' >> "$(git rev-parse --git-common-dir)/info/exclude"
 npm ci --prefix ~/skills/claude/video   # the reports' renderer and playwright-core for discovery's mock
 ```
 
@@ -209,11 +209,11 @@ Then, in Claude Code inside the project:
   source of record and the signoff's target.
 - The Workflow tool resolves the symlink, and the fronts' folders sit
   beside the repository: the clone and the designs root go in
-  `permissions.additionalDirectories` (`/pipeline-setup` writes both
-  into `settings.json` as `~/…` paths; a path that differs per machine
-  goes in `.claude/settings.local.json`), in every directory a session
-  opens in, or the workflows refuse to start and every agent's write
-  there is denied (each stage can still pass a workflow inline).
+  `permissions.additionalDirectories`, in every directory a session
+  opens in (where exactly: `pipeline-setup/templates/permissions.md`,
+  "Replace the placeholders"), or the workflows refuse to start and
+  every agent's write there is denied (each stage can still pass a
+  workflow inline).
 - On the station: Node (current LTS), `ffmpeg` and `npm ci` in
   `claude/video/` for the reports; `playwright-core` and a Chromium for
   discovery's mock (`PLAYWRIGHT_DIR`, `PROTO_CHROME`); `gitleaks` on PATH, or the

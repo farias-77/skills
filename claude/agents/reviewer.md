@@ -47,6 +47,8 @@ When the diff is read and every AC is checked, stop and report. A
 finding an earlier run raised is not raised again unless the code under
 it changed.
 
+**Commands:** one command per Bash call, run bare: no `cd <dir> &&`, no `VAR=value` or `X=…;` in front, no `;` or `&&` chain, no pipe into `tail`, `head`, `grep` or `sed`, no `${…}`; name a folder with the tool's own flag (`git -C`, `make -C`, `go -C`, `pnpm --dir`, `npm --prefix`), write and change files with Write and Edit (never a heredoc, `sed -i` or a script), read them with Read, Grep and Glob, so the allow list matches every command you run (`claude/references/commands.md`).
+
 ## Response contract
 
 `verified` (each AC: the code `file:line` and its proof; each checklist

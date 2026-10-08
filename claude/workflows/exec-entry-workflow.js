@@ -199,8 +199,8 @@ async function buildPass(task, items, label) {
 
 // ---------- the gate ----------
 
-const loadWait = () => `First wait for the machine: until the 1-min load is under ${args?.loadThreshold ?? 'nproc'}, at most 10 minutes:
-timeout 590 bash -c 'until awk -v t="${args?.loadThreshold ?? '$(nproc)'}" "{ exit !(\\$1 + 0 < t + 0) }" /proc/loadavg; do sleep 15; done'
+const loadWait = () => `First wait for the machine: until the 1-min load is under ${args?.loadThreshold ?? 'nproc'}, at most 10 minutes, with this one command:
+bash ${args?.referencesDir}/../scripts/load-wait.sh${args?.loadThreshold ? ` ${args.loadThreshold}` : ''}
 Then run the gate whatever its exit; put its last line in \`load\`.`
 
 let gateN = 0
