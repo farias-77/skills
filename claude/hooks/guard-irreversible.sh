@@ -37,15 +37,18 @@
 # no output and exit 0 lets the rules decide. Anything the guard cannot read,
 # and any internal error, exits 2, which blocks: it fails closed.
 #
-# The allow file: $GUARD_ALLOW_FILE, default
-# $CLAUDE_PROJECT_DIR/.claude/hooks/irreversible.allow. Only the user writes
-# it (by hand or with `! .claude/hooks/authorize.sh`); the guard denies every
-# agent write. One entry per line, `#` starts a comment:
+# The allow file: $GUARD_ALLOW_FILE, default irreversible.allow in this
+# script's own directory (symlinks followed), where the authorize.sh beside it
+# writes: a copy in .claude/hooks/ has its own file, and a guard run by path
+# from another repo (../skills/claude/hooks/...) reads the one next to it.
+# Only the user writes it (by hand or with `! <hooks dir>/authorize.sh`); the
+# guard denies every agent write. One entry per line, `#` starts a comment:
 #   <a command, verbatim>    that exact command passes (whitespace collapsed)
 #   protected <branch>       one more protected branch (main, master,
 #                            production and prod always are)
 #   default-branch <branch>  the repo's default branch, also protected
 #   auth <route> <slug> merge=<branch>[@<sha>] tag=<0|1> until=<UTC> [repo=<name>]
+#   auth tag <slug> ref=<ref> merged=<sha> tag=1 until=<UTC>
 #                            written by authorize.sh; see "Authorizations"
 #
 # The agent's identity folder (its gh login, its cloud key) is one ERE in
@@ -61,6 +64,8 @@
 #     authorization dies at its tag. Pushing the same tag again passes.
 #   - with repo=<name>, only PRs of that repository.
 # The guard records the head it let merge as merged=<sha> on the line.
+# The tag route (a release with no front) allows no merge: ONE v* tag whose
+# commit is exactly its merged=<sha>, marked used= like the others.
 #
 # Matching reads the whole command string, so `bash -c '...'`, a full binary
 # path or a chained `a && b` are caught too; a rare false positive on text
@@ -72,6 +77,16 @@
 set -uo pipefail
 
 self=$0
+
+# This script's directory, symlinks followed: the allow file's default home.
+script_dir() {
+  local f=$1 d
+  while [ -L "$f" ]; do
+    d=$(cd -P "$(dirname "$f")" && pwd) || return 1
+    f=$(readlink "$f"); case "$f" in /*) ;; *) f=$d/$f ;; esac
+  done
+  cd -P "$(dirname "$f")" && pwd
+}
 
 if [ "${1:-}" = "--self-test" ]; then
   fails=0
@@ -130,7 +145,10 @@ ask()  { decide ask "$1"; }
 gh_t() { if command -v timeout >/dev/null 2>&1; then timeout 20 gh "$@"; else gh "$@"; fi; }
 
 # --- configuration ----------------------------------------------------------
-allow_file=${GUARD_ALLOW_FILE:-${CLAUDE_PROJECT_DIR:-$cwd}/.claude/hooks/irreversible.allow}
+if [ -n "${GUARD_ALLOW_FILE:-}" ]; then allow_file=$GUARD_ALLOW_FILE
+else here=$(script_dir "$self") && [ -n "$here" ] || fail_closed "cannot find its own directory to read the allow file"
+  allow_file=$here/irreversible.allow
+fi
 norm() { tr -s '[:space:]' ' ' | sed 's/^ //; s/ $//'; }
 verbatim=() protected=(main master production prod)
 default_branch=${GUARD_DEFAULT_BRANCH:-}
@@ -160,8 +178,8 @@ if [ -f "$allow_file" ]; then
             merged=*) merged=${kv#merged=} ;;
           esac
         done
-        case "$route" in release|short|hotfix|legacy) ;; *) continue ;; esac
-        [ -n "$slug" ] && [ -n "$branch" ] && [ -n "$until" ] || continue
+        case "$route" in release|short|hotfix|legacy) [ -n "$branch" ] || continue ;; tag) [ -n "$merged" ] || continue ;; *) continue ;; esac
+        [ -n "$slug" ] && [ -n "$until" ] || continue
         u=$(date -u -d "$until" +%s 2>/dev/null) || continue
         [ "$u" -gt "$now" ] || continue
         A_LINE+=("$n") A_ROUTE+=("$route") A_SLUG+=("$slug") A_BRANCH+=("$branch") A_SHA+=("$sha")
@@ -291,7 +309,8 @@ fi
 
 current_branch() { git -C "$1" symbolic-ref --short -q HEAD 2>/dev/null; }
 deletable() { local b=${1#refs/heads/}; case "$b" in story/?*|evidence/?*) return 0 ;; esac; return 1; }
-# A v* tag push needs a live authorization with tag=1 whose merge the tag carries.
+# A v* tag push needs a live authorization with tag=1 whose merge the tag
+# carries; a tag-route line, a tag on exactly its commit.
 tag_push() { # dir, tag
   local dir=$1 t=${2#refs/tags/} commit i
   commit=$(git -C "$dir" rev-parse -q --verify "refs/tags/$t^{commit}" 2>/dev/null) || ask "the tag $t is not in the local repo, so the guard cannot check what it carries; create it, then push"
@@ -299,11 +318,12 @@ tag_push() { # dir, tag
     [ "${A_TAG[$i]}" = 1 ] || continue
     [ "${A_USED[$i]}" = "$t" ] && return 0
     [ -z "${A_USED[$i]}" ] && [ -n "${A_MERGED[$i]}" ] || continue
+    [ "${A_ROUTE[$i]}" = tag ] && [ "$commit" != "${A_MERGED[$i]}" ] && continue
     git -C "$dir" merge-base --is-ancestor "${A_MERGED[$i]}" "$commit" 2>/dev/null || continue
     mark "${A_LINE[$i]}" used "$t"
     return 0
   done
-  deny "no live authorization covers the tag $t: it needs the user's authorize line with tag=1 and a merge it allowed under the tag; one tag per authorization"
+  deny "no live authorization covers the tag $t: it needs the user's authorize line with tag=1 and a merge it allowed under the tag, or a tag-route line naming its commit; one tag per authorization"
 }
 
 seg_text=$(printf '%s' "$c" | tr "\"'" '  ' | tr ';&|()`' '\n\n\n\n\n\n')
@@ -436,7 +456,7 @@ descends() { # sha, head: the head is the sha or a descendant of it
 }
 
 for i in ${A_LINE[@]+"${!A_LINE[@]}"}; do
-  [ -z "${A_USED[$i]}" ] || continue
+  [ -z "${A_USED[$i]}" ] && [ "${A_ROUTE[$i]}" != tag ] || continue
   if [ -n "${A_REPO[$i]}" ]; then case "/$slug_repo" in */"${A_REPO[$i]}") ;; *) continue ;; esac; fi
   ok=0
   case "$hname" in

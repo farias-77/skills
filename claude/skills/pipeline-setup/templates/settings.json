@@ -128,7 +128,9 @@
       "Edit(./.claude/settings.json)",
       "Edit(./.claude/hooks/**)",
       "Write(./.claude/settings.json)",
-      "Write(./.claude/hooks/**)"
+      "Write(./.claude/hooks/**)",
+      "Edit(//**/irreversible.allow)",
+      "Write(//**/irreversible.allow)"
     ]
   },
   "hooks": {

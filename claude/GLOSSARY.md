@@ -13,7 +13,7 @@ is here, it uses this one.
 | **the play** | what he types to start a stage: `/clear`, then `/stage-<name> <slug>` (or `/lets-cook <idea>`) |
 | **`/goal`** | the one message, handed to him at a stage's open, that lets the stage run to its close on its own; discovery, a conversation, has none |
 | **the canary** | `git push origin a:b`, run at every stage's open: the guard must deny it with a reason containing `guard-canary`, or the stage does not open |
-| **the authorization line** | `! .claude/hooks/authorize.sh <release\|short\|hotfix\|legacy> …`, run by him only; one line in the guard's allow file that lets one front merge into `main` and push one tag; dies at its tag or in 3 days |
+| **the authorization line** | `! .claude/hooks/authorize.sh <release\|short\|hotfix\|legacy\|tag> …`, run by him only; one line in the guard's allow file that lets one front merge into `main` and push one tag (`tag`: no merge, one tag on one commit); dies at its tag or in 3 days |
 | **pre-flight** | what only he can hand over (a key, an account, a DNS record), each with a ready `!` command; checked at plan, handed over at execute's open |
 | **veto list** | what the conductor decided in his place (`ruled: conductor`), one line each, in the close message; he may undo any before the next stage |
 | **designs root** (`<designs-root>`) | the folder named by the line `designs-root: <path>` in the project's `CLAUDE.md` (relative to the main checkout, or absolute), for every front's folder, `_coordination.md` and `_retros/` |

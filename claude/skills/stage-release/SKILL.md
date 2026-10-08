@@ -69,8 +69,9 @@ the CI ends the turn on a `ScheduleWakeup` sized to it (a staging deploy
    recorded his ok; `04-release/plan.md` exists; the PR
    `feat/<slug>` → `main` is open and ready. Missing: stop and send him
    back to the stage that owns it.
-3. **The authorization.** `cat .claude/hooks/irreversible.allow` and
-   find a live `auth release <slug>` line (the execute's ok handed him
+3. **The authorization.** `cat` the allow file, `irreversible.allow`
+   next to the guard the settings run (`.claude/hooks/` in a copy
+   install), and find a live `auth release <slug>` line (the execute's ok handed him
    the command). Missing or expired: the message below carries, first,
    the exact command for him to run:
    `! .claude/hooks/authorize.sh release <slug> feat/<slug>@<the head he said ok to>`.
@@ -128,6 +129,15 @@ should be done and read the run (`gh run view <id>`); never poll.
    then `git push origin vX.Y.Z`. The guard spends the authorization on
    this push; the same tag pushed again still passes. The CI holds the
    tag until the previous tag's watch ends.
+
+**A release with no front: the tag route.** When the commit to ship is
+already on `main` and no merge passed the guard under a line (a first
+release, a tag cut by hand), no `merged=` carries the tag and the guard
+denies it. He authorizes that one commit instead:
+`! .claude/hooks/authorize.sh tag <slug> main@<sha>` (`<sha>` the
+commit the tag points at: the full sha, or a prefix of 7+ when run
+from the repo). It allows no merge and exactly one `v*` tag on exactly
+that commit; it dies at the tag or in 3 days.
 
 ## Step 4 · Production
 

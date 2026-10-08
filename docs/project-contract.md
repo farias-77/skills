@@ -301,8 +301,9 @@ directory):
   [`authorize.sh`](../claude/hooks/authorize.sh) in `.claude/hooks/`,
   registered on `Bash|Edit|Write|MultiEdit|NotebookEdit` through a
   **fail-closed wrapper**: a missing guard blocks every call;
-- the allow file `.claude/hooks/irreversible.allow`, written only by
-  him: verbatim commands, `protected <branch>`, `default-branch
+- the allow file `irreversible.allow` next to the guard (in
+  `.claude/hooks/`, or beside the pipeline clone's guard when a root
+  runs it by path), written only by him: verbatim commands, `protected <branch>`, `default-branch
   <branch>`, and the `auth` lines `authorize.sh` writes.
 
 Templates: [settings.json](../claude/skills/pipeline-setup/templates/settings.json)
@@ -315,8 +316,9 @@ before them. The real limits sit outside the session too (role 15).
 
 **How the stages use it.** Every stage opens with the canary (`git push
 origin a:b`, denied). He authorizes a release with `! .claude/hooks/authorize.sh
-release <slug> feat/<slug>@<sha>` (or `short`, `hotfix`, `legacy`); the
-guard lets one merge and one tag through, then the line is dead.
+release <slug> feat/<slug>@<sha>` (or `short`, `hotfix`, `legacy`, or
+`tag <slug> main@<sha>` for a release with no front); the guard lets one
+merge and one tag through, then the line is dead.
 
 ### 15 · Agent identities
 
