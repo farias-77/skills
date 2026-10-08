@@ -2,10 +2,9 @@
 
 <!--
   Written by the conductor at P2. Only what needs HIM in person: a key or
-  secret only he can mint, an account, a quota, a contract, DNS. Everything
-  an agent can check (the gate commands, the stack, gh, the cloud
-  environment, the guard canary) the conductor checks itself at plan and
-  lists under "Checked at plan". "Nothing" is a complete pre-flight.
+  secret only he can mint, an account, a quota, a contract, DNS. What an
+  agent can check goes under "Checked at plan". "Nothing" is a complete
+  pre-flight.
   Values he types are prompted (`read -s`), never written here.
   These comments never reach the file.
 -->

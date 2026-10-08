@@ -2,9 +2,7 @@
 
 The close delivers one video to the people who use the product: the
 operators, the employees, the clients. It answers three things: what
-problem this solves for them, how to use it, and where it is. People
-ask for features that already exist because nobody showed them; this
-video is the showing.
+problem this solves for them, how to use it, and where it is.
 
 ## Which piece
 
@@ -14,8 +12,7 @@ video is the showing.
 | only backend | a **motion piece** that explains the idea in the users' words ("your leads arrive on their own at 6 am") |
 
 Screens are ingredients; the piece is motion. 30 s – 3 min (a one-label
-change is 30–45 s), an `.mp4`
-of at most 15 MB that he forwards himself. Built with the
+change is 30–45 s), an `.mp4` of at most 15 MB that he forwards himself. Built with the
 `make-it-a-movie` skill by `video-builder (Sonnet 5.5, high)`, in
 one render.
 
@@ -30,11 +27,9 @@ one render.
   then how to use it, then where it is.
 - Where to put things: the video at `report/close/video.mp4` (the Close
   tab plays it; rendered with `--size 1080 --max-mb 15`), the text at
-  `05-close/whats-new.md`,
-  its scratch under `05-close/_scratch/` (removed by the cleanup). On
-  the short route and the hotfix: the stories are the ACs of `brief.md`,
-  the text is the "what's new" of `close.md`, and the scratch is
-  `report/close/film/`.
+  `05-close/whats-new.md`, its scratch under `05-close/_scratch/`. On
+  the short route and the hotfix: the text is the "what's new" of
+  `close.md`, and the scratch is `report/close/film/`.
 
 ## Recorded in staging, never in production
 
@@ -71,9 +66,3 @@ do, and where to find it. No version numbers, no technical words. It
 goes in full in the final message. In the Close deck a slide holds 40
 words at most (`check-deck.mjs`): the title and the sentences on one
 slide, the lines of what they can now do on the next.
-
-## Nothing goes outside
-
-The `.mp4` and the text go to him; he forwards them. Nothing is
-published on a public page, a store or a social account without his
-approval.

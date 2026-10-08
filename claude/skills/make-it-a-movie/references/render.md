@@ -25,10 +25,6 @@ is `path · seconds · MB`.
 | real footage at 1080p | ~0.7 s | ~20 min |
 | a 3D scene (three.js, `swangle`) | ~0.8–1 s | ~25–30 min |
 
-Measured runs: a 44 s film took about 25 minutes, and a 271 s film about
-80 minutes. The telemetry measures every render; these numbers only help
-you plan.
-
 **What makes it faster:**
 
 - a shorter film (cut a scene; never cut the reading time);
@@ -70,10 +66,7 @@ has to. Audio is kept when the film has it (AAC 128k).
   the fastest transitions, and `reviews/critique.md`.
 - `ffprobe -v error -show_entries format=duration,size -of csv=p=0 out.mp4`
   confirms the length and size.
-- Delete `<film>/stills/` by its full path. Never `rm` a glob, and never
-  delete anything under `/tmp` or `$TMPDIR`: other renders' bundles live
-  there. The kit already removed its run folders and keeps no bundle
-  cache.
+- The clean-up is the skill's step 9.
 
 ## When the render fails
 

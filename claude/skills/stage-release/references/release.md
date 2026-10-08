@@ -1,9 +1,7 @@
 # Release: the path to production
 
-Read before step 1 of stage-release, and by lets-cook before it
-releases a short route or a hotfix. The project's CLAUDE.md and its
-delivery doc name the real workflows, commands and URLs; this file is
-the shape they follow.
+The project's CLAUDE.md and its delivery doc name the real workflows,
+commands and URLs; this file is the shape they follow.
 
 ## The trunk
 
@@ -43,8 +41,6 @@ file, live until its tag or for 3 days:
   through, and `used=<tag>` when it lets the tag through. A tag must
   carry a merge the line allowed. After the tag the line is dead: a
   new merge or a new tag needs a new line from him.
-- You read the file (`cat`); you never write it. A denial means the
-  step is outside what he authorized: it is a stop.
 
 ## Taking turns on main
 
@@ -59,10 +55,8 @@ Fronts coordinate by talking (`SendMessage` to the session named in
 3. **Waiting is not idle.** When another front lands on `main`, merge
    `main` into `feat/<slug>` right away and let the local CI run while
    you wait.
-4. A peer that does not answer in 15 minutes (offline, holding
-   messages): take the conservative choice (wait for the running
-   staging to finish; never merge over it), write one line in
-   `_coordination.md` with "no answer, conservative", and go on.
+4. A peer silent for 15 minutes: the conservative choice is to wait
+   for the running staging to finish, never merge over it.
 5. The tag needs no turn: the production workflow runs one tag at a
    time and waits for the previous tag's watch.
 

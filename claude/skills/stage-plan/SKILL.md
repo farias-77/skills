@@ -40,8 +40,7 @@ open ──► P0 recon ──► P1 cut ──► P2 briefs ∥ pre-flight ─�
 | P4 close | the session; `video-builder (Sonnet 5.5, high)` ∥ `slides-builder (Sonnet 5.5, medium)`; the Explainer by template | the report, `_coordination.md`, the message |
 
 The session is the conductor: Opus 5.5, high. It dispatches, rules,
-writes `preflight.md` and `reviews.md`, and never reads to look
-something up: a scout does (house rule).
+writes `preflight.md` and `reviews.md`.
 
 ## Inputs and outputs
 
@@ -69,8 +68,7 @@ Missing a design document: stop, and say which stage owns it.
 
 1. **The house rules.** Read the file that
    `realpath ${CLAUDE_SKILL_DIR}/../../../CLAUDE.md` prints and run its
-   Open: the canary (in the product
-   repo).
+   Open: the canary (in the product repo).
 2. Read `.state.md`: it says `stage: plan` (else stop, the stage it
    names owns the front); dispatch P0 in the background.
 3. Hand him the goal, filled in, in one code block:
@@ -166,8 +164,7 @@ Run `plan-review-workflow.js` by `scriptPath`
 `planDir`, `designDir`, `storiesPath`, `root` (the codebase),
 `referencesDir` (`${CLAUDE_SKILL_DIR}/references`), `language`, and
 `briefs` = `graph.json`'s `reviewBriefs`. While the agents are not
-installed, add `inlineAgents: true` and `agentsDir`. If the Workflow
-tool refuses a path outside the working directories, pass the file's whole content as `script` (same `args`).
+installed, add `inlineAgents: true` and `agentsDir`.
 
 Save `.result` as `02-plan/reviews/round-1.json`. `valid: false` is not
 a round: fix the cause, run it again.
@@ -232,6 +229,4 @@ Everything is in files; the first missing output decides the step: no
 
 No code, no branches, no re-decision of the design: a node that cannot
 be built as designed is a dated amendment request in `01-design/notes.md`
-and the node marked blocked in `plan.md`. Frictions go to
-`dreaming-notes.md` as they happen. Every agent named carries its model
-and effort.
+and the node marked blocked in `plan.md`.

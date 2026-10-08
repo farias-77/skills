@@ -57,8 +57,7 @@ words for their work.
 the person notices now ("your report arrives in a minute, not an hour"),
 told with a `Flow` or `Numbers` and no architecture.
 
-Length 30 s – 3 min; a one-label change is 30–45 s. Real screens come from staging or a test account with
-synthetic data, never production. Real names never appear.
+Length 30 s – 3 min; a one-label change is 30–45 s.
 
 ## Writing the words
 

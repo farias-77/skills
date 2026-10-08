@@ -87,18 +87,10 @@ Done when: the tag is in production with the smoke and the 15-minute watch green
 exists, the report's three tabs are published, and I got the notification with the link and the next command.
 ```
 
-The irreversible steps the `/goal` names were his call already (in
-`plan.md`); they never stop the release. Only what it does not name
-does.
-
 ## Step 1 · Into main
 
-1. **Take the turn.** One front at a time sits between its merge and
-   its green staging. GitHub is the truth: a staging deploy running on
-   `main` means another front is there; wait it out on a wakeup. Tell
-   the release sessions named in `_coordination.md` that you are
-   merging (`SendMessage`). A hotfix that says it goes first, goes
-   first (references/release.md, "Taking turns").
+1. **Take the turn** on `main` by references/release.md, "Taking
+   turns on main".
 2. **`main` moved since his ok?** Merge `origin/main` into
    `feat/<slug>` (a merge, never a rebase), renumber the migrations if
    the project has a command for it (`make restamp`), push, and run the
@@ -157,9 +149,6 @@ creates no release. Wake when it should be done and read the run.
 | the environment (runner, network, a quota) | run it again once; it does not count. Never a production `migrate`: that is a stop |
 | a second red of code, anywhere | stop |
 
-An `X.n` runs exec-entry by `scriptPath`; when the Workflow tool refuses
-the kit's path, pass the file's whole content as `script` (same `args`).
-
 ## The stop list (only these stop)
 
 | Stop and ask | Why |
@@ -174,8 +163,7 @@ the kit's path, pass the file's whole content as `script` (same `args`).
 
 A stop is a `PushNotification` plus the question tool: what happened,
 the evidence in one line, the options with yours first, and the
-`! authorize` command ready when "yes" needs one. Everything that does
-not depend on the answer goes on (the report's pieces, the trace).
+`! authorize` command ready when "yes" needs one.
 
 ## Step 5 · Close
 
@@ -192,12 +180,10 @@ not depend on the answer goes on (the report's pieces, the trace).
 | Explainer | the report template from `trace.md`; with an incident, `artifact-builder (Sonnet 5.5, medium)` draws it | the release's timeline |
 
    When they return, check every number against `trace.md` and the CI
-   runs, run
-   `gitleaks dir <designs-root>/<slug>` (or `make gitleaks dir=…` when gitleaks is not on PATH; a finding stops the publish),
-   and publish to the front's link with the label "release closed".
-   The short route and the hotfix stop at step 4 (`lets-cook` §7): their
-   Release tab is built and published at the short close, by the table
-   in `lets-cook` §8, because their link exists only from then.
+   runs, run `gitleaks dir <designs-root>/<slug>` (a finding stops the
+   publish), and publish to the front's link with the label "release
+   closed". The short route and the hotfix stop at step 4: their
+   Release tab is published at the short close (`lets-cook` §8).
 3. **Cleanup.** Remove what this stage created: the `X.n` worktrees and
    their stacks (`claude/scripts/cleanup.sh <slug> --check` shows what
    is left; the full sweep is the close's).

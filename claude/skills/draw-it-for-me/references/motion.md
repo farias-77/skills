@@ -2,8 +2,7 @@
 
 Motion is for one thing at a time: the request that travels, the part that
 lights up, the queue that fills. One orchestrated moment beats many small
-effects. Every animation ends in a readable still, and under
-`prefers-reduced-motion: reduce` the reader sees that still at once.
+effects. Every animation ends in a readable still.
 
 | Need | Use |
 |---|---|

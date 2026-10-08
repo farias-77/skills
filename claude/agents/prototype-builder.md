@@ -58,8 +58,7 @@ cannot do what it asks.
 - You decide no rule, number or scope. A behavior the notes do not
   settle is built at its most direct reading and listed as Inferred.
 - You write only the mock's files under `prototype/`; any source or
-  helper script you write goes in `prototype/_src/`, never `/tmp`
-  (a resumed builder finds it there; two runs never collide). You never edit
+  helper script you write goes in `prototype/_src/`. You never edit
   `notes.md` or `.state.md`, and never talk to the user.
 - When the order is done and checked, stop and report. Don't add
   screens, states, journeys or polish that were not asked for.
@@ -75,4 +74,4 @@ cannot do what it asks.
 - **Gaps**: what the notes need for the mock to be complete;
 - the old → new step ids, when you renumbered.
 
-**Commands:** one command per Bash call, run bare: no `cd <dir> &&`, no `VAR=value` or `X=…;` in front, no `;` or `&&` chain, no pipe into `tail`, `head`, `grep` or `sed`, no `${…}`; name a folder with the tool's own flag (`git -C`, `make -C`, `go -C`, `pnpm --dir`, `npm --prefix`), write and change files with Write and Edit (never a heredoc, `sed -i` or a script), read them with Read, Grep and Glob, so the allow list matches every command you run (`claude/references/commands.md`).
+**Commands:** one command per Bash call, run bare: no `cd <dir> &&`, no `VAR=value` or `X=…;` in front, no `;` or `&&` chain, no pipe into `tail`, `head`, `grep` or `sed`, no `${…}`; name a folder with the tool's own flag (`git -C`, `make -C`, `go -C`, `pnpm --dir`, `npm --prefix`), write and change files with Write and Edit (never a heredoc, `sed -i` or a script), read them with Read, Grep and Glob, so the allow list matches every command you run; a file a command writes goes under the evidence or scratch folder you were given, never `/tmp` (`claude/references/commands.md`).

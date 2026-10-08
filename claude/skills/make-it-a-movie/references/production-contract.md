@@ -1,10 +1,8 @@
 # The production contract
 
-A film made in code goes wrong in a predictable way: every decision that
-nobody wrote down is filled with a safe default, such as big centred text,
-a gradient, everything fading in the same way, a logo at the end. The
-contract removes those gaps before the render. It keeps five layers apart,
-each in its own file, with a gate between each one and the next.
+The contract writes every decision down before the render. It keeps five
+layers apart, each in its own file, with a gate between each one and the
+next.
 
 ## The layers
 
@@ -142,19 +140,12 @@ to do. Put every PNG in `stills/`.
 
 ## Known traps
 
-- **Full-screen backgrounds under software GL.** A full-screen SVG
-  pattern under a radial gradient ghosted and doubled its layers under
-  `swangle`. Any background beyond the theme's `bgKind` is a pre-rendered
-  1920×1080 PNG in `assets/`, placed with `<Img>`. Transitions dip, so
-  one scene fades out completely before the next fades in. Never
-  crossfade two full frames. The kit's scene fade already dips.
-- **Deleting files.** Never `rm` a glob, and never delete anything under
-  `/tmp` or `$TMPDIR`. Other renders keep their bundles there, and one
-  glob has already wiped them. Delete only `<film>/stills/`, by its full
-  path. The kit removes its own run folders.
-- **One format.** The film is horizontal, 16:9. If a vertical or square
-  version is ever wanted, it is a separate composition laid out for that
-  frame, never a crop.
+- **Full-screen backgrounds under software GL** (`swangle`). Any
+  background beyond the theme's `bgKind` is a pre-rendered 1920×1080 PNG
+  in `assets/`, placed with `<Img>`. Never crossfade two full frames; the
+  kit's scene fade already dips.
+- **Deleting files:** the skill's step 9.
+- **One format:** the skill's "The sizes".
 
 ## What is delivered
 

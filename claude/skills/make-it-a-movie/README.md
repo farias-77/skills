@@ -12,7 +12,7 @@ Two audiences:
 
 - **A reviewer** (45–90 s, 720p): how the work runs, what was decided,
   what needs their eye.
-- **Users** (1–3 min): what is new and how to use it, with no technical
+- **Users** (30 s – 3 min): what is new and how to use it, with no technical
   detail.
 
 2D by default; 3D only when asked.

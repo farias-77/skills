@@ -88,9 +88,8 @@ the middle follows the story you were given.
 - **No real person's name** unless the source is about that person's own
   role and the brief allows it.
 
-`references/layouts.md` has working slides to copy: cover, statement, big
-numbers, a diagram that builds, a table, a comparison, a timeline, a
-decision, a quote and the closing slide.
+`references/layouts.md` has working slides to copy, one per kind of
+slide above.
 
 ## The look
 
@@ -104,25 +103,17 @@ icons, everything centred, or an accent stripe on every card.
 `@import url("../../tokens.css");` and takes every colour, face and
 radius from its tokens (`claude/report/tokens.css`): `--bg` for the
 ground, `--ink-1`…`--ink-3`, `--line`, `--ok` `--warn` `--bad` for status,
-`--f-sans` and `--f-mono`. Never copy the values, so the deck follows the
-report's light or dark theme. The accent is `--ink-1`, or a status colour
-when the slide is about one.
+`--f-sans` and `--f-mono`, never copying the values. The accent is
+`--ink-1`, or a status colour when the slide is about one.
 
 ## Check before you hand back
 
 Run `node scripts/check-deck.mjs <deck-folder> <png-folder>` once. It
-checks `deck.json`, then opens every slide at 1920×1080 and reports
-these problems:
-
-- more than 40 words;
-- text under 24 px;
-- anything outside the canvas;
-- console errors;
-- a blocked host.
-
-It saves a PNG of each slide at half size, after it removes the old ones;
-in a stage report the PNG folder is `report/<stage>/_scratch/deck-png/`. Read the PNGs, fix every line
-it prints once, and run it again. If the check cannot open a browser,
+checks `deck.json`, then opens every slide at 1920×1080 and reports more
+than 40 words, text under 24 px, anything outside the canvas, console
+errors and a blocked host. It saves a PNG of each slide at half size; in a stage report the PNG
+folder is `report/<stage>/_scratch/deck-png/`. Read the PNGs, fix every
+line it prints once, and run it again. If the check cannot open a browser,
 it still runs the file checks; say so in your return.
 
 When the deck is written and checked, stop. Don't add slides, files or

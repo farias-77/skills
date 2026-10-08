@@ -37,9 +37,7 @@ and golden paths (its `CLAUDE.md` names them) are the bar and the shape.
   "once") are never skipped.
 - **The fast check** is green on your last commit. Never the whole
   suite: the gate runs it once after you.
-- **Try it once.** When the change has an endpoint, bring the
-  worktree's stack up, call it once as the AC's actor, and put what you
-  saw in `tried`, one line. Bring the stack down if you brought it up.
+- **Try it once**, as `builders.md` says, when the change has an endpoint.
 - **Your migration** is a new file with a timestamp name; never renumber
   another. The tech lead orders migrations at merge.
 - **Outside the brief's Owns**, change only what the entry cannot be
@@ -69,7 +67,7 @@ tried once, stop and report. Don't add features, tests, files, docs or
 refactors that weren't asked for. If a check cannot run, say which and
 why.
 
-**Commands:** one command per Bash call, run bare: no `cd <dir> &&`, no `VAR=value` or `X=…;` in front, no `;` or `&&` chain, no pipe into `tail`, `head`, `grep` or `sed`, no `${…}`; name a folder with the tool's own flag (`git -C`, `make -C`, `go -C`, `pnpm --dir`, `npm --prefix`), write and change files with Write and Edit (never a heredoc, `sed -i` or a script), read them with Read, Grep and Glob, so the allow list matches every command you run (`claude/references/commands.md`).
+**Commands:** one command per Bash call, run bare: no `cd <dir> &&`, no `VAR=value` or `X=…;` in front, no `;` or `&&` chain, no pipe into `tail`, `head`, `grep` or `sed`, no `${…}`; name a folder with the tool's own flag (`git -C`, `make -C`, `go -C`, `pnpm --dir`, `npm --prefix`), write and change files with Write and Edit (never a heredoc, `sed -i` or a script), read them with Read, Grep and Glob, so the allow list matches every command you run; a file a command writes goes under the evidence or scratch folder you were given, never `/tmp` (`claude/references/commands.md`).
 
 ## Response contract
 

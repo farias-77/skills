@@ -184,8 +184,7 @@ longer than product motion (up to ~1.2 s per hop), since it explains.
 ## Publishing
 
 The builder publishes its own file with the `Artifact` tool, always to
-the same URL, after a green walk. The conductor never reads the mock's
-HTML.
+the same URL, after a green walk.
 
 | | First publish | Every later publish |
 |---|---|---|

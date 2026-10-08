@@ -108,11 +108,10 @@ purple gradients, glass cards, emoji as icons, everything centred, or an
 accent stripe on every card.
 
 **In a stage report, the look is the report's.** Link
-`<link rel="stylesheet" href="../tokens.css">` and take every colour, face
-and radius from its tokens (`claude/report/tokens.css`), never copying
-the values; they already cover both themes. The report frames the page
-and sets its `data-theme`, so the page has no theme button and no outer
-side gutter of its own.
+`<link rel="stylesheet" href="../tokens.css">` and take every colour,
+face and radius from its tokens (`claude/report/tokens.css`), never
+copying the values. The report frames the page and sets its theme, so
+the page has no theme button and no outer side gutter of its own.
 
 ## Check before you hand back
 

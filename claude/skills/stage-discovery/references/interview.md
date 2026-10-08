@@ -1,6 +1,5 @@
 # The interview
 
-Read by the conductor (Opus 5.5, high) before the first question.
 The aim: he talks, the mock shows what he said within minutes, and
 nothing about **what** to build is left open at the lock. It should
 feel like a sharp colleague interviewing him, never a form.
@@ -17,12 +16,9 @@ voice dump (he talks, no interruption) → restate in one short message (the jou
   paste, in any order. Write it into the notes (Starting point, Themes,
   Said). Restate it in one short message: what you understood, in his
   words, as the list of journeys you heard.
-- **Batches.** At most four questions per call, in the house shape:
-  the question carries the context (the quote, the gap, why a wrong
-  guess changes the build) and asks one thing; each option's label is
-  the answer in his words; your recommendation comes first and says
-  so. A question with no sensible closed options is asked in prose, one
-  per turn.
+- **Batches.** At most four questions per call, in the house shape. A
+  question with no sensible closed options is asked in prose, one per
+  turn.
 - **The frontier.** Ask only the decisions whose prerequisites are
   settled. Recompute after every batch.
 
@@ -47,15 +43,11 @@ the implementer decides it.
 Propose the behavior you believe is right: "I assume an expired invite
 stays in the list, marked expired; confirm?". Confirmed, it is a fact.
 Not discussed, it goes to the notes' Inferred block, is visible in the
-mock, and is asked before the lock. Never inferred silently. An
-inferred look, copy or naming item is never asked: it is the builder's
-pick, shown in the mock.
+mock, and is asked before the lock. Never inferred silently.
 
-**Check before you ask.** Before an option goes to him, know what it
-costs: an inferred data order, format or field gets a scout's answer
-to "does the system already store this?". An option that needs a
-migration, a recurring cost or an irreversible change says so in its
-description.
+**Check before you ask.** An inferred data order, format or field gets
+a scout's answer to "does the system already store this?" before it
+becomes an option.
 
 ## Anchor on the concrete
 
@@ -85,9 +77,6 @@ are, it is not the goal.
 | Vocabulary | one word per concept, with what to avoid; a term that already means something else in the product (the recon's collisions) is renamed |
 | In and Out | every capability is In or Out; Out says "not building, because …" or "future direction" |
 
-The error paths are the line that stories most often miss: nothing in
-that row reaches the design without his decision.
-
 ## Self-check before every question
 
 Rewrite or drop a question that is two questions, smuggles its answer
@@ -102,7 +91,5 @@ answered in the notes, or ladders "why" past the business goal.
 
 ## Restate before closing a theme
 
-Your rewrite of his words, confirmed, is what goes to Confirmed. A rule,
-a number, a scope line or the data shown is restated and confirmed
-before it is ordered into the mock; look, copy and layout go straight
-to the builder.
+Your rewrite of his words, confirmed, is what goes to Confirmed (the
+SKILL's D2 table says what is restated first).

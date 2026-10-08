@@ -1,8 +1,7 @@
 # Ruling the review, then the playback
 
-Read by the conductor (Opus 5.5, high) at D5 and D6. The shared scale
-and owners are in `claude/references/judging.md`; this file is what is
-particular to discovery.
+The shared scale and owners are in `claude/references/judging.md`;
+this file is what is particular to discovery.
 
 ## The oracle is the locked mock
 
@@ -52,10 +51,8 @@ Calibrations:
 - A finding that names a lock, a retry count or a status code found
   nothing for discovery: for the design.
 
-There is one round. After the writer applies the fixes, read each
-changed line against its finding and rerun `proto.mjs trace`. A fix that
-did not land goes back once; what is still wrong goes to the playback
-as his.
+A fix that did not land goes back once; what is still wrong after that
+goes to the playback as his.
 
 ## The playback
 
@@ -77,8 +74,6 @@ question is one story:
   options are the decision's answers instead, the pick first ("Confirm,
   one read per manager (recommended)" · "Confirm, one read per tab").
 
-About ten stories take three calls.
-
 **An adjust that changes behavior is an amendment.** In order: an edit
 order to the `prototype-builder` (the mock changes and is republished),
 `proto.mjs lock` again with his answer as the lock words, the
@@ -94,14 +89,4 @@ the stories:
 | **I have an idea** (Other) | his words go to the architect as his idea |
 | **I have a constraint** (Other) | his words go to the architect as a constraint |
 
-Write the answer, verbatim, to the notes' "For the design" block. The
-design opens straight on the architect.
-
-Every answer is a line in `rulings.md`:
-
-```
-2026-10-05 · discovery playback · S-003 · conductor: one read per manager · ruled: confirmed · "uma leitura por gestor"
-```
-
-A pattern (he keeps picking against the recommendation on one kind of
-decision) is a line in `dreaming-notes.md`, marked `[taste]`.
+Write the answer, verbatim, to the notes' "For the design" block.

@@ -11,9 +11,6 @@ place when it replaces a paragraph.
 | hand-drawn boxes you place yourself | SVG; dagre or ELK for the positions |
 | an idea or a sketch, not a spec | Rough.js |
 
-Colours always come from the page tokens, so the diagram works in both
-themes.
-
 ## Mermaid
 
 Published alone as its own page, the host renders `<pre class="mermaid">`

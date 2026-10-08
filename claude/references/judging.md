@@ -129,8 +129,6 @@ brief, read by the same kinds as discovery.
 - **`inconclusive` is not green.** A seat that could not run what its
   check needed says what and why; the entry parks `inconclusive`.
 - **C, the contract commit:** only `security` blocks.
-- **Speculative code** blocks only with the quote of what serves no AC
-  and no real risk.
 - **Budgets:** 2 gate fix passes, 1 review fix pass. The delta goes to
   each seat that blocked, plus the reviewer whenever the fix touched a
   test or a gate path (the code-owner paths, `gatePaths`). Still

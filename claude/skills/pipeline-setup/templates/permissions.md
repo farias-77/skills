@@ -15,13 +15,11 @@ command later touches.
 | one repository | that repository |
 | two roots: `CLAUDE.md`, the standards and `.claude/skills/` in a root, the product in a child repository | the root, and the product repository too when sessions open there (a cloud entry always does) |
 
-Each session root also needs the README's install, which stays out of
-git: the `skills`, `agents` and `workflows` symlinks in `.claude/`,
+Each session root also needs the README's install, out of git: the
+`skills`, `agents` and `workflows` symlinks in `.claude/`,
 `CLAUDE.local.md` and `.claude/settings.local.json`, listed in
-`.git/info/exclude` (untracked, they break a secret scan of the
-untracked files). The clone and the designs root go in
-`additionalDirectories` as the placeholders table below says. The audit
-reports them missing; Step 3 never commits them.
+`.git/info/exclude`. The audit reports them missing; Step 3 never
+commits them.
 
 At the root, a command into the product names it (`git -C <product> …`,
 `make -C <product> …`); the allow rules carry that form. Each copy is
@@ -79,11 +77,8 @@ a QA script under the evidence folder, `nproc`, `/proc/loadavg` and the
 heartbeat; the stack's `up`, `status` and `down`, `gitleaks`, the load
 wait, `cleanup.sh`, the kit's `node` scripts, `ffmpeg`, `ffprobe` and
 `render.sh`, the stills' removal, `systemd-inhibit`. Each in the bare
-form and the `-C <worktree>` form, because every agent runs one bare
-command per call (`claude/references/commands.md`): in print mode and
-in a subagent nobody answers a prompt, and a frontmatter `Bash(…)`
-grants nothing there, so a command the list misses is denied. The
-merge and the tag sit in allow because the guard checks each against
+form and the `-C <worktree>` form (`claude/references/commands.md`
+says why). The merge and the tag sit in allow because the guard checks each against
 his authorization line. Keep each rule as narrow as the command: a
 broad `Bash(gh *)` or `Bash(gcloud *)` covers an irreversible command
 too. Nothing allows a push to `main`.
@@ -111,9 +106,7 @@ push. The audit fills each template allow's `*` with a sample (`gh pr
 create x`, `git push origin feat/x`, `git tag -a v1.0.0`) and matches it
 against every project deny; each hit is named in the readiness file,
 and Step 3 removes that deny and keeps the template's narrow denies
-above. The guard, not the list, is the boundary: it still denies the
-push to a protected branch and the merge or tag no authorization
-covers.
+above.
 
 ## The guard hook
 

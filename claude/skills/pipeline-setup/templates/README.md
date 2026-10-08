@@ -10,17 +10,12 @@ reads this file before it applies one; nothing here is copied.
   (`--help`), and the explanation lives in the tool's own document
   copied beside it (`structure-check/README.md`). The
   only `#` lines kept are shebangs.
-- **The guard is the exception.** `guard-irreversible.sh` and its test
-  are the pipeline's files, copied verbatim and updated from the
-  pipeline, so they keep their header. When the project's standards (or
-  a linter) enforces a no-comment rule, that rule must exclude
-  `.claude/hooks/`: the role-14 step adds the exclusion where the rule
-  is written, in the same commit.
+- **The guard is the exception**: the hooks keep their header comments
+  (`permissions.md`, "What to copy").
 - **No placeholder survives.** Every `<…>` is replaced with what the
   audit found, or the line is deleted. A value not known yet is written
   as what it is (for example "not run: the gate needs a secret the
-  station lacks"), never as a token to fill later. Step 4 greps for
-  leftovers.
+  station lacks"), never as a token to fill later.
 - **The project's language.** A document goes in the language its
   neighbours are written in (the feature maps, the standards); a script
   goes in the language the repo's own tooling uses, where its lint and
@@ -53,8 +48,7 @@ copy from it.
   tutorial.
 - A kind the codebase does not have yet: "none — the plan's foundation
   builds the first one in the standards' full shape".
-- Keep it under ~150 lines. The weekly retro re-reads it; when an
-  exemplar drifts, it is replaced.
+- Keep it under ~150 lines.
 
 Kinds a project usually has, to adapt or delete (shown for a Go and
 TypeScript project):

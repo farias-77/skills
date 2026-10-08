@@ -1,10 +1,8 @@
 # The merge queue and local CI
 
-The tech lead is the only one that merges into `feat/<slug>`, and the
-project's **signoff command** (its `CLAUDE.md` names it; the fallback is
-`claude/scripts/local-ci.sh`) is the only thing that posts the
-`local-ci` status `main` requires. No agent merges, and nothing posts a status by
-hand (the guard denies the raw call).
+The tech lead is the only one that merges into `feat/<slug>`; only the
+project's **signoff command** posts `local-ci` (house rules, "The CI is
+local").
 
 ## The queue: one entry at a time, the critical path first
 

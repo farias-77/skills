@@ -24,8 +24,6 @@ Facts (ASSETS) are kept apart from choices (FILM, VISUAL RULES).
 
 - Keep:
 - Avoid:
-- Never invent a product screen, a metric, a logo or a quote. A missing
-  asset stops the work with a question.
 
 ## DELIVERABLES
 

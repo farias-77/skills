@@ -2,8 +2,7 @@
 
 <!--
   Written by the conductor from 02-plan/reviews/round-1.json, the rulings
-  before any fix leaves. One round; fixes verified by reading and by the
-  checker. Nobody is asked. These comments never reach the file.
+  before any fix leaves. These comments never reach the file.
 -->
 
 ## Round 1 · <date> · run <id>

@@ -70,7 +70,6 @@ holds in these steps, with the close as the "done".
 | `claude/references/judging.md` | at D5: the shared scale (blocks · note) and owners |
 
 You never read the mock's HTML: the builder owns it and publishes it.
-Anything you need from a file you have not read goes to a scout.
 
 ## Files
 
@@ -121,7 +120,6 @@ The host may lack a tool; say what is missing in one line and run on:
 |---|---|
 | `Artifact` (headless or cloud) | **local mode**, `mode: local`: the builder runs `proto.mjs shots`; your message gives the PNG paths; comments come by chat; the report stays in `report/` for the next local session to publish |
 | the question tool | the questions go as text, same shape: numbered, lettered options, your pick first and marked |
-| `Workflow` accepting the kit's path (outside the working directories and the added ones) | pass the file's whole content as `script` (same `args`) |
 
 ## D0 · Recon, in the background
 
@@ -271,22 +269,13 @@ and `claude/references/judging.md`, in `reviews.md`
 - for the design → `reviews.md`, never asked;
 - dismissed → with the quote or frame that closes it.
 
-There is no second round.
-
 ## D6 · The playback
 
 By [references/playback.md](references/playback.md): story by story,
 four per call, **Confirm** · **Adjust** · **Cut**, with the review's
 decisions of his and the writer's Inferred entries inside each story's
-question. About ten stories, three calls.
-
-- An adjust that changes behavior is an **amendment**: an edit order to
-  the builder, `proto.mjs lock` again with his answer as `--words`, the
-  writer re-derives only that story, `trace` green.
-- A cut story leaves `stories.md`; an Out line takes its place.
-- **The last call carries the design question** (Nothing in mind,
-  propose · I have an idea · I have a constraint). His answer goes,
-  verbatim, to the notes' "For the design".
+question. An adjust that changes behavior is an **amendment**; the last
+call carries the design question.
 
 Every answer is a line in `rulings.md`. When one story is left, propose
 the short route in one line; on his yes, write `brief.md` from
@@ -309,7 +298,7 @@ background, each with the stage's files and the report folder
 While they work, clean what this stage created: `prototype/shots/`
 (local mode), any scratch frames folder, `_run/`, a recon stack still
 up. When they return: every number on a slide is checked against
-`stories.md` or the notes; run `gitleaks dir <workstream>` (or `make gitleaks dir=<workstream>` when gitleaks is not on PATH; a finding stops the publish);
+`stories.md` or the notes; run `gitleaks dir <workstream>` (a finding stops the publish);
 publish the page to the front's link with the label "discovery closed".
 
 Then: `.state.md` to `stage: design`, commit the workstream folder
@@ -322,8 +311,6 @@ Then: `.state.md` to `stage: design`, commit the workstream folder
 | For the design | his answer to the last question |
 | Next | `/clear`, then `/stage-design <slug>` |
 
-Nothing runs until he types it.
-
 ## Resuming
 
 Everything is in files. `/stage-discovery <slug>`: run the opening's
@@ -333,11 +320,8 @@ Open). From D2 on, read the unanswered comments before you speak. The
 builder of an earlier session is gone: a fresh `prototype-builder`
 reads `index.html` and the notes first. At D5 a saved
 `reviews/round-1.json` is never run again: continue from `reviews.md`.
-Never resume from memory of an earlier session.
 
 ## How to write
 
 Literal sentences, one idea each, concrete values, his words in
-quotation marks where they decide something. The files are written in
-his language; ids and keywords (GIVEN, WHEN, THEN) stay as the
-templates have them.
+quotation marks where they decide something.

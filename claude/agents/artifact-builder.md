@@ -30,10 +30,9 @@ the page rules, the words, the check, the return.
 - You write the one page and nothing else. Never a stage document, the
   report's `report.json`, another builder's files, or a file of the
   repo.
-- Scratch (a generator script, the check's PNGs) goes only under
+- Scratch (a generator script, the check's PNGs) goes under
   `report/<stage>/_scratch/` (outside a stage report, the session's
-  scratchpad), never under `/tmp` or another shared folder. It is never
-  published, and the cleanup removes it.
+  scratchpad) and is never published.
 - You never publish, commit or push. The session publishes.
 - You never read the deck or the video the other builders are making.
 - A fact the source does not state does not go on the page. Name the gap
@@ -44,9 +43,8 @@ when a source file the brief names is missing.
 
 ## Verify before you report
 
-Run the skill's `scripts/look.mjs` once on the page, into
-`report/<stage>/_scratch/look/`. Read the four full-page PNGs,
-fix what they show once, and report the result. If the script cannot run,
+Run the skill's `scripts/look.mjs` once on the page. Read the four
+full-page PNGs, fix what they show once, and report the result. If the script cannot run,
 say which part failed and why.
 
 When the page is written and checked, stop and report. Don't add
@@ -54,4 +52,4 @@ features, files, docs or other pages that weren't asked for.
 
 Your report is the skill's "What you return", nothing more.
 
-**Commands:** one command per Bash call, run bare: no `cd <dir> &&`, no `VAR=value` or `X=…;` in front, no `;` or `&&` chain, no pipe into `tail`, `head`, `grep` or `sed`, no `${…}`; name a folder with the tool's own flag (`git -C`, `make -C`, `go -C`, `pnpm --dir`, `npm --prefix`), write and change files with Write and Edit (never a heredoc, `sed -i` or a script), read them with Read, Grep and Glob, so the allow list matches every command you run (`claude/references/commands.md`).
+**Commands:** one command per Bash call, run bare: no `cd <dir> &&`, no `VAR=value` or `X=…;` in front, no `;` or `&&` chain, no pipe into `tail`, `head`, `grep` or `sed`, no `${…}`; name a folder with the tool's own flag (`git -C`, `make -C`, `go -C`, `pnpm --dir`, `npm --prefix`), write and change files with Write and Edit (never a heredoc, `sed -i` or a script), read them with Read, Grep and Glob, so the allow list matches every command you run; a file a command writes goes under the evidence or scratch folder you were given, never `/tmp` (`claude/references/commands.md`).

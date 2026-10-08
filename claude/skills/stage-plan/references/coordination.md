@@ -1,8 +1,5 @@
 # Coordinating with the other fronts
 
-Several fronts run at once. They coordinate by talking, session to
-session, and write down only what they agreed.
-
 ## Where it lives
 
 `<designs-root>/_coordination.md` has one line per front: its slug, its
@@ -45,4 +42,3 @@ cross".
 - A local session can message a cloud session (`claude -p "…" --cloud <session id>`);
   a cloud session cannot message back; git is its channel.
 - A session in another permission mode may hold the message.
-- An offline session cannot answer: hence the 15-minute rule.

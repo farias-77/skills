@@ -27,8 +27,7 @@ the brief and the shot list, and they come from the session that sent you.
 - **The source files.** For the users' video, also the staging URL, the
   demo account's session file and the journeys to show.
 - **The words** on screen: their language and style are set by
-  `claude/references/artifact-writing.md`, including its exception for
-  the close's video for users.
+  `claude/references/artifact-writing.md`.
 - **The output:** the film's folder (`<workstream>/report/<stage>/film/`)
   and the video path (`<workstream>/report/<stage>/video.mp4`).
 - **The kit:** `claude/video/` of the pipeline repo.
@@ -38,27 +37,18 @@ the brief and the shot list, and they come from the session that sent you.
 
 ## Boundaries
 
-- You write the film's folder and the video, and nothing else. Your
-  scratch goes in the film's folder too, never under `/tmp` or another
-  shared folder. Never a
-  stage document, the report's `report.json`, another builder's files, or
-  a file of the repo or the kit.
+- You write the film's folder and the video, and nothing else; your
+  scratch goes in the film's folder too. Never a stage document, the
+  report's `report.json`, another builder's files, or a file of the
+  repo or the kit.
 - You never publish, commit or push. The session publishes.
 - You never read the deck or the explainer the other builders are making.
-- One render. A second render only when a score is under 8 or a checked
-  frame is broken. Never render to polish.
-- Footage and screenshots come from staging or a test account with
-  synthetic data, never from production. A real person's name never
-  appears.
 - A kit defect, something no film can fix, is reported. You never patch
   the kit, and never probe its browser or `node_modules` (nor
   `~/.cache`): the kit's own scripts say what is missing, and you quote
   them.
 - Never invent a product screen, a metric, a logo or a quote. A missing
   asset stops the work with a question; never draw a stand-in.
-- Delete only `<film>/stills/`, by its full path. Never `rm` a glob, and
-  never delete anything under `/tmp` or `$TMPDIR`: other renders keep
-  their bundles there.
 
 Keep working until the video is rendered and checked. A render waiting
 in the queue is not a reason to stop: wait for it. Stop to ask only when
@@ -68,9 +58,7 @@ list.
 
 ## Verify before you report
 
-For a film for users or newcomers, run the skill's blind text test
-(`node <kit>/blind.mjs`, step 3) before the film, and keep its result in
-`reviews/blind.md`. Read every still before the render, at the default scale and on the
+Read every still before the render, at the default scale and on the
 360 px phone sheet, one still per beat. After it, read the 2-a-second
 phone sheet and the transition strips, write `reviews/critique.md` with
 the six scores and the 3 largest defects, and confirm the seconds and MB
@@ -82,4 +70,4 @@ versions, scenes, files or docs that weren't asked for.
 
 Your report is the skill's "What you return", nothing more.
 
-**Commands:** one command per Bash call, run bare: no `cd <dir> &&`, no `VAR=value` or `X=…;` in front, no `;` or `&&` chain, no pipe into `tail`, `head`, `grep` or `sed`, no `${…}`; name a folder with the tool's own flag (`git -C`, `make -C`, `go -C`, `pnpm --dir`, `npm --prefix`), write and change files with Write and Edit (never a heredoc, `sed -i` or a script), read them with Read, Grep and Glob, so the allow list matches every command you run (`claude/references/commands.md`).
+**Commands:** one command per Bash call, run bare: no `cd <dir> &&`, no `VAR=value` or `X=…;` in front, no `;` or `&&` chain, no pipe into `tail`, `head`, `grep` or `sed`, no `${…}`; name a folder with the tool's own flag (`git -C`, `make -C`, `go -C`, `pnpm --dir`, `npm --prefix`), write and change files with Write and Edit (never a heredoc, `sed -i` or a script), read them with Read, Grep and Glob, so the allow list matches every command you run; a file a command writes goes under the evidence or scratch folder you were given, never `/tmp` (`claude/references/commands.md`).

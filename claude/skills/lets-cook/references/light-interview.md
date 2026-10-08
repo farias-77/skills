@@ -22,9 +22,7 @@ question costs his attention.
 1. **Restate** the idea in one to three lines, in his words.
 2. **What changes, for whom, how he will know it worked, what must not
    break.** Only the parts the scouts and his sentence did not answer.
-3. **The questions** go through the question tool: at most four in one
-   call, each one decision, your pick first and marked.
-4. Never an obvious question. Never a question the code or the scouts
+3. Never an obvious question. Never a question the code or the scouts
    already answered, or a fact a short run would show (a timing, a
    library's behaviour): run it.
 

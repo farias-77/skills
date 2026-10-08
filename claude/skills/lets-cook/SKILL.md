@@ -24,7 +24,7 @@ allowed-tools: Read, Write, Edit, Glob, Grep, Agent, SendMessage, Workflow, AskU
 
 ```
 /lets-cook <idea> ──► scouts in the background ──► light interview ──► the route, in one line
-  ├─ full    ──► slug + notes ──► load stage-discovery, same session
+  ├─ full    ──► load stage-discovery, same session
   ├─ short   ──► brief ──► ! authorize + /goal ──► one entry ──► his use ──► release ──► short close
   └─ hotfix  ──► brief + the test that reproduces ──► ! authorize + /goal ──► one entry
                  ──► release (his staging check, or delegated) ──► short close
@@ -62,8 +62,7 @@ with the time `date -u +%FT%TZ` printed; never rewrite a line.
 
 1. **The house rules.** Read the file that
    `realpath ${CLAUDE_SKILL_DIR}/../../../CLAUDE.md` prints and run its
-   Open: the canary, then the designs root (no `designs-root:` line →
-   stop with the line to add).
+   Open: the canary, then the designs root.
 2. **Scouts, in the background, from his first sentence.** One
    `scout (Haiku 5.5, medium)` per question: where this lives (the
    feature map, the files); which fronts are open
@@ -74,19 +73,13 @@ with the time `date -u +%FT%TZ` printed; never rewrite a line.
 
 ## 2 · The light interview
 
-Follow `references/light-interview.md`. Restate the idea in one to
-three lines. Ask only what would throw the build away if guessed wrong;
-everything else you assume and write under "Assumed" in the brief, and
-he sees it when he uses it. Questions go through the question tool,
-your pick first. For a hotfix, ask once: "Can I ship without you
-checking staging?"
+Follow `references/light-interview.md`.
 
 ## 3 · The route
 
-Decide by `references/routes.md` and say it in one line:
-"short route: one behavior, 2 ACs, one nullable column, nothing
-irreversible". When in doubt between short and full, go full: going
-small on the wrong thing builds the wrong thing.
+Decide by `references/routes.md` and say it in one line. When in
+doubt between short and full, go full: going small on the wrong thing
+builds the wrong thing.
 
 - **Full:** create nothing. Load `stage-discovery` with the Skill tool,
   with what he said as Confirmed lines for its notes; its Open creates
@@ -97,7 +90,7 @@ small on the wrong thing builds the wrong thing.
 
 1. Write `<designs-root>/<slug>/brief.md` from `templates/brief.md`.
    Hotfix: its first AC is the one that reproduces the bug.
-2. `gitleaks dir <designs-root>/<slug>` (or `make gitleaks dir=…` when gitleaks is not on PATH): a finding stops everything
+2. `gitleaks dir <designs-root>/<slug>`: a finding stops everything
    (a secret in a brief is an incident).
 3. `.state.md`, rewritten at each step:
 
@@ -165,17 +158,17 @@ notification. Never loosen this done to call it met; stop early only when truly 
   | `trailer` | the commit trailer your own commits carry |
   | `loadThreshold` | `nproc` |
 
-  When the Workflow tool
-  refuses the kit's path, pass the file's whole content as `script` (same `args`). The
-  `reviewer (Opus 5.5, high)` always runs; on a hotfix, with the
+  The `reviewer (Opus 5.5, high)` always runs; on a hotfix, with the
   security pass.
 - When the entry comes back `ready`, push and open the PR ready. Fixes
   and rounds are checked by the entry gate only. The whole gate runs
   once, on the final head, before it ships: the project's signoff
-  command (`claude/scripts/local-ci.sh` when it names none), after his
-  ok on the short route, right away on a hotfix. A red there is one
-  fix, checked by the entry gate, then the whole gate once more. The
-  merge waits for its `local-ci`.
+  command (`claude/scripts/local-ci.sh` when it names none), run bare
+  from the session root as `tooling/local-ci <sha>` (`tooling/local-ci
+  --dry-run <sha>` in a rehearsal: it posts nothing), after his ok on
+  the short route, right away on a hotfix. A red there is one fix,
+  checked by the entry gate, then the whole gate once more. The merge
+  waits for its `local-ci`.
 
 ## 6 · His use
 
@@ -190,9 +183,7 @@ notification. Never loosen this done to call it met; stop early only when truly 
 
 Follow steps 1–4 of `stage-release` with its `references/release.md`:
 take the turn on `main`, merge, staging, a **patch** tag (`v1.0.0`
-when the repo has no `v*` tag yet: stage-release's first-tag rule
-wins), production,
-the watch. The release's red rule and stop list apply as they are. A
+when the repo has no `v*` tag yet), production, the watch. The release's red rule and stop list apply as they are. A
 hotfix goes first on `main` (release.md, "The hotfix"). In a legacy
 repo: release.md, "Legacy repos". At the green staging, dispatch the
 users' video only when a screen users see changed.
@@ -226,11 +217,11 @@ users' video only when a screen users see changed.
 | Switch | What happens |
 |---|---|
 | short → full, any time | the brief and your notes become Confirmed lines of the discovery's notes; a branch already built stays, and the plan names it as an entry's base. Load `stage-discovery` |
-| full → short, until the design closes | the discovery or design conductor proposes it in one line when one story is left; on his yes it writes `brief.md` from `templates/brief.md` with that story's ACs and loads `lets-cook` (`/lets-cook <slug>` resumes from the brief) |
+| full → short, until the design closes | the discovery or design conductor proposes it in one line when one story is left; on his yes it writes `brief.md` and loads `lets-cook` |
 | he says "switch" | switch; never argue the route twice |
 
 ## Resuming
 
 `/lets-cook <slug>` with an existing folder: the canary, then
-`.state.md` and `trace.md`, and from the release on `04-release/trace.md`
-(the release steps write there). The last line written is where you are.
+`.state.md` and `trace.md`, and from the release on
+`04-release/trace.md`. The last line written is where you are.

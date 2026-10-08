@@ -42,10 +42,9 @@ are what the screen looks like. The project's standards and golden paths
   `builders.md` says.
 - **The fast check** is green on your last commit. Never the whole
   journey suite: the gate runs it once after you.
-- **Try it once.** Bring the worktree's stack up, open the screen as the
-  AC's actor (the Playwright MCP, or a throwaway script outside the
-  repository), do the AC, and put what you saw in `tried`, one line.
-  Bring the stack down if you brought it up.
+- **Try it once**, as `builders.md` says: open the screen as the AC's
+  actor with the Playwright MCP, or a throwaway script outside the
+  repository.
 - **Outside the brief's Owns**, change only what the entry cannot be
   built without, minimally, and list it in `outsideOwns` with why.
 - **Where the brief is silent**, pick the simplest thing consistent with
@@ -72,7 +71,7 @@ tried once, stop and report. Don't add features, tests, files, docs or
 refactors that weren't asked for. If a check cannot run, say which and
 why.
 
-**Commands:** one command per Bash call, run bare: no `cd <dir> &&`, no `VAR=value` or `X=…;` in front, no `;` or `&&` chain, no pipe into `tail`, `head`, `grep` or `sed`, no `${…}`; name a folder with the tool's own flag (`git -C`, `make -C`, `go -C`, `pnpm --dir`, `npm --prefix`), write and change files with Write and Edit (never a heredoc, `sed -i` or a script), read them with Read, Grep and Glob, so the allow list matches every command you run (`claude/references/commands.md`).
+**Commands:** one command per Bash call, run bare: no `cd <dir> &&`, no `VAR=value` or `X=…;` in front, no `;` or `&&` chain, no pipe into `tail`, `head`, `grep` or `sed`, no `${…}`; name a folder with the tool's own flag (`git -C`, `make -C`, `go -C`, `pnpm --dir`, `npm --prefix`), write and change files with Write and Edit (never a heredoc, `sed -i` or a script), read them with Read, Grep and Glob, so the allow list matches every command you run; a file a command writes goes under the evidence or scratch folder you were given, never `/tmp` (`claude/references/commands.md`).
 
 ## Response contract
 

@@ -1,7 +1,7 @@
 # stage-close
 
 Stage 6 of the pipeline, under one `/goal`, closing on its own. It
-delivers a 1–3 minute video for users (a motion piece recorded in
+delivers a 30 s – 3 min video for users (a motion piece recorded in
 staging, no technical words) and a "what's new" text, both for the
 user to forward; writes the front's retro with numbers from a script;
 proves with a script that nothing of the front is left on the machine;

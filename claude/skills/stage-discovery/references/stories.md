@@ -57,8 +57,6 @@ Every story has a table: limit (boundary input), dependency failure,
 permission, repeat (double submit, two tabs, a retry). Each row points
 to a journey step, a frame, or an Out line with a reason. A row with
 none of them is a gap: it goes to Inferred or Open, never silence.
-These are the paths the design most often gets wrong when the stories
-skip them.
 
 ## Inferred and Open
 

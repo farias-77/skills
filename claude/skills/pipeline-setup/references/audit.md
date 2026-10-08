@@ -1,13 +1,9 @@
 # The audit — what each scout looks for, and how a role is rated
 
-Six scouts, one per group of roles of `docs/project-contract.md`,
-dispatched together. Each gets its group's rows below **as the
-question**, the path of the **audit worktree** (a detached checkout of
-the default branch's sha, never the user's working tree), the
-standards' path read the same way when they live in another
-repository, the session roots, and the shape of the answer: per role,
-the literal lines with `path:line`, where it looked, what it did not
-find. The scout quotes; the session rates.
+Six scouts, one per group of roles of `docs/project-contract.md`, each
+briefed as SKILL.md Step 1 says, with the answer per role: the literal
+lines with `path:line`, where it looked, what it did not find. The
+scout quotes; the session rates.
 
 ## The rating
 
@@ -84,6 +80,5 @@ One-line commands, quoted in the readiness file:
 | GitHub only: `gh api user --jq .login` | role 15: who the agents are |
 | `git -C <audit worktree> rev-parse HEAD` | the sha the audit read |
 
-**A remote that is not GitHub:** never call `gh` for this project and
-never guess an owner from its name; the ruleset parts of roles 6 and 7
-are `n/a: non-GitHub remote`.
+**A remote that is not GitHub:** never guess an owner from its name;
+the ruleset parts of roles 6 and 7 are `n/a: non-GitHub remote`.

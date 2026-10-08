@@ -29,10 +29,8 @@ The script never removes unmerged work by itself. It lists it as
 `unmerged` until you pass:
 
 - `--discard <branch>` when `rulings.md` says he discarded it;
-- `--keep <branch>` when he said "later". It stays, and the retro gets
-  one "Got stuck" line saying where it is.
-
-Nothing in `rulings.md` about it: keep it, and say so in the retro.
+- `--keep <branch>` when he said "later", or when `rulings.md` says
+  nothing about it.
 
 ## What the script cannot see
 
@@ -41,8 +39,3 @@ Nothing in `rulings.md` about it: keep it, and say so in the retro.
 | staging actors created for the video | the project's staging-actor command, delete, for this front's actors |
 | cloud sessions the front launched | none still running (the execute's list of cloud runs) |
 | remote `feat/` or `hotfix/` branches still there | the ruleset deletes merged branches; one left is listed as `his` (it does not count against the empty `--check`): name it in the message |
-
-## The proof
-
-The final `--check` output goes into `05-close/trace.md`. The close's
-`/goal` is not done until it reads "nothing of <slug> is left".

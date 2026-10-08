@@ -40,10 +40,8 @@ for it.
 
 ## How you work
 
-The film moves through gates. Each gate is a file or a check, and the
-next one starts only when it passes. The detail is in
-`references/production-contract.md`, and the templates are in
-`templates/`.
+The film moves through gates; the next starts only when the last
+passes (`references/production-contract.md`, templates in `templates/`).
 
 ```
 brief → assets → style guide + shot list → film.tsx + check → contact sheet
@@ -65,11 +63,11 @@ brief → assets → style guide + shot list → film.tsx + check → contact sh
    whoever writes the shot list (you, in a stage report) runs the blind
    text test: the on-screen text, in order and nothing else, goes in
    `reviews/blind-text.md`, then
-   `node <kit>/blind.mjs reviews/blind-text.md reviews/blind.md`. A fresh
-   Sonnet 5.5 (low) session with no context explains the subject back in
-   five sentences and lists every word that blocked it. Fix the text and
-   run it again until the explanation matches your three to five things,
-   three runs at most; what is still wrong goes in your return.
+   `node <kit>/blind.mjs reviews/blind-text.md reviews/blind.md` (a
+   reader with no context explains it back and lists the words that
+   blocked it). Fix the text and run it again until the explanation
+   matches your three to five things, three runs at most; what is still
+   wrong goes in your return.
 4. **Film.** Write `film.tsx` with the library (`references/motion.md`),
    starting from `claude/video/example/film.tsx`. Then run
    `node <kit>/film.mjs check film.tsx`, which bundles the film and lists
@@ -80,8 +78,8 @@ brief → assets → style guide + shot list → film.tsx + check → contact sh
    contract's checklist: readable at 360 px wide, the subject filling the
    frame, inside the safe area, real assets,
    one type scale and one palette, the subject read by 2 s, the caption
-   treatment changing with the beat's role (hook, step, end) instead of
-   one band on every beat, and a last frame that works as a poster. Fix it all in one pass, then redo only
+   treatment changing with the beat's role (hook, step, end), and a last
+   frame that works as a poster. Fix it all in one pass, then redo only
    the stills you changed (`--scene <id>`).
 6. **Render once:** `<kit>/render.sh film.tsx out.mp4` with the flags in
    the table below. It waits for the machine (`queued on …` means wait,
@@ -120,15 +118,11 @@ files or docs that weren't asked for.
 made from it by cropping.
 
 **2D by default.** Use 3D (`references/three.md`) only when the brief asks
-for it. A 3D scene costs about as much per frame as a whole 2D scene at
-1080p.
+for it.
 
-**Render time is the budget.** On the shared machine, a 2D frame costs
-about 0.3 to 1.1 s and a 1080p frame with real footage about 0.7 s. So a
-60 s stage film (1,800 frames) takes roughly 10 to 30 minutes, and a
-2-minute users' film at 1080p about 40 minutes. Shorter is faster:
-cut a scene before you lower the reading time. The details are in
-`references/render.md`.
+**Render time is the budget.** A 60 s stage film takes roughly 10 to 30
+minutes on the shared machine (`references/render.md`). Shorter is
+faster: cut a scene before you lower the reading time.
 
 ## The rules on screen
 
@@ -175,8 +169,7 @@ cut a scene before you lower the reading time. The details are in
 - **No real person's data.** Names, emails and documents on screen are
   synthetic, recorded on a test or staging account, never production. A
   real person's name never appears, even as an example.
-- **Language.** `claude/references/artifact-writing.md` sets it, with
-  its one exception for a film: the close's video for users. Every
+- **Language.** `claude/references/artifact-writing.md` sets it. Every
   accent right. The kit has no words of its own.
 
 ## The look
@@ -184,12 +177,13 @@ cut a scene before you lower the reading time. The details are in
 The look is the style guide. In a stage report, the style guide takes
 the report's palette from `claude/report/tokens.css` (the dark set: the
 ground, the greys, the status colours as the one accent) and the kit's
-closest faces (Inter Tight, IBM Plex Mono). Without one from the caller,
-choose it for the subject: start from `THEMES.ink` or `THEMES.paper`, then change the
-accent, the fonts (the kit's local faces) and the background. Keep one
-accent for the one thing that matters in each scene. Each object moves by
-its class (`references/motion.md`), and after every move the viewer knows
-where to look.
+closest faces (Inter Tight, IBM Plex Mono). Without one from the
+caller, choose it for the subject: start from `THEMES.ink` or
+`THEMES.paper`, then change the accent, the fonts (the kit's local
+faces) and the background. Keep one accent for the one thing that
+matters in each scene. Each object moves by its class
+(`references/motion.md`), and after every move the viewer knows where
+to look.
 
 Avoid these template defaults: big centred text on every scene,
 everything fading in the same way, everything overshooting, a gradient

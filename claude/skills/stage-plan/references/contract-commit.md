@@ -29,9 +29,3 @@ goes with that entry.
 
 Only a security hole (a route spec'd without auth, a secret, a grant too
 wide). Everything else is a note for the entry that fills the stub.
-
-## Example
-
-A module that does not exist yet: the strict server does not compile
-without a handler for each operation, so `C` carries the stubs and the
-module's registration. Even a whole new app is `C` + `E-01`.

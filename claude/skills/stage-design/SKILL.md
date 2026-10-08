@@ -66,9 +66,6 @@ D0 reading → D1 his idea → D2 architect → guard → your ruling
 | `claude/references/judging.md` | before D6: the shared scale (blocks · note) and owners |
 | `00-discovery/stories.md`, `proposal.md`, the six documents | whole: you rule on them |
 
-Anything else you need (the code, the standards, other fronts, the
-mock) goes to a scout.
-
 ## Files
 
 ```
@@ -228,10 +225,6 @@ carries. In one message, in parallel:
   `data-and-contracts`), the standards' path, the language. Keep each
   id in `.state.md`.
 
-A document with nothing to carry (no table, no resource, no new access
-rule) gets no writer: write it yourself as one line,
-`None: <why>`.
-
 **The writers' questions** come back in their reports. Merge the ones
 that are one choice and answer each once, in the notes' "Questions
 answered", then to every writer it touches:
@@ -267,8 +260,7 @@ standard; contracts `references/contracts.md`:
 | `design-contracts (Sonnet 5.5, high)` | does each Contract hold against the code that exists and the code that will be generated? every field marked? |
 | `overengineering-guard (Opus 5.5, medium)` | what in the documents serves no AC and no real risk? |
 
-Save each return, as it came, in `reviews/`. AC coverage is not a lens:
-`review-prep.mjs` already proved it.
+Save each return, as it came, in `reviews/`.
 
 **Rule** every finding in `reviews.md` before any fix moves, by
 `claude/references/judging.md`:
@@ -286,7 +278,7 @@ The guard's finding blocks only with a concrete quote of what serves no
 AC and no real risk; "could be simpler" is a note and never starts
 anything. Stage the documents (`git add`) before the fixes go out;
 verify each fix by `git diff -- <file>` against the finding, opening
-the file only when they disagree, then `review-prep.mjs` again. **There is no second round.**
+the file only when they disagree, then `review-prep.mjs` again.
 
 ## D7 · The report, the cleanup, the close
 
@@ -302,9 +294,8 @@ the background, as `claude/docs/stage-report.md` describes:
 While they work, clean what this stage created (scratch folders, a
 stack brought up for a check). When they return: every number on a
 slide is checked against a document or the notes; `gitleaks dir
-<workstream>` (or `make gitleaks dir=<workstream>` when gitleaks is not on PATH) is clean (a finding stops
-the publish); publish to the front's link with the label "design
-closed".
+<workstream>` is clean (a finding stops the publish); publish to the
+front's link with the label "design closed".
 
 Then `.state.md` to `stage: plan`, commit the workstream folder (push
 only on his word), and one message:
@@ -328,11 +319,9 @@ only the affected tab is rebuilt.
 `reviews.md` rulings → D6; otherwise D7. The architect and the writers
 of an earlier session are gone: a fresh one reads its file (and
 `proposal.md` with "Changes per round") before acting, and never
-rewrites a finished file. Never resume from memory.
+rewrites a finished file.
 
 ## How to write
 
 Literal sentences, one idea each, concrete values, his words quoted
-where they decide something. The documents are written in his
-language; ids, headings and keywords stay as the templates have
-them.
+where they decide something.

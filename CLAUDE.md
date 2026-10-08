@@ -8,7 +8,9 @@ is the kit (`realpath ${CLAUDE_SKILL_DIR}/../..`, written as `kit:` in
 `<designs-root>` is the folder named by the line `designs-root: <path>`
 in the project's own `CLAUDE.md` (or its `CLAUDE.local.md`), for the
 fronts' folders and `_coordination.md`; never a folder named by a
-`CLAUDE.md` in a parent directory.
+`CLAUDE.md` in a parent directory. A workflow runs by `scriptPath`;
+when the Workflow tool refuses the kit's path, pass the file's whole
+content as `script` (same `args`).
 
 ## One door, six stages, what each asks of him
 
@@ -86,9 +88,9 @@ read this file, `[user]` lines first.
 In every skill, table, README and message that names an agent, the
 name carries the model and the effort in parentheses:
 `story-writer (Sonnet 5.5, high)`, `the conductor (Opus 5.5, high)`.
-Only Opus 5.5 and Sonnet 5.5 are used; every main session runs on Opus
-5.5, high; subagents are mostly Sonnet 5.5, never above high. The one
-table, with the evidence for each pick, is
+Opus 5.5 and Sonnet 5.5 are used, and Haiku 5.5 where the table says;
+every main session runs on Opus 5.5, high; subagents are mostly Sonnet
+5.5, never above high. The one table, with the evidence for each pick, is
 [docs/models.md](docs/models.md); `node scripts/check-models.mjs`
 fails when a frontmatter, a workflow or the table disagree.
 
@@ -157,9 +159,9 @@ tabs, **Video · Deck · Explainer** (the short route's exceptions are in
 data is a graph or a timeline. **A stage closes only when its three
 tabs are published**: he validates through them. Before each publish,
 `gitleaks dir <workstream>` must be clean (where gitleaks is not on
-PATH, the project's own target: `make gitleaks dir=<workstream>`). The page stays private;
-anything published outside the company needs his approval. The
-procedure is [docs/stage-report.md](docs/stage-report.md).
+PATH, `make gitleaks dir=<workstream>`, here and in every stage). The
+page stays private; anything published outside the company needs his
+approval. The procedure is [docs/stage-report.md](docs/stage-report.md).
 
 The stage files (`*.md` under the front) are written for the machine,
 complete and exact, in his language (his words verbatim; ids, keywords

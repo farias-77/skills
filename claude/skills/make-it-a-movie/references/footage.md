@@ -8,9 +8,6 @@ two ways to bring them in:
 - **Footage** (`Screen`) shows the motion of the product itself: a menu
   opening, a list filling. Use it where that motion explains the step.
 
-Record on staging or a test account with synthetic data, never on
-production.
-
 ## Screenshots with `Shot`
 
 Take them at 1920×1080 (Playwright `page.screenshot`, viewport

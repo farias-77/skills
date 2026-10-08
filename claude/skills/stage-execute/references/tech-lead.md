@@ -49,28 +49,3 @@ overlap: settle it now, before it is a conflict.
 | Disk under 10 GB free | no new local stack starts; under 5 GB, stop and clean (worktrees and stacks of merged entries first) |
 | The first front after the Haiku A/B (`exec-gate` live check, `docs/models.md`) | on 2–3 real entries, right after the entry's gate returns, dispatch `exec-gate` once more on the same head with Haiku 5.5, medium, without the stack; record both results (green, each `code`/`machine` tag, the surface) on the board and act only on the Sonnet one. They agree → note in `dreaming-notes.md` that `exec-gate` switches to Haiku 5.5, medium |
 | Nothing in flight and nothing can start | decide what is the session's; only what is his becomes a notification and one question. Never stand still in silence |
-
-## Night and limits
-
-- The machine does not sleep while anything is in flight:
-  `systemd-inhibit --what=sleep:idle --why="<slug> execute" sleep infinity`
-  in the background, stopped at the close. The queue runs through the
-  night on its own.
-- No cap on cloud entries: every ready entry starts. A rate limit is
-  waited out and retried, never pre-empted by a cap.
-
-## Examples
-
-**Two entries, one fix.** E-02 and E-05 both return "the shared date
-formatter rounds wrong". E-02 is on the critical path: it fixes it in
-its resume. E-05's resume says "do not touch the formatter; merge `feat`
-after E-02 lands".
-
-**Round-cap with a clear fix.** E-01 parked: the reviewer blocked twice,
-the region came from the request body. `security-and-access.md` says the
-region comes from the session. One resume with a fresh budget, the fixes
-file quoting that line. E-int starts once E-01 is in `feat`.
-
-**Rate limit.** Three entries come back `interrupted` at once, the reset
-in 35 minutes. The tech lead waits without spending turns, resumes the
-critical path's entry, the others five minutes later.

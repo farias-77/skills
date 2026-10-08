@@ -89,7 +89,7 @@ calibration before golden paths).
 
 | # | Role | Usual fix | Cost | Template |
 |---|---|---|---|---|
-| 14 | permissions, guard, authorization | in **every session root**: `.claude/settings.json` merged (lists unioned, the stricter rule wins, except a project deny that shadows a template allow the routes need: flagged and replaced by the template's narrow denies, [permissions.md](templates/permissions.md)), with the PreToolUse **fail-closed wrapper** on `Bash\|Edit\|Write\|MultiEdit\|NotebookEdit`, timeout 60, and the PostToolUse **fail-open wrapper** of `remind-scout.sh`, timeout 5; `guard-irreversible.sh`, `authorize.sh`, `remind-scout.sh` and their tests copied to `.claude/hooks/`; credential reads denied; dead rules pruned; a no-comment rule excludes `.claude/hooks/` | S | [settings.json](templates/settings.json), [permissions.md](templates/permissions.md), the pipeline's `claude/hooks/` |
+| 14 | permissions, guard, authorization | in **every session root**: `.claude/settings.json` merged (lists unioned, the stricter rule wins, except a project deny that shadows a template allow: [permissions.md](templates/permissions.md)), with the PreToolUse **fail-closed wrapper** on `Bash\|Edit\|Write\|MultiEdit\|NotebookEdit`, timeout 60, and the PostToolUse **fail-open wrapper** of `remind-scout.sh`, timeout 5; `guard-irreversible.sh`, `authorize.sh`, `remind-scout.sh` and their tests copied to `.claude/hooks/`; credential reads denied; dead rules pruned; a no-comment rule excludes `.claude/hooks/` | S | [settings.json](templates/settings.json), [permissions.md](templates/permissions.md), the pipeline's `claude/hooks/` |
 | 1 | standards and the commands table | the index, and the commands table in `CLAUDE.md` naming what exists (a role with no command is written as missing, never invented); the line `designs-root: <absolute path>` in `CLAUDE.md` (in `CLAUDE.local.md` when the path is per machine), asked of him once when the audit found none: every stage stops without it | S | — |
 | 6 | the signoff command | when the project has none: `claude/scripts/local-ci.sh` copied into its tooling, with its gate and down commands set, and named in the commands table; the bot token and the ruleset go to the user | S | the pipeline's `claude/scripts/local-ci.sh` |
 | 7 | gate paths and the floor | `CODEOWNERS` narrowed to the gate paths; the floor target is L | S · L | — |
@@ -168,8 +168,5 @@ check), then ask: "Push the branches and open pull requests"
 ## Boundaries
 
 - Never a force-push, never a merge.
-- Never posts a commit status, changes a ruleset, creates an identity,
-  writes or reads a secret: those are listed for him with their
-  command.
 - Never edits the pipeline repo; a gap in the bar is noted in the
   readiness file for the weekly retro.

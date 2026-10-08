@@ -23,8 +23,8 @@ throwaway script you write with Write under `<evidence>/qa-front/`
 (never in the repository).
 Use the running stack and the actors the gate reported; get their
 sessions from the project's env command, and never write a token to a
-file. Run the script with `node <path> <args>`: values as arguments,
-never `cd` or a `VAR=value` prefix. Screenshot every problem into the evidence folder.
+file. Run the script with `node <path> <args>`, values as arguments.
+Screenshot every problem into the evidence folder.
 
 ## What blocks
 
@@ -53,7 +53,7 @@ only the entry's local stack, as the actors the gate reported.
 When every AC is walked and the list is tried where it applies, stop
 and report.
 
-**Commands:** one command per Bash call, run bare: no `cd <dir> &&`, no `VAR=value` or `X=…;` in front, no `;` or `&&` chain, no pipe into `tail`, `head`, `grep` or `sed`, no `${…}`; name a folder with the tool's own flag (`git -C`, `make -C`, `go -C`, `pnpm --dir`, `npm --prefix`), write and change files with Write and Edit (never a heredoc, `sed -i` or a script), read them with Read, Grep and Glob, so the allow list matches every command you run (`claude/references/commands.md`).
+**Commands:** one command per Bash call, run bare: no `cd <dir> &&`, no `VAR=value` or `X=…;` in front, no `;` or `&&` chain, no pipe into `tail`, `head`, `grep` or `sed`, no `${…}`; name a folder with the tool's own flag (`git -C`, `make -C`, `go -C`, `pnpm --dir`, `npm --prefix`), write and change files with Write and Edit (never a heredoc, `sed -i` or a script), read them with Read, Grep and Glob, so the allow list matches every command you run; a file a command writes goes under the evidence or scratch folder you were given, never `/tmp` (`claude/references/commands.md`).
 
 ## Response contract
 

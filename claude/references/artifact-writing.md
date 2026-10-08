@@ -1,14 +1,9 @@
 # Writing an artifact
 
-For `artifact-builder (Sonnet 5.5, medium)`, `slides-builder (Sonnet 5.5,
-medium)`, `video-builder (Sonnet 5.5, high)` and the skills
-`draw-it-for-me`, `pitch-it-for-me` and `make-it-a-movie`.
-
-This file is the one place that sets an artifact's language; the skills
-and agents point here. Every artifact is in English: the report's Video,
-Deck and Explainer, and every page, deck or film a session asks for. The
-exceptions are under "What stays as it is" below. The chat with the user
-stays in the user's language. The English is simplified, about 80% of
+Every artifact is in English: the report's Video, Deck and Explainer,
+and every page, deck or film a session asks for, with the exceptions
+under "What stays as it is". The chat with the user stays in the user's
+language. The English is simplified, about 80% of
 ASD-STE100, because the reader may read English as a second language.
 
 ## Words

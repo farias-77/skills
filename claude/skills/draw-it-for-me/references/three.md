@@ -2,8 +2,8 @@
 
 3D earns its place when depth itself explains something: layers stacked
 in front of each other, data flowing through pipes, a system pulled apart,
-a map. A spinning logo or 3D bars do not. Ask for high effort before
-building a complex scene, and say in one line why 2D would not do.
+a map. A spinning logo or 3D bars do not. Say in one line why 2D would
+not do.
 
 **Every scene has a fallback.** Draw the same picture as a still SVG in
 the scene's box first. Start WebGL after the page has painted, and swap

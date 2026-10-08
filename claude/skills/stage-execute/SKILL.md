@@ -56,8 +56,6 @@ The builders read [builders.md](references/builders.md) with
 [backend.md](references/backend.md) or
 [frontend.md](references/frontend.md); the reviewer reads
 [review.md](references/review.md); the QAs read [qa.md](references/qa.md).
-The product's own standards and golden paths are the "how"; these are
-the roles.
 
 ## Inputs and outputs
 
@@ -82,8 +80,7 @@ environment exists (the bar, `docs/project-contract.md`).
 
 1. **The house rules.** Read the file that
    `realpath ${CLAUDE_SKILL_DIR}/../../../CLAUDE.md` prints and run its
-   Open: the canary (in the product
-   repo).
+   Open: the canary (in the product repo).
 2. The pre-flight was checked at plan. List only the items he must run
    himself (from `preflight.md`), each with its `!` command. An item
    still missing parks only the entries it blocks.
@@ -255,10 +252,9 @@ read its evidence branch first, then restart the watcher.
 
 ## Boundaries
 
-No product code and no review by the session. No merge into `main`
-(that is the release's step 1). Nothing merges that did not come back
-`ready` and pass the queue's affected gate. No status posted except by
-the signoff command. No re-decision of the design or the plan: a node that
-cannot be built as designed parks with the quote, and he decides. Notes
-are read, never built. Frictions go to `dreaming-notes.md` as they
-happen. Every agent named carries its model and effort.
+No product code and no review by the session. No merge into `main`.
+Nothing merges that did not come back `ready` and pass the queue's
+affected gate. No status posted except by the signoff command. No
+re-decision of the design or the plan: a node that cannot be built as
+designed parks with the quote, and he decides. Notes are read, never
+built.

@@ -26,8 +26,6 @@ to what changed; skip what the change cannot affect, and say so.
 5. **Every number shown twice agrees**: a total, a badge, a count, a
    list's length, a date, on both screens and after a reload.
 
-Screenshot each problem into the evidence folder.
-
 ## API (qa-backend)
 
 1. **The ACs.** Each AC a caller sees: the request as its actor, the
@@ -45,8 +43,6 @@ Screenshot each problem into the evidence folder.
      5xx, nothing stored.
 3. **The log** of each request: no person's data, no token.
 
-Keep every command in `<evidence>/qa-back/commands.md`.
-
 ## Blocks or note
 
 Blocks only what a user or a client would hit, with the steps (or the
@@ -58,8 +54,6 @@ that opens a new tab, a missing integration key (a note when the screen
 shows the raw error), and behaviour the code, tests or copy call intended.
 
 An AC's case you could not run (the stack down, an actor missing, a
-route unreachable) is never a pass: its AC id, the case and why go in
-`inconclusive`. A case outside the ACs (a break-it case, a state, a
-change of data the ACs do not name) that you did not run is a note,
-never `inconclusive`. The stack and its seed are the entry's own:
-writing through the screens or the API as an actor is fine.
+route unreachable) is never a pass: it goes in `inconclusive`; a case
+outside the ACs that you did not run is a note. The stack and its seed
+are the entry's own: writing through the screens or the API is fine.

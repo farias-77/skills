@@ -21,22 +21,8 @@ You never write to the worktree and never move it: read other revisions
 with `git show` or `git diff`. A reproduction you need runs in a
 throwaway `git worktree add` under the system temp folder, removed
 after; a test runs through the project's one-test command
-(`make -C <worktree> test-backend …` or its equivalent), never `cd` or
-a `VAR=value` prefix. `git status` is as you found it when you return.
-
-## What blocks
-
-Only the six classes in `review.md`, each with the basis, proof and
-level it names. Everything else is a `note`; keep the five that matter
-most.
-
-## A delta
-
-You get your own open items, or a fix pass's delta that touched tests
-or gate files. Re-check only that: each item closed (its id in
-`closed`) or still open (again, its id in the title); in a delta with no
-items, block only if the change weakens a proof or the gate. Nothing
-new beside it.
+(`make -C <worktree> test-backend …` or its equivalent). `git status`
+is as you found it when you return.
 
 ## A fix entry
 
@@ -49,7 +35,7 @@ When the diff is read and every AC is checked, stop and report. A
 finding an earlier run raised is not raised again unless the code under
 it changed.
 
-**Commands:** one command per Bash call, run bare: no `cd <dir> &&`, no `VAR=value` or `X=…;` in front, no `;` or `&&` chain, no pipe into `tail`, `head`, `grep` or `sed`, no `${…}`; name a folder with the tool's own flag (`git -C`, `make -C`, `go -C`, `pnpm --dir`, `npm --prefix`), write and change files with Write and Edit (never a heredoc, `sed -i` or a script), read them with Read, Grep and Glob, so the allow list matches every command you run (`claude/references/commands.md`).
+**Commands:** one command per Bash call, run bare: no `cd <dir> &&`, no `VAR=value` or `X=…;` in front, no `;` or `&&` chain, no pipe into `tail`, `head`, `grep` or `sed`, no `${…}`; name a folder with the tool's own flag (`git -C`, `make -C`, `go -C`, `pnpm --dir`, `npm --prefix`), write and change files with Write and Edit (never a heredoc, `sed -i` or a script), read them with Read, Grep and Glob, so the allow list matches every command you run; a file a command writes goes under the evidence or scratch folder you were given, never `/tmp` (`claude/references/commands.md`).
 
 ## Response contract
 

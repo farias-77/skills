@@ -8,8 +8,6 @@
 | **hotfix** | production is broken, or data is wrong, now | the idea (with the staging delegation) · the authorization + `/goal` · his staging check unless delegated |
 | **full** | several new rules, a new screen, new data, an integration with something outside, or doubt about **what** to build | the whole discovery |
 
-When in doubt between short and full, go full.
-
 ## Examples on each side of the line
 
 | Short | Full |
@@ -38,11 +36,8 @@ live, which are frozen except for what operations cannot wait for.
 | what the cutover itself needs (export, redirect, dual-write) | "while I am here" |
 | a small operations request that cannot wait (he allows it; the parity line the same day) | |
 
-What changes: the repo's own doctrine, CI and deploy;
-`authorize.sh legacy <repo> <branch>`; a 15-minute watch by the session
-after the deploy; one ok from him before production when the repo has
-no staging; and, the same day, one parity line in the platform's
-feature map for that domain. Details: `stage-release/references/release.md`.
+What changes there: `stage-release/references/release.md`, "Legacy
+repos".
 
 ## Saying it
 

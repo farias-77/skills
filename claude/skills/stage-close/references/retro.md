@@ -37,10 +37,3 @@ weekly.
    weekly; group what is one idea.
 5. **Unmerged work kept for later** (the cleanup's `kept` lines): one
    "Got stuck" line saying where it is.
-6. Written in his language, short lines, one idea each.
-
-## After the close
-
-The retro closes on its own. When he comments, append his words at
-the end, verbatim, marked `[user]`, with the date. Nothing else
-changes.
