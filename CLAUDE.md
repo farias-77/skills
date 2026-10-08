@@ -7,9 +7,11 @@ is the kit (`realpath ${CLAUDE_SKILL_DIR}/../..`, written as `kit:` in
 `.state.md`); `docs/…` sits beside it in the pipeline repo;
 `<designs-root>` is the folder named by the line `designs-root: <path>`
 in the project's own `CLAUDE.md`, in git, for the fronts' folders and
-`_coordination.md`; a relative path resolves from the project's repo
-root (`git rev-parse --show-toplevel`), an absolute one stands as
-written; never a folder named by a `CLAUDE.md` in a parent directory. A workflow runs by `scriptPath`;
+`_coordination.md`. A relative path resolves from the project's main
+checkout, so a worktree resolves it the same as the checkout:
+`dirname "$(git rev-parse --path-format=absolute --git-common-dir)"`;
+an absolute one stands as written. Never a folder named by a
+`CLAUDE.md` in a parent directory. A workflow runs by `scriptPath`;
 when the Workflow tool refuses the kit's path, pass the file's whole
 content as `script` (same `args`).
 

@@ -200,8 +200,8 @@ Each stage reads the house rules (`CLAUDE.md` at the clone's root) at
 its opening, so the project does not import them. Name the designs
 root (where each front's folder lives) with the line
 `designs-root: ../designs` in the project's `CLAUDE.md`, in git (a
-relative path resolves from the repo root; an absolute one is accepted
-too); every stage stops without it.
+relative path resolves from the main checkout, worktrees included; an
+absolute one is accepted too); every stage stops without it.
 Then, in Claude Code inside the project:
 `/pipeline-setup .`
 

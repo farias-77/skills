@@ -64,8 +64,8 @@ commands table that names the command, file or folder of every role
 here, the worktrees root, and whether a cloud environment exists; and
 the line `designs-root: ../designs` (the folder that holds each
 front's folder and `_coordination.md`) in `CLAUDE.md`, in git, relative
-to the repo root (an absolute path is accepted too). Without it every
-stage stops at its open.
+to the main checkout, worktrees included (an absolute path is accepted
+too). Without it every stage stops at its open.
 
 **Why.** The pipeline carries no taste of its own. A reviewer's
 finding blocks on a `rule` basis only when it cites a written rule.
