@@ -1,0 +1,38 @@
+/* The report's look: the one set of tokens the shell, the decks, the explainers and the films read.
+   Pages link it (the shell as tokens.css, an explainer as ../tokens.css, a deck's theme.css as ../../tokens.css). */
+@import url('https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500&display=swap');
+
+:root {
+  --bg: #fbfbfb; --surface: #ffffff; --surface-2: #f7f7f8; --surface-3: #f0f0f2;
+  --line: #ececef; --line-strong: #dcdce0;
+  --ink-1: #111113; --ink-2: #52525a; --ink-3: #6b6b72;
+  --focus: #111113; --ring: rgba(17, 17, 19, .12);
+  --ok: #16a34a; --warn: #ca8a04; --bad: #dc2626; --idle: #a1a1a8;
+  --ok-tint: rgba(22, 163, 74, .10); --warn-tint: rgba(202, 138, 4, .12); --bad-tint: rgba(220, 38, 38, .08);
+  --dot: rgba(17, 17, 19, .30);
+  --f-sans: 'Geist', 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --f-mono: 'Geist Mono', ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+  --r-chip: 5px; --r-control: 6px; --r-card: 10px;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #09090a; --surface: #0e0e10; --surface-2: #131316; --surface-3: #1a1a1e;
+    --line: #1e1e22; --line-strong: #2a2a2f;
+    --ink-1: #ededef; --ink-2: #a1a1a8; --ink-3: #85858c;
+    --focus: #ededef; --ring: rgba(237, 237, 239, .18);
+    --ok: #22c55e; --warn: #eab308; --bad: #ef4444; --idle: #6b6b72;
+    --ok-tint: rgba(34, 197, 94, .12); --warn-tint: rgba(234, 179, 8, .12); --bad-tint: rgba(239, 68, 68, .12);
+    --dot: rgba(236, 236, 239, .40);
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #09090a; --surface: #0e0e10; --surface-2: #131316; --surface-3: #1a1a1e;
+  --line: #1e1e22; --line-strong: #2a2a2f;
+  --ink-1: #ededef; --ink-2: #a1a1a8; --ink-3: #85858c;
+  --focus: #ededef; --ring: rgba(237, 237, 239, .18);
+  --ok: #22c55e; --warn: #eab308; --bad: #ef4444; --idle: #6b6b72;
+  --ok-tint: rgba(34, 197, 94, .12); --warn-tint: rgba(234, 179, 8, .12); --bad-tint: rgba(239, 68, 68, .12);
+  --dot: rgba(236, 236, 239, .40);
+  color-scheme: dark;
+}

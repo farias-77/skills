@@ -1,0 +1,29 @@
+{
+  "title": "Orders",
+  "slug": "2026-10-05-orders",
+  "lang": "en",
+  "route": "full",
+  "updatedAt": "05/10 16:40",
+  "notices": [
+    {"tone": "warn", "text": "Design video renders after the plan's (queue)."}
+  ],
+  "stages": [
+    {"id": "discovery", "name": "Discovery", "state": "closed", "closedAt": "05/10 11:05",
+     "numbers": {"time": "1 h 40 min", "cost": "US$ 3.10", "touches": "6"},
+     "tabs": {"video": {"state": "failed", "why": "The render ran out of disk; the line is in dreaming-notes.md."},
+              "deck": {"state": "building"},
+              "explainer": {"state": "building"}}},
+    {"id": "design", "name": "Design", "state": "closed", "closedAt": "05/10 14:20",
+     "numbers": {"time": "2 h 05 min", "cost": "US$ 5.80", "touches": "3"},
+     "tabs": {"video": {"state": "building"},
+              "deck": {"state": "ready", "dir": "design/deck"},
+              "explainer": {"state": "none", "why": "Example: the architecture explainer is not part of this sample."}}},
+    {"id": "plan", "name": "Plan", "state": "running",
+     "tabs": {"video": {"state": "building"},
+              "deck": {"state": "building"},
+              "explainer": {"state": "ready", "file": "plan/explainer.html"}}},
+    {"id": "execute", "name": "Execute", "state": "todo"},
+    {"id": "release", "name": "Release", "state": "todo"},
+    {"id": "close", "name": "Close", "state": "todo"}
+  ]
+}

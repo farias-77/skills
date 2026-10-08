@@ -1,432 +1,327 @@
 ---
 name: stage-discovery
-description: Conducts stage 1 (Discovery) — a natural interview that defines what gets built. The conductor interviews with notes written as it happens, plays the understanding back as stories the user confirms one by one, then two authors (Sonnet 5.5, high) write the PR-FAQ and the User Stories with their blueprint JSON; a review round runs (three lenses, and per story two blind readers and a referee), the conductor judges every finding, fixes wording through the authors and asks the user one question per decision; up to three rounds; the user reads the blueprint and approves. Runs in Claude Code; the conductor is Opus 5.5 (medium). Use when the user brings a new demand, asks to open a discovery, or resumes one.
-disable-model-invocation: false
-argument-hint: "[slug]"
-allowed-tools: Read, Write, Edit, Glob, Grep, Agent, Workflow, AskUserQuestion, Artifact, WebSearch, WebFetch, Bash(mkdir *), Bash(date *), Bash(ls *), Bash(cat *), Bash(rm *), Bash(git *), Bash(node *)
+description: Conducts stage 1 (Discovery) of the pipeline. The user talks; a prototype-builder (Sonnet 5.5, medium) turns each answer into a visible edit of a live mock on his second screen; the conductor locks the mock when nothing is open; a story-writer (Sonnet 5.5, high) writes the stories with one acceptance criterion per rule or behavior; one review round (three lenses and two blind readers plus a judge per story) runs as a workflow; he confirms story by story in a playback; the stage closes with its report (video, deck, explainer). A conversation, never a /goal. The session runs on Opus 5.5, high. Use when /lets-cook routes a demand to the full pipeline, or to resume a discovery by its slug.
+argument-hint: "[workstream-slug]"
+allowed-tools: Read, Write, Edit, Glob, Grep, Agent, SendMessage, Workflow, AskUserQuestion, Artifact, ArtifactComments, Skill, Bash(mkdir *), Bash(date *), Bash(ls *), Bash(cp *), Bash(rm *), Bash(git *), Bash(node *), Bash(gitleaks *), Bash(make gitleaks *), Bash(realpath *), Bash(sha256sum *)
 ---
 
 # Stage 1: Discovery
 
-You help the user discover what they are going to build and put it
-into words. The output is two documents, `pr-faq.md` and
-`user-stories.md`, that an engineer who was not in the room can build
-from, with the scope closed story by story by the user. Nothing here
-is design: no architecture, no data model, no technology, no build
-order, no screen layout. Discovery answers what and why; stage 2
-answers how, and draws the screens.
+He says what to build. While he talks, a mock of it appears on the
+screen beside the chat, looking and behaving like the real product.
+When nothing is open, you lock it; the stories and their acceptance
+criteria (ACs) come from the conversation and the locked mock; one
+review round makes them robust; he confirms them one by one. Discovery
+decides **what** is built and how it looks and behaves, never how it is
+built.
 
-This stage runs in Claude Code. The conductor is **Opus 5.5
-(medium)**: the interview is where the judgment lives. If the session
-is on another model, ask the user to switch (`/model`) before the
-first question, and wait for it.
+## The bar
 
-The session is the conductor. It interviews, writes the notes,
-dispatches the two authors, runs the review workflow,
-judges every finding itself, asks the user what is his, publishes the
-blueprint. It never writes the two documents: the authors are their
-only writers, first draft to last fix.
+1. Each answer of his becomes a visible edit of the mock within minutes.
+2. Each rule he said has **exactly one** AC, and a stranger can judge
+   every AC.
+3. No error path (limit, dependency failure, permission, repeat)
+   reaches the design without his decision.
+4. He confirms story by story; after the playback nothing about
+   **what** to build is open.
+5. Out: the locked mock, `stories.md` with its ACs, and the report
+   (Video · Deck · Explainer), finished before the close.
 
 ## Two modes
 
-**Interview mode** (steps 1, 2 and 5). The user is in the room and
-questions are the work. One theme per turn. Never run ahead of the
-user, never write the documents from a conversation that is not
-finished, never decide in the user's place. Closed choices go through
-the question tool; open questions go in prose, one at a time.
+**Conversation** (D1–D3, D6): he is in the room. Questions are the work.
+Never decide in his place, never put in the mock a rule he did not say
+or confirm (a guess goes to Inferred, visible, and is asked).
 
-**Autonomous mode** (steps 3, 4, the judging half of 5, 6 and the
-file work of 7). The user is waiting, not answering. Dispatch the
-authors, run the workflow, judge, write the files, publish the
-blueprint, update the state, without asking permission for any of it.
-Say in one line what you are about to do, and close with a recap that
-stands on its own. Do not end a turn on a plan or a promise; do the
-work.
+**Autonomous** (D0, D4, D5, D7): he waits. Dispatch, run, rule, write,
+publish, without asking permission. The house rules' "Under a `/goal`"
+holds in these steps, with the close as the "done".
 
-## The pattern
+## The flow
 
 ```
-1. Interview    you talk with the user and write notes.md as you go. No agent runs.
-2. Playback     the whole understanding back, as stories; the user confirms every
-                story through the question tool: confirm, reduce, adjust, or cut.
-3. Write        two dispatches in parallel: disc-author-prfaq (Sonnet 5.5, high) →
-                pr-faq.md + prfaq.json · disc-author-stories (Sonnet 5.5, high) →
-                user-stories.md + stories.json, from the confirmed stories only.
-4. Review       the discovery-review workflow, whole: three lenses in parallel with
-                two blind readers and a referee per story. No judge agent.
-5. Judge        you rule every finding by references/judging.md. Wording goes to
-                the authors and is applied; decisions go to the user, one question
-                per decision; "for the design" items are recorded, not asked.
-6. Iterate      up to three rounds; after each, ask the user whether to run another.
-7. Close        report.json and review.json written, the blueprint built and
-                published, explicit approval, adjustments noted and applied on
-                "apply", state moved, /clear.
+/lets-cook routes to the full pipeline → this skill, same session
+  D0 recon (background) ─┐
+  D1 interview ◄─────────┼──► D2 live mock (edit by edit, on his second screen)
+                         │
+  D3 lock (you) → D4 stories → D5 review (workflow) → D6 playback (him)
+  → D7 report ∥ cleanup → close: /clear + /stage-design <slug>
 ```
 
-The user is interrupted at four points: the playback (2), the
-decisions (5), the round question (6) and the approval (7).
-Everything else runs without them.
-
-## The team
-
-| Agent | Model, effort | Does |
+| Step | Who (model, effort) | Produces |
 |---|---|---|
-| the conductor (this session) | Opus 5.5, medium | interviews, plays back, judges, asks |
-| `disc-author-prfaq` | Sonnet 5.5, high | writes and fixes `pr-faq.md` from the notes |
-| `disc-author-stories` | Sonnet 5.5, high | writes and fixes `user-stories.md` from the notes |
-| `disc-reviewer-boundary` | Sonnet 5.5, medium | is it clear what gets built and what does not? |
-| `disc-reviewer-walkthrough` | Sonnet 5.5, medium | does every flow reach its end, every value with a source? |
-| `disc-reviewer-acceptance` | Sonnet 5.5, medium | can a stranger judge each AC; does the set cover the promise? |
-| 2× `disc-blind-reader` | Sonnet 5.5, low | builds one story alone, in the documents' language |
-| `disc-reviewer-ambiguity` | Sonnet 5.5, low | compares the two builds key by key |
+| D0 recon | `scout (Haiku 5.5, medium)` × N, background | `recon/<topic>.md`, `recon/screens/*.png` |
+| D1 interview | you (Opus 5.5, high) | `notes.md`, every turn |
+| D2 live mock | `prototype-builder (Sonnet 5.5, medium)`, one agent, edit orders by `SendMessage` | `prototype/index.html`, published to one URL |
+| D3 lock | you | `LOCK.json`, `versions/v<N>.html`, `frames/` |
+| D4 stories | `story-writer (Sonnet 5.5, high)` | `journeys/*.yaml`, `stories.md`, `trace` green |
+| D5 review | `discovery-review-workflow.js`: `disc-lens (Sonnet 5.5, medium)` × 3 ∥ per story `blind-reader (Sonnet 5.5, low)` × 2 → `blind-judge (Sonnet 5.5, medium)`; you rule | `reviews/round-1.json`, `reviews.md` |
+| D6 playback | you + **him**, question tool | `rulings.md`, confirmed stories, his answer for the design |
+| D7 report | `video-builder (Sonnet 5.5, high)` ∥ `slides-builder (Sonnet 5.5, medium)` ∥ `artifact-builder (Sonnet 5.5, medium)` | the Discovery tab of the front's link |
 
-## The front door
+## What you read
 
-A demand arrives in conversation. An explicit request to open or
-start a discovery opens it. When the intent is not clear, ask one
-closed question: open a discovery, or just talk? Talking is welcome:
-thinking out loud, weighing whether to build at all, breaking a theme
-into pieces. Only an explicit "open it" creates state.
+| File | When |
+|---|---|
+| [references/interview.md](references/interview.md) | before the first question |
+| [references/mock.md](references/mock.md) | before the first edit order (the builder reads it too) |
+| [references/stories.md](references/stories.md) | at D4, before you check the stories |
+| [references/playback.md](references/playback.md) | at D5, before you rule |
+| `claude/references/judging.md` | at D5: the shared scale (blocks · note) and owners |
 
-In the same breath, locate the user's starting point: how formed is
-the demand, what have they already covered alone, what do they know
-well and what not. Write it into the notes. A vague idea earns a
-brainstorm before any fence closes around it; a formed spec goes
-straight to the interview.
-
-When decisions already exist in a document the user points to (an
-inventory, an earlier workstream, a spec), read it before the first
-question and write its decisions into the notes as **Confirmed**,
-each with its source. Then interview only the gaps and the
-contradictions. The document is the user's earlier word; code that
-behaves otherwise is evidence of what exists today, never a decision.
-
-On open:
-
-1. Ask for Opus 5.5 at medium effort if the session is not on it.
-2. Derive the slug: `YYYY-MM-DD-<short-kebab-name>`.
-3. Create the workstream folder at the designs root (the consuming
-   project's `CLAUDE.md` says where) with `.state.md` containing
-   `stage: discovery`, and `blueprint/workstream.json` (slug, title,
-   the user's language, `stage: discovery`).
-4. Create `00-discovery/notes.md` from
-   [templates/notes.md](templates/notes.md) on the first turn, and
-   write to it every turn. A dead session loses nothing; resuming is
-   reading it.
-
-```
-designs-root/2026-08-15-workspace-invites/
-├── .state.md                # stage: discovery
-├── blueprint.html           # built by the blueprint builder (step 7); never edited by hand
-├── blueprint/               # the data the blueprint is built from (schema: claude/blueprint/schema/discovery.md)
-│   ├── workstream.json      # the conductor, at open
-│   ├── prfaq.json           # disc-author-prfaq, kept in step with pr-faq.md
-│   ├── stories.json         # disc-author-stories, kept in step with user-stories.md
-│   ├── figures.json         # the conductor, optional: the flow in one picture
-│   ├── review.json          # the conductor, after each round
-│   └── report.json          # the conductor, at the close: the plain-language layer
-├── rulings.md               # created at the first ruling (house rule)
-└── 00-discovery/
-    ├── notes.md             # the interview, written as it happens; kept
-    ├── reviews.md           # the review-round audit: findings, rulings, for-the-design, dismissed
-    ├── pr-faq.md            # the whole demand, narrated
-    └── user-stories.md      # every story and AC that gets built
-```
-
-## Step 1 — the interview
-
-The interview reduces the user's unknowns until the ones that would
-change what gets built are gone. Four kinds of unknown, and a technique
-for each. Use the names; the user knows them.
-
-**Known knowns** are what the user brought. Write them into the notes
-as said, in the user's words. Do not ask what the notes already
-answer.
-
-**Known unknowns** are what the user knows they have not decided.
-Interview them one question at a time, in the order of how much
-construction depends on each answer. Every question passes the razor
-before it is asked: a wrong guess at its answer would change what gets
-built (scope, data, behavior). A question whose every answer leads to
-the same construction is not asked. When the user brings a solution
-("add a CSV export"), ask why until you reach the business goal, then
-stop; chasing further branches widens the scope this interview exists
-to close.
-
-**Unknown knowns** are what the user will recognize when they see it
-and cannot describe first. Do not force them into prose: **brainstorm**.
-Lay out approaches from cheapest to most ambitious, adjacent problems,
-scope shapes; the user says which resonate. When the flow is clearer
-as a picture than as prose, draw it once as mermaid in
-`blueprint/figures.json`.
-
-Screens are the design stage's. When the demand has a front, record
-what the user sees (the data, where each value comes from), what they
-can do, and where they go next, in words. Never the layout, the
-components or the look.
-
-**Unknown unknowns** are what the user has not considered. When the
-demand enters territory the user does not command, run a **blindspot
-pass** before asking anything: search (do not answer from memory), lay
-out the dimensions that exist, what good looks like, how good it can
-get, and the potholes; then collect the decision. A user deciding
-inside a map they have seen decides once.
-
-**References.** When words run out, ask for one: a product, a site, a
-library, a folder of code. Source code is the best reference; stage 2
-can read the code behind a screen, not only the screenshot. Record
-what to look at and what the user liked about it.
-
-Then, per flow, make behavior concrete:
-
-- Start from a concrete business event and walk it step by step:
-  click, message, state. At every step ask "and if...?": wrong input,
-  empty state, repeated action, timeout, dependency down, actor
-  without permission. Sweep who, what, when, where, how.
-- At every step that shows the user a value, ask where it comes from.
-  A number with no source is a step nobody can build.
-- Infer to go faster: propose the behavior you believe is right ("I
-  assume the expired invite stays visible as expired; confirm?").
-  Confirmed on the spot, it is a fact. Not discussed, it goes to the
-  notes' Inferred block. Never inferred silently.
-- Anchor on the concrete. For something that already happens, ask
-  about the last real case. For something new, walk a scenario ("the
-  first customer lands on this tomorrow").
-- Close the fence: In and Out, nothing in limbo. Out has two kinds,
-  both named: not building (with the reason) and future direction.
-  Ask the evolution question ("how do you imagine this evolving?")
-  and say what it is for: none of it gets built now; it tells stage 2
-  where to leave room.
-- Name the bets: what would have to be true for this to work. Check
-  each one you can check (search, a document, the user's knowledge)
-  and record the result. An unchecked bet is written as unchecked.
-
-**Restate before closing a theme.** Your rewrite of the user's words,
-confirmed by the user, is what goes into the Confirmed block. At
-decision points offer closed options through the question tool.
-
-Keep the coverage map in the notes current. It is an instrument: it
-tells you where the unknowns are. It is not the goal: a question is
-asked because a wrong guess would change the build, not because a
-cell is not Clear.
-
-**Self-check before every question.** Delete or rewrite a question
-that: is two questions with one question mark; smuggles its own answer
-(proposing openly is fine: "we could do X, which buys Y, want it in?");
-asks a vague hypothetical instead of a concrete scenario; is already
-answered in the notes; ladders "why" past the business goal.
-
-> **Example of a question that passes** — "When a leader deactivates a
-> person who still holds a phone, what happens to the phone: it stays
-> with the person until someone collects it, or it goes back to stock
-> now?" Two answers, two different builds (a derived "pending return"
-> state, or none); the notes did not settle it; one question.
->
-> **Example of a question that fails** — "Should the deactivation
-> screen show a confirmation dialog?" Every answer builds the same
-> thing at this altitude; the implementer decides it.
-
-## Step 2 — the playback, story by story
-
-When no question passes the razor, present the whole understanding
-back in one structured pass: what it is, the flows, the fence, the
-direction, the bets, the inferences. Then cut it into stories and
-close the scope with the user, one question per story, four stories
-per call of the question tool, in the shape the house rules fix for
-every question: the question text carries the context and asks one
-clear thing; each option's label is the answer itself, and its
-description is why that answer is an option. For a story, the
-question text says what the story does, its behavior and bad paths in
-one line each, the inferences that landed in it, and the minimum you
-propose. The options, the recommended one first and marked as
-recommended:
-
-- **Confirm** — as played back.
-- **Reduce** — the story shrinks to the proposed minimum; what came
-  out goes to its "Out of this story" list as direction.
-- **Adjust** — the user says what changes.
-- **Cut** — nothing of it gets built; it goes to "What we are NOT
-  building", as direction.
-
-> **Example** — header `S-005`, question: "S-005 Lifecycle: a person
-> is active or inactive. Whoever has the person in scope marks
-> inactive (date automatic, reason optional) and can reactivate;
-> creating with an existing CPF is refused with a hint to reactivate.
-> Proposed minimum: exactly that. Out of the minimum: cancel/renew as
-> a cycle, transfer between subleaders. Inferred here: inactive
-> people stay in the tree, greyed. What do you want built?"
-> Options: label "Reduce to the minimum" / description "the cycle and
-> the transfer have no story asking for them yet; they stay as
-> direction" (recommended) · "Confirm the whole story" / "the cycle
-> and the transfer get built now, as written" · "Adjust" / "you say
-> what changes" · "Cut" / "nothing of this gets built; it goes to
-> What we are NOT building".
-
-An adjusted story is asked again once the change is written. Each
-inference is confirmed (it becomes a fact) or rejected in the same
-pass. Write the result into the notes' **Stories** block (id, name,
-the ruling, the user's words) and each ruling into `rulings.md`
-(house rule). What leaves this step is only what gets built.
-
-## Step 3 — write
-
-Two `Agent` dispatches in the same message, in parallel:
-**`disc-author-prfaq`** and **`disc-author-stories`**, each with the
-path to `notes.md`, its template, the slug, the language of the
-documents (the user's), and the blueprint schema
-(`${CLAUDE_SKILL_DIR}/../../blueprint/schema/discovery.md`). Each author
-writes from the notes only, and writes its blueprint JSON
-(`blueprint/prfaq.json`, `blueprint/stories.json`) in the same pass:
-the same content, in the shape the shell reads, kept in step through
-every later fix. Both briefs include, verbatim:
-
-> Where the notes are ambiguous, write the reading their wording most
-> directly supports, list that assumption in the Inferred list, and do
-> not write for the other readings as well.
-
-When both return, read the two files together. Check that every
-confirmed story is written and no other, that every Confirmed fact is
-an AC, that the PR-FAQ's "What we are NOT building" matches the notes'
-Out blocks and the cut stories, and that the two JSON files match
-their documents. Anything missing goes back to the author of that
-file in one message before the review starts. What an author had to
-guess sits in its Inferred list; you ask the user about each one with
-the decisions of step 5.
-
-## Step 4 — the review round
-
-Autonomous mode. Run the `discovery-review` workflow by
-`scriptPath` (never by name):
-`${CLAUDE_SKILL_DIR}/../../workflows/discovery-review.js`, with
-`discoveryDir`, `round`, `language` (the documents'), the stories
-file's vocabulary block, and `stories`: one `{id, text}`
-per story block, split at every `## S-` heading. Scripts cannot read
-files; you pass the text.
-
-The round runs whole every time: the document lenses in parallel with
-the per-story blind reads. Every reviewer answers under the
-reviewer contract (`docs/standards/reviewer-contract.md` in the
-pipeline repo). The
-workflow returns the findings with the referees' verdicts and the
-lens results; it rules nothing. A round in which every story came
-back unread is **invalid**: the workflow says so, and you fix the
-cause (the readers' output, the keys) and run it again before
-judging anything.
-
-## Step 5 — judge, then ask
-
-You are the judge. The ruler is
-[references/judging.md](references/judging.md): read it whole the
-first time, and rule every finding by it, in `reviews.md`, before
-anything else happens. Per finding: sustained, deferred, dismissed or
-for-the-design, the owner (author or user) on a sustained one, and the
-reason with the sentence that decides it. Merge first: findings whose
-fix is the same edit, seen by several lenses, are one finding with
-one ruling.
-
-**Owner `author`.** Wording, structure, a value the documents already
-imply, an alignment between the two files: send them to the author of
-the file in one apply batch each, applied without asking the user.
-The author's report carries the propagation table and the final
-lines; a fix without pasted lines is not done, send it back. There is
-no veto question: the user reads the blueprint at the close and
-reports there whatever he wants changed.
-
-**Owner `user`.** Product behavior, scope, cost, personal data, a
-confirmed fact contested, a sentence that admits two readings that
-are two products, and every entry of the authors' Inferred lists
-(confirm, and the author rewrites it as fact; or reject, and the
-author rewrites the sentence). Group them **by decision**: several findings that
-resolve by the same choice are one question. Ask through the question
-tool, one question per decision, four per call, in the house shape:
-the question text carries the context (the lens, the quote, the gap,
-why it matters) and asks one clear thing; the options are the
-possible decisions, your recommendation first and marked as yours,
-each with its label as the decision and its description as what that
-decision costs or buys. Every answer is a ruling line in `rulings.md`
-as it happens; a pattern across answers is a line in `taste-notes.md`.
-
-**For the design.** A finding whose answer is a mechanism the design
-stage decides (a lock, a retry policy, an HTTP status, a storage
-shape) is not asked and not dropped: it goes to the "For the design"
-list of `reviews.md`, which stage 2 reads at its macro shape.
-
-**Dismissed** findings die with the sentence that forecloses them, in
-`reviews.md`. They are visible in the blueprint's review block.
-
-A user ruling that changes a story materially is confirmed once more
-in step 2's shape, after the author applied it.
-
-## Step 6 — iterate
-
-The round is cheap (Sonnet 5.5 at medium and low), so it runs again
-after every round that changed text, whole. Three rounds are the ceiling. After
-each round's rulings are applied, ask the user one question: run
-another round, or close with what is left; say what the round found
-(findings, sustained, what changed) in the question. The third round
-is never followed by a fourth. What is still sustained when the user
-closes goes to the blueprint's review block as residue, with your
-reasons, and he decides at the approval.
-
-## Step 7 — close
-
-The blueprint is built, never edited (house rule). Write the two
-files that are yours: `blueprint/review.json` (the rounds, your
-validation, the user's decisions, the author fixes, the for-the-design
-list, the dismissed with their sentence, the residue; from `reviews.md`
-and `rulings.md`) and `blueprint/report.json`, the plain-language
-layer the tab shows first: one sentence, three things to know, the
-flow in verbs, one sentence per story, one per decision the user took,
-and a short paragraph for what stays out, the bets, the inferred and
-the review. Write it for the newcomer on the team: technical but new,
-familiar words, a role for each thing, no code. Check the authors'
-`prfaq.json` and `stories.json` are in step with the final documents.
-Then:
-
-```
-node "${CLAUDE_SKILL_DIR}/../../blueprint/build.mjs" <workstream-dir>
-```
-
-The build validates every file against the schema
-(`${CLAUDE_SKILL_DIR}/../../blueprint/schema/discovery.md`) and
-refuses with the field named; fix the data, never the HTML. Publish `blueprint.html`,
-keep the same file path at every later stage, and record the owning
-account beside the URL in `.state.md`.
-
-Present the URL and ask for approval. Approval is explicit; silence or
-a loose "looks good" does not close the stage. The user reads the
-blueprint and sends adjustments one at a time: note each one in a
-visible list and dispatch the authors only when he says "apply"; never
-between two adjustments. After the batch, run step 4 once more if the
-text changed materially, and ask again. On approval: `.state.md` to
-`stage: design`, commit the workstream folder (push only with the
-user's explicit approval), and suggest `/clear` before stage 2 (house
-rule). The close commit is the last act, after he says there is
-nothing more. On rejection: the reasons reopen the interview.
-
-## How to write, in every file and every question
-
-Say what you mean. Mannered prose substitutes metaphor and flourish
-for direct statement: "a dial worth turning" for "a parameter worth
-varying". It makes the reader work so the writer can perform, and it
-is imprecise, because a metaphor drags in connotations you did not
-choose. When a literal phrase exists, use it. One idea per sentence.
-Concrete values. The user's words, in quotation marks, where they
-decide something or describe a taste.
-
-Use lists and tables where the content has parallel items (stories,
-findings, options). Keep the interview itself in prose. Every agent
-named in a message carries its model and effort in parentheses.
+You never read the mock's HTML: the builder owns it and publishes it.
 
 ## Files
 
-- **Permanent:** `notes.md`, `pr-faq.md`,
-  `user-stories.md`, `reviews.md`, `rulings.md`, `taste-notes.md`,
-  `blueprint/*.json`, `blueprint.html`, `.state.md`.
+```
+<designs-root>/<slug>/
+├── .state.md                 stage, step (D0–D7), kit, mode (artifact | local), builder id, mock url + version, locked, report url
+├── .gitignore                _run/, **/.remotion/, **/film/assets/, **/stills/
+├── rulings.md · dreaming-notes.md
+├── report/                   the front's link: report.json + discovery/ (video.mp4, deck/, explainer.html)
+└── 00-discovery/
+    ├── notes.md              the conversation, every turn
+    ├── recon/                <topic>.md (each scout writes its own), screens/*.png
+    ├── prototype/            index.html · versions/v<N>.html · walks/v<N>.json · frames/ · LOCK.json
+    ├── journeys/J<n>-<name>.yaml
+    ├── stories.md
+    ├── reviews/              stories/ (proto.mjs split) · round-1.json (the workflow's return)
+    └── reviews.md            your rulings
+```
+
+`proto.mjs` is `node <kit>/skills/stage-discovery/scripts/proto.mjs`:
+`walk`, `frames`, `look`, `shots`, `lock`, `trace`, `split`, `model`
+(its header documents each). It needs `playwright-core` and a Chromium;
+when either is missing, say so in one line with the install command
+from its header and keep interviewing.
+
+## Opening
+
+1. **The kit.** `realpath ${CLAUDE_SKILL_DIR}/../..` is the pipeline's
+   `claude/` folder; write it in `.state.md` as `kit:` and give agents
+   resolved paths.
+2. **The house rules.** Read `<kit>/../CLAUDE.md` and run its Open:
+   the canary.
+3. **One front at a time.** Read the designs root's coordination file.
+   When another front holds his attention in a discovery or a design
+   debate, say so once and queue this one: message that front's
+   session (`SendMessage`) to tell this one when it frees him, and
+   wait on its answer.
+4. **New:** the slug `YYYY-MM-DD-<short-kebab-name>` (the project's
+   naming rule wins), the folder, `.state.md` (`stage: discovery`,
+   `step: D1`), `.gitignore`, and `00-discovery/notes.md` from
+   [templates/notes.md](templates/notes.md). What `/lets-cook` already
+   heard goes in as Confirmed. **Resume:** see the last section.
+5. Start D0 in the same turn.
+
+The host may lack a tool; say what is missing in one line and run on:
+
+| Missing | What changes |
+|---|---|
+| `Artifact` (headless or cloud) | **local mode**, `mode: local`: the builder runs `proto.mjs shots`; your message gives the PNG paths; comments come by chat; the report stays in `report/` for the next local session to publish |
+| the question tool | the questions go as text, same shape: numbered, lettered options, your pick first and marked |
+
+## D0 · Recon, in the background
+
+From his first sentences, one `scout (Haiku 5.5, medium)` per question,
+in parallel, in the background; never wait on them to talk to him.
+Each writes its answer, quotes with `path:line`, to
+`00-discovery/recon/<topic>.md`:
+
+- the feature map of each area he names;
+- the exported design tokens and components (paths, and the lines that
+  name the typeface, radius and color roles);
+- other fronts: the coordination file and each running workstream's
+  `.state.md` that touches the same areas;
+- term collisions: each domain word he used that the product already
+  uses for something else.
+
+When the app is drivable, capture the current screens of the named
+areas yourself, one command each, without opening the images
+(`proto.mjs look <url> … --shot 00-discovery/recon/screens/<name>.png`;
+log in through `--env-cmd` and `env:NAME` fills, never a secret on the
+command line). A stack you bring up for this you take down when done.
+A missing export or a stack that cannot come up is one line in the
+notes; the mock then uses the shell's defaults.
+
+## D1 · The interview
+
+By [references/interview.md](references/interview.md): the voice dump
+first, uninterrupted; the restatement in one short message; then
+batches of at most four questions through the question tool, your
+recommendation first; the razor (ask only what, guessed wrong, changes
+the build); infer to go faster; nothing a scout can answer. Write
+`notes.md` every turn: a dead session loses nothing.
+
+## D2 · The live mock
+
+**v1** as soon as one journey is clear (actor, trigger, steps, end): do
+not wait for the whole interview. Dispatch `prototype-builder (Sonnet
+5.5, medium)` in the background, in build mode, with: `notes.md`, the
+recon folder, the tokens and components paths (or "none"), the shell
+([templates/prototype-shell.html](templates/prototype-shell.html)),
+[references/mock.md](references/mock.md), the output path, the
+languages, the actors, whether time matters, the `proto.mjs` path, and
+the mode (artifact or local). Keep interviewing while it builds. Keep
+its agent id in `.state.md`.
+
+**Every later version is an edit order** to the same agent, by
+`SendMessage` (it keeps its context): one line per change, each with
+its source (`batch 3 · Q2`, `comment <id>`, `chat`), his words, and your
+restatement. One batch of his answers is one order, published once.
+Send the next order only after the builder's return; answers that
+arrive meanwhile join that order. Sort each item first:
+
+| Item | Path |
+|---|---|
+| look, copy, layout, motion, a missing state, a name (a colour, a file name, a label) | straight to the builder; never a question to him |
+| a rule, a number, scope, the data shown, a journey added or cut | restated and confirmed by him first, written to the notes as Confirmed, then ordered |
+
+The builder edits, runs `proto.mjs walk` until it passes, copies the
+version, **publishes it itself** to the same URL, and returns: the URL,
+the version, what changed per journey, its Inferred list and its gaps.
+Record the URL and version in `.state.md` and a Mock log row. Then one
+short message: the link (first time), what changed per journey, what to
+look at first. Deep links: `#play-J2` opens a journey, `#<screen>.<state>`
+a state; `~dark`, `~pt-BR`, `~phone` add to either.
+
+**His feedback** comes by chat and by comments on the mock. Watch the
+artifact with `ArtifactComments` after the first publish; each comment
+becomes a line of the next edit order and is answered once its change
+is published ("done in v4"). The builder's Inferred entries on look,
+copy or naming stay its picks, never asked; the rest go to the notes'
+Inferred block and into a later batch.
+
+**A builder that cannot publish** (the tool is not given to
+subagents): you publish its file yourself, reading it first, and say
+in one line that the context cost is now yours.
+
+## D3 · The lock
+
+You lock when the checklist is empty:
+
+- `notes.md` has nothing in Open and nothing in Inferred;
+- every rule in the Rules table is shown by a journey step, or marked
+  `[build]` in its Proof column with his ok;
+- every comment is answered;
+- the last walk passed.
+
+Tell the builder this version is the lock candidate: it renumbers each
+journey's steps `s1, s2, …` in play order and reports the old → new
+map. Then announce in one line ("locked v6: 4 journeys, 11 rules") and
+run:
+
+```
+node <kit>/skills/stage-discovery/scripts/proto.mjs lock <workstream>/00-discovery/prototype --words "<your announcement>" [--gap "<where>::<what>" …]
+```
+
+It walks once more, copies `versions/v<N>.html`, renders `frames/`,
+and writes `LOCK.json`. He may object in one line; his confirmation
+comes at the playback. Write the notes' Lock block and `.state.md`
+(`step: D4`, `locked: v<N>`). After the lock the mock changes only by
+an amendment (D6).
+
+## D4 · The stories
+
+Dispatch `story-writer (Sonnet 5.5, high)` in write mode with: the
+locked `versions/v<N>.html`, `LOCK.json`, `frames/manifest.json`,
+`notes.md`, [references/stories.md](references/stories.md), the
+templates ([journey.yaml](templates/journey.yaml),
+[stories.md](templates/stories.md)), the `proto.mjs` path and the
+language. It writes `journeys/*.yaml` and `stories.md` and returns only
+after `proto.mjs trace` passes.
+
+Then read `stories.md` whole: you rule on it from here to the close.
+Check by reading what `trace` cannot: each story names its journeys and
+carries its error-path table; no two ACs check one behavior; the Out
+lines match the notes. A miss goes back to the writer in one message.
+
+## D5 · The review: one round
+
+```
+node <kit>/skills/stage-discovery/scripts/proto.mjs split <workstream>/00-discovery/stories.md <workstream>/00-discovery/reviews/stories
+```
+
+prints the index. Run the workflow by `scriptPath`
+(`<kit>/workflows/discovery-review-workflow.js`), with `args`:
+`discoveryDir`, `mock` (the locked version), `proto` (absolute paths),
+`language`, `index` (the JSON `split` printed, as a value, never a
+string), and `inlineAgents: true` with `agentsDir` (`<kit>/agents`)
+while the agents are not installed. It returns `.result` inside an envelope; save the result as
+`reviews/round-1.json`.
+
+| Section | Who | Asks |
+|---|---|---|
+| Lenses | `disc-lens (Sonnet 5.5, medium)` × 3 | **in-out**: is every capability In or Out, nothing in limbo? · **coverage**: does every rule have its AC, and does each story pass through limit, dependency failure, permission and repeat? · **acceptance**: can a stranger decide pass or fail on every AC? |
+| Double-blind | per story, `blind-reader (Sonnet 5.5, low)` × 2, then `blind-judge (Sonnet 5.5, medium)` | do two readers who see only the story and the mock understand each AC the same way, and does the mock agree? |
+
+A round the workflow marks invalid is fixed at its cause and run again
+before anything is ruled. `[build]` ACs are not read blind.
+
+**Rule** every finding by [references/playback.md](references/playback.md)
+and `claude/references/judging.md`, in `reviews.md`
+([template](templates/reviews.md)), before any fix moves:
+
+- owner `story-writer` → one apply batch, by `SendMessage`, without
+  asking him, the files staged (`git add`) first; you verify each fix
+  by `git diff -- <file>` against the finding and rerun `trace`;
+- his → into the playback, one question per decision;
+- for the design → `reviews.md`, never asked;
+- dismissed → with the quote or frame that closes it.
+
+## D6 · The playback
+
+By [references/playback.md](references/playback.md): story by story,
+four per call, **Confirm** · **Adjust** · **Cut**, with the review's
+decisions of his and the writer's Inferred entries inside each story's
+question. An adjust that changes behavior is an **amendment**; the last
+call carries the design question.
+
+Every answer is a line in `rulings.md`. When one story is left, propose
+the short route in one line; on his yes, write `brief.md` from
+`<kit>/skills/lets-cook/templates/brief.md` and load `lets-cook`.
+
+## D7 · The report, the cleanup, the close
+
+**The report is finished before the stage closes**: he validates
+through it. The front's link is born here; write its URL in
+`.state.md`. Dispatch the three builders in one message, in the
+background, each with the stage's files and the report folder
+(`report/discovery/`), as `claude/docs/stage-report.md` describes:
+
+| Tab | Builder | Brief |
+|---|---|---|
+| Video | `video-builder (Sonnet 5.5, high)` | the problem and the solution told through the stories, 60–90 s, a motion piece; **not** the mock in use; the fixtures are invented names (`meta.fixtures`) |
+| Deck | `slides-builder (Sonnet 5.5, medium)` | the story map, the rules with their numbers, what stays out, his decisions |
+| Explainer | `artifact-builder (Sonnet 5.5, medium)` | the locked mock beside a clickable map: story → its ACs → the step or frame each one anchors on |
+
+While they work, clean what this stage created: `prototype/shots/`
+(local mode), any scratch frames folder, `_run/`, a recon stack still
+up. When they return: every number on a slide is checked against
+`stories.md` or the notes; run `gitleaks dir <workstream>` (a finding stops the publish);
+publish the page to the front's link with the label "discovery closed".
+
+Then: `.state.md` to `stage: design`, commit the workstream folder
+(push only on his word), and one message:
+
+| | |
+|---|---|
+| The link | the front's report, Discovery tab |
+| The scope | stories · ACs · rules · what is out, one line |
+| For the design | his answer to the last question |
+| Next | `/clear`, then `/stage-design <slug>` |
 
 ## Resuming
 
-Everything is in files. Read `.state.md`, then `notes.md` (its
-coverage map and Open list say where the interview stopped), then the
-documents and `reviews.md` if they exist. Continue from the first
-step whose output is missing. Never from memory of a previous session.
+Everything is in files. `/stage-discovery <slug>`: run the opening's
+steps 1–3, then read `.state.md` (its step, `kit:`, `mode:`, the mock's
+URL and version) and `notes.md` (Coverage map, Journeys, Mock log,
+Open). From D2 on, read the unanswered comments before you speak. The
+builder of an earlier session is gone: a fresh `prototype-builder`
+reads `index.html` and the notes first. At D5 a saved
+`reviews/round-1.json` is never run again: continue from `reviews.md`.
+
+## How to write
+
+Literal sentences, one idea each, concrete values, his words in
+quotation marks where they decide something.

@@ -1,0 +1,7 @@
+{
+  "title": "Orders · Design",
+  "slides": [
+    {"file": "01.html", "title": "The proposal in one picture", "notes": "Three parts: API, queue, worker. Source: 01-design/solution.md:12-30."},
+    {"file": "02.html", "title": "Decided for you", "notes": "One queue, no event bus. Ruled by the conductor; listed for veto in rulings.md."}
+  ]
+}

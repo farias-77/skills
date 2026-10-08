@@ -1,0 +1,140 @@
+{
+  "workstream": "orders",
+  "acs": [
+    "S1.1",
+    "S1.2",
+    "S2.1",
+    "S2.2",
+    "S2.3",
+    "S2.4",
+    "S2.5",
+    "S2.6",
+    "S2.7",
+    "S2.8",
+    "S2.9",
+    "S2.10",
+    "S2.11",
+    "S3.1"
+  ],
+  "shared": [
+    "backend/api/openapi.yaml",
+    "backend/internal/gen/**"
+  ],
+  "fronts": [
+    {
+      "front": "billing",
+      "session": "billing-execute",
+      "files": [
+        "frontend/app/e2e/**"
+      ],
+      "agreed": "additive only: a new spec file, no edit to theirs"
+    }
+  ],
+  "nodes": [
+    {
+      "id": "C",
+      "kind": "contract",
+      "name": "Orders contract and skeleton",
+      "after": [],
+      "acs": [],
+      "owns": [
+        "backend/api/openapi.yaml",
+        "backend/internal/gen/**",
+        "backend/database/migrations/20261005120000_orders.sql",
+        "backend/internal/orders/http/stubs.go",
+        "backend/tests/factory/order.go"
+      ],
+      "extends": [],
+      "provides": [
+        "POST /orders",
+        "GET /orders",
+        "factory.Order"
+      ],
+      "uses": []
+    },
+    {
+      "id": "E-01",
+      "kind": "entry",
+      "name": "Place an order",
+      "sides": [
+        "back",
+        "front"
+      ],
+      "after": [],
+      "acs": [
+        "S1.1",
+        "S1.2"
+      ],
+      "owns": [
+        "backend/internal/orders/app/place_order.go",
+        "frontend/app/src/features/orders/new/**"
+      ],
+      "extends": [
+        "backend/internal/orders/http/stubs.go"
+      ],
+      "provides": [],
+      "uses": [
+        "POST /orders",
+        "factory.Order"
+      ]
+    },
+    {
+      "id": "E-02",
+      "kind": "entry",
+      "name": "List orders by day",
+      "sides": [
+        "back"
+      ],
+      "after": [],
+      "acs": [
+        "S2.1",
+        "S2.2",
+        "S2.3",
+        "S2.4",
+        "S2.5",
+        "S2.6",
+        "S2.7",
+        "S2.8",
+        "S2.9",
+        "S2.10",
+        "S2.11"
+      ],
+      "owns": [
+        "backend/internal/orders/app/list_orders.go",
+        "backend/internal/gen/orders.go"
+      ],
+      "extends": [],
+      "provides": [],
+      "uses": [
+        "GET /orders",
+        "factory.Order"
+      ]
+    },
+    {
+      "id": "E-int",
+      "kind": "integration",
+      "name": "Place then see it listed",
+      "sides": [
+        "front"
+      ],
+      "after": [
+        {
+          "id": "E-01",
+          "class": "ui",
+          "need": "the journey submits the order form E-01 builds"
+        }
+      ],
+      "acs": [
+        "S3.1"
+      ],
+      "owns": [
+        "frontend/app/e2e/orders-place-and-list.spec.ts"
+      ],
+      "extends": [],
+      "provides": [],
+      "uses": [
+        "factory.Order"
+      ]
+    }
+  ]
+}

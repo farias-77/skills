@@ -1,74 +1,30 @@
-# Design review audit — <workstream>
+# Design review — <workstream>
 
 <!--
-  Written by the CONDUCTOR, with no scribe agent: the workflow's
-  return value is saved as is in reviews/round-N.json (the authority),
-  and this file is the index written from it in one pass, the rulings
-  appended as they happen. Permanent: the proof the review happened
-  and the record of the rulings; design-review.json is filled from it
-  at the close. MUST have, per round: every lens that ran with verdict,
-  run id (from the workflow journal, not prose) and verified list; the
-  flows read blind, with the keys where the two readers built
-  different products; every finding with the conductor's ruling, owner
-  and reason (the foreclosing sentence quoted on every dismissal), and,
-  for the user's, his ruling and words. Written before anything is
-  applied. Round 1 is whole; rounds 2 and 3 are delta only, on the
-  user's word, recorded here with his words.
+  Written by the conductor, who rules. Each lens's return is saved as it
+  came in 01-design/reviews/<lens>.json. One round; fixes verified by
+  reading and by review-prep.mjs. Scale: blocks · note.
 -->
 
-## Round <N> — <date> · run <id> · whole | delta over <docs, flows>
+## Before the round
 
-| Lens | Verdict | Run id | Findings |
+`review-prep.mjs`: <ok · ACs <n>, cited <n> · sizes · warnings>
+
+## The round — <date>
+
+| Lens | Findings | Blocks | Notes |
 |---|---|---|---|
-| design-reviewer-data | | | |
-| design-reviewer-code | | | |
-| design-reviewer-infra | | | |
-| design-reviewer-security | | | |
-| design-reviewer-contracts | | | |
-| design-reviewer-alarms | | | |
-| design-reviewer-coverage | | | |
-| design-reviewer-facts | | | |
-| design-reviewer-ui | | | |
-| design-reviewer-consistency | | | |
-| design-reviewer-ambiguity | | — | |
+| design-consistency (Opus 5.5, medium) | | | |
+| design-security (Opus 5.5, medium) | | | |
+| design-contracts (Sonnet 5.5, high) | | | |
+| overengineering-guard (Opus 5.5, medium) | | | |
 
-### Blind reads
+## Rulings
 
-| Flow | Keys compared | Different product | Unread |
-|---|---|---|---|
-| <flow heading> | <n> | <keys, or none> | <yes when a reader was dropped> |
-
-### Findings and rulings
-
-#### [<severity>] <lens>#<n> — <title>
-
-- **Finding:** <gap>
-- **Merged with:** <ids, or —>
-- **Ruling:** <sustained / deferred / dismissed> · owner <writer / user / implementer / —> — <reason; the sentence quoted on a dismissal>
-- **User:** <his ruling and words when the owner was him; "—" otherwise>
-
-### The lists
-
-- **To the writers** (by document): …
-- **To the user** (by decision): …
-- **To latitude** (by document): …
-- **Dismissed**: …
-
-### Round close
-
-<sustained N (writer N · user N · implementer N) · deferred N · dismissed N · the user's word on another round>
-
-## Close
-
-### Precision per lens
-
-| Lens | Findings | Sustained | Deferred | Dismissed |
+| Id (merged) | Severity | Ruling | Owner | Reason (the quote) |
 |---|---|---|---|---|
 
-### Residue
+## Fixes verified
 
-<what stayed sustained after the last round and was applied without re-review, with the line proof; what the user accepted as is, with his words>
-
-### Taste notes added
-
-<one line each, as written to the workstream's taste-notes.md>
+| Id | Line now | Verified |
+|---|---|---|

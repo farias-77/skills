@@ -1,226 +1,234 @@
 # Pipeline house rules
 
-Rules that cross every stage. Stage skills point here instead of
-repeating them; a consuming project loads these rules alongside the
-skills.
+Rules that cross every stage. Every stage skill (and `lets-cook`)
+reads this file at its opening, at `<kit>/../CLAUDE.md`, instead of
+repeating it; a consuming project does not import it. Paths: `claude/…`
+is the kit (`realpath ${CLAUDE_SKILL_DIR}/../..`, written as `kit:` in
+`.state.md`); `docs/…` sits beside it in the pipeline repo;
+`<designs-root>` is the folder named by the line `designs-root: <path>`
+in the project's own `CLAUDE.md` (or its `CLAUDE.local.md`), for the
+fronts' folders and `_coordination.md`; never a folder named by a
+`CLAUDE.md` in a parent directory. A workflow runs by `scriptPath`;
+when the Workflow tool refuses the kit's path, pass the file's whole
+content as `script` (same `args`).
 
-## Stage transitions: `/clear`, never `/compact`
+## One door, six stages, what each asks of him
 
-When a stage closes and the next one begins, suggest the user runs
-**`/clear`** — not `/compact`. Everything the next stage needs lives in
-the files by contract (`.state.md`, the wave's stage folders, the
-blueprint); a generated summary is session memory smuggled past the
-source, and it can contradict the files later. If a stage suffers after
-a clear, the bug is a missing file in the previous stage — fix the
-file, not the context. Re-entry is always by workstream slug: the stage
-skill resumes from `.state.md`.
+Every demand enters by **`/lets-cook <idea>`**: a light interview,
+then the session picks the route (full, short, hotfix) and says why in
+one line. The full route is six stages. He is asked only what is his.
+
+| Stage | How it runs | Where he is in the loop |
+|---|---|---|
+| 1 discovery | a conversation, no `/goal` | he talks while a live mock is built beside the chat; he confirms the stories one by one at the playback |
+| 2 design | one `/goal` | he debates the one proposal (deck first, then a ≤60 s video) until he says "closed"; rarely, a question that changes a locked AC, adds a recurring cost or cannot be undone |
+| 3 plan | one `/goal` | nothing; the close lists what was decided in his place for his veto |
+| 4 execute | one `/goal` | the pre-flight items only he can run; his hands-on with the running app, each answer an `A.n` round, until his "ok" |
+| 5 release | his authorization line + one `/goal` | only the stop list (an irreversible step the `/goal` does not name, a new production deploy after a rollback, a second red) |
+| 6 close | one `/goal` | nothing; he forwards the users' video and the "what's new" text |
+
+## Every stage opens and closes the same way
+
+**Open.** (1) **The canary**: `git push origin a:b`, run alone (no
+`cd`, nothing chained), must come back denied by the guard with a
+reason containing `guard-canary`; anything
+else and the stage does not open. (2) **The designs root**: no
+`designs-root:` line in the project's `CLAUDE.md` or `CLAUDE.local.md`
+→ write nothing anywhere; stop with the exact line for him to add,
+`designs-root: <absolute path>`, proposing `<repo>/../designs`. (3) The
+stage's `/goal`, filled in, in one code block for him to paste
+(discovery, a conversation, has none).
+
+**Close.** The stage's report is finished and published first (below).
+Then one message: the link, what the stage produced in one table, what
+was decided in his place, and the next play:
+
+```
+/clear
+/stage-<next> <slug>
+```
+
+Never `/compact`: everything the next stage needs lives in the files
+(`.state.md`, the stage folders). A stage that suffers after a clear
+has a missing file in the stage before it; fix the file. No stage
+starts the next one: nothing runs until he types the play. Re-entry is
+always by slug; the stage resumes from its files, never from memory.
+
+## Under a `/goal`, the stage runs on its own
+
+Inside a `/goal` nothing waits for him but what is his. These are not
+reasons to stop: a finished step, a summary and the next step
+announced, an offer to wait, a list of decisions he could take, a
+milestone. A status note or a recommendation goes in the same message
+as the next tool call; carry on with whatever does not depend on his
+answer. An offer to wait that you notice in a draft is deleted, and
+the next thing is done. Stop only for a question that is his (through
+the question tool), a background agent you wait on (end the turn on a
+status table: agent · task · state; it wakes you), or the goal's
+"done". Time matters here: do not spend time that can be avoided, and
+the earlier a correct result is obtained, the better. The factory runs
+through the night on its own: keep the machine awake while work is in
+flight. On a rate limit, wait for the reset and retry; an entry
+interrupted a third time parks with the reason, and the rest goes on.
+There is no fixed cap on parallel work.
 
 ## "Note this for the dreaming"
 
-At any stage, when the user says to note something for the dreaming
-("anote no dreaming note", or words to that effect), append it to the
-workstream's `dreaming-notes.md` on the spot, marked **`[user]`** —
-his words as close to verbatim as the entry allows, plus what he
-already wants changed when he says it. These entries are first-class
-input to the retro of stage 6 and to the weekly retro, which weighs
-them first: he wrote them knowing what he wants.
-This is separate from the standing rule that every stage notes its
-own frictions as they happen — both feed the same file.
+When he says to note something for the dreaming (or words to that
+effect), append it to the front's `dreaming-notes.md` on the spot,
+marked **`[user]`**: his words as close to verbatim as the entry
+allows, plus what he already wants changed. A pattern in his rulings
+(he keeps choosing against the recommendation on one kind of decision)
+is a line there too, marked **`[taste]`**. Every stage also notes its
+own frictions as they happen. The close's retro and the weekly retro
+read this file, `[user]` lines first.
 
 ## Every agent is named with its model and effort
 
-In every skill, agent table, README paragraph and message that names
-an agent, the name carries the model and the effort in parentheses:
-`disc-author-stories (Sonnet 5.5, high)`, `the conductor (Opus 5.5,
-medium)`, `disc-blind-reader (Sonnet 5.5, low)`. Model and effort live
-in the agent's frontmatter (`model:`, `effort:`); the parentheses are
-how the reader sees the cost of a step without opening the file.
+In every skill, table, README and message that names an agent, the
+name carries the model and the effort in parentheses:
+`story-writer (Sonnet 5.5, high)`, `the conductor (Opus 5.5, high)`.
+Opus 5.5 and Sonnet 5.5 are used, and Haiku 5.5 where the table says;
+every main session runs on Opus 5.5, high; subagents are mostly Sonnet
+5.5, never above high. The one table, with the evidence for each pick, is
+[docs/models.md](docs/models.md); `node scripts/check-models.mjs`
+fails when a frontmatter, a workflow or the table disagree.
 
 ## The session never reads to look something up; it sends a scout
 
-Every session that conducts a stage is an expensive model in a long
-conversation — the conductor at discovery, design, plan and close, the
-session at execution and at release. A file
-such a session opens itself does not cost one read: it enters the
-context and is paid again on every turn that follows. So the rule is
-the same at every stage: **when the session needs something it has not
-read — what a document says, what a repo already has, what a standard
-requires, what a past workstream recorded — it dispatches
-`scout` (Sonnet 5.5, low) and works from what comes back.**
-
-The scout locates and quotes; it never summarizes and never concludes.
-It returns the literal lines with their `path:line`, where it looked,
-and what it did not find — that last part is what lets the session
-tell "it is not there" from "the scout missed it". The session opens a
-file itself only when it is about to **rule** on that text: judging a
-finding, approving a document, writing a decision. Scout to find; the
-session to decide.
-
-What the rule does not cover: a file the session is writing or has
-just written, a file the user named and asked to be read now, and a
-stage's own template. Those the session reads.
+A stage's session is an expensive model in a long conversation: a file
+it opens is paid again on every turn after. **When it needs something
+it has not read** (what a document says, what a repo has, what a
+standard requires, what a past front recorded), **it dispatches
+`scout (Haiku 5.5, medium)`**, which quotes the literal lines with
+`path:line`, says where it looked and what it did not find, and writes
+its answer to the file the session names (`recon/<topic>.md`). The
+session opens a file itself only when it is about to rule on it, when
+it is writing it, or when he asked for it.
 
 ## How a question is asked
 
-Every question through the question tool has one shape. The question
-text carries the context (what this is about, the quote, the gap, why
-it matters) and asks one clear thing. Each option's label is the
-answer itself, in the words the user would say; its description is
-why that answer is an option: what it costs, what it buys, when it is
-the right one. The recommended option comes first and says so. Four
-questions to a call, at most. Never a board he answers in prose.
+Every question goes through the question tool, in one shape. The
+question text carries the context (what this is about, the quote, the
+gap, why it matters) and asks one thing. Each option's label is the
+answer in his words; its description is what that answer costs and
+buys, checked before the question is asked (a scout when the code
+holds it): an option that implies a migration, a recurring cost or an
+irreversible change says so in its description. Your pick comes first
+and says so. One question per decision; four questions to a call, at
+most. Never a board he answers in prose.
 
-## Every reply in the terminal is built to be followed at a glance
+## Every reply is built for a reader who skims
 
-The user reads a lot of pipeline output in a day and skims. A reply
-that names agents, options, findings or steps is a table; a sequence
-or a pipeline is a flow drawn in a code block; a list is short
-topics, one or two lines each; a paragraph is for the one argument
-that is prose. A table carries no more columns than the reader needs
-to decide. This holds for every stage skill and every message the
-conductor writes.
+The `i-wont-read-all-this` style holds in every reply: the next action
+first; a table for parallel things (agents, options, findings), a flow
+in a code block for a sequence, short topics for a list; one decision
+per prose message (the question tool may carry up to four); no
+preamble, no recap. A paragraph only for the one
+argument that is prose. He likes to see things: diagrams, flows and
+animations over text.
 
-## The user's rulings are the record
+## The rulings are the record
 
-At discovery, at design and at plan the conductor judges every
-finding by the stage's `references/judging.md`; there is no judge
-agent. The ruling names the owner of each sustained finding: wording
-goes to the author (at design and plan: the document's or the goal's
-writer) without a question; product, scope, cost, data format,
-contract shape, security posture, the sequence and confirmed
-decisions go to him; at design a real observation that is declared
-latitude goes to the implementer, as one line in the document's "The
-implementer decides" section, and at plan to the worker, as one line
-in the goal's "The worker decides" section. He rules what is his,
-except at plan: there the conductor rules the user-owned findings
-against the cut he approved when the wave's walk and required rows
-stay as they are (marked `ruled: conductor` in `rulings.md`) and
-lists them at the close for veto; only a finding that would change
-what a wave accepts reaches him as a question. The budget at
-discovery is three rounds at most, the user asked after each; at
-design, round 1 is whole and automatic and rounds 2 and 3 run only on
-his word and only over the delta, three at most; at plan, round 1 is
-whole and automatic, round 2 runs automatically over the delta, and a
-third only on his explicit call. His validation of every story
-(confirm / reduce / adjust / cut) is a ruling too, recorded the same
-way.
-**The rulings are asked through the question tool, always**, in the
-house shape: one question per **decision** at every stage (findings
-that resolve by the same choice are one question); the context in
-the question itself (source, severity, quote, gap, fix, the
-conductor's reason), the rulings as the answers with the conductor's
-pick first and marked as his, four to a call. Wording fixes are applied without a question and without a
-veto: the user reads the blueprint at the approval and reports there
-whatever he wants changed. At execution the judge agent of each entry
-(`exec-judge`) rules every finding of its rounds by the execute stage's
-`judging.md`; what is his (a question the judge raised, an entry still
-sustained after three rounds) is parked, never asked, and the user
-rules it with the builders' choices at the audit that closes stage 4;
-a ruling he gives there is a ruling too. At release his one ruling is his answer to "vai?" on the release PR,
-recorded verbatim in the trace and in `rulings.md`; a fix built during
-the release is an entry through the stage-4 pipeline, judged there by
-`exec-judge`. At the close nothing is ruled: the retro records what
-went wrong and the ideas it suggests, and his comments go in verbatim.
-The pipeline changes only at the weekly retro, where he rules each
-group of ideas gathered across the week's workstreams (apply, park,
-drop).
-Every ruling is appended, as it happens, to the workstream's
-**`rulings.md`** (workstream root; created on the first ruling), one
-line each:
+Every review is one round, ruled by
+[`claude/references/judging.md`](claude/references/judging.md): the
+scale (`blocks` · `note`), the owners per stage, and the one rule that
+turns his class into a conservative decision of yours. Only a locked
+AC changed, a new recurring cost, or something irreversible becomes a
+question to him. Every ruling, his or yours, is one line of the
+front's **`rulings.md`**:
 
 ```
-2026-09-01 · design r3 · design-reviewer-infra#2 · judge: dismissed · ruled: sustained · "the cost line encodes the SLA, it stays"
+2026-10-05 · design D6 · design-security#S-2 · conductor: conservative · ruled: conductor · "keeps the lock, reversible"
 ```
 
-Date · stage and round (or the PR at stage 4) · the finding id · what
-the judge proposed · what he ruled · his reason, verbatim where he
-gave one.
-The stage's own audit (`reviews.md`, the lane trace) keeps the detail;
-`rulings.md` is the index the retro reads first, next to
-`dreaming-notes.md`. A pattern in it — a ruling he keeps overruling, a
-class he keeps dismissing, a design card where he chose against the
-recommendation — is noted on the spot in the workstream's
-**`taste-notes.md`** (workstream root; created on the first note), one
-line each, as the pattern rather than the instance. Nothing there is a
-rule: the retro carries it, and the weekly retro decides, with him,
-what each note becomes — a doctrine line, a skill line, an agent
-prompt — or whether it is dropped.
+Date · stage and step (or the entry at execute) · the finding id ·
+what the conductor proposed · what was ruled (`ruled: conductor` when
+you ruled in his place) · the reason, his verbatim where he gave one.
+The stage's `reviews.md` keeps the detail; `rulings.md` and
+`dreaming-notes.md` are what the retros read first.
 
-## The blueprint is built, never edited
+## One link per front, finished before the stage closes
 
-No agent opens `blueprint.html`. Each stage writes JSON under
-`<workstream>/blueprint/` in the shapes `claude/blueprint/schema/`
-fixes, and `node claude/blueprint/build.mjs <workstream>` assembles
-the shell from the pipeline repo, the data and the strings of the
-workstream's language into one self-contained file, validating the
-data and refusing with the field named. The shell is the repo's: a
-fix there reaches every workstream at its next build, and no
-workstream carries its own copy to port. Only the stages that have
-data appear on the page; a stage that has not run is a step in the
-journey line, never a tab.
+Each front has **one report link**: a rail of stages, each with three
+tabs, **Video · Deck · Explainer** (the short route's exceptions are in
+[docs/stage-report.md](docs/stage-report.md)). The page is the fixed shell
+`claude/report/shell.html` plus `report.json`; the tabs are built by
+`video-builder (Sonnet 5.5, high)`, `slides-builder` and
+`artifact-builder` (both Sonnet 5.5, medium), or an Explainer filled from a template where the stage's
+data is a graph or a timeline. **A stage closes only when its three
+tabs are published**: he validates through them. Before each publish,
+`gitleaks dir <workstream>` must be clean (where gitleaks is not on
+PATH, `make gitleaks dir=<workstream>`, here and in every stage). The
+page stays private; anything published outside the company needs his
+approval. The procedure is [docs/stage-report.md](docs/stage-report.md).
 
-The shell's invariants, kept in the repo and never negotiated per
-workstream: the page never scrolls sideways (only tables, figures and
-wireframes scroll inside their own box); light and dark themes, a
-monochrome palette, the theme button on the rail; body text 18 px on
-a wide column; every section opens with a plain-language layer
-written for the newcomer on the team, and the documents' detail sits
-behind a click. A stage that needs a picture writes mermaid in the
-data; the page renders it.
+The stage files (`*.md` under the front) are written for the machine,
+complete and exact, in his language (his words verbatim; ids, keywords
+and headings as the templates have them); the `language` a writer's
+brief names is that language. The report is for a person: a picture first, short
+sentences, only what would change a decision, and the file named as
+the authority for the rest. The report and every other artifact are in
+simplified English, with the exceptions it lists, by
+[`claude/references/artifact-writing.md`](claude/references/artifact-writing.md);
+the chat with him stays in his language.
 
-The blueprint is written in the language the user talks to you in:
-`workstream.json` names it, and `claude/blueprint/strings.<lang>.json`
-carries the shell's own words. A new language is a new strings file in
-the repo, not a translated copy of the shell.
+## Fronts coordinate by talking
 
-## The blueprint is the report; the files are the record
+Several fronts run at once. Each front's line in `_coordination.md`
+names its stage, branch and session; sessions agree by `SendMessage`
+(release order, a shared file, a migration, a hotfix's priority) and
+write the outcome in one line. A peer silent for 15 minutes: proceed
+on the conservative choice and note it. One front at a time holds his
+attention in a discovery or a design debate; the rest runs in
+parallel.
 
-The stage documents (`*.md` under the workstream) are written for the
-machine: as complete and exact as the next stage needs — every entity,
-every query, every alarm, every class of the sweep. **The blueprint is
-not their projection.** It is the team reporting to a technical lead
-who wants to understand how the thing works and what matters, in
-twenty minutes, not three hours. Same tabs, same shell; another
-altitude.
+## The CI is local
 
-- **Natural to read, first of all.** Short sentences, plain words, one
-  idea per paragraph. Every section opens with a picture, a diagram,
-  a chart or a table, and the prose supports it, never the reverse.
-  Nothing dense: a reader who skims the visuals and the first lines
-  has the shape of the thing; the text is there for whoever wants
-  the next layer. If a paragraph needs a second read, it is a
-  diagram or a table that was not drawn.
-- **The test for a detail:** it enters the blueprint if the reader
-  would decide something differently knowing it. Otherwise it stays in
-  the file — and the file is named as the authority ("the exact numbers
-  live in `data-model.md`"), so nobody reads the blueprint as source.
-- **The intro of every tab is the report.** Read only the opening
-  paragraph and you know what this is, how it is organized, what it
-  costs. Then, up front: *what needs your eye here* — the decisions
-  taken in the user's place, the tradeoffs assumed, the numbers that
-  encode a business rule. The rest is there to be trusted, and says so.
-- **Decisions taken in the user's place never leave.** They only
-  shrink: the question, the options in one line each, the pick, why —
-  three sentences.
-- **Lists are curated, never complete.** The entities that explain the
-  model, not all of them; the alarms that would wake someone; the
-  sweep's verdict and what it found, not the class-by-class checklist;
-  the resources that explain the bill. Group what is one idea ("the two
-  snapshots", "the content rows"). The counts in section titles count
-  what is shown, not what exists.
-- **Plain technical language.** "Takes a lock so two cycles never run
-  together", not "conditional put on the lock item keyed by run_id".
-  Technical names only when they are the name of the thing. Per
-  mechanism, three short paragraphs at most: *what happens · when it
-  goes wrong · worth a look* — the last one is the review hook.
-- **Machine provenance stays out:** reference lists to research files,
-  line-by-line JSON comments, projection expressions, per-round
-  history. Diagrams earn their place when they replace prose — the
-  whole cycle in one picture, yes; one per mechanism, no.
-- **Ceiling:** a wave's Design tab reads in 20–30 minutes — roughly
-  6–8 thousand words across its nine subtabs; a subtab in two or three.
-  Plan and Execution tabs hold the same altitude.
+The whole gate runs on our own compute (this machine or a cloud
+session VM), never on a hosted queue. The project names its **signoff
+command** in its `CLAUDE.md` (the bar's role 6; `claude/scripts/local-ci.sh`
+is the fallback): it runs the whole gate in a clean worktree and,
+only on exit 0 and under the bot identity, posts the **`local-ci`**
+commit status `main` requires. No agent posts a status or reads the
+bot's token; the guard denies both. Hosted CI keeps the deploys and
+the environments.
 
-Discovery keeps the PR-FAQ and the stories whole, because they are
-the demand itself and the user approves them there; whole behind the
-click, with the plain sentence in front.
+## One guard for what cannot be undone
+
+`claude/hooks/guard-irreversible.sh` is the only guard; `/pipeline-setup`
+installs it with `authorize.sh` behind a fail-closed wrapper on Bash
+and every file tool. It denies the irreversible (destroying
+infrastructure, deleting data, force-push, a forged status, switching
+identity, edits to itself or the settings) and any merge into a
+protected branch or `v*` tag that no live **authorization line**
+covers. Only he writes that line, as a `!` command:
+`! .claude/hooks/authorize.sh <release|short|hotfix|legacy> <slug> <branch>[@<sha>]` (legacy: `<repo>` in place of `<slug>`).
+It dies at its tag or in 3 days.
+
+## Every stage measures itself, by script
+
+Nothing is recorded by hand. `node claude/scripts/telemetry.mjs <slug>`
+reads the transcripts and the entries' `run-*.json`, and writes the front's `metrics.json` (time, cost as an estimate, his
+touches per stage); a value it cannot measure is `null` with a line in
+`gaps`. The retro and the weekly retro use those numbers.
+
+## Writing skills, agents and workflows
+
+- **Prompts** follow the Opus 5.5 and Sonnet 5.5 prompting guides
+  (platform.claude.com, prompt engineering): effort sets the thinking,
+  so no "think carefully" lines; name the early stops you do not want;
+  give Sonnet a scope line ("when the work is done and checked, stop
+  and report; add nothing that was not asked") and a real check before
+  it reports done.
+- **Every skill folder has its own `README.md`**: what it does, how to
+  install only it, its files. Knowledge lives in the skill's
+  `references/`; there are no knowledge-pack skills.
+- **Workflows** are plain JavaScript files named `<name>-workflow.js`
+  under `claude/workflows/`: small named functions, sections that match
+  the phases, comments only for why. Each has a dry run under
+  `scripts/`.
+- **This repo is public:** generic English, no company, product or
+  person's name.
+- Literal sentences, one idea each, concrete values. Prefer removing to
+  adding.

@@ -1,65 +1,93 @@
-# Brief — <workstream> — <E-nn | F> — <name>
+# <C | E-nn | E-int> · <name>
 
 <!--
-  Written by a plan-writer from plan.md, the design and the recon. This
-  file is the whole brief one builder receives: zero conversation
-  context, the codebase, the design folder and this file. It points at
-  the design; it never re-decides it and never copies what a pointer
-  serves. The builder works in its own worktree and stack, builds back
-  and front, runs every `run`, checks every `expect`, looks at every
-  screenshot, and hands the entry back for review and merge.
+  Written by plan-writer (Sonnet 5.5, high) from the node in plan.graph.json,
+  plan.md and the design. It is the whole instruction the entry's builders
+  get at stage 4: builder-backend (Opus 5.5, medium) for the back side,
+  builder-frontend (Opus 5.5, medium) for the front, in parallel when the
+  node has both sides. They have this file, the design, the codebase and
+  nobody to ask.
 
-  Must-haves: what it builds on each side with the design pointers;
-  the proof as run/expect (and see/where for screens); what it seeds
-  and with which factory; what it touches; "Out of this brief"; "The
-  builder decides"; "Pre-flight"; "Questions" empty (a question left
-  here is a plan defect).
+  plan-graph.mjs --briefs compares these sections with the node, item by
+  item: Acceptance, Contract, Uses, Provides, Owns, Extends. The item is
+  the FIRST COLUMN of a table row, or the first `code` of a bullet, in
+  backticks. Keep the headings as written.
+
+  These comments are instructions to you; none reaches the brief.
 -->
 
-## What this entry delivers
+**Kind:** <contract | entry | integration> · **Sides:** <back · front | back | front> · **After:** <— | E-nn (ui: the journey submits the form E-nn builds)>
 
-<one paragraph: what a person can do when it merges, and why it waits for nothing (or for which entry's behavior)>
+## What this delivers
 
-## Before you start
-
-- Read: `<designs-root>/<workstream>/01-design/` (the design; `notes.md` is the law), the recon of the areas below, the consuming project's `CLAUDE.md` and its engineering doctrine.
-- Starts from: the top of `feat/<workstream>` with the foundation merged<, and E-nn merged — or E-nn's branch when it is ready and not yet merged (stacked)>.
-- Never edit a shared file (the files the doctrine marks as shared: migrations, the API contract, generated code, the module registry): a change there is a foundation amendment; stop and report it.
-- Feature map: the <back | front> side updates `<the feature map's path>` for this entry; the other side does not edit it.
+<one or two sentences: what a person or a caller can do when this merges>
 
 ## Builds
 
-**Stories:** `<SLUG>-S-001` AC-1 · AC-2 · …
+- **Back:** <use case, rules, routes, in the design's names, or "none"> · `solution.md` §<part>
+- **Front:** <screen, its states, its actions, or "none"> · `screens.md` §<screen> · mock frames <names>
 
-**Back** — <use case, rules, route implementation, jobs, in concrete names>
-- Design: `architecture.md` §<flow> · `contracts.md` §<route> · `data-model.md` §<entity>
+## Acceptance
 
-**Front** — <screen, states, actions> (or "none")
-- Design: `ui.md` §<screen> (artboard `ui/<Screen>.dc.html`)
-
-## Proof
-
-| Step | Run / See | Expect / Where |
+| AC | The criterion (stories, verbatim) | Proved at (tests.md) |
 |---|---|---|
-| 1 | run `<command or spec>` | `<the cases named, the bad paths among them>` |
-| 2 | see `<journey spec>` screenshots, both themes, 390 px | where `ui.md` §<screen> |
-| 3 | run `<the gate command>` | exit 0 |
+| `<J1.s2.1>` | <GIVEN … WHEN … THEN …> | <unit · integration · journey> |
 
-**Seeds:** <factory calls the tests use, in the shape of which design section; "none">
-**Touches:** <module files, screen folder, spec files>
+## Contract
 
-## Out of this brief
+<!-- Only when the node has both sides. Copied from data-and-contracts.md,
+     never invented: every route both sides share, the request and response
+     with every field (required, optional, nullable), every error with its
+     status and code. -->
 
-<what looks like this entry's and is another's (→ E-nn), and what is direction, one line each>
+| Route | Request | Response | Errors |
+|---|---|---|---|
+| `<POST /orders>` | `<{ "day": "2026-10-05", "items": [{ "sku": "bread", "qty": 2 }] }>` | `<201 { "id": "ord_1", "status": "placed" }>` | `<422 day_in_past · 401 no session>` |
+
+## Uses
+
+<!-- The node's `uses`, each with its producer from the graph. -->
+
+| Name | Producer |
+|---|---|
+| `<POST /orders>` | C |
+
+## Owns
+
+<!-- The node's `owns`, exactly. -->
+
+- `<backend/internal/orders/app/place_order.go>` · <the use case>
+
+## Extends
+
+<!-- The node's `extends`, exactly, each with what is added; "none" when empty. -->
+
+- `<backend/internal/orders/http/stubs.go>` · <fills the `PlaceOrder` stub>
+
+## Done
+
+1. Every AC above has a proof that fails if the AC breaks, at the layer named.
+2. The entry gate is green: `<make check>` · `<make test-affected base=feat/<slug>>`.
 
 ## The builder decides
 
-<one line each: a choice left open with its bound, from the design's latitude sections where they apply>
+<!-- Details the design did not fix and that do not change what is built:
+     one line each. "nothing" when empty. -->
 
-## Pre-flight
+- <the empty-state copy, within screens.md's tone>
 
-<what the user handed over for this entry and where it lives; "nothing">
+<!-- ================= C only: in place of Acceptance and Uses =================
 
-## Questions
+## Provides
 
-<empty when the brief is done>
+| Name | Path |
+|---|---|
+| `<POST /orders>` | `<backend/api/openapi.yaml>` (stub answers 501, no test asserts it) |
+| `<factory.Order>` | `<backend/tests/factory/order.go>` |
+
+## Proof
+
+- `<make gen>` leaves no diff.
+- The migrations apply from an empty database.
+- `<make check>` is green with every stub in place.
+-->

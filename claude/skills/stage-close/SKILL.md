@@ -1,146 +1,160 @@
 ---
 name: stage-close
-description: Conducts stage 6 (Close) — the retro of one workstream, with nothing changed in the pipeline. The session (Opus 5.5, medium) harvests the whole record through one close-harvester (Sonnet 5.5, medium) per source (the reviews and rulings of the document stages, the execution's board and runs, the release's trace, the notes), writes the workstream in numbers and the precision of every reviewer, cleans what the workstream left behind, and writes the retro — what worked, what went wrong, and what could change in the pipeline, each idea with its evidence and the file it would touch; the user reads it and adds his view, recorded verbatim; nothing is decided, no issue is opened, no pipeline file is edited. The retro is saved in a fixed shape (retro.md + retro.json) so the weekly-retro skill can gather every workstream of the week. Use when a workstream's .state.md says stage close, or to resume a close in progress.
-disable-model-invocation: false
+description: Conducts stage 6 (Close) of the pipeline under one /goal, and closes on its own. It delivers the video for users (30 s – 3 min, a motion piece recorded in staging, no technical words) as an .mp4 plus a "what's new" text for the user to forward; writes the front's retro (at most 5 items per section, numbers from claude/scripts/telemetry.mjs, slowness counted as something that went wrong); proves nothing of the front is left on the machine with claude/scripts/cleanup.sh; and publishes its report (video, deck, explainer). A scout harvests the frictions. The retro changes nothing in the pipeline: the weekly retro does. The session runs on Opus 5.5, high. Use when a front's .state.md says stage close, or to resume a close by its slug.
 argument-hint: "<workstream-slug>"
-allowed-tools: Read, Write, Edit, Glob, Grep, Agent, Workflow, AskUserQuestion, Artifact, Bash
+allowed-tools: Read, Write, Edit, Glob, Grep, Agent, AskUserQuestion, Artifact, PushNotification, ScheduleWakeup, Bash
 ---
 
 # Stage 6: Close
 
-The workstream is in production. This stage looks back at how it got
-there and writes down what the pipeline could learn from it. It is a
-**retro, not a change**: nothing in the pipeline repo is edited, no
-issue is opened, no idea is decided here. Once a week the user runs
-`weekly-retro` over every workstream closed that week and decides
-there what changes in the pipeline; one friction seen in three
-workstreams weighs more than one seen once, and only a week's view
-shows it.
+## The bar
 
-The session is **Opus 5.5 at medium effort**. It does not read the
-record whole: the harvesters do, one per source, and bring back the
-numbers and every friction with its evidence. The session writes the
-retro from what they brought and talks it through with the user.
-
-## The pattern
-
-```
-0. Open      .state.md says close and the release is closed
-1. Harvest   close-harvest workflow: one close-harvester (Sonnet 5.5, medium) per source, in parallel
-             → 05-close/harvest/<source>.json: numbers, precision per reviewer, every friction with evidence
-2. Numbers   the workstream in numbers and the precision per stage and reviewer
-3. Sweep     worktrees, branches and stacks the workstream left behind; the state closed
-4. Retro     what worked · what went wrong · ideas for the pipeline, each with evidence and the
-             file it would touch → 05-close/retro.md and blueprint/close/retro.json
-5. Talk      the user reads it (the Close tab) and adds his view; his words go in verbatim as
-             his notes; nothing is ruled
-6. Close     the build, .state.md → closed, the commit of the workstream folder
-```
-
-The user is in the room only at step 5. There are no questions to
-rule: he reads, comments if he wants, and says it is closed.
+1. The users get a 30 s – 3 min video, in motion, with no technical
+   word, and a "what's new" text ready to paste.
+2. The retro has at most 5 items per section; its numbers come from
+   the script; time lost counts as something that went wrong.
+3. Nothing of the front is left on the machine, proven by a script.
+4. It closes on its own. What he says later goes into the retro,
+   verbatim.
+5. It is the one stage that waits for its own video: the video for
+   users is what the close delivers.
 
 ## The team
 
-| Agent | Model, effort | Does |
+| Who (model, effort) | Does |
+|---|---|
+| you, the session (Opus 5.5, high) | the retro, the cleanup, the checks, the delivery |
+| `video-builder (Sonnet 5.5, high)` | the video for users, started at the release's green staging |
+| `scout (Haiku 5.5, medium)` | the harvest of frictions, with `templates/harvest.md` |
+| `slides-builder (Sonnet 5.5, medium)` | the Close deck |
+
+## The flow
+
+```
+0 open            canary · preconditions · the /goal → he pastes it
+1 in parallel ┌── the video for users: wait for what is left of its render (or dispatch it now)
+              ├── harvest: scout + templates/harvest.md ──► telemetry.mjs ──► retro.md
+              └── cleanup.sh --check → --apply → --check empty
+2 report          Video (the users' video) · Deck (retro, numbers, what's new) · Explainer (the numbers)
+3 deliver         the .mp4, the text, the link · PushNotification · closed
+```
+
+| Read | When |
+|---|---|
+| [references/user-video.md](references/user-video.md) | before you brief or check the video |
+| [references/retro.md](references/retro.md) | before you write the retro |
+| [references/cleanup.md](references/cleanup.md) | before the cleanup |
+
+```
+<designs-root>/<slug>/05-close/
+├── whats-new.md                 the text for users (templates/whats-new.md)
+├── retro.md                     templates/retro.md
+└── trace.md                     one line per step (templates/trace.md)
+<designs-root>/<slug>/report/close/video.mp4   the video for users, also the Close tab's Video
+<designs-root>/<slug>/metrics.json             written by telemetry.mjs
+```
+
+## Unattended
+
+Nothing in this stage asks him. A wait on the render ends the turn on
+a `ScheduleWakeup` sized to what is left. Keep `trace.md` current; it
+is the resume point.
+
+## Step 0 · Open
+
+1. **The house rules.** Read the file that
+   `realpath ${CLAUDE_SKILL_DIR}/../../../CLAUDE.md` prints and run its
+   Open: the canary.
+2. **Preconditions.** `.state.md` says `stage: close`; the release's
+   trace ends with the tag in production (a short route or a hotfix
+   closes inside lets-cook, with `templates/short-close.md` of that
+   skill, not here).
+3. **The `/goal`**, then end the turn:
+
+```
+/goal Close <slug> with the stage-close skill, without asking me anything.
+Done when: the video for users and the "what's new" text are ready; retro.md is written with the
+script's numbers; cleanup.sh --check comes back empty; the Close tab is on the front's link; and I
+got the notification with the video, the text and the link.
+```
+
+## Step 1 · Three jobs at once
+
+Start all three in one turn.
+
+**The video for users.** The release dispatched the
+`video-builder (Sonnet 5.5, high)` at its green staging. Read its
+state from the machine: `report/close/video.mp4` exists → done; a
+render of it still running (`pgrep -af 'render.sh.*<slug>'`), or the
+`video:` agent of `.state.md` still running → wake when it should end;
+none of these → dispatch it now with
+`references/user-video.md` and the stories (it records in staging).
+When it returns, check it as that reference says.
+
+**The retro.**
+1. Dispatch one `scout (Haiku 5.5, medium)` with `templates/harvest.md`
+   and these paths: `dreaming-notes.md`, `rulings.md`, every stage's
+   board or trace (`03-execution/` board and parked list,
+   `04-release/trace.md`), and the reviews files. It returns each
+   friction with `path:line`, the quote and the time it cost; nothing
+   is written to a file.
+2. Run `node claude/scripts/telemetry.mjs <slug> --ws <designs-root>/<slug>`. It writes
+   `metrics.json`: time, cost and his touches per stage, with `gaps`
+   for what it could not measure.
+3. Write `05-close/retro.md` from `templates/retro.md`, as
+   `references/retro.md` says.
+
+**The cleanup.** Follow `references/cleanup.md`:
+`cleanup.sh <slug> --check`, decide what is his (unmerged work),
+`--apply`, then `--check` until it comes back empty. Paste the final
+`--check` output into `trace.md`: it is the proof.
+
+## Step 2 · The report, finished before the close
+
+Dispatch `slides-builder (Sonnet 5.5, medium)` as
+`claude/docs/stage-report.md` describes, into `report/close/`:
+
+| Tab | Who | What |
 |---|---|---|
-| the session | Opus 5.5, medium | the numbers, the sweep, the retro, the talk |
-| `close-harvester` × 1 per source | Sonnet 5.5, medium | reads one source of the record; returns numbers, precision and frictions with `file:line` and the quote; decides nothing |
+| Video | the users' video itself | 30 s – 3 min, for users |
+| Deck | `slides-builder (Sonnet 5.5, medium)` | the retro (at most 5 per section), the numbers per stage, the "what's new" text |
+| Explainer | the report template from `metrics.json` | the front's time, cost and touches per stage, beside the earlier fronts' `metrics.json` |
 
-## Preconditions
+Check every number on a slide against `metrics.json`. Run
+`gitleaks dir <designs-root>/<slug>`; a finding stops the publish.
+Publish to the front's link with the label "closed".
 
-`.state.md` says `stage: close`; `blueprint/release/release.json` has
-`closed` set. Missing: halt, back to stage 5.
+## Step 3 · Deliver and close
 
-```
-designs-root/<workstream>/05-close/
-├── harvest/<source>.json   # each harvester's answer, verbatim
-├── retro.md                # the retro, for reading
-└── trace.md                # one line per step, `date -u`
-blueprint/close/retro.json  # the same retro, in the fixed shape weekly-retro reads
-```
+1. `.state.md` → `stage: closed`. Your line in `_coordination.md`:
+   closed. Commit the workstream folder (push only on his word).
+   From here the folder is history, read only: nobody updates its
+   design documents; what must last lives in the feature map.
+2. One message and a `PushNotification`:
 
-## Step 1 — harvest
+| | |
+|---|---|
+| For users | the `.mp4` path (≤ 15 MB, ready to forward) |
+| What's new | the text, in full, ready to paste |
+| The link | the front's report, Close tab |
+| The numbers | time · cost (estimate) · his touches, one line |
+| Known issue | only if the video has one he should know before forwarding |
 
-By [references/harvest.md](references/harvest.md): run
-`${CLAUDE_SKILL_DIR}/../../workflows/close-harvest.js` by `scriptPath`
-with the workstream, the language, the number keys and the four
-sources (documents, execution, release, notes) with their paths. Save
-each answer as it came to `05-close/harvest/<source>.json` before
-anything is summed.
+It is the last stage: no next command. When he comments later, append
+his words verbatim at the end of `retro.md`, marked `[user]`, and
+commit.
 
-## Step 2 — the numbers
+## When the render fails
 
-Sum what the harvesters counted into the keys of
-`${CLAUDE_SKILL_DIR}/../../blueprint/schema/close.md`: the days, the
-stories and entries, the rounds per stage, the findings, the parked,
-the staging runs and reds, the fixes, rollbacks and hotfixes, the
-watch, the rulings. And the precision per stage and reviewer: found ·
-sustained · deferred · latitude · dismissed. A number the record does
-not carry is `null`, never estimated. There is no comparison with the
-previous workstream here; the weekly retro compares.
-
-## Step 3 — sweep
-
-What the workstream left behind, so the next one starts clean: the
-entry worktrees and their branches merged or abandoned, a local stack
-still up, a feature branch already in `main`, a stale lock. Remove
-what is safely removable (merged branches, dead worktrees, stopped
-stacks) and list the rest for the user with the command that removes
-it. Never delete a branch that is not merged, never touch `main` or
-the staging branch.
-
-## Step 4 — the retro
-
-By [references/retro.md](references/retro.md), from the harvest and
-the numbers:
-
-- **What worked** — what the record shows went smoothly and should be
-  kept, each with its evidence.
-- **What went wrong** — every friction worth a line: what happened,
-  where (`file:line`), the quote, what it cost (a round, a stop, a red,
-  a day, a question the user had to answer).
-- **Ideas for the pipeline** — what could change so it does not
-  happen again: the stage, the pipeline file it would touch (a skill,
-  an agent, a workflow, a template), the change in one or two
-  sentences, why, and the frictions that support it. An idea that
-  belongs to the project's doctrine or to the venture, not to the
-  pipeline, is marked so.
-
-Write `05-close/retro.md` from [templates/retro.md](templates/retro.md)
-and `blueprint/close/retro.json` in the shape the schema fixes; build
-and publish the blueprint.
-
-## Step 5 — the talk
-
-Tell the user the retro is ready, with the Close tab's link and the
-three things that matter most. He reads, and anything he says about it
-goes into `retro.md` and `retro.json` as his notes, verbatim, with the
-idea or friction it refers to when he names one. Nothing is ruled and
-nothing is asked through the question tool: his notes are the input
-the weekly retro gives the most weight to. When he says it is closed,
-it is.
-
-## Step 6 — close
-
-Rebuild the blueprint, `.state.md` → `stage: closed`, and commit the
-workstream folder (push only with his explicit approval). Suggest
-`/clear`.
-
-## How to write
-
-Say what you mean. Literal sentences, concrete values, the user's
-words verbatim. An idea names the file it would touch and the evidence
-behind it; an idea with no evidence is not written.
+Run the cleanup first (it frees the render caches and the front's images),
+then render **once more** if the failure was the machine's (disk,
+memory). A second failure: deliver the text alone, mark the Video tab
+"failed", and write one line in `dreaming-notes.md`. A problem seen in
+the finished video goes in the message as a known issue; it is
+rendered again only on his note.
 
 ## Resuming
 
-Everything is in files. Read `.state.md`, `05-close/trace.md`,
-`05-close/harvest/`, `retro.md`. Continue from the first step with no
-trace line.
-
-## Boundaries
-
-No edit to the pipeline repo, no issue opened, no idea decided: the
-weekly retro does that. No edit to product code. The sweep never
-deletes unmerged work.
+`/stage-close <slug>`: the canary, then `.state.md` and `trace.md`. A
+retro already written is not rewritten; a cleanup is re-checked, never
+assumed.

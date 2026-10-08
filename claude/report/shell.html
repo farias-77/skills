@@ -1,0 +1,224 @@
+<meta charset="utf-8">
+<title>Stage Report</title>
+<meta name="description" content="One link per workstream: every stage, with its video, its deck and its explainer.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="tokens.css">
+<style>
+  /* layout: a 248px rail of stages beside one column; the rail becomes a top bar under 860px */
+  * { box-sizing: border-box; }
+  html, body { height: 100%; overflow-x: clip; }
+  body { margin: 0; background: var(--bg); color: var(--ink-1); font: 15px/22px var(--f-sans); letter-spacing: -.003em; -webkit-font-smoothing: antialiased; }
+  button { font: inherit; color: inherit; cursor: pointer; }
+  a { color: inherit; }
+  :focus-visible { outline: 1px solid var(--focus); outline-offset: -1px; box-shadow: 0 0 0 3px var(--ring); }
+  .mono { font-family: var(--f-mono); font-variant-numeric: tabular-nums; }
+  .ov { font: 500 11px/16px var(--f-mono); letter-spacing: .06em; text-transform: uppercase; color: var(--ink-3); }
+
+  .app { display: grid; grid-template-columns: 248px minmax(0, 1fr); min-height: 100%; }
+  .rail { position: sticky; top: env(safe-area-inset-top, 0px); height: 100vh; height: 100dvh; display: flex; flex-direction: column; gap: 18px; padding: 14px 12px 12px; background: var(--surface); border-right: 1px solid var(--line); overflow-y: auto; }
+  .brand { display: flex; flex-direction: column; gap: 2px; padding: 4px 8px 0; min-width: 0; }
+  .brand b { font-size: 15px; line-height: 22px; font-weight: 600; letter-spacing: -.02em; overflow-wrap: anywhere; }
+  .notices { display: flex; flex-direction: column; gap: 6px; padding: 10px 12px; border: 1px solid var(--line); border-radius: var(--r-card); background: var(--surface-2); }
+  .notices[hidden] { display: none; }
+  .notice { display: flex; gap: 8px; align-items: baseline; font-size: 13px; line-height: 18px; color: var(--ink-2); }
+  .stages { display: flex; flex-direction: column; gap: 2px; }
+  .stages .ov { padding: 0 10px 6px; }
+  .st { display: flex; align-items: center; gap: 10px; height: 34px; padding: 0 10px; border-radius: var(--r-control); border: 1px solid transparent; text-decoration: none; color: var(--ink-2); font-size: 13.5px; font-weight: 500; white-space: nowrap; }
+  .st:hover { background: var(--surface-3); color: var(--ink-1); }
+  .st[aria-current="page"] { background: var(--surface-3); color: var(--ink-1); border-color: var(--line-strong); }
+  .st.todo { color: var(--ink-3); }
+  .st .when { margin-left: auto; font: 11px/16px var(--f-mono); color: var(--ink-3); }
+  .dot { width: 6px; height: 6px; border-radius: 50%; flex: none; background: var(--idle); }
+  .dot.closed { background: var(--ok); box-shadow: 0 0 0 3px var(--ok-tint); }
+  .dot.running { background: var(--warn); box-shadow: 0 0 0 3px var(--warn-tint); }
+  .dot.failed { background: var(--bad); box-shadow: 0 0 0 3px var(--bad-tint); }
+  .foot { margin-top: auto; display: flex; flex-direction: column; gap: 10px; }
+  .theme { display: flex; gap: 2px; padding: 2px; border: 1px solid var(--line); border-radius: var(--r-control); background: var(--bg); }
+  .theme button { flex: 1; height: 26px; border: 1px solid transparent; border-radius: var(--r-chip); background: none; font-size: 12px; font-weight: 500; color: var(--ink-3); }
+  .theme button[aria-pressed="true"] { background: var(--surface-3); border-color: var(--line-strong); color: var(--ink-1); }
+  .updated { font: 11px/16px var(--f-mono); color: var(--ink-3); padding: 0 4px; }
+
+  main { min-width: 0; display: flex; flex-direction: column; }
+  .head { padding: 28px 36px 0; display: flex; flex-direction: column; gap: 6px; }
+  .head h1 { margin: 0; font-size: 26px; line-height: 32px; font-weight: 600; letter-spacing: -.025em; text-wrap: balance; }
+  .head .state { display: flex; gap: 8px; align-items: center; }
+  .tabs { margin-top: 18px; display: flex; gap: 22px; border-bottom: 1px solid var(--line); padding: 0 36px; overflow-x: auto; }
+  .tab { height: 40px; display: flex; align-items: center; gap: 8px; border: 0; border-bottom: 1px solid transparent; margin-bottom: -1px; background: none; font-size: 13.5px; font-weight: 500; color: var(--ink-3); white-space: nowrap; padding: 0; }
+  .tab:hover { color: var(--ink-1); }
+  .tab[aria-selected="true"] { color: var(--ink-1); border-bottom-color: var(--ink-1); }
+  .tab .chip { height: 17px; display: inline-flex; align-items: center; padding: 0 5px; border-radius: var(--r-chip); background: var(--surface-3); font: 11px/1 var(--f-mono); color: var(--ink-2); }
+  .tab.off { color: var(--ink-3); opacity: .6; }
+  .body { padding: 24px 36px 40px; display: flex; flex-direction: column; gap: 20px; }
+
+  .frame { position: relative; width: 100%; border: 1px solid var(--line); border-radius: var(--r-card); background: var(--surface); overflow: hidden; }
+  .video { aspect-ratio: 16 / 9; max-width: 100%; background: #000; }
+  .video video { width: 100%; height: 100%; display: block; }
+  .slide { aspect-ratio: 16 / 9; max-width: 100%; }
+  .slide iframe { position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; border: 0; transform-origin: 0 0; background: var(--surface); }
+  .pager { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+  .pager .t { font-size: 13.5px; color: var(--ink-2); min-width: 0; overflow-wrap: anywhere; }
+  .btn { height: 32px; display: inline-flex; align-items: center; gap: 6px; padding: 0 12px; border-radius: var(--r-control); border: 1px solid var(--line-strong); background: var(--surface-2); font-size: 13px; font-weight: 500; text-decoration: none; }
+  .btn:hover { background: var(--surface-3); }
+  .btn[disabled] { opacity: .45; cursor: default; }
+  .notes { padding: 12px 14px; border: 1px solid var(--line); border-radius: var(--r-card); background: var(--surface-2); font-size: 14px; line-height: 21px; color: var(--ink-2); white-space: pre-wrap; overflow-wrap: anywhere; }
+  .explainer { height: calc(100dvh - 210px); min-height: 560px; }
+  .explainer iframe { width: 100%; height: 100%; border: 0; display: block; background: var(--surface); }
+  .empty { position: relative; aspect-ratio: 16 / 9; max-width: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; text-align: center; padding: 24px; border: 1px dashed var(--line-strong); border-radius: var(--r-card); background: var(--surface); overflow: hidden; }
+  .empty::before { content: ''; position: absolute; inset: 0; background-image: radial-gradient(circle, var(--dot) 0, var(--dot) 1px, transparent 1.4px); background-size: 9px 9px; opacity: .35; -webkit-mask-image: radial-gradient(ellipse 60% 70% at 50% 45%, #000 0%, transparent 70%); mask-image: radial-gradient(ellipse 60% 70% at 50% 45%, #000 0%, transparent 70%); }
+  .empty > * { position: relative; }
+  .empty b { font-size: 15px; font-weight: 600; }
+  .empty p { margin: 0; max-width: 52ch; color: var(--ink-2); font-size: 14px; }
+  .pill { display: inline-flex; align-items: center; gap: 6px; height: 22px; padding: 0 8px; border-radius: 999px; border: 1px solid var(--line-strong); background: var(--surface-2); font-size: 12px; font-weight: 500; white-space: nowrap; }
+  .spin { width: 12px; height: 12px; border-radius: 50%; border: 1.5px solid var(--line-strong); border-top-color: var(--ink-1); animation: spin .9s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .nums { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+  .num { padding: 14px 16px; border: 1px solid var(--line); border-radius: var(--r-card); background: var(--surface); display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+  .num .v { font: 500 22px/28px var(--f-mono); font-variant-numeric: tabular-nums; letter-spacing: -.01em; overflow-wrap: anywhere; }
+  .err { margin: 40px 36px; max-width: 60ch; color: var(--ink-2); }
+
+  @media (max-width: 860px) {
+    .app { grid-template-columns: minmax(0, 1fr); }
+    .rail { position: static; height: auto; border-right: 0; border-bottom: 1px solid var(--line); padding: 12px 16px; gap: 12px; }
+    .stages { flex-direction: row; overflow-x: auto; gap: 4px; padding-bottom: 2px; }
+    .stages .ov, .st .when, .foot .updated { display: none; }
+    .foot { margin-top: 0; }
+    .head { padding: 20px 16px 0; }
+    .tabs { padding: 0 16px; }
+    .body { padding: 18px 16px 32px; }
+    .nums { grid-template-columns: minmax(0, 1fr); }
+    .explainer { height: 75vh; min-height: 480px; }
+    .err { margin: 24px 16px; }
+  }
+  @media (prefers-reduced-motion: reduce) { .spin { animation: none; } }
+</style>
+
+<div class="app">
+  <nav class="rail" aria-label="Stages">
+    <div class="brand"><b id="ws-title">…</b><span class="ov" id="ws-slug"></span></div>
+    <div class="notices" id="notices" hidden></div>
+    <div class="stages" id="stages"></div>
+    <div class="foot">
+      <div class="theme" role="group" id="theme"></div>
+      <span class="updated" id="updated"></span>
+    </div>
+  </nav>
+  <main id="main"><p class="err" id="err" hidden></p></main>
+</div>
+
+<script>
+const STRINGS = {
+  en: {notices: 'Operations', stages: 'Stages', video: 'Video', deck: 'Deck', explainer: 'Explainer', closed: 'closed', running: 'running', todo: 'not yet', failed: 'failed', building: 'being made', rendering: 'rendering', none: 'not in this stage', time: 'time', cost: 'cost', touches: 'your touches', prev: 'Previous', next: 'Next', notes: 'Notes', open: 'Open on its own', updated: 'updated', auto: 'Auto', light: 'Light', dark: 'Dark', noData: 'The report data (report.json) could not be loaded.', notYet: 'This stage has not started.'},
+};
+const TABS = ['video', 'deck', 'explainer'];
+let R = null, S = STRINGS.en, cur = {stage: null, tab: null, slide: 0}, deckCache = {};
+const $ = (id) => document.getElementById(id);
+const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'}[c]));
+const store = {get(k) { try { return localStorage.getItem(k); } catch { return null; } }, set(k, v) { try { v == null ? localStorage.removeItem(k) : localStorage.setItem(k, v); } catch {} }};
+
+function paint(f) {
+  try { const d = f.contentDocument.documentElement, t = document.documentElement.getAttribute('data-theme'); t ? d.setAttribute('data-theme', t) : d.removeAttribute('data-theme'); } catch {}
+}
+function theme(choice) {
+  if (choice) document.documentElement.setAttribute('data-theme', choice); else document.documentElement.removeAttribute('data-theme');
+  store.set('report-theme', choice);
+  document.querySelectorAll('iframe').forEach(paint);
+  $('theme').innerHTML = [['', S.auto], ['light', S.light], ['dark', S.dark]].map(([v, l]) => `<button type="button" aria-pressed="${(choice || '') === v}" data-v="${v}">${l}</button>`).join('');
+}
+$('theme').addEventListener('click', (e) => { const b = e.target.closest('button'); if (b) theme(b.dataset.v || null); });
+
+const stageOf = (id) => R.stages.find((s) => s.id === id);
+const tabOf = (st, t) => (st.tabs || {})[t] || {state: 'none'};
+const ready = (st, t) => tabOf(st, t).state === 'ready';
+
+function pickDefault() {
+  const live = R.stages.filter((s) => s.state !== 'todo');
+  const st = live[live.length - 1] || R.stages[0];
+  return {stage: st.id, tab: TABS.find((t) => ready(st, t)) || 'video'};
+}
+function fromHash() {
+  const h = location.hash.slice(1);
+  const [sid, tab] = h.split('-');
+  if (sid && stageOf(sid)) return {stage: sid, tab: TABS.includes(tab) ? tab : (TABS.find((t) => ready(stageOf(sid), t)) || 'video')};
+  return pickDefault();
+}
+function go(stage, tab) {
+  cur = {stage, tab, slide: cur.stage === stage && cur.tab === tab ? cur.slide : 0};
+  history.replaceState(null, '', `#${stage}-${tab}`);
+  render();
+}
+
+function rail() {
+  $('ws-title').textContent = R.title;
+  $('ws-slug').textContent = R.slug || '';
+  document.title = R.title;
+  const n = R.notices || [];
+  $('notices').hidden = !n.length;
+  $('notices').innerHTML = n.length ? `<span class="ov">${S.notices}</span>` + n.map((x) => `<div class="notice"><span class="dot ${x.tone === 'bad' ? 'failed' : x.tone === 'ok' ? 'closed' : 'running'}"></span><span>${esc(x.text)}</span></div>`).join('') : '';
+  $('stages').innerHTML = `<span class="ov">${S.stages}</span>` + R.stages.map((s) => `<a class="st ${s.state}" href="#${s.id}" data-id="${s.id}" ${s.id === cur.stage ? 'aria-current="page"' : ''}><span class="dot ${s.state}"></span>${esc(s.name)}<span class="when">${esc(s.closedAt ? s.closedAt.slice(0, 5) : '')}</span></a>`).join('');
+  $('updated').textContent = R.updatedAt ? `${S.updated} ${R.updatedAt}` : '';
+}
+$('stages').addEventListener('click', (e) => { const a = e.target.closest('a.st'); if (!a) return; e.preventDefault(); const st = stageOf(a.dataset.id); go(st.id, TABS.find((t) => ready(st, t)) || 'video'); });
+
+function emptyState(t, why) {
+  const label = t.state === 'building' ? (cur.tab === 'video' ? S.rendering : S.building) : S[t.state] || S.none;
+  const icon = t.state === 'building' ? '<span class="spin"></span>' : `<span class="dot ${t.state === 'failed' ? 'failed' : ''}"></span>`;
+  return `<div class="empty"><span class="pill">${icon}${esc(label)}</span>${why ? `<p>${esc(why)}</p>` : ''}</div>`;
+}
+
+async function deckOf(st, t) {
+  const dir = t.dir.replace(/\/$/, '');
+  if (!deckCache[dir]) deckCache[dir] = fetch(`${dir}/deck.json`, {cache: 'no-store'}).then((r) => r.json()).catch(() => null);
+  return deckCache[dir];
+}
+
+async function panel(st) {
+  const t = tabOf(st, cur.tab);
+  if (st.state === 'todo') return emptyState({state: 'none'}, S.notYet);
+  if (t.state !== 'ready') return emptyState(t, t.why);
+  if (cur.tab === 'video') return `<div class="frame video"><video controls preload="metadata" playsinline src="${esc(t.file)}"></video></div>`;
+  if (cur.tab === 'explainer') return `<div class="frame explainer"><iframe src="${esc(t.file)}" title="${esc(st.name)} · ${S.explainer}"></iframe></div><div class="pager"><a class="btn" href="${esc(t.file)}" target="_blank" rel="noopener">${S.open} ↗</a></div>`;
+  const deck = await deckOf(st, t);
+  if (!deck || !deck.slides || !deck.slides.length) return emptyState({state: 'failed'}, `${t.dir}/deck.json`);
+  const i = Math.min(cur.slide, deck.slides.length - 1), sl = deck.slides[i], dir = t.dir.replace(/\/$/, '');
+  return `<div class="frame slide" id="slide"><iframe src="${esc(dir + '/' + sl.file)}" title="${esc(sl.title || '')}" scrolling="no"></iframe></div>
+    <div class="pager"><button class="btn" type="button" data-step="-1" ${i === 0 ? 'disabled' : ''}>← ${S.prev}</button><span class="mono">${i + 1} / ${deck.slides.length}</span><button class="btn" type="button" data-step="1" ${i === deck.slides.length - 1 ? 'disabled' : ''}>${S.next} →</button><span class="t">${esc(sl.title || '')}</span>${sl.notes ? `<button class="btn" type="button" data-notes>${S.notes}</button>` : ''}</div>
+    ${sl.notes ? `<div class="notes" id="notes" hidden>${esc(sl.notes)}</div>` : ''}`;
+}
+
+function fit() {
+  const box = $('slide');
+  if (!box) return;
+  box.querySelector('iframe').style.transform = `scale(${box.clientWidth / 1920})`;
+}
+new ResizeObserver(fit).observe(document.body);
+
+async function render() {
+  rail();
+  const st = stageOf(cur.stage);
+  const state = st.state === 'closed' && st.closedAt ? `${S.closed} · ${st.closedAt}` : S[st.state] || st.state;
+  const tabs = TABS.map((t) => { const x = tabOf(st, t); return `<button class="tab ${x.state === 'none' ? 'off' : ''}" role="tab" type="button" data-tab="${t}" aria-selected="${t === cur.tab}">${S[t]}${t === 'video' && x.seconds ? `<span class="chip">${Math.floor(x.seconds / 60)}:${String(Math.round(x.seconds % 60)).padStart(2, '0')}</span>` : ''}</button>`; }).join('');
+  const nums = st.numbers ? `<div class="nums">${['time', 'cost', 'touches'].map((k) => `<div class="num"><span class="ov">${S[k]}</span><span class="v">${esc(st.numbers[k] ?? '—')}</span></div>`).join('')}</div>` : '';
+  const body = await panel(st);
+  $('main').innerHTML = `<header class="head"><div class="state"><span class="dot ${st.state}"></span><span class="ov">${esc(state)}</span></div><h1>${esc(st.name)}</h1></header>
+    <div class="tabs" role="tablist">${tabs}</div><section class="body">${body}${nums}</section>`;
+  $('main').querySelectorAll('iframe').forEach((f) => f.addEventListener('load', () => paint(f)));
+  fit();
+}
+
+$('main').addEventListener('click', (e) => {
+  const tb = e.target.closest('[data-tab]'); if (tb) return go(cur.stage, tb.dataset.tab);
+  const sp = e.target.closest('[data-step]'); if (sp && !sp.disabled) { cur.slide += Number(sp.dataset.step); return render(); }
+  if (e.target.closest('[data-notes]')) $('notes').hidden = !$('notes').hidden;
+});
+document.addEventListener('keydown', (e) => {
+  if (cur.tab !== 'deck' || e.target.closest('input, textarea')) return;
+  const b = document.querySelector(`[data-step="${e.key === 'ArrowRight' ? 1 : e.key === 'ArrowLeft' ? -1 : 0}"]`);
+  if (b && !b.disabled) b.click();
+});
+window.addEventListener('hashchange', () => { const h = fromHash(); if (h.stage !== cur.stage || h.tab !== cur.tab) { cur = {...h, slide: 0}; render(); } });
+
+fetch('report.json', {cache: 'no-store'})
+  .then((r) => { if (!r.ok) throw new Error(r.status); return r.json(); })
+  .then((data) => { R = data; S = STRINGS[R.lang] || STRINGS.en; theme(store.get('report-theme')); cur = {...fromHash(), slide: 0}; render(); })
+  .catch(() => { theme(store.get('report-theme')); $('err').hidden = false; $('err').textContent = STRINGS.en.noData; });
+</script>

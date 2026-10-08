@@ -1,0 +1,51 @@
+<title>Deck</title>
+<style>
+  /* the page that pages through deck/deck.json when a deck is published on its own */
+  :root { --bg: #f4f4f2; --surface: #ffffff; --line: #dcdcd8; --ink: #141414; --ink-2: #5a5a58; }
+  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --bg: #0c0c0d; --surface: #151517; --line: #2a2a2e; --ink: #ededef; --ink-2: #a1a1a8; color-scheme: dark; } }
+  :root[data-theme="dark"] { --bg: #0c0c0d; --surface: #151517; --line: #2a2a2e; --ink: #ededef; --ink-2: #a1a1a8; color-scheme: dark; }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font: 15px/1.5 system-ui, -apple-system, 'Segoe UI', sans-serif; padding-inline: 16px; padding-block: 20px 32px; overflow-x: clip; }
+  .wrap { max-width: 1280px; margin: 0 auto; display: flex; flex-direction: column; gap: 12px; }
+  h1 { margin: 0; font-size: 20px; font-weight: 600; }
+  .frame { position: relative; aspect-ratio: 16 / 9; max-width: 100%; border: 1px solid var(--line); border-radius: 10px; overflow: hidden; background: var(--surface); }
+  .frame iframe { position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; border: 0; transform-origin: 0 0; }
+  .bar { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+  button { height: 34px; padding: 0 14px; border-radius: 6px; border: 1px solid var(--line); background: var(--surface); color: var(--ink); font: inherit; font-size: 14px; font-weight: 500; cursor: pointer; }
+  button[disabled] { opacity: .4; cursor: default; }
+  .n { font-variant-numeric: tabular-nums; } .t { color: var(--ink-2); min-width: 0; overflow-wrap: anywhere; }
+  .notes { padding: 12px 14px; border: 1px solid var(--line); border-radius: 10px; background: var(--surface); color: var(--ink-2); white-space: pre-wrap; overflow-wrap: anywhere; }
+</style>
+<div class="wrap">
+  <h1 id="title">Deck</h1>
+  <div class="frame" id="frame"><iframe id="slide" title="Slide" scrolling="no"></iframe></div>
+  <div class="bar"><button type="button" id="prev">← Previous</button><span class="n" id="n"></span><button type="button" id="next">Next →</button><span class="t" id="st"></span><button type="button" id="nb">Notes</button></div>
+  <div class="notes" id="notes" hidden></div>
+</div>
+<script>
+const $ = (id) => document.getElementById(id);
+let deck = null, i = 0;
+function fit() { $('slide').style.transform = `scale(${$('frame').clientWidth / 1920})`; }
+function show() {
+  const s = deck.slides[i];
+  $('slide').src = `deck/${s.file}`;
+  $('slide').title = s.title || `Slide ${i + 1}`;
+  $('n').textContent = `${i + 1} / ${deck.slides.length}`;
+  $('st').textContent = s.title || '';
+  $('notes').textContent = s.notes || '';
+  $('nb').hidden = !s.notes;
+  if (!s.notes) $('notes').hidden = true;
+  $('prev').disabled = i === 0;
+  $('next').disabled = i === deck.slides.length - 1;
+}
+$('prev').onclick = () => { if (i > 0) { i--; show(); } };
+$('next').onclick = () => { if (i < deck.slides.length - 1) { i++; show(); } };
+$('nb').onclick = () => ($('notes').hidden = !$('notes').hidden);
+document.addEventListener('keydown', (e) => { if (e.key === 'ArrowRight') $('next').click(); if (e.key === 'ArrowLeft') $('prev').click(); });
+new ResizeObserver(fit).observe($('frame'));
+fetch('deck/deck.json', {cache: 'no-store'}).then((r) => r.json()).then((d) => {
+  deck = d;
+  $('title').textContent = document.title = d.title || 'Deck';
+  show();
+}).catch(() => ($('title').textContent = 'deck/deck.json could not be loaded.'));
+</script>

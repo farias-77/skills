@@ -1,17 +1,18 @@
-# Close trace — <workstream>
+# Close trace · <slug>
 
-<!--
-  One line per step as it ran, appended, never rewritten. The hour from
-  `date -u`. A resumed session continues from the first step without a
-  line here.
--->
+<!-- One line per step as it ends, `date -u +'%F %H:%M'`. The resume point. -->
 
-| At (UTC) | Step | What | Result | File |
-|---|---|---|---|---|
-| <YYYY-MM-DD HH:MM> | 0 | preconditions read; release closed | ok | `.state.md` |
-| | 1 | harvest back: documents <n> frictions · execution <n> · release <n> · notes <n> | ok | `05-close/harvest/` |
-| | 2 | numbers and precision summed | ok | `retro.json` |
-| | 3 | sweep: <n> worktrees, <n> branches removed; <n> left for the user | ok | `retro.md` |
-| | 4 | retro written: <n> worked · <n> wrong · <n> ideas; blueprint published | ok | `<URL>` |
-| | 5 | the user's notes: <n> | ok | `retro.md` |
-| | 6 | closed | ok | `.state.md` |
+- <date> · open · canary denied · /goal pasted
+- <date> · video · rendering since <time> \| dispatched now \| done: <length>, <MB>
+- <date> · harvest · <n> frictions returned
+- <date> · numbers · metrics.json written · gaps: <n>
+- <date> · retro · written
+- <date> · cleanup · discarded: <branches> \| kept: <branches> \| none
+- <date> · cleanup · final --check:
+
+```
+<the output, verbatim>
+```
+
+- <date> · report · published, label "closed"
+- <date> · delivered · .state.md → closed

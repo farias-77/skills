@@ -1,0 +1,74 @@
+# journeys/<J-id>-<kebab-title>.yaml: one locked journey, derived from the locked mock.
+#
+# Written by story-writer after the lock, one file per journey of the
+# mock's journey panel. The mock is the source: id, start, step ids, target,
+# fill, net and the frame each step lands on are copied from it, and
+# `proto.mjs trace` refuses any difference. What the writer adds is what the
+# frame shows in words a test can assert (expect) and what happens behind it
+# (effects), read from the mock's screens, copy and backstage.
+#
+# Later stages read these files: the journey walk of stage 4 follows the
+# steps (one walk per journey, one test step per AC), QA compares the real
+# screen with each step's frame. Ids never change after the
+# lock. Keys stay at this indentation: the trace check reads them by line.
+
+id: J1
+title: Invite the first teammate
+actor: workspace admin              # one actor per journey
+job: When a new teammate joins, I want to send them an invite, so they can start working today.
+rules: [INV-1]                      # every rule id this journey exercises (the notes' Rules table)
+start: invites.empty                # the frame the journey opens on
+given: |                            # the state before step 1, in words (fixtures named)
+  The workspace has no invites. The admin is signed in.
+variants:                           # what the same steps must hold under (from the notes)
+  lang: [en, pt-BR]
+  width: [390, 1280]
+steps:
+  - id: s1
+    do: Open the invite form        # one event, declarative
+    target: '[data-act="open-form"]'
+    fill: {}
+    net: ok                         # ok | slow | error | timeout: the answer of the next request
+    expect:
+      frame: invite-form.idle       # the state the screen lands on (a mock frame)
+      see:                          # what is on screen, by role + accessible name or copy key
+        - heading "form.title"
+        - textbox "form.email", empty, focused
+        - text "form.hint"
+        - button "form.send", enabled
+    effects: []                     # nothing happens behind this step; an empty list is a claim
+    rules: []
+    png: frames/journeys/J1.s1.png  # the locked picture of this step
+  - id: s2
+    do: Type her e-mail and send
+    target: 'button[type="submit"]'
+    fill: { '#invite-email': marina.okafor@acme.com.br }
+    net: ok
+    expect:
+      frame: invites.sent
+      see:
+        - status "list.sent.title" with marina.okafor@acme.com.br
+        - text "list.sent.body" with the date 7 days after the send
+        - row marina.okafor@acme.com.br · Pending
+    effects:
+      - { kind: db, table: invites, op: insert, email: marina.okafor@acme.com.br }
+      - { kind: email, to: marina.okafor@acme.com.br, template: invite }
+    must_not:                       # effects that must NOT happen, written out
+      - a second e-mail to the same address
+    rules: [INV-1]
+    png: frames/journeys/J1.s2.png
+  # A step whose event is not a click carries `as` (view as another actor, from the
+  # mock's debug bar) or `clock` (the mock's clock moves: "+1d", or an ISO time),
+  # copied from the mock, in place of target and fill:
+  #   - id: s3
+  #     do: Midnight passes
+  #     clock: '2026-10-10T00:00:00-03:00'
+  #     expect:
+  #       frame: invites.expired
+  #       see: [ ... ]
+  #   - id: s4
+  #     do: View as the invited teammate
+  #     as: teammate
+  #     expect:
+  #       frame: inbox.ideal
+  #       see: [ ... ]

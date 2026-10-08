@@ -1,249 +1,185 @@
 # skills
 
-An opinionated, stage-gated development pipeline for AI agent teams —
+An opinionated, stage-gated development pipeline for AI agent teams,
 built as [Claude Code](https://claude.com/claude-code) skills, agents
 and workflows, extracted from production use at a real software
 company and published as-is.
 
 **This is not a framework.** It is one team's working pipeline, made
-public because the ideas travel even where the specifics don't. It
-does not try to be configurable — it is deliberately opinionated, and
-the intention is that you read it, steal what fits, and shape your
-own; not that you adopt it wholesale. The best way to use it: **fork
-it and keep editing** — bend every rule toward what serves your team,
-with this model as your starting base, never as absolute truth. Even
-here it isn't treated as one: the closing stage exists precisely to
-keep rewriting these files as reality pushes back.
+public because the ideas travel even where the specifics don't. Read
+it, steal what fits, and shape your own. The best way to use it is to
+**fork it and keep editing**: the weekly retro exists to keep
+rewriting these files as reality pushes back.
 
-## How it works
+## What it is
 
-One demand becomes a **workstream**: one folder, one conducting Claude
-Code session, one **blueprint** (a single self-contained HTML artifact
-the human reviews on — same URL from discovery to done, growing a tab
-per stage; built from JSON the stages write, never edited by an
-agent). The demand travels through six stages; each stage is a
-skill that conducts the session, and each ends at an **explicit human
-checkpoint** — the pipeline runs autonomously between gates, never
-through them.
+A software factory for a team of one: a person says what to build, and
+a crew of agents turns it into tested, reviewed, released code, with a
+report he can watch at every stage. Several fronts run at once, through
+the night, and he is asked only what is his.
 
-```mermaid
-flowchart LR
-  D1["1 · Discovery"] --> D2["2 · Design"]
-  D2 --> D3["3 · Plan"]
-  D3 --> D4["4 · Execute"]
-  D4 --> D5["5 · Release"]
-  D5 --> D6["6 · Close"]
-  D6 -. "retro" .-> W["Weekly retro"]
-  W -. "changes the pipeline" .-> D1
+| Rule | What it means |
+|---|---|
+| **Proof over opinion** | a live mock he clicks, ACs that become tests, a gate, QA on the running app; reviewers exist for what cannot be run |
+| **Right size** | one proposal sized to the problem, an overengineering guard whose only job is to cut, an evolution path for what was left out; "could be simpler" never blocks |
+| **One round** | every review runs once; a fix is verified by reading or by the delta, never by a second round |
+| **He is asked only what is his** | the conductor decides his class conservatively and lists it for veto; only a locked AC changed, a new recurring cost or something irreversible becomes a question |
+| **A report he can watch** | one link per front: each stage gets a Video, a Deck and an Explainer, finished before the stage closes |
+| **Local CI, one guard** | the whole gate runs on our compute and posts the status `main` requires; a hook denies what cannot be undone |
+| **It measures itself** | a script reads time, cost and his touches per stage; the weekly retro turns what repeats into changes he rules |
+
+## One door, three routes
+
+```
+/lets-cook <idea> ──► scouts in the background ──► a light interview ──► the route, in one line
+  ├─ full    ──► the six stages below
+  ├─ short   ──► one-page brief ──► ! authorize + /goal ──► one entry ──► his use ──► release ──► short close
+  └─ hotfix  ──► brief + a test that reproduces the bug ──► ! authorize + /goal ──► one entry ──► release
 ```
 
-Underneath, four mechanics carry everything:
-
-- **The session conducts; agents work.** The session dispatches,
-  routes, audits, and talks to the human — it never writes the
-  deliverables. Authors write, reviewers report, the human rules; every
-  agent is a file under `claude/agents/` with five fixed sections.
-- **State is 100% external.** The workstream folder, GitHub as the
-  source of record, the board as a projection. Any agent — even a
-  conductor mid-stage — can die and be re-dispatched: it re-derives
-  everything from the source and continues. Nothing lives in memory.
-- **Reviews are workflows, not discipline.** Every review round is a
-  deterministic script in `workflows/` — all reviewers, every round,
-  structured outputs, lazy passes re-dispatched automatically. There
-  is no code path that runs a subset, so skipping review is not a
-  temptation an agent can act on.
-- **Every reviewer answers one contract.**
-  [reviewer-contract.md](docs/standards/reviewer-contract.md): verdict
-  derived arithmetically from the worst finding, verbatim proof of
-  reading, and the rule that a clean pass without a verification trail
-  is invalid.
+Every route keeps every check (builder, gate, reviewer and QAs, local
+CI, staging, tag, watch); only the ceremony shrinks.
 
 ## The six stages
 
-**1 · Discovery** — the engineering team interviewing the demand's
-owner, one fluid conversation with notes written as it happens, until
-the unknowns that would change what gets built are gone; the
-conductor is Opus 5.5 (medium). Screens are not drawn here: they are
-the design's. The conductor plays the understanding back as stories
-and **the owner confirms every story by hand**, one question each:
-confirm, reduce, adjust, or cut; what leaves the playback is only what
-gets built. Two authors (Sonnet 5.5, high) then write the PR-FAQ and the
-user stories from the notes, in parallel: what gets built, what stays
-out, every acceptance criterion with an ID. A whole review round runs,
-cheap by design (Sonnet 5.5, medium and low): three lenses read the documents
-while, per story, two
-**blind readers** describe what each would build and a referee reports
-where they built different products. The **conductor judges** every
-finding by the discovery razor — a wrong guess would change what gets
-built — with a closed list of classes that are never dismissed
-(personal data, money, legal, security, a contradiction) and a
-"for the design" list for the mechanics that are stage 2's; wording
-goes to the authors without a question, decisions go to the owner
-grouped by decision. Up to three rounds, the owner choosing after each
-whether to run another. In the
-ideal world, this stage isn't run *for* the business team but *by*
-it — the skill interviews whoever owns the demand, and engineering
-only enters at stage 2 with the ambiguity already wrung out.
-
-**2 · Design** — a defined scope in, how the whole demand gets built
-on the system as it is out. The shape is the consuming project's
-doctrine; the design applies it and never reopens it. **Recon first**:
-scouts (Sonnet 5.5, low) read the system as it is today (feature maps,
-docs, the modules the stories touch) and a **deep-research workflow
-per external tool** (Sonnet 5.5, medium: planner, blind searchers,
-synthesizer, critic, citer) reads its documentation into a sourced
-file. Then the conductor (Opus 5.5, high) asks whether the human
-already has a shape in mind: if he does, he talks first and the
-conductor builds on it, saying where it would go another way and at
-what cost; if not, the conductor arrives with the proposal. Either way
-it walks eleven subjects (the shape, architecture, data, contracts,
-screens, security, infra, observability, rollout, code, acceptance),
-every one thought even when nothing changes in it, under the
-**construction razor**: extend what exists when the responsibility
-exists, a new piece in its owning module when it is new, fix instead
-of a parallel path, never a workaround or a temporary step unless the
-human asks for it, never speculation. They iterate to a final version,
-one card per real fork, `notes.md` holding one version of every
-decision. **Ten writers (Sonnet 5.5, high) write the ten documents in
-parallel** from the same notes and research, deciding nothing (a gap
-is a question back), each also writing its blueprint JSON, and round 1
-runs at once: ten lenses (Opus 5.5 or Sonnet 5.5, medium) — data, code (which blocks
-every workaround), infra, security, contracts, alarms, coverage,
-facts, UI and consistency — beside, per flow, two **blind readers**
-(Sonnet 5.5, low) and a referee (Sonnet 5.5, low) reporting where they
-would build different things. **The conductor judges** every finding
-by the design razor with a closed list of classes never dismissed;
-wording goes to the writer without a question, decisions go to the
-human one question per decision, latitude to the implementer. The
-human then says whether a second or a third round runs, each over the
-delta only. The blueprint's Design tab is read by the human at the
-close, where his adjustments are noted and applied in a batch. The
-order of construction is stage 3's.
-
-**3 · Plan** — the design becomes a cut built **as parallel as the
-machine allows**. One scout (Sonnet 5.5, low) per area of the codebase
-writes what exists today; the conductor (Opus 5.5, medium) arrives with
-the cut and the human shapes it. First the **foundation**: everything
-two builders would fight over — every migration of the demand, the
-whole contract with its generated code, the new modules registered,
-the shared pieces, the factories — laid down once, so no later piece
-ever touches a shared file. Then the **graph of entries**: one story,
-or a small group that proves only together, built vertically (back,
-front, tests) in its own worktree with its own local stack; an **edge**
-only where an entry's proof needs another entry's behavior (data is
-seeded by the factories, never an edge); everything free runs at once,
-up to a **concurrency cap** measured on the machine. Every entry is
-proved by commands on the local stack (`run`/`expect`, and a
-screenshot against its artboard for a screen); nothing needs alpha or
-prod. One writer (Sonnet 5.5, high) per entry writes the **brief** its
-builder will receive, deciding nothing; three lenses (Sonnet 5.5, high)
-— coverage, verifiability, order — and, per brief, two blind readers
-(Sonnet 5.5, low) with a referee (Sonnet 5.5, low) review it; round 2
-runs automatically over the delta, a third only on the human's word.
-The pre-flight (what only he can hand over) is handed at the close.
-
-**4 · Execute** — the plan becomes merged, reviewed code, with no
-human in the loop until the end. **One session** (Opus 5.5, high)
-receives one goal, "build the whole plan", and orchestrates without
-writing or reviewing code: the foundation first, then every entry whose
-edges are merged or ready, critical path first, in parallel up to the
-cap the machine was measured to hold, each in its own worktree and
-local stack, through the **exec-entry** workflow.
-`builder-backend` and `builder-frontend` (Opus 5.5, high) build the two
-sides at once in their own worktrees, tests and journeys first, and
-check their own work against the reviewers' checklist before they
-return; the **gate** (`exec-gate`, Sonnet 5.5, medium) merges them and runs
-the doctrine's fast check and affected tests each round, sending every
-red back to the side that owns it; a **panel that never wrote the
-code** reads the diff — lenses for fidelity, workaround, proof (one per
-side), security, operations and visual (Opus 5.5, medium, fidelity and
-visual on Sonnet 5.5, high; craft only on the foundation) and QA that use the running stack as an adversary
-through a mandatory checklist, per side and one for abuse (Opus 5.5,
-high), each seated only when the diff touches what it reads — and a **judge** (`exec-judge`, Opus 5.5, medium) rules every
-finding, on its own under the goal, sending the rest to the session or
-the user; the builders fix back ∥ front, the gate runs, and the delta is
-verified by the lenses it touches and a QA replay (Sonnet 5.5, medium), two
-rounds at most; before an entry is ready the whole gate runs once and
-the gate writes the record. **No code enters without review**: every
-build, fix, conflict resolution and foundation amendment passes the
-gate and the panel. The session merges what comes back ready through a
-serial queue (the base merged in, the affected gate, merge), writes foundation
-amendments when an entry needs a shared file changed, builds the
-deferred findings in parallel finishing slices, reads the whole branch
-once for maintainability, and parks what is the user's. When everything
-is merged and green it calls him once for the **audit**: the parked,
-what was decided in his place, the choices the builders made where the
-documents were silent, the precision of every reviewer and the QA's
-coverage. `main` is stage 5's.
-
-**5 · Release** — the audited feature branch reaches production
-through the project's own delivery pipeline, with one question to the
-human. The session (Opus 5.5, medium) writes the release plan from the
-audit and the doctrine's delivery standard, merges the feature branch
-into staging on its own (the audit authorized it) and follows the CI
-while it deploys staging and runs the real suite; a red in the code is
-fixed as an entry `R.n` through the stage-4 pipeline — builders, gate,
-panel, judge — so no fix ships unreviewed. One `release-scribe`
-(Sonnet 5.5, medium) per versioned artifact derives the version and the
-notes. Then the session opens the release PR and asks the human once:
-**"vai?"**. On his word it merges; the CI deploys to production the
-same artifact staging proved, runs its read-only checks and rolls back
-on its own when they fail. The session reads every proof the audit
-deferred to production at its hour, runs a hotfix the same way while
-the workstream is open, and calls him once at the end with everything
-in production.
-
-**6 · Close** — the retro of the workstream, with nothing changed in
-the pipeline. One harvester (Sonnet 5.5, medium) per source of the record
-returns the numbers, the precision of every reviewer and every
-friction with its evidence; the session (Opus 5.5, medium) sums the
-numbers, cleans what the workstream left behind, and writes the retro:
-what worked, what went wrong, and the ideas for the pipeline, each
-with the file it would touch and the frictions behind it. The human
-reads it and comments; his words go in verbatim; nothing is decided,
-no issue is opened, no pipeline file is edited.
-
-**Weekly · the retro of the week** — the only place the pipeline
-changes. `weekly-retro` (Opus 5.5, medium) gathers the retro of every
-workstream closed in the week, merges the ideas that repeat, sums the
-reviewers' precision, and brings the human a board ranked by his own
-notes and by how many workstreams saw each thing. He rules each group
-— apply, park, drop — and the session applies what he approved to the
-pipeline, verifies it, and commits with his word.
-
-## On cost
-
-This pipeline is expensive to run today, and that was a deliberate
-non-concern. Every entry's diff is read whole by the lenses and the adversarial QA, then its delta verified, two rounds at most;
-discovery and design run up to three rounds on the human's word, plan runs round 2 automatically and a third on his word; ambiguity is hunted by dispatching multiple readers at
-the same document. That redundancy is exactly
-where the quality comes from — and it is priced in tokens.
-
-We optimized for the trendline, not the invoice: models keep getting
-better and cheaper, and a pipeline built around abundant intelligence
-ages well along that curve. Where the ratio hurts you today, the
-levers are obvious — smaller models on the evidence lenses, fewer
-readers, narrower rounds — but they are yours to pull, not defaults
-we chose.
-
-## Layout
-
-```
-claude/                 the pipeline — the six stages, Claude Code
-  skills/               one folder per stage — SKILL.md + templates + references
-  agents/               every agent, named <stage>-<role>[-<lens>], five fixed sections
-  workflows/            the deterministic review rounds (plain JS, single-file)
-  blueprint/            the blueprint shell, its build, the strings per language, the JSON schemas, an example
-codex/                  placeholder — nothing runs in Codex today
-docs/
-  standards/            the single-source rulers everything points at
+```mermaid
+flowchart LR
+  D1["1 · Discovery<br/>live mock + stories"] --> D2["2 · Design<br/>one proposal · the debate"]
+  D2 --> D3["3 · Plan<br/>the build graph"]
+  D3 --> D4["4 · Execute<br/>entries + local CI + his hands-on"]
+  D4 --> D5["5 · Release<br/>main · staging · tag · production"]
+  D5 --> D6["6 · Close<br/>users' video + retro"]
+  D6 -. "the retro" .-> W["Weekly retro"]
+  W -. "changes the pipeline" .-> D1
 ```
 
-## Installing into a project
+Each stage opens with **the canary** (the guard must deny `git push
+origin a:b`) and, except discovery, hands him **one `/goal`**; then it
+runs on its own to its close. It closes with its report published and
+the next play: `/clear`, then `/stage-<next> <slug>`. Every session
+runs on Opus 5.5, high.
 
-Shared across projects by symlink — each project keeps its own
-settings, MCP config, and machine tuning; the pipeline stays one
-source:
+| Stage | What happens | His part |
+|---|---|---|
+| **1 · Discovery** | while he talks, `prototype-builder (Sonnet 5.5, medium)` turns each answer into a visible edit of a live mock; the conductor locks it when nothing is open; `story-writer (Sonnet 5.5, high)` writes the stories, one AC per rule; one review round (`discovery-review-workflow.js`: three `disc-lens (Sonnet 5.5, medium)` and, per story, two `blind-reader (Sonnet 5.5, low)` and a `blind-judge (Sonnet 5.5, medium)`) | the conversation; the playback, story by story |
+| **2 · Design** | scouts read the system; `architect (Opus 5.5, high)` writes one proposal with its v1 → v2 → v3 path; `overengineering-guard (Opus 5.5, medium)` cuts; after his "closed", the architect writes `solution.md` and five `design-writer (Sonnet 5.5, high)` the other documents; four lenses review once, called directly by the session: `design-consistency` and `design-security` (Opus 5.5, medium), `design-contracts (Sonnet 5.5, high)`, the guard again | the debate over a deck and a ≤60 s video, until "closed" |
+| **3 · Plan** | `planner (Opus 5.5, high)` cuts the widest graph: a thin contract commit C, entries of one whole behaviour (≤12 ACs) with front and back in parallel, E-int last; `plan-writer (Sonnet 5.5, high)` writes one brief per node; one round (`plan-review-workflow.js`: `plan-reviewer (Opus 5.5, medium)` and the double-blind per brief); the session rules everything and writes the pre-flight | nothing; a veto list at the close |
+| **4 · Execute** | the session is the tech lead. Every ready entry runs `exec-entry-workflow.js`, in its own cloud session when the project has one: `builder-backend` ∥ `builder-frontend (Opus 5.5, medium)` → `exec-gate (Sonnet 5.5, low)` → `reviewer (Opus 5.5, high)` ∥ `qa-frontend` · `qa-backend (Opus 5.5, medium)` by surface → one fix pass → the delta. A serial queue merges into `feat/<slug>`; the project's signoff command runs the whole gate once, after his ok, and posts `local-ci` | the pre-flight; his hands-on with the running app, each answer an `A.n` round, until "ok" |
+| **5 · Release** | merge into `main` behind `local-ci`; the CI deploys staging and smokes; a `vX.Y.Z` tag promotes the same image to production, smokes, watches 15 minutes and rolls back on its own. A red gets one fix entry; a second red stops | his authorization line; a question only on the stop list (a new production deploy after a rollback is one) |
+| **6 · Close** | the users' video (1–3 min, recorded on staging) and a "what's new" text he forwards; a short retro with the script's numbers; a script proves nothing of the front is left on the machine | nothing |
+
+The **weekly retro** reads the week's closed fronts together and
+proposes changes, each with its evidence and exact edit; he rules each
+one (apply · park · drop). It is the only place the pipeline changes.
+
+## The roster
+
+Every agent is a file under `claude/agents/`. Only **Opus 5.5** and
+**Sonnet 5.5** are used: Opus where judgment pays (architecture, the
+cut, code, review, QA, the risk lenses), Sonnet for literal reading
+and templated writing, never above high.
+[docs/models.md](docs/models.md) holds the evidence for each pick;
+`node scripts/check-models.mjs` fails when an agent disagrees with it.
+
+| Stage | Agent | Model, effort |
+|---|---|---|
+| all | `scout` | Haiku 5.5, medium |
+| every report | `video-builder` | Sonnet 5.5, high |
+| every report | `slides-builder` · `artifact-builder` | Sonnet 5.5, medium |
+| discovery, plan | `blind-reader` | Sonnet 5.5, low (plan briefs: Haiku 5.5, high) |
+|  | `blind-judge` | Sonnet 5.5, medium |
+| discovery | `prototype-builder` | Sonnet 5.5, medium |
+|  | `story-writer` | Sonnet 5.5, high |
+|  | `disc-lens` | Sonnet 5.5, medium |
+| design | `architect` | Opus 5.5, high |
+|  | `overengineering-guard` | Opus 5.5, medium |
+|  | `design-writer` | Sonnet 5.5, high |
+|  | `design-consistency` · `design-security` | Opus 5.5, medium |
+|  | `design-contracts` | Sonnet 5.5, high |
+| plan | `planner` | Opus 5.5, high |
+|  | `plan-writer` | Sonnet 5.5, high |
+|  | `plan-reviewer` | Opus 5.5, medium |
+| execute | `builder-backend` · `builder-frontend` | Opus 5.5, medium |
+|  | `exec-gate` | Sonnet 5.5, low |
+|  | `reviewer` | Opus 5.5, high |
+|  | `qa-frontend` · `qa-backend` | Opus 5.5, medium |
+
+## The skills
+
+| Skill | Runs as | What it does |
+|---|---|---|
+| `lets-cook` | session | the one door: interview, route, and the short route and hotfix end to end |
+| `stage-discovery` · `stage-design` · `stage-plan` · `stage-execute` · `stage-release` · `stage-close` | session | the six stages |
+| `weekly-retro` | session | the week's fronts read together; the only place the pipeline changes |
+| `pipeline-setup` | session | audits a project against the bar and closes the cheap gaps on a branch |
+| `draw-it-for-me` | preloaded by `artifact-builder`, `prototype-builder` | explanatory pages: diagrams that build, motion, 3D, charts |
+| `pitch-it-for-me` | preloaded by `slides-builder` | HTML slide decks, one idea per slide |
+| `make-it-a-movie` | preloaded by `video-builder` | motion films written as one TSX file on the video kit, rendered once |
+| `i-wont-read-all-this` | always on | replies shaped for a reader who skims |
+
+Each skill folder has its own `README.md`: what it does, how to install
+only it, its files. Knowledge lives in each skill's `references/`.
+
+## The workflows
+
+| Workflow | Stage | Runs | Dry run |
+|---|---|---|---|
+| `discovery-review-workflow.js` | discovery | three lenses ∥ the double-blind per story | `scripts/discovery-review-dry-run.mjs` |
+| `plan-review-workflow.js` | plan | the plan reviewer ∥ the double-blind per brief | `scripts/plan-review-dry-run.mjs` |
+| `exec-entry-workflow.js` | execute, release, lets-cook | one entry: builders → gate → reviewer ∥ QAs → triage → one fix → the delta; modes `build`, `resume`, `update`, `fix` | `scripts/exec-entry-dry-run.mjs` |
+
+The design review needs no workflow: the session calls its four lenses
+directly.
+
+## The report
+
+Each front has **one private link**: a rail of stages, each with
+**Video · Deck · Explainer**, filled as each stage closes and finished
+before it does. The shell is `claude/report/shell.html` plus a
+`report.json`; the video kit (`claude/video/`) renders a TSX film on
+its motion library into an MP4; the decks are HTML slides. The short
+route's rail is Build · Release · Close. See
+[docs/stage-report.md](docs/stage-report.md).
+
+## Local CI and the guard
+
+- **The CI is local.** The project's signoff command runs the whole
+  gate in a clean worktree on our compute and, only on exit 0 and
+  under a bot identity, posts the `local-ci` status `main` requires.
+  `claude/scripts/local-ci.sh` is the generic fallback. Hosted CI keeps
+  the deploys and the environments.
+- **One guard.** `claude/hooks/guard-irreversible.sh` is a PreToolUse
+  hook on Bash and every file tool, installed behind a fail-closed
+  wrapper: it denies the irreversible (destroying infrastructure,
+  deleting data, force-push, a forged status, reading the CI token,
+  switching identity, edits to itself), and any merge into `main` or
+  `v*` tag that his authorization line does not cover.
+  `claude/hooks/authorize.sh` writes that line; only he runs it, as
+  `! .claude/hooks/authorize.sh …`.
+
+## The bar and `/pipeline-setup`
+
+The pipeline is generic: it reads the stack, the commands and the
+taste from the project. [docs/project-contract.md](docs/project-contract.md)
+is the bar, written as roles in three levels: required (standards,
+golden paths, the gates, a stack per worktree, the release roles, the
+permissions and the guard, the local-CI signoff, the mock toolchain,
+the smoke), recommended, and for the full experience (a cloud
+environment for entries, the video toolchain).
+
+Run **`/pipeline-setup <path-to-project>`** first. It audits the
+project with scouts reading a detached worktree at the default
+branch's sha, writes `pipeline-readiness.md` (present · partial ·
+missing, each with its evidence) on a setup branch, proposes the
+cheapest order to close the gaps, and applies the generic pieces on
+that branch when you say so: the settings, the guard and
+`authorize.sh`, the structure check, the cloud templates. What is the
+user's alone (branch protection, the bot identity, anything with a
+secret) is listed with a ready command, never run.
+
+## Install
+
+Shared across projects by symlink; each project keeps its own settings:
 
 ```bash
 git clone https://github.com/farias-77/skills.git ~/skills
@@ -252,38 +188,65 @@ cd <your-project>/.claude
 ln -s ~/skills/claude/skills skills
 ln -s ~/skills/claude/agents agents
 ln -s ~/skills/claude/workflows workflows
-ln -s ~/skills/docs docs
+printf '.claude/skills\n.claude/agents\n.claude/workflows\nCLAUDE.local.md\n.claude/settings.local.json\n' >> "$(git rev-parse --git-common-dir)/info/exclude"
+npm ci --prefix ~/skills/claude/video   # the reports' renderer and playwright-core for discovery's mock
 ```
 
-What the pipeline expects from its surroundings:
+The links stay out of git through `.git/info/exclude`: untracked, they
+would trip a secret scan that copies the untracked files (`gitleaks`
+behind `cp --parents`) and turn the gate red for no change of yours.
 
-- **Claude Code**, with the `gh` CLI authenticated — GitHub is the
-  source of record.
-- The Workflow tool only launches a script it can read from the
-  working directory or an added directory, and it resolves the
-  symlink: add the clone to the project's settings
-  (`permissions.additionalDirectories: ["~/skills"]` in
-  `.claude/settings.local.json`), or the review workflows refuse to
-  start.
-- Project specifics — environments, credentials, deploy targets, the
-  build-guard slot count — live in **your** project's `CLAUDE.md`,
-  never in these files.
+Each stage reads the house rules (`CLAUDE.md` at the clone's root) at
+its opening, so the project does not import them. Name the designs
+root (where each front's folder lives) with the line
+`designs-root: <absolute path>` in the project's `CLAUDE.md` (or its
+`CLAUDE.local.md` when the path is per machine); every stage stops
+without it.
+Then, in Claude Code inside the project:
+`/pipeline-setup .`
 
-## Glossary
+- **Claude Code** with the `gh` CLI authenticated: GitHub is the
+  source of record and the signoff's target.
+- The Workflow tool resolves the symlink, and the fronts' folders sit
+  beside the repository: the clone and the designs root go in
+  `permissions.additionalDirectories`, in every directory a session
+  opens in (where exactly: `pipeline-setup/templates/permissions.md`,
+  "Replace the placeholders"), or the workflows refuse to start and
+  every agent's write there is denied (each stage can still pass a
+  workflow inline).
+- On the station: Node (current LTS), `ffmpeg` and `npm ci` in
+  `claude/video/` for the reports; `playwright-core` and a Chromium for
+  discovery's mock (`PLAYWRIGHT_DIR`, `PROTO_CHROME`); `gitleaks` on PATH, or the
+  project's `make gitleaks dir=<path>`.
+- Headless (`claude -p`, a script, a test harness): pass
+  `--settings .claude/settings.json` (print mode ignores the allow
+  entries of a workspace never trusted interactively), `--add-dir` for
+  the designs root and the clone, and set
+  `CLAUDE_CODE_PRINT_BG_WAIT_CEILING_MS=0` (print mode kills background
+  agents and workflows 10 minutes after the last turn).
+- Project specifics (environments, credentials, deploy targets) live
+  in **your** project's `CLAUDE.md` and standards, never in these files.
 
-| Term | Meaning |
-|---|---|
-| **workstream** | one demand, end to end — one folder, one blueprint, one conducting session |
-| **foundation** | what every entry would otherwise fight over (migrations, the contract, the module registry, factories), laid down once at the start of stage 4 |
-| **entry** | one story, or a small group that proves only together, built vertically in its own worktree; an edge only where its proof needs another entry's behavior |
-| **blueprint** | the workstream's single review artifact — one URL, tabs per stage |
-| **conductor** | whoever dispatches and audits without doing the work — the stage's session |
-| **lens** | a reviewer scoped to one failure mode |
-| **judge** | whoever rules every finding — sustained/deferred/dismissed, with the reason; reviewers report at the maximum bar. At discovery, design and plan the conductor judges by the stage's `references/judging.md` (at plan it also rules the sequence findings in the user's place against the approved cut); at execution `exec-judge` rules every round of every entry, and the user rules what parked at the audit; at release a fix is judged the same way, and the user's one ruling is his "vai?"; at the close nothing is ruled; at the weekly retro the user rules each group of ideas. |
-| **blind reader** | an agent that reads alone, so divergence from its sibling exposes ambiguity |
-| **andon** | stop before building on a broken premise — a cheap halt beats wrong work |
-| **retro** | the close of a workstream: what worked, what went wrong, the ideas for the pipeline with their evidence; nothing is decided there |
-| **weekly retro** | the only place the pipeline changes: the week's retros gathered, the repeated ideas grouped, the user rules each group |
+## Layout
+
+```
+CLAUDE.md               the house rules every stage follows
+claude/
+  GLOSSARY.md           one line per term
+  references/           judging.md: the one rule for every review
+  skills/               one folder per skill: SKILL.md, README.md, references/, templates/, scripts/
+  agents/               every agent, its model and effort in the frontmatter
+  workflows/            <name>-workflow.js: the multi-agent rounds, plain JS
+  hooks/                guard-irreversible.sh, authorize.sh, remind-scout.sh, their tests
+  scripts/              local-ci.sh (the fallback signoff), telemetry.mjs, cleanup.sh
+  report/               the report shell, the template explainer, a working example
+  video/                the video kit (Remotion): the motion library, render.sh
+docs/                   the bar, models.md, the stage report, testing the pipeline
+scripts/                check-models.mjs; the workflows' and local-ci's dry runs
+codex/                  a placeholder
+```
+
+Terms are in [claude/GLOSSARY.md](claude/GLOSSARY.md).
 
 ## License
 

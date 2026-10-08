@@ -1,58 +1,37 @@
-# Release plan — <workstream>
+# Release plan · <slug>
 
-<!--
-  Written by the SESSION from the audit, the execution record, the
-  design's rollout and the doctrine's delivery standard. Every step and
-  check is copied from those, never paraphrased. Timestamps from
-  `date -u`.
--->
+<!-- Written at execute, while he uses the app; the head is filled at his ok.
+     The release /goal is filled from this file. Timestamps from `date -u`. -->
 
-- **Written:** <YYYY-MM-DD HH:MM UTC>
-- **The ask ("vai?"):** <his words, verbatim, with the hour> | not yet asked
+- **Head he said ok to:** `feat/<slug>` @ `<sha>` · <date>
+- **Version:** vX.Y.Z (<minor: a front · patch: short route, hotfix>)
 
-## What ships
+## Ships
 
-| Entry | What it delivers | Merged at |
+| Story | What changes for its user |
+|---|---|
+| <S-n> | <one line> |
+
+## Migrations
+
+| File | Expand or contract | Existing table? | Real-data risk · how it was checked |
+|---|---|---|---|
+| `<file>` | expand | <yes: table> \| no | <risk> · <the count he ran, result, date> \| none |
+
+## Goes live for real people
+
+<emails, notifications, jobs that act on real data, a toggle turned on; one line each> | nothing
+
+## Known irreversible steps (authorized in the /goal)
+
+<one line each, with when it runs> | none
+
+## Toggles
+
+| Toggle | Starts | Turned on by |
 |---|---|---|
-| <E-nn> | <one line> | `<sha>` |
+| <name> | off | <its own PR \| this release> |
 
-- **Amendments:** <F.n, one line each> | none
-- **Residue he accepted at the audit:** <one line each, with what it touches in production> | none
+## Smoke additions
 
-## Versioned artifacts
-
-| Artifact | Last version | Bump (from the commits) | Expected |
-|---|---|---|---|
-| `<artifact>` | `vX.Y.Z` \| none | major \| minor \| patch | `vX.Y.Z` |
-
-## Pre-flight — only he can do these
-
-| # | What | Why the session cannot | Status |
-|---|---|---|---|
-| 1 | <what> | <why> | **done** <date> \| **delegated:** <how, where the value lives> |
-
-## Staging
-
-| # | The session | The CI | Check (read-only) → expected |
-|---|---|---|---|
-| 1 | PR `feat/<workstream>` → `<staging branch>`, merge on green | deploys staging, runs the staging suite | `<command>` → `<value>` |
-
-## Production (after "vai")
-
-| # | The session | The CI | Check (read-only) → expected |
-|---|---|---|---|
-| 1 | merge the release PR `<staging branch>` → `main` | deploys the same artifact, runs its checks, rolls back on red | `<command>` → `<value>` |
-
-**Rollback:** <the doctrine's automatic rollback, one line> · safe for data: yes | **no: <why>**
-
-## The watch
-
-| # | What | Readable at (UTC) | Expects | Read by |
-|---|---|---|---|---|
-| 1 | <what> | <YYYY-MM-DD HH:MM> | <value> | `<command>` |
-
-## Where the session stops
-
-- The third red on one step.
-- A rollback not safe for data: <which, why> — stops before the production merge. | none
-- A pre-flight item found missing.
+<read-only journeys this front adds to the smoke, if the CI's list does not cover them> | none

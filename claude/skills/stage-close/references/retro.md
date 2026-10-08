@@ -1,55 +1,39 @@
-# The retro — step 4 of stage 6
+# The front's retro
 
-The retro is written for two readers: the user now, and the weekly
-retro later, which gathers every workstream of the week and looks for
-what repeats. Both need the same thing: each claim with its evidence,
-each idea with the file it would touch.
+A short record for the weekly retro. It changes nothing in the
+pipeline: an idea here is only an idea until he rules on it at the
+weekly.
 
-## What worked
+## The format (`templates/retro.md`)
 
-What the record shows went smoothly and should not be lost when the
-pipeline changes: a stage that closed in one round, a lens that
-sustained most of what it found, a mechanism that caught a real
-defect. Each with the evidence (`file:line` or a number).
+```
+05-close/retro.md
+├── Numbers       time · cost · his touches, per stage (from metrics.json; null stays null)
+├── Went well     ≤ 5
+├── Got stuck     ≤ 5   each with the time it cost; slowness counts
+├── Ideas         ≤ 5   each with the number it should move (time, cost or touches)
+└── His notes     [user] lines, verbatim, appended later
+```
 
-## What went wrong
+## Where it comes from
 
-One entry per friction worth a line, merged when several harvesters
-brought the same thing: what happened, the stage it bit, where
-(`file:line`), the quote, and what it cost (a round, a stop, a red, a
-day, a question the user had to answer). The user's `[user]` notes
-always enter, in his words.
+| Source | What it gives |
+|---|---|
+| `metrics.json` (`telemetry.mjs`) | the numbers; the stage that took longest; the wait on him |
+| the harvest of `scout (Haiku 5.5, medium)` | each friction with `path:line`, the quote, the time it cost |
+| `dreaming-notes.md` | frictions noted on the spot; his `[user]` notes; `[taste]` patterns in his rulings |
+| `rulings.md` | what he ruled, and where he ruled against the recommendation |
 
-## Ideas for the pipeline
+## How to choose
 
-What could change so the friction does not come back. Each idea:
-
-- **stage** it belongs to (or `house` for a rule that crosses stages);
-- **lands** — `pipeline` (a file of the pipeline repo), `doctrine`
-  (the project's engineering doctrine), `venture` (the business, a
-  process outside the software) or `incident` (a one-off, nothing to
-  change);
-- **target** — the file it would touch, when it lands in the pipeline
-  (a skill, an agent, a workflow, a template, the blueprint);
-- **change** — what would change, in one or two sentences;
-- **why** — the cost it removes;
-- **evidence** — the ids of the frictions behind it.
-
-An idea is a proposal, not a decision: write the change the evidence
-supports and nothing more. A friction with no idea (a one-off) stays
-in "what went wrong" only.
-
-## Precision
-
-The table per stage and reviewer (found · sustained · deferred ·
-latitude · dismissed) goes in as it was counted. A reviewer that
-dismissed most of what it found, or sustained nothing, is a line in
-"what went wrong" with its numbers; the weekly retro decides whether
-it is calibration or chance.
-
-## The user's notes
-
-When the user reads the retro and comments, his words go in verbatim,
-each attached to the idea or friction it refers to when he names one,
-otherwise as a note of its own. They are the input the weekly retro
-weighs most.
+1. **His `[user]` notes weigh first.** Each one he wrote becomes a
+   "Got stuck" or an "Idea", in his words.
+2. **Time is an error.** A step that took long, a wait on a render, a
+   rate-limit pause, a red that cost a round: each is a "Got stuck"
+   with its minutes. What would have made the front faster is an idea.
+3. **Numbers, never memory.** A number not in `metrics.json` is not in
+   the retro. A `null` is written as "not measured" with the gap.
+4. **At most 5 per section.** Pick what would change a decision at the
+   weekly; group what is one idea.
+5. **Unmerged work kept for later** (the cleanup's `kept` lines): one
+   "Got stuck" line saying where it is.

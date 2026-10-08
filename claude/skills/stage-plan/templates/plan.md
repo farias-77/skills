@@ -1,94 +1,72 @@
-# Plan — <workstream> — from A to B
+# Plan · <workstream>
 
 <!--
-  Written by the CONDUCTOR, whole, once the user approved the cut. The
-  writers never edit it; stage 4 fills the Status column as entries
-  merge and writes the amendments.
-
-  Three words: the FOUNDATION lays down once everything the entries
-  would fight over (migrations, the contract and its generated code,
-  the module registry, the shared pieces, the factories); an ENTRY is a
-  story, or a small group that proves only together, built vertically
-  (back, front, tests) in its own worktree; an EDGE exists only when an
-  entry's proof needs another entry's behavior — data is seeded by the
-  factories, never an edge. Everything with no edge is built at once,
-  up to the cap. An edge held by one journey only is "stacked": the
-  entry starts on the other's branch when that one is ready.
-
-  Size is relative (S · M · L); the critical path is the longest chain
-  of sizes from the foundation to the last merge. The cap is the
-  measured one in recon/machine.md.
-
-  Decision blocks (house format) where the user chose between two
-  cuts; the conductor's recommendation kept beside the choice.
+  Written by planner (Opus 5.5, high), whole, from the same decisions as
+  plan.graph.json; the two never disagree, and plan-graph.mjs runs after
+  every change. Stage 4 fills Status. These comments never reach the file.
 -->
 
 ## From A to B
 
-**A (today):** <one paragraph from recon/: what each area of the codebase has>
-**B (the design):** <one paragraph: what exists when the last entry is merged>
-
-## The foundation — `F`
-
-<!-- built alone, first; after it no entry edits any of these files -->
-
-| Kind | What |
-|---|---|
-| migration | <tables and columns, expansion only, with the data-model.md section> |
-| contract | <every new or changed route in the API contract; the generated code; routes answer 501 until their entry lands> |
-| module | <new modules registered in the composition> |
-| shared | <a component or helper two entries use, as the design names it> |
-| factory | <one per entity the proofs seed> |
-
-**Proof:** run `<the gate command>` → expect `<exit 0; the new routes answer 501>`
-**Serves every entry:** <per entry: the fields its screen shows are in the contract · its responses assemble from the foundation's reads · its config and secrets are in the config and the test environment · each state-spending journey has its own target per project and width · its routes' time budget under the write timeout>
-**Brief:** `02-plan/briefs/F.md`
-
-## The entries
-
-| Id | Name | Stories | Builds (back · front) | Size | After | Proof | Touches | Feature map |
-|---|---|---|---|---|---|---|---|---|
-| E-01 | <name> | S-001 | <use case, route> · <screen> | M | — | run `<command or spec>` → expect `<cases named>` | <module, screen> | back |
-| E-05 | <name> | S-005 | <…> · — | S | E-04 (its test clicks <the button E-04 builds>) · stacked when one journey only | <…> | <…> | back |
+**A (today):** <from recon/: what exists, and what the other fronts are changing>
+**B (the design):** <from solution.md: what exists when the last entry merges>
 
 ## The graph
 
 ```mermaid
-flowchart LR
-  F[Foundation] --> E01[E-01 · name]
-  F --> E04[E-04 · name]
-  E04 --> E05[E-05 · name]
+<plan-graph.mjs --mermaid output>
 ```
 
-**Critical path:** <F → E-nn → … → the last merge, with the sizes>
-**Steps:** <foundation, then N entries at once, then …> · **Concurrency cap:** <n> (measured in `recon/machine.md`)
-
-## Pre-flight
-
-| Item | Entry | Status |
-|---|---|---|
-| <what the user hands over, and where it lives> | <E-nn or F> | handed · missing |
-
-Open decisions of doctrine or test, decided before stage 4:
-
-| Decision | The options | Entries it touches | Decided |
+| Nodes | Width | Depth | Critical path |
 |---|---|---|---|
-| <a rule the entries lean on that the doctrine leaves open> | <A · B> | <E-nn> | <the choice, his words> |
+| <C + n entries + E-int> | <n> | <n> | <C → E-nn → E-int> |
 
-## Decisions
+**Start order** (critical path first): <E-03, E-01, …>
 
-> **Decision — <title>**
-> Context: <the cut in question>
-> Options: A) <option — its cost> · B) <option — its cost>
-> Recommended: <letter>
-> Chosen: <letter> — <why, the user's words>
+## The contract commit
+
+| Item | What | Used by |
+|---|---|---|
+| spec | <routes> | <all> |
+| table | <name, additive> | <E-01, E-03> |
+| stubs | <operations> | <the entry that fills each> |
+| factory | <name> | <E-01, E-02> |
+
+## The entries
+
+| Id | Name | ACs | Sides | After (class · need) |
+|---|---|---|---|---|
+| E-01 | <name> | <n> | back · front | — |
+| E-int | <name> | <n> | front | <E-01 (ui · the journey submits its form)> |
+
+## Ownership
+
+| Path | Owner | Extended by |
+|---|---|---|
+| `<spec, generated code>` | C | — |
+| `<backend/internal/orders/app/place_order.go>` | E-01 | — |
+
+## Other fronts
+
+| Front (session) | Touches | Agreed |
+|---|---|---|
+| <slug (session name)> | <path> | <additive: a new target at the end · or: E-04 waits for its merge> |
+
+## Gate commands
+
+1. `<the fast check>`
+2. `<the affected tests, base=feat/<workstream>>`
+
+The whole gate (`local-ci`) runs on the top of `feat/<workstream>` at the end of stage 4.
+
+## Decided in his place
+
+> **<title>** · <the question> · picked <the choice> · <why, one line> · veto: <what changes if he vetoes>
 
 ## Status
 
-<!-- stage 4 fills: one line per entry as it merges: date · entry · sha · proof line -->
+Stage 4 fills this: date · entry · sha · fix passes · minutes.
 
 ## Amendments
 
-<!-- An entry, an edge or the foundation that changes while being built:
-     date, what changed, why, in the user's words where he gave them.
-     The sections above are edited in place; the amendment is the trail. -->
+One dated line per change after the review: what changed, why, the checker's line.
