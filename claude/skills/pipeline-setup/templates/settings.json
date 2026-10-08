@@ -126,9 +126,8 @@
       "Read(~/.config/gcloud/**)",
       "Read(~/.config/local-ci/**)",
       "Edit(./.claude/settings.json)",
-      "Edit(./.claude/hooks/**)",
-      "Write(./.claude/settings.json)",
-      "Write(./.claude/hooks/**)"
+      "Edit(./.claude/settings.local.json)",
+      "Edit(./.claude/hooks/**)"
     ]
   },
   "hooks": {

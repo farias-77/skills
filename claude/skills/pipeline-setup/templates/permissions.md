@@ -92,7 +92,10 @@ creating or deleting a release (the CI creates it after the watch),
 only the signoff command posts); **reading credentials**: `.env`,
 `secrets/`, `~/.config/gh/`, `~/.config/gcloud/` and the CI token
 (`~/.config/local-ci/`, or wherever the signoff command keeps it);
-editing the settings and the hooks.
+editing the settings, `settings.local.json` (it holds the agent's
+identity env) and the hooks. File edits are denied by `Edit(…)` rules
+only: they cover every file-editing tool, and a `Write(…)` deny is
+dead (Claude Code warns about it at session start).
 
 Rules match prefixes and are not a boundary on their own: one
 reordered flag or a `bash -c` escapes them. That is why the hook
