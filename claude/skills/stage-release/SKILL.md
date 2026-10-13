@@ -178,7 +178,9 @@ the evidence in one line, the options with yours first, and the
 
 ## Step 5 · Close
 
-1. **Trace and numbers.** `trace.md` complete; run
+1. **Trace and numbers.** With a `tracker:` line in `.state.md`,
+   `notion-tracker released <tag>` (or `stopped <why>` when it did not
+   reach production). `trace.md` complete; run
    `node claude/scripts/telemetry.mjs <slug> --stage release --ws <designs-root>/<slug> --out -`.
 2. **The report, finished before the close.** Dispatch the builders in
    one message, in the background, with the stage's files and

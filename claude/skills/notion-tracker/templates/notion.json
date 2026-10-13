@@ -1,0 +1,27 @@
+{
+  "tools": "mcp__notion__",
+  "dataSource": "collection://00000000-0000-0000-0000-000000000000",
+  "code": "REQ-",
+  "fields": {
+    "owner": "Owner",
+    "stage": "Stage",
+    "workstream": "Workstream",
+    "report": "Report",
+    "releasedIn": "Released in",
+    "lastUpdate": "Last update",
+    "requestedBy": "Requested by",
+    "type": "Type"
+  },
+  "stages": {
+    "backlog": "Backlog",
+    "discovery": "Discovery",
+    "design": "Design",
+    "plan": "Plan",
+    "execute": "Execute",
+    "build": "Execute",
+    "release": "Release",
+    "close": "Close",
+    "done": "Done",
+    "declined": "Declined"
+  }
+}

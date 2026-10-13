@@ -110,6 +110,7 @@ and templated writing, never above high.
 |---|---|---|
 | `lets-cook` | session | the one door: interview, route, and the short route and hotfix end to end |
 | `stage-discovery` · `stage-design` · `stage-plan` · `stage-execute` · `stage-release` · `stage-close` | session | the six stages |
+| `notion-tracker` | session, loaded by the others | optional: pulls a demand from a Notion database and keeps its page in step with the stages |
 | `weekly-retro` | session | the week's workstreams read together; the only place the pipeline changes |
 | `pipeline-setup` | session | audits a project against the bar and closes the cheap gaps on a branch |
 | `draw-it-for-me` | preloaded by `artifact-builder`, `prototype-builder` | explanatory pages: diagrams that build, motion, 3D, charts |
