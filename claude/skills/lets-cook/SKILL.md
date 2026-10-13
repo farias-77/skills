@@ -1,7 +1,7 @@
 ---
 name: lets-cook
-description: The single entry point of the pipeline. `/lets-cook <idea>` always opens the same way, with scouts in the background and a light interview, then the session picks the route by its own judgment and says it in one line with the reason. Full route: it loads stage-discovery in the same session. Short route (one behavior, one entry): a one-page brief, one authorization and one /goal, the stage-4 entry pipeline, his use, the release path, a short close. Hotfix (production broken now): the same with a test that reproduces the bug first. A fix in a legacy repo is a short route or a hotfix marked `repo: legacy`. Every route keeps every check; only the ceremony shrinks. He can switch routes at any time. The session runs on Opus 5.5, high. Use for any new demand, change, bug or incident.
-argument-hint: "<the idea, in his words | a tracker code such as REQ-12>"
+description: The single entry point of the pipeline. `/lets-cook <idea>` always opens the same way, with scouts in the background and a light interview, then the session picks the route by its own judgment and says it in one line with the reason. Full route: it loads stage-discovery in the same session. Short route (one behavior, one entry): a one-page brief, one authorization and one /goal, the stage-4 entry pipeline, his use, the release path, a short close. Hotfix (production broken now): the same with a test that reproduces the bug first. A fix in a legacy repo is a short route or a hotfix marked `repo: legacy`. Every route keeps every check; only the ceremony shrinks. He can switch routes at any time. The session runs on Opus 5.5, high. Use for any new demand, change, bug or incident, and when he asks to pull the next demand from the tracker.
+argument-hint: "<the idea, in his words | a tracker code such as REQ-12 | next>"
 allowed-tools: Read, Write, Edit, Glob, Grep, Agent, SendMessage, Workflow, AskUserQuestion, Artifact, PushNotification, ScheduleWakeup, Skill, Bash
 ---
 
@@ -72,7 +72,8 @@ with the time `date -u +%FT%TZ` printed; never rewrite a line.
    its turn inside stage-discovery.
 3. **The tracker.** When the project root has `notion.json`, load
    `notion-tracker` with `pull <code|url>` for a code or a page link,
-   or for a plain idea (it then creates the page). The page's words
+   `pull next` for `next` or words like "pull the next demand", or
+   for a plain idea (it then creates the page). The page's words
    are his words for the interview; its writes wait for the slug.
 
 ## 2 · The light interview
