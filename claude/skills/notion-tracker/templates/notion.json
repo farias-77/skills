@@ -10,7 +10,9 @@
     "releasedIn": "Released in",
     "lastUpdate": "Last update",
     "requestedBy": "Requested by",
-    "type": "Type"
+    "type": "Type",
+    "priority": "Priority",
+    "created": "Created"
   },
   "stages": {
     "backlog": "Backlog",

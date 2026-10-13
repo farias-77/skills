@@ -1,7 +1,7 @@
 ---
 name: notion-tracker
-description: Keeps a Notion demand database in step with the pipeline, so the team sees from Notion every workstream running and its stage. Optional; it acts only when the project has `notion.json` at its root. lets-cook loads it to pull a demand (`/lets-cook REQ-12`): it reads the page as his words, sets Owner to whoever pulled it, Stage and Workstream. Every stage loads it at its Open and its Close to update Stage, Report and Last update; the release sets Released in; the close sets Stage to done. A workstream that did not come from Notion gets a page of its own at the pull. A Notion failure never stops a stage. Runs in the calling session (Opus 5.5, high); no agent.
-argument-hint: "<event> <slug> [value]: pull <code|url> · open <stage> · close <stage> <report-url> · released <tag> · done · stopped <why>"
+description: Keeps a Notion demand database in step with the pipeline, so the team sees from Notion every workstream running and its stage. Optional; it acts only when the project has `notion.json` at its root. lets-cook loads it to pull a demand (`/lets-cook REQ-12`, or `/lets-cook next` and "pull the next demand" for the most urgent one in the backlog): it reads the page as his words, sets Owner to whoever pulled it, Stage and Workstream. Every stage loads it at its Open and its Close to update Stage, Report and Last update; the release sets Released in; the close sets Stage to done. A workstream that did not come from Notion gets a page of its own at the pull. A Notion failure never stops a stage. Runs in the calling session (Opus 5.5, high); no agent.
+argument-hint: "<event> <slug> [value]: pull <code|url|next> · open <stage> · close <stage> <report-url> · released <tag> · done · stopped <why>"
 allowed-tools: Read, Edit, Bash
 ---
 
@@ -21,7 +21,7 @@ goes on.
 | `tools` | the prefix of the Notion MCP server's tools, e.g. `mcp__notion__`; the calls below are `<tools>notion-fetch` and so on |
 | `dataSource` | the database's data source, `collection://…` |
 | `code` | the prefix of the auto id, e.g. `REQ-`; `/lets-cook REQ-12` is a pull |
-| `fields` | the property names: `owner`, `stage`, `workstream`, `report`, `releasedIn`, `lastUpdate`, `requestedBy`, `type` |
+| `fields` | the property names: `owner`, `stage`, `workstream`, `report`, `releasedIn`, `lastUpdate`, `requestedBy`, `type`, `priority`, `created` |
 | `stages` | the option name for each stage: `discovery` … `close`, `build` for the short route's entry and his use, `backlog` and `done`, the board's first and last columns, and `declined` |
 
 No secret goes in the file: each person's MCP login is the access, and
@@ -50,7 +50,7 @@ event is a no-op.
 
 | Event | Who calls it | Writes |
 |---|---|---|
-| `pull <code\|url>` | lets-cook, step 1 | see "The pull" |
+| `pull <code\|url\|next>` | lets-cook, step 1 | see "The pull" |
 | `open <stage>` | every stage, at its Open | Stage · Last update |
 | `close <stage> <report-url>` | every stage, after its report is published | Report (when empty) · Last update |
 | `released <tag>` | stage-release, lets-cook step 7, at production green | Released in · Last update |
@@ -65,7 +65,12 @@ every line of a body counts against the workspace's block cap.
 ## The pull
 
 1. **The page.** A code (`REQ-12`): query `dataSource` for the row whose
-   id property equals it. A url: fetch it. Not found, or Stage already
+   id property equals it. A url: fetch it. `next`: query the rows with
+   Stage = `stages.backlog` and take the first by Priority (the
+   property's option order, most urgent first); a tie goes to the
+   oldest Created. Say the pick in one line (`REQ-4 · Urgent`) and the
+   next two behind it, then go on; "another one" from him takes the
+   next. Not found, or Stage already
    past `stages.backlog` with an Owner who is not you: stop and tell him who
    holds it.
 2. **His words.** The page's body becomes the input lets-cook would
