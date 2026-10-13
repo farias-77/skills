@@ -1,7 +1,7 @@
 # stage-design
 
-Stage 2 of the pipeline. From the locked discovery (the mock, its
-stories and acceptance criteria), one proposal sized to the problem,
+Stage 2 of the pipeline. From the locked discovery (its stories and
+acceptance criteria, and the mock when a screen changed), one proposal sized to the problem,
 with its evolution path (v1 → v2 → v3), debated with the user until he
 says it is closed; then six documents stage 3 cuts into entries
 without asking, reviewed once by four lenses. Runs under one `/goal`;

@@ -23,7 +23,7 @@ one line. The full route is six stages. He is asked only what is his.
 
 | Stage | How it runs | Where he is in the loop |
 |---|---|---|
-| 1 discovery | a conversation, no `/goal` | he talks while a live mock is built beside the chat; he confirms the stories one by one at the playback |
+| 1 discovery | a conversation, no `/goal` | he is interviewed; when a screen changes, he iterates its mock until he says it is ready; he confirms the stories one by one at the playback |
 | 2 design | one `/goal` | he debates the one proposal (deck first, then a ≤60 s video) until he says "closed"; rarely, a question that changes a locked AC, adds a recurring cost or cannot be undone |
 | 3 plan | one `/goal` | nothing; the close lists what was decided in his place for his veto |
 | 4 execute | one `/goal` | the pre-flight items only he can run; his hands-on with the running app, each answer an `A.n` round, until his "ok" |

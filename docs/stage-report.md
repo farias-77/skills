@@ -26,7 +26,7 @@ when its three tabs are published, and that message carries the link.
 
 | Stage | Video | Deck | Explainer |
 |---|---|---|---|
-| Discovery | the problem and the solution told through the stories, 60–90 s | the story map, rules, what stays out, his decisions | the locked mock + a clickable map of stories → ACs |
+| Discovery | the problem and the solution told through the stories, 60–90 s | the story map, rules, what stays out, his decisions | the locked mock + a clickable map of stories → ACs; with no screen, the story map with each flow drawn |
 | Design | the proposal: one picture of the system, the main flow, the evolution path | decisions (against the recommendation first), risks accepted, what the guard cut | the architecture: layers, data in motion, the v1 → v2 → v3 selector |
 | Plan | the graph assembling: contract commit, entries in parallel, critical path | entries, edges and why, merge points with other workstreams, what was decided in his place | the clickable DAG (each node: ACs, files, dependencies) |
 | Execute | what was built, real screens in motion | per entry: ACs → proofs, findings, A.n, what is parked | the replay of the DAG on a timeline: what ran when, where the time went |

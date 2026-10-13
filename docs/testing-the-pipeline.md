@@ -37,11 +37,10 @@ The prompt tells the conductor three things beyond the slash command:
 
 - **The Artifact tools.** A print-mode or cloud session usually has no
   `Artifact`, `ArtifactData` or `ArtifactComments`. Discovery then runs
-  in local mode (its skill, "Prerequisites and the host"): no published
-  mock, pictures from `proto.mjs shots`, his step verdicts written to
-  `walks/verdicts.json` from the persona's answers, the stage report
-  kept local. The publish, the verdict store and the comments are not
-  exercised; say so in the run's findings.
+  in local mode (its skill, the Opening's missing-tool table): no
+  published mock, pictures from `proto.mjs shots`, the stage report
+  kept local. The publish and the comments are not exercised; say so in
+  the run's findings.
 - **The question tool.** Without it the batches go as text in the house
   shape (each skill's fallback). The tool's own rendering is not tested.
 - **Model and effort switches.** A non-interactive session cannot run

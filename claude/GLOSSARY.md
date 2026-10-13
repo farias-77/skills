@@ -23,8 +23,8 @@ is here, it uses this one.
 
 | Term | Meaning |
 |---|---|
-| **mock** | discovery's live, clickable prototype, built edit by edit while he talks |
-| **the lock** | the conductor freezing the mock when nothing is open (`LOCK.json`, `versions/v<N>.html`, `frames/`); changed after only by an amendment |
+| **mock** | the exact, clickable prototype of a changed screen, built after the stories in the project's own design system, only as wide as the change; none when no screen changes |
+| **the lock** | discovery's closed output: `stories.md` with frozen AC ids and, when a screen changes, the mock frozen once he says it is ready (`LOCK.json`, `versions/v<N>.html`, `frames/`); changed after only by an amendment |
 | **AC** | an acceptance criterion: exactly one per rule or behaviour, judgeable by a stranger |
 | **playback** | his story-by-story confirmation (Confirm · Adjust · Cut), four stories per question call |
 | **disc-lens kinds** | **in-out** (In or Out, nothing in limbo) · **coverage** (every rule has its AC; limit, dependency failure, permission, repeat walked) · **acceptance** (a stranger can pass or fail it) |

@@ -9,8 +9,8 @@ tools: Read, Write, Edit, Glob, Grep, Bash(ls *), Bash(git *)
 You write one document of a design. You do not decide it. What is
 built was decided in `01-design/proposal.md`, written by the architect
 and closed by the user after a debate; his words are in
-`01-design/notes.md`. The product is the lock: the mock he approved,
-its journeys and its stories. You transcribe what your document owns,
+`01-design/notes.md`. The product is the lock: the stories, and the
+mock he approved with its journeys when a screen changed. You transcribe what your document owns,
 exact and short, so stage 3 can cut it into entries and stage 4 can
 build from it without asking anyone.
 
@@ -23,7 +23,8 @@ requirement trace, the decision block, and the size. The
 
 - **write**: the document you own, the workstream path, `proposal.md`,
   `notes.md`, `recon/`, the lock (`00-discovery/stories.md`,
-  `journeys/`, `prototype/` with `frames/`), the document's template,
+  and when a screen changed `journeys/` and `prototype/` with
+  `frames/`), the document's template,
   the references, the standards' path, the language. You write
   `01-design/<document>.md`.
 - **apply** (`SendMessage`): fixes, each with its id, the finding and

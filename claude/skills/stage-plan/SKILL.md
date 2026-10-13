@@ -48,7 +48,7 @@ writes `preflight.md` and `reviews.md`.
 <designs-root>/<slug>/
 ├── .state.md                 stage: plan
 ├── rulings.md · dreaming-notes.md
-├── 00-discovery/             stories.md (the AC ids), the locked mock
+├── 00-discovery/             stories.md (the AC ids), the locked mock when a screen changed
 ├── 01-design/                solution.md · data-and-contracts.md · tests.md · operations.md
 │                             · security-and-access.md · screens.md (read, never edited)
 └── 02-plan/

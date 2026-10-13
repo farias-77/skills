@@ -9,7 +9,7 @@
 -->
 
 Opened <date>. Language: <language>.
-Lock: `00-discovery/prototype/` v<N> · journeys <n> · stories <S-001 … S-0NN> · ACs <n>.
+Lock: stories <S-001 … S-0NN> · ACs <n> · mock: `00-discovery/prototype/` v<N>, journeys <n> | none (no screen).
 
 ## What we are building (one sentence)
 

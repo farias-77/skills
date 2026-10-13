@@ -33,8 +33,8 @@ frontmatter together.
 | `artifact-builder` | discovery, design, a release incident | Sonnet 5.5 | medium | One explainer page from the draw-it-for-me references |
 | `blind-reader` | discovery, plan | Sonnet 5.5 | low | A blind reader must read literally; low keeps it cheap. Discovery stories stay on Sonnet: in the A/B, Haiku high won only 3 of 8 blinded pairs and passed a known defect twice. Plan briefs run on Haiku 5.5, high (per-call override below) |
 | `blind-judge` | discovery, plan | Sonnet 5.5 | medium | Compares two readings key by key; reports only where the text failed |
-| `prototype-builder` | discovery | Sonnet 5.5 | medium | Applies one edit order at a time to the live mock; each edit is small and the conductor reviews it live |
-| `story-writer` | discovery | Sonnet 5.5 | high | Derives journeys, stories and ACs from a locked source: templated writing |
+| `prototype-builder` | discovery | Sonnet 5.5 | medium | Builds the mock of a changed screen from the stories and the project's design system, then one round order at a time; each round is small and he reviews it |
+| `story-writer` | discovery | Sonnet 5.5 | high | Writes stories and ACs from the interview notes, then anchors them on the locked mock when there is one: templated writing |
 | `disc-lens` | discovery | Sonnet 5.5 | medium | One checklist lens per call (in-out, coverage, acceptance) |
 | `architect` | design | Opus 5.5 | high | Open-ended design judgment: GDPval 1576 (medium) → 1690 (high) |
 | `overengineering-guard` | design | Opus 5.5 | medium | Cuts what serves no AC and no real risk: judgment on "does this need to exist?" |
