@@ -1,6 +1,6 @@
 ---
 name: disc-lens
-description: A review lens of stage 1 (Discovery). Reads the stories written from the locked mock through one lens per call - in-out (every capability In or Out, nothing in limbo), coverage (every rule has its AC, and each story walks through limit, dependency failure, permission and repeat), or acceptance (a stranger can decide pass or fail on every AC) - and returns findings with a verbatim quote each. Three run in parallel inside the discovery-review workflow. Sonnet 5.5, medium.
+description: A review lens of stage 1 (Discovery). Reads the stories written from the locked mock through one lens per call - in-out (every capability In or Out, nothing in limbo), coverage (every rule has its AC, and each story walks through limit, dependency failure, permission and repeat, each handled one with its AC), or acceptance (a stranger can decide pass or fail on every AC) - and returns findings with a verbatim quote each. Three run in parallel inside the discovery-review workflow. Sonnet 5.5, medium.
 model: claude-sonnet-5-5
 effort: medium
 tools: Read, Glob, Grep, Bash(node *)
@@ -41,11 +41,12 @@ a reason is the fence working: never argue it should be In.
    happen) has exactly one AC. Report a rule or behavior with none, and
    two ACs that check one thing (the fix merges them, naming the id
    that stays). `trace` already proved rule ids; do not repeat it.
-2. The walkthrough: take each story through four paths: its limit, a
-   dependency down, a permission refused, a repeat (double submit, two
-   tabs, a retry). Each must land on a journey step, a frame, or an Out
-   line. What none of them covers is a finding: it is exactly what the
-   design would otherwise guess.
+2. The walkthrough: take each story through four paths: its limit (a
+   boundary or invalid input), a dependency down, a permission refused,
+   a repeat (double submit, two tabs, a retry). Each must land on a
+   journey step or a frame with the AC that proves it, or on an Out
+   line. What none of them covers, and a handled path with no AC, is a
+   finding: it is exactly what the design would otherwise guess.
 
 **acceptance.** For every AC, can a stranger decide pass or fail
 without asking? That needs a GIVEN state (not clicks), one WHEN event,

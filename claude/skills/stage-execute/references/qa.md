@@ -8,7 +8,8 @@ to what changed; skip what the change cannot affect, and say so.
 ## Screens (qa-frontend)
 
 1. **The ACs by hand.** Each AC a person sees: do it as its actor, look,
-   reload, look again.
+   reload, look again; then at least one failure case it implies (its
+   refusal, its error path) the same way.
 2. **The states** the design lists for each changed screen: empty, one
    and many, an API error (route interception), slow loading. Each one
    says something a person understands; typed input survives an error.
@@ -30,7 +31,8 @@ to what changed; skip what the change cannot affect, and say so.
 
 1. **The ACs.** Each AC a caller sees: the request as its actor, the
    response against the Contract (status, fields, types), the data read
-   back, the side effects the AC names.
+   back, the side effects the AC names; then at least one failure case
+   it implies, with nothing written.
 2. **The break-it list**, every route that accepts input or writes:
    - **bad input**: a field missing, empty, of the wrong type, at its
      limit and one past it, only spaces, control characters;

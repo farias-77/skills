@@ -42,7 +42,8 @@ paths, Inferred and Open.
    copied from the mock, never edited. You add `given`, `variants`,
    each step's `see`, `effects`, `must_not`, `rules` and `png`.
 4. **The stories.** One per job, the happy journey as the main flow,
-   the others as extensions where they branch; the error-path table;
+   the others as extensions where they branch; the error-path table,
+   each handled path with its AC;
    In and Out repeated where they touch the story.
 5. **The ACs.** One per rule in the Rules table and one per behavior
    he said; anchored on the step where it shows first; the format and
