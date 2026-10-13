@@ -169,7 +169,8 @@ notification. Never loosen this done to call it met; stop early only when truly 
   --dry-run <sha>` in a rehearsal: it posts nothing), after his ok on
   the short route, right away on a hotfix. A red there is one fix,
   checked by the entry gate, then the whole gate once more. The merge
-  waits for its `local-ci`.
+  waits for its `local-ci` and follows the house rule "Up to date
+  before a shared merge".
 
 ## 6 · His use
 
@@ -194,8 +195,11 @@ users' video only when a screen users see changed.
 1. `node claude/scripts/telemetry.mjs <slug> --ws <designs-root>/<slug>`.
 2. Write `<designs-root>/<slug>/close.md` from `templates/short-close.md`:
    the numbers, a short retro, the "what's new" text.
-3. `claude/scripts/cleanup.sh <slug> --check` → `--apply` → `--check`
-   empty (`stage-close/references/cleanup.md`).
+3. `claude/scripts/cleanup.sh <slug> --repo <repo> --ws <designs-root>/<slug>`:
+   `--check` → `--apply` → `--check` empty, which leaves each repo's
+   main checkout on its default branch, level with origin
+   (`stage-close/references/cleanup.md`). A checkout listed as `his`
+   goes in the message.
 4. **The minimal report**, finished before the message, as
    `claude/docs/stage-report.md` describes. The rail is Build · Release
    · Close:

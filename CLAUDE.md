@@ -197,6 +197,17 @@ commit status `main` requires. No agent posts a status or reads the
 bot's token; the guard denies both. Hosted CI keeps the deploys and
 the environments.
 
+## Up to date before a shared merge
+
+A merge into `feat/<slug>` needs nothing: that branch is the
+workstream's alone. Every merge into a shared branch (`main`, or any
+branch other people or workstreams push to) goes, right before it:
+`git fetch` → merge `origin/<base>` into the branch (a merge, never a
+rebase) → if that brought anything, push and run what the target
+requires (the signoff command) on the new head, then fetch again →
+merge only when the fetch brings nothing new. A tag goes only on a
+commit that is in `origin/<base>` after a fetch.
+
 ## One guard for what cannot be undone
 
 `claude/hooks/guard-irreversible.sh` is the only guard; `/pipeline-setup`

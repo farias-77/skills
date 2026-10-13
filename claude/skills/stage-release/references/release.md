@@ -83,7 +83,7 @@ Production is broken or data is wrong now. It enters through
 ```
 hotfix/<slug> from main → a test that reproduces it: red, then green
 → entry gate green → `reviewer (Opus 5.5, high)` with the security pass ∥ the QAs by surface (Opus 5.5, medium) → PR ready: local-ci once, on the final head
-→ merge → staging + smoke → his check on staging, unless he delegated it in the interview
+→ up to date (house rule) → merge → staging + smoke → his check on staging, unless he delegated it in the interview
 → patch tag → production, the same image → smoke + watch → GitHub release
 ```
 
@@ -105,6 +105,8 @@ for. A short route or a hotfix runs there with:
 
 - the repo's own doctrine, CI and deploy;
 - `! .claude/hooks/authorize.sh legacy <repo> <branch>`;
+- the house rule "Up to date before a shared merge" against the
+  repo's own base, right before the merge;
 - through staging when the repo has one; **without staging, one ok
   from him before production**;
 - after the deploy, a 15-minute watch by the session itself (health and

@@ -22,6 +22,10 @@
 #                containers, volumes, networks and images named <slug>-* or
 #                <slug>_* (compose projects included)
 #   scratch      _run/, _scratch/ and .remotion/ under the workstream's folder
+#   checkouts    each repo's main checkout not on its default branch, or
+#                behind origin: switched and fast-forwarded on --apply. The
+#                designs root too, when it is on its default branch (its
+#                changes under the workstream's folder do not count as dirty)
 #
 # It never removes unmerged work by itself: a branch not in origin's default
 # branch, or a worktree with uncommitted changes, is listed as "unmerged"
@@ -76,6 +80,41 @@ unmerged() { # kind, name, why, [the branch the user ruled on]
   say unmerged "$1" "$2 ($3; pass --discard or --keep)"; left=1
 }
 q() { printf '%q' "$1"; }
+
+# a main checkout, zeroed for the next workstream: on the default branch,
+# level with origin. Never discards: uncommitted changes, another branch, a
+# detached head or local commits not on origin are listed as "his" and left.
+main_checkout() { local c; c=$(git -C "$1" rev-parse --path-format=absolute --git-common-dir 2>/dev/null) && dirname "$(realpath "$c")"; }
+zero() { # dir, [the workstream's folder, when dir is the designs root]
+  local d=$1 own=${2:-} def b dirty behind=0 ahead=0 cmd='' why=''
+  def=$(git -C "$d" symbolic-ref -q --short refs/remotes/origin/HEAD 2>/dev/null || echo origin/main); def=${def#origin/}
+  git -C "$d" fetch -q origin "$def" 2>/dev/null
+  b=$(git -C "$d" symbolic-ref -q --short HEAD)
+  [ -n "$own" ] && [ "$b" != "$def" ] && return
+  own=${own:+${own#"$d"/}}
+  dirty=$(git -C "$d" status --porcelain --untracked-files=no -- . ${own:+":(exclude)$own"} 2>/dev/null | head -n 1)
+  if git -C "$d" rev-parse -q --verify "refs/remotes/origin/$def" >/dev/null && git -C "$d" rev-parse -q --verify "refs/heads/$def" >/dev/null; then
+    behind=$(git -C "$d" rev-list --count "$def..origin/$def")
+    ahead=$(git -C "$d" rev-list --count "origin/$def..$def")
+  fi
+  if [ -n "$dirty" ]; then say his checkout "$d (uncommitted changes on ${b:-a detached head}; left as is)"; return; fi
+  if [ "$ahead" -gt 0 ]; then say his checkout "$d ($def has $ahead commit(s) not on origin; left as is)"; return; fi
+  if [ "$b" != "$def" ]; then
+    if [ -z "$b" ] || ! ours "$b"; then say his checkout "$d (on ${b:-a detached head}, not this workstream's; left as is)"; return; fi
+    cmd="git -C $(q "$d") switch -q $(q "$def")" why="on $b, not $def"
+  fi
+  if [ "$behind" -gt 0 ]; then
+    cmd="${cmd:+$cmd && }git -C $(q "$d") pull -q --ff-only origin $(q "$def")" why="${why:+$why, }$def $behind behind origin"
+  fi
+  [ -n "$cmd" ] && found checkout "$d ($why)" "$cmd"
+}
+
+# first, so the workstream's branch is no longer checked out when it is removed
+seen=()
+for r in ${repos[@]+"${repos[@]}"}; do
+  m=$(main_checkout "$r"); [ -n "$m" ] || continue
+  in_list "$m" ${seen[@]+"${seen[@]}"} || { seen+=("$m"); zero "$m"; }
+done
 
 for r in ${repos[@]+"${repos[@]}"}; do
   git -C "$r" rev-parse --git-dir >/dev/null 2>&1 || { say skipped repo "$r (not a git repo)"; continue; }
@@ -152,6 +191,12 @@ fi
 # scratch under the workstream's folder
 if [ -n "$ws" ] && [ -d "$ws" ]; then
   while IFS= read -r d; do found scratch "$d" "rm -rf $(q "$d")"; done < <(find "$ws" -type d \( -name _run -o -name _scratch -o -name .remotion \) -prune -print 2>/dev/null)
+fi
+
+# the designs root, last: zeroed like a repo, but only when on its default branch
+if [ -n "$ws" ] && [ -d "$ws" ]; then
+  m=$(main_checkout "$ws")
+  [ -n "$m" ] && ! in_list "$m" ${seen[@]+"${seen[@]}"} && zero "$m" "$(cd "$ws" && pwd -P)"
 fi
 
 if [ "$mode" = apply ]; then

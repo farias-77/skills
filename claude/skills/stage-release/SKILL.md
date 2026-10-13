@@ -33,7 +33,7 @@ allowed-tools: Read, Write, Edit, Glob, Grep, Agent, SendMessage, Workflow, AskU
 
 ```
 0 open        canary · preconditions · the authorization line read back · the /goal → he pastes it
-1 main        main moved? merge main into feat + local CI · local-ci green on the head · merge
+1 main        up to date (house rule): fetch · origin/main into feat + local CI when it moved · merge
 2 staging     the CI deploys and smokes · green → peers told, the users' video starts recording
 3 tag         vX.Y.Z on the merge, notes from the stories → push (the authorization is spent)
 4 production  the CI: same image → smoke → 15-min watch → GitHub release · red → rollback by itself
@@ -92,11 +92,12 @@ exists, the report's three tabs are published, and I got the notification with t
 
 1. **Take the turn** on `main` by references/release.md, "Taking
    turns on main".
-2. **`main` moved since his ok?** Merge `origin/main` into
-   `feat/<slug>` (a merge, never a rebase), renumber the migrations if
-   the project has a command for it (`make restamp`), push, and run the
-   signoff command on the new head. A red
-   here is an `X.n` on `feat`, exactly as at execute.
+2. **Up to date, right before the merge**, by the house rule "Up to
+   date before a shared merge": fetch; when `origin/main` has commits
+   `feat/<slug>` lacks, merge it in, renumber the migrations if the
+   project has a command for it (`make restamp`), push, run the signoff
+   command on the new head, and fetch again. A red here is an `X.n` on
+   `feat`, exactly as at execute.
 3. **The merge.** The PR's head has `local-ci` green, and the code
    owner's approval when the PR touches the gate's paths (asked at the
    execute's ok). Then
@@ -135,8 +136,8 @@ already on `main` and no merge passed the guard under a line (a first
 release, a tag cut by hand), no `merged=` carries the tag and the guard
 denies it. He authorizes that one commit instead:
 `! .claude/hooks/authorize.sh tag <slug> main@<sha>` (`<sha>` the
-commit the tag points at: the full sha, or a prefix of 7+ when run
-from the repo). It allows no merge and exactly one `v*` tag on exactly
+commit the tag points at, in `origin/main` after a fetch: the full
+sha, or a prefix of 7+ when run from the repo). It allows no merge and exactly one `v*` tag on exactly
 that commit; it dies at the tag or in 3 days.
 
 ## Step 4 · Production
