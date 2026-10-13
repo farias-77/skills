@@ -16,7 +16,7 @@ it.
 | 2 · Security | `security` | a hole from the checklist below | the steps or the command and what it showed |
 | 3 · The gate weakened to pass | `rule` | a looser assert, baseline or threshold; a lint, coverage or gate target changed; a failing test deleted with no replacement named | the line, and the rule id |
 | 4 · A workaround | `rule` or `bug` | the symptom treated: a special case for the test's data, a sleep, retry or longer timeout hiding a race, an error swallowed | the line, and the reproduction or the rule |
-| 5 · Speculative | `rule` | an abstraction, parameter, flag, layer or service with no consumer in the diff or the codebase, and no extension point the design names | **the quote of the code that serves no AC and no real risk** |
+| 5 · Speculative | `rule` | an abstraction, parameter, flag, layer or service with no consumer in the diff or the codebase, and no extension point the design names; or a new journey test with no reason why a cheaper layer cannot fail on the same bug | **the quote of the code that serves no AC and no real risk** |
 | 6 · Contract and data | `rule` | a field removed or its meaning changed while a client uses it; a migration the running code cannot run on; an invariant with no database constraint; money not in integer cents; time not in UTC | the line, and the rule |
 
 A concrete reproduction of anything else that breaks is `bug`. A

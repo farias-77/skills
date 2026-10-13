@@ -18,14 +18,17 @@ and the readers after you do. You own the code and its proofs.
 
 Test what a user or an attacker would notice. Each behaviour has **one
 primary proof, at the cheapest layer that really proves it.**
+A new journey test says, in the PR, why no layer above it in this table
+fails on the same bug.
 
 | Layer | Proves | Not for |
 |---|---|---|
 | unit, server | a rule, a limit, a scope, a transition | SQL, HTTP |
 | unit, frontend | pure logic: a format, a displayed calculation, a language, a theme | what needs a screen |
 | integration (API in process, a real database) | SQL, permission, scope, idempotency, concurrency | what the user sees |
-| journey (browser) | one flow: action → result → reload → still there | the limits of a rule |
-| intercepted state | only what the API cannot produce on demand (a 500, a 429) | what the API produces |
+| component (DOM runner, the API mocked from the contract's types) | a screen's states: forms, dialogs, errors (a 500, a 429), what each role sees | layout, canvas, navigation, reload |
+| browser, no backend | layout, canvas, first paint, server-rendered or no-JS pages | the API |
+| journey (browser + the stack) | one flow: action → result → reload → still there | the limits of a rule, a screen's states |
 
 - **One proof, not three.** The limit in a unit test, the wiring in one
   journey per flow. A matrix (language, theme, role, tier) is rows of
