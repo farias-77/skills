@@ -22,6 +22,7 @@ repos) and `--ws <designs-root>/<slug>`.
 | branches, local and on origin | `feat/<slug>`, `story/<slug>/*`, `evidence/<slug>/*`, `fix/<slug>/*`, `hotfix/<slug>`, `revert/<slug>` |
 | docker | the project's `make sweep workstream=<slug>` (containers, volumes, networks, images with the workstream's label); without it, everything named `<slug>-*` |
 | scratch | `_run/`, `_scratch/`, `.remotion/` under the workstream's folder |
+| checkouts, left zeroed | each repo's main checkout, and the designs root when on its default branch: `--apply` switches off the workstream's branch to the default one and runs `git pull --ff-only`; uncommitted changes, another branch or local commits are listed as `his`, left as they are (not counted): name them in the message |
 
 ## Unmerged work is his
 

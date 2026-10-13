@@ -107,7 +107,8 @@ When it returns, check it as that reference says.
 **The cleanup.** Follow `references/cleanup.md`:
 `cleanup.sh <slug> --check`, decide what is his (unmerged work),
 `--apply`, then `--check` until it comes back empty. Paste the final
-`--check` output into `trace.md`: it is the proof.
+`--check` output into `trace.md`: it is the proof. A checkout
+listed as `his` (left off the default branch) goes in the message.
 
 ## Step 2 · The report, finished before the close
 
