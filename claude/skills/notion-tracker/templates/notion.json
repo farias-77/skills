@@ -10,7 +10,16 @@
     "releasedIn": "Released in",
     "lastUpdate": "Last update",
     "requestedBy": "Requested by",
-    "type": "Type"
+    "type": "Type",
+    "priority": "Priority",
+    "deadline": "Deadline",
+    "created": "Created"
+  },
+  "priority": {
+    "Urgent": 0,
+    "High": 3,
+    "Medium": 14,
+    "Low": null
   },
   "stages": {
     "backlog": "Backlog",

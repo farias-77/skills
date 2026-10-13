@@ -21,7 +21,8 @@ goes on.
 | `tools` | the prefix of the Notion MCP server's tools, e.g. `mcp__notion__`; the calls below are `<tools>notion-fetch` and so on |
 | `dataSource` | the database's data source, `collection://…` |
 | `code` | the prefix of the auto id, e.g. `REQ-`; `/lets-cook REQ-12` is a pull |
-| `fields` | the property names: `owner`, `stage`, `workstream`, `report`, `releasedIn`, `lastUpdate`, `requestedBy`, `type` |
+| `fields` | the property names: `owner`, `stage`, `workstream`, `report`, `releasedIn`, `lastUpdate`, `requestedBy`, `type`, `priority`, `deadline`, `created` |
+| `priority` | the Priority options, most urgent first, each with its window in days (`null`: no window) |
 | `stages` | the option name for each stage: `discovery` … `close`, `build` for the short route's entry and his use, `backlog` and `done`, the board's first and last columns, and `declined` |
 
 No secret goes in the file: each person's MCP login is the access, and
@@ -66,11 +67,13 @@ every line of a body counts against the workspace's block cap.
 
 1. **The page.** A code (`REQ-12`): query `dataSource` for the row whose
    id property equals it. A url: fetch it. `next`: query the rows with
-   Stage = `stages.backlog` and take the first by Priority (the
-   option order, most urgent first), then the earliest Deadline (empty
-   last), then the oldest Created. Say the pick in one line with why
-   (`REQ-7 · Urgent · deadline 16/10`) and the next two behind it, then
-   go on; "another one" from him takes the next. Not found, or Stage already
+   Stage = `stages.backlog` and take the one due first. Due = the
+   earlier of Deadline and Created + the Priority's window (`priority`
+   in the config: days per option; an option with no window adds no
+   date). Ties: the most urgent Priority, then the oldest Created; rows
+   with no due date go last. Say the pick in one line with why
+   (`REQ-4 · Urgent · due 13/10`) and the next two behind it, then go
+   on; "another one" from him takes the next. Not found, or Stage already
    past `stages.backlog` with an Owner who is not you: stop and tell him who
    holds it.
 2. **His words.** The page's body becomes the input lets-cook would
