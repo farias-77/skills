@@ -40,9 +40,12 @@ else and the stage does not open. (2) **The designs root**: no
 anywhere; stop and propose exactly `designs-root: ../designs` for the
 project's `CLAUDE.md`. (3) The
 stage's `/goal`, filled in, in one code block for him to paste
-(discovery, a conversation, has none).
+(discovery, a conversation, has none). (4) **The tracker**: when
+`.state.md` has a `tracker:` line, load `notion-tracker` with
+`open <stage>`.
 
-**Close.** The stage's report is finished and published first (below).
+**Close.** The stage's report is finished and published first (below);
+with a `tracker:` line, `notion-tracker close <stage> <report-url>`.
 Then one message: the link, what the stage produced in one table, what
 was decided in his place, and the next play:
 

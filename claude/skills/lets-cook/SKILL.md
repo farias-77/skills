@@ -1,7 +1,7 @@
 ---
 name: lets-cook
 description: The single entry point of the pipeline. `/lets-cook <idea>` always opens the same way, with scouts in the background and a light interview, then the session picks the route by its own judgment and says it in one line with the reason. Full route: it loads stage-discovery in the same session. Short route (one behavior, one entry): a one-page brief, one authorization and one /goal, the stage-4 entry pipeline, his use, the release path, a short close. Hotfix (production broken now): the same with a test that reproduces the bug first. A fix in a legacy repo is a short route or a hotfix marked `repo: legacy`. Every route keeps every check; only the ceremony shrinks. He can switch routes at any time. The session runs on Opus 5.5, high. Use for any new demand, change, bug or incident.
-argument-hint: "<the idea, in his words>"
+argument-hint: "<the idea, in his words | a tracker code such as REQ-12>"
 allowed-tools: Read, Write, Edit, Glob, Grep, Agent, SendMessage, Workflow, AskUserQuestion, Artifact, PushNotification, ScheduleWakeup, Skill, Bash
 ---
 
@@ -70,6 +70,10 @@ with the time `date -u +%FT%TZ` printed; never rewrite a line.
    legacy repo.
    Hotfix and short route skip the attention queue; a full route waits
    its turn inside stage-discovery.
+3. **The tracker.** When the project root has `notion.json`, load
+   `notion-tracker` with `pull <code|url>` for a code or a page link,
+   or for a plain idea (it then creates the page). The page's words
+   are his words for the interview; its writes wait for the slug.
 
 ## 2 · The light interview
 
@@ -185,7 +189,8 @@ notification. Never loosen this done to call it met; stop early only when truly 
 
 Follow steps 1–4 of `stage-release` with its `references/release.md`:
 take the turn on `main`, merge, staging, a **patch** tag (`v1.0.0`
-when the repo has no `v*` tag yet), production, the watch. The release's red rule and stop list apply as they are. A
+when the repo has no `v*` tag yet), production, the watch; at production green,
+`notion-tracker released <tag>` when `.state.md` has a `tracker:` line. The release's red rule and stop list apply as they are. A
 hotfix goes first on `main` (release.md, "The hotfix"). In a legacy
 repo: release.md, "Legacy repos". At the green staging, dispatch the
 users' video only when a screen users see changed.
@@ -213,7 +218,8 @@ users' video only when a screen users see changed.
 5. `.state.md` → `stage: closed`; your `_coordination.md` row: "out in
    vX.Y.Z", or, when the release stopped before production, "closed:
    not out, <why, in a few words>" (the stop and its next commands are
-   in `04-release/trace.md`). Commit the folder. One message and a
+   in `04-release/trace.md`). Commit the folder; with a `tracker:`
+   line, `notion-tracker done` (or `stopped <why>` when not out). One message and a
    `PushNotification`: the version (or "not out" and why), the link,
    the "what's new" text, the video if any.
 
