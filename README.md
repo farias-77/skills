@@ -20,7 +20,7 @@ the night, and he is asked only what is his.
 
 | Rule | What it means |
 |---|---|
-| **Proof over opinion** | a live mock he clicks, ACs that become tests, a gate, QA on the running app; reviewers exist for what cannot be run |
+| **Proof over opinion** | a mock he clicks when a screen changes, ACs that become tests, a gate, QA on the running app; reviewers exist for what cannot be run |
 | **Right size** | one proposal sized to the problem, an overengineering guard whose only job is to cut, an evolution path for what was left out; "could be simpler" never blocks |
 | **One round** | every review runs once; a fix is verified by reading or by the delta, never by a second round |
 | **He is asked only what is his** | the conductor decides his class conservatively and lists it for veto; only a locked AC changed, a new recurring cost or something irreversible becomes a question |
@@ -44,7 +44,7 @@ CI, staging, tag, watch); only the ceremony shrinks.
 
 ```mermaid
 flowchart LR
-  D1["1 · Discovery<br/>live mock + stories"] --> D2["2 · Design<br/>one proposal · the debate"]
+  D1["1 · Discovery<br/>interview + stories (+ mock)"] --> D2["2 · Design<br/>one proposal · the debate"]
   D2 --> D3["3 · Plan<br/>the build graph"]
   D3 --> D4["4 · Execute<br/>entries + local CI + his hands-on"]
   D4 --> D5["5 · Release<br/>main · staging · tag · production"]
@@ -61,7 +61,7 @@ runs on Opus 5.5, high.
 
 | Stage | What happens | His part |
 |---|---|---|
-| **1 · Discovery** | while he talks, `prototype-builder (Sonnet 5.5, medium)` turns each answer into a visible edit of a live mock; the conductor locks it when nothing is open; `story-writer (Sonnet 5.5, high)` writes the stories, one AC per rule; one review round (`discovery-review-workflow.js`: three `disc-lens (Sonnet 5.5, medium)` and, per story, two `blind-reader (Sonnet 5.5, low)` and a `blind-judge (Sonnet 5.5, medium)`) | the conversation; the playback, story by story |
+| **1 · Discovery** | an interview that infers the obvious from the rest of the system; at its end `story-writer (Sonnet 5.5, high)` writes the stories, one AC per rule; when a screen changes, `prototype-builder (Sonnet 5.5, medium)` builds the exact mock in the project's design system and he iterates it until he says it is ready; one review round (`discovery-review-workflow.js`: three `disc-lens (Sonnet 5.5, medium)` and, per story, two `blind-reader (Sonnet 5.5, low)` and a `blind-judge (Sonnet 5.5, medium)`) | the interview; the mock's rounds; the playback, story by story |
 | **2 · Design** | scouts read the system; `architect (Opus 5.5, high)` writes one proposal with its v1 → v2 → v3 path; `overengineering-guard (Opus 5.5, medium)` cuts; after his "closed", the architect writes `solution.md` and five `design-writer (Sonnet 5.5, high)` the other documents; four lenses review once, called directly by the session: `design-consistency` and `design-security` (Opus 5.5, medium), `design-contracts (Sonnet 5.5, high)`, the guard again | the debate over a deck and a ≤60 s video, until "closed" |
 | **3 · Plan** | `planner (Opus 5.5, high)` cuts the widest graph: a thin contract commit C, entries of one whole behaviour (≤12 ACs) with frontend and backend in parallel, E-int last; `plan-writer (Sonnet 5.5, high)` writes one brief per node; one round (`plan-review-workflow.js`: `plan-reviewer (Opus 5.5, medium)` and the double-blind per brief); the session rules everything and writes the pre-flight | nothing; a veto list at the close |
 | **4 · Execute** | the session is the tech lead. Every ready entry runs `exec-entry-workflow.js`, in its own cloud session when the project has one: `builder-backend` ∥ `builder-frontend (Opus 5.5, medium)` → `exec-gate (Sonnet 5.5, low)` → `reviewer (Opus 5.5, high)` ∥ `qa-frontend` · `qa-backend (Opus 5.5, medium)` by surface → one fix pass → the delta. A serial queue merges into `feat/<slug>`; the project's signoff command runs the whole gate once, after his ok, and posts `local-ci` | the pre-flight; his hands-on with the running app, each answer an `A.n` round, until "ok" |

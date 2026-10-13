@@ -11,8 +11,8 @@
 
 | Check | Result |
 |---|---|
-| `proto.mjs walk` at the lock | <PASS · or the gaps in LOCK.json> |
-| `proto.mjs trace` | <PASS> · ACs <N>, per story <S-001: n, …> |
+| `proto.mjs walk` at the lock | <PASS · or the gaps in LOCK.json> · n/a: no screen |
+| `proto.mjs trace` (`trace none` with no mock) | <PASS> · ACs <N>, per story <S-001: n, …> |
 
 ## The round — <date> · run <id>
 

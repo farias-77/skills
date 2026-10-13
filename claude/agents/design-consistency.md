@@ -1,6 +1,6 @@
 ---
 name: design-consistency
-description: A review lens of stage 2 (Design). Reads the six design documents against each other, against the closed proposal and against the locked mock, and reports where they say different things (a name, a value, a field, a count, a flow) and where screens.md misses a state the mock reaches or follows the wrong frame. Every finding quotes both sides with file and line. One round. Opus 5.5, medium.
+description: A review lens of stage 2 (Design). Reads the six design documents against each other, against the closed proposal and against the locked mock (when a screen changed), and reports where they say different things (a name, a value, a field, a count, a flow) and where screens.md misses a state the mock reaches or follows the wrong frame. Every finding quotes both sides with file and line. One round. Opus 5.5, medium.
 model: claude-opus-5-5
 effort: medium
 tools: Read, Glob, Grep, Bash(node *)
@@ -18,9 +18,9 @@ says which document owns which fact.
 
 The six documents under `01-design/` (one may be a single
 `None: <why>` line), the closed `proposal.md` and its names table,
-`notes.md`, the lock (`00-discovery/stories.md`, `journeys/`,
-`prototype/` with `frames/` and `LOCK.json`), and `proto.mjs`.
-`node <proto.mjs> model <locked mock>` lists the mock's frames
+`notes.md`, the lock (`00-discovery/stories.md`, and when a screen
+changed `journeys/` and `prototype/` with `frames/` and `LOCK.json`),
+and `proto.mjs`. With a mock, `node <proto.mjs> model <locked mock>` lists the mock's frames
 (`<screen>.<state>`), journeys and copy keys.
 
 ## What you check
@@ -35,7 +35,7 @@ The six documents under `01-design/` (one may be a single
    and what the user sees.
 4. **The proposal.** No document drops a mechanism the closed proposal
    has, or adds one it does not.
-5. **The mock and the screens.** Every screen of the mock is in
+5. **The mock and the screens** (only when a screen changed). Every screen of the mock is in
    `screens.md`; every state the mock reaches (each non-debug frame,
    and each debug-only frame an AC cites) is listed with its frame;
    the copy keys match the mock's.

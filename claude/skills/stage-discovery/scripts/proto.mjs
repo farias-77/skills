@@ -10,8 +10,10 @@
  *   node proto.mjs shots  <index.html> <token|J<n>> … [--out dir] [--width 1280] [--theme light] [--lang pt-BR]
  *   node proto.mjs lock   <prototype-dir> --words "his words" [--override "his words, gaps accepted"]
  *                         [--gap "<where>::<what>"] … (one per open item he locked over)
- *   node proto.mjs trace  <index.html> <journeys-dir> <stories.md> [--notes notes.md]
+ *   node proto.mjs trace  <index.html|none> <journeys-dir|-> <stories.md> [--notes notes.md]
  *   node proto.mjs split  <stories.md> <out-dir>
+ *   node proto.mjs assemble <out index.html> --shell <prototype-shell.html> --title "<feature> mock"
+ *                         --tokens <tokens.css> --css <product.css> --js <product.js>
  *   node proto.mjs model  <index.html>
  *
  * walk    every frame in every language (renders as its own token, no console error, no missing
@@ -26,8 +28,8 @@
  *         journey step (journeys/<J>.<s>.png), and manifest.json with each file's sha256. The page is
  *         opened as the artifact publishes it (doctype added).
  * look    one state, optionally driven by fills, clicks, actor switches (--as), clock advances (--clock)
- *         and waits in order; prints what is on screen (the frame, the visible text, the new side
- *         effects). Takes a URL too, for the current app: --wait <selector|ms> and --wait-url <text or
+ *         and waits in order; prints what is on screen (the frame, the visible text, the fields, the
+ *         controls with disabled / busy / current, the new side effects). Takes a URL too, for the current app: --wait <selector|ms> and --wait-url <text or
  *         /regex/> let a logged-in SPA settle after a click; a fill value `env:NAME` is read from the
  *         environment (or from the KEY=VALUE lines --env-cmd prints: the project's env command, role 8)
  *         and never printed, so a test actor's password never sits on the command line. --page opens
@@ -47,6 +49,12 @@
  *         another story defines. An AC is one rule or one behavior, never one per step or per state:
  *         a step with no AC is fine (its frame, locked, covers it). An AC marked [build] after its rule
  *         ids is proved by the build, not the mock: counted apart (buildAcs).
+ *         `trace none - <stories.md> --notes notes.md`: the same checks before a mock exists (or when no
+ *         screen changes), against the journeys and steps of the notes' Journeys section; no YAML, no
+ *         frame ACs.
+ * assemble the mock from its sources: the shell with its <title> and the inner text of its three
+ *         editable blocks (style#tokens, style#product, script#product) replaced by the three files; the
+ *         SHELL blocks stay byte for byte. Rerun after every source edit; `walk` checks the result.
  * split   stories.md cut for the review: vocabulary.md (the `## Vocabulary` section), one S-NNN.md
  *         per story block, and index.json { vocabulary, stories: [{ id, file, acs, build }] }: the AC
  *         ids each block defines (the blind reader's keys) and its [build] ACs (skipped by the reader).
@@ -400,6 +408,10 @@ async function look(target, token, opts = {}) {
       label: (el.labels && el.labels[0] ? el.labels[0].innerText : el.getAttribute('aria-label') || el.name || el.id || el.tagName.toLowerCase()).trim(),
       value: el.type === 'checkbox' || el.type === 'radio' ? el.checked : el.type === 'password' ? (el.value ? '(hidden)' : '') : el.value,
       disabled: el.disabled, invalid: el.getAttribute('aria-invalid') === 'true' })), proto);
+    out.controls = await page.evaluate(p => [...(p ? document.getElementById('screen') : document.body).querySelectorAll('button, a[href], [role=button], [role=tab]')].map(el => ({
+      name: (el.getAttribute('aria-label') || el.innerText || '').trim().replace(/\s+/g, ' ').slice(0, 80),
+      disabled: !!el.disabled || el.getAttribute('aria-disabled') === 'true', busy: el.getAttribute('aria-busy') === 'true',
+      current: el.getAttribute('aria-current') || el.getAttribute('aria-selected') || null })).filter(c => c.name), proto);
     if (proto) {
       out.effects = (await page.evaluate(() => window.proto.effects())).slice(fx0);
       out.requests = await page.evaluate(() => window.proto.requests());
@@ -480,12 +492,30 @@ async function lock(dir, opts) {
 }
 
 // ── trace ───────────────────────────────────────────────────────────────
+// the journeys and step ids of the notes' "## Journeys" section: "### J1 — …" and its "**Steps:** s1 … · s2 …" line
+function notesJourneys(notesFile) {
+  const notes = fs.readFileSync(notesFile, 'utf8').replace(/<!--[\s\S]*?-->/g, '');
+  const sec = notes.split(/^## Journeys\b.*$/m)[1]?.split(/^## /m)[0] || '';
+  return sec.split(/^(?=### J\d+)/m).filter(b => /^### J\d+/.test(b)).map(b => {
+    const line = (b.match(/\*\*Steps:\*\*(.*)$/m) || [])[1] || '';
+    return { id: b.match(/^### (J\d+)/)[1], steps: [...new Set([...line.matchAll(/\b(s\d+)\b/g)].map(m => m[1]))].map(id => ({ id })) };
+  });
+}
+
 async function trace(file, jdir, storiesFile, opts = {}) {
-  const { browser, page } = await open(file, { hash: '#~bare~fast' });
+  const noMock = file === 'none';
+  const where = noMock ? "in the notes' Journeys" : 'in the locked mock';
   let journeys, frameList;
-  try { journeys = await page.evaluate(() => window.proto.journeys()); frameList = await page.evaluate(() => window.proto.frames()); } finally { await browser.close(); }
+  if (noMock) {
+    if (!opts.notes) die('trace none needs --notes notes.md: the journeys come from its Journeys section');
+    journeys = notesJourneys(opts.notes); frameList = [];
+  } else {
+    const { browser, page } = await open(file, { hash: '#~bare~fast' });
+    try { journeys = await page.evaluate(() => window.proto.journeys()); frameList = await page.evaluate(() => window.proto.frames()); } finally { await browser.close(); }
+  }
   const fails = [];
-  const yamls = fs.existsSync(jdir) ? fs.readdirSync(jdir).filter(f => /\.ya?ml$/.test(f)) : [];
+  if (noMock && !journeys.length) fails.push("no journey in the notes' Journeys section (### J<n> with a **Steps:** line)");
+  const yamls = !noMock && fs.existsSync(jdir) ? fs.readdirSync(jdir).filter(f => /\.ya?ml$/.test(f)) : [];
   const parsed = {};
   for (const f of yamls) {
     const t = fs.readFileSync(path.join(jdir, f), 'utf8');
@@ -499,7 +529,7 @@ async function trace(file, jdir, storiesFile, opts = {}) {
         rules: ((b.match(/^\s+rules:\s*\[([^\]]*)\]/m) || [])[1] || '').split(',').map(s => s.trim().replace(/["']/g, '')).filter(Boolean) })),
     };
   }
-  for (const j of journeys) {
+  if (!noMock) for (const j of journeys) {
     const y = parsed[j.id];
     if (!y) { fails.push(`journey ${j.id}: no YAML in ${jdir}`); continue; }
     if (y.start !== j.start) fails.push(`${j.id}: YAML start ${y.start} ≠ mock start ${j.start}`);
@@ -523,14 +553,14 @@ async function trace(file, jdir, storiesFile, opts = {}) {
   for (const b of blocks) for (const id of new Set(mentions(b.text))) if (owner.has(id) && owner.get(id) !== b.id) fails.push(`${b.id} cites ${id}, an AC of ${owner.get(id)}: cite it by name ("the <what it checks> criterion of ${owner.get(id)}"), never by id`);
   const tokens = new Set(frameList.map(f => f.token));
   for (const a of frameAcs) {
-    if (!tokens.has(a.token)) fails.push(`AC ${a.id}: no frame ${a.token} in the locked mock`);
+    if (!tokens.has(a.token)) fails.push(noMock ? `AC ${a.id}: a frame AC needs a mock; anchor it on a journey step` : `AC ${a.id}: no frame ${a.token} in the locked mock`);
     if (!a.rules.length) fails.push(`AC ${a.id}: no rule id in [ ]`);
   }
   const seen = new Set();
   for (const a of acs) {
     if (seen.has(a.id)) fails.push(`AC ${a.id}: duplicate id`); seen.add(a.id);
     const j = journeys.find(x => x.id === a.j);
-    if (!j || !j.steps.some(s => s.id === a.s)) fails.push(`AC ${a.id}: no step ${a.j}.${a.s} in the locked mock`);
+    if (!j || !j.steps.some(s => s.id === a.s)) fails.push(`AC ${a.id}: no step ${a.j}.${a.s} ${where}`);
     if (!a.rules.length) fails.push(`AC ${a.id}: no rule id in [ ]`);
   }
   // one AC per rule: a rule carried by several ACs is one AC written per detail (merge them)
@@ -545,7 +575,7 @@ async function trace(file, jdir, storiesFile, opts = {}) {
     for (const m of sec.matchAll(/^\|\s*([A-Z][A-Z0-9]*-\d+)\s*\|/gm)) ruleIds.add(m[1]);
   }
   for (const r of ruleIds) if (!acRules.has(r)) fails.push(`rule ${r}: no AC carries it`);
-  return { ok: fails.length === 0, journeys: journeys.length, yamls: Object.keys(parsed).length, acs: acs.length, frameAcs: frameAcs.length, buildAcs: [...acs, ...frameAcs].filter(a => a.build).length, rules: ruleIds.size, fails };
+  return { ok: fails.length === 0, mock: !noMock, journeys: journeys.length, yamls: Object.keys(parsed).length, acs: acs.length, frameAcs: frameAcs.length, buildAcs: [...acs, ...frameAcs].filter(a => a.build).length, rules: ruleIds.size, fails };
 }
 
 // ── stories.md, cut ─────────────────────────────────────────────────────
@@ -575,6 +605,25 @@ function split(storiesFile, outDir) {
   return index;
 }
 
+// ── assemble ────────────────────────────────────────────────────────────
+function assemble(out, opts) {
+  for (const k of ['shell', 'title', 'tokens', 'css', 'js']) if (!opts[k]) die(`assemble needs --${k}`);
+  let html = fs.readFileSync(opts.shell, 'utf8');
+  const put = (open, close, text, name) => {
+    const i = html.indexOf(open); const j = i < 0 ? -1 : html.indexOf(close, i + open.length);
+    if (i < 0 || j < 0) die(`assemble: the shell has no ${name} block (${open} … ${close})`);
+    html = html.slice(0, i + open.length) + '\n' + text.trim() + '\n' + html.slice(j);
+  };
+  put('<title>', '</title>', opts.title, 'title');
+  put('<style id="tokens">', '</style>', fs.readFileSync(opts.tokens, 'utf8'), 'tokens');
+  put('<style id="product">', '</style>', fs.readFileSync(opts.css, 'utf8'), 'product style');
+  put('<script id="product">', '</script>', fs.readFileSync(opts.js, 'utf8'), 'product script');
+  html = html.replace(/^<title>\n([\s\S]*?)\n<\/title>/, '<title>$1</title>');
+  fs.mkdirSync(path.dirname(path.resolve(out)), { recursive: true });
+  fs.writeFileSync(out, html);
+  return { out: path.resolve(out), kb: +(Buffer.byteLength(html) / 1024).toFixed(1) };
+}
+
 // ── model ───────────────────────────────────────────────────────────────
 async function model(file) {
   const { browser, page, errors } = await open(file, { hash: '#~bare~fast' });
@@ -586,7 +635,7 @@ async function model(file) {
 }
 
 // ── main ────────────────────────────────────────────────────────────────
-const usage = 'usage: proto.mjs walk|frames|look|shots|lock|trace|split|model … (see the header of this file)';
+const usage = 'usage: proto.mjs walk|frames|look|shots|lock|trace|split|assemble|model … (see the header of this file)';
 try {
   if (cmd === 'walk') {
     if (!pos[0]) die(usage);
@@ -611,6 +660,9 @@ try {
     for (const f of r.files) console.log(f);
     for (const p of r.problems) console.log(`  ✕ ${p}`);
     process.exit(r.problems.length ? 1 : 0);
+  } else if (cmd === 'assemble') {
+    if (!pos[0]) die(usage);
+    console.log(JSON.stringify(assemble(pos[0], flags)));
   } else if (cmd === 'split') {
     if (!pos[1]) die(usage);
     console.log(JSON.stringify(split(pos[0], pos[1]), null, 2));

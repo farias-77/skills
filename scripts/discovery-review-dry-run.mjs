@@ -56,6 +56,8 @@ const scenarios = [
     judge: (story) => story === 'S-002' ? null : { story, findings: [] }, expect: { valid: true, unread: 1 } },
   { title: 'no index → invalid, no agent dispatched',
     index: null, expect: { valid: false, findings: 0, agents: 0 } },
+  { title: 'no mock (no screen changes) → the readers get the text only, the round is valid',
+    noMock: true, expect: { valid: true, findings: 0, readers: 4, judges: 2, textOnly: true } },
   { title: 'a story whose every AC is [build] → no reader, no judge',
     index: BUILD_ONLY, expect: { valid: true, findings: 0, readers: 0, judges: 0, skippedBuild: 1 } },
 ];
@@ -69,7 +71,9 @@ const pipeline = async (items, ...stages) => Promise.all(items.map(async (item, 
 let bad = 0;
 for (const sc of scenarios) {
   const counts = {}, calls = {}, logs = [];
+  const prompts = [];
   const agent = async (prompt, o) => {
+    prompts.push(prompt);
     const name = o.agentType;
     counts[name] = (counts[name] ?? 0) + 1;
     const key = `${name}|${o.label}`;
@@ -81,7 +85,8 @@ for (const sc of scenarios) {
     throw new Error(`unknown agent ${name}`);
   };
   const index = 'index' in sc ? sc.index : INDEX;
-  const r = await run({ discoveryDir: '/w/00-discovery', mock: '/w/00-discovery/prototype/versions/v4.html', proto: '/k/proto.mjs', language: 'en', index },
+  const mock = sc.noMock ? undefined : '/w/00-discovery/prototype/versions/v4.html';
+  const r = await run({ discoveryDir: '/w/00-discovery', mock, proto: '/k/proto.mjs', language: 'en', index },
     agent, parallel, pipeline, (m) => logs.push(m), () => {});
   const e = sc.expect, got = [];
   const total = Object.values(counts).reduce((a, b) => a + b, 0);
@@ -95,6 +100,8 @@ for (const sc of scenarios) {
   if ('readers' in e && (counts['blind-reader'] ?? 0) !== e.readers) got.push(`readers ${counts['blind-reader'] ?? 0}`);
   if ('judges' in e && (counts['blind-judge'] ?? 0) !== e.judges) got.push(`judges ${counts['blind-judge'] ?? 0}`);
   if ('agents' in e && total !== e.agents) got.push(`agents ${total}`);
+  if (e.textOnly && prompts.some((p) => /locked mock|The tool:/.test(p))) got.push('a prompt names a mock');
+  if (!sc.noMock && prompts.some((p) => /No mock/.test(p))) got.push('a prompt says no mock while there is one');
   if (r.findings.some((f) => !f.id || !f.quote || !f.gap)) got.push('a finding without id, quote or gap');
   console.log(`${got.length ? 'FAIL' : 'ok  '}  ${sc.title}${got.length ? `  (${got.join(', ')})` : ''}`);
   if (verbose || got.length) { for (const l of logs) console.log(`        log: ${l}`); for (const d of r.dropped) console.log(`        dropped: ${d.source} ${d.why}`); }

@@ -1,7 +1,7 @@
 export const meta = {
   name: 'discovery-review',
-  description: 'Stage-1 review of the stories derived from the locked mock: three lenses and, per story, two blind readers and a judge, in parallel; one round; every finding goes to the conductor',
-  whenToUse: 'Stage 1 (discovery), step D5, after proto.mjs trace passes and proto.mjs split has cut the stories',
+  description: 'Stage-1 review of the stories (anchored on the locked mock when a screen changes): three lenses and, per story, two blind readers and a judge, in parallel; one round; every finding goes to the conductor',
+  whenToUse: 'Stage 1 (discovery), step D4, after proto.mjs split has cut the stories (and, with a mock, after proto.mjs trace passes)',
   phases: [
     { title: 'Lenses', detail: 'disc-lens × 3: in-out, coverage, acceptance' },
     { title: 'Double-blind', detail: 'per story: blind-reader × 2, then blind-judge' },
@@ -54,9 +54,9 @@ const READING = {
           ac: { type: 'string' },
           understood: { type: 'string', description: 'in one or two sentences, what this AC requires' },
           verdict: { type: 'string', enum: ['pass', 'fail', 'undecidable'] },
-          observed: { type: 'string', description: 'what the mock showed, quoted' },
+          observed: { type: 'string', description: 'what the mock showed, quoted; with no mock, the story line the verdict rests on, quoted' },
           missing: { type: 'string', description: 'undecidable: exactly what was missing; otherwise ""' },
-          how: { type: 'string', description: 'the exact proto.mjs look commands run' },
+          how: { type: 'string', description: 'the exact proto.mjs look commands run; with no mock, "text only"' },
         },
       },
     },
@@ -89,7 +89,7 @@ const JUDGMENT = {
 
 const TITLES = {
   diverge: 'two readers read it differently',
-  contradicts: 'the locked mock does otherwise',
+  contradicts: 'the mock or another text says otherwise',
   undecidable: 'a stranger cannot decide pass or fail',
 }
 
@@ -114,10 +114,12 @@ const D = args?.discoveryDir
 const language = args?.language ?? 'the language of the documents'
 const { problems, stories = [], vocabulary } = readIndex(args?.index)
 const rules = String(args?.proto ?? '').replace(/scripts\/proto\.mjs$/, 'references/stories.md')
-const sources = `The documents: ${D}/stories.md · ${D}/journeys/ · ${D}/notes.md
+const mockLine = args?.mock
+  ? `The locked mock: ${args.mock}\nThe tool: node ${args?.proto}`
+  : 'No mock: no screen changes. Judge from the text; the notes are the oracle.'
+const sources = `The documents: ${D}/stories.md${args?.mock ? ` · ${D}/journeys/` : ''} · ${D}/notes.md
 The rules for stories: ${rules}
-The locked mock: ${args?.mock}
-The tool: node ${args?.proto}
+${mockLine}
 Language of the documents: ${language}`
 
 function call(name, prompt, opts) {
@@ -155,9 +157,9 @@ async function runLens(lens) {
 
 // ---------- Double-blind ----------
 
+const readerMockLine = args?.mock ? mockLine : 'No mock: no screen changes. Judge from the story text alone.'
 const storyInputs = (s) => `Story ${s.id}.
-The locked mock: ${args?.mock}
-The tool: node ${args?.proto}
+${readerMockLine}
 The story (read this file): ${s.file}
 The vocabulary (read this file): ${vocabulary ?? 'none'}
 The AC ids: ${[...s.acs].join(', ')}
@@ -235,7 +237,8 @@ if (problems.length) {
   log(`index invalid: ${problems.slice(0, 5).join('; ')}`)
   return { valid: false, findings: [], lenses: [], stories: [], unread: [], skippedBuild: [], dropped: problems.map((why) => ({ source: 'index', why })) }
 }
-if (!args?.mock || !args?.proto || !D) log('discoveryDir, mock or proto missing in args: the agents cannot reach the material')
+if (!D || !args?.proto) log('discoveryDir or proto missing in args: the agents cannot reach the material (proto also locates the rules for stories)')
+if (!args?.mock) log('no mock: the readers judge from the text alone')
 
 const skippedBuild = stories.flatMap((s) => s.build.map((ac) => `${s.id} ${ac}`))
 log(`round 1: ${LENSES.length} lenses · ${stories.length} stories × (2 readers + 1 judge) · ${skippedBuild.length} [build] AC(s) not read blind`)

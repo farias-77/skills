@@ -58,22 +58,23 @@ Every ruling is one line of the workstream's `rulings.md`:
 2026-10-05 · design D6 · design-security#S-2 · conductor: conservative (scope from the actor) · ruled: conductor · "keeps the lock, reversible"
 ```
 
-## Discovery (D5, after the lock)
+## Discovery (D4, the review)
 
-The oracle is the **locked mock**: what does it do? (`proto.mjs look`
-on the locked version, never memory.) Detail and calibrations:
+The oracle is what he decided: the **locked mock** when a screen
+changes (what does it do? `proto.mjs look` on the locked version,
+never memory), otherwise the notes' Confirmed lines, Rules and Out. Detail and calibrations:
 `stage-discovery/references/playback.md`.
 
 | Ruling | When | Goes to |
 |---|---|---|
-| fix, owner `story-writer (Sonnet 5.5, high)` | the fix changes how something is written and decides nothing: an AC rewritten to what the mock does, a THEN given its place, two ACs on one rule merged | the writer, one batch, no question |
-| his, at the playback | the fix changes what the mock does (an amendment), scope, personal data, money, a stated constraint, or contests what he confirmed | one question per decision, inside the story's playback call |
+| fix, owner `story-writer (Sonnet 5.5, high)` | the fix changes how something is written and decides nothing: an AC rewritten to the oracle, a THEN given its place, two ACs on one rule merged | the writer, one batch, no question |
+| his, at the playback | the fix changes the behavior he decided (an amendment), scope, personal data, money, a stated constraint, or contests what he confirmed | one question per decision, inside the story's playback call |
 | for the design | the answer is a mechanism: a lock, a retry, a status code, a storage shape, a threshold | `reviews.md` "For the design"; never asked |
 | dismissed | taste, wording, a divergence that builds the same thing, a misread | with its quote |
 
 **Never dismissed:** personal data, money, legal and stated
 constraints, a confirmed fact contested with a quote, a story that
-contradicts the mock. In doubt between the writer and him: him.
+contradicts the oracle. In doubt between the writer and him: him.
 
 The lenses are `disc-lens (Sonnet 5.5, medium)` × 3 (**in-out**,
 **coverage**, **acceptance**); the double-blind is two

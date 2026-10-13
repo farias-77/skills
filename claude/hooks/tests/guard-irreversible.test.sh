@@ -388,7 +388,7 @@ grep -q "merged=$stranger" "$skills/irreversible.allow"; check 0 $? "the root-ru
 at none .claude/hooks/guard-irreversible.sh "$tmp/link" 'gh pr merge 18 --merge'
 at deny .claude/hooks/guard-irreversible.sh "$tmp/vend" 'gh pr merge 18 --merge'
 run deny Write "$skills/irreversible.allow"
-run deny Edit '/home/u/clonex/skills/claude/hooks/irreversible.allow'
+run deny Edit '/home/u/skills/claude/hooks/irreversible.allow'
 run deny Bash 'echo "auth short x merge=feat/x tag=1 until=2099-01-01T00:00Z" >> ../skills/claude/hooks/irreversible.allow'
 run deny Bash '../skills/claude/hooks/authorize.sh tag x main@0123456789abcdef0123456789abcdef01234567'
 

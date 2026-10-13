@@ -160,7 +160,7 @@ html[data-width="desktop"] .pr-stage { justify-content: flex-start; }
 html[data-bare] .pr-bar, html[data-bare] .pr-panel { display: none !important; }
 html[data-bare] .pr-stage { padding: 0; overflow: visible; }
 html[data-bare] .pr-device { width: 100% !important; max-width: none; min-height: 100vh; border: 0 !important; border-radius: 0 !important; }
-#screen { min-height: inherit; }
+#screen { min-height: inherit; container: screen / inline-size; }
 #screen.pr-enter { animation: pr-in 180ms var(--ease-out); }
 @keyframes pr-in { from { opacity: 0; transform: translateY(4px); } }
 @media (prefers-reduced-motion: reduce) { @keyframes pr-in { from { opacity: 0; } } }

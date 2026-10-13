@@ -135,7 +135,7 @@ out (tech-lead.md). For each:
    |---|---|
    | `mode` · `entry` · `kind` | `build` · the id · `contract` for C, else `entry` |
    | `briefPath` · `sides` | the brief · the node's `sides` |
-   | `designDir` · `storiesPath` · `mockDir` | the design, the stories, the locked mock frames |
+   | `designDir` · `storiesPath` · `mockDir` | the design, the stories, the locked mock frames (none when the discovery had no screen) |
    | `projectDocs` · `referencesDir` | the product's `CLAUDE.md` · `${CLAUDE_SKILL_DIR}/references` |
    | `fastCheck` · `gateCommands` · `gatePaths` | from `plan.md` and the product's `CLAUDE.md` (gate paths = the code-owner paths) |
    | `worktree` · `branch` · `base` | the entry's worktree, its branch, `feat/<slug>` |

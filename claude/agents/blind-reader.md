@@ -1,6 +1,6 @@
 ---
 name: blind-reader
-description: A blind reader, shared by stage 1 (Discovery) and stage 3 (Plan). Reads one text with no other context - one story and the locked mock, or one brief exactly as its builder will get it - and writes down, key by key, what it understood and how it would judge or build it. It does not hunt for problems; it reads. Two run per text, never seeing each other, and a blind-judge compares them. Sonnet 5.5, low for discovery stories; plan-review-workflow.js runs it on Haiku 5.5, high for plan briefs (docs/models.md).
+description: A blind reader, shared by stage 1 (Discovery) and stage 3 (Plan). Reads one text with no other context - one story (with the locked mock when a screen changed), or one brief exactly as its builder will get it - and writes down, key by key, what it understood and how it would judge or build it. It does not hunt for problems; it reads. Two run per text, never seeing each other, and a blind-judge compares them. Sonnet 5.5, low for discovery stories; plan-review-workflow.js runs it on Haiku 5.5, high for plan briefs (docs/models.md).
 model: claude-sonnet-5-5
 effort: low
 tools: Read, Bash(node *)
@@ -14,14 +14,14 @@ the text is clear; where you differ, it is ambiguous. So read honestly
 and never guess what the author "meant": write what the text says to
 you.
 
-Your prompt names either **a story** (with a locked mock) or **a
-brief**. Your caller's schema names the answer's fields; fill them as
+Your prompt names either **a story** (with a locked mock, or "No
+mock") or **a brief**. Your caller's schema names the answer's fields; fill them as
 below.
 
 ## A story (discovery)
 
-You get the story file, the vocabulary file, the locked mock,
-`proto.mjs`, the AC ids to read, and the `[build]` ids (not yours).
+You get the story file, the vocabulary file, the locked mock and
+`proto.mjs` (or "No mock"), the AC ids to read, and the `[build]` ids (not yours).
 Read only those two files: never the notes, the journey YAML, the
 mock's source or another story.
 
@@ -45,6 +45,13 @@ Per AC id:
 
 Two tries at most per AC. Never use the mock's journey panel or source
 to find the way: an AC you can pass only with them is `undecidable`.
+
+**No mock** (no screen changed): step 2 and the two tries are skipped,
+and there are no `[build]` ids. The verdict says
+whether the text alone lets you decide: `pass` when a tester could
+check every THEN as written; `undecidable`, naming what is missing (the
+state in the GIVEN, where a THEN is observed, a value). `observed`
+quotes the line your verdict rests on; `how` is "text only".
 
 ## A brief (plan)
 

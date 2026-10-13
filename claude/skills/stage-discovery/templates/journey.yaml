@@ -42,17 +42,17 @@ steps:
   - id: s2
     do: Type her e-mail and send
     target: 'button[type="submit"]'
-    fill: { '#invite-email': marina.okafor@acme.com.br }
+    fill: { '#invite-email': marina.okafor@example.com }
     net: ok
     expect:
       frame: invites.sent
       see:
-        - status "list.sent.title" with marina.okafor@acme.com.br
+        - status "list.sent.title" with marina.okafor@example.com
         - text "list.sent.body" with the date 7 days after the send
-        - row marina.okafor@acme.com.br · Pending
+        - row marina.okafor@example.com · Pending
     effects:
-      - { kind: db, table: invites, op: insert, email: marina.okafor@acme.com.br }
-      - { kind: email, to: marina.okafor@acme.com.br, template: invite }
+      - { kind: db, table: invites, op: insert, email: marina.okafor@example.com }
+      - { kind: email, to: marina.okafor@example.com, template: invite }
     must_not:                       # effects that must NOT happen, written out
       - a second e-mail to the same address
     rules: [INV-1]

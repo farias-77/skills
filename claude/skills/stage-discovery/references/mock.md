@@ -1,17 +1,19 @@
 # The mock
 
 Read by `prototype-builder (Sonnet 5.5, medium)` before every build and
-by the conductor (Opus 5.5, high) when it writes an edit order. The
-mock is the thing he validates the product through. At the lock it
-becomes the reference every later stage builds against: the journeys
-become test walks, the frames become the pictures the real screens are
-compared with. So it is **exact** (looks and behaves like the real
-thing will), **complete** (every state the screen really reaches is
-there and reachable), **beautiful from v1**, and **never fragile**.
+by the conductor (Opus 5.5, high) when it writes a round order. A mock
+exists only when a screen changes; it is built after the stories, from
+`stories.md` and the notes, and he iterates it until he says it is
+ready. At the lock it becomes the reference every later stage builds
+against: the journeys become test walks, the frames become the pictures
+the real screens are compared with. So it is **exact** (looks and
+behaves like the real thing will), **complete** for the change (every
+state the changed screen really reaches is there and reachable),
+**only as wide as the change**, and **never fragile**.
 
-The visual taste comes from the `draw-it-for-me` skill (layout, type,
-color, motion, accessibility). The order of authority: his words, then
-the project's design system, then that skill.
+The order of authority: his words, then the project's design system,
+then the `draw-it-for-me` skill (only for what the project does not
+decide).
 
 ## The page contract (a claude.ai artifact)
 
@@ -37,16 +39,23 @@ with no error shown.
   `:root:not([data-theme="light"])`, and again under
   `:root[data-theme="dark"]`. No literal color in a component rule.
 - **Width.** Works at 390 px with a 16 px gutter and no sideways page
-  scroll; only a table or a chart scrolls inside its own box.
+  scroll; only a table or a chart scrolls inside its own box. The
+  phone width is a 390 px device drawn inside a wide window, so a
+  `@media` query never fires: `#screen` is a container named `screen`,
+  and narrow rules are `@container screen (max-width: …)`.
 - **Size.** Under 300 KB.
 
 ## The shell contract
 
 Start from `templates/prototype-shell.html`, never from a blank page.
-Edit exactly four places: the `<title>` (the feature's name + "mock"),
+Four places are yours: the `<title>` (the feature's name + "mock"),
 the style block `id="tokens"`, the style block `id="product"`, and the
-script block `id="product"`. The blocks marked SHELL are not yours; a
-bug there is reported, never patched.
+script block `id="product"`. Keep the three blocks as files,
+`prototype/_src/tokens.css`, `product.css` and `product.js`, and build
+`index.html` from them with
+`node <proto.mjs> assemble <prototype>/index.html --shell <shell> --title "<name> mock" --tokens <_src/tokens.css> --css <_src/product.css> --js <_src/product.js>`;
+never edit `index.html` by hand. The blocks marked SHELL are not
+yours; a bug there is reported, never patched.
 
 The product block is one `P.define({...})` call:
 
@@ -96,10 +105,14 @@ is in the reference frames.
   blind readers read as "what was written"; a field missing there reads
   as not written. A field a mock cannot know: `partial: true`.
 - Nothing is a dead end: something on screen can be acted on, or the
-  frame is `terminal` and the notes say why.
-- Step ids are `s1, s2, …` in play order at the lock (the AC ids derive
-  from them). Before that, a new step takes the next free id and a
-  removed step leaves its id unused.
+  frame is `terminal` and the builder's report says why (the conductor
+  writes it to the notes). A journey's `start` counts as visited.
+- Journey and step ids are the stories' (the AC ids derive from them).
+  Before the first lock, a step the mock adds takes the next free id
+  and a removed step leaves its id unused; the lock renumbers `s1, s2,
+  …` in play order and the anchor moves the AC ids with the map. After
+  the anchor, a step an amendment adds is appended at the journey's
+  end, or becomes an extension journey: the ids never move again.
 
 ## Which states
 
@@ -108,6 +121,10 @@ screen ask which of these the product can actually be in: ideal, empty
 (first use, cleared, no results), loading, partial, error, no
 permission; for each action: idle, submitting, success, refused by a
 rule, failed dependency. Build those; skip the ones it cannot reach.
+
+A rule with a number has its boundary reachable: a fixture or a clock
+mark on each side of it (the 24 h: marks at +23 h 59 min and +24 h), so
+its one AC is observed at the boundary, never "a day later".
 
 The four error paths of every journey (a limit hit, a dependency down,
 a permission refused, a repeat) each map to a state, and the state to
@@ -118,20 +135,26 @@ Inferred, never left out.
 
 ## Looking like the real product
 
-- **Tokens.** When the project exports tokens, map them onto the
-  shell's names (`--background`, `--foreground`, `--muted`,
-  `--muted-foreground`, `--border`, `--input`, `--ring`, `--primary`,
-  `--primary-foreground`, `--card`, `--success`, `--warning`,
-  `--warning-text`, `--danger`, `--radius-*`, `--font-sans`,
-  `--font-mono`, `--ease-out`), keeping the three-block shape. Without
-  an export, keep the defaults and say so.
-- **Components.** Reproduce the project's components from its
-  components list and the recon screenshots: heights, paddings,
-  radius, border weight, icon family and size, table density, how a
-  field shows its error. Never invent a component the product has.
-- **The surroundings.** Inside an existing app, draw its header and
-  navigation around the feature, quiet and static, so he judges it in
-  place.
+The project's design system is the look; this file never names one.
+The recon (`recon/*.md`) gives its paths: the tokens, the shared
+components, the app shell, the source of the screens the change sits
+in, and screenshots of them. Open those files and copy from them.
+
+- **Tokens.** Read the project's token source (an exported tokens
+  file first; otherwise the CSS variables or theme config the recon
+  names) and map each value onto the shell's names (`--background`,
+  `--foreground`, `--muted`, `--muted-foreground`, `--border`,
+  `--input`, `--ring`, `--primary`, `--primary-foreground`, `--card`,
+  `--success`, `--warning`, `--warning-text`, `--danger`,
+  `--radius-*`, `--font-sans`, `--font-mono`, `--ease-out`), keeping
+  the three-block shape. Both themes when the product has both.
+- **Components.** Reproduce each component the changed screen uses from
+  its source: height, padding, radius, border weight, type size, icon
+  family and size, density, how a field shows its error. Never invent a
+  component the product has; never restyle one. Where a component
+  disagrees with the Copy rules below (an empty state with no reason
+  line), the component wins. A control the product shows only on hover
+  is drawn visible in the frames that need it, listed as Inferred.
 - **Data.** Realistic and worst case: real-sounding invented names in
   each language, messy numbers, a long e-mail, a long name, counts of
   0, 1 and many, a missing optional field. Never "John Doe", "Test 123"
@@ -141,6 +164,24 @@ Inferred, never left out.
 - **Photos.** A one-file mock carries no real photos: draw a
   placeholder at the real size and crop (the aspect, the focal point),
   never a stock picture. "Photos not locked" goes as a gap at the lock.
+- **Without a design system** (the recon found none): keep the shell's
+  defaults and say so in the report's Gaps.
+
+## Only as wide as the change
+
+He judges the change in place, so the screen around it is drawn, but
+the work goes into the change. Sort every region of the screen:
+
+| Region | How it is built |
+|---|---|
+| the change: the new screen, tab, control, column, state | exact, interactive, every state it reaches |
+| the frame that gives it place: the app shell, the sidebar, the header, the sibling tabs | copied faithfully from the source, static: a sibling tab or link does nothing, or is not clickable |
+| content next to the change that it does not touch | a simple copy when that is cheap; otherwise a quiet block at its real size and position |
+
+Read only the source of the screens the change sits in and the shell;
+never explore or rebuild the rest of the product. A region that would
+take long to copy and does not affect the change is a block, and the
+report says so in one line.
 
 ## Copy
 
@@ -159,17 +200,6 @@ nothing over 300 ms; `transform` and `opacity` only; never
 `transition: all`. Frequent actions do not animate.
 `prefers-reduced-motion` keeps opacity only. Frames render in still
 mode, so motion never changes a frame.
-
-## A backend-only feature
-
-With no screen, the mock is an **animated flow** of the data and the
-steps: each stage of the flow is a screen (the file arrives → it is
-validated → rows are written → the summary goes out), drawn as a
-diagram with the data moving between stages. It keeps the same
-contract: frames, journeys, the clock (the 06:00 run is a clock mark),
-and the bar's "Next request" plays the failure, the empty file and the
-repeat. The walk runs on it like on any mock. Flow motion may run
-longer than product motion (up to ~1.2 s per hop), since it explains.
 
 ## Never fragile
 
@@ -191,8 +221,8 @@ the same URL, after a green walk.
 | Call | `file_path` = `00-discovery/prototype/index.html`, `icon: "prototype"`, a one-sentence `description`, `capabilities: {"comments": {"composer_only": true}}` (load the `artifact-capabilities` skill first) | the same `file_path`; with `url` when this builder did not publish it in its own conversation (read it first, as the tool asks); no `icon`, no `capabilities` |
 | Before | `cp index.html versions/v<N>.html` | the same |
 
-The edits of one batch of answers are published together, once, so
-the mock does not flicker.
+The edits of one round order are published together, once, so the mock
+does not flicker.
 
 **Local mode** (no `Artifact` tool: a headless or cloud session):
 `node proto.mjs shots 00-discovery/prototype/index.html <the changed

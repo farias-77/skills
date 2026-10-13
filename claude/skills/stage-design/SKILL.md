@@ -1,14 +1,14 @@
 ---
 name: stage-design
-description: Conducts stage 2 (Design) of the pipeline, under one /goal. Takes the locked discovery (the mock, its stories and ACs) and produces one proposal sized to the problem, with its evolution path (v1 → v2 → v3), debated with the user until he says it is closed, then six documents the plan cuts without asking. Scouts (Haiku 5.5, medium) read the system; an architect (Opus 5.5, high) proposes and later writes solution.md; an overengineering-guard (Opus 5.5, medium) cuts what serves no AC and no real risk; he watches a deck and a short video and debates through the question tool; five design-writers (Sonnet 5.5, high) write the other documents; four lenses review once; the stage closes with its report (video, deck, explainer). The session runs on Opus 5.5, high. Use after a discovery closes, or to resume a design by its slug.
+description: Conducts stage 2 (Design) of the pipeline, under one /goal. Takes the locked discovery (its stories and ACs, and the mock when a screen changed) and produces one proposal sized to the problem, with its evolution path (v1 → v2 → v3), debated with the user until he says it is closed, then six documents the plan cuts without asking. Scouts (Haiku 5.5, medium) read the system; an architect (Opus 5.5, high) proposes and later writes solution.md; an overengineering-guard (Opus 5.5, medium) cuts what serves no AC and no real risk; he watches a deck and a short video and debates through the question tool; five design-writers (Sonnet 5.5, high) write the other documents; four lenses review once; the stage closes with its report (video, deck, explainer). The session runs on Opus 5.5, high. Use after a discovery closes, or to resume a design by its slug.
 argument-hint: "<workstream-slug>"
 allowed-tools: Read, Write, Edit, Glob, Grep, Agent, SendMessage, AskUserQuestion, Artifact, Skill, Bash(mkdir *), Bash(date *), Bash(ls *), Bash(cp *), Bash(rm *), Bash(git *), Bash(node *), Bash(gitleaks *), Bash(make gitleaks *), Bash(realpath *)
 ---
 
 # Stage 2: Design
 
-The lock comes in: the mock he clicked, its stories, its acceptance
-criteria (ACs). Out comes **one** way the system carries it, sized to
+The lock comes in: the stories and their acceptance criteria (ACs),
+and the mock he clicked when a screen changes. Out comes **one** way the system carries it, sized to
 the problem, agreed with him, and written in six documents stage 3
 cuts into entries without asking anyone. Agents left alone
 overengineer; every page this stage adds is a page stage 4 builds and
@@ -87,8 +87,10 @@ D0 reading → D1 his idea → D2 architect → guard → your ruling
 
 1. **The kit**: `realpath ${CLAUDE_SKILL_DIR}/../..`, written in
    `.state.md` as `kit:`. **Preconditions**: `.state.md` says
-   `stage: design`; `00-discovery/` has `prototype/LOCK.json`, `stories.md` and
-   the notes' "For the design". Missing: stop, back to stage 1.
+   `stage: design`; `00-discovery/` has `stories.md` and the notes'
+   "For the design", and `prototype/LOCK.json` when `.state.md` says
+   `screen: yes`. Missing: stop, back to stage 1. With `screen: no`,
+   `screens.md` is the line `None: no screen changes`.
 2. **The house rules**: read `<kit>/../CLAUDE.md` and run its Open:
    the canary.
 3. **D0 starts now**, in the background, before the goal (below).
@@ -255,7 +257,7 @@ standard; contracts `references/contracts.md`:
 
 | Lens | Asks |
 |---|---|
-| `design-consistency (Opus 5.5, medium)` | does any document contradict another, the proposal or the mock? does every screen in `screens.md` cover the states the mock reaches? |
+| `design-consistency (Opus 5.5, medium)` | does any document contradict another, the proposal or the mock (when there is one)? does every screen in `screens.md` cover the states the mock reaches? |
 | `design-security (Opus 5.5, medium)` | scope, another user's data, personal data, secrets, identities, the floor cases |
 | `design-contracts (Sonnet 5.5, high)` | does each Contract hold against the code that exists and the code that will be generated? every field marked? |
 | `overengineering-guard (Opus 5.5, medium)` | what in the documents serves no AC and no real risk? |

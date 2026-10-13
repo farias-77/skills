@@ -1,21 +1,22 @@
 # Stories: <feature name> (`<slug>`)
 
 <!--
-  Written by story-writer from the conversation and the LOCKED mock. Nothing here is new: every
-  use case is a family of locked journeys, every acceptance criterion is a
-  rule or a behavior the mock shows, every value is one the mock shows or
-  the notes confirmed.
+  Written by story-writer from the conversation at the end of the interview; when a screen
+  changes, anchored on the LOCKED mock. Nothing here is new: every use case is a family of
+  journeys, every acceptance criterion is a rule or a behavior he said (and the mock shows,
+  when there is one), every value is one the notes confirmed or the mock shows.
   What the writer had to guess goes to Inferred; what it could not settle
   goes to Open. Both MUST be empty to close the stage.
 
   IDs:
   - A story is a use case: S-001, S-002…, one per job, with its journeys.
   - One AC per rule and one per behavior he said, never one per step, per
-    state or per copy string: the locked frames cover the states, the
+    state or per copy string: the locked frames (when there is a mock) cover the states, the
     layout and the copy. A step with no rule or behavior of its own has no
     AC. A rule id sits in one AC only.
-  - An AC id anchors on the locked step where the behavior shows first:
-    <journey>.<step>.<n> (J1.s2.1). It never changes after the lock; later
+  - An AC id anchors on the step where the behavior shows first:
+    <journey>.<step>.<n> (J1.s2.1), the notes' step, moved to the locked
+    step when a mock is anchored. It never changes after that; later
     stages cite it.
   - In [ ] after the id: the rule ids the AC checks (the notes' Rules
     table), or the story id when it checks behavior no numbered rule covers.
@@ -40,14 +41,15 @@
   Values are concrete: fixture names, numbers with their units, copy keys
   where the copy is the point. No selectors, no internals, no "quickly" or
   "correctly". Effects that must not happen are stated ("the inbox still
-  holds 1 e-mail"). A rule with a number gets ONE AC at the boundary the
-  mock shows (the 11th refused, the 10th kept).
+  holds 1 e-mail"). A rule with a number gets ONE AC at its boundary
+  (the 11th refused, the 10th kept).
 
   Each story block stands alone: a blind reader gets ONE block plus the
-  vocabulary and must be able to judge every AC against the mock.
+  vocabulary and must be able to judge every AC against the mock, or
+  from the text alone when there is none.
 -->
 
-Locked mock: **v<N>** · `00-discovery/prototype/LOCK.json` · frames in `00-discovery/prototype/frames/`
+Locked mock: **v<N>** · `00-discovery/prototype/LOCK.json` · frames in `00-discovery/prototype/frames/` | not yet: a screen changes, the anchor fills this line | none: no screen changes
 
 Personas: **<persona>** (<who, in one line>), …
 
@@ -104,7 +106,7 @@ Personas: **<persona>** (<who, in one line>), …
      AC that proves it, or to an Out line with its reason. A path with
      none of them is a gap: it goes to Inferred or Open, never silence. -->
 
-| Path | Case | Where in the mock | AC |
+| Path | Case | Where (journey step, or frame with a mock) | AC |
 |---|---|---|---|
 | Limit (boundary or invalid input) | <case> | <J4.s1, or frame token> | <AC id> |
 | Dependency failure | <case> | <…> | <AC id> |
