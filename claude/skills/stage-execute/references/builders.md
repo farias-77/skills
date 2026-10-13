@@ -31,7 +31,10 @@ primary proof, at the cheapest layer that really proves it.**
   journey per flow. A matrix (language, theme, role, tier) is rows of
   one table at the cheapest layer; in the browser only when the AC is
   about that dimension.
-- **A proof fails if the AC breaks.** Assert state and effect, never
+- **A proof fails if the AC breaks.** Each AC has the proof of its
+  success case and of the failure cases it implies, each at the
+  cheapest layer; a test exists for a decision of the behaviour, never
+  to cover a line. Assert state and effect, never
   markup or an internal call. An expected value is a literal, never the
   code's own formula. Would it pass if every function it imports
   returned `undefined`? Then rewrite it or delete it: no new test beats

@@ -12,14 +12,16 @@ it.
 
 | Class | Basis | Blocks when | Proof |
 |---|---|---|---|
-| 1 · Does not work, or is not proved | `ac` | an AC does not happen, or has no proof that would fail if it broke (it would pass if every imported function returned `undefined`: a weak assert alone, only mocks or an absence, the test's own setup asserted, a constant pinned, a fixture asserting a fixture), or the diff breaks a behaviour that existed | the AC id and what happens instead |
+| 1 · Does not work, or is not proved | `ac` | an AC does not happen, or has no proof that would fail if it broke (it would pass if every imported function returned `undefined`: a weak assert alone, only mocks or an absence, the test's own setup asserted, a constant pinned, a fixture asserting a fixture), or a failure case the AC or its story names has no proof, or the diff breaks a behaviour that existed | the AC id and what happens instead |
 | 2 · Security | `security` | a hole from the checklist below | the steps or the command and what it showed |
 | 3 · The gate weakened to pass | `rule` | a looser assert, baseline or threshold; a lint, coverage or gate target changed; a failing test deleted with no replacement named | the line, and the rule id |
 | 4 · A workaround | `rule` or `bug` | the symptom treated: a special case for the test's data, a sleep, retry or longer timeout hiding a race, an error swallowed | the line, and the reproduction or the rule |
 | 5 · Speculative | `rule` | an abstraction, parameter, flag, layer or service with no consumer in the diff or the codebase, and no extension point the design names | **the quote of the code that serves no AC and no real risk** |
 | 6 · Contract and data | `rule` | a field removed or its meaning changed while a client uses it; a migration the running code cannot run on; an invariant with no database constraint; money not in integer cents; time not in UTC | the line, and the rule |
 
-A concrete reproduction of anything else that breaks is `bug`.
+A concrete reproduction of anything else that breaks is `bug`. A
+missing failure case no AC and no story names is a note, never a
+block: no speculative cases.
 
 **"Could be simpler" never blocks** and never opens a round. Taste,
 naming, a refactor you would like: a note at most.

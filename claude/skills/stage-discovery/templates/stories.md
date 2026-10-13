@@ -100,16 +100,16 @@ Personas: **<persona>** (<who, in one line>), …
 
 ### Error paths
 
-<!-- The four paths, each mapped to a journey step, a frame, or an Out
-     line with its reason. A path with none of them is a gap: it goes to
-     Inferred or Open, never silence. -->
+<!-- The four paths, each mapped to a journey step or a frame with the
+     AC that proves it, or to an Out line with its reason. A path with
+     none of them is a gap: it goes to Inferred or Open, never silence. -->
 
-| Path | Case | Where in the mock |
-|---|---|---|
-| Limit (boundary input) | <case> | <J4.s1, or frame token> |
-| Dependency failure | <case> | <…> |
-| Permission | <case> | <…, or "Out: <reason>"> |
-| Repeat (double submit, two tabs, a retry) | <case> | <…> |
+| Path | Case | Where in the mock | AC |
+|---|---|---|---|
+| Limit (boundary or invalid input) | <case> | <J4.s1, or frame token> | <AC id> |
+| Dependency failure | <case> | <…> | <AC id> |
+| Permission | <case> | <…, or "Out: <reason>"> | <AC id, or — when Out> |
+| Repeat (double submit, two tabs, a retry) | <case> | <…> | <AC id> |
 
 ### In and Out
 

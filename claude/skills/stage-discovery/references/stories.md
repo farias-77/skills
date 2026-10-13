@@ -53,10 +53,11 @@ cites only its own AC ids (another story's criterion is named in words).
 
 ## The four error paths
 
-Every story has a table: limit (boundary input), dependency failure,
-permission, repeat (double submit, two tabs, a retry). Each row points
-to a journey step, a frame, or an Out line with a reason. A row with
-none of them is a gap: it goes to Inferred or Open, never silence.
+Every story has a table: limit (boundary or invalid input), dependency
+failure, permission, repeat (double submit, two tabs, a retry). Each row
+points to a journey step or a frame with the AC that proves it (the
+refusal and what is not written), or to an Out line with a reason. A row
+with none of them is a gap: it goes to Inferred or Open, never silence.
 
 ## Inferred and Open
 
