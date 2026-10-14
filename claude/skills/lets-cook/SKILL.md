@@ -81,7 +81,9 @@ with the time `date -u +%FT%TZ` printed; never rewrite a line.
    `notion-tracker` with `pull <code|url>` for a code or a page link,
    `pull next` for `next` or words like "pull the next demand", or
    for a plain idea (it then creates the page). The page's words
-   are his words for the interview; its writes wait for the slug.
+   are his words for the interview. Owner and Last update are written
+   at the pull, before the interview; Stage, Workstream and the
+   `tracker:` line wait for the slug.
 
 ## 2 · The light interview
 
