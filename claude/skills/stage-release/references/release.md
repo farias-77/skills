@@ -55,8 +55,8 @@ Workstreams coordinate by talking (`SendMessage` to the session named in
 2. Before merging, message the sessions in release: "merging <slug>".
    After the green staging: "main is free".
 3. **Waiting is not idle.** When another workstream lands on `main`, merge
-   `main` into `feat/<slug>` right away and let the local CI run while
-   you wait.
+   `main` into `feat/<slug>` right away and let the gate run while you
+   wait (in the cloud when the project has a cloud environment).
 4. A peer silent for 15 minutes: the conservative choice is to wait
    for the running staging to finish, never merge over it.
 5. The tag needs no turn: the production workflow runs one tag at a

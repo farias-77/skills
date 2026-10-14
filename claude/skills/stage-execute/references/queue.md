@@ -2,7 +2,10 @@
 
 The tech lead is the only one that merges into `feat/<slug>`; only the
 project's **signoff command** posts `local-ci` (house rules, "The CI is
-local").
+local"). With a cloud environment, steps 1 to 3 below and every gate in
+this file run in cloud sessions ([cloud.md](cloud.md), "The queue in
+the cloud" and "The whole gate in the cloud"); this machine runs only
+step 4 (a merge of a head a VM checked) and the status post.
 
 ## The queue: one entry at a time, the critical path first
 
@@ -37,7 +40,9 @@ for each ready entry
 
 Between two queue merges: `git merge main` into `feat/<slug>`, `make
 restamp`, the affected gate, push. Lockfiles are regenerated, never
-merged by hand.
+merged by hand. With a cloud environment this is a queue step on
+`story/<slug>/main-<n>` (cloud.md), and `feat` fast-forwards to its
+green head.
 
 ## The PR and local CI
 
@@ -51,8 +56,15 @@ decided by him):
    iterates (his `A.n` rounds, the `X.n` fixes), each push is checked
    by the affected gate only, as in the queue.
 3. **Run the whole gate once, at the end**: after his final ok, on the
-   final head of `feat`, on this machine (or in the cloud, `cloud.md`),
-   in the background:
+   final head of `feat`. With a cloud environment, in a signoff session
+   that records it, and posted here from the record (cloud.md, "The
+   whole gate in the cloud"):
+
+   ```
+   <the signoff command> --post-from evidence/<slug>/signoff-<n> <the head of feat/<slug>>
+   ```
+
+   Without one, on this machine, in the background:
 
    ```
    <the signoff command> <the head of feat/<slug>>
@@ -71,7 +83,7 @@ decided by him):
 
 | Red | What happens |
 |---|---|
-| a test **outside** the diff | run local-ci once more. Green: flaky; an `X.n` fixes it, as below. A flaky seen for the first time in this workstream is this workstream's: fixed, never deleted |
+| a test **outside** the diff | run the whole gate once more (a new `signoff-<n>` in the cloud). Green: flaky; an `X.n` fixes it, as below. A flaky seen for the first time in this workstream is this workstream's: fixed, never deleted |
 | anything else | one `X.n` per failing area (failures with no file in common run in parallel): exec-entry `fix`, the reviewer reading it, then the queue (the affected gate) and the whole gate once more on the new head |
 | red twice on the same area | the tech lead decides: a smaller fix, a re-cut, or it goes to him with the evidence |
 

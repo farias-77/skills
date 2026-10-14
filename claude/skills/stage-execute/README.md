@@ -32,7 +32,7 @@ it), then run `/stage-execute <workstream-slug>`.
 | `SKILL.md` | the stage, step by step |
 | `references/tech-lead.md` | the playbook: overlaps, conflicts, parked entries, rate limits, other workstreams, the night |
 | `references/queue.md` | the merge queue, migrations, `main` moving, the PR and local CI |
-| `references/cloud.md` | entries in cloud sessions: the evidence branch, the run prompt, heartbeat, relaunch |
+| `references/cloud.md` | entries, queue steps and the whole gate in cloud sessions: the evidence branch, the run prompts, heartbeat, relaunch, the record and `--post-from` |
 | `references/builders.md` | the builders' role and the testing rule |
 | `references/backend.md` · `frontend.md` | Go and React craft, and visual taste, trimmed to the standards |
 | `references/review.md` | the six classes that block, the security checklist, five notes at most |
@@ -40,3 +40,4 @@ it), then run `/stage-execute <workstream-slug>`.
 | `templates/board.md` · `brief-adjust.md` | the board, and the brief of an A.n round or an X.n fix |
 | `scripts/cloud-watch.sh` | waits for pushes on the evidence branches with no model turns |
 | `scripts/heartbeat.sh` | one beat per agent start and end; pushed in a cloud run |
+| `scripts/run-workflow.sh` | in a cloud VM, runs a workflow through a nested print-mode Claude Code, which applies the `Workflow` allow rule instead of asking him |

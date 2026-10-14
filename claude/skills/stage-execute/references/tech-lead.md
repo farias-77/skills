@@ -42,7 +42,7 @@ overlap: settle it now, before it is a conflict.
 | A cloud entry gone silent | `cloud.md`: past its agent's ceiling with no beat → first a follow-up into its session (`claude -p "…" --cloud <session id>`); the send fails or still no beat → relaunch on a new branch `-r2` from its last commit; once more in the cloud, then local |
 | Another workstream (or a hotfix) merged into `main` | merge `main` into `feat` between two queue merges (never a rebase), `make restamp`, the affected gate |
 | A shared file another workstream also changes | message that workstream's session (its name is in `_coordination.md`); agree additive or who goes first; one line in `_coordination.md`. No answer in 15 minutes → the conservative choice, noted |
-| The final head needs the whole gate (after his ok) | when the project allows it, a dedicated cloud session runs the signoff command on the head (`cloud.md`); the tech lead reads the `local-ci` status posted on the sha, never the session. Red, or no status within 90 minutes: run it here |
+| The final head needs the whole gate (after his ok) | with a cloud environment, a signoff session records it and this machine posts from the record (`cloud.md`, "The whole gate in the cloud"). A red record: an `X.n`. No record within 90 minutes: relaunch once, then run it here |
 | A hotfix needs the cloud now | it starts before any new entry of this workstream |
 | A flaky test outside the diff | the gate already ran it again once; it goes on the board and an `X.n` fixes it in the next push that was happening anyway |
 | The same file conflicting again and again | resolve it, and note the hot file in `dreaming-notes.md` |

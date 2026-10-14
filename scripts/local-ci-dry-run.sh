@@ -38,5 +38,28 @@ expect "an unpushed sha is refused" "$(ci e --gate true)" 2 "push it first"
 expect "the gate runs in a fresh worktree at the sha" "$(ci f --ref HEAD~1 --gate 'test "$(git rev-parse HEAD)" = "$(git rev-parse origin/main)"' --dry-run)" 0 "would post"
 [ -z "$(git -C "$tmp/repo" worktree list | sed 1d)" ] || { echo "FAIL  a worktree was left behind"; bad=1; }
 
+# The cloud split: a VM records with --dry-run --record and pushes the record; this machine posts with --post-from.
+expect "a recorded run writes local-ci.json for the sha" "$(ci g --ref HEAD~1 --gate 'echo vm-gate' --dry-run --record "$tmp/rec")" 0 "recorded in"
+jq -e --arg sha "$(git -C "$tmp/repo" rev-parse HEAD~1)" '.sha == $sha and .rc == 0 and .gate == "echo vm-gate"' "$tmp/rec/local-ci.json" >/dev/null \
+  && [ -s "$tmp/rec/gate.log" ] || { echo "FAIL  the record lacks the sha, rc, gate or log"; bad=1; }
+push_record() { # branch json
+  git -C "$tmp/repo" worktree add -q --orphan -b "$1" "$tmp/ev-$1" 2>/dev/null
+  echo "$2" >"$tmp/ev-$1/local-ci.json"
+  git -C "$tmp/ev-$1" add -A && git -C "$tmp/ev-$1" -c user.name=t -c user.email=t@t commit -q -m record
+  git -C "$tmp/ev-$1" push -q origin "$1"; git -C "$tmp/repo" worktree remove --force "$tmp/ev-$1"
+}
+push_record ev-green "$(cat "$tmp/rec/local-ci.json")"
+: >"$tmp/gh.calls"
+expect "--post-from posts a green record without running the gate" "$(ci h --ref HEAD~1 --gate 'echo vm-gate' --post-from ev-green)" 0 "record ev-green@"
+grep -q "statuses/" "$tmp/gh.calls" || { echo "FAIL  --post-from did not post"; bad=1; }
+[ ! -d "$tmp/state-h/logs" ] || [ -z "$(ls "$tmp/state-h/logs")" ] || { echo "FAIL  --post-from ran the gate"; bad=1; }
+: >"$tmp/gh.calls"
+expect "a record for another sha is refused" "$(git -C "$tmp/repo" push -q origin HEAD:main; ci i --ref HEAD --gate 'echo vm-gate' --post-from ev-green)" 1 "does not hold"
+push_record ev-red "$(jq -c '.rc = 1' "$tmp/rec/local-ci.json")"
+expect "a red record is refused" "$(ci j --ref HEAD~1 --gate 'echo vm-gate' --post-from ev-red)" 1 "exited 1"
+expect "a record of another gate is refused" "$(ci k --ref HEAD~1 --gate 'make verify' --post-from ev-green)" 1 "not make verify"
+expect "a branch with no record is refused" "$(ci l --post-from main)" 2 "no local-ci.json"
+[ ! -s "$tmp/gh.calls" ] || { echo "FAIL  a refused record called gh"; bad=1; }
+
 [ $bad -eq 0 ] && echo "local-ci dry run: ok" || echo "local-ci dry run: FAILED"
 exit $bad

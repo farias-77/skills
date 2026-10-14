@@ -171,7 +171,9 @@ By [references/queue.md](references/queue.md): one at a time, the
 critical path first; base in (merge, never rebase), restamp, the affected gate,
 merge `--no-ff`, the worktree and stack removed at once, then start what
 unblocked. Between two merges, a `main` that moved (another workstream, a
-hotfix) is merged into `feat`.
+hotfix) is merged into `feat`. With a cloud environment, the base in,
+the restamp and the gate run in a queue session and this machine only
+merges the head it checked ([references/cloud.md](references/cloud.md)).
 
 ## 6 · The end: PR, local CI, his hands-on
 
@@ -208,7 +210,9 @@ hotfix) is merged into `feat`.
 His "ok" closes the hands-on: one line in `rulings.md`. Then the
 project's signoff command runs the whole gate once on the final head,
 in the background (queue.md; `claude/scripts/local-ci.sh` when the
-project names none); it posts `local-ci` on that sha only on green. A
+project names none); it posts `local-ci` on that sha only on green.
+With a cloud environment it runs in a signoff session with `--record`
+and this machine posts with `--post-from` (cloud.md). A
 red is an `X.n` by queue.md, then the whole gate once more. The close
 starts meanwhile; the stage ends on its green.
 

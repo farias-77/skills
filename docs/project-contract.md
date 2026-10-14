@@ -145,7 +145,13 @@ or the pipeline's fallback
 runs the whole gate in a fresh worktree at one pushed sha and, **only
 on exit 0**, posts the commit status **`local-ci`** on that sha under
 the **bot identity** (role 15). It has a `--dry-run` that posts
-nothing; without the bot's token it exits 3 ("green, not posted"). The
+nothing; without the bot's token it exits 3 ("green, not posted"). A
+project with a cloud environment needs two more flags: `--record <dir>`
+writes `<dir>/local-ci.json` (the sha, the gate, its exit code, the
+seconds, the host) and the gate's logs beside it, which a VM runs with
+`--dry-run` and pushes to an evidence branch; `--post-from <branch>`
+runs no gate, reads `local-ci.json` at the tip of `origin/<branch>` and
+posts only when it names this sha, the whole gate and exit 0. The
 token is the bot's everyday one (role 15), not a second token, so the
 gate runs overnight with nobody pasting anything. The barrier is the
 guard: it denies agents printing the token and posting any status by
@@ -162,7 +168,9 @@ cannot be forged by an agent.
 **How the stages use it.** Plan's pre-flight runs it with `--dry-run`
 on `main`; execute runs it on the top of the feature branch;
 release merges only a head with `local-ci` green; lets-cook runs it on
-the short route's PR.
+the short route's PR. With a cloud environment, each of these runs in a
+cloud session with `--record`, and this machine only posts with
+`--post-from` (stage-execute's `references/cloud.md`).
 
 ### 7 · Gate paths and the floor
 

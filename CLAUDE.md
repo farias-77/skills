@@ -191,14 +191,24 @@ parallel.
 
 ## The CI is local
 
-The whole gate runs on our own compute (this machine or a cloud
-session VM), never on a hosted queue. The project names its **signoff
-command** in its `CLAUDE.md` (the bar's role 6; `claude/scripts/local-ci.sh`
-is the fallback): it runs the whole gate in a clean worktree and,
-only on exit 0 and under the bot identity, posts the **`local-ci`**
-commit status `main` requires. No agent posts a status or reads the
-bot's token; the guard denies both. Hosted CI keeps the deploys and
-the environments.
+The whole gate runs on our own compute, never on a hosted queue. The
+project names its **signoff command** in its `CLAUDE.md` (the bar's
+role 6; `claude/scripts/local-ci.sh` is the fallback): it runs the
+whole gate in a clean worktree and, only on exit 0 and under the bot
+identity, posts the **`local-ci`** commit status `main` requires. No
+agent posts a status or reads the bot's token; the guard denies both.
+Hosted CI keeps the deploys and the environments.
+
+**When the project has a cloud environment, this machine runs no
+gate.** Every gate (an entry's, the queue's, the whole gate) runs in a
+cloud session VM; this machine keeps the sessions and, when he asks
+for it, the stack for his hands-on. The VM runs the whole gate as
+`<signoff command> --dry-run --record <dir> <sha>` and pushes the
+record (sha, exit, logs) to an evidence branch; this machine posts the
+status with `<signoff command> --post-from <branch> <sha>`, which runs
+nothing and posts only when the record names that sha, the whole gate
+and exit 0. A VM cannot post as the bot: the cloud's GitHub proxy signs
+every call as the account connected to claude.ai.
 
 ## Up to date before a shared merge
 
