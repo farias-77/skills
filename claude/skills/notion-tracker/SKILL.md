@@ -66,7 +66,8 @@ every line of a body counts against the workspace's block cap.
 
 1. **The page.** A code (`REQ-12`): query `dataSource` for the row whose
    id property equals it. A url: fetch it. `next`: query the rows with
-   Stage = `stages.backlog` and take the first by Priority (the
+   Stage = `stages.backlog` and an empty Owner (an Owner means someone
+   already pulled it, you included), and take the first by Priority (the
    property's option order, most urgent first); a tie goes to the
    oldest Created. Say the pick in one line (`REQ-4 · Urgent`) and the
    next two behind it, then go on; "another one" from him takes the
@@ -78,10 +79,12 @@ every line of a body counts against the workspace's block cap.
    "Steps to repeat" as Confirmed lines, Type as a hint for the route
    (a Bug with production broken now is a hotfix). The light interview
    still runs, and asks only what the page leaves open.
-3. **The writes**, once the slug exists: Owner = you
-   (`<tools>notion-get-self`), Stage = the
-   route's first stage, Workstream = the slug, Last update. Then the
-   `tracker:` line in `.state.md`.
+3. **The writes.** At the pull, before the interview, so other
+   sessions and people see the demand is taken: Owner = you
+   (`<tools>notion-get-self`), Last update = `<YYYY-MM-DD> · pulled,
+   interview`. Once the slug exists: Stage = the route's first stage,
+   Workstream = the slug, Last update. Then the `tracker:` line in
+   `.state.md`.
 
 **A demand that did not come from Notion** (`/lets-cook <idea>` with
 `notion.json` present): create a page in `dataSource` with the title,
