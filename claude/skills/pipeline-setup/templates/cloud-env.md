@@ -46,7 +46,7 @@ gate test.
 |---|---|
 | the setup script | `<path>/cloud-setup.sh`: toolchains, dependency caches, images, browsers; prints a line per step with the elapsed seconds; under about five minutes so the snapshot caches it |
 | the stack up | `.claude/hooks/cloud-session-start.sh`, registered as a `SessionStart` hook (startup and resume) in `.claude/settings.json`; it does nothing unless `CLAUDE_CODE_REMOTE` is `true` |
-| the permissions | `.claude/settings.json`: the gate, the stack, git fetch and push of `story/*` and `evidence/*`, and `Workflow` (a nested `claude -p` in the VM starts the entry's workflow and needs it) |
+| the permissions | `.claude/settings.json`: the gate, the stack, git fetch and push of `story/*` and `evidence/*`, and `Workflow` (a nested `claude -p` in the VM starts the entry's workflow, in auto mode) |
 | the pipeline | `.claude/pipeline/` at tag `<tag>` of the pipeline repository |
 
 ## Checked

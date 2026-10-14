@@ -2,10 +2,12 @@
 # run-workflow.sh <repo> <script.js> <args.json> <return.json> [log]
 # Runs one workflow in a cloud session VM through a nested print-mode Claude Code, and writes
 # its return to <return.json>. The cloud session itself asks the user to approve every Workflow
-# launch whatever the allow rules say; print mode never asks and applies the project's
-# `Workflow` allow rule. The workspace is untrusted there, so the project's settings come in
-# by --settings, or print mode ignores its allow rules. Exit: 0 a return written · 1 none
-# (an interrupted return is written instead) · 2 bad call.
+# launch; print mode never asks. The VM's workspace is untrusted, so print mode ignores the
+# project's allow rules: in acceptEdits every command outside them is denied, and an agent's
+# plain `git rev-parse` was. Auto mode lets the classifier decide instead, as in the cloud
+# session; the project's guard hook and deny rules still apply (a VM probe saw the guard deny
+# its canary in both modes). Exit: 0 a return written · 1 none (an interrupted return is
+# written instead) · 2 bad call.
 set -uo pipefail
 [ $# -ge 4 ] || { echo "usage: run-workflow.sh <repo> <script.js> <args.json> <return.json> [log]" >&2; exit 2; }
 repo=$(cd "$1" && pwd) || exit 2
@@ -23,7 +25,7 @@ prompt="Use a workflow: run the Workflow tool with scriptPath $script and, as it
 # Print mode kills background work 10 minutes after its last turn unless the ceiling is off;
 # the prompt goes on stdin because --add-dir takes every argument after it.
 (cd "$repo" && CLAUDE_CODE_PRINT_BG_WAIT_CEILING_MS=0 claude -p --settings "$settings" \
-  --permission-mode acceptEdits --add-dir "$(dirname "$script")" "$(dirname "$args")" "$(dirname "$out")" \
+  --permission-mode auto --add-dir "$(dirname "$script")" "$(dirname "$args")" "$(dirname "$out")" \
   <<<"$prompt") >"$log" 2>&1
 rc=$?
 
