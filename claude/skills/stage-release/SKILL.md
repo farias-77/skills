@@ -157,7 +157,7 @@ creates no release. Wake when it should be done and read the run.
 
 | Red | What happens |
 |---|---|
-| staging (deploy, migrate, smoke) | one `X.n`: `exec-entry-workflow.js` mode `fix` on `fix/<slug>/X.n` from `main` (the `reviewer (Opus 5.5, high)` always) → PR → `local-ci` → merge (the authorization covers it) → staging again |
+| staging (deploy, migrate, smoke) | one `X.n`: `exec-entry-workflow.js` mode `fix` on `fix/<slug>/X.n` from `main` (the `reviewer (Opus 5.5, high)` always; in a cloud session, and its whole gate in a signoff session, when the project has a cloud environment: stage-execute's `references/cloud.md`) → PR → `local-ci` → merge (the authorization covers it) → staging again |
 | `local-ci` on the PR at step 1 | one `X.n` on `feat/<slug>`, as at execute |
 | production rolled back | one `X.n` on `fix/<slug>/X.n`, its PR green on `local-ci` → **ask** him before it goes anywhere: the old line died at the tag, so its merge and its patch tag need his new `! .claude/hooks/authorize.sh release <slug> fix/<slug>/X.n@<sha>` → merge → staging and smoke → a patch tag |
 | the environment (runner, network, a quota) | run it again once; it does not count. Never a production `migrate`: that is a stop |

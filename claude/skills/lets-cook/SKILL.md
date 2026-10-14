@@ -18,7 +18,11 @@ allowed-tools: Read, Write, Edit, Glob, Grep, Agent, SendMessage, Workflow, AskU
    idea, the authorization with the `/goal`, his ok.
 4. A hotfix starts from a test that reproduces the bug, red before the
    fix and green after. Never a shortcut.
-5. He switches routes whenever he wants, and nothing he said is lost.
+5. With a cloud environment, this machine runs no gate and no build:
+   the entry, every `A.n` and `X.n`, a base that moved and the whole
+   gate run in cloud sessions, exactly as at execute. Only his use
+   brings the stack up here.
+6. He switches routes whenever he wants, and nothing he said is lost.
 
 ## The flow
 
@@ -35,6 +39,8 @@ allowed-tools: Read, Write, Edit, Glob, Grep, Agent, SendMessage, Workflow, AskU
 |---|---|
 | [references/routes.md](references/routes.md) | before you announce the route |
 | [references/light-interview.md](references/light-interview.md) | before the first question |
+| `stage-execute/references/cloud.md` | before the entry, when the product's `CLAUDE.md` names a cloud environment: it is how the entry, the rounds, the fixes, a moved base and the whole gate run |
+| `stage-execute/references/queue.md` | before the merge: the base in, the PR, the whole gate |
 | `stage-release/references/release.md` | before the release of a short route or a hotfix |
 
 ## The team
@@ -144,7 +150,17 @@ notification. Never loosen this done to call it met; stop early only when truly 
   `main`; legacy: the repo's own branch rule).
 - **Hotfix first:** the test that reproduces the bug, at the cheapest
   layer that shows it, red on the current code. It stays in the
-  security floor when the bug was one.
+  security floor when the bug was one. With a cloud environment it is
+  the brief's first AC: the builder adds it first and runs it red on
+  `main` before the fix, and the entry's notes carry that red line.
+- **Where it runs.** With a cloud environment, the entry runs in a
+  cloud session by `stage-execute/references/cloud.md`: the branch
+  pushed, the evidence branch with `input/` (this pipeline copied in,
+  so `run-workflow.sh` travels), the run prompt, the watcher, the
+  return copied back. So do every `A.n` round and `X.n` fix (mode
+  `fix`), a base that moved (a queue step) and the whole gate (a
+  signoff session). This machine never runs a gate. Without a cloud
+  environment, everything below runs here.
 - Run `exec-entry-workflow.js` mode `build`, one entry, with the args
   of stage-execute's table (its step 3): `briefPath` = `brief.md`,
   `sides` = the sides its ACs touch (`['back']`, `['front']` or both),
@@ -157,24 +173,25 @@ notification. Never loosen this done to call it met; stop early only when truly 
   | Arg | Short route value |
   |---|---|
   | `entry` · `kind` | `E1` · `entry` |
-  | `worktree` · `branch` | a worktree of the branch under the product's worktrees root, `<root>/<slug>/E1` · `feat/<slug>` (hotfix: `hotfix/<slug>`) |
+  | `worktree` · `branch` | a worktree of the branch under the product's worktrees root, `<root>/<slug>/E1` · `feat/<slug>` (hotfix: `hotfix/<slug>`); in the cloud, `{repo}` and the branch, and `evidenceDir` is `{evidence}` (cloud.md) |
   | `projectDocs` | the worktree's `CLAUDE.md` |
   | `fastCheck` · `gateCommands` | the commands table's fast check, then it and the entry gate with `base=main`, each with `-C <worktree>` |
   | `gatePaths` | the code-owner paths (`CODEOWNERS`) |
   | `trailer` | the commit trailer your own commits carry |
-  | `loadThreshold` | `nproc` |
+  | `loadThreshold` | `nproc`; none in the cloud |
 
   The `reviewer (Opus 5.5, high)` always runs; on a hotfix, with the
   security pass.
 - When the entry comes back `ready`, push and open the PR ready. Fixes
   and rounds are checked by the entry gate only. The whole gate runs
-  once, on the final head, before it ships: the project's signoff
-  command (`claude/scripts/local-ci.sh` when it names none), run bare
-  from the session root as `tooling/local-ci <sha>` (`tooling/local-ci
-  --dry-run <sha>` in a rehearsal: it posts nothing), after his ok on
-  the short route, right away on a hotfix. With a cloud environment it
-  runs in a signoff session and this machine posts with `--post-from`
-  (stage-execute's `references/cloud.md`). A red there is one fix,
+  once, on the final head, before it ships, after his ok on the short
+  route, right away on a hotfix. With a cloud environment: a signoff
+  session records it and this machine posts with `<the signoff command>
+  --post-from evidence/<slug>/signoff-<n> <sha>` (cloud.md, "The whole
+  gate in the cloud"). Without one: the project's signoff command
+  (`claude/scripts/local-ci.sh` when it names none), run bare from the
+  session root as `tooling/local-ci <sha>` (`--dry-run` in a rehearsal:
+  it posts nothing). A red there is one fix,
   checked by the entry gate, then the whole gate once more. The merge
   waits for its `local-ci` and follows the house rule "Up to date
   before a shared merge".
@@ -184,7 +201,10 @@ notification. Never loosen this done to call it met; stop early only when truly 
 - **Short route:** bring the local environment up with the brief's
   "The seed shows", and ask through the question tool: ok, or what to
   adjust. Each answer is one `A.n` round (mode `fix`, the `reviewer (Opus 5.5, high)` on
-  every round), then ask again, until his ok. His ok closes the build.
+  every round; in a cloud session when there is a cloud environment),
+  then the environment up again on the new head, and ask again, until
+  his ok. His ok closes the build. The stack for his use is the only
+  thing this route runs here.
 - **Hotfix:** his check is on staging, after the merge (step 7),
   unless he delegated it.
 
