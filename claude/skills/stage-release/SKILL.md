@@ -24,7 +24,7 @@ allowed-tools: Read, Write, Edit, Glob, Grep, Agent, SendMessage, Workflow, AskU
 |---|---|
 | you, the session (Opus 5.5, high) | every step below; you never write or review code |
 | the CI (GitHub Actions) | push to `main`: staging deploy + smoke. Tag `v*`: the same image to production, smoke, 15-minute watch, rollback, then the GitHub release |
-| the project's signoff command (`claude/scripts/local-ci.sh` when it names none) | the project's whole gate on this machine or a cloud VM, in a fresh worktree; the only writer of the required `local-ci` status, posted under the bot identity on green |
+| the project's signoff command (`claude/scripts/local-ci.sh` when it names none) | the project's whole gate in a fresh worktree: in a cloud VM with `--record` when the project has a cloud environment (this machine then posts with `--post-from`), else on this machine; the only writer of the required `local-ci` status, posted under the bot identity on green |
 | the stage-4 cast through `exec-entry-workflow.js` mode `fix` | an `X.n` fix: `builder-backend` · `builder-frontend (Opus 5.5, medium)`, `exec-gate (Sonnet 5.5, low)`, `reviewer (Opus 5.5, high)`; no QA unless the fix asks for one (`qa: 'backend'` when it touches auth, permissions or personal data) |
 | `scout (Haiku 5.5, medium)` | anything you need to look up |
 | `video-builder (Sonnet 5.5, high)` · `slides-builder` · `artifact-builder (Sonnet 5.5, medium)` | the report's tabs; `video-builder` also starts the close's video for users |
@@ -96,8 +96,11 @@ exists, the report's three tabs are published, and I got the notification with t
    date before a shared merge": fetch; when `origin/main` has commits
    `feat/<slug>` lacks, merge it in, renumber the migrations if the
    project has a command for it (`make restamp`), push, run the signoff
-   command on the new head, and fetch again. A red here is an `X.n` on
-   `feat`, exactly as at execute.
+   command on the new head, and fetch again. With a cloud environment
+   the merge of `main`, the restamp and the whole gate run in cloud
+   sessions and this machine only fast-forwards `feat` and posts the
+   status (stage-execute's `references/cloud.md`). A red here is an
+   `X.n` on `feat`, exactly as at execute.
 3. **The merge.** The PR's head has `local-ci` green, and the code
    owner's approval when the PR touches the gate's paths (asked at the
    execute's ok). Then

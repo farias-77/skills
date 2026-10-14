@@ -172,7 +172,9 @@ notification. Never loosen this done to call it met; stop early only when truly 
   command (`claude/scripts/local-ci.sh` when it names none), run bare
   from the session root as `tooling/local-ci <sha>` (`tooling/local-ci
   --dry-run <sha>` in a rehearsal: it posts nothing), after his ok on
-  the short route, right away on a hotfix. A red there is one fix,
+  the short route, right away on a hotfix. With a cloud environment it
+  runs in a signoff session and this machine posts with `--post-from`
+  (stage-execute's `references/cloud.md`). A red there is one fix,
   checked by the entry gate, then the whole gate once more. The merge
   waits for its `local-ci` and follows the house rule "Up to date
   before a shared merge".

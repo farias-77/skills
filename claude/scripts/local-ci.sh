@@ -1,19 +1,25 @@
 #!/usr/bin/env bash
 # local-ci.sh — the whole gate on our own compute, and the only writer of the `local-ci` commit status.
 #
-#   local-ci.sh [--repo <dir>] [--ref <ref>] [--gate "<command>"] [--context <name>] [--dry-run]
+#   local-ci.sh [--repo <dir>] [--ref <ref>] [--gate "<command>"] [--context <name>] [--dry-run] [--record <dir>]
+#   local-ci.sh --post-from <branch> [--repo <dir>] [--ref <ref>] [--gate "<command>"] [--context <name>] [--dry-run]
 #
 # Runs the project's whole gate once, in a fresh worktree detached at <ref>, and posts
 # <context> = success on that sha under the bot identity, only when the gate exits 0.
 # A red gate posts nothing. A tree already verified green is not run again.
+# --record writes <dir>/local-ci.json (sha, gate, rc, secs, host) and the log beside it:
+#   a cloud session VM runs the gate with --dry-run --record and pushes <dir> to a branch.
+# --post-from runs no gate: it reads local-ci.json at the tip of origin/<branch> and posts
+#   only when the record names this sha, this gate and rc 0. A VM cannot post as the bot:
+#   the cloud's GitHub proxy signs every call as the account connected to claude.ai.
 #
 # Env: LOCAL_CI_GATE (default "make verify") · LOCAL_CI_DOWN (default "make down", best effort)
 #      LOCAL_CI_TOKEN_FILE (default ~/.config/local-ci/token: the bot's fine-grained token)
 #      LOCAL_CI_STATE (default ~/.local/state/local-ci: logs and verified trees)
-# Exit: 0 green and posted (or --dry-run) · 1 gate red · 2 bad call · 3 green, not posted
+# Exit: 0 green and posted (or --dry-run) · 1 gate red, or a record that does not hold · 2 bad call · 3 green, not posted
 set -uo pipefail
 
-repo=. ref=HEAD context=local-ci dry=0
+repo=. ref=HEAD context=local-ci dry=0 record_dir= post_from=
 gate=${LOCAL_CI_GATE:-make verify}
 down=${LOCAL_CI_DOWN:-make down}
 token_file=${LOCAL_CI_TOKEN_FILE:-$HOME/.config/local-ci/token}
@@ -27,11 +33,15 @@ while [ $# -gt 0 ]; do
     --gate) gate=$2; shift 2 ;;
     --context) context=$2; shift 2 ;;
     --dry-run) dry=1; shift ;;
-    -h|--help) sed -n '2,15p' "$0"; exit 0 ;;
+    --record) record_dir=$2; shift 2 ;;
+    --post-from) post_from=$2; shift 2 ;;
+    -h|--help) sed -n '2,21p' "$0"; exit 0 ;;
     *) die "unknown argument $1" ;;
   esac
 done
 
+case $record_dir in ''|/*) ;; *) record_dir=$PWD/$record_dir ;; esac
+[ -z "$record_dir$post_from" ] || command -v jq >/dev/null || die "--record and --post-from need jq"
 cd "$repo" 2>/dev/null || die "no repo at $repo"
 sha=$(git rev-parse --verify --quiet "$ref^{commit}") || die "no commit at $ref"
 tree=$(git rev-parse "$sha^{tree}")
@@ -52,8 +62,31 @@ post() {
   echo "local-ci: $context=success posted on $sha"
 }
 
+if [ -n "$post_from" ]; then
+  git fetch --quiet origin "+refs/heads/$post_from:refs/remotes/origin/$post_from" 2>/dev/null || die "no branch $post_from on origin"
+  result=$(git show "refs/remotes/origin/$post_from:local-ci.json" 2>/dev/null) || die "$post_from has no local-ci.json at its tip"
+  verdict=$(jq -r --arg sha "$sha" --arg gate "$gate" '
+    if .sha != $sha then "it is for \(.sha), not \($sha)"
+    elif .gate != $gate then "it ran \(.gate), not \($gate)"
+    elif .rc != 0 then "the gate exited \(.rc)"
+    else "green" end' <<<"$result")
+  [ "$verdict" = green ] || { echo "local-ci: the record on $post_from does not hold: $verdict; nothing posted"; exit 1; }
+  post "$gate · $(jq -r .secs <<<"$result")s on $(jq -r .host <<<"$result") · record $post_from@$(git rev-parse --short=8 "refs/remotes/origin/$post_from")"
+  exit $?
+fi
+
+write_record() { # rc secs log
+  [ -n "$record_dir" ] || return 0
+  mkdir -p "$record_dir"
+  jq -nc --arg sha "$sha" --arg gate "$gate" --argjson rc "$1" --argjson secs "$2" --arg host "$(hostname)" \
+    '{sha: $sha, gate: $gate, rc: $rc, secs: $secs, host: $host}' >"$record_dir/local-ci.json"
+  [ ! -f "$3" ] || cp "$3" "$record_dir/gate.log"
+  echo "local-ci: recorded in $record_dir/local-ci.json"
+}
+
 if [ -f "$record" ]; then
   echo "local-ci: tree ${tree:0:12} already verified green ($(cut -d' ' -f1-3 "$record"))"
+  write_record 0 0 ""
   post "$gate · tree ${tree:0:12} (verified before)"; exit $?
 fi
 
@@ -68,6 +101,7 @@ start=$SECONDS
 rc=$?
 secs=$((SECONDS - start))
 
+write_record "$rc" "$secs" "$log"
 if [ $rc -ne 0 ]; then
   echo "local-ci: RED (exit $rc, ${secs}s); nothing posted. Last lines of $log:"
   tail -n 40 "$log" | sed 's/^/  /'
