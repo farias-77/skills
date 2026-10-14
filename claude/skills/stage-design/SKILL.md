@@ -2,7 +2,7 @@
 name: stage-design
 description: Conducts stage 2 (Design) of the pipeline, under one /goal. Takes the locked discovery (its stories and ACs, and the mock when a screen changed) and produces one proposal sized to the problem, with its evolution path (v1 → v2 → v3), debated with the user until he says it is closed, then six documents the plan cuts without asking. Scouts (Haiku 5.5, medium) read the system; an architect (Opus 5.5, high) proposes and later writes solution.md; an overengineering-guard (Opus 5.5, medium) cuts what serves no AC and no real risk; he watches a deck and a short video and debates through the question tool; five design-writers (Sonnet 5.5, high) write the other documents; four lenses review once; the stage closes with its report (video, deck, explainer). The session runs on Opus 5.5, high. Use after a discovery closes, or to resume a design by its slug.
 argument-hint: "<workstream-slug>"
-allowed-tools: Read, Write, Edit, Glob, Grep, Agent, SendMessage, AskUserQuestion, Artifact, Skill, Bash(mkdir *), Bash(date *), Bash(ls *), Bash(cp *), Bash(rm *), Bash(git *), Bash(node *), Bash(gitleaks *), Bash(make gitleaks *), Bash(realpath *)
+allowed-tools: Read, Write, Edit, Glob, Grep, Agent, SendMessage, ListAgents, AskUserQuestion, Artifact, Skill, Bash(mkdir *), Bash(date *), Bash(ls *), Bash(cp *), Bash(rm *), Bash(git *), Bash(node *), Bash(gitleaks *), Bash(make gitleaks *), Bash(realpath *)
 ---
 
 # Stage 2: Design
@@ -92,7 +92,7 @@ D0 reading → D1 his idea → D2 architect → guard → your ruling
    `screen: yes`. Missing: stop, back to stage 1. With `screen: no`,
    `screens.md` is the line `None: no screen changes`.
 2. **The house rules**: read `<kit>/../CLAUDE.md` and run its Open:
-   the canary.
+   the canary, the pulls, who else is working.
 3. **D0 starts now**, in the background, before the goal (below).
 4. **The goal.** One message with the scouts' status and the command
    to paste, written in his language:

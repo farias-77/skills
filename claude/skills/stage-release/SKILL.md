@@ -2,7 +2,7 @@
 name: stage-release
 description: Conducts stage 5 (Release) of the pipeline under one /goal. It merges the finished workstream (feat/<slug>) into main under the user's authorization, follows the CI's staging deploy and smoke, tags vX.Y.Z so the CI promotes the same image to production with a smoke and a 15-minute watch that rolls back on its own, and closes with its report (video, deck, explainer). A red gets one fix entry through the stage-4 pipeline, then it stops. It stops for the user only on its stop list. The short route and the hotfix follow the same path from lets-cook. The session runs on Opus 5.5, high. Use when a workstream's .state.md says stage release, or to resume a release by its slug.
 argument-hint: "<workstream-slug>"
-allowed-tools: Read, Write, Edit, Glob, Grep, Agent, SendMessage, Workflow, AskUserQuestion, Artifact, PushNotification, ScheduleWakeup, Skill, Bash
+allowed-tools: Read, Write, Edit, Glob, Grep, Agent, SendMessage, ListAgents, Workflow, AskUserQuestion, Artifact, PushNotification, ScheduleWakeup, Skill, Bash
 ---
 
 # Stage 5: Release
@@ -216,6 +216,7 @@ the evidence in one line, the options with yours first, and the
 
 ## Resuming
 
-`/stage-release <slug>`: run the canary, then read `.state.md`,
+`/stage-release <slug>`: run the house Open (the canary, the pulls,
+who else is working), then read `.state.md`,
 `trace.md` and the CI runs of `main` and of the tags. The trace's last
 line is where you are; never resume from memory.

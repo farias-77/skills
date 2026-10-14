@@ -2,7 +2,7 @@
 name: stage-plan
 description: Conducts stage 3 (Plan) on its own, under one /goal - cuts the closed design into a build graph stage 4 runs as wide as it can (a thin contract commit C, entries that are each one whole behaviour of at most 12 ACs, frontend and backend in parallel on the Contract, an edge only where nothing can be faked, E-int last), writes one brief per entry, checks the pre-flight, runs one review round (plan-reviewer ∥ two blind readers and a judge per brief), rules every finding itself, coordinates with the other workstreams by message, and closes with its report (Video, Deck, Explainer) and the next command. Asks the user nothing. Use when a workstream's .state.md says stage plan, or to resume a plan in progress.
 argument-hint: "<workstream-slug>"
-allowed-tools: Read, Write, Edit, Glob, Grep, Agent, SendMessage, Workflow, Artifact, Bash
+allowed-tools: Read, Write, Edit, Glob, Grep, Agent, SendMessage, ListAgents, Workflow, Artifact, Bash
 ---
 
 # Stage 3 · Plan
@@ -68,7 +68,8 @@ Missing a design document: stop, and say which stage owns it.
 
 1. **The house rules.** Read the file that
    `realpath ${CLAUDE_SKILL_DIR}/../../../CLAUDE.md` prints and run its
-   Open: the canary (in the product repo).
+   Open: the canary (in the product repo), the pulls, who else is
+   working.
 2. Read `.state.md`: it says `stage: plan` (else stop, the stage it
    names owns the workstream); dispatch P0 in the background.
 3. Hand him the goal, filled in, in one code block:
