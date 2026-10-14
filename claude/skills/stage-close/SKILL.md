@@ -2,7 +2,7 @@
 name: stage-close
 description: Conducts stage 6 (Close) of the pipeline under one /goal, and closes on its own. It delivers the video for users (30 s – 3 min, a motion piece recorded in staging, no technical words) as an .mp4 plus a "what's new" text for the user to forward; writes the workstream's retro (at most 5 items per section, numbers from claude/scripts/telemetry.mjs, slowness counted as something that went wrong); proves nothing of the workstream is left on the machine with claude/scripts/cleanup.sh; and publishes its report (video, deck, explainer). A scout harvests the frictions. The retro changes nothing in the pipeline: the weekly retro does. The session runs on Opus 5.5, high. Use when a workstream's .state.md says stage close, or to resume a close by its slug.
 argument-hint: "<workstream-slug>"
-allowed-tools: Read, Write, Edit, Glob, Grep, Agent, AskUserQuestion, Artifact, PushNotification, ScheduleWakeup, Bash
+allowed-tools: Read, Write, Edit, Glob, Grep, Agent, SendMessage, ListAgents, AskUserQuestion, Artifact, PushNotification, ScheduleWakeup, Bash
 ---
 
 # Stage 6: Close
@@ -156,6 +156,7 @@ rendered again only on his note.
 
 ## Resuming
 
-`/stage-close <slug>`: the canary, then `.state.md` and `trace.md`. A
+`/stage-close <slug>`: the house Open (the canary, the pulls, who
+else is working), then `.state.md` and `trace.md`. A
 retro already written is not rewritten; a cleanup is re-checked, never
 assumed.

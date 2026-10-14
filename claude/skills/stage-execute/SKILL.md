@@ -2,7 +2,7 @@
 name: stage-execute
 description: Conducts stage 4 (Execute) as the tech lead, under one /goal - builds the whole plan from the contract commit to the user's hands-on. Every ready entry runs through the exec-entry workflow (builder-backend ∥ builder-frontend → exec-gate → reviewer ∥ the QAs the surface calls for → one fix pass → the delta), in its own cloud session when the project has one; the session orchestrates the graph, the merge queue and the migration order, settles overlaps and conflicts, coordinates with other workstreams by message, runs the whole gate as local CI (the local-ci status), opens the PR to main, brings the app up for his hands-on, builds his adjustments as A.n rounds, and closes on his ok with its report (Video, Deck, Explainer). Use when a workstream's .state.md says stage execute, or to resume one in progress.
 argument-hint: "<workstream-slug>"
-allowed-tools: Read, Write, Edit, Glob, Grep, Agent, SendMessage, Workflow, AskUserQuestion, Artifact, PushNotification, Monitor, Bash
+allowed-tools: Read, Write, Edit, Glob, Grep, Agent, SendMessage, ListAgents, Workflow, AskUserQuestion, Artifact, PushNotification, Monitor, Bash
 ---
 
 # Stage 4 · Execute
@@ -80,7 +80,8 @@ environment exists (the bar, `docs/project-contract.md`).
 
 1. **The house rules.** Read the file that
    `realpath ${CLAUDE_SKILL_DIR}/../../../CLAUDE.md` prints and run its
-   Open: the canary (in the product repo).
+   Open: the canary (in the product repo), the pulls, who else is
+   working.
 2. The pre-flight was checked at plan. List only the items he must run
    himself (from `preflight.md`), each with its `!` command. An item
    still missing parks only the entries it blocks.

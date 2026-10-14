@@ -35,12 +35,22 @@ one line. The full route is six stages. He is asked only what is his.
 **Open.** (1) **The canary**: `git push origin a:b`, run alone (no
 `cd`, nothing chained), must come back denied by the guard with a
 reason containing `guard-canary`; anything
-else and the stage does not open. (2) **The designs root**: no
+else and the stage does not open. (2) **Up to date**: `git pull
+--ff-only` in the product's main checkout and in the kit's checkout
+(`realpath <kit>/..`); a pull that is not a fast-forward (a local change,
+another branch checked out) stops the stage and is reported to him,
+never resolved by a reset or a stash. (3) **Who else is working**:
+`ListAgents` (the live sessions) against `_coordination.md` (the
+rows). A peer on the same area, branch, migration or shared file gets a
+`SendMessage` before anything is touched, and the agreement goes in one
+line of `_coordination.md`; a row whose session is gone is marked
+"session closed", never deleted. Then write or refresh this stage's own
+row. (4) **The designs root**: no
 `designs-root:` line in the project's `CLAUDE.md` → write nothing
 anywhere; stop and propose exactly `designs-root: ../designs` for the
-project's `CLAUDE.md`. (3) The
+project's `CLAUDE.md`. (5) The
 stage's `/goal`, filled in, in one code block for him to paste
-(discovery, a conversation, has none). (4) **The tracker**: when
+(discovery, a conversation, has none). (6) **The tracker**: when
 `.state.md` has a `tracker:` line, load `notion-tracker` with
 `open <stage>`.
 

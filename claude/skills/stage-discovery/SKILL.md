@@ -2,7 +2,7 @@
 name: stage-discovery
 description: Conducts stage 1 (Discovery) of the pipeline. An interview that extracts what to build, infers the obvious from the rest of the system and asks the rest; at its end a story-writer (Sonnet 5.5, high) writes the stories with one acceptance criterion per rule or behavior. When a screen changes, a prototype-builder (Sonnet 5.5, medium) builds the exact mock in the project's own design system, only as wide as the change; he iterates it until he says it is ready, and the stories absorb what the mock revealed. One review round (three lenses, two blind readers plus a judge per story) runs as a workflow; he confirms story by story in a playback that first explains each block in plain words; the stage closes with its report (video, deck, explainer). A conversation, never a /goal. The session runs on Opus 5.5, high. Use when /lets-cook routes a demand to the full pipeline, or to resume a discovery by its slug.
 argument-hint: "[workstream-slug]"
-allowed-tools: Read, Write, Edit, Glob, Grep, Agent, SendMessage, Workflow, AskUserQuestion, Artifact, ArtifactComments, Skill, Bash(mkdir *), Bash(date *), Bash(ls *), Bash(cp *), Bash(rm *), Bash(git *), Bash(node *), Bash(gitleaks *), Bash(make gitleaks *), Bash(realpath *), Bash(sha256sum *)
+allowed-tools: Read, Write, Edit, Glob, Grep, Agent, SendMessage, ListAgents, Workflow, AskUserQuestion, Artifact, ArtifactComments, Skill, Bash(mkdir *), Bash(date *), Bash(ls *), Bash(cp *), Bash(rm *), Bash(git *), Bash(node *), Bash(gitleaks *), Bash(make gitleaks *), Bash(realpath *), Bash(sha256sum *)
 ---
 
 # Stage 1: Discovery
@@ -104,7 +104,7 @@ from its header. Without a mock, only `split` and `trace none` run.
    `claude/` folder; write it in `.state.md` as `kit:` and give agents
    resolved paths.
 2. **The house rules.** Read `<kit>/../CLAUDE.md` and run its Open:
-   the canary.
+   the canary, the pulls, who else is working.
 3. **One workstream at a time.** Read the designs root's coordination file.
    When another workstream holds his attention in a discovery or a design
    debate, say so once and queue this one: message that workstream's

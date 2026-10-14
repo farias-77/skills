@@ -2,7 +2,7 @@
 name: lets-cook
 description: The single entry point of the pipeline. `/lets-cook <idea>` always opens the same way, with scouts in the background and a light interview, then the session picks the route by its own judgment and says it in one line with the reason. Full route: it loads stage-discovery in the same session. Short route (one behavior, one entry): a one-page brief, one authorization and one /goal, the stage-4 entry pipeline, his use, the release path, a short close. Hotfix (production broken now): the same with a test that reproduces the bug first. A fix in a legacy repo is a short route or a hotfix marked `repo: legacy`. Every route keeps every check; only the ceremony shrinks. He can switch routes at any time. The session runs on Opus 5.5, high. Use for any new demand, change, bug or incident, and when he asks to pull the next demand from the tracker.
 argument-hint: "<the idea, in his words | a tracker code such as REQ-12 | next>"
-allowed-tools: Read, Write, Edit, Glob, Grep, Agent, SendMessage, Workflow, AskUserQuestion, Artifact, PushNotification, ScheduleWakeup, Skill, Bash
+allowed-tools: Read, Write, Edit, Glob, Grep, Agent, SendMessage, ListAgents, Workflow, AskUserQuestion, Artifact, PushNotification, ScheduleWakeup, Skill, Bash
 ---
 
 # Let's cook: one door, three routes
@@ -68,11 +68,12 @@ with the time `date -u +%FT%TZ` printed; never rewrite a line.
 
 1. **The house rules.** Read the file that
    `realpath ${CLAUDE_SKILL_DIR}/../../../CLAUDE.md` prints and run its
-   Open: the canary, then the designs root.
+   Open: the canary, the pulls, who else is working, then the designs
+   root.
 2. **Scouts, in the background, from his first sentence.** One
    `scout (Haiku 5.5, medium)` per question: where this lives (the
-   feature map, the files); which workstreams are open
-   (`_coordination.md`) and whether one touches this area; is it in a
+   feature map, the files); whether an open workstream touches this
+   area (the Open's peers, read against the area's files); is it in a
    legacy repo.
    Hotfix and short route skip the attention queue; a full route waits
    its turn inside stage-discovery.
@@ -256,6 +257,7 @@ users' video only when a screen users see changed.
 
 ## Resuming
 
-`/lets-cook <slug>` with an existing folder: the canary, then
+`/lets-cook <slug>` with an existing folder: the house Open (the
+canary, the pulls, who else is working), then
 `.state.md` and `trace.md`, and from the release on
 `04-release/trace.md`. The last line written is where you are.
