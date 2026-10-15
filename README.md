@@ -117,6 +117,7 @@ and templated writing, never above high.
 | `pitch-it-for-me` | preloaded by `slides-builder` | HTML slide decks, one idea per slide |
 | `make-it-a-movie` | preloaded by `video-builder` | motion films written as one TSX file on the video kit, rendered once |
 | `i-wont-read-all-this` | always on | replies shaped for a reader who skims |
+| `check` | `/check` | one glanceable line: 🔴 needs you · 🟢 running on its own · ✅ done, then only what the state needs |
 
 Each skill folder has its own `README.md`: what it does, how to install
 only it, its files. Knowledge lives in each skill's `references/`.
