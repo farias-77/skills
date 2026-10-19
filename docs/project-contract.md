@@ -12,12 +12,6 @@ In a two-root layout (a session root holds `CLAUDE.md`, the standards
 and `.claude/skills/`; the product repositories sit beside or under
 it) the session root's `CLAUDE.md` is the source every stage reads.
 
-`/pipeline-setup <path-to-project>` audits a project against this bar,
-writes `pipeline-readiness.md` on a setup branch (✓ present · ~
-partial · ✗ missing, each with its evidence), proposes the cheapest
-order to close the gaps, and applies the generic pieces on that branch
-when the user says so ([the skill](../claude/skills/pipeline-setup/SKILL.md)).
-
 ## The three levels
 
 | Level | What it buys | Without it |
@@ -81,7 +75,7 @@ PR in the project.
 server module, an endpoint, a job, a screen, a component, a migration,
 a test per layer), each a path and one sentence on what to copy. A
 kind the codebase lacks says "none"; the contract commit builds the
-first. Template: [golden-paths.md](../claude/skills/pipeline-setup/templates/golden-paths.md).
+first.
 
 **Why.** Parallel builders converge on one shape only when one shape is
 named.
@@ -232,8 +226,7 @@ execute's queue and release's step 1 run `make restamp` after merging
 **What it is.** One file per feature or domain: what it does, one line
 per rule, its screens, routes, tables and jobs, and a short section on
 how to drive it (the route, the actor, the steps per state, the side
-effects to read back). Template:
-[verify-map.md](../claude/skills/pipeline-setup/templates/verify-map.md).
+effects to read back).
 
 **Why.** A scout can quote only what is written; the QAs and the users'
 video must drive a feature they did not build.
@@ -314,8 +307,6 @@ directory):
   runs it by path), written only by him: verbatim commands, `protected <branch>`, `default-branch
   <branch>`, and the `auth` lines `authorize.sh` writes.
 
-Templates: [settings.json](../claude/skills/pipeline-setup/templates/settings.json)
-and [permissions.md](../claude/skills/pipeline-setup/templates/permissions.md).
 A standards rule against code comments excludes `.claude/hooks/`.
 
 **Why.** The stages run without a human between the gates. Permission
@@ -372,8 +363,7 @@ suppressed lint, a skipped test, a gate path missing from
 `CODEOWNERS`), skipping `.claude/`; and a structure check on a diff
 against a base: complexity, size, duplication, import fences, new
 dependencies, with thresholds from the codebase's own p95/p99, never
-from a book. Template:
-[structure-check](../claude/skills/pipeline-setup/templates/structure-check/).
+from a book.
 
 **Why.** Code that works and that nobody can extend is the failure the
 pipeline fears most; size, complexity and fences can be gated.
@@ -385,8 +375,7 @@ the trend.
 
 **What it is.** The tokens (colors, type, spacing, radii, motion) as one
 CSS file and one JSON, generated from the source of truth, plus the
-core components with their props. Recipe:
-[design-tokens-export.md](../claude/skills/pipeline-setup/templates/design-tokens-export.md).
+core components with their props.
 
 **Why.** A mock that looks like another product is approved for the
 wrong reasons.
@@ -420,11 +409,7 @@ brings the stack up only when `CLAUDE_CODE_REMOTE` is `true`, test-only
 env vars (never a real secret), the guard and the settings committed,
 a network allowlist with a reason per host, and the pipeline vendored
 under `.claude/pipeline/` at a tag with its `VERSION`. One repository
-per session: a multi-repository session loads no hooks. Templates:
-[cloud-setup.sh](../claude/skills/pipeline-setup/templates/cloud-setup.sh),
-[cloud-session-start.sh](../claude/skills/pipeline-setup/templates/cloud-session-start.sh),
-[cloud-settings.json](../claude/skills/pipeline-setup/templates/cloud-settings.json),
-[cloud-env.md](../claude/skills/pipeline-setup/templates/cloud-env.md).
+per session: a multi-repository session loads no hooks.
 
 **Why.** One machine caps the width; with a VM per entry the width is
 the plan's, bounded only by rate limits, which are waited out.

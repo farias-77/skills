@@ -24,7 +24,7 @@
 # (from the hook input), else ${TMPDIR:-/tmp}/remind-scout-<uid>: the count on
 # the first line, then the paths the session wrote.
 #
-# Install (pipeline-setup does this): copy to .claude/hooks/, chmod +x, and
+# Install: copy to .claude/hooks/, chmod +x, and
 # register it in .claude/settings.json through a fail-open wrapper:
 #   "PostToolUse": [{"matcher": "Read|Grep|Glob|Write|Edit|MultiEdit|NotebookEdit|Agent|Task",
 #     "hooks": [{"type": "command", "timeout": 5, "command":

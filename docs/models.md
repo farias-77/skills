@@ -70,4 +70,4 @@ switch and goes on without waiting.
 
 | Session | Model, effort | Evidence |
 |---|---|---|
-| `/lets-cook`, every `/stage-*`, `/weekly-retro`, `/pipeline-setup` | Opus 5.5, high | Long contexts where almost every turn rules, cuts or orchestrates; one setting for every stage keeps the play simple |
+| `/lets-cook`, every `/stage-*`, `/weekly-retro` | Opus 5.5, high | Long contexts where almost every turn rules, cuts or orchestrates; one setting for every stage keeps the play simple |

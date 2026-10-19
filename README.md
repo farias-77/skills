@@ -112,7 +112,6 @@ and templated writing, never above high.
 | `stage-discovery` · `stage-design` · `stage-plan` · `stage-execute` · `stage-release` · `stage-close` | session | the six stages |
 | `notion-tracker` | session, loaded by the others | optional: pulls a demand from a Notion database and keeps its page in step with the stages |
 | `weekly-retro` | session | the week's workstreams read together; the only place the pipeline changes |
-| `pipeline-setup` | session | audits a project against the bar and closes the cheap gaps on a branch |
 | `draw-it-for-me` | preloaded by `artifact-builder`, `prototype-builder` | explanatory pages: diagrams that build, motion, 3D, charts |
 | `pitch-it-for-me` | preloaded by `slides-builder` | HTML slide decks, one idea per slide |
 | `make-it-a-movie` | preloaded by `video-builder` | motion films written as one TSX file on the video kit, rendered once |
@@ -159,7 +158,7 @@ route's rail is Build · Release · Close. See
   `claude/hooks/authorize.sh` writes that line; only he runs it, as
   `! .claude/hooks/authorize.sh …`.
 
-## The bar and `/pipeline-setup`
+## The bar
 
 The pipeline is generic: it reads the stack, the commands and the
 taste from the project. [docs/project-contract.md](docs/project-contract.md)
@@ -168,16 +167,6 @@ golden paths, the gates, a stack per worktree, the release roles, the
 permissions and the guard, the local-CI signoff, the mock toolchain,
 the smoke), recommended, and for the full experience (a cloud
 environment for entries, the video toolchain).
-
-Run **`/pipeline-setup <path-to-project>`** first. It audits the
-project with scouts reading a detached worktree at the default
-branch's sha, writes `pipeline-readiness.md` (present · partial ·
-missing, each with its evidence) on a setup branch, proposes the
-cheapest order to close the gaps, and applies the generic pieces on
-that branch when you say so: the settings, the guard and
-`authorize.sh`, the structure check, the cloud templates. What is the
-user's alone (branch protection, the bot identity, anything with a
-secret) is listed with a ready command, never run.
 
 ## Install
 
@@ -204,16 +193,13 @@ root (where each workstream's folder lives) with the line
 `designs-root: ../designs` in the project's `CLAUDE.md`, in git (a
 relative path resolves from the main checkout, worktrees included; an
 absolute one is accepted too); every stage stops without it.
-Then, in Claude Code inside the project:
-`/pipeline-setup .`
 
 - **Claude Code** with the `gh` CLI authenticated: GitHub is the
   source of record and the signoff's target.
 - The Workflow tool resolves the symlink, and the workstreams' folders sit
   beside the repository: the clone and the designs root go in
   `permissions.additionalDirectories`, in every directory a session
-  opens in (where exactly: `pipeline-setup/templates/permissions.md`,
-  "Replace the placeholders"), or the workflows refuse to start and
+  opens in, or the workflows refuse to start and
   every agent's write there is denied (each stage can still pass a
   workflow inline).
 - On the station: Node (current LTS), `ffmpeg` and `npm ci` in

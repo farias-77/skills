@@ -233,9 +233,9 @@ commit that is in `origin/<base>` after a fetch.
 
 ## One guard for what cannot be undone
 
-`claude/hooks/guard-irreversible.sh` is the only guard; `/pipeline-setup`
-installs it with `authorize.sh` behind a fail-closed wrapper on Bash
-and every file tool. It denies the irreversible (destroying
+`claude/hooks/guard-irreversible.sh` is the only guard, installed
+with `authorize.sh` behind a fail-closed wrapper on Bash and every
+file tool. It denies the irreversible (destroying
 infrastructure, deleting data, force-push, a forged status, switching
 identity, edits to itself or the settings) and any merge into a
 protected branch or `v*` tag that no live **authorization line**

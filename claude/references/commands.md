@@ -8,7 +8,6 @@ Every agent that runs Bash carries this sentence, verbatim;
 Why: in print mode and in every subagent nobody can answer a permission
 prompt (a frontmatter `Bash(…)` grants nothing there), so a command the
 allow list does not match is denied, and a compound command matches
-only when every part does. The allow list
-(`pipeline-setup/templates/settings.json`) carries each command the
+only when every part does. The allow list carries each command the
 agents run, in its bare form and its `-C <worktree>` form; the guard
 hook, not the list, is the boundary.

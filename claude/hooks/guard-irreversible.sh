@@ -18,7 +18,7 @@
 #          cannot resolve (GitHub silent for 20 s, a PR it cannot read)
 #   none   everything else: the settings' allow/ask/deny rules decide
 #
-# Install (pipeline-setup does this): copy this file and authorize.sh to
+# Install: copy this file and authorize.sh to
 # .claude/hooks/ of every directory the sessions open in, chmod +x, and
 # register it in that .claude/settings.json through a wrapper, so a missing
 # file blocks instead of passing:
