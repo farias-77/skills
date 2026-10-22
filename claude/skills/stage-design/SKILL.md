@@ -54,7 +54,7 @@ D0 reading → D1 his idea → D2 architect → guard → your ruling
 | D4 debate | you + **him** + the same `architect` by `SendMessage` | `proposal.md` closed, his words |
 | D5 documents | `architect` (solution) ∥ `design-writer (Sonnet 5.5, high)` × up to 5 | six documents, `review-prep.mjs` green |
 | D6 review | `design-consistency (Opus 5.5, medium)` ∥ `design-security (Opus 5.5, medium)` ∥ `design-contracts (Sonnet 5.5, high)` ∥ `overengineering-guard (Opus 5.5, medium)` | `reviews.md`, fixes verified |
-| D7 report | `slides-builder` ∥ `artifact-builder (Sonnet 5.5, medium)`; `video-builder (Sonnet 5.5, high)` only if the system's figure changed | the Design tab of the workstream's link |
+| D7 report | `artifact-builder (Sonnet 5.5, medium)`; `slides-builder (Sonnet 5.5, medium)` and `video-builder (Sonnet 5.5, high)` only when he picks them (the video only if the system's figure changed) | the Design tab of the workstream's link |
 
 ## What you read
 
@@ -284,8 +284,10 @@ the file only when they disagree, then `review-prep.mjs` again.
 
 ## D7 · The report, the cleanup, the close
 
-**The report is finished before the stage closes.** In one message, in
-the background, as `claude/docs/stage-report.md` describes:
+**The report is finished before the stage closes.** The Explainer
+always; the Video and the Deck only when he picks them in the close's
+question. In the background, as `claude/docs/stage-report.md`
+describes:
 
 | Tab | Builder | Brief |
 |---|---|---|

@@ -16,8 +16,8 @@ allowed-tools: Read, Write, Edit, Glob, Grep, Agent, SendMessage, ListAgents, As
 3. Nothing of the workstream is left on the machine, proven by a script.
 4. It closes on its own. What he says later goes into the retro,
    verbatim.
-5. It is the one stage that waits for its own video: the video for
-   users is what the close delivers.
+5. When he asks for the video for users, it is the one stage that
+   waits for its own video: that video is what the close delivers.
 
 ## The team
 
@@ -82,14 +82,14 @@ got the notification with the video, the text and the link.
 
 Start all three in one turn.
 
-**The video for users.** The release dispatched the
-`video-builder (Sonnet 5.5, high)` at its green staging. Read its
-state from the machine: `report/close/video.mp4` exists → done; a
-render of it still running (`pgrep -af 'render.sh.*<slug>'`), or the
-`video:` agent of `.state.md` still running → wake when it should end;
-none of these → dispatch it now with
+**The video for users, when he asks for it.** First, one question
+through the question tool, multi-select: "The close's Explainer is
+being made. Also make:" Video for users · Deck (none is a valid
+answer). On Video: `report/close/video.mp4` already there → done;
+else dispatch `video-builder (Sonnet 5.5, high)` with
 `references/user-video.md` and the stories (it records in staging).
-When it returns, check it as that reference says.
+When it returns, check it as that reference says. Without it, the
+message carries the "what's new" text alone.
 
 **The retro.**
 1. Dispatch one `scout (Haiku 5.5, medium)` with `templates/harvest.md`
@@ -112,7 +112,8 @@ listed as `his` (left off the default branch) goes in the message.
 
 ## Step 2 · The report, finished before the close
 
-Dispatch `slides-builder (Sonnet 5.5, medium)` as
+The Explainer always; the Deck by `slides-builder (Sonnet 5.5,
+medium)` and the Video only when he picked them in step 1, as
 `claude/docs/stage-report.md` describes, into `report/close/`:
 
 | Tab | Who | What |

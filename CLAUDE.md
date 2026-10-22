@@ -172,8 +172,13 @@ tabs, **Video · Deck · Explainer** (the short route's exceptions are in
 `claude/report/shell.html` plus `report.json`; the tabs are built by
 `video-builder (Sonnet 5.5, high)`, `slides-builder` and
 `artifact-builder` (both Sonnet 5.5, medium), or an Explainer filled from a template where the stage's
-data is a graph or a timeline. **A stage closes only when its three
-tabs are published**: he validates through them. Before each publish,
+data is a graph or a timeline. **The Explainer is always made; the
+Video and the Deck only when he asks for them**: at each stage's
+close, one question through the question tool (multi-select: Video ·
+Deck; none is a valid answer), asked while the Explainer is already
+being built. A tab he did not pick is `skipped` in `report.json`.
+**A stage closes only when its Explainer and the tabs he picked are
+published**: he validates through them. Before each publish,
 `gitleaks dir <workstream>` must be clean (where gitleaks is not on
 PATH, `make gitleaks dir=<workstream>`, here and in every stage). The
 page stays private; anything published outside the company needs his

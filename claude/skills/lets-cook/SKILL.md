@@ -50,8 +50,9 @@ allowed-tools: Read, Write, Edit, Glob, Grep, Agent, SendMessage, ListAgents, Wo
 | you, the session (Opus 5.5, high) | the interview, the route, the brief, the release, the short close | all |
 | `scout (Haiku 5.5, medium)` × 2–4 | the area's map, the other workstreams, legacy or not, broken in production or not | all |
 | the stage-4 cast through `exec-entry-workflow.js` | `builder-backend` · `builder-frontend (Opus 5.5, medium)` → `exec-gate (Sonnet 5.5, low)` → `reviewer (Opus 5.5, high)` ∥ `qa-frontend` · `qa-backend (Opus 5.5, medium)` by surface | short, hotfix |
-| `slides-builder (Sonnet 5.5, medium)` | the minimal report's decks | short, hotfix |
-| `video-builder (Sonnet 5.5, high)` | the users' video, only when a screen users see changed | short, hotfix |
+| `artifact-builder (Sonnet 5.5, medium)` | the minimal report's Explainers | short, hotfix |
+| `slides-builder (Sonnet 5.5, medium)` | the minimal report's decks, only when he asks for them | short, hotfix |
+| `video-builder (Sonnet 5.5, high)` | the users' video, only when he asks for it and a screen users see changed | short, hotfix |
 | `artifact-builder (Sonnet 5.5, medium)` | the Release explainer, only with an incident | short, hotfix |
 
 ## Unattended, after the `/goal`
@@ -218,8 +219,7 @@ take the turn on `main`, merge, staging, a **patch** tag (`v1.0.0`
 when the repo has no `v*` tag yet), production, the watch; at production green,
 `notion-tracker released <tag>` when `.state.md` has a `tracker:` line. The release's red rule and stop list apply as they are. A
 hotfix goes first on `main` (release.md, "The hotfix"). In a legacy
-repo: release.md, "Legacy repos". At the green staging, dispatch the
-users' video only when a screen users see changed.
+repo: release.md, "Legacy repos".
 
 ## 8 · The short close
 
@@ -233,13 +233,15 @@ users' video only when a screen users see changed.
    goes in the message.
 4. **The minimal report**, finished before the message, as
    `claude/docs/stage-report.md` describes. The rail is Build · Release
-   · Close:
+   · Close. The Explainers always; one question through the question
+   tool, multi-select, decides the rest: Decks · Video for users (none
+   is a valid answer):
 
-| Stage | Video | Deck | Explainer |
+| Stage | Explainer (always) | Deck (when asked) | Video (when asked) |
 |---|---|---|---|
-| Build | — | the brief, "Assumed", the proof, what the review found | — |
-| Release | — | version, notes, smokes | only with an incident |
-| Close | only if a screen users see changed | numbers and "what's new" | — |
+| Build | the brief, "Assumed", the proof, what the review found | the same, as slides | — |
+| Release | the release's timeline (with an incident, drawn) | version, notes, smokes | — |
+| Close | the numbers and the "what's new" text | the same, as slides | the users' video, only if a screen users see changed |
 
 5. `.state.md` → `stage: closed`; your `_coordination.md` row: "out in
    vX.Y.Z", or, when the release stopped before production, "closed:

@@ -1,8 +1,10 @@
 # The stage report
 
 Each workstream has **one link**. The page has a rail of stages on the
-left, and each stage has three tabs: **Video · Deck · Explainer**. The same
-link fills in as each stage finishes.
+left, and each stage has three tabs: **Video · Deck · Explainer**. The
+Explainer is always made; the Video and the Deck only when he asks for
+them at the stage's close. The same link fills in as each stage
+finishes.
 
 ```
 ┌──────────────┬───────────────────────────────────────────┐
@@ -20,7 +22,8 @@ link fills in as each stage finishes.
 
 **The report is finished before the stage closes.** The user validates
 much of the work through it, so the stage's closing message goes out only
-when its three tabs are published, and that message carries the link.
+when its Explainer and the tabs he picked are published, and that
+message carries the link.
 
 ## What each tab shows
 
@@ -64,13 +67,18 @@ including the exception for the Close's users' video.
 
 ```
 stage work done
-  → report.json: this stage "running", its tabs "building", its numbers from
+  → the Explainer starts at once: artifact-builder (or the session fills explainer.json)
+  → meanwhile, one question through the question tool, multi-select:
+      "The Explainer is being made. Also make:"  Video · Deck   (none is a valid answer)
+    under a /goal it is his question like any other; the Explainer does not wait for it
+  → report.json: this stage "running", the Explainer and the picked tabs "building",
+    the others "skipped"; its numbers from
     node claude/scripts/telemetry.mjs <slug> --stage <stage> --ws <workstream> --out -
-  → in parallel: video-builder · slides-builder · artifact-builder (or the session fills explainer.json)
-  → wait for all three (renders queue on the machine, one at a time)
+  → in parallel, only what he picked: video-builder · slides-builder
+  → wait for what was started (renders queue on the machine, one at a time)
   → gitleaks dir <workstream> (or make gitleaks dir=<workstream>); a finding stops the publish (a leak, per the security standard)
   → the session reads the new text files, then publishes to the SAME url: index.html, report.json and this stage's files only (never _scratch/)
-  → report.json: the stage "closed" with closedAt, each tab "ready" (or "failed" with why); publish once more
+  → report.json: the stage "closed" with closedAt, each made tab "ready" (or "failed" with why), the others "skipped"; publish once more
   → the closing message: the link (…#<stage>), then what the stage asks of him
 ```
 
@@ -83,9 +91,9 @@ running). This video stays the Design tab's video, unless the debate
 added or removed a part of the system; then it is rendered again from the
 closed proposal.
 
-**The close** waits for its users' video, which is the close's product.
-Recording starts as soon as the release is green on staging. The video
-is rendered at `report/close/video.mp4` (`--size 1080 --max-mb 15`), where
+**The close** asks for its users' video in its question like any
+other Video; when he picks it, the close waits for it, recorded on
+staging. The video is rendered at `report/close/video.mp4` (`--size 1080 --max-mb 15`), where
 the Close tab plays it, and goes out as that `.mp4` plus the "what's new" text for him to forward;
 nothing is published outside the company without his approval.
 

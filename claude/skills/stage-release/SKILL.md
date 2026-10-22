@@ -27,17 +27,17 @@ allowed-tools: Read, Write, Edit, Glob, Grep, Agent, SendMessage, ListAgents, Wo
 | the project's signoff command (`claude/scripts/local-ci.sh` when it names none) | the project's whole gate in a fresh worktree: in a cloud VM with `--record` when the project has a cloud environment (this machine then posts with `--post-from`), else on this machine; the only writer of the required `local-ci` status, posted under the bot identity on green |
 | the stage-4 cast through `exec-entry-workflow.js` mode `fix` | an `X.n` fix: `builder-backend` · `builder-frontend (Opus 5.5, medium)`, `exec-gate (Sonnet 5.5, low)`, `reviewer (Opus 5.5, high)`; no QA unless the fix asks for one (`qa: 'backend'` when it touches auth, permissions or personal data) |
 | `scout (Haiku 5.5, medium)` | anything you need to look up |
-| `video-builder (Sonnet 5.5, high)` · `slides-builder` · `artifact-builder (Sonnet 5.5, medium)` | the report's tabs; `video-builder` also starts the close's video for users |
+| `video-builder (Sonnet 5.5, high)` · `slides-builder` · `artifact-builder (Sonnet 5.5, medium)` | the report's tabs: the Explainer always, the Video and the Deck when he picks them |
 
 ## The flow
 
 ```
 0 open        canary · preconditions · the authorization line read back · the /goal → he pastes it
 1 main        up to date (house rule): fetch · origin/main into feat + local CI when it moved · merge
-2 staging     the CI deploys and smokes · green → peers told, the users' video starts recording
+2 staging     the CI deploys and smokes · green → peers told
 3 tag         vX.Y.Z on the merge, notes from the stories → push (the authorization is spent)
 4 production  the CI: same image → smoke → 15-min watch → GitHub release · red → rollback by itself
-5 close       trace · telemetry · report (3 tabs) · cleanup · .state.md → close · the message
+5 close       trace · telemetry · report (Explainer + what he picks) · cleanup · .state.md → close · the message
 ```
 
 Read [references/release.md](references/release.md) before step 1. It
@@ -85,7 +85,7 @@ Authorized in this release: the merge of feat/<slug> into main, its fix/<slug>/X
 vX.Y.Z, and these known irreversible steps from plan.md: <list, or "none">.
 Goes live for real people: <from plan.md, or "nothing">.
 Done when: the tag is in production with the smoke and the 15-minute watch green, the GitHub release
-exists, the report's three tabs are published, and I got the notification with the link and the next command.
+exists, the report's Explainer and the tabs I picked are published, and I got the notification with the link and the next command.
 ```
 
 ## Step 1 · Into main
@@ -114,12 +114,8 @@ exists, the report's three tabs are published, and I got the notification with t
 The push to `main` runs the staging deploy and its smoke. Wake when it
 should be done and read the run (`gh run view <id>`); never poll.
 
-- **Green:** tell the peers `main` is free. Dispatch the close's video
-  for users now, in the background: `video-builder (Sonnet 5.5, high)`
-  with `stage-close/references/user-video.md` and the stories; it
-  records in staging while you go on (on the short route only when a
-  screen users see changed). Write its agent id in `.state.md` as
-  `video:`.
+- **Green:** tell the peers `main` is free. The video for users is
+  the close's, and only when he asks for it there.
 - **Red:** the red rule below.
 
 ## Step 3 · The tag
@@ -185,9 +181,10 @@ the evidence in one line, the options with yours first, and the
    `notion-tracker released <tag>` (or `stopped <why>` when it did not
    reach production). `trace.md` complete; run
    `node claude/scripts/telemetry.mjs <slug> --stage release --ws <designs-root>/<slug> --out -`.
-2. **The report, finished before the close.** Dispatch the builders in
-   one message, in the background, with the stage's files and
-   `report/release/`, as `claude/docs/stage-report.md` describes:
+2. **The report, finished before the close.** The Explainer always;
+   ask the close's question (Video · Deck) and dispatch what he picks,
+   in the background, with the stage's files and `report/release/`, as
+   `claude/docs/stage-report.md` describes:
 
 | Tab | Builder | Brief |
 |---|---|---|

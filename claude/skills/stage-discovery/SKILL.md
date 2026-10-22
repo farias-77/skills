@@ -29,8 +29,8 @@ it looks and behaves, never how it is built.
 5. He confirms story by story, after a plain explanation of each; after
    the playback nothing about **what** to build is open.
 6. Out: `stories.md` with its ACs, the locked mock when a screen
-   changes, and the report (Video · Deck · Explainer), finished before
-   the close.
+   changes, and the report (the Explainer; the Video and the Deck when
+   he asks for them), finished before the close.
 
 ## Two modes
 
@@ -60,7 +60,7 @@ rule, write, publish, without asking permission. The house rules'
 | D3 mock (a screen changes) | `prototype-builder (Sonnet 5.5, medium)`, one agent, round orders by `SendMessage`; then `story-writer`, anchor mode | `prototype/index.html` published to one URL, `LOCK.json`, `journeys/*.yaml`, `trace` green |
 | D4 review | `discovery-review-workflow.js`: `disc-lens (Sonnet 5.5, medium)` × 3 ∥ per story `blind-reader (Sonnet 5.5, low)` × 2 → `blind-judge (Sonnet 5.5, medium)`; you rule | `reviews/round-1.json`, `reviews.md` |
 | D5 playback | you + **him**: a plain message per block, then the question tool | `rulings.md`, confirmed stories, his answer for the design |
-| D6 report | `video-builder (Sonnet 5.5, high)` ∥ `slides-builder (Sonnet 5.5, medium)` ∥ `artifact-builder (Sonnet 5.5, medium)` | the Discovery tab of the workstream's link |
+| D6 report | `artifact-builder (Sonnet 5.5, medium)`; `video-builder (Sonnet 5.5, high)` ∥ `slides-builder (Sonnet 5.5, medium)` when he picks them | the Discovery tab of the workstream's link |
 
 ## What you read
 
@@ -305,7 +305,8 @@ the short route in one line; on his yes, write `brief.md` from
 
 **The report is finished before the stage closes**: he validates
 through it. The workstream's link is born here; write its URL in
-`.state.md`. Dispatch the three builders in one message, in the
+`.state.md`. Dispatch the Explainer's builder now, ask him the close's
+question (Video · Deck), and dispatch the builders he picks, in the
 background, each with the stage's files and the report folder
 (`report/discovery/`), as `claude/docs/stage-report.md` describes:
 
