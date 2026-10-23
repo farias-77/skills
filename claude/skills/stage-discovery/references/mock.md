@@ -64,14 +64,14 @@ The product block is one `P.define({...})` call:
 | `meta` | `name`, `version` (bumped every build), `languages`, `clock` (the fixed "now"), `currency`, `fixtures` (every person's name in the seed, all invented) |
 | `copy` | `{ <lang>: { key: string, or { one, other } } }`: every visible string, every language |
 | `seed()` | a fresh store: `{ screen, view: { <screen>: { state, fields } }, db: { <table>: [rows] } }` |
-| `screens` | `{ <name>: { title, render(s, P) } }`: `render` is pure, reads `s`, returns `P.html\`…\``; `title` names the screen in the controls |
+| `screens` | `{ <name>: { title, variants, render(s, P) } }`: `render` is pure, reads `s`, returns `P.html\`…\``; `title` names the screen; `variants` (two or more names) are that screen's design options, `P.variant()` reads the one picked |
 | `frames` | `{ '<screen>.<state>': { title, setup(s), debugOnly?, terminal? } }`: every state the mock can show |
 | `actions` | `{ <name>: (s, ctx, P) => … }`, named by `data-act`; may `await P.request` |
 | `journeys` | `[{ id: 'J1', title, actor, job, rules, start, steps: [{ id: 's1', do, target, fill, net, expect, see, effects, rules }] }]` |
-| `variants` | optional, three names at most; `P.variant()` picks the rendering |
+| `variants` | legacy, for every screen at once: prefer each screen's own `variants` |
 | `actors` | when more than one kind of user sees it: `[{ id, title, home }]`, the controls' "View as" |
 | `clock` | when time changes what is shown: `{ marks: [{ label, at }], onAdvance(s, P) }`, the controls' "Clock" |
-| `review` | the guided path he follows: `[{ frame, check }]`, every state he must see, in the order of the flow, each with one line of what to check, taken from the story's ACs |
+| `review` | the path he follows with Ctrl+→: `[{ frame, check, as, theme }]`, every state he must see in the order of the flow, each with one line of what to check from the story's ACs, the actor it is seen as (`as`), and `theme: 'dark'` where a dark view matters |
 | `meta.uiLang` | the language of the controls' labels: `en` or `pt-BR` (his); `meta.ui` overrides any label |
 
 Helpers: `P.html` (escapes; `P.raw` for trusted markup), `P.t(key,
@@ -80,20 +80,25 @@ extra)`, `P.view()`, `P.request(name, fn)` (the fake network; `fn`
 writes only on ok or slow), `P.effect(kind, data)`, `P.toast(text)`
 (transient only), `P.now()`, `P.actor()`, `P.render()`.
 
-**The product fills the window; he sees only the product.** The
-shell's controls float above it in one panel, outside `#screen`, that
-hides to a handle (and with the H key). They hold only what he switches
-to look at something: this screen's states (normal, loading, empty,
-error and the screen's own), the other screens, "View as", the design
-variant, the clock, the language, the theme and the width. On top of
-the panel sits **the review**: "Next step" / "Previous" (keys N and P)
-through `review`, a progress bar ("3 of 12"), each state seen ticked,
-the line of what to check, "Review complete" at the end, and the place
-he stopped remembered between visits. It is how he reviews: he follows
-it from the first state to the last. Inside a published artifact the
-`#hash` does not reach the page, so the review is also the only way
-there to reach a given state. No journey, step list, play button or
-frame map is shown to him: journeys stay in the model for the tools. So every state he must be able to see is a
+**The product fills the window; he sees only the product, and moves
+with Ctrl+→ and Ctrl+←.** The review is the one way through the mock:
+every state that is not `debugOnly` (normal, loading, empty, error and
+the screen's own), each already seen as the right actor, and every
+screen once in each theme, so he never opens a control to see
+something. Write `review` so it holds all of that in the order of the
+flow; the shell adds any frame left out, and a dark pass (the screen's
+first step again) for a screen with no dark step. The controls float
+above the product in one small panel, outside `#screen`; H hides it,
+and hidden it still shows the step's name and "7/48". The panel holds
+the review (progress, the step's name, what to check, ← / →, "All
+steps" to jump, ticks, "Review complete", the place he stopped
+remembered), the width (always: Fit, Phone, Desktop; the review
+renders at the width he picks, never one step per width), the design
+options only on a screen that has them (signalled "◆ 2 options", also
+on the hidden handle), and the language when there is more than one.
+No state picker, "view as", theme, clock or journey is shown: the
+review covers them. Inside a published artifact the `#hash` does not
+reach the page; the review is the way there. So every state he must be able to see is a
 frame with its own title (a loading state is a frame, not a slow
 request he has to time). Never draw a "view as" switch, a clock or a
 "Mock" strip inside `#screen`: everything there is in the reference

@@ -29,9 +29,11 @@ the project does not decide.
   the actors, whether time matters, and the mode (artifact or local).
   The journeys keep the stories' journey ids and step ids (`s1, s2, …`
   of each journey); a step you add takes the next free id. Write the
-  `review` path: every state he must see, in the order of the flow,
-  each with one line of what to check from the story's ACs; and set
-  `meta.uiLang` to his language.
+  `review` path so he needs nothing but Ctrl+→: every state he must
+  see, in the order of the flow, each with one line of what to check
+  from the story's ACs and the actor it is seen as (`as`); a screen's
+  design options go in that screen's `variants`; set `meta.uiLang` to
+  his language.
 - **round** (every later version, by `SendMessage`): an order, one line
   per change: its source, his words, the conductor's restatement. A
   fresh dispatch (a resumed stage) reads `index.html`, `stories.md` and

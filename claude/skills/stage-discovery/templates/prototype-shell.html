@@ -15,17 +15,15 @@
     4. script block id=product      P.define({...}): copy, seed, screens, frames, journeys, actions,
                                     and, when the product has them, actors ("view as") and clock
   The blocks marked SHELL are not edited; a shell fix goes to the template.
-  The product fills the window. The mock's controls float above it in ONE panel
-  (outside #screen) that hides to a handle, also with the H key. On top, the REVIEW:
-  an ordered path through every state he must see (Next step / Previous, N / P keys,
-  progress, each state seen ticked, remembered between visits; the model's `review`,
-  else built from the journeys). Below it, only what can be switched to look at
-  something: the screen, the state of this screen, who is looking, the design
-  variant, the clock, the language, the theme and the width. The panel's labels
-  follow meta.uiLang (en, pt-BR; meta.ui overrides any label). No journey is shown;
-  journeys stay in the model for the tools (proto.mjs walk, lock, frames).
-  Inside a published artifact the #hash does not reach the page: the review is how
-  he moves through the states there.
+  The product fills the window. He reviews by THE REVIEW alone: Ctrl+→ next, Ctrl+← previous,
+  through every state that is not debugOnly, each seen as its actor, every screen once in each
+  theme (the model's `review`, completed from the journeys and the frames). The controls float
+  above the product in one small panel (H hides it; hidden, the handle shows the step's name and
+  N/total): the review, the width (always), the design options only on a screen that has them,
+  the language when there is more than one. The labels follow meta.uiLang (en, pt-BR; meta.ui
+  overrides any label). No journey, state picker or "view as" is shown; journeys stay in the model
+  for the tools (proto.mjs walk, lock, frames). Inside a published artifact the #hash does not
+  reach the page: the review is how he moves through the states there.
 
   Addressing (only a bare #token reaches the page inside an artifact):
     #screen.state                     a frame, e.g. #invites.empty
@@ -169,6 +167,10 @@ html[data-bare] .pr-device { width: 100% !important; min-height: 100vh; border: 
 .pr-all li button[aria-current="true"] { background: var(--chrome-hi); font-weight: 600; }
 .pr-tick { flex: 0 0 22px; font: 500 11px/1.6 var(--font-mono); color: var(--success); text-align: right; }
 .pr-mini { font: 500 11px/1 var(--font-mono); color: var(--chrome-dim); }
+.pr-hname { max-width: min(46vw, 420px); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pr-opt { font-size: 11px; font-weight: 600; color: var(--background); background: var(--chrome-fg); border-radius: 999px; padding: 3px 8px; }
+.pr-variants { padding: 8px; border: 1px solid var(--chrome-fg); border-radius: var(--radius-md); }
+.pr-variants > span { color: var(--chrome-fg); font-weight: 600; }
 .pr-problems { color: var(--danger); font: 11px/1.4 var(--font-mono); white-space: pre-wrap; border: 1px solid var(--danger); border-radius: var(--radius-sm); padding: 8px; }
 .pr-ring { position: absolute; pointer-events: none; border-radius: var(--radius-md); box-shadow: 0 0 0 2px var(--background), 0 0 0 4px var(--ring); transition: opacity 200ms var(--ease-out); z-index: 30; }
 .pr-toast { position: absolute; left: 50%; bottom: 16px; transform: translateX(-50%); background: var(--foreground); color: var(--background); padding: 8px 14px; border-radius: var(--radius-md); font-size: 13px; z-index: 31; max-width: calc(100% - 32px); }
@@ -334,7 +336,12 @@ html[data-bare] .pr-device { width: 100% !important; min-height: 100vh; border: 
         if (st.net && !['ok', 'slow', 'error', 'timeout'].includes(st.net)) P.problem(`${j.id}.${st.id}: net must be ok, slow, error or timeout`);
       }
     }
-    for (const r of m.review) if (!r || !m.frames[r.frame]) P.problem(`review: "${r && r.frame}" is not a frame`);
+    for (const r of m.review) {
+      if (!r || !m.frames[r.frame]) P.problem(`review: "${r && r.frame}" is not a frame`);
+      else if (r.as && !aids.has(r.as)) P.problem(`review ${r.frame}: as "${r.as}" is not an actor id`);
+      else if (r.theme && !['light', 'dark'].includes(r.theme)) P.problem(`review ${r.frame}: theme must be light or dark`);
+    }
+    for (const [name, sc] of Object.entries(m.screens)) if (sc.variants && (!Array.isArray(sc.variants) || sc.variants.length < 2)) P.problem(`screen "${name}": variants is a list of two or more names`);
     for (const l of m.meta.languages) if (!m.copy[l]) P.problem(`language "${l}" has no copy table`);
     state.model = m;
     state.lang = m.meta.languages[0];
@@ -361,9 +368,12 @@ html[data-bare] .pr-device { width: 100% !important; min-height: 100vh; border: 
      s.clock; P.now() reads it; onAdvance runs the jobs that time triggers (expiries, reminders).
    - P.effect records the WHOLE write (every field of the row, the e-mail, the event); a step's declared
      effects match a subset. An effect that cannot carry every field says partial: true.
-   - review: [{ frame, check }] — the guided path he follows: every state he must see, in the order of
-     the flow, each with one line of what to check (from the story's ACs). Without it the shell builds
-     one from the journeys. screens.<name>.title names a screen in the controls. */
+   - review: [{ frame, check, as, theme }] — the path he follows with Ctrl+→: every state he must see,
+     in the order of the flow, each with one line of what to check (from the story's ACs), the actor
+     it is seen as (as) and, where it matters, theme: 'dark'. The shell adds what is missing: frames
+     not listed, and one dark pass per screen that has none. screens.<name>.title names a screen;
+     screens.<name>.variants: ['a', 'b'] lists the design options of that screen (P.variant() reads
+     the one picked), and the controls show them only on that screen. */
 P.define({
   meta: { name: 'Example', version: 1, languages: ['en', 'pt-BR'], clock: '2026-01-15T09:00:00-03:00' },
   copy: {
@@ -449,6 +459,7 @@ P.define({
   function render() {
     const token = P.frame();
     const sc = M.screens[S.store.screen];
+    if (Array.isArray(sc.variants) && !sc.variants.includes(S.variant)) S.variant = sc.variants[0];
     const focusedId = document.activeElement && screenEl.contains(document.activeElement) ? document.activeElement.id : null;
     let out;
     try { out = sc.render(S.store, P); }
@@ -550,7 +561,8 @@ P.define({
       const j = M.journeys.find(x => x.id === play[1]);
       if (j) return startJourney(j, play[2] ? j.steps.findIndex(x => x.id === play[2]) : 0);
     }
-    const token = M.frames[head] ? head : ((R.length && R[ui.step].frame) || M.journeys[0]?.start || Object.keys(M.frames)[0]);
+    if (!head && !S.bare && ui.startStep && ui.startStep()) return;
+    const token = M.frames[head] ? head : (M.journeys[0]?.start || Object.keys(M.frames)[0]);
     if (head && !M.frames[head] && !play) P.problem(`#${head} is not a frame; showing ${token}`);
     if (token && load(token)) render(); else chrome();
   }
@@ -617,26 +629,40 @@ P.define({
     ui.now = Math.max(0, upto);   // the step to play next
     chrome();
   }
-  // ── chrome: one floating panel over the product, hidden to a handle (key H) ──
+  // ── chrome: the review, and one small floating panel (H hides it) ──────
   const LABELS = {
-    en: { controls: 'Controls', hide: 'Hide', review: 'Review', of: 'of', prev: 'Previous', next: 'Next step', done: 'Review complete', restart: 'Start over', all: 'All steps', check: 'Check', screen: 'Screen', state: 'State of this screen', viewAs: 'View as', variant: 'Design variant', clock: 'Clock', moveTo: 'Move to…', lang: 'Language', theme: 'Theme', width: 'Width', auto: 'Auto', light: 'Light', dark: 'Dark', fit: 'Fit', phone: 'Phone', desktop: 'Desktop', problems: 'mock problem(s)', keys: 'H hides · N next · P previous' },
-    'pt-BR': { controls: 'Controles', hide: 'Ocultar', review: 'Revisão', of: 'de', prev: 'Anterior', next: 'Próxima etapa', done: 'Revisão completa', restart: 'Recomeçar', all: 'Todas as etapas', check: 'Confira', screen: 'Tela', state: 'Estado desta tela', viewAs: 'Ver como', variant: 'Variação de design', clock: 'Relógio', moveTo: 'Mover para…', lang: 'Idioma', theme: 'Tema', width: 'Largura', auto: 'Auto', light: 'Claro', dark: 'Escuro', fit: 'Ajustar', phone: 'Celular', desktop: 'Desktop', problems: 'problema(s) no mock', keys: 'H oculta · N próxima · P anterior' },
+    en: { controls: 'Controls', hide: 'Hide', review: 'Review', of: 'of', prev: 'Previous', next: 'Next', done: 'Review complete', restart: 'Start over', all: 'All steps', check: 'Check', variant: 'Design options here', options: 'options', lang: 'Language', width: 'Width', fit: 'Fit', phone: 'Phone', desktop: 'Desktop', light: 'light', dark: 'dark', problems: 'mock problem(s)', keys: 'Ctrl+→ next · Ctrl+← previous · H hides' },
+    'pt-BR': { controls: 'Controles', hide: 'Ocultar', review: 'Revisão', of: 'de', prev: 'Anterior', next: 'Próxima', done: 'Revisão completa', restart: 'Recomeçar', all: 'Todas as etapas', check: 'Confira', variant: 'Opções de design aqui', options: 'opções', lang: 'Idioma', width: 'Largura', fit: 'Ajustar', phone: 'Celular', desktop: 'Desktop', light: 'claro', dark: 'escuro', problems: 'problema(s) no mock', keys: 'Ctrl+→ próxima · Ctrl+← anterior · H oculta' },
   };
   const uiLang = M.meta.uiLang || (/^pt/i.test(navigator.language || '') ? 'pt-BR' : 'en');
   const L = Object.assign({}, LABELS.en, LABELS[uiLang] || {}, M.meta.ui || {});
 
-  // The review: an ordered path through every state he must see. The model's `review` when it has
-  // one; else the journeys' starts and landings in order (the step's words as what to check), then
-  // every other frame that is not debugOnly.
+  // The review is the one way through the mock: every state that is not debugOnly, each with the
+  // actor it is seen as, and every screen once in each theme. The model's `review` first, in its
+  // order; then the journeys' starts and landings; then any frame left. A screen with no dark step
+  // gets one: its first step again, in dark, right after it.
   const R = (() => {
     const out = [], seen = new Set();
-    const add = (frame, check) => { if (M.frames[frame] && !seen.has(frame)) { seen.add(frame); out.push({ frame, check: check || '' }); } };
-    if (M.review.length) { for (const r of M.review) add(r.frame, r.check); return out; }
-    for (const j of M.journeys) { add(j.start, j.title); for (const st of j.steps) add(st.expect, st.do); }
-    for (const [t, f] of Object.entries(M.frames)) if (!f.debugOnly) add(t, '');
+    const add = (r) => {
+      if (!M.frames[r.frame] || M.frames[r.frame].debugOnly) return;
+      const key = r.frame + '|' + (r.as || '') + '|' + (r.theme || 'light');
+      if (seen.has(key)) return;
+      seen.add(key); out.push({ frame: r.frame, check: r.check || '', as: r.as || null, theme: r.theme === 'dark' ? 'dark' : 'light' });
+    };
+    for (const r of M.review) add(r);
+    const has = f => out.some(r => r.frame === f);
+    for (const j of M.journeys) { if (!has(j.start)) add({ frame: j.start, check: j.title }); for (const st of j.steps) if (!has(st.expect)) add({ frame: st.expect, check: st.do }); }
+    for (const t of Object.keys(M.frames)) if (!has(t)) add({ frame: t, check: M.frames[t].title });
+    const screenOf = r => r.frame.split('.')[0];
+    for (const scr of [...new Set(out.map(screenOf))]) {
+      if (out.some(r => screenOf(r) === scr && r.theme === 'dark')) continue;
+      const i = out.findIndex(r => screenOf(r) === scr);
+      out.splice(i + 1, 0, Object.assign({}, out[i], { theme: 'dark' }));
+    }
     return out;
   })();
   const REVIEW_KEY = `mock-review:${M.meta.name}:v${V}`;
+  const keyOf = r => r.frame + '|' + (r.as || '') + '|' + r.theme;
   const store = {
     get(k, d) { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch (e) { return d; } },
     set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) { /* a private window: it lasts this visit */ } },
@@ -644,36 +670,44 @@ P.define({
   ui.hidden = store.get('mock-controls-hidden', false);
   const saved = store.get(REVIEW_KEY, {});
   ui.step = Math.min(Number(saved.step) || 0, Math.max(R.length - 1, 0));
-  ui.seen = new Set((saved.seen || []).filter(f => R.some(r => r.frame === f)));
+  ui.seen = new Set((saved.seen || []).filter(k => R.some(r => keyOf(r) === k)));
   const saveReview = () => store.set(REVIEW_KEY, { step: ui.step, seen: [...ui.seen] });
   function setHidden(v) { ui.hidden = v; store.set('mock-controls-hidden', v); chrome(); }
+  function showStep() {
+    const r = R[ui.step];
+    if (!load(r.frame)) return;
+    if (r.as) S.store.actor = r.as;
+    setTheme(r.theme);
+    ui.seen.add(keyOf(r)); saveReview();
+    render();
+  }
   function goStep(i) {
     if (!R.length) return;
     ui.step = Math.max(0, Math.min(i, R.length - 1));
-    saveReview();
-    if (load(R[ui.step].frame)) render();
+    showStep();
   }
   function restart() { ui.seen.clear(); goStep(0); }
+  ui.startStep = () => R.length ? (showStep(), true) : false;
 
   const seg = (name, cur, opts) => h`<span class="pr-seg" role="group" aria-label="${name}">${opts.map(([v, l]) => h`<button type="button" data-ui="${name}" data-v="${v}" aria-pressed="${String(cur === v)}">${l}</button>`)}</span>`;
-  const pick = (name, label, cur, opts) => opts.length <= 4
-    ? h`<div class="pr-field"><span>${label}</span>${seg(name, cur, opts)}</div>`
-    : h`<label class="pr-field"><span>${label}</span><select data-ui="${name}" aria-label="${label}">${opts.map(([v, l]) => h`<option value="${v}" ${v === cur ? P.raw('selected') : ''}>${l}</option>`)}</select></label>`;
   const titleOf = t => (M.frames[t] && M.frames[t].title) || t;
   const screenTitle = s => (M.screens[s] && M.screens[s].title) || s;
+  const actorTitle = id => (M.actors.find(a => a.id === id) || {}).title || id;
+  const stepName = r => `${screenTitle(r.frame.split('.')[0])} · ${titleOf(r.frame)}${r.as ? ' · ' + actorTitle(r.as) : ''}${r.theme === 'dark' ? ' · ' + L.dark : ''}`;
+  // A screen's design options: its own `variants`; the model's `variants` count for every screen
+  // only when no screen declares its own.
+  const perScreen = Object.values(M.screens).some(s => Array.isArray(s.variants));
+  const variantsHere = () => { const sc = M.screens[S.store.screen] || {}; return perScreen ? (sc.variants || []) : M.variants; };
 
   function reviewBlock() {
     if (!R.length) return '';
-    const done = ui.seen.size >= R.length, r = R[ui.step], here = P.frame() === r.frame;
+    const done = ui.seen.size >= R.length, r = R[ui.step];
     const pct = Math.round(100 * ui.seen.size / R.length);
     return h`<section class="pr-review" aria-label="${L.review}">
       <div class="pr-rhead"><b>${L.review}</b><span>${ui.step + 1} ${L.of} ${R.length}</span></div>
       <div class="pr-meter" role="progressbar" aria-valuemin="0" aria-valuemax="${R.length}" aria-valuenow="${ui.seen.size}"><span style="width:${pct}%"></span></div>
       ${done ? h`<p class="pr-done">✓ ${L.done} · ${R.length}/${R.length}</p>` : ''}
-      <div class="pr-now ${here ? '' : 'pr-off'}">
-        <span class="pr-where">${screenTitle(r.frame.split('.')[0])} · ${titleOf(r.frame)}</span>
-        ${r.check ? h`<span class="pr-check"><b>${L.check}:</b> ${r.check}</span>` : ''}
-      </div>
+      <div class="pr-now"><span class="pr-where">${stepName(r)}</span>${r.check ? h`<span class="pr-check"><b>${L.check}:</b> ${r.check}</span>` : ''}</div>
       <div class="pr-nav">
         <button type="button" class="pr-btn" data-ui="prev" ${ui.step === 0 ? P.raw('disabled') : ''}>← ${L.prev}</button>
         ${ui.step < R.length - 1
@@ -681,20 +715,23 @@ P.define({
           : h`<button type="button" class="pr-btn" data-ui="restart">↺ ${L.restart}</button>`}
       </div>
       <details class="pr-all"><summary>${L.all} (${ui.seen.size}/${R.length})</summary>
-        <ol>${R.map((x, i) => h`<li><button type="button" data-ui="step" data-v="${i}" aria-current="${String(i === ui.step)}"><span class="pr-tick">${ui.seen.has(x.frame) ? '✓' : i + 1}</span>${screenTitle(x.frame.split('.')[0])} · ${titleOf(x.frame)}</button></li>`)}</ol>
+        <ol>${R.map((x, i) => h`<li><button type="button" data-ui="step" data-v="${i}" aria-current="${String(i === ui.step)}"><span class="pr-tick">${ui.seen.has(keyOf(x)) ? '✓' : i + 1}</span>${stepName(x)}</button></li>`)}</ol>
       </details>
     </section>`;
   }
 
   function chrome() {
     if (!S.store) return;
-    const scr = S.store.screen, cur = P.frame();
-    if (R.some(r => r.frame === cur) && !ui.seen.has(cur)) { ui.seen.add(cur); saveReview(); }
-    const states = Object.entries(M.frames).filter(([t]) => t.split('.')[0] === scr).map(([t, f]) => [t, f.title + (f.debugOnly ? ' (debug)' : '')]);
-    const screens = Object.keys(M.screens).filter(s => Object.keys(M.frames).some(t => t.split('.')[0] === s));
+    const vars = variantsHere();
+    const r = R[ui.step];
     ctl.toggleAttribute('data-hidden', ui.hidden);
     if (ui.hidden) {
-      ctl.innerHTML = String(h`<div class="pr-head"><button type="button" class="pr-handle" data-ui="hide" aria-expanded="false" aria-label="${L.controls}">${S.problems.length ? h`<span class="pr-dot" aria-hidden="true"></span>` : ''}${L.controls}${R.length ? h`<span class="pr-mini">${ui.seen.size}/${R.length}</span>` : ''}<kbd>H</kbd></button></div>`);
+      ctl.innerHTML = String(h`<div class="pr-head"><button type="button" class="pr-handle" data-ui="hide" aria-expanded="false" aria-label="${L.controls}">
+        ${S.problems.length ? h`<span class="pr-dot" aria-hidden="true"></span>` : ''}
+        <span class="pr-hname">${r ? stepName(r) : P.frame()}</span>
+        ${R.length ? h`<span class="pr-mini">${ui.step + 1}/${R.length}</span>` : ''}
+        ${vars.length > 1 ? h`<span class="pr-opt" title="${L.variant}">◆ ${vars.length} ${L.options}</span>` : ''}
+        <kbd>H</kbd></button></div>`);
       return;
     }
     ctl.innerHTML = String(h`
@@ -704,59 +741,34 @@ P.define({
       </div>
       <div class="pr-body">
         ${reviewBlock()}
-        ${screens.length > 1 ? pick('screen', L.screen, scr, screens.map(s => [s, screenTitle(s)])) : ''}
-        ${states.length ? h`<div class="pr-field"><span>${L.state}</span>${seg('frame', cur, states)}</div>` : ''}
-        ${M.actors.length > 1 ? pick('actor', L.viewAs, P.actor() || '', M.actors.map(a => [a.id, a.title])) : ''}
-        ${M.variants.length > 1 ? pick('variant', L.variant, S.variant, M.variants.map(v => [v, v])) : ''}
-        ${M.clock ? h`<label class="pr-field"><span>${L.clock} · ${P.fmt.date(P.now(), { dateStyle: 'medium', timeStyle: 'short' })}</span><select data-ui="clock" aria-label="${L.clock}"><option value="" selected>${L.moveTo}</option>${[['+1h', '+1h'], ['+1d', '+1d'], ['+7d', '+7d']].concat((M.clock.marks || []).map(k => [k.at, k.label])).map(([v, l]) => h`<option value="${v}">${l}</option>`)}</select></label>` : ''}
-        ${M.meta.languages.length > 1 ? pick('lang', L.lang, S.lang, M.meta.languages.map(l => [l, l])) : ''}
-        <div class="pr-row">
-          <div class="pr-field"><span>${L.theme}</span>${seg('theme', ui.theme, [['system', L.auto], ['light', L.light], ['dark', L.dark]])}</div>
-          <div class="pr-field"><span>${L.width}</span>${seg('width', ui.width, [['fit', L.fit], ['phone', L.phone], ['desktop', L.desktop]])}</div>
-        </div>
-        <span class="pr-token" title="#${cur}">#${cur} · ${L.keys}</span>
+        ${vars.length > 1 ? h`<div class="pr-field pr-variants"><span>◆ ${L.variant} (${vars.length} ${L.options})</span>${seg('variant', S.variant, vars.map(v => [v, v]))}</div>` : ''}
+        <div class="pr-field"><span>${L.width}</span>${seg('width', ui.width, [['fit', L.fit], ['phone', L.phone], ['desktop', L.desktop]])}</div>
+        ${M.meta.languages.length > 1 ? h`<div class="pr-field"><span>${L.lang}</span>${seg('lang', S.lang, M.meta.languages.map(l => [l, l]))}</div>` : ''}
+        <span class="pr-token" title="#${P.frame()}">${L.keys}</span>
         ${S.problems.length ? h`<div class="pr-problems" role="alert">${S.problems.length} ${L.problems}:\n${S.problems.slice(-6).join('\n')}</div>` : ''}
       </div>`);
   }
 
-  function toScreen(s) {
-    const first = Object.keys(M.frames).find(t => t.split('.')[0] === s);
-    if (first && load(first)) render();
-  }
   document.addEventListener('click', e => {
     const el = e.target.closest('[data-ui]');
-    if (!el || screenEl.contains(el) || el.tagName === 'SELECT' || el.disabled) return;
+    if (!el || screenEl.contains(el) || el.disabled) return;
     const k = el.dataset.ui, v = el.dataset.v;
     if (k === 'hide') setHidden(!ui.hidden);
     else if (k === 'next') goStep(ui.step + 1);
     else if (k === 'prev') goStep(ui.step - 1);
     else if (k === 'restart') restart();
     else if (k === 'step') goStep(Number(v));
-    else if (k === 'theme') setTheme(v);
     else if (k === 'width') setWidth(v);
-    else if (k === 'frame') { if (load(v)) render(); }
-    else if (k === 'screen') toScreen(v);
-    else if (k === 'actor') setActor(v);
     else if (k === 'variant') { S.variant = v; render(); }
     else if (k === 'lang') setLang(v);
   });
-  document.addEventListener('change', e => {
-    const el = e.target;
-    if (!el.dataset || !el.dataset.ui || screenEl.contains(el) || !el.value) return;
-    if (el.dataset.ui === 'screen') toScreen(el.value);
-    else if (el.dataset.ui === 'lang') setLang(el.value);
-    else if (el.dataset.ui === 'variant') { S.variant = el.value; render(); }
-    else if (el.dataset.ui === 'actor') setActor(el.value);
-    else if (el.dataset.ui === 'clock') advance(el.value);
-  });
   addEventListener('keydown', e => {
-    if (e.metaKey || e.ctrlKey || e.altKey || S.bare) return;
+    if (e.metaKey || e.altKey || S.bare) return;
     const t = e.target;
     if (t && (t.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName))) return;
-    const k = e.key.toLowerCase();
-    if (k === 'h') setHidden(!ui.hidden);
-    else if (k === 'n' && R.length) goStep(ui.step + 1);
-    else if (k === 'p' && R.length) goStep(ui.step - 1);
+    if (e.ctrlKey && e.key === 'ArrowRight') goStep(ui.step + 1);
+    else if (e.ctrlKey && e.key === 'ArrowLeft') goStep(ui.step - 1);
+    else if (!e.ctrlKey && (e.key === 'h' || e.key === 'H')) setHidden(!ui.hidden);
     else return;
     e.preventDefault();
   });

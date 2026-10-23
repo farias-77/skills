@@ -198,13 +198,13 @@ the mode (artifact or local). Keep its agent id in `.state.md`. Its
 journeys keep the stories' journey ids and step ids (`s1, s2, …` of
 each journey); a step the mock adds takes the next free id.
 
-**Rounds.** Send him the link and one line: "follow the Review in the
-controls (Next step, or N)". The mock is the product alone, full
-screen; its floating controls (hidden with H) carry the review, a
-guided path through every state he must see with what to check at
-each, and switch the screen, the state, who is looking, the design
-variant, the theme and the width. Name a state by its review step
-("step 7 of 12, the failed invite"): in a published artifact the
+**Rounds.** Send him the link and one line: "Ctrl+→ goes through
+every state". The mock is the product alone, full screen; the review
+walks every state he must see, as the right actor and in both themes,
+with what to check at each; the small floating panel (H hides it)
+carries the review, the width and, on a screen that has them, the
+design options. Name a state by its review step
+("step 7 of 48, the failed invite"): in a published artifact the
 `#<screen>.<state>` links do not reach the page; they work only on a
 local file. Journeys are not shown to him. His feedback comes by chat
 and by comments on the mock (watch it with `ArtifactComments` after the
