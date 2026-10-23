@@ -15,12 +15,15 @@
     4. script block id=product      P.define({...}): copy, seed, screens, frames, journeys, actions,
                                     and, when the product has them, actors ("view as") and clock
   The blocks marked SHELL are not edited; a shell fix goes to the template.
-  Who is looking and what time it is are mock controls, not product: they live in
-  the debug bar (outside #screen), so they never show in a reference frame.
+  The product fills the window. The mock's controls float above it in ONE panel
+  (outside #screen) that hides to a handle, also with the H key: only what can be
+  switched to look at it: this screen's state, the other screens, who is looking,
+  the design variant, the clock, the language, the theme and the width. No journey
+  is shown; journeys stay in the model for the tools (proto.mjs walk, lock, frames).
 
   Addressing (only a bare #token reaches the page inside an artifact):
     #screen.state                     a frame, e.g. #invites.empty
-    #play-J2  #play-J2.s3             the journey panel on that journey (and step)
+    #play-J2  #play-J2.s3             a journey's start (played up to that step), for the tools
     modifiers joined by "~":          ~light ~dark ~LANG ~phone ~desktop ~bare ~fast
     e.g. #invite-form.failed~dark~pt-BR~bare   (what the frame renderer opens)
 
@@ -85,95 +88,63 @@
 </style>
 
 <style id="shell">
-/* ── SHELL: the mock's chrome. It recedes; the product is the subject. ───── */
+/* ── SHELL: the mock's chrome. The product fills the window; the controls
+   float above it in one panel that hides to a handle (key H). ─────────── */
 :root {
-  --chrome-bg: color-mix(in oklch, var(--muted) 70%, var(--background));
+  --chrome-bg: color-mix(in oklch, var(--card) 94%, transparent);
   --chrome-fg: var(--foreground);
   --chrome-dim: var(--muted-foreground);
   --chrome-line: var(--border);
   --chrome-hi: color-mix(in oklch, var(--foreground) 8%, transparent);
+  --chrome-shadow: 0 12px 32px color-mix(in oklch, var(--foreground) 16%, transparent), 0 2px 6px color-mix(in oklch, var(--foreground) 10%, transparent);
 }
 *, *::before, *::after { box-sizing: border-box; }
 html, body { height: 100%; }
 body { margin: 0; background: var(--background); color: var(--foreground); font: 14px/1.5 var(--font-sans); -webkit-font-smoothing: antialiased; }
 html[data-still] *, html[data-still] *::before, html[data-still] *::after { transition: none !important; animation: none !important; }
-#proto { min-height: 100%; display: flex; flex-direction: column; }
-.pr-bar { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 40; display: flex; flex-wrap: wrap; align-items: center; gap: 8px 10px; padding: 8px 16px; background: var(--chrome-bg); border-bottom: 1px solid var(--chrome-line); font-size: 12px; color: var(--chrome-dim); }
-.pr-bar[data-collapsed] > :not(.pr-keep) { display: none; }
-.pr-name { font-weight: 600; color: var(--chrome-fg); font-size: 13px; display: flex; align-items: center; gap: 8px; }
-.pr-ver { font: 500 11px/1 var(--font-mono); padding: 4px 6px; border-radius: var(--radius-sm); border: 1px solid var(--chrome-line); color: var(--chrome-dim); }
-.pr-field { display: flex; align-items: center; gap: 6px; }
-.pr-field > span { white-space: nowrap; }
-.pr-bar select, .pr-panel select { font: inherit; font-size: 12px; color: var(--chrome-fg); background: var(--background); border: 1px solid var(--chrome-line); border-radius: var(--radius-sm); padding: 4px 6px; min-height: 28px; max-width: 190px; }
-.pr-seg { display: inline-flex; border: 1px solid var(--chrome-line); border-radius: var(--radius-sm); overflow: hidden; }
-.pr-seg button { font: inherit; font-size: 12px; border: 0; background: transparent; color: var(--chrome-dim); padding: 4px 8px; min-height: 28px; cursor: pointer; }
-.pr-seg button + button { border-left: 1px solid var(--chrome-line); }
-.pr-seg button[aria-pressed="true"] { background: var(--chrome-hi); color: var(--chrome-fg); font-weight: 500; }
-.pr-btn { font: inherit; font-size: 12px; font-weight: 500; color: var(--chrome-fg); background: var(--background); border: 1px solid var(--chrome-line); border-radius: var(--radius-sm); padding: 4px 10px; min-height: 28px; cursor: pointer; }
-.pr-btn[aria-pressed="true"] { background: var(--chrome-fg); color: var(--background); border-color: var(--chrome-fg); }
-.pr-btn:disabled { opacity: .5; cursor: default; }
-.pr-spacer { flex: 1 1 0; }
-.pr-token { font: 11px/1.4 var(--font-mono); color: var(--chrome-fg); user-select: all; padding: 4px 6px; border-radius: var(--radius-sm); background: var(--chrome-hi); overflow-wrap: anywhere; }
-.pr-net-hot { color: var(--danger); font-weight: 600; }
-.pr-problems { flex-basis: 100%; color: var(--danger); font: 12px/1.4 var(--font-mono); white-space: pre-wrap; }
-.pr-body { flex: 1 1 auto; display: flex; min-height: 0; }
-.pr-panel { width: 320px; flex: 0 0 320px; background: var(--chrome-bg); border-right: 1px solid var(--chrome-line); overflow: auto; font-size: 13px; }
-.pr-panel.pr-back { border-right: 0; border-left: 1px solid var(--chrome-line); }
-.pr-panel h2 { margin: 0; font-size: 12px; font-weight: 600; color: var(--chrome-dim); letter-spacing: .04em; text-transform: uppercase; }
-.pr-phead { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 12px 16px; border-bottom: 1px solid var(--chrome-line); position: sticky; top: 0; background: var(--chrome-bg); z-index: 1; }
-.pr-close { display: none; }
-.pr-jlist { list-style: none; margin: 0; padding: 8px; display: grid; gap: 4px; }
-.pr-j { display: grid; grid-template-columns: 16px minmax(0, 1fr) auto; gap: 8px; align-items: start; width: 100%; text-align: left; font: inherit; color: var(--chrome-fg); background: transparent; border: 1px solid transparent; border-radius: var(--radius-md); padding: 8px; cursor: pointer; }
-.pr-j:hover { background: var(--chrome-hi); }
-.pr-j[aria-current="true"] { background: var(--background); border-color: var(--chrome-line); }
-.pr-j small { display: block; color: var(--chrome-dim); font-size: 12px; }
-.pr-jid { font: 500 11px/1.6 var(--font-mono); color: var(--chrome-dim); }
-.pr-steps { list-style: none; margin: 0; padding: 0 8px 8px; display: grid; gap: 8px; }
-.pr-step { background: var(--background); border: 1px solid var(--chrome-line); border-radius: var(--radius-md); padding: 12px; display: grid; gap: 8px; }
-.pr-step[data-now] { border-color: var(--ring); box-shadow: 0 0 0 1px var(--ring); }
-.pr-step header { display: flex; gap: 8px; align-items: baseline; }
-.pr-step header b { font-weight: 600; }
-.pr-kv { display: grid; grid-template-columns: 56px minmax(0, 1fr); gap: 2px 8px; font-size: 12px; color: var(--chrome-dim); margin: 0; }
-.pr-kv dt { color: var(--chrome-dim); }
-.pr-kv dd { margin: 0; color: var(--chrome-fg); overflow-wrap: anywhere; }
-.pr-acts { display: flex; flex-wrap: wrap; gap: 6px; }
-.pr-jtools { display: flex; flex-wrap: wrap; gap: 6px; padding: 8px 16px 12px; }
-.pr-foot { padding: 12px 16px 16px; color: var(--chrome-dim); font-size: 12px; border-top: 1px solid var(--chrome-line); }
-.pr-tabs { display: flex; gap: 4px; padding: 8px 16px 0; }
-.pr-tabs button { font: inherit; font-size: 12px; border: 0; border-bottom: 2px solid transparent; background: none; color: var(--chrome-dim); padding: 6px 4px; cursor: pointer; }
-.pr-tabs button[aria-selected="true"] { color: var(--chrome-fg); border-bottom-color: var(--chrome-fg); }
-.pr-fx { list-style: none; margin: 0; padding: 8px 16px 16px; display: grid; gap: 8px; }
-.pr-fx li { border: 1px solid var(--chrome-line); background: var(--background); border-radius: var(--radius-md); padding: 8px 10px; display: grid; gap: 4px; }
-.pr-fx li[data-new] { border-color: var(--ring); }
-.pr-kind { font: 500 11px/1 var(--font-mono); text-transform: uppercase; letter-spacing: .04em; color: var(--chrome-dim); }
-.pr-fx pre, .pr-tbl { margin: 0; font: 11px/1.5 var(--font-mono); white-space: pre-wrap; overflow-wrap: anywhere; color: var(--chrome-fg); }
-.pr-tblwrap { overflow-x: auto; padding: 0 16px 16px; }
-.pr-tblwrap h3 { font: 600 12px/1 var(--font-mono); margin: 12px 0 6px; color: var(--chrome-dim); }
-.pr-tblwrap table { border-collapse: collapse; font: 11px/1.4 var(--font-mono); }
-.pr-tblwrap th, .pr-tblwrap td { border: 1px solid var(--chrome-line); padding: 4px 6px; text-align: left; white-space: nowrap; }
-.pr-empty { padding: 16px; color: var(--chrome-dim); font-size: 12px; }
-.pr-stage { flex: 1 1 auto; min-width: 0; overflow: auto; padding: 24px 16px; display: flex; justify-content: center; align-items: flex-start; }
-.pr-device { position: relative; width: 100%; max-width: 100%; background: var(--background); color: var(--foreground); }
+#proto { min-height: 100%; }
+.pr-stage { min-height: 100vh; display: flex; justify-content: center; align-items: flex-start; }
+.pr-device { position: relative; width: 100%; min-height: 100vh; background: var(--background); color: var(--foreground); }
+html[data-width] .pr-stage { padding: 24px 16px; overflow: auto; background: color-mix(in oklch, var(--muted) 70%, var(--background)); }
 html[data-width="phone"] .pr-device { width: 390px; min-height: 760px; border: 1px solid var(--chrome-line); border-radius: 24px; overflow: hidden; }
-html[data-width="desktop"] .pr-device { width: 1440px; max-width: none; min-height: 860px; border: 1px solid var(--chrome-line); border-radius: var(--radius-lg); overflow: hidden; }
+html[data-width="desktop"] .pr-device { width: 1440px; min-height: 860px; flex: 0 0 auto; border: 1px solid var(--chrome-line); border-radius: var(--radius-lg); overflow: hidden; }
 html[data-width="desktop"] .pr-stage { justify-content: flex-start; }
-html[data-bare] .pr-bar, html[data-bare] .pr-panel { display: none !important; }
-html[data-bare] .pr-stage { padding: 0; overflow: visible; }
-html[data-bare] .pr-device { width: 100% !important; max-width: none; min-height: 100vh; border: 0 !important; border-radius: 0 !important; }
+html[data-bare] .pr-ctl { display: none !important; }
+html[data-bare] .pr-stage { padding: 0; background: none; }
+html[data-bare] .pr-device { width: 100% !important; min-height: 100vh; border: 0 !important; border-radius: 0 !important; }
 #screen { min-height: inherit; container: screen / inline-size; }
 #screen.pr-enter { animation: pr-in 180ms var(--ease-out); }
 @keyframes pr-in { from { opacity: 0; transform: translateY(4px); } }
 @media (prefers-reduced-motion: reduce) { @keyframes pr-in { from { opacity: 0; } } }
+
+.pr-ctl { position: fixed; z-index: 60; right: 16px; bottom: calc(16px + env(safe-area-inset-bottom, 0px)); width: min(300px, calc(100vw - 32px)); max-height: calc(100vh - 32px); overflow: auto; background: var(--chrome-bg); -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px); border: 1px solid var(--chrome-line); border-radius: var(--radius-lg); box-shadow: var(--chrome-shadow); font-size: 12px; color: var(--chrome-dim); transition: opacity 160ms var(--ease-out), transform 160ms var(--ease-out); }
+.pr-ctl[data-hidden] { width: auto; overflow: visible; border-radius: 999px; }
+.pr-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 10px 12px; border-bottom: 1px solid var(--chrome-line); }
+.pr-ctl[data-hidden] .pr-head { border: 0; padding: 0; }
+.pr-name { font-weight: 600; color: var(--chrome-fg); font-size: 13px; display: flex; align-items: center; gap: 8px; min-width: 0; }
+.pr-ver { font: 500 11px/1 var(--font-mono); padding: 3px 5px; border-radius: var(--radius-sm); border: 1px solid var(--chrome-line); color: var(--chrome-dim); }
+.pr-handle { display: inline-flex; align-items: center; gap: 8px; font: inherit; font-size: 12px; font-weight: 500; color: var(--chrome-fg); background: none; border: 0; border-radius: 999px; padding: 8px 14px; min-height: 36px; cursor: pointer; }
+.pr-handle kbd, .pr-hide kbd { font: 500 10px/1 var(--font-mono); padding: 3px 5px; border: 1px solid var(--chrome-line); border-radius: 4px; color: var(--chrome-dim); }
+.pr-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--danger); }
+.pr-hide { display: inline-flex; align-items: center; gap: 6px; font: inherit; font-size: 12px; color: var(--chrome-dim); background: none; border: 1px solid transparent; border-radius: var(--radius-sm); padding: 4px 6px; min-height: 28px; cursor: pointer; }
+.pr-hide:hover { background: var(--chrome-hi); color: var(--chrome-fg); }
+.pr-body { display: grid; gap: 12px; padding: 12px; }
+.pr-field { display: grid; gap: 6px; }
+.pr-field > span { font-weight: 500; color: var(--chrome-dim); }
+.pr-ctl select { font: inherit; font-size: 12px; color: var(--chrome-fg); background: var(--background); border: 1px solid var(--chrome-line); border-radius: var(--radius-sm); padding: 4px 6px; min-height: 30px; width: 100%; }
+.pr-seg { display: flex; flex-wrap: wrap; gap: 4px; }
+.pr-seg button { font: inherit; font-size: 12px; border: 1px solid var(--chrome-line); background: var(--background); color: var(--chrome-dim); border-radius: var(--radius-sm); padding: 4px 8px; min-height: 30px; cursor: pointer; }
+.pr-seg button:hover { color: var(--chrome-fg); }
+.pr-seg button[aria-pressed="true"] { background: var(--chrome-fg); color: var(--background); border-color: var(--chrome-fg); font-weight: 500; }
+.pr-row { display: flex; gap: 12px; flex-wrap: wrap; }
+.pr-row > .pr-field { flex: 1 1 120px; }
+.pr-token { font: 11px/1.4 var(--font-mono); color: var(--chrome-dim); user-select: all; overflow-wrap: anywhere; }
+.pr-problems { color: var(--danger); font: 11px/1.4 var(--font-mono); white-space: pre-wrap; border: 1px solid var(--danger); border-radius: var(--radius-sm); padding: 8px; }
 .pr-ring { position: absolute; pointer-events: none; border-radius: var(--radius-md); box-shadow: 0 0 0 2px var(--background), 0 0 0 4px var(--ring); transition: opacity 200ms var(--ease-out); z-index: 30; }
 .pr-toast { position: absolute; left: 50%; bottom: 16px; transform: translateX(-50%); background: var(--foreground); color: var(--background); padding: 8px 14px; border-radius: var(--radius-md); font-size: 13px; z-index: 31; max-width: calc(100% - 32px); }
 .pr-crash { margin: 24px; padding: 16px; border: 1px solid var(--danger); border-radius: var(--radius-md); color: var(--danger); font: 12px/1.5 var(--font-mono); white-space: pre-wrap; }
 .pr-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 :focus-visible { outline: 2px solid var(--ring); outline-offset: 2px; }
-@media (max-width: 1099px) {
-  .pr-panel { position: fixed; z-index: 50; left: 0; right: 0; bottom: 0; width: auto; max-height: 72vh; border: 0; border-top: 1px solid var(--chrome-line); border-radius: var(--radius-lg) var(--radius-lg) 0 0; box-shadow: 0 -8px 24px color-mix(in oklch, var(--foreground) 12%, transparent); padding-bottom: env(safe-area-inset-bottom, 0px); }
-  .pr-panel.pr-back { border-left: 0; }
-  .pr-close { display: inline-flex; }
-}
 </style>
 
 <style id="product">
@@ -190,16 +161,12 @@ html[data-bare] .pr-device { width: 100% !important; max-width: none; min-height
 </style>
 
 <div id="proto">
-  <header class="pr-bar" id="pr-bar" aria-label="Mock controls"></header>
-  <div class="pr-body">
-    <aside class="pr-panel" id="pr-journeys" aria-label="Journeys" hidden></aside>
-    <main class="pr-stage" id="pr-stage">
-      <div class="pr-device" id="pr-device">
-        <div id="screen" data-comment-target></div>
-      </div>
-    </main>
-    <aside class="pr-panel pr-back" id="pr-backstage" aria-label="Backstage" hidden></aside>
-  </div>
+  <main class="pr-stage" id="pr-stage">
+    <div class="pr-device" id="pr-device">
+      <div id="screen" data-comment-target></div>
+    </div>
+  </main>
+  <aside class="pr-ctl" id="pr-ctl" aria-label="Mock controls"></aside>
   <div class="pr-sr" id="pr-live" aria-live="polite"></div>
 </div>
 
@@ -244,7 +211,7 @@ html[data-bare] .pr-device { width: 100% !important; max-width: none; min-height
     relative: (n, unit) => new Intl.RelativeTimeFormat(state.lang, { numeric: 'auto' }).format(n, unit),
   };
   /** The mock's clock: fixed (meta.clock), so every frame renders the same; the store's
-      `clock` (set by a frame's setup, the bar's Advance, or a journey step's `clock`) moves it. */
+      `clock` (set by a frame's setup, the controls' Clock, or a journey step's `clock`) moves it. */
   P.now = () => new Date((state.store && state.store.clock) || state.model?.meta.clock || '2026-01-15T09:00:00Z');
   /** Who is looking (an id of `actors`), kept in the store's `actor`; null when the product has one actor. */
   P.actor = () => (state.store && state.store.actor) || null;
@@ -256,7 +223,7 @@ html[data-bare] .pr-device { width: 100% !important; max-width: none; min-height
     return /^\d{4}-\d\d-\d\dT/.test(String(spec)) && !isNaN(d) ? d : null;
   };
 
-  /** Side effects the screen cannot show: rows, e-mails, events, jobs, alarms. Shown in the backstage. */
+  /** Side effects the screen cannot show: rows, e-mails, events, jobs, alarms. Read by the tools (window.proto.effects). */
   P.effect = (kind, data) => { state.effects.push(Object.assign({ kind: String(kind) }, data, { _seq: ++state.seq })); };
   /** The current screen's view: { state, fields, ...whatever the product keeps }. */
   P.view = () => state.store.view[state.store.screen];
@@ -271,7 +238,7 @@ html[data-bare] .pr-device { width: 100% !important; max-width: none; min-height
   P.frame = () => state.store ? state.store.screen + '.' + P.view().state : '';
   P.variant = () => state.variant;
 
-  /** Fake network. The debug bar (or a journey step's `net`) sets the answer of the NEXT request:
+  /** Fake network. A journey step's `net` (or window.proto.setNet) sets the answer of the NEXT request:
       ok · slow · error · timeout. fn runs only on ok/slow and does the write (db + effects). */
   P.request = (name, fn) => {
     const mode = state.net;
@@ -296,7 +263,7 @@ html[data-bare] .pr-device { width: 100% !important; max-width: none; min-height
   };
   P.render = () => P._render && P._render();
 
-  /** The product's single entry point. Validates the model and shows every problem in the bar. */
+  /** The product's single entry point. Validates the model and shows every problem in the controls. */
   P.define = model => {
     const m = Object.assign({ meta: {}, copy: {}, screens: {}, frames: {}, journeys: [], actions: {}, variants: [], actors: [], clock: null }, model);
     m.meta = Object.assign({ name: 'Mock', version: 1, languages: Object.keys(m.copy) }, m.meta);
@@ -314,7 +281,7 @@ html[data-bare] .pr-device { width: 100% !important; max-width: none; min-height
       if (!a || !/^[A-Za-z0-9_-]+$/.test(a.id || '')) P.problem(`actor "${a && a.id}": ids are letters, digits, _ and -`);
       else if (aids.has(a.id)) P.problem(`actor "${a.id}": duplicate id`);
       else aids.add(a.id);
-      if (a && !a.title) P.problem(`actor "${a.id}": needs a title (the name the bar shows)`);
+      if (a && !a.title) P.problem(`actor "${a.id}": needs a title (the name the controls show)`);
       if (a && a.home && !m.frames[a.home] && !m.screens[String(a.home).split('.')[0]]) P.problem(`actor "${a.id}": home "${a.home}" is not a screen.state`);
     }
     if (m.clock) for (const k of m.clock.marks || []) if (!P._advance(new Date(), k.at)) P.problem(`clock mark "${k.label}": at must be an ISO time with its offset`);
@@ -357,9 +324,9 @@ html[data-bare] .pr-device { width: 100% !important; max-width: none; min-height
    - Every (screen, state) the mock can show is a frame with a setup that reaches it from seed().
    - Journeys: J1…; steps s1…; each step = do (words) · ONE event: target (selector), as (actor id) or
      clock ("+1d", "+2h", or an ISO time) · fill · net · expect (frame) · see (copy keys) · effects.
-   - More than one actor: actors: [{ id, title, home: '<screen>.<state>' or enter(s, P) }]; the bar's
+   - More than one actor: actors: [{ id, title, home: '<screen>.<state>' or enter(s, P) }]; the controls'
      "View as" sets s.actor and goes to home (or runs enter); P.actor() reads it; a frame's setup may set it.
-   - Time that matters: clock: { marks: [{ label, at: ISO }], onAdvance(s, P) }; the bar's "Clock" moves
+   - Time that matters: clock: { marks: [{ label, at: ISO }], onAdvance(s, P) }; the controls' "Clock" moves
      s.clock; P.now() reads it; onAdvance runs the jobs that time triggers (expiries, reminders).
    - P.effect records the WHOLE write (every field of the row, the e-mail, the event); a step's declared
      effects match a subset. An effect that cannot carry every field says partial: true. */
@@ -409,21 +376,17 @@ P.define({
 </script>
 
 <script id="shell-boot">
-/* ── SHELL: boot, router, chrome, journey panel, backstage, comments. ──── */
+/* ── SHELL: boot, router, journeys for the tools, the floating controls. ── */
 (() => {
   'use strict';
   const S = P._, M = S.model;
   const $ = id => document.getElementById(id);
   const root = document.documentElement;
-  const screenEl = $('screen'), bar = $('pr-bar'), jp = $('pr-journeys'), bp = $('pr-backstage'), device = $('pr-device');
+  const screenEl = $('screen'), ctl = $('pr-ctl'), device = $('pr-device');
   const h = P.html;
   if (!M) { screenEl.innerHTML = '<div class="pr-crash">The product block did not call P.define({...}).</div>'; return; }
 
-  const ui = {
-    theme: 'system', width: 'fit', journey: M.journeys[0]?.id || null, now: 0, collapsed: false,
-    tab: 'effects', since: 0, playing: false,
-    panels: { journeys: innerWidth >= 1100, backstage: innerWidth >= 1100 },
-  };
+  const ui = { theme: 'system', width: 'fit', journey: M.journeys[0]?.id || null, now: 0, since: 0, hidden: false };
   const V = String(M.meta.version);
 
   // ── store and frames ──────────────────────────────────────────────────
@@ -546,7 +509,7 @@ P.define({
     const play = head.match(/^play-(J\d+)(?:\.(s\d+))?$/);
     if (play) {
       const j = M.journeys.find(x => x.id === play[1]);
-      if (j) { ui.panels.journeys = true; return startJourney(j, play[2] ? j.steps.findIndex(x => x.id === play[2]) : 0); }
+      if (j) return startJourney(j, play[2] ? j.steps.findIndex(x => x.id === play[2]) : 0);
     }
     const token = M.frames[head] ? head : (M.journeys[0]?.start || Object.keys(M.frames)[0]);
     if (head && !M.frames[head] && !play) P.problem(`#${head} is not a frame; showing ${token}`);
@@ -615,135 +578,79 @@ P.define({
     ui.now = Math.max(0, upto);   // the step to play next
     chrome();
   }
-  async function playAll(j) {
-    if (ui.playing) return;
-    ui.playing = true; await startJourney(j, 0);
-    for (let i = 0; i < j.steps.length; i++) { if (!(await playStep(j, i))) break; await wait(700); }
-    ui.playing = false; chrome();
-  }
-
-  // ── comments: the artifact's composer, when the page runs as an artifact ──
-  let comments = null;
-  (async () => {
-    if (!window.claude || typeof window.claude.use !== 'function') return;
-    try { comments = await window.claude.use('comments'); chrome(); } catch (e) { comments = null; }
-  })();
-
-  // ── chrome: bar, journey panel, backstage ────────────────────────────
+  // ── chrome: one floating panel over the product, hidden to a handle (key H) ──
   const seg = (name, cur, opts) => h`<span class="pr-seg" role="group" aria-label="${name}">${opts.map(([v, l]) => h`<button type="button" data-ui="${name}" data-v="${v}" aria-pressed="${String(cur === v)}">${l}</button>`)}</span>`;
-  const frameTitle = tok => (M.frames[tok] && M.frames[tok].title) || tok;
-  const fxText = e => Object.entries(e).filter(([k]) => k !== 'kind' && k !== '_seq').map(([k, v]) => `${k}: ${typeof v === 'object' ? JSON.stringify(v) : v}`).join('\n');
-  const fxLine = list => list && list.length ? list.map(e => e.kind + (e.table ? ' ' + e.table : e.to ? ' → ' + e.to : e.name ? ' ' + e.name : '')).join(' · ') : 'nothing';
+  const pick = (name, label, cur, opts) => opts.length <= 4
+    ? h`<div class="pr-field"><span>${label}</span>${seg(name, cur, opts)}</div>`
+    : h`<label class="pr-field"><span>${label}</span><select data-ui="${name}" aria-label="${label}">${opts.map(([v, l]) => h`<option value="${v}" ${v === cur ? P.raw('selected') : ''}>${l}</option>`)}</select></label>`;
+  const HIDDEN_KEY = 'mock-controls-hidden';
+  try { ui.hidden = localStorage.getItem(HIDDEN_KEY) === '1'; } catch (e) { ui.hidden = false; }
+  function setHidden(v) {
+    ui.hidden = v;
+    try { localStorage.setItem(HIDDEN_KEY, v ? '1' : '0'); } catch (e) { /* a private window: the choice lasts this visit */ }
+    chrome();
+  }
 
   function chrome() {
     if (!S.store) return;
-    const frames = Object.entries(M.frames);
-    const groups = {};
-    for (const [tok, f] of frames) (groups[tok.split('.')[0]] = groups[tok.split('.')[0]] || []).push([tok, f]);
-    bar.toggleAttribute('data-collapsed', ui.collapsed);
-    bar.innerHTML = String(h`
-      <span class="pr-name pr-keep">${M.meta.name}<span class="pr-ver">v${V}</span></span>
-      <label class="pr-field"><span>State</span><select data-ui="frame" aria-label="State">
-        ${Object.entries(groups).map(([g, list]) => h`<optgroup label="${g}">${list.map(([tok, f]) => h`<option value="${tok}" ${tok === P.frame() ? P.raw('selected') : ''}>${f.title}${f.debugOnly ? ' (debug)' : ''}</option>`)}</optgroup>`)}
-      </select></label>
-      ${M.meta.languages.length > 1 ? h`<label class="pr-field"><span>Language</span><select data-ui="lang">${M.meta.languages.map(l => h`<option ${l === S.lang ? P.raw('selected') : ''}>${l}</option>`)}</select></label>` : ''}
-      ${seg('theme', ui.theme, [['system', 'Auto'], ['light', 'Light'], ['dark', 'Dark']])}
-      ${seg('width', ui.width, [['fit', 'Fit'], ['phone', 'Phone'], ['desktop', 'Desktop']])}
-      <label class="pr-field"><span class="${S.net !== 'ok' ? 'pr-net-hot' : ''}">Next request</span><select data-ui="net">${['ok', 'slow', 'error', 'timeout'].map(n => h`<option ${n === S.net ? P.raw('selected') : ''}>${n}</option>`)}</select></label>
-      ${M.actors.length ? h`<label class="pr-field"><span>View as</span><select data-ui="actor" aria-label="View as">${M.actors.map(a => h`<option value="${a.id}" ${a.id === P.actor() ? P.raw('selected') : ''}>${a.title}</option>`)}${P.actor() ? '' : h`<option value="" selected disabled>(none)</option>`}</select></label>` : ''}
-      ${M.clock ? h`<label class="pr-field"><span>Clock</span><span class="pr-token" title="The mock's now">${P.fmt.date(P.now(), { dateStyle: 'medium', timeStyle: 'short' })}</span><select data-ui="clock" aria-label="Advance the clock"><option value="" selected>Advance…</option>${[['+1h', '+1 hour'], ['+1d', '+1 day'], ['+7d', '+7 days']].concat((M.clock.marks || []).map(k => [k.at, k.label])).map(([v, l]) => h`<option value="${v}">${l}</option>`)}</select></label>` : ''}
-      ${M.variants.length > 1 ? h`<label class="pr-field"><span>Variant</span><select data-ui="variant">${M.variants.map(v => h`<option ${v === S.variant ? P.raw('selected') : ''}>${v}</option>`)}</select></label>` : ''}
-      <span class="pr-token" title="This state's address">#${P.frame()}</span>
-      <span class="pr-spacer"></span>
-      ${M.journeys.length ? h`<button type="button" class="pr-btn" data-ui="panel" data-v="journeys" aria-pressed="${String(ui.panels.journeys)}">Journeys</button>` : ''}
-      <button type="button" class="pr-btn" data-ui="panel" data-v="backstage" aria-pressed="${String(ui.panels.backstage)}">Backstage</button>
-      <button type="button" class="pr-btn pr-keep" data-ui="collapse" aria-label="${ui.collapsed ? 'Show controls' : 'Hide controls'}">${ui.collapsed ? 'Controls' : 'Hide'}</button>
-      ${S.problems.length ? h`<div class="pr-problems" role="alert">${S.problems.length} mock problem(s):\n${S.problems.slice(-6).join('\n')}</div>` : ''}`);
-
-    if (innerWidth < 1100 && ui.panels.journeys && ui.panels.backstage) ui.panels.backstage = false;
-    jp.hidden = !ui.panels.journeys || !M.journeys.length;
-    if (!jp.hidden) {
-      const j = M.journeys.find(x => x.id === ui.journey) || M.journeys[0];
-      const total = frames.length, reached = frames.filter(([t]) => S.reached.has(t)).length;
-      jp.innerHTML = String(h`
-        <div class="pr-phead"><h2>Journeys</h2><button type="button" class="pr-btn pr-close" data-ui="panel" data-v="journeys" aria-pressed="true">Close</button></div>
-        <ul class="pr-jlist">${M.journeys.map(x => h`<li><button type="button" class="pr-j" data-ui="journey" data-v="${x.id}" aria-current="${String(x.id === j.id)}">
-          <span><span class="pr-jid">${x.id}</span> ${x.title}<small>${x.steps.length} step${x.steps.length === 1 ? '' : 's'}</small></span>
-        </button></li>`)}</ul>
-        ${j ? h`
-          <div class="pr-jtools">
-            <button type="button" class="pr-btn" data-ui="play-all" ${ui.playing ? P.raw('disabled') : ''}>Play all</button>
-            <button type="button" class="pr-btn" data-ui="restart">Restart</button>
-          </div>
-          ${j.job ? h`<p class="pr-empty" style="padding-top:0">${j.job}</p>` : ''}
-          <ol class="pr-steps">${j.steps.map((st, i) => {
-            return h`<li class="pr-step" ${i === ui.now ? P.raw('data-now') : ''} data-comment-target>
-              <header><span class="pr-jid">${st.id}</span><b>${st.do}</b></header>
-              <dl class="pr-kv">
-                ${st.as ? h`<dt>as</dt><dd>${(M.actors.find(a => a.id === st.as) || {}).title || st.as}</dd>` : ''}
-                ${st.clock ? h`<dt>clock</dt><dd>${st.clock}</dd>` : ''}
-                <dt>expect</dt><dd>${frameTitle(st.expect)}</dd>
-                <dt>behind</dt><dd>${fxLine(st.effects)}</dd>
-                ${st.net ? h`<dt>network</dt><dd>${st.net}</dd>` : ''}
-              </dl>
-              <div class="pr-acts">
-                <button type="button" class="pr-btn" data-ui="step" data-v="${i}" ${ui.playing ? P.raw('disabled') : ''}>Play step</button>
-                ${comments ? h`<button type="button" class="pr-btn" data-ui="comment" data-v="${i}">Comment</button>` : ''}
-              </div>
-            </li>`;
-          })}</ol>` : ''}
-        <div class="pr-foot">States reached ${reached}/${total}</div>`);
+    const scr = S.store.screen, cur = P.frame();
+    const label = ([t, f]) => [t, f.title + (f.debugOnly ? ' (debug)' : '')];
+    const here = Object.entries(M.frames).filter(([t]) => t.split('.')[0] === scr).map(label);
+    const elsewhere = {};
+    for (const [t, f] of Object.entries(M.frames)) if (t.split('.')[0] !== scr) (elsewhere[t.split('.')[0]] = elsewhere[t.split('.')[0]] || []).push(label([t, f]));
+    ctl.toggleAttribute('data-hidden', ui.hidden);
+    if (ui.hidden) {
+      ctl.innerHTML = String(h`<div class="pr-head"><button type="button" class="pr-handle" data-ui="hide" aria-expanded="false" aria-label="Show the mock controls">${S.problems.length ? h`<span class="pr-dot" aria-hidden="true"></span>` : ''}Controls <kbd>H</kbd></button></div>`);
+      return;
     }
-
-    bp.hidden = !ui.panels.backstage;
-    if (!bp.hidden) {
-      const fx = S.effects.slice().reverse();
-      const tables = Object.entries(S.store.db || {}).filter(([, rows]) => Array.isArray(rows));
-      bp.innerHTML = String(h`
-        <div class="pr-phead"><h2>Backstage</h2><button type="button" class="pr-btn pr-close" data-ui="panel" data-v="backstage" aria-pressed="true">Close</button></div>
-        <div class="pr-tabs" role="tablist">${[['effects', 'Effects (' + fx.length + ')'], ['data', 'Data'], ['network', 'Network (' + S.requests.length + ')']].map(([k, l]) => h`<button type="button" role="tab" data-ui="tab" data-v="${k}" aria-selected="${String(ui.tab === k)}">${l}</button>`)}</div>
-        ${ui.tab === 'effects' ? (fx.length ? h`<ul class="pr-fx">${fx.map(e => h`<li ${e._seq > ui.since ? P.raw('data-new') : ''}><span class="pr-kind">${e.kind}</span><pre>${fxText(e)}</pre></li>`)}</ul>` : h`<p class="pr-empty">No side effects yet. Rows written, e-mails sent and events emitted appear here as the mock runs.</p>`) : ''}
-        ${ui.tab === 'data' ? (tables.length ? h`<div class="pr-tblwrap">${tables.map(([name, rows]) => {
-          const cols = [...new Set(rows.flatMap(r => Object.keys(r)))];
-          return h`<h3>${name} · ${rows.length}</h3>${rows.length ? h`<table><thead><tr>${cols.map(c => h`<th>${c}</th>`)}</tr></thead><tbody>${rows.map(r => h`<tr>${cols.map(c => h`<td>${typeof r[c] === 'object' ? JSON.stringify(r[c]) : r[c]}</td>`)}</tr>`)}</tbody></table>` : ''}`;
-        })}</div>` : h`<p class="pr-empty">No tables in the store.</p>`) : ''}
-        ${ui.tab === 'network' ? (S.requests.length ? h`<ul class="pr-fx">${S.requests.slice().reverse().map(r => h`<li><span class="pr-kind">${r.answer}</span><pre>${r.name}</pre></li>`)}</ul>` : h`<p class="pr-empty">No requests yet. Set the answer of the next one in the bar.</p>`) : ''}`);
-    }
+    ctl.innerHTML = String(h`
+      <div class="pr-head">
+        <span class="pr-name">${M.meta.name}<span class="pr-ver">v${V}</span></span>
+        <button type="button" class="pr-hide" data-ui="hide" aria-expanded="true" aria-label="Hide the mock controls">Hide <kbd>H</kbd></button>
+      </div>
+      <div class="pr-body">
+        ${here.length ? h`<div class="pr-field"><span>This screen</span>${seg('frame', cur, here)}</div>` : ''}
+        ${Object.keys(elsewhere).length ? h`<label class="pr-field"><span>Other screens</span><select data-ui="frame" aria-label="Other screens"><option value="" selected>Go to…</option>${Object.entries(elsewhere).map(([g, list]) => h`<optgroup label="${g}">${list.map(([t, l]) => h`<option value="${t}">${l}</option>`)}</optgroup>`)}</select></label>` : ''}
+        ${M.actors.length > 1 ? pick('actor', 'View as', P.actor() || '', M.actors.map(a => [a.id, a.title])) : ''}
+        ${M.variants.length > 1 ? pick('variant', 'Design variant', S.variant, M.variants.map(v => [v, v])) : ''}
+        ${M.clock ? h`<label class="pr-field"><span>Clock · ${P.fmt.date(P.now(), { dateStyle: 'medium', timeStyle: 'short' })}</span><select data-ui="clock" aria-label="Move the clock"><option value="" selected>Move to…</option>${[['+1h', '+1 hour'], ['+1d', '+1 day'], ['+7d', '+7 days']].concat((M.clock.marks || []).map(k => [k.at, k.label])).map(([v, l]) => h`<option value="${v}">${l}</option>`)}</select></label>` : ''}
+        ${M.meta.languages.length > 1 ? pick('lang', 'Language', S.lang, M.meta.languages.map(l => [l, l])) : ''}
+        <div class="pr-row">
+          <div class="pr-field"><span>Theme</span>${seg('theme', ui.theme, [['system', 'Auto'], ['light', 'Light'], ['dark', 'Dark']])}</div>
+          <div class="pr-field"><span>Width</span>${seg('width', ui.width, [['fit', 'Fit'], ['phone', 'Phone'], ['desktop', 'Desktop']])}</div>
+        </div>
+        <span class="pr-token" title="This state's address">#${cur}</span>
+        ${S.problems.length ? h`<div class="pr-problems" role="alert">${S.problems.length} mock problem(s):\n${S.problems.slice(-6).join('\n')}</div>` : ''}
+      </div>`);
   }
 
-  document.addEventListener('click', async e => {
+  document.addEventListener('click', e => {
     const el = e.target.closest('[data-ui]');
-    if (!el || screenEl.contains(el)) return;
+    if (!el || screenEl.contains(el) || el.tagName === 'SELECT') return;
     const k = el.dataset.ui, v = el.dataset.v;
-    const j = M.journeys.find(x => x.id === ui.journey);
-    if (k === 'theme') setTheme(v);
+    if (k === 'hide') setHidden(!ui.hidden);
+    else if (k === 'theme') setTheme(v);
     else if (k === 'width') setWidth(v);
-    else if (k === 'panel') {
-      ui.panels[v] = !ui.panels[v];
-      if (ui.panels[v] && innerWidth < 1100) for (const other of Object.keys(ui.panels)) if (other !== v) ui.panels[other] = false;  // one sheet at a time on narrow screens
-      chrome();
-    }
-    else if (k === 'collapse') { ui.collapsed = !ui.collapsed; chrome(); }
-    else if (k === 'journey') { const x = M.journeys.find(y => y.id === v); if (x) await startJourney(x, 0); }
-    else if (k === 'restart' && j) await startJourney(j, 0);
-    else if (k === 'play-all' && j) await playAll(j);
-    else if (k === 'step' && j) { ui.playing = true; await playStep(j, Number(v)); ui.playing = false; chrome(); }
-    else if (k === 'tab') { ui.tab = v; chrome(); }
-    else if (k === 'comment' && j && comments) {
-      const st = j.steps[v];
-      const target = screenEl.querySelector(st.target) || screenEl;
-      try { await comments.openComposer({ element: target }); } catch (err) { /* soft refusal: nothing to do */ }
-    }
+    else if (k === 'frame') { if (load(v)) render(); }
+    else if (k === 'actor') setActor(v);
+    else if (k === 'variant') { S.variant = v; render(); }
+    else if (k === 'lang') setLang(v);
   });
   document.addEventListener('change', e => {
     const el = e.target;
-    if (!el.dataset || !el.dataset.ui || screenEl.contains(el)) return;
-    if (el.dataset.ui === 'frame') { load(el.value); render(); }
+    if (!el.dataset || !el.dataset.ui || screenEl.contains(el) || !el.value) return;
+    if (el.dataset.ui === 'frame') { if (load(el.value)) render(); }
     else if (el.dataset.ui === 'lang') setLang(el.value);
-    else if (el.dataset.ui === 'net') P._setNet(el.value);
     else if (el.dataset.ui === 'variant') { S.variant = el.value; render(); }
     else if (el.dataset.ui === 'actor') setActor(el.value);
-    else if (el.dataset.ui === 'clock' && el.value) advance(el.value);
+    else if (el.dataset.ui === 'clock') advance(el.value);
+  });
+  addEventListener('keydown', e => {
+    if ((e.key !== 'h' && e.key !== 'H') || e.metaKey || e.ctrlKey || e.altKey || S.bare) return;
+    const t = e.target;
+    if (t && (t.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName))) return;
+    e.preventDefault();
+    setHidden(!ui.hidden);
   });
 
   // ── SHELL API: the surface the walk, the frame renderer and the blind reader use ──

@@ -158,7 +158,7 @@ const DEAD_END = () => {
   return !scr.querySelector('button:not([disabled]), a[href], [data-act]:not([disabled]), input:not([disabled]):not([type=hidden]), select:not([disabled]), textarea:not([disabled])');
 };
 
-// One journey step through the real UI: its fills and its click on #screen, or the bar's actor switch
+// One journey step through the real UI: its fills and its click on #screen, or the controls' actor switch
 // (as) or clock advance (clock); then wait until the mock settles on the step's frame. Throws when it
 // does not; the caller reports from the state the mock is in.
 async function driveStep(page, st) {

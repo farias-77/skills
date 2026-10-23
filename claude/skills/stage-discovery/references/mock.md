@@ -69,8 +69,8 @@ The product block is one `P.define({...})` call:
 | `actions` | `{ <name>: (s, ctx, P) => … }`, named by `data-act`; may `await P.request` |
 | `journeys` | `[{ id: 'J1', title, actor, job, rules, start, steps: [{ id: 's1', do, target, fill, net, expect, see, effects, rules }] }]` |
 | `variants` | optional, three names at most; `P.variant()` picks the rendering |
-| `actors` | when more than one kind of user sees it: `[{ id, title, home }]`, the bar's "View as" |
-| `clock` | when time changes what is shown: `{ marks: [{ label, at }], onAdvance(s, P) }`, the bar's "Clock" |
+| `actors` | when more than one kind of user sees it: `[{ id, title, home }]`, the controls' "View as" |
+| `clock` | when time changes what is shown: `{ marks: [{ label, at }], onAdvance(s, P) }`, the controls' "Clock" |
 
 Helpers: `P.html` (escapes; `P.raw` for trusted markup), `P.t(key,
 vars)`, `P.fmt.number/money/date/time/relative`, `P.nav(screen, state,
@@ -78,11 +78,18 @@ extra)`, `P.view()`, `P.request(name, fn)` (the fake network; `fn`
 writes only on ok or slow), `P.effect(kind, data)`, `P.toast(text)`
 (transient only), `P.now()`, `P.actor()`, `P.render()`.
 
-**The bar is how he proves behavior.** State, actor ("View as"),
-language, theme, width, clock and "Next request" (ok, slow, error,
-timeout) live in the shell's bar, outside `#screen`. Never draw a "view
-as" switch, a clock or a "Mock" strip inside `#screen`: everything there
-is in the reference frames.
+**The product fills the window; he sees only the product.** The
+shell's controls float above it in one panel, outside `#screen`, that
+hides to a handle (and with the H key). They hold only what he switches
+to look at something: this screen's states (normal, loading, empty,
+error and the screen's own), the other screens, "View as", the design
+variant, the clock, the language, the theme and the width. No journey,
+step list, play button or frame map is shown to him: journeys stay in
+the model for the tools. So every state he must be able to see is a
+frame with its own title (a loading state is a frame, not a slow
+request he has to time). Never draw a "view as" switch, a clock or a
+"Mock" strip inside `#screen`: everything there is in the reference
+frames.
 
 ## Rules the walk enforces
 
@@ -91,7 +98,7 @@ is in the reference frames.
 - A screen's state is **one value** (the frame token's tail), never a
   set of booleans.
 - Every state the mock reaches is a **frame** whose `setup` reaches it
-  from `seed()`. A state only the bar reaches is `debugOnly`; every
+  from `seed()`. A state only the controls reach is `debugOnly`; every
   other frame is visited by a journey.
 - **Every visible string is a copy key** present in every language.
 - An action is reached through `data-act` on a button or a `<form>`.
@@ -101,9 +108,9 @@ is in the reference frames.
   exactly its `effects`; a step that produces nothing says
   `effects: []`. `net` sets the next request's answer.
 - **`P.effect` records the whole write**: every field of the row, the
-  e-mail or the event. The backstage is what the story writer and the
-  blind readers read as "what was written"; a field missing there reads
-  as not written. A field a mock cannot know: `partial: true`.
+  e-mail or the event. The effects (`window.proto.effects()`, the
+  walk's report) are what the story writer and the blind readers read
+  as "what was written"; a field missing there reads as not written. A field a mock cannot know: `partial: true`.
 - Nothing is a dead end: something on screen can be acted on, or the
   frame is `terminal` and the builder's report says why (the conductor
   writes it to the notes). A journey's `start` counts as visited.

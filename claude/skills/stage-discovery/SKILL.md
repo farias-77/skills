@@ -198,9 +198,11 @@ the mode (artifact or local). Keep its agent id in `.state.md`. Its
 journeys keep the stories' journey ids and step ids (`s1, s2, …` of
 each journey); a step the mock adds takes the next free id.
 
-**Rounds.** Send him the link: what to look at first, and the deep
-links (`#play-J2` plays a journey, `#<screen>.<state>` opens a state;
-`~dark`, `~pt-BR`, `~phone` add to either). His feedback comes by chat
+**Rounds.** Send him the link: what to look at first, and the state
+links (`#<screen>.<state>` opens a state; `~dark`, `~pt-BR`, `~phone`
+add to it). The mock is the product alone, full screen; its floating
+controls (hidden with H) switch the states, who is looking, the design
+variant, the theme and the width. Journeys are not shown to him. His feedback comes by chat
 and by comments on the mock (watch it with `ArtifactComments` after the
 first publish). Each batch of feedback is one **round order** to the
 same agent, by `SendMessage`: one line per change, each with its source
@@ -289,8 +291,9 @@ By [references/playback.md](references/playback.md): blocks of at most
 four stories. Before each block, **one message that explains it to a
 newcomer**, in his language: per story, what it is in one sentence, an
 example with fixture names and numbers, what happens when it fails, and
-the mock's journey link (`#play-J<n>`; in local mode, the journey's
-`proto.mjs shots` PNG paths) or, with no screen, the flow drawn in a
+the mock's state links of the story's key moments (`#<screen>.<state>`;
+in local mode, the journey's `proto.mjs shots` PNG paths) or, with no
+screen, the flow drawn in a
 code block. Then the block's question call: **Confirm** ·
 **Adjust** · **Cut**, with the review's decisions of his and the
 writer's Inferred entries inside each story's question. An adjust that

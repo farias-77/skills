@@ -68,7 +68,8 @@ story:
   has 10 invites sent today; she sends one more to João; it is
   refused and João gets nothing."
 - **When it fails**: what the person sees and what is not written.
-- **See it**: with a mock, the journey link (`<mock url>#play-J2`);
+- **See it**: with a mock, the state links of the story's key moments
+  (`<mock url>#invite-form.failed`), in the order they happen;
   with no screen, the flow drawn in a code block:
 
 ```
