@@ -89,13 +89,14 @@ something. Write `review` so it holds all of that in the order of the
 flow; the shell adds any frame left out, and a dark pass (the screen's
 first step again) for a screen with no dark step. The controls float
 above the product in one small panel, outside `#screen`; H hides it,
-and hidden it still shows the step's name and "7/48". The panel holds
+and hidden it is a one-line label: the screen and "7/48", with a
+"◆" when the screen has design options. The panel holds
 the review (progress, the step's name, what to check, ← / →, "All
 steps" to jump, ticks, "Review complete", the place he stopped
 remembered), the width (always: Fit, Phone, Desktop; the review
 renders at the width he picks, never one step per width), the design
-options only on a screen that has them (signalled "◆ 2 options", also
-on the hidden handle), and the language when there is more than one.
+options only on a screen that has them (signalled "◆ 2 options"; a
+"◆" on the hidden label), and the language when there is more than one.
 No state picker, "view as", theme, clock or journey is shown: the
 review covers them. Inside a published artifact the `#hash` does not
 reach the page; the review is the way there. So every state he must be able to see is a

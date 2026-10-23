@@ -168,7 +168,7 @@ html[data-bare] .pr-device { width: 100% !important; min-height: 100vh; border: 
 .pr-tick { flex: 0 0 22px; font: 500 11px/1.6 var(--font-mono); color: var(--success); text-align: right; }
 .pr-mini { font: 500 11px/1 var(--font-mono); color: var(--chrome-dim); }
 .pr-hname { max-width: min(46vw, 420px); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.pr-opt { font-size: 11px; font-weight: 600; color: var(--background); background: var(--chrome-fg); border-radius: 999px; padding: 3px 8px; }
+.pr-opt { font-size: 11px; color: var(--chrome-fg); }
 .pr-variants { padding: 8px; border: 1px solid var(--chrome-fg); border-radius: var(--radius-md); }
 .pr-variants > span { color: var(--chrome-fg); font-weight: 600; }
 .pr-problems { color: var(--danger); font: 11px/1.4 var(--font-mono); white-space: pre-wrap; border: 1px solid var(--danger); border-radius: var(--radius-sm); padding: 8px; }
@@ -726,12 +726,7 @@ P.define({
     const r = R[ui.step];
     ctl.toggleAttribute('data-hidden', ui.hidden);
     if (ui.hidden) {
-      ctl.innerHTML = String(h`<div class="pr-head"><button type="button" class="pr-handle" data-ui="hide" aria-expanded="false" aria-label="${L.controls}">
-        ${S.problems.length ? h`<span class="pr-dot" aria-hidden="true"></span>` : ''}
-        <span class="pr-hname">${r ? stepName(r) : P.frame()}</span>
-        ${R.length ? h`<span class="pr-mini">${ui.step + 1}/${R.length}</span>` : ''}
-        ${vars.length > 1 ? h`<span class="pr-opt" title="${L.variant}">◆ ${vars.length} ${L.options}</span>` : ''}
-        <kbd>H</kbd></button></div>`);
+      ctl.innerHTML = String(h`<div class="pr-head"><button type="button" class="pr-handle" data-ui="hide" aria-expanded="false" aria-label="${L.controls} (H)">${S.problems.length ? h`<span class="pr-dot" aria-hidden="true"></span>` : ''}${r ? screenTitle(r.frame.split('.')[0]) : L.controls}${R.length ? h`<span class="pr-mini">· ${ui.step + 1}/${R.length}</span>` : ''}${vars.length > 1 ? h`<span class="pr-opt" title="${L.variant}">◆</span>` : ''}</button></div>`);
       return;
     }
     ctl.innerHTML = String(h`
