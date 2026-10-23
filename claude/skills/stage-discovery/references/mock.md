@@ -64,13 +64,15 @@ The product block is one `P.define({...})` call:
 | `meta` | `name`, `version` (bumped every build), `languages`, `clock` (the fixed "now"), `currency`, `fixtures` (every person's name in the seed, all invented) |
 | `copy` | `{ <lang>: { key: string, or { one, other } } }`: every visible string, every language |
 | `seed()` | a fresh store: `{ screen, view: { <screen>: { state, fields } }, db: { <table>: [rows] } }` |
-| `screens` | `{ <name>: { render(s, P) } }`: pure, reads `s`, returns `P.html\`…\`` |
+| `screens` | `{ <name>: { title, render(s, P) } }`: `render` is pure, reads `s`, returns `P.html\`…\``; `title` names the screen in the controls |
 | `frames` | `{ '<screen>.<state>': { title, setup(s), debugOnly?, terminal? } }`: every state the mock can show |
 | `actions` | `{ <name>: (s, ctx, P) => … }`, named by `data-act`; may `await P.request` |
 | `journeys` | `[{ id: 'J1', title, actor, job, rules, start, steps: [{ id: 's1', do, target, fill, net, expect, see, effects, rules }] }]` |
 | `variants` | optional, three names at most; `P.variant()` picks the rendering |
 | `actors` | when more than one kind of user sees it: `[{ id, title, home }]`, the controls' "View as" |
 | `clock` | when time changes what is shown: `{ marks: [{ label, at }], onAdvance(s, P) }`, the controls' "Clock" |
+| `review` | the guided path he follows: `[{ frame, check }]`, every state he must see, in the order of the flow, each with one line of what to check, taken from the story's ACs |
+| `meta.uiLang` | the language of the controls' labels: `en` or `pt-BR` (his); `meta.ui` overrides any label |
 
 Helpers: `P.html` (escapes; `P.raw` for trusted markup), `P.t(key,
 vars)`, `P.fmt.number/money/date/time/relative`, `P.nav(screen, state,
@@ -83,9 +85,15 @@ shell's controls float above it in one panel, outside `#screen`, that
 hides to a handle (and with the H key). They hold only what he switches
 to look at something: this screen's states (normal, loading, empty,
 error and the screen's own), the other screens, "View as", the design
-variant, the clock, the language, the theme and the width. No journey,
-step list, play button or frame map is shown to him: journeys stay in
-the model for the tools. So every state he must be able to see is a
+variant, the clock, the language, the theme and the width. On top of
+the panel sits **the review**: "Next step" / "Previous" (keys N and P)
+through `review`, a progress bar ("3 of 12"), each state seen ticked,
+the line of what to check, "Review complete" at the end, and the place
+he stopped remembered between visits. It is how he reviews: he follows
+it from the first state to the last. Inside a published artifact the
+`#hash` does not reach the page, so the review is also the only way
+there to reach a given state. No journey, step list, play button or
+frame map is shown to him: journeys stay in the model for the tools. So every state he must be able to see is a
 frame with its own title (a loading state is a frame, not a slow
 request he has to time). Never draw a "view as" switch, a clock or a
 "Mock" strip inside `#screen`: everything there is in the reference
