@@ -8,7 +8,7 @@ the reason:
 | Route | When | Path |
 |---|---|---|
 | full | several rules, a new screen, new data, an integration, or doubt about what to build | loads `stage-discovery` in the same session |
-| short | one behavior that fits one entry | a one-page brief → one authorization and one `/goal` → the entry pipeline → his use → release → a short close |
+| short | one behavior that fits one entry | a one-page brief → one `/goal` → the entry pipeline → his use → release → a short close |
 | hotfix | production broken now | the same, starting from a test that reproduces the bug |
 | `repo: legacy` | a short route or a hotfix in an old, frozen repo | the repo's own CI and deploy, a session watch, his ok before production when there is no staging |
 
@@ -19,7 +19,7 @@ Every route keeps every check; only the ceremony shrinks.
 This skill needs the pipeline: `stage-discovery` (full route),
 `stage-release` and its `references/release.md` (the path to
 production), `stage-close/references/cleanup.md`, the stage-4 cast and
-`exec-entry-workflow.js`, the guard and `authorize.sh`, and
+`exec-entry-workflow.js`, and
 `claude/scripts/`. Install the whole `claude/` folder (see the repo's
 README).
 

@@ -25,7 +25,7 @@ the night, and he is asked only what is his.
 | **One round** | every review runs once; a fix is verified by reading or by the delta, never by a second round |
 | **He is asked only what is his** | the conductor decides his class conservatively and lists it for veto; only a locked AC changed, a new recurring cost or something irreversible becomes a question |
 | **A report he can watch** | one link per workstream: each stage gets a Video, a Deck and an Explainer, finished before the stage closes |
-| **Local CI, one guard** | the whole gate runs on our compute and posts the status `main` requires; a hook denies what cannot be undone |
+| **Local CI** | the whole gate runs on our compute and posts the status `main` requires |
 | **It measures itself** | a script reads time, cost and his touches per stage; the weekly retro turns what repeats into changes he rules |
 
 ## One door, three routes
@@ -33,8 +33,8 @@ the night, and he is asked only what is his.
 ```
 /lets-cook <idea> ──► scouts in the background ──► a light interview ──► the route, in one line
   ├─ full    ──► the six stages below
-  ├─ short   ──► one-page brief ──► ! authorize + /goal ──► one entry ──► his use ──► release ──► short close
-  └─ hotfix  ──► brief + a test that reproduces the bug ──► ! authorize + /goal ──► one entry ──► release
+  ├─ short   ──► one-page brief ──► /goal ──► one entry ──► his use ──► release ──► short close
+  └─ hotfix  ──► brief + a test that reproduces the bug ──► /goal ──► one entry ──► release
 ```
 
 Every route keeps every check (builder, gate, reviewer and QAs, local
@@ -53,8 +53,7 @@ flowchart LR
   W -. "changes the pipeline" .-> D1
 ```
 
-Each stage opens with **the canary** (the guard must deny `git push
-origin a:b`) and, except discovery, hands him **one `/goal`**; then it
+Each stage, except discovery, hands him **one `/goal`**; then it
 runs on its own to its close. It closes with its report published and
 the next play: `/clear`, then `/stage-<next> <slug>`. Every session
 runs on Opus 5.5, high.
@@ -65,7 +64,7 @@ runs on Opus 5.5, high.
 | **2 · Design** | scouts read the system; `architect (Opus 5.5, high)` writes one proposal with its v1 → v2 → v3 path; `overengineering-guard (Opus 5.5, medium)` cuts; after his "closed", the architect writes `solution.md` and five `design-writer (Sonnet 5.5, high)` the other documents; four lenses review once, called directly by the session: `design-consistency` and `design-security` (Opus 5.5, medium), `design-contracts (Sonnet 5.5, high)`, the guard again | the debate over a deck and a ≤60 s video, until "closed" |
 | **3 · Plan** | `planner (Opus 5.5, high)` cuts the widest graph: a thin contract commit C, entries of one whole behaviour (≤12 ACs) with frontend and backend in parallel, E-int last; `plan-writer (Sonnet 5.5, high)` writes one brief per node; one round (`plan-review-workflow.js`: `plan-reviewer (Opus 5.5, medium)` and the double-blind per brief); the session rules everything and writes the pre-flight | nothing; a veto list at the close |
 | **4 · Execute** | the session is the tech lead. Every ready entry runs `exec-entry-workflow.js`, in its own cloud session when the project has one: `builder-backend` ∥ `builder-frontend (Opus 5.5, medium)` → `exec-gate (Sonnet 5.5, low)` → `reviewer (Opus 5.5, high)` ∥ `qa-frontend` · `qa-backend (Opus 5.5, medium)` by surface → one fix pass → the delta. A serial queue merges into `feat/<slug>`; the project's signoff command runs the whole gate once, after his ok, and posts `local-ci` | the pre-flight; his hands-on with the running app, each answer an `A.n` round, until "ok" |
-| **5 · Release** | merge into `main` behind `local-ci`; the CI deploys staging and smokes; a `vX.Y.Z` tag promotes the same image to production, smokes, watches 15 minutes and rolls back on its own. A red gets one fix entry; a second red stops | his authorization line; a question only on the stop list (a new production deploy after a rollback is one) |
+| **5 · Release** | merge into `main` behind `local-ci`; the CI deploys staging and smokes; a `vX.Y.Z` tag promotes the same image to production, smokes, watches 15 minutes and rolls back on its own. A red gets one fix entry; a second red stops | his go is the release's `/goal`; a question only on the stop list (a new production deploy after a rollback is one) |
 | **6 · Close** | the users' video (1–3 min, recorded on staging) and a "what's new" text he forwards; a short retro with the script's numbers; a script proves nothing of the workstream is left on the machine | nothing |
 
 The **weekly retro** reads the week's closed workstreams together and
@@ -78,8 +77,7 @@ Every agent is a file under `claude/agents/`. Only **Opus 5.5** and
 **Sonnet 5.5** are used: Opus where judgment pays (architecture, the
 cut, code, review, QA, the risk lenses), Sonnet for literal reading
 and templated writing, never above high.
-[docs/models.md](docs/models.md) holds the evidence for each pick;
-`node scripts/check-models.mjs` fails when an agent disagrees with it.
+[docs/models.md](docs/models.md) holds the evidence for each pick.
 
 | Stage | Agent | Model, effort |
 |---|---|---|
@@ -125,9 +123,9 @@ only it, its files. Knowledge lives in each skill's `references/`.
 
 | Workflow | Stage | Runs | Dry run |
 |---|---|---|---|
-| `discovery-review-workflow.js` | discovery | three lenses ∥ the double-blind per story | `scripts/discovery-review-dry-run.mjs` |
-| `plan-review-workflow.js` | plan | the plan reviewer ∥ the double-blind per brief | `scripts/plan-review-dry-run.mjs` |
-| `exec-entry-workflow.js` | execute, release, lets-cook | one entry: builders → gate → reviewer ∥ QAs → triage → one fix → the delta; modes `build`, `resume`, `update`, `fix` | `scripts/exec-entry-dry-run.mjs` |
+| `discovery-review-workflow.js` | discovery | three lenses ∥ the double-blind per story | `tests/discovery-review-dry-run.mjs` |
+| `plan-review-workflow.js` | plan | the plan reviewer ∥ the double-blind per brief | `tests/plan-review-dry-run.mjs` |
+| `exec-entry-workflow.js` | execute, release, lets-cook | one entry: builders → gate → reviewer ∥ QAs → triage → one fix → the delta; modes `build`, `resume`, `update`, `fix` | `tests/exec-entry-dry-run.mjs` |
 
 The design review needs no workflow: the session calls its four lenses
 directly.
@@ -142,21 +140,13 @@ its motion library into an MP4; the decks are HTML slides. The short
 route's rail is Build · Release · Close. See
 [docs/stage-report.md](docs/stage-report.md).
 
-## Local CI and the guard
+## Local CI
 
 - **The CI is local.** The project's signoff command runs the whole
   gate in a clean worktree on our compute and, only on exit 0 and
   under a bot identity, posts the `local-ci` status `main` requires.
   `claude/scripts/local-ci.sh` is the generic fallback. Hosted CI keeps
   the deploys and the environments.
-- **One guard.** `claude/hooks/guard-irreversible.sh` is a PreToolUse
-  hook on Bash and every file tool, installed behind a fail-closed
-  wrapper: it denies the irreversible (destroying infrastructure,
-  deleting data, force-push, a forged status, reading the CI token,
-  switching identity, edits to itself), and any merge into `main` or
-  `v*` tag that his authorization line does not cover.
-  `claude/hooks/authorize.sh` writes that line; only he runs it, as
-  `! .claude/hooks/authorize.sh …`.
 
 ## The bar
 
@@ -164,7 +154,7 @@ The pipeline is generic: it reads the stack, the commands and the
 taste from the project. [docs/project-contract.md](docs/project-contract.md)
 is the bar, written as roles in three levels: required (standards,
 golden paths, the gates, a stack per worktree, the release roles, the
-permissions and the guard, the local-CI signoff, the mock toolchain,
+permissions, the local-CI signoff, the mock toolchain,
 the smoke), recommended, and for the full experience (a cloud
 environment for entries, the video toolchain).
 
@@ -225,13 +215,11 @@ claude/
   skills/               one folder per skill: SKILL.md, README.md, references/, templates/, scripts/
   agents/               every agent, its model and effort in the frontmatter
   workflows/            <name>-workflow.js: the multi-agent rounds, plain JS
-  hooks/                guard-irreversible.sh, authorize.sh, remind-scout.sh, their tests
   scripts/              local-ci.sh (the fallback signoff), telemetry.mjs, cleanup.sh
   report/               the report shell, the template explainer, a working example
   video/                the video kit (Remotion): the motion library, render.sh
 docs/                   the bar, models.md, the stage report, testing the pipeline
-scripts/                check-models.mjs; the workflows' and local-ci's dry runs
-codex/                  a placeholder
+tests/                  run.sh: every kit check in one command; the workflows' and local-ci's dry runs
 ```
 
 Terms are in [claude/GLOSSARY.md](claude/GLOSSARY.md).

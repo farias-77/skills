@@ -232,8 +232,7 @@ run at once.
   The VM's workspace is untrusted, so print mode ignores the project's
   allow rules (in acceptEdits an agent's plain `git rev-parse` was
   denied); auto mode lets the classifier decide, and the project's
-  guard hook and deny rules still apply: a VM probe saw the guard deny
-  its canary inside the nested session.
+  deny rules still apply inside the nested session.
 - A VM cannot post a commit status as the bot: the cloud's GitHub proxy
   signs every call as the account connected to claude.ai, whatever
   token the VM holds. Hence `--record` there and `--post-from` here.

@@ -52,5 +52,5 @@ Runtime needs: Node 20+, `playwright-core` and a Chromium for
 | `scripts/proto.mjs` | walk, frames, look, shots, lock, trace (also `trace none`), split, assemble, model |
 
 The review workflow is `claude/workflows/discovery-review-workflow.js`;
-its dry run is `node scripts/discovery-review-dry-run.mjs` from the
+its dry run is `node tests/discovery-review-dry-run.mjs` from the
 repo root.

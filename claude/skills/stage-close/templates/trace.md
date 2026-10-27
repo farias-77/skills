@@ -2,7 +2,7 @@
 
 <!-- One line per step as it ends, `date -u +'%F %H:%M'`. The resume point. -->
 
-- <date> · open · canary denied · /goal pasted
+- <date> · open · /goal pasted
 - <date> · video · rendering since <time> \| dispatched now \| done: <length>, <MB>
 - <date> · harvest · <n> frictions returned
 - <date> · numbers · metrics.json written · gaps: <n>

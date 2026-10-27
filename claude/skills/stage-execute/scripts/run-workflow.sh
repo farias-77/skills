@@ -5,8 +5,7 @@
 # launch; print mode never asks. The VM's workspace is untrusted, so print mode ignores the
 # project's allow rules: in acceptEdits every command outside them is denied, and an agent's
 # plain `git rev-parse` was. Auto mode lets the classifier decide instead, as in the cloud
-# session; the project's guard hook and deny rules still apply (a VM probe saw the guard deny
-# its canary in both modes). Exit: 0 a return written · 1 none (an interrupted return is
+# session; the project's deny rules still apply inside the nested session. Exit: 0 a return written · 1 none (an interrupted return is
 # written instead) · 2 bad call.
 set -uo pipefail
 [ $# -ge 4 ] || { echo "usage: run-workflow.sh <repo> <script.js> <args.json> <return.json> [log]" >&2; exit 2; }

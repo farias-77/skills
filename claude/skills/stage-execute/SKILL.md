@@ -80,8 +80,7 @@ environment exists (the bar, `docs/project-contract.md`).
 
 1. **The house rules.** Read the file that
    `realpath ${CLAUDE_SKILL_DIR}/../../../CLAUDE.md` prints and run its
-   Open: the canary (in the product repo), the pulls, who else is
-   working.
+   Open: the pulls, who else is working.
 2. The pre-flight was checked at plan. List only the items he must run
    himself (from `preflight.md`), each with its `!` command. An item
    still missing parks only the entries it blocks.
@@ -204,9 +203,7 @@ merges the head it checked ([references/cloud.md](references/cloud.md)).
    it"** · **"I have adjustments"**. When the diff touches a code-owner
    path, it carries the PR link and "approve it on GitHub with your ok"
    (an approval is dismissed by every push, so it comes after the last
-   round). It also carries the release authorization line he runs
-   (`! .claude/hooks/authorize.sh release <slug> feat/<slug>@<sha>`);
-   the release's `/goal` comes from `/stage-release` itself.
+   round). The release's `/goal` comes from `/stage-release` itself.
 
 His "ok" closes the hands-on: one line in `rulings.md`. Then the
 project's signoff command runs the whole gate once on the final head,
@@ -221,8 +218,8 @@ starts meanwhile; the stage ends on its green.
 
 All at once:
 
-1. **The report**, by `claude/docs/stage-report.md`, finished before the
-   stage closes; the Explainer always; the Video and the Deck only when he picks them in the close's question (`claude/docs/stage-report.md`): the Video by `video-builder (Sonnet 5.5, high)` (what
+1. **The report**, by `docs/stage-report.md`, finished before the
+   stage closes; the Explainer always; the Video and the Deck only when he picks them in the close's question (`docs/stage-report.md`): the Video by `video-builder (Sonnet 5.5, high)` (what
    was built, the real screens captured from his hands-on environment),
    the Deck by `slides-builder (Sonnet 5.5, medium)` (per entry: ACs →
    proofs, findings, the A.n, what stayed out and why), the Explainer by

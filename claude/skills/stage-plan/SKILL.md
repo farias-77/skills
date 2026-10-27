@@ -68,8 +68,7 @@ Missing a design document: stop, and say which stage owns it.
 
 1. **The house rules.** Read the file that
    `realpath ${CLAUDE_SKILL_DIR}/../../../CLAUDE.md` prints and run its
-   Open: the canary (in the product repo), the pulls, who else is
-   working.
+   Open: the pulls, who else is working.
 2. Read `.state.md`: it says `stage: plan` (else stop, the stage it
    names owns the workstream); dispatch P0 in the background.
 3. Hand him the goal, filled in, in one code block:
@@ -140,7 +139,7 @@ coming up, `gh` acting as the bot identity, the signoff command ready
 (it exists and `<the signoff command> --help` answers, or
 `claude/scripts/local-ci.sh --help` when the project names none; the
 whole gate runs once, at the end), the cloud
-environment, the canary. Only what he must do in person stays as an
+environment. Only what he must do in person stays as an
 item, with a ready `!` command, a `!` check, and what it blocks.
 
 **The writers' questions** come back together. Answer each from the
@@ -194,8 +193,8 @@ All three run at once:
 1. **Coordination.** This workstream's line in `_coordination.md`: stage
    `execute`, branch `feat/<slug>`, this session's name, the shared
    files it will touch and what was agreed.
-2. **The report**, by `claude/docs/stage-report.md`, finished before
-   the stage closes; the Explainer always; the Video and the Deck only when he picks them in the close's question (`claude/docs/stage-report.md`): the Video by `video-builder (Sonnet 5.5, high)`
+2. **The report**, by `docs/stage-report.md`, finished before
+   the stage closes; the Explainer always; the Video and the Deck only when he picks them in the close's question (`docs/stage-report.md`): the Video by `video-builder (Sonnet 5.5, high)`
    (the graph assembling: C, the entries in parallel, the critical
    path), the Deck by `slides-builder (Sonnet 5.5, medium)` (entries,
    edges and why, the agreements with other workstreams, what was decided in

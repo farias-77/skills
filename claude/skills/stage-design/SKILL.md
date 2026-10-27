@@ -92,7 +92,7 @@ D0 reading → D1 his idea → D2 architect → guard → your ruling
    `screen: yes`. Missing: stop, back to stage 1. With `screen: no`,
    `screens.md` is the line `None: no screen changes`.
 2. **The house rules**: read `<kit>/../CLAUDE.md` and run its Open:
-   the canary, the pulls, who else is working.
+   the pulls, who else is working.
 3. **D0 starts now**, in the background, before the goal (below).
 4. **The goal.** One message with the scouts' status and the command
    to paste, written in his language:
@@ -286,7 +286,7 @@ the file only when they disagree, then `review-prep.mjs` again.
 
 **The report is finished before the stage closes.** The Explainer
 always; the Video and the Deck only when he picks them in the close's
-question. In the background, as `claude/docs/stage-report.md`
+question. In the background, as `docs/stage-report.md`
 describes:
 
 | Tab | Builder | Brief |

@@ -22,27 +22,21 @@ feat/<slug> ──PR (local-ci, his ok)──► main ──push──► stagin
    promotes that image; nothing is rebuilt.
 4. The GitHub release is created by the CI after the watch is green,
    from the tag's annotation. The list of releases is what is in
-   production. Agents never create one (the guard denies it).
+   production. Agents never create one.
 
-## The authorization
+## His go
 
-He writes it with `! .claude/hooks/authorize.sh <route> ...` (the
-guard denies the script to agents). One line in the guard's allow
-file, `irreversible.allow` next to the guard and `authorize.sh`, live
-until its tag or for 3 days:
+His go is the route's `/goal`: the release's, or the lets-cook one on
+the short route, the hotfix and a legacy repo. It names the merge, the
+fixes (`fix/<slug>/*`, and a `revert/*` PR on a hotfix) and, outside a
+legacy repo, one `v*` tag.
 
-| Route | Command | Lets through |
-|---|---|---|
-| release | `authorize.sh release <slug> feat/<slug>@<sha>` | the merge of `feat/<slug>` at a head that is or descends from `<sha>` (so merging `main` in after his ok stays covered), every `fix/<slug>/*`, one `v*` tag |
-| short | `authorize.sh short <slug> feat/<slug>` | the merge of `feat/<slug>` and of every `fix/<slug>/*`, one `v*` tag |
-| hotfix | `authorize.sh hotfix <slug> hotfix/<slug>` | the merge of `hotfix/<slug>`, of every `fix/<slug>/*` and of a `revert/*` PR, one `v*` tag |
-| legacy | `authorize.sh legacy <repo> <branch>` | the merge of `<branch>` in that repo only; no tag |
-| tag | `authorize.sh tag <slug> <ref>@<sha>` | no merge; one `v*` tag whose commit is exactly `<sha>` (full, or 7+ resolved in the repo it runs in): a release with no workstream |
-
-- The guard writes `merged=<head>` on the line when it lets a merge
-  through, and `used=<tag>` when it lets the tag through. A tag must
-  carry a merge the line allowed (the tag route: sit on its commit). After the tag the line is dead: a
-  new merge or a new tag needs a new line from him.
+- The merge into `main` is `gh pr merge <n> --merge --match-head-commit
+  <head>`, right after "Up to date before a shared merge".
+- The tag is pushed the same way, on a commit in `origin/main`.
+- When Claude Code refuses either (its classifier may ask for a human),
+  the session sends him the PR link, or the tag and the reason, and the
+  merge or the push is his click; that wait is his.
 
 ## Taking turns on main
 
@@ -93,7 +87,7 @@ hotfix/<slug> from main → a test that reproduces it: red, then green
    into its `feat` again.
 3. A workstream already merged whose release stopped red, or that has been
    silent 60 minutes: the hotfix reverts it through a `revert/<that
-   slug>` PR (the hotfix authorization covers it), with one line in
+   slug>` PR, with one line in
    `_coordination.md`. A revert, never a release branch.
 4. If production was rolled back by the watch, the rollback already
    mitigated it; the hotfix is the fix, never a skipped check.
@@ -104,7 +98,6 @@ An old repo still live, frozen except for what operations cannot wait
 for. A short route or a hotfix runs there with:
 
 - the repo's own doctrine, CI and deploy;
-- `! .claude/hooks/authorize.sh legacy <repo> <branch>`;
 - the house rule "Up to date before a shared merge" against the
   repo's own base, right before the merge;
 - through staging when the repo has one; **without staging, one ok

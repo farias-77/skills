@@ -1,6 +1,6 @@
 ---
 name: stage-release
-description: Conducts stage 5 (Release) of the pipeline under one /goal. It merges the finished workstream (feat/<slug>) into main under the user's authorization, follows the CI's staging deploy and smoke, tags vX.Y.Z so the CI promotes the same image to production with a smoke and a 15-minute watch that rolls back on its own, and closes with its report (video, deck, explainer). A red gets one fix entry through the stage-4 pipeline, then it stops. It stops for the user only on its stop list. The short route and the hotfix follow the same path from lets-cook. The session runs on Opus 5.5, high. Use when a workstream's .state.md says stage release, or to resume a release by its slug.
+description: Conducts stage 5 (Release) of the pipeline under one /goal. It merges the finished workstream (feat/<slug>) into main under the user's `/goal`, follows the CI's staging deploy and smoke, tags vX.Y.Z so the CI promotes the same image to production with a smoke and a 15-minute watch that rolls back on its own, and closes with its report (video, deck, explainer). A red gets one fix entry through the stage-4 pipeline, then it stops. It stops for the user only on its stop list. The short route and the hotfix follow the same path from lets-cook. The session runs on Opus 5.5, high. Use when a workstream's .state.md says stage release, or to resume a release by its slug.
 argument-hint: "<workstream-slug>"
 allowed-tools: Read, Write, Edit, Glob, Grep, Agent, SendMessage, ListAgents, Workflow, AskUserQuestion, Artifact, PushNotification, ScheduleWakeup, Skill, Bash
 ---
@@ -13,7 +13,7 @@ allowed-tools: Read, Write, Edit, Glob, Grep, Agent, SendMessage, ListAgents, Wo
    step nobody planned.
 2. Production runs the image staging ran. A red production goes back
    to the previous tag by itself, through the CI.
-3. His authorization covers one workstream and dies at its tag.
+3. His `/goal` covers one workstream.
 4. A red gets one fix. A second red stops.
 5. The report (Video, Deck, Explainer) is finished before the stage
    closes.
@@ -32,16 +32,16 @@ allowed-tools: Read, Write, Edit, Glob, Grep, Agent, SendMessage, ListAgents, Wo
 ## The flow
 
 ```
-0 open        canary · preconditions · the authorization line read back · the /goal → he pastes it
+0 open        preconditions · the /goal → he pastes it
 1 main        up to date (house rule): fetch · origin/main into feat + local CI when it moved · merge
 2 staging     the CI deploys and smokes · green → peers told
-3 tag         vX.Y.Z on the merge, notes from the stories → push (the authorization is spent)
+3 tag         vX.Y.Z on the merge, notes from the stories → push
 4 production  the CI: same image → smoke → 15-min watch → GitHub release · red → rollback by itself
 5 close       trace · telemetry · report (Explainer + what he picks) · cleanup · .state.md → close · the message
 ```
 
 Read [references/release.md](references/release.md) before step 1. It
-holds the trunk, the authorization, how workstreams take turns on `main`, the
+holds the trunk, the merge and the tag, how workstreams take turns on `main`, the
 smoke and the watch, the hotfix and the legacy repos. Read
 [references/migrations.md](references/migrations.md) when `plan.md`
 lists a migration.
@@ -64,20 +64,14 @@ the CI ends the turn on a `ScheduleWakeup` sized to it (a staging deploy
 
 1. **The house rules.** Read the file that
    `realpath ${CLAUDE_SKILL_DIR}/../../../CLAUDE.md` prints and run its
-   Open: the canary.
+   Open: the pulls, who else is working, then the designs root.
 2. **Preconditions.** `.state.md` says `stage: release`; the execute
    recorded his ok; `04-release/plan.md` exists; the PR
    `feat/<slug>` → `main` is open and ready. Missing: stop and send him
    back to the stage that owns it.
-3. **The authorization.** `cat` the allow file, `irreversible.allow`
-   next to the guard the settings run (`.claude/hooks/` in a copy
-   install), and find a live `auth release <slug>` line (the execute's ok handed him
-   the command). Missing or expired: the message below carries, first,
-   the exact command for him to run:
-   `! .claude/hooks/authorize.sh release <slug> feat/<slug>@<the head he said ok to>`.
-4. **Coordination.** Edit your line in `_coordination.md`: stage
+3. **Coordination.** Edit your line in `_coordination.md`: stage
    `release`, branch, this session's name.
-5. **The `/goal`.** Fill it from `plan.md` and end the turn:
+4. **The `/goal`.** Fill it from `plan.md` and end the turn:
 
 ```
 /goal Release <slug> with the stage-release skill, without asking me anything outside its stop list.
@@ -104,10 +98,9 @@ exists, the report's Explainer and the tabs I picked are published, and I got th
 3. **The merge.** The PR's head has `local-ci` green, and the code
    owner's approval when the PR touches the gate's paths (asked at the
    execute's ok). Then
-   `gh pr merge <n> --merge --match-head-commit <head>`. The guard lets
-   it through when the head is, or descends from, the authorized sha.
-   A guard denial is a stop: record it and ask, the authorize command
-   ready.
+   `gh pr merge <n> --merge --match-head-commit <head>`. When Claude
+   Code refuses the merge (its classifier may ask for a human), send
+   him the PR link and the merge is his click; that wait is his.
 
 ## Step 2 · Staging
 
@@ -126,18 +119,9 @@ should be done and read the run (`gh run view <id>`); never poll.
    line per story (id + what changed for its user), then what goes
    live for real people. The CI publishes them with the release.
 3. `git tag -a vX.Y.Z <the merge sha on main> -F 04-release/notes.md`,
-   then `git push origin vX.Y.Z`. The guard spends the authorization on
-   this push; the same tag pushed again still passes. The CI holds the
-   tag until the previous tag's watch ends.
-
-**A release with no workstream: the tag route.** When the commit to ship is
-already on `main` and no merge passed the guard under a line (a first
-release, a tag cut by hand), no `merged=` carries the tag and the guard
-denies it. He authorizes that one commit instead:
-`! .claude/hooks/authorize.sh tag <slug> main@<sha>` (`<sha>` the
-commit the tag points at, in `origin/main` after a fetch: the full
-sha, or a prefix of 7+ when run from the repo). It allows no merge and exactly one `v*` tag on exactly
-that commit; it dies at the tag or in 3 days.
+   then `git push origin vX.Y.Z`; a refusal by Claude Code goes to him
+   the same way. The CI holds the tag until the previous tag's watch
+   ends.
 
 ## Step 4 · Production
 
@@ -153,9 +137,9 @@ creates no release. Wake when it should be done and read the run.
 
 | Red | What happens |
 |---|---|
-| staging (deploy, migrate, smoke) | one `X.n`: `exec-entry-workflow.js` mode `fix` on `fix/<slug>/X.n` from `main` (the `reviewer (Opus 5.5, high)` always; in a cloud session, and its whole gate in a signoff session, when the project has a cloud environment: stage-execute's `references/cloud.md`) → PR → `local-ci` → merge (the authorization covers it) → staging again |
+| staging (deploy, migrate, smoke) | one `X.n`: `exec-entry-workflow.js` mode `fix` on `fix/<slug>/X.n` from `main` (the `reviewer (Opus 5.5, high)` always; in a cloud session, and its whole gate in a signoff session, when the project has a cloud environment: stage-execute's `references/cloud.md`) → PR → `local-ci` → merge → staging again |
 | `local-ci` on the PR at step 1 | one `X.n` on `feat/<slug>`, as at execute |
-| production rolled back | one `X.n` on `fix/<slug>/X.n`, its PR green on `local-ci` → **ask** him before it goes anywhere: the old line died at the tag, so its merge and its patch tag need his new `! .claude/hooks/authorize.sh release <slug> fix/<slug>/X.n@<sha>` → merge → staging and smoke → a patch tag |
+| production rolled back | one `X.n` on `fix/<slug>/X.n`, its PR green on `local-ci` → **ask** him before it goes anywhere → merge → staging and smoke → a patch tag |
 | the environment (runner, network, a quota) | run it again once; it does not count. Never a production `migrate`: that is a stop |
 | a second red of code, anywhere | stop |
 
@@ -169,11 +153,11 @@ creates no release. Wake when it should be done and read the run.
 | a new paid resource, a DNS switch | cost and cutover |
 | a new production deploy after a rollback | a real incident: he decides |
 | a second red of code | it does not loop |
-| a guard denial | something is outside what he authorized |
 
 A stop is a `PushNotification` plus the question tool: what happened,
-the evidence in one line, the options with yours first, and the
-`! authorize` command ready when "yes" needs one.
+the evidence in one line, the options with yours first. A refusal by
+Claude Code of an irreversible step goes to him the same way, with the
+evidence.
 
 ## Step 5 · Close
 
@@ -184,7 +168,7 @@ the evidence in one line, the options with yours first, and the
 2. **The report, finished before the close.** The Explainer always;
    ask the close's question (Video · Deck) and dispatch what he picks,
    in the background, with the stage's files and `report/release/`, as
-   `claude/docs/stage-report.md` describes:
+   `docs/stage-report.md` describes:
 
 | Tab | Builder | Brief |
 |---|---|---|
@@ -213,7 +197,7 @@ the evidence in one line, the options with yours first, and the
 
 ## Resuming
 
-`/stage-release <slug>`: run the house Open (the canary, the pulls,
+`/stage-release <slug>`: run the house Open (the pulls,
 who else is working), then read `.state.md`,
 `trace.md` and the CI runs of `main` and of the tags. The trace's last
 line is where you are; never resume from memory.

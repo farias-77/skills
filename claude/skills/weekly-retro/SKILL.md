@@ -97,9 +97,7 @@ checkout the sessions read:
 1. The approved edit, nothing around it. The pipeline stays generic:
    no company, product or private name in its files.
 2. Verify what can be verified: `node --check` on a workflow or script,
-   `bash -n` on a shell file, `bash claude/hooks/tests/guard-irreversible.test.sh`
-   when the guard changed, the dry-runs under `scripts/`, the model
-   check when an agent changed.
+   `bash -n` on a shell file, then `bash tests/run.sh`.
 3. Show him the diff.
 
 ## Step 5 · Land

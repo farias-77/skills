@@ -104,7 +104,7 @@ from its header. Without a mock, only `split` and `trace none` run.
    `claude/` folder; write it in `.state.md` as `kit:` and give agents
    resolved paths.
 2. **The house rules.** Read `<kit>/../CLAUDE.md` and run its Open:
-   the canary, the pulls, who else is working.
+   the pulls, who else is working.
 3. **One workstream at a time.** Read the designs root's coordination file.
    When another workstream holds his attention in a discovery or a design
    debate, say so once and queue this one: message that workstream's
@@ -315,7 +315,7 @@ through it. The workstream's link is born here; write its URL in
 `.state.md`. Dispatch the Explainer's builder now, ask him the close's
 question (Video · Deck), and dispatch the builders he picks, in the
 background, each with the stage's files and the report folder
-(`report/discovery/`), as `claude/docs/stage-report.md` describes:
+(`report/discovery/`), as `docs/stage-report.md` describes:
 
 | Tab | Builder | Brief |
 |---|---|---|

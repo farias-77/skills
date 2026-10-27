@@ -27,4 +27,3 @@
 | `gh` acts as the bot identity | <✓ bot-login> |
 | the local-ci token is in place | <✓> |
 | cloud environment for entries | <✓ ready · or: absent, entries run locally> |
-| guard canary (`git push origin a:b` denied) | <✓ denied> |

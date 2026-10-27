@@ -1,6 +1,6 @@
 ---
 name: lets-cook
-description: The single entry point of the pipeline. `/lets-cook <idea>` always opens the same way, with scouts in the background and a light interview, then the session picks the route by its own judgment and says it in one line with the reason. Full route: it loads stage-discovery in the same session. Short route (one behavior, one entry): a one-page brief, one authorization and one /goal, the stage-4 entry pipeline, his use, the release path, a short close. Hotfix (production broken now): the same with a test that reproduces the bug first. A fix in a legacy repo is a short route or a hotfix marked `repo: legacy`. Every route keeps every check; only the ceremony shrinks. He can switch routes at any time. The session runs on Opus 5.5, high. Use for any new demand, change, bug or incident, and when he asks to pull the next demand from the tracker.
+description: The single entry point of the pipeline. `/lets-cook <idea>` always opens the same way, with scouts in the background and a light interview, then the session picks the route by its own judgment and says it in one line with the reason. Full route: it loads stage-discovery in the same session. Short route (one behavior, one entry): a one-page brief, one /goal, the stage-4 entry pipeline, his use, the release path, a short close. Hotfix (production broken now): the same with a test that reproduces the bug first. A fix in a legacy repo is a short route or a hotfix marked `repo: legacy`. Every route keeps every check; only the ceremony shrinks. He can switch routes at any time. The session runs on Opus 5.5, high. Use for any new demand, change, bug or incident, and when he asks to pull the next demand from the tracker.
 argument-hint: "<the idea, in his words | a tracker code such as REQ-12 | next>"
 allowed-tools: Read, Write, Edit, Glob, Grep, Agent, SendMessage, ListAgents, Workflow, AskUserQuestion, Artifact, PushNotification, ScheduleWakeup, Skill, Bash
 ---
@@ -15,7 +15,7 @@ allowed-tools: Read, Write, Edit, Glob, Grep, Agent, SendMessage, ListAgents, Wo
    local CI with the whole gate → staging → tag → watch. Only the
    ceremony shrinks.
 3. The short route reaches production with three touches from him: the
-   idea, the authorization with the `/goal`, his ok.
+   idea, the `/goal`, his ok.
 4. A hotfix starts from a test that reproduces the bug, red before the
    fix and green after. Never a shortcut.
 5. With a cloud environment, this machine runs no gate and no build:
@@ -29,8 +29,8 @@ allowed-tools: Read, Write, Edit, Glob, Grep, Agent, SendMessage, ListAgents, Wo
 ```
 /lets-cook <idea> ──► scouts in the background ──► light interview ──► the route, in one line
   ├─ full    ──► load stage-discovery, same session
-  ├─ short   ──► brief ──► ! authorize + /goal ──► one entry ──► his use ──► release ──► short close
-  └─ hotfix  ──► brief + the test that reproduces ──► ! authorize + /goal ──► one entry
+  ├─ short   ──► brief ──► /goal ──► one entry ──► his use ──► release ──► short close
+  └─ hotfix  ──► brief + the test that reproduces ──► /goal ──► one entry
                  ──► release (his staging check, or delegated) ──► short close
   (short or hotfix in an old repo: `repo: legacy`)
 ```
@@ -69,7 +69,7 @@ with the time `date -u +%FT%TZ` printed; never rewrite a line.
 
 1. **The house rules.** Read the file that
    `realpath ${CLAUDE_SKILL_DIR}/../../../CLAUDE.md` prints and run its
-   Open: the canary, the pulls, who else is working, then the designs
+   Open: the pulls, who else is working, then the designs
    root.
 2. **Scouts, in the background, from his first sentence.** One
    `scout (Haiku 5.5, medium)` per question: where this lives (the
@@ -101,7 +101,7 @@ builds the wrong thing.
   the slug, the folder and `.state.md`. This skill ends there.
 - **Short or hotfix:** go on.
 
-## 4 · The brief and the authorization
+## 4 · The brief and the `/goal`
 
 1. Write `<designs-root>/<slug>/brief.md` from `templates/brief.md`.
    Hotfix: its first AC is the one that reproduces the bug.
@@ -122,13 +122,11 @@ builds the wrong thing.
    hotfix also tells every session named there, by `SendMessage`:
    "hotfix <slug> in flight, it merges first".
 4. One message, then end the turn: the brief's link, the route line,
-   and the two commands he runs (where the root runs the pipeline
-   clone's guard by path, `authorize.sh` is the one beside that guard):
+   and the `/goal` he pastes:
 
 ```
-! .claude/hooks/authorize.sh <short | hotfix> <slug> <feat/<slug> | hotfix/<slug>>
 /goal Ship <slug> by the <short route | hotfix> with the lets-cook skill, from <designs-root>/<slug>/brief.md.
-I authorize the merge into main and one patch tag; the authorization expires at the tag.
+I authorize the merge into main and one patch tag.
 Done when: the entry passed its gate and review; <I used it and said ok through the question tool | my
 staging check is delegated>; local-ci is green on the PR's final head; the tag is in production with the smoke and
 the watch green; cleanup.sh --check came back empty; I got the notification. Never loosen this done
@@ -139,9 +137,8 @@ In a legacy repo there is no tag (`stage-release/references/release.md`,
 "Legacy repos"):
 
 ```
-! .claude/hooks/authorize.sh legacy <repo> <branch>
 /goal Ship <slug> in the legacy repo <repo> with the lets-cook skill, from <designs-root>/<slug>/brief.md.
-I authorize the merge of <branch> into <repo>'s main, no tag; the authorization expires in 3 days.
+I authorize the merge of <branch> into <repo>'s main, no tag.
 Done when: the entry passed its gate and review; <I said ok through the question tool (before production
 when the repo has no staging) | my check is delegated>; the repo's own CI deployed it; the 15-minute watch
 is green; the parity line is in the feature map; cleanup.sh --check came back empty; I got the
@@ -232,7 +229,7 @@ repo: release.md, "Legacy repos".
    (`stage-close/references/cleanup.md`). A checkout listed as `his`
    goes in the message.
 4. **The minimal report**, finished before the message, as
-   `claude/docs/stage-report.md` describes. The rail is Build · Release
+   `docs/stage-report.md` describes. The rail is Build · Release
    · Close. The Explainers always; one question through the question
    tool, multi-select, decides the rest: Decks · Video for users (none
    is a valid answer):
@@ -262,6 +259,6 @@ repo: release.md, "Legacy repos".
 ## Resuming
 
 `/lets-cook <slug>` with an existing folder: the house Open (the
-canary, the pulls, who else is working), then
+pulls, who else is working), then
 `.state.md` and `trace.md`, and from the release on
 `04-release/trace.md`. The last line written is where you are.

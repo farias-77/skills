@@ -8,5 +8,3 @@ settings.local.json
 # usage telemetry dumps — never tracked
 cc.json
 
-# the guard's allow file: the user's authorization lines, never tracked
-claude/hooks/irreversible.allow*

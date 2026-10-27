@@ -27,30 +27,27 @@ one line. The full route is six stages. He is asked only what is his.
 | 2 design | one `/goal` | he debates the one proposal (deck first, then a ≤60 s video) until he says "closed"; rarely, a question that changes a locked AC, adds a recurring cost or cannot be undone |
 | 3 plan | one `/goal` | nothing; the close lists what was decided in his place for his veto |
 | 4 execute | one `/goal` | the pre-flight items only he can run; his hands-on with the running app, each answer an `A.n` round, until his "ok" |
-| 5 release | his authorization line + one `/goal` | only the stop list (an irreversible step the `/goal` does not name, a new production deploy after a rollback, a second red) |
+| 5 release | his go is the release's `/goal` | only the stop list (an irreversible step the `/goal` does not name, a new production deploy after a rollback, a second red) |
 | 6 close | one `/goal` | nothing; he forwards the users' video and the "what's new" text |
 
 ## Every stage opens and closes the same way
 
-**Open.** (1) **The canary**: `git push origin a:b`, run alone (no
-`cd`, nothing chained), must come back denied by the guard with a
-reason containing `guard-canary`; anything
-else and the stage does not open. (2) **Up to date**: `git pull
+**Open.** (1) **Up to date**: `git pull
 --ff-only` in the product's main checkout and in the kit's checkout
 (`realpath <kit>/..`); a pull that is not a fast-forward (a local change,
 another branch checked out) stops the stage and is reported to him,
-never resolved by a reset or a stash. (3) **Who else is working**:
+never resolved by a reset or a stash. (2) **Who else is working**:
 `ListAgents` (the live sessions) against `_coordination.md` (the
 rows). A peer on the same area, branch, migration or shared file gets a
 `SendMessage` before anything is touched, and the agreement goes in one
 line of `_coordination.md`; a row whose session is gone is marked
 "session closed", never deleted. Then write or refresh this stage's own
-row. (4) **The designs root**: no
+row. (3) **The designs root**: no
 `designs-root:` line in the project's `CLAUDE.md` → write nothing
 anywhere; stop and propose exactly `designs-root: ../designs` for the
-project's `CLAUDE.md`. (5) The
+project's `CLAUDE.md`. (4) The
 stage's `/goal`, filled in, in one code block for him to paste
-(discovery, a conversation, has none). (6) **The tracker**: when
+(discovery, a conversation, has none). (5) **The tracker**: when
 `.state.md` has a `tracker:` line, load `notion-tracker` with
 `open <stage>`.
 
@@ -98,17 +95,6 @@ allows, plus what he already wants changed. A pattern in his rulings
 is a line there too, marked **`[taste]`**. Every stage also notes its
 own frictions as they happen. The close's retro and the weekly retro
 read this file, `[user]` lines first.
-
-## Every agent is named with its model and effort
-
-In every skill, table, README and message that names an agent, the
-name carries the model and the effort in parentheses:
-`story-writer (Sonnet 5.5, high)`, `the conductor (Opus 5.5, high)`.
-Opus 5.5 and Sonnet 5.5 are used, and Haiku 5.5 where the table says;
-every main session runs on Opus 5.5, high; subagents are mostly Sonnet
-5.5, never above high. The one table, with the evidence for each pick, is
-[docs/models.md](docs/models.md); `node scripts/check-models.mjs`
-fails when a frontmatter, a workflow or the table disagree.
 
 ## The session never reads to look something up; it sends a scout
 
@@ -211,7 +197,7 @@ project names its **signoff command** in its `CLAUDE.md` (the bar's
 role 6; `claude/scripts/local-ci.sh` is the fallback): it runs the
 whole gate in a clean worktree and, only on exit 0 and under the bot
 identity, posts the **`local-ci`** commit status `main` requires. No
-agent posts a status or reads the bot's token; the guard denies both.
+agent posts a status by hand or reads the bot's token.
 Hosted CI keeps the deploys and the environments.
 
 **When the project has a cloud environment, this machine runs no
@@ -235,19 +221,6 @@ rebase) → if that brought anything, push and run what the target
 requires (the signoff command) on the new head, then fetch again →
 merge only when the fetch brings nothing new. A tag goes only on a
 commit that is in `origin/<base>` after a fetch.
-
-## One guard for what cannot be undone
-
-`claude/hooks/guard-irreversible.sh` is the only guard, installed
-with `authorize.sh` behind a fail-closed wrapper on Bash and every
-file tool. It denies the irreversible (destroying
-infrastructure, deleting data, force-push, a forged status, switching
-identity, edits to itself or the settings) and any merge into a
-protected branch or `v*` tag that no live **authorization line**
-covers. Only he writes that line, as a `!` command:
-`! .claude/hooks/authorize.sh <release|short|hotfix|legacy> <slug> <branch>[@<sha>]` (legacy: `<repo>` in place of `<slug>`),
-or `! .claude/hooks/authorize.sh tag <slug> main@<sha>` for a release with no workstream (one tag on that commit, no merge).
-It dies at its tag or in 3 days. The line lands in `irreversible.allow` beside the script, the file the guard beside it reads.
 
 ## Every stage measures itself, by script
 

@@ -8,7 +8,7 @@ proves with a script that nothing of the workstream is left on the machine;
 and publishes the stage's report.
 
 ```
-canary → /goal → ┌ the users' video (started at the release's green staging)
+/goal → ┌ the users' video (started at the release's green staging)
                  ├ harvest (scout) → telemetry.mjs → retro.md
                  └ cleanup.sh --check → --apply → --check empty
                → report → delivery: .mp4 + text + link

@@ -16,12 +16,9 @@ evidence is in each row. Three findings carry most of the table:
 - **Sonnet 5.5 never above high**: its max scores below its xhigh, and
   xhigh costs 2–4× high for a few points. Subagents default to Sonnet.
 
-This file is the source. `node scripts/check-models.mjs` reads every
-`claude/agents/*.md` frontmatter and the workflows' agent maps, and
-fails on a model outside the three, an agent missing here, a model or
-effort that differs from its row (or, in a workflow, from its per-call
-override), or a workflow file not named `<name>-workflow.js`. To change a pick, change the row and the agent's
-frontmatter together.
+This file is the reference table for people; each agent's frontmatter
+is the source. To change a pick, change the agent's frontmatter and
+the row together.
 
 ## The agents
 

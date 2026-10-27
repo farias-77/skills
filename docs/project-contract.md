@@ -37,7 +37,7 @@ it) the session root's `CLAUDE.md` is the source every stage reads.
 | 11 | A browser-drivable app | required with screens | execute, release, close |
 | 12 | Delivery: staging, production on a tag, watch, rollback | required | release |
 | 13 | The smoke and the staging actors | required | release, close |
-| 14 | Permissions, the guard and the authorization | required | every stage |
+| 14 | Permissions | required | every stage |
 | 15 | Agent identities | required | execute, release |
 | 16 | The station's toolchain | required | discovery, every report |
 | 17 | The house lint and the structure check | recommended | execute, weekly |
@@ -147,9 +147,8 @@ seconds, the host) and the gate's logs beside it, which a VM runs with
 runs no gate, reads `local-ci.json` at the tip of `origin/<branch>` and
 posts only when it names this sha, the whole gate and exit 0. The
 token is the bot's everyday one (role 15), not a second token, so the
-gate runs overnight with nobody pasting anything. The barrier is the
-guard: it denies agents printing the token and posting any status by
-hand, so only this command posts.
+gate runs overnight with nobody pasting anything. No agent posts a
+status by hand or reads the token, so only this command posts.
 
 `main`'s ruleset requires `local-ci`, pull requests only, no
 force-push, no deletion. Hosted CI keeps only what needs GitHub: the
@@ -170,7 +169,7 @@ cloud session with `--record`, and this machine only posts with
 
 **What it is.** The **gate paths**: the files that decide green (the
 gate's configuration, the lint and coverage settings, the CI workflows,
-the floor's tests, the guard and the settings), listed in `CODEOWNERS`
+the floor's tests and the settings), listed in `CODEOWNERS`
 and only those, so a pull request touching one needs his approval on
 GitHub. The execute stage passes them to each entry as `gatePaths`.
 The **floor**: the security tests that may never disappear, and a
@@ -266,7 +265,7 @@ advance is not improvised.
 
 **How the stages use it.** Release merges, follows the staging run,
 tags, follows production. After a production rollback, the fix's new
-production deploy waits for his word and a new authorization line.
+production deploy waits for his word.
 
 ### 13 · The smoke and the staging actors
 
@@ -284,40 +283,25 @@ staging, never production.
 **How the stages use it.** The CI's smoke; `video-builder (Sonnet 5.5,
 high)` records the close's users' video on staging as those actors.
 
-### 14 · Permissions, the guard and the authorization
+### 14 · Permissions
 
 **What it is.** In `.claude/` of **every directory the sessions open
-in** (Claude Code loads settings and hooks from the session's own
-directory):
+in** (Claude Code loads its settings from the session's own directory):
+a `settings.json` with **allow** rules for what the stages run all day
+(the gates, the stack, read-only `git` and `gh`, pushes of `feat/*`,
+`story/*` and `evidence/*`, deleting remote `story/*` and
+`evidence/*`, `gh pr merge`, re-running a run and the rollback
+workflow), **ask** for the rest that reaches production, and **deny**
+for reads of the `gh` and cloud credentials and the CI token, and for
+edits to the settings.
 
-- `settings.json` with **allow** rules for what the stages run all day
-  (the gates, the stack, read-only `git` and `gh`, pushes of `feat/*`,
-  `story/*` and `evidence/*`, deleting remote `story/*` and
-  `evidence/*`, `gh pr merge`, re-running a run and the rollback
-  workflow), **ask** for the rest that reaches production, and **deny**
-  for reads of the `gh` and cloud credentials and the CI token, and for
-  edits to the settings and hooks;
-- the pipeline's guard
-  [`guard-irreversible.sh`](../claude/hooks/guard-irreversible.sh) and
-  [`authorize.sh`](../claude/hooks/authorize.sh) in `.claude/hooks/`,
-  registered on `Bash|Edit|Write|MultiEdit|NotebookEdit` through a
-  **fail-closed wrapper**: a missing guard blocks every call;
-- the allow file `irreversible.allow` next to the guard (in
-  `.claude/hooks/`, or beside the pipeline clone's guard when a root
-  runs it by path), written only by him: verbatim commands, `protected <branch>`, `default-branch
-  <branch>`, and the `auth` lines `authorize.sh` writes.
+**Why.** The stages run without a human between the gates. The rules
+say what runs unattended and what asks; Claude Code's auto mode and
+the GitHub ruleset on `main` are the safety net. The real limits sit
+outside the session too (role 15).
 
-A standards rule against code comments excludes `.claude/hooks/`.
-
-**Why.** The stages run without a human between the gates. Permission
-rules match prefixes; the hook reads the whole command and decides
-before them. The real limits sit outside the session too (role 15).
-
-**How the stages use it.** Every stage opens with the canary (`git push
-origin a:b`, denied). He authorizes a release with `! .claude/hooks/authorize.sh
-release <slug> feat/<slug>@<sha>` (or `short`, `hotfix`, `legacy`, or
-`tag <slug> main@<sha>` for a release with no workstream); the guard lets one
-merge and one tag through, then the line is dead.
+**How the stages use it.** The stages run inside these rules. A step
+they refuse goes to him with the evidence.
 
 ### 15 · Agent identities
 
@@ -331,7 +315,7 @@ agents' reach; the bot's token expiry is on a calendar.
 
 **Why.** An author cannot approve his own PR, so `CODEOWNERS` bites only
 when the agents are someone else; a read-only cloud identity cannot
-destroy what the guard missed.
+destroy what the permissions missed.
 
 **How the stages use it.** Plan's pre-flight checks `gh` acts as the
 bot; every push, PR and status comes from it.
@@ -406,7 +390,7 @@ entry runs end to end in a fresh VM from the repository alone: a setup
 script (toolchains at the pinned versions, warm caches, the stack's
 images, the browsers; about five minutes), a `SessionStart` hook that
 brings the stack up only when `CLAUDE_CODE_REMOTE` is `true`, test-only
-env vars (never a real secret), the guard and the settings committed,
+env vars (never a real secret), the settings committed,
 a network allowlist with a reason per host, and the pipeline vendored
 under `.claude/pipeline/` at a tag with its `VERSION`. One repository
 per session: a multi-repository session loads no hooks.

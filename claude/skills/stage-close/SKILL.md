@@ -31,7 +31,7 @@ allowed-tools: Read, Write, Edit, Glob, Grep, Agent, SendMessage, ListAgents, As
 ## The flow
 
 ```
-0 open            canary · preconditions · the /goal → he pastes it
+0 open            preconditions · the /goal → he pastes it
 1 in parallel ┌── the video for users: wait for what is left of its render (or dispatch it now)
               ├── harvest: scout + templates/harvest.md ──► telemetry.mjs ──► retro.md
               └── cleanup.sh --check → --apply → --check empty
@@ -64,7 +64,7 @@ is the resume point.
 
 1. **The house rules.** Read the file that
    `realpath ${CLAUDE_SKILL_DIR}/../../../CLAUDE.md` prints and run its
-   Open: the canary.
+   Open: the pulls, who else is working, then the designs root.
 2. **Preconditions.** `.state.md` says `stage: close`; the release's
    trace ends with the tag in production (a short route or a hotfix
    closes inside lets-cook, with `templates/short-close.md` of that
@@ -114,7 +114,7 @@ listed as `his` (left off the default branch) goes in the message.
 
 The Explainer always; the Deck by `slides-builder (Sonnet 5.5,
 medium)` and the Video only when he picked them in step 1, as
-`claude/docs/stage-report.md` describes, into `report/close/`:
+`docs/stage-report.md` describes, into `report/close/`:
 
 | Tab | Who | What |
 |---|---|---|
@@ -157,7 +157,7 @@ rendered again only on his note.
 
 ## Resuming
 
-`/stage-close <slug>`: the house Open (the canary, the pulls, who
+`/stage-close <slug>`: the house Open (the pulls, who
 else is working), then `.state.md` and `trace.md`. A
 retro already written is not rewritten; a cleanup is re-checked, never
 assumed.
