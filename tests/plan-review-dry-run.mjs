@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 // Runs claude/workflows/plan-review-workflow.js with mocked agents (no model is called) and checks each scenario.
-// Usage: node scripts/plan-review-dry-run.mjs [-v]
+// Usage: node tests/plan-review-dry-run.mjs [-v]
 
 import { readFileSync } from 'node:fs'
 import { join, dirname } from 'node:path'

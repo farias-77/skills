@@ -2,7 +2,7 @@
 // Runs claude/workflows/discovery-review-workflow.js with canned agents: no model is called.
 // Exits 1 when a scenario ends other than expected.
 //
-// Usage: node scripts/discovery-review-dry-run.mjs [-v]
+// Usage: node tests/discovery-review-dry-run.mjs [-v]
 
 import { readFileSync } from 'node:fs';
 import { join, dirname } from 'node:path';

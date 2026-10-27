@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 // Runs claude/workflows/exec-entry-workflow.js with mocked agents (no model is called) and checks each scenario.
-// Usage: node scripts/exec-entry-dry-run.mjs [-v]
+// Usage: node tests/exec-entry-dry-run.mjs [-v]
 
 import { readFileSync } from 'node:fs'
 import { join, dirname } from 'node:path'
