@@ -93,7 +93,7 @@ Personas: **<persona>** (<who, in one line>), …
 - **`J2.s2.1`** [S-001] GIVEN <state>
   WHEN <event>
   THEN <the behavior he said, with no numbered rule> (observed: screen)
-- **`frame:<token>.1`** [<RULE-2>] GIVEN <the state forced from the debug bar>
+- **`frame:<token>.1`** [<RULE-2>] GIVEN <the debug-only state, reached by its frame>
   WHEN <event>
   THEN <the behavior only that frame shows> (observed: screen)
 - **`frame:<token>.2`** [<RULE-3>] [build] GIVEN <state>

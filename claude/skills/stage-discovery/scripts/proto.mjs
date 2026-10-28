@@ -12,7 +12,7 @@
  *                         [--gap "<where>::<what>"] … (one per open item he locked over)
  *   node proto.mjs trace  <index.html|none> <journeys-dir|-> <stories.md> [--notes notes.md]
  *   node proto.mjs split  <stories.md> <out-dir>
- *   node proto.mjs assemble <out index.html> --shell <prototype-shell.html> --title "<feature> mock"
+ *   node proto.mjs assemble <out index.html> --shell <prototype-shell.html> --title "Mock - <feature>"
  *                         --tokens <tokens.css> --css <product.css> --js <product.js>
  *   node proto.mjs model  <index.html>
  *

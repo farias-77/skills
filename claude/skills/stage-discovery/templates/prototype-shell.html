@@ -1,4 +1,4 @@
-<title>Feature mock</title>
+<title>Mock - Feature</title>
 <!--
   prototype-shell.html: the starting point of every discovery mock.
 
@@ -17,13 +17,12 @@
   The blocks marked SHELL are not edited; a shell fix goes to the template.
   The product fills the window. He reviews by THE REVIEW alone: Ctrl+→ next, Ctrl+← previous,
   through every state that is not debugOnly, each seen as its actor, every screen once in each
-  theme (the model's `review`, completed from the journeys and the frames). The controls float
-  above the product in one small panel (H hides it; hidden, the handle shows the step's name and
-  N/total): the review, the width (always), the design options only on a screen that has them,
-  the language when there is more than one. The labels follow meta.uiLang (en, pt-BR; meta.ui
-  overrides any label). No journey, state picker or "view as" is shown; journeys stay in the model
-  for the tools (proto.mjs walk, lock, frames). Inside a published artifact the #hash does not
-  reach the page: the review is how he moves through the states there.
+  theme (the model's `review`, completed from the journeys and the frames). The only chrome is one
+  thin bar at the top, a label: ‹ N/total, the step's check, ◆ when the screen has design options,
+  ⋯ for the rest (width, design options, language, all steps), ›. The page moves down by the bar's
+  height so it covers nothing; H hides it. Labels follow meta.uiLang (en, pt-BR; meta.ui overrides).
+  Journeys stay in the model for the tools (proto.mjs walk, lock, frames). Inside a published
+  artifact the #hash does not reach the page: the review is how he moves through the states there.
 
   Addressing (only a bare #token reaches the page inside an artifact):
     #screen.state                     a frame, e.g. #invites.empty
@@ -121,17 +120,19 @@ html[data-bare] .pr-device { width: 100% !important; min-height: 100vh; border: 
 @keyframes pr-in { from { opacity: 0; transform: translateY(4px); } }
 @media (prefers-reduced-motion: reduce) { @keyframes pr-in { from { opacity: 0; } } }
 
-.pr-ctl { position: fixed; z-index: 60; right: 16px; bottom: calc(16px + env(safe-area-inset-bottom, 0px)); width: min(300px, calc(100vw - 32px)); max-height: calc(100vh - 32px); overflow: auto; background: var(--chrome-bg); -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px); border: 1px solid var(--chrome-line); border-radius: var(--radius-lg); box-shadow: var(--chrome-shadow); font-size: 12px; color: var(--chrome-dim); transition: opacity 160ms var(--ease-out), transform 160ms var(--ease-out); }
-.pr-ctl[data-hidden] { width: auto; overflow: visible; border-radius: 999px; }
-.pr-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 10px 12px; border-bottom: 1px solid var(--chrome-line); }
-.pr-ctl[data-hidden] .pr-head { border: 0; padding: 0; }
-.pr-name { font-weight: 600; color: var(--chrome-fg); font-size: 13px; display: flex; align-items: center; gap: 8px; min-width: 0; }
-.pr-ver { font: 500 11px/1 var(--font-mono); padding: 3px 5px; border-radius: var(--radius-sm); border: 1px solid var(--chrome-line); color: var(--chrome-dim); }
-.pr-handle { display: inline-flex; align-items: center; gap: 8px; font: inherit; font-size: 12px; font-weight: 500; color: var(--chrome-fg); background: none; border: 0; border-radius: 999px; padding: 8px 14px; min-height: 36px; cursor: pointer; }
-.pr-handle kbd, .pr-hide kbd { font: 500 10px/1 var(--font-mono); padding: 3px 5px; border: 1px solid var(--chrome-line); border-radius: 4px; color: var(--chrome-dim); }
+.pr-ctl { position: fixed; z-index: 60; top: calc(8px + env(safe-area-inset-top, 0px)); left: 50%; transform: translateX(-50%); width: min(680px, calc(100vw - 16px)); font-size: 12px; color: var(--chrome-dim); }
+.pr-ctl[data-hidden] { display: none; }
+html[data-bar] .pr-stage { padding-top: calc(50px + env(safe-area-inset-top, 0px)); }
+.pr-bar2 { display: flex; align-items: center; gap: 6px; height: 34px; padding: 0 4px; background: var(--chrome-bg); -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px); border: 1px solid var(--chrome-line); border-radius: 999px; box-shadow: var(--chrome-shadow); }
+.pr-icon { flex: 0 0 auto; display: inline-grid; place-items: center; width: 28px; height: 28px; font: 600 14px/1 var(--font-sans); color: var(--chrome-fg); background: none; border: 0; border-radius: 999px; cursor: pointer; }
+.pr-icon:hover:not(:disabled) { background: var(--chrome-hi); }
+.pr-icon:disabled { opacity: .35; cursor: default; }
+.pr-count { flex: 0 0 auto; font: 500 11px/1 var(--font-mono); color: var(--chrome-dim); }
+.pr-label { flex: 1 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--chrome-fg); font-size: 13px; }
+.pr-label.pr-ok { color: var(--success); font-weight: 600; }
+.pr-optbtn { flex: 0 0 auto; font: 600 11px/1 var(--font-sans); color: var(--background); background: var(--chrome-fg); border: 0; border-radius: 999px; padding: 5px 8px; cursor: pointer; }
+.pr-menu { margin-top: 6px; max-height: min(70vh, 520px); overflow: auto; display: grid; gap: 12px; padding: 12px; background: var(--chrome-bg); -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px); border: 1px solid var(--chrome-line); border-radius: var(--radius-lg); box-shadow: var(--chrome-shadow); }
 .pr-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--danger); }
-.pr-hide { display: inline-flex; align-items: center; gap: 6px; font: inherit; font-size: 12px; color: var(--chrome-dim); background: none; border: 1px solid transparent; border-radius: var(--radius-sm); padding: 4px 6px; min-height: 28px; cursor: pointer; }
-.pr-hide:hover { background: var(--chrome-hi); color: var(--chrome-fg); }
 .pr-body { display: grid; gap: 12px; padding: 12px; }
 .pr-field { display: grid; gap: 6px; }
 .pr-field > span { font-weight: 500; color: var(--chrome-dim); }
@@ -629,12 +630,12 @@ P.define({
     ui.now = Math.max(0, upto);   // the step to play next
     chrome();
   }
-  // ── chrome: the review, and one small floating panel (H hides it) ──────
+  // ── chrome: one thin bar at the top, a label of what to check (H hides it; ⋯ opens the rest) ──
   const LABELS = {
-    en: { controls: 'Controls', hide: 'Hide', review: 'Review', of: 'of', prev: 'Previous', next: 'Next', done: 'Review complete', restart: 'Start over', all: 'All steps', check: 'Check', variant: 'Design options here', options: 'options', lang: 'Language', width: 'Width', fit: 'Fit', phone: 'Phone', desktop: 'Desktop', light: 'light', dark: 'dark', problems: 'mock problem(s)', keys: 'Ctrl+→ next · Ctrl+← previous · H hides' },
-    'pt-BR': { controls: 'Controles', hide: 'Ocultar', review: 'Revisão', of: 'de', prev: 'Anterior', next: 'Próxima', done: 'Revisão completa', restart: 'Recomeçar', all: 'Todas as etapas', check: 'Confira', variant: 'Opções de design aqui', options: 'opções', lang: 'Idioma', width: 'Largura', fit: 'Ajustar', phone: 'Celular', desktop: 'Desktop', light: 'claro', dark: 'escuro', problems: 'problema(s) no mock', keys: 'Ctrl+→ próxima · Ctrl+← anterior · H oculta' },
+    en: { more: 'More', step: 'Step', controls: 'Controls', hide: 'Hide', review: 'Review', of: 'of', prev: 'Previous', next: 'Next', done: 'Review complete', restart: 'Start over', all: 'All steps', check: 'Check', variant: 'Design options here', options: 'options', lang: 'Language', width: 'Width', fit: 'Fit', phone: 'Phone', desktop: 'Desktop', light: 'light', dark: 'dark', problems: 'mock problem(s)', keys: 'Ctrl+→ next · Ctrl+← previous · H hides the bar · Esc closes this' },
+    'pt-BR': { more: 'Mais', step: 'Etapa', controls: 'Controles', hide: 'Ocultar', review: 'Revisão', of: 'de', prev: 'Anterior', next: 'Próxima', done: 'Revisão completa', restart: 'Recomeçar', all: 'Todas as etapas', check: 'Confira', variant: 'Opções de design aqui', options: 'opções', lang: 'Idioma', width: 'Largura', fit: 'Ajustar', phone: 'Celular', desktop: 'Desktop', light: 'claro', dark: 'escuro', problems: 'problema(s) no mock', keys: 'Ctrl+→ próxima · Ctrl+← anterior · H oculta a barra · Esc fecha isto' },
   };
-  const uiLang = M.meta.uiLang || (/^pt/i.test(navigator.language || '') ? 'pt-BR' : 'en');
+  const uiLang = M.meta.uiLang || 'en';
   const L = Object.assign({}, LABELS.en, LABELS[uiLang] || {}, M.meta.ui || {});
 
   // The review is the one way through the mock: every state that is not debugOnly, each with the
@@ -699,49 +700,38 @@ P.define({
   const perScreen = Object.values(M.screens).some(s => Array.isArray(s.variants));
   const variantsHere = () => { const sc = M.screens[S.store.screen] || {}; return perScreen ? (sc.variants || []) : M.variants; };
 
-  function reviewBlock() {
-    if (!R.length) return '';
-    const done = ui.seen.size >= R.length, r = R[ui.step];
-    const pct = Math.round(100 * ui.seen.size / R.length);
-    return h`<section class="pr-review" aria-label="${L.review}">
-      <div class="pr-rhead"><b>${L.review}</b><span>${ui.step + 1} ${L.of} ${R.length}</span></div>
-      <div class="pr-meter" role="progressbar" aria-valuemin="0" aria-valuemax="${R.length}" aria-valuenow="${ui.seen.size}"><span style="width:${pct}%"></span></div>
-      ${done ? h`<p class="pr-done">✓ ${L.done} · ${R.length}/${R.length}</p>` : ''}
-      <div class="pr-now"><span class="pr-where">${stepName(r)}</span>${r.check ? h`<span class="pr-check"><b>${L.check}:</b> ${r.check}</span>` : ''}</div>
-      <div class="pr-nav">
-        <button type="button" class="pr-btn" data-ui="prev" ${ui.step === 0 ? P.raw('disabled') : ''}>← ${L.prev}</button>
-        ${ui.step < R.length - 1
-          ? h`<button type="button" class="pr-btn pr-primary" data-ui="next">${L.next} →</button>`
-          : h`<button type="button" class="pr-btn" data-ui="restart">↺ ${L.restart}</button>`}
-      </div>
-      <details class="pr-all"><summary>${L.all} (${ui.seen.size}/${R.length})</summary>
-        <ol>${R.map((x, i) => h`<li><button type="button" data-ui="step" data-v="${i}" aria-current="${String(i === ui.step)}"><span class="pr-tick">${ui.seen.has(keyOf(x)) ? '✓' : i + 1}</span>${stepName(x)}</button></li>`)}</ol>
-      </details>
-    </section>`;
-  }
-
   function chrome() {
     if (!S.store) return;
     const vars = variantsHere();
     const r = R[ui.step];
     ctl.toggleAttribute('data-hidden', ui.hidden);
-    if (ui.hidden) {
-      ctl.innerHTML = String(h`<div class="pr-head"><button type="button" class="pr-handle" data-ui="hide" aria-expanded="false" aria-label="${L.controls} (H)">${S.problems.length ? h`<span class="pr-dot" aria-hidden="true"></span>` : ''}${r ? screenTitle(r.frame.split('.')[0]) : L.controls}${R.length ? h`<span class="pr-mini">· ${ui.step + 1}/${R.length}</span>` : ''}${vars.length > 1 ? h`<span class="pr-opt" title="${L.variant}">◆</span>` : ''}</button></div>`);
-      return;
-    }
+    if (ui.hidden || S.bare) delete root.dataset.bar; else root.dataset.bar = '';
+    if (ui.hidden) { ctl.innerHTML = ''; return; }
+    const done = R.length && ui.seen.size >= R.length;
+    const label = !r ? P.frame() : (r.check || stepName(r));
     ctl.innerHTML = String(h`
-      <div class="pr-head">
-        <span class="pr-name">${M.meta.name}<span class="pr-ver">v${V}</span></span>
-        <button type="button" class="pr-hide" data-ui="hide" aria-expanded="true">${L.hide} <kbd>H</kbd></button>
+      <div class="pr-bar2" role="toolbar" aria-label="${L.review}">
+        ${R.length ? h`<button type="button" class="pr-icon" data-ui="prev" aria-label="${L.prev}" ${ui.step === 0 ? P.raw('disabled') : ''}>‹</button>
+        <span class="pr-count">${ui.step + 1}/${R.length}</span>` : ''}
+        ${S.problems.length ? h`<span class="pr-dot" title="${S.problems.length} ${L.problems}"></span>` : ''}
+        <span class="pr-label ${done && ui.step === R.length - 1 ? 'pr-ok' : ''}" title="${r ? stepName(r) + (r.check ? ' · ' + r.check : '') : ''}">${done && ui.step === R.length - 1 ? h`✓ ${L.done} · ${label}` : label}</span>
+        ${vars.length > 1 ? h`<button type="button" class="pr-optbtn" data-ui="menu" title="${L.variant}">◆ ${vars.length}</button>` : ''}
+        <button type="button" class="pr-icon" data-ui="menu" aria-label="${L.more}" aria-expanded="${String(!!ui.menu)}">⋯</button>
+        ${R.length ? (ui.step < R.length - 1
+          ? h`<button type="button" class="pr-icon" data-ui="next" aria-label="${L.next}">›</button>`
+          : h`<button type="button" class="pr-icon" data-ui="restart" aria-label="${L.restart}">↺</button>`) : ''}
       </div>
-      <div class="pr-body">
-        ${reviewBlock()}
+      ${ui.menu ? h`<div class="pr-menu">
+        ${r ? h`<div class="pr-field"><span>${L.step} ${ui.step + 1} ${L.of} ${R.length}</span><b style="color:var(--chrome-fg)">${stepName(r)}</b></div>` : ''}
         ${vars.length > 1 ? h`<div class="pr-field pr-variants"><span>◆ ${L.variant} (${vars.length} ${L.options})</span>${seg('variant', S.variant, vars.map(v => [v, v]))}</div>` : ''}
         <div class="pr-field"><span>${L.width}</span>${seg('width', ui.width, [['fit', L.fit], ['phone', L.phone], ['desktop', L.desktop]])}</div>
         ${M.meta.languages.length > 1 ? h`<div class="pr-field"><span>${L.lang}</span>${seg('lang', S.lang, M.meta.languages.map(l => [l, l]))}</div>` : ''}
-        <span class="pr-token" title="#${P.frame()}">${L.keys}</span>
+        ${R.length ? h`<details class="pr-all"><summary>${L.all} (${ui.seen.size}/${R.length})</summary>
+          <ol>${R.map((x, i) => h`<li><button type="button" data-ui="step" data-v="${i}" aria-current="${String(i === ui.step)}"><span class="pr-tick">${ui.seen.has(keyOf(x)) ? '✓' : i + 1}</span>${stepName(x)}</button></li>`)}</ol>
+        </details>` : ''}
+        <span class="pr-token">${L.keys}</span>
         ${S.problems.length ? h`<div class="pr-problems" role="alert">${S.problems.length} ${L.problems}:\n${S.problems.slice(-6).join('\n')}</div>` : ''}
-      </div>`);
+      </div>` : ''}`);
   }
 
   document.addEventListener('click', e => {
@@ -749,6 +739,7 @@ P.define({
     if (!el || screenEl.contains(el) || el.disabled) return;
     const k = el.dataset.ui, v = el.dataset.v;
     if (k === 'hide') setHidden(!ui.hidden);
+    else if (k === 'menu') { ui.menu = !ui.menu; chrome(); }
     else if (k === 'next') goStep(ui.step + 1);
     else if (k === 'prev') goStep(ui.step - 1);
     else if (k === 'restart') restart();
@@ -764,6 +755,7 @@ P.define({
     if (e.ctrlKey && e.key === 'ArrowRight') goStep(ui.step + 1);
     else if (e.ctrlKey && e.key === 'ArrowLeft') goStep(ui.step - 1);
     else if (!e.ctrlKey && (e.key === 'h' || e.key === 'H')) setHidden(!ui.hidden);
+    else if (e.key === 'Escape' && ui.menu) { ui.menu = false; chrome(); }
     else return;
     e.preventDefault();
   });

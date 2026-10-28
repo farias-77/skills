@@ -1,8 +1,7 @@
 # Right-sizing a design
 
-Read by `architect (Opus 5.5, high)`, `overengineering-guard (Opus 5.5,
-medium)` and the conductor (Opus 5.5, high) before a proposal is
-written, cut or ruled. Cited by section number (§3 C4, §4 R2); keep
+Read by the `architect`, the `overengineering-guard` and the session
+before a solution is drafted, cut or ruled. Cited by section number (§3 C4, §4 R2); keep
 the numbers when editing.
 
 ## 1 · The bar: the basics done well
@@ -53,9 +52,9 @@ default, the standards win.
 
 ## 3 · The checklist
 
-Pass/fail on the proposal or a document.
+Pass/fail on the solution or a document.
 
-**A · The proposal**
+**A · The solution**
 
 - A1. One solution, not options. It meets every AC and the floor; one
   that fails an AC is broken, not basic.

@@ -4,13 +4,13 @@ export const meta = {
   whenToUse: 'Stage 1 (discovery), step D4, after proto.mjs split has cut the stories (and, with a mock, after proto.mjs trace passes)',
   phases: [
     { title: 'Lenses', detail: 'disc-lens × 3: in-out, coverage, acceptance' },
-    { title: 'Double-blind', detail: 'per story: blind-reader × 2, then blind-judge' },
+    { title: 'Double-blind', detail: 'per story: story-reader × 2, then blind-judge' },
   ],
 }
 
 const AGENTS = {
   'disc-lens': { model: 'sonnet', effort: 'medium' },
-  'blind-reader': { model: 'sonnet', effort: 'low' },
+  'story-reader': { model: 'haiku', effort: 'high' },
   'blind-judge': { model: 'sonnet', effort: 'medium' },
 }
 const LENSES = ['in-out', 'coverage', 'acceptance']
@@ -111,7 +111,7 @@ function readIndex(index) {
 }
 
 const D = args?.discoveryDir
-const language = args?.language ?? 'the language of the documents'
+const language = args?.language ?? 'English'
 const { problems, stories = [], vocabulary } = readIndex(args?.index)
 const rules = String(args?.proto ?? '').replace(/scripts\/proto\.mjs$/, 'references/stories.md')
 const mockLine = args?.mock
@@ -173,7 +173,7 @@ const coversEvery = (s) => (r) => {
 
 async function readTwice(s) {
   const read = (who) => once(
-    () => call('blind-reader', `Reader ${who}, of one story.\n${storyInputs(s)}`, { label: `${s.id}·${who}`, phase: 'Double-blind', schema: READING }),
+    () => call('story-reader', `Reader ${who}, of one story.\n${storyInputs(s)}`, { label: `${s.id}·${who}`, phase: 'Double-blind', schema: READING }),
     coversEvery(s),
     `${s.id} reader ${who}`,
   )

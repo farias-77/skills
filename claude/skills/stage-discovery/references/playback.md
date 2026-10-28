@@ -25,7 +25,7 @@ the group once.
 | Ruling | When | Goes to |
 |---|---|---|
 | **fix, owner `story-writer`** | the fix changes how something is written and decides nothing: an AC rewritten to the oracle, a THEN given its observed place, a value the oracle holds, two ACs on one rule merged | the writer, in one batch, without asking him |
-| **his, at the playback** | the fix changes the behavior he decided (an amendment), adds or removes scope, touches personal data, money or a stated constraint, or contests something he confirmed | one question per decision, inside the story's playback call |
+| **his, at the playback** | the fix changes the behavior he decided (an amendment), adds or removes scope, touches personal data, money or a stated constraint, or contests something he confirmed | one question per decision, in the playback's question call |
 | **for the design** | the answer is a mechanism: a lock, a retry policy, a status code, a storage shape, a threshold, where a job runs | `reviews.md` "For the design"; never asked here |
 | **dismissed** | taste, wording, a divergence that builds the same thing, a misread | dies with the sentence or frame token that forecloses it, quoted |
 
@@ -57,55 +57,45 @@ goes to the playback as his.
 
 ## The playback
 
-Blocks of at most four stories. Each block is two things, in order.
+One message, then one question call. He does not read the stories: the
+message is how he checks that what was understood is what he wants.
 
-**1. The explanation, one chat message.** Written for a newcomer who
-was not in the interview, in his language, plain words, no ids. Per
-story:
+**1. The message: what was understood, in a plain text.** In his
+language, plain words, no ids, no GIVEN/WHEN/THEN, no list of stories.
+Everything he needs to know, nothing he does not: if a line would not
+change his answer, it is not there. In this order:
 
-- **What it is**, in one sentence.
-- **An example**, with the fixtures' names and real numbers: "Marina
-  has 10 invites sent today; she sends one more to João; it is
-  refused and João gets nothing."
-- **When it fails**: what the person sees and what is not written.
-- **See it**: with a mock, the review steps of the story's key
-  moments ("the mock, review steps 4 to 7"), in the order they happen;
-  with no screen, the flow drawn in a code block:
+- **What we will build**, two or three sentences: who uses it, what
+  they can do that they cannot today, and why.
+- **The flow**, drawn in a code block: the main path and where it
+  branches when something fails.
 
 ```
-file arrives ──► validated ──► 120 rows written ──► summary e-mail
-                    │ invalid
-                    └──► nothing written · the error e-mail names the line
+manager invites ──► e-mail arrives ──► person accepts ──► joins the team
+                         │ link expired (7 days) ──► "ask for a new invite"
 ```
 
-**2. The question call**, four stories at most. Each question is one
-story:
+- **The rules as understood**, one short line each, with the real
+  numbers and the actor: "a manager sends at most 10 invites a day; the
+  11th is refused on the spot". Every rule of the Rules table, the
+  error paths (limit, failure, permission, repeat) and what is written
+  or not when they happen. Merge what reads as one rule; never pad.
+- **What stays out**, one line.
+- **What we assumed**, one line each: the writer's and your Inferred
+  entries he never discussed, so he can catch a wrong guess.
+- **What is his to decide**, numbered: the review's findings that are
+  his, each with your pick and why in one line. "None" when none.
+- **See it**: with a mock, the review steps to follow ("the mock,
+  Ctrl+→ through steps 1 to 48"); in local mode, the shots' PNG paths.
 
-- **The question text:** the story's title and job in one line; its ACs
-  one line each (the id and the behavior in plain words, never the
-  GIVEN/WHEN/THEN); the review's decisions on that story that are his,
-  each with the conductor's pick and why; the writer's Inferred entries
-  on that story.
-- **The options:**
-  1. **Confirm** (recommended, when nothing of his is open) — the story
-     and the picks stand.
-  2. **Adjust** — he writes in "Other" what changes.
-  3. **Cut** — the story leaves the scope; an Out line takes its place.
+**2. The question call**, one call:
 
-  When a decision of his on that story has a real alternative, the
-  options are the decision's answers instead, the pick first ("Confirm,
-  one read per manager (recommended)" · "Confirm, one read per tab").
-
-**An adjust that changes behavior is an amendment.** With a mock, in
-order: a round order to the `prototype-builder` (the mock changes and
-is republished), `proto.mjs lock` again with his answer as the lock
-words, the `story-writer` re-derives only that story, `trace` green.
-With no screen: his answer becomes a Confirmed line in the notes, and
-the `story-writer` re-derives only that story. His answer is the lock;
-nothing waits for another "ok".
-
-**The last call carries the design question**, one question beside
-the stories:
+- One question per decision of his from the list, its options the
+  decision's answers, your pick first.
+- One question **"Is this what we build?"**: **Confirm** (recommended
+  when nothing of his is open) · **Adjust** (he writes in "Other" what
+  changes).
+- The design question, beside them:
 
 | Option | Means for stage 2 |
 |---|---|
@@ -113,4 +103,14 @@ the stories:
 | **I have an idea** (Other) | his words go to the architect as his idea |
 | **I have a constraint** (Other) | his words go to the architect as a constraint |
 
-Write the answer, verbatim, to the notes' "For the design" block.
+Write the design answer, verbatim, to the notes' "For the design" block.
+
+**An adjust that changes behavior is an amendment.** With a mock, in
+order: a round order to the `prototype-builder` (the mock changes and
+is republished), `proto.mjs lock` again with his answer as the lock
+words, the `story-writer` re-derives only the stories it touches,
+`trace` green. With no screen: his answer becomes a Confirmed line in
+the notes, and the `story-writer` re-derives only the stories it
+touches. Then one short message with only what changed, and the
+"Is this what we build?" question again. His Confirm closes the
+playback; nothing waits for another "ok".

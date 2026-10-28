@@ -1,14 +1,14 @@
 # Design notes — <workstream>
 
 <!--
-  Written by the conductor as the stage happens. With proposal.md it is
-  the writers' source: proposal.md says what is built; this file says
+  Written by the session as the stage happens. With solution.md it is
+  the writers' source: solution.md says what is built; this file says
   what exists today, his words, how the debate went, and every answer
   given to the writers. A revised decision replaces the old text in
   place and is dated under Amendments.
 -->
 
-Opened <date>. Language: <language>.
+Opened <date>.
 Lock: stories <S-001 … S-0NN> · ACs <n> · mock: `00-discovery/prototype/` v<N>, journeys <n> | none (no screen).
 
 ## What we are building (one sentence)
@@ -37,13 +37,13 @@ Where the conductor disagrees, with its ground: <an AC it fails, a floor item, a
 
 ## The debate
 
-- Deck and video: <the workstream's link, Design tab>
+- The page: <the workstream's link, Design tab>
 
 ### Round <n> — <date>
 
 - **His points:** 1. "<words>" · 2. "<words>"
 - **Ruled:** <point → decision; the question's pick when one was asked>
-- **Changed in proposal.md:** <one line>
+- **Changed in solution.md:** <one line>
 
 Closed <date>: "<his words>"
 
@@ -56,7 +56,7 @@ Closed <date>: "<his words>"
 
 ## Veto list
 
-<!-- Every decision taken in his place after he closed the proposal:
+<!-- Every decision taken in his place after he closed the solution:
      ruled: conductor lines, guard cuts after the close. Goes in the
      close message. -->
 

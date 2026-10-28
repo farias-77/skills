@@ -1,15 +1,16 @@
 # stage-design
 
 Stage 2 of the pipeline. From the locked discovery (its stories and
-acceptance criteria, and the mock when a screen changed), one proposal sized to the problem,
-with its evolution path (v1 → v2 → v3), debated with the user until he
-says it is closed; then six documents stage 3 cuts into entries
-without asking, reviewed once by four lenses. Runs under one `/goal`;
-every question to him goes through the question tool. The stage ends
-with its report (video, deck, explainer) and the command for stage 3.
+acceptance criteria, and the mock when a screen changed), one solution
+sized to the problem, with its evolution path (v1 → v2 → v3). He sees
+it as one visual page and debates it until he says it is closed; then
+five documents stage 3 cuts into entries without asking, reviewed once
+by four lenses. Runs under one `/goal`; every question to him goes
+through the question tool. The page becomes the report's Explainer;
+video and slides only when he asks.
 
 ```
-scouts → architect → guard → deck + video → debate → six documents → review-prep → four lenses → report → /stage-plan <slug>
+scouts → architect drafts solution.md → guard cuts → the page → debate → solution expanded → five documents → review-prep → four lenses → report → /stage-plan <slug>
 ```
 
 ## Install
@@ -25,14 +26,15 @@ for the scan before the report is published.
 
 | Agent | Does |
 |---|---|
-| `scout (Haiku 5.5, medium)` | reads the current system, the standards and the other workstreams into `recon/` |
-| `architect (Opus 5.5, high)` | one proposal and its versions; the debate's edits; `solution.md` |
-| `overengineering-guard (Opus 5.5, medium)` | cuts what serves no AC and no real risk: the proposal, then the documents |
+| `scout (Haiku 5.5, high)` | reads the current system, the standards and the other workstreams into `recon/` |
+| `architect (Opus 5.5, high)` | `solution.md`: drafted, edited each round, expanded at the close |
+| `overengineering-guard (Opus 5.5, medium)` | cuts what serves no AC and no real risk: the draft, then the documents |
+| `artifact-builder (Sonnet 5.5, medium)` | the page he debates on, which becomes the Explainer |
 | `design-writer (Sonnet 5.5, high)` × up to 5 | data-and-contracts, tests, operations, security-and-access, screens |
-| `design-consistency (Opus 5.5, medium)` | documents vs each other, the proposal and the mock; screen states |
+| `design-consistency (Opus 5.5, medium)` | the six files against each other and the mock; screen states |
 | `design-security (Opus 5.5, medium)` | scope, personal data, secrets, identities |
 | `design-contracts (Sonnet 5.5, high)` | each Contract against the code that exists and will be generated |
-| `video-builder (Sonnet 5.5, high)` · `slides-builder` · `artifact-builder` (Sonnet 5.5, medium) | the deck and video of the debate, and the report: the Explainer always, the Video and the Deck when he asks |
+| `video-builder (Sonnet 5.5, high)` · `slides-builder (Sonnet 5.5, medium)` | the Video and the Deck, only when he asks |
 
 ## Files
 
@@ -40,9 +42,9 @@ for the scan before the report is published.
 |---|---|
 | `SKILL.md` | the stage, step by step (D0–D7) |
 | `references/right-sizing.md` | the bar, the overengineering list, the floor, the versions |
-| `references/documents.md` | what each of the six documents carries and never carries |
+| `references/documents.md` | what each of the six files carries and never carries |
 | `references/contracts.md` | the Contract: headers, required · optional · nullable, error codes, the OpenAPI fragment |
-| `templates/proposal.md` | the architect's proposal |
-| `templates/solution.md` … `templates/screens.md` | the six documents |
-| `templates/notes.md` · `templates/reviews.md` | the conductor's record and rulings |
-| `scripts/review-prep.mjs` | the six documents exist, every AC is proved, no open question is left, sizes (`--self-test` runs its own cases) |
+| `templates/solution.md` | the architect's file, from draft to closed |
+| `templates/data-and-contracts.md` … `templates/screens.md` | the five documents |
+| `templates/notes.md` · `templates/reviews.md` | the session's record and rulings |
+| `scripts/review-prep.mjs` | the six files exist, every AC is proved, no open question is left, sizes (`--self-test` runs its own cases) |

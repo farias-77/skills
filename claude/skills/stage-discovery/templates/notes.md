@@ -6,8 +6,8 @@
   point; story-writer, which writes the stories from it at the end of the
   interview; prototype-builder, which builds the mock from the stories and
   it when a screen changes.
-  If a fact is not here (or, later, in the locked mock), they do not know it. Write in the
-  user's language; keep his own words where they carry a decision or a taste.
+  If a fact is not here (or, later, in the locked mock), they do not know it. Write in
+  English; quote his own words where they carry a decision or a taste.
 -->
 
 ## Starting point
@@ -112,10 +112,6 @@
 |---|---|---|---|
 | v1 | <date> | first build: J1, J2 | the stories |
 | v2 | <date> | <change> | <round n · comment <id> · chat> |
-
-## Bets
-
-- <assumption> — checked by <search · document · his knowledge> — <holds · does not hold · unchecked>
 
 ## Open
 

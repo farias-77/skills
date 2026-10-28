@@ -1,6 +1,6 @@
 # The mock
 
-Read by `prototype-builder (Sonnet 5.5, medium)` before every build and
+Read by `prototype-builder (Sonnet 5.5, high)` before every build and
 by the conductor (Opus 5.5, high) when it writes a round order. A mock
 exists only when a screen changes; it is built after the stories, from
 `stories.md` and the notes, and he iterates it until he says it is
@@ -48,12 +48,12 @@ with no error shown.
 ## The shell contract
 
 Start from `templates/prototype-shell.html`, never from a blank page.
-Four places are yours: the `<title>` (the feature's name + "mock"),
+Four places are yours: the `<title>` (`Mock - <feature>`),
 the style block `id="tokens"`, the style block `id="product"`, and the
 script block `id="product"`. Keep the three blocks as files,
 `prototype/_src/tokens.css`, `product.css` and `product.js`, and build
 `index.html` from them with
-`node <proto.mjs> assemble <prototype>/index.html --shell <shell> --title "<name> mock" --tokens <_src/tokens.css> --css <_src/product.css> --js <_src/product.js>`;
+`node <proto.mjs> assemble <prototype>/index.html --shell <shell> --title "Mock - <feature>" --tokens <_src/tokens.css> --css <_src/product.css> --js <_src/product.js>`;
 never edit `index.html` by hand. The blocks marked SHELL are not
 yours; a bug there is reported, never patched.
 
@@ -72,7 +72,7 @@ The product block is one `P.define({...})` call:
 | `actors` | when more than one kind of user sees it: `[{ id, title, home }]`, the controls' "View as" |
 | `clock` | when time changes what is shown: `{ marks: [{ label, at }], onAdvance(s, P) }`, the controls' "Clock" |
 | `review` | the path he follows with Ctrl+→: `[{ frame, check, as, theme }]`, every state he must see in the order of the flow, each with one line of what to check from the story's ACs, the actor it is seen as (`as`), and `theme: 'dark'` where a dark view matters |
-| `meta.uiLang` | the language of the controls' labels: `en` or `pt-BR` (his); `meta.ui` overrides any label |
+| `meta.uiLang` | the language of the controls' labels: `en` (the default) or `pt-BR`; `meta.ui` overrides any label |
 
 Helpers: `P.html` (escapes; `P.raw` for trusted markup), `P.t(key,
 vars)`, `P.fmt.number/money/date/time/relative`, `P.nav(screen, state,
@@ -87,19 +87,18 @@ the screen's own), each already seen as the right actor, and every
 screen once in each theme, so he never opens a control to see
 something. Write `review` so it holds all of that in the order of the
 flow; the shell adds any frame left out, and a dark pass (the screen's
-first step again) for a screen with no dark step. The controls float
-above the product in one small panel, outside `#screen`; H hides it,
-and hidden it is a one-line label: the screen and "7/48", with a
-"◆" when the screen has design options. The panel holds
-the review (progress, the step's name, what to check, ← / →, "All
-steps" to jump, ticks, "Review complete", the place he stopped
-remembered), the width (always: Fit, Phone, Desktop; the review
-renders at the width he picks, never one step per width), the design
-options only on a screen that has them (signalled "◆ 2 options"; a
-"◆" on the hidden label), and the language when there is more than one.
-No state picker, "view as", theme, clock or journey is shown: the
-review covers them. Inside a published artifact the `#hash` does not
-reach the page; the review is the way there. So every state he must be able to see is a
+first step again) for a screen with no dark step. The controls are one
+thin bar at the top, a label: "‹ 7/48 <what to check here> ⋯ ›", a
+"◆ 2" when the screen has design options, a red dot on a mock problem.
+The page moves down by the bar's height, so the bar never covers the
+product; H hides the bar. Everything else sits behind "⋯" (Esc closes
+it): the step's screen, state, actor and theme, the design options, the
+width (Fit, Phone, Desktop; the review renders at the width he picks,
+never one step per width), the language, "All steps" to jump. Write each
+`check` as the one sentence he reads on that bar: short, concrete, what
+to look at on this screen. No state picker, "view as", theme, clock or
+journey is shown: the review covers them. Inside a published artifact
+the `#hash` does not reach the page; the review is the way there. So every state he must be able to see is a
 frame with its own title (a loading state is a frame, not a slow
 request he has to time). Never draw a "view as" switch, a clock or a
 "Mock" strip inside `#screen`: everything there is in the reference
@@ -112,8 +111,8 @@ frames.
 - A screen's state is **one value** (the frame token's tail), never a
   set of booleans.
 - Every state the mock reaches is a **frame** whose `setup` reaches it
-  from `seed()`. A state only the controls reach is `debugOnly`; every
-  other frame is visited by a journey.
+  from `seed()`. A state no journey reaches (one only the tools render)
+  is `debugOnly`; every other frame is visited by a journey.
 - **Every visible string is a copy key** present in every language.
 - An action is reached through `data-act` on a button or a `<form>`.
   Inputs have a `name`, an `id` and a `<label>`.

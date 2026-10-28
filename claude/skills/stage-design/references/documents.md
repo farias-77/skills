@@ -1,8 +1,7 @@
 # The six documents
 
-Read by every `design-writer (Sonnet 5.5, high)`, by the
-`architect (Opus 5.5, high)` when it writes `solution.md`, by the four
-lenses, and by the conductor. The documents are machine input: stage 3
+Read by every `design-writer`, by the `architect` when it expands
+`solution.md` at the close, by the four lenses, and by the session. The documents are machine input: stage 3
 cuts them into entries without asking, stage 4 builds from them. Write
 to be consumed, not admired.
 
@@ -10,7 +9,7 @@ to be consumed, not admired.
 
 | # | Document | Carries | Never carries | Written by |
 |---|---|---|---|---|
-| 1 | `solution.md` | the closed proposal, expanded: the parts, the flows step by step, the names, the versions (v1 → v2 → v3), the decisions and where the architect disagreed with him | columns, JSON, test cases | `architect` |
+| 1 | `solution.md` | the closed solution, expanded at the close: the parts with their repo and path, the flows step by step with their failures, the names, the versions (v1 → v2 → v3), the decisions and where the architect disagreed with him | columns, JSON, test cases | `architect` |
 | 2 | `data-and-contracts.md` | tables and expand-only migrations; one **Contract** per feature (see `contracts.md`); events, when there are any | why the design is shaped so (that is `solution.md`) | `design-writer` |
 | 3 | `tests.md` | each AC by id → the layer that proves it and what the proof asserts; one walk per journey, one test step per AC; the floor tests the demand touches | the AC's text (cited by id only); status codes or JSON fields as the proof | `design-writer` |
 | 4 | `operations.md` | migration and rollout order, flags (usually "None."), the alarms that would wake someone, rollback per step, and the **Resources** table | dashboards nobody decides from | `design-writer` |
@@ -18,7 +17,7 @@ to be consumed, not admired.
 | 6 | `screens.md` | only when a screen changes (otherwise `None: no screen changes`): each screen of the locked mock mapped onto the real frontend: the route, the component it extends, the states it reaches, the mock frames it follows, the data it shows (the contract that serves it), what the mock fakes | copy rewritten (the mock's copy is the copy) | `design-writer` |
 
 **A document with nothing to carry** (a landing section with no table,
-no resource, no new access rule) is one line written by the conductor,
+no resource, no new access rule) is one line written by the session,
 `None: <why>`, with no writer and no lens on it.
 
 ## The Resources table (in `operations.md`)
@@ -32,10 +31,10 @@ changes has a row and an owner. "None." when there are none.
 
 ## Rules that cross every document
 
-**The proposal is the source.** Every decision and every name comes
-from the closed `proposal.md` and its names table. A writer builds what
+**The solution is the source.** Every decision and every name comes
+from the closed `solution.md` and its names table. A writer builds what
 it says and nothing above it: a mechanism it does not have is a
-question, never an addition; a mechanism it has is never dropped.
+question; a mechanism it has stays in.
 
 **One owner per fact.** The data and the wire live in
 `data-and-contracts.md`; the shape in `solution.md`; the proof in
@@ -54,7 +53,7 @@ column, index, route, job, flag, cap, retry, alarm, test) ends with
 | `rule:<id>` | a business rule of the stories' Rules table |
 | `std:<id>` | a rule of the project's standards |
 | `floor:D<n>` | the floor (`right-sizing.md` §3 D) |
-| `door:<name>` | a one-way door the proposal names |
+| `door:<name>` | a one-way door the solution names |
 | `ruling:<date>#<n>` | a line of `rulings.md` |
 
 **Decisions inline.** Every choice that could have gone another way:
@@ -90,4 +89,4 @@ a piece runs and what happens when the other side fails; a stored
 field's key, format and retention; a contract's shape; who can do
 what; which alarms exist; what was relaxed. Names of code (a component,
 a helper) are the implementer's; names of the domain are the
-proposal's.
+solution's.
