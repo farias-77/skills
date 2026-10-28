@@ -23,12 +23,17 @@ one line. The full route is six stages. He is asked only what is his.
 
 | Stage | How it runs | Where he is in the loop |
 |---|---|---|
-| 1 discovery | a conversation, no `/goal` | he is interviewed; when a screen changes, he iterates its mock until he says it is ready; he confirms the stories one by one at the playback |
-| 2 design | one `/goal` | he debates the one proposal (deck first, then a ≤60 s video) until he says "closed"; rarely, a question that changes a locked AC, adds a recurring cost or cannot be undone |
+| 1 discovery | a conversation, no `/goal` | he is interviewed; when a screen changes, he iterates its mock until he says it is ready; he confirms one plain text of what was understood at the playback |
+| 2 design | one `/goal` | he debates the one solution, drawn as one visual page, until he says "closed"; rarely, a question that changes a locked AC, adds a recurring cost or cannot be undone |
 | 3 plan | one `/goal` | nothing; the close lists what was decided in his place for his veto |
 | 4 execute | one `/goal` | the pre-flight items only he can run; his hands-on with the running app, each answer an `A.n` round, until his "ok" |
 | 5 release | his go is the release's `/goal` | only the stop list (an irreversible step the `/goal` does not name, a new production deploy after a rollback, a second red) |
-| 6 close | one `/goal` | nothing; he forwards the users' video and the "what's new" text |
+| 6 close | one `/goal` | which material to make for the users (video, deck); he forwards it with the "what's new" text |
+
+Once a week, `/weekly-retro` reads every workstream that moved and is
+where he rules what changes in the pipeline and in a project's
+standards; `/standards` builds a project's standards book and applies
+what he approved there.
 
 ## Every stage opens and closes the same way
 
@@ -96,13 +101,29 @@ is a line there too, marked **`[taste]`**. Every stage also notes its
 own frictions as they happen. The close's retro and the weekly retro
 read this file, `[user]` lines first.
 
+## The project's rules live in its standards book
+
+The pipeline carries no taste of its own. Each project keeps its
+architecture map, its engineering, testing, security and operations
+rules, its design system and its feature maps in one folder of its own
+repo, named by `standards: <folder>` in its `CLAUDE.md`
+([`claude/skills/standards/references/book.md`](claude/skills/standards/references/book.md)
+is the contract). Every stage reads the files it needs, every reviewer
+cites a rule by its id, and the builders keep the maps current in the
+same diff as the change. A gap the work shows (a finding no rule
+covers, a pattern the book lacks, a step the runbook missed) is a line
+in `dreaming-notes.md` marked **`[standards]`**; the close gathers
+them, the weekly retro rules them, and `/standards update` opens the
+pull request. A project with no `standards:` line gets one line
+proposing `/standards setup`, and the stage goes on.
+
 ## The session never reads to look something up; it sends a scout
 
 A stage's session is an expensive model in a long conversation: a file
 it opens is paid again on every turn after. **When it needs something
 it has not read** (what a document says, what a repo has, what a
 standard requires, what a past workstream recorded), **it dispatches
-`scout (Haiku 5.5, medium)`**, which quotes the literal lines with
+`scout (Haiku 5.5, high)`**, which quotes the literal lines with
 `path:line`, says where it looked and what it did not find, and writes
 its answer to the file the session names (`recon/<topic>.md`). The
 session opens a file itself only when it is about to rule on it, when
@@ -152,28 +173,36 @@ The stage's `reviews.md` keeps the detail; `rulings.md` and
 
 ## One link per workstream, finished before the stage closes
 
-Each workstream has **one report link**: a rail of stages, each with three
-tabs, **Video · Deck · Explainer** (the short route's exceptions are in
+Each workstream has **one report link**, an artifact titled
+`Report - <workstream>`: one tab per stage, and each stage is **one
+page that scrolls**: the video on top when one was made, then the deck,
+then the Explainer (the short route's exceptions are in
 [docs/stage-report.md](docs/stage-report.md)). The page is the fixed shell
-`claude/report/shell.html` plus `report.json`; the tabs are built by
+`claude/report/shell.html` plus `report.json`; the pieces are built by
 `video-builder (Sonnet 5.5, high)`, `slides-builder` and
 `artifact-builder` (both Sonnet 5.5, medium), or an Explainer filled from a template where the stage's
 data is a graph or a timeline. **The Explainer is always made; the
 Video and the Deck only when he asks for them**: at each stage's
 close, one question through the question tool (multi-select: Video ·
 Deck; none is a valid answer), asked while the Explainer is already
-being built. A tab he did not pick is `skipped` in `report.json`.
-**A stage closes only when its Explainer and the tabs he picked are
-published**: he validates through them. Before each publish,
+being built. A piece he did not pick is `skipped` in `report.json`.
+**A stage closes only when its Explainer and the pieces he picked are
+published**: he validates through them. Every artifact the pipeline
+publishes is named `<Kind> - <name>`: `Report - <workstream>`,
+`Mock - <feature>`, `Architecture - <project>`,
+`Design System - <project>`. Before each publish,
 `gitleaks dir <workstream>` must be clean (where gitleaks is not on
 PATH, `make gitleaks dir=<workstream>`, here and in every stage). The
 page stays private; anything published outside the company needs his
 approval. The procedure is [docs/stage-report.md](docs/stage-report.md).
 
+Everything the pipeline writes into a repo is in English: the stage
+files, the standards book, the code, the commits and the pull requests.
 The stage files (`*.md` under the workstream) are written for the machine,
-complete and exact, in his language (his words verbatim; ids, keywords
-and headings as the templates have them); the `language` a writer's
-brief names is that language. The report is for a person: a picture first, short
+complete and exact (his words quoted verbatim where they carry a
+decision; ids, keywords and headings as the templates have them); the
+`language` a writer's brief names is English, and only the product's
+visible copy is in the users' languages. The report is for a person: a picture first, short
 sentences, only what would change a decision, and the file named as
 the authority for the rest. The report and every other artifact are in
 simplified English, with the exceptions it lists, by
@@ -225,25 +254,48 @@ commit that is in `origin/<base>` after a fetch.
 ## Every stage measures itself, by script
 
 Nothing is recorded by hand. `node claude/scripts/telemetry.mjs <slug>`
-reads the transcripts and the entries' `run-*.json`, and writes the workstream's `metrics.json` (time, cost as an estimate, his
-touches per stage); a value it cannot measure is `null` with a line in
-`gaps`. The retro and the weekly retro use those numbers.
+reads the transcripts, the entries' `run-*.json` and the workstream's
+files, and writes its `metrics.json`: time, cost as an estimate and his
+touches per stage, plus the `signals` the weekly retro compares (first
+passes, rounds, rulings taken in his place, tagged notes, rule ids
+cited); a value it cannot measure is `null` with a line in `gaps`. The
+retro and the weekly retro use those numbers.
 
 ## Writing skills, agents and workflows
 
 - **Prompts** follow the Opus 5.5 and Sonnet 5.5 prompting guides
   (platform.claude.com, prompt engineering): effort sets the thinking,
-  so no "think carefully" lines; name the early stops you do not want;
+  so no "think carefully" lines (the one exception is "Think the
+  problem through before you answer." for an agent that answers in a
+  JSON schema); name the early stops you do not want;
   give Sonnet a scope line ("when the work is done and checked, stop
   and report; add nothing that was not asked") and a real check before
   it reports done.
+- **One shape per kind.** An agent: frontmatter (name, a one-line
+  description saying what it does and who calls it, model, effort,
+  tools), a short role paragraph, then `## What you receive` ·
+  `## How you work` (ending on "Done when …") · `## Boundaries` ·
+  `## Report`, and the Commands paragraph of
+  `claude/references/commands.md`, verbatim, when it has Bash. A
+  section that does not apply is left out; the order never changes. A
+  skill: frontmatter (name, what it does and when to use it,
+  argument-hint, allowed-tools), the bar (what done means), the flow
+  (one diagram, one step · who · produces table), what you read (each
+  reference and its step), files, opening, the steps, close, resuming.
+- **One agent, one job.** Modes only when the inputs are alike; two
+  procedures make two agents.
+- **Progressive disclosure.** A `SKILL.md` says what and when; the how
+  of a step lives in `references/`, read at that step. Knowledge both
+  the session and an agent read (a format, a contract) lives in one
+  reference, never copied into a prompt.
+- **Say the target behavior.** Write what to do; a prohibition only as
+  a hard guardrail, next to what to do instead.
 - **Every skill folder has its own `README.md`**: what it does, how to
   install only it, its files. Knowledge lives in the skill's
   `references/`; there are no knowledge-pack skills.
 - **Workflows** are plain JavaScript files named `<name>-workflow.js`
   under `claude/workflows/`: small named functions, sections that match
-  the phases, comments only for why. Each has a dry run under
-  `scripts/`.
+  the phases, comments only for why. Each has a dry run under `tests/`.
 - **This repo is public:** generic English, no company, product or
   person's name.
 - Literal sentences, one idea each, concrete values. Prefer removing to

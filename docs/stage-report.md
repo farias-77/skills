@@ -1,40 +1,42 @@
 # The stage report
 
-Each workstream has **one link**. The page has a rail of stages on the
-left, and each stage has three tabs: **Video · Deck · Explainer**. The
-Explainer is always made; the Video and the Deck only when he asks for
-them at the stage's close. The same link fills in as each stage
-finishes.
+Each workstream has **one link**, an artifact titled
+`Report - <workstream>`. The page has one tab per stage on the left,
+and each stage is **one page that scrolls**: the video on top when one
+was made, then the deck, then the Explainer, then the stage's numbers.
+The Explainer is always made; the Video and the Deck only when he asks
+for them at the stage's close, and a piece he did not ask for takes no
+room. The same link fills in as each stage finishes.
 
 ```
 ┌──────────────┬───────────────────────────────────────────┐
 │ Operations   │  ● CLOSED · 05/10 14:20                   │
 │              │  Design                                   │
-│ ● Discovery  │  Video   Deck   Explainer                 │
-│ ● Design  ◀  │  ┌─────────────────────────────────────┐  │
-│ ◐ Plan       │  │  player / slides / explainer        │  │
-│ ○ Execute    │  └─────────────────────────────────────┘  │
-│ ○ Release    │  time · cost · your touches               │
-│ ○ Close      │                                           │
+│ ● Discovery  │  VIDEO     ┌───────────────────────────┐  │
+│ ● Design  ◀  │            │  player (when made)       │  │
+│ ◐ Plan       │  DECK      │  slides (when made)       │  │
+│ ○ Execute    │  EXPLAINER │  the explainer, always    │  │
+│ ○ Release    │            └───────────────────────────┘  │
+│ ○ Close      │  time · cost · your touches               │
 └──────────────┴───────────────────────────────────────────┘
 ● closed   ◐ running   ○ not yet          (phone: the rail becomes a top bar)
 ```
 
 **The report is finished before the stage closes.** The user validates
 much of the work through it, so the stage's closing message goes out only
-when its Explainer and the tabs he picked are published, and that
+when its Explainer and the pieces he picked are published, and that
 message carries the link.
 
-## What each tab shows
+## What each piece shows
 
 | Stage | Video | Deck | Explainer |
 |---|---|---|---|
 | Discovery | the problem and the solution told through the stories, 60–90 s | the story map, rules, what stays out, his decisions | the locked mock + a clickable map of stories → ACs; with no screen, the story map with each flow drawn |
-| Design | the proposal: one picture of the system, the main flow, the evolution path | decisions (against the recommendation first), risks accepted, what the guard cut | the architecture: layers, data in motion, the v1 → v2 → v3 selector |
+| Design | the solution: one picture of the system, the main flow, the evolution path | decisions (against the recommendation first), risks accepted, what the guard cut | the solution drawn: the system as a mind map (parts, patterns, infrastructure, every connection; what changes highlighted), data moving through each flow and where it fails, the v1 → v2 → v3 selector, the disagreements and the cuts; built at D3 for the debate, final at the close |
 | Plan | the graph assembling: contract commit, entries in parallel, critical path | entries, edges and why, merge points with other workstreams, what was decided in his place | the clickable DAG (each node: ACs, files, dependencies) |
 | Execute | what was built, real screens in motion | per entry: ACs → proofs, findings, A.n, what is parked | the replay of the DAG on a timeline: what ran when, where the time went |
 | Release | main → staging → tag → production, smokes and the watch, 30–45 s | versions, notes, smokes, rollback if any | the release timeline; with an incident, the incident drawn |
-| Close | **for users**: a tutorial of the new screens, or a motion piece of the idea if only the backend changed, 30 s – 3 min, recorded on staging | the retro (up to 5 per section) + the numbers + the "what's new" text to paste | the workstream's numbers: time, cost and touches per stage, against earlier workstreams |
+| Close | **for users**: a tutorial of the new screens, or a motion piece of the idea if only the backend changed, 30 s – 3 min, recorded on staging, in the project's design system | **for the team**: the feature explained screen by screen, in the project's design system, ending on the "what's new" lines | the workstream's numbers (time, cost and touches per stage, against earlier workstreams) and the retro, with its proposals for the standards |
 
 **Short route and hotfix:** the rail is **Build · Release · Close**. What
 each of their tabs holds is the table in `lets-cook` §8 "The short close",
@@ -49,7 +51,7 @@ touches) come from the telemetry.
 | Deck | `slides-builder (Sonnet 5.5, medium)` | `pitch-it-for-me`, HTML slides paged inside the report |
 | Explainer · discovery, design, a release incident | `artifact-builder (Sonnet 5.5, medium)` | `draw-it-for-me` |
 | Explainer · plan, execute, release, close | **no agent**: the template `claude/report/explainer.html` + an `explainer.json` the session fills | from `plan.graph.json`, the board, `trace.md` or the telemetry |
-| The page (rail + tabs) | the fixed template `claude/report/shell.html` + `report.json` | no build step |
+| The page (one tab per stage, its pieces stacked) | the fixed template `claude/report/shell.html` + `report.json` | no build step |
 | Publishing | the stage session (Opus 5.5, high) | Artifact, always to the same URL |
 
 **The look** is the report's, one set of tokens in `claude/report/tokens.css`
@@ -71,36 +73,33 @@ stage work done
   → meanwhile, one question through the question tool, multi-select:
       "The Explainer is being made. Also make:"  Video · Deck   (none is a valid answer)
     under a /goal it is his question like any other; the Explainer does not wait for it
-  → report.json: this stage "running", the Explainer and the picked tabs "building",
+  → report.json: this stage "running", the Explainer and the picked pieces "building",
     the others "skipped"; its numbers from
     node claude/scripts/telemetry.mjs <slug> --stage <stage> --ws <workstream> --out -
   → in parallel, only what he picked: video-builder · slides-builder
   → wait for what was started (renders queue on the machine, one at a time)
   → gitleaks dir <workstream> (or make gitleaks dir=<workstream>); a finding stops the publish (a leak, per the security standard)
   → the session reads the new text files, then publishes to the SAME url: index.html, report.json and this stage's files only (never _scratch/)
-  → report.json: the stage "closed" with closedAt, each made tab "ready" (or "failed" with why), the others "skipped"; publish once more
+  → report.json: the stage "closed" with closedAt, each made piece "ready" (or "failed" with why), the others "skipped"; publish once more
   → the closing message: the link (…#<stage>), then what the stage asks of him
 ```
 
-**The design debate's video** is the exception that runs early. At the
-start of the debate, the proposal's deck goes out first, with the question
-"Closed / I have points" and "the video arrives in ~N min". The video
-follows: at most 60 s, 720p at 24 fps, rendered with `--first` so it goes
-ahead of the queue. Both are published on the link at once (Design,
-running). This video stays the Design tab's video, unless the debate
-added or removed a part of the system; then it is rendered again from the
-closed proposal.
+**The design debate's page** is the exception that runs early. The
+Explainer is built from the drafted `solution.md` at D3 and published
+(Design, running) before the debate's first question; each round
+redraws only what changed; at the close it shows the solution as
+closed. The close's question (Video · Deck) is asked as at every stage.
 
 **The close** asks for its users' video in its question like any
 other Video; when he picks it, the close waits for it, recorded on
 staging. The video is rendered at `report/close/video.mp4` (`--size 1080 --max-mb 15`), where
-the Close tab plays it, and goes out as that `.mp4` plus the "what's new" text for him to forward;
+the Close page plays it, and goes out as that `.mp4` plus the "what's new" text for him to forward;
 nothing is published outside the company without his approval.
 
 **When a piece fails** (a render that dies, a deck that cannot be
-written), the builder gets one fix of its own and no more. The tab is set
+written), the builder gets one fix of its own and no more. The piece is set
 to `failed` with one line of why, a line goes to `dreaming-notes.md`, and
-the stage closes with the tabs that exist.
+the stage closes with the pieces that exist.
 
 **After an adjustment**, only the affected piece is rebuilt, at the same
 path, and republished with a label ("design · adjusted").
@@ -112,7 +111,7 @@ path, and republished with a label ("design · adjusted").
 
 ```
 <workstream>/report/
-├── index.html            the shell, copied from claude/report/shell.html when report/ is made, <title> set to the workstream's name
+├── index.html            the shell, copied from claude/report/shell.html when report/ is made, <title> set to `Report - <workstream>`
 ├── tokens.css            the report's look, copied from claude/report/tokens.css with the shell; the decks and explainers link it
 ├── report.json           stages, states, numbers, tabs
 └── <stage>/
@@ -154,13 +153,14 @@ per version.
 - `stages[].id`: `discovery` `design` `plan` `execute` `release` `close`, or
   `build` `release` `close` on the short route and the hotfix.
 - `state`: `closed` · `running` · `todo`.
-- A tab's `state`: `ready` · `building` · `failed` (with `why`) · `none`
-  (not made for this stage, with `why`).
+- A piece's `state` (under `tabs`): `ready` · `building` · `failed` (with
+  `why`) · `skipped` (he did not ask for it) · `none` (not made for this
+  stage). `skipped` and `none` take no room on the page.
 - `lang`: always `en`.
 - `notices` are the operations lines on the rail; drop them when they are
   no longer true.
 
-A deep link opens a stage and a tab: `…#design` or `…#design-deck`.
+A deep link opens a stage: `…#design`.
 
 ## explainer.json (plan, execute, release, close)
 
@@ -183,6 +183,7 @@ A deep link opens a stage and a tab: `…#design` or `…#design-deck`.
 - **Execute:** the same graph with each node's state, and a timeline of
   the entries.
 - **Release:** a timeline of its steps from `trace.md`.
-- **Close:** numbers and a table per stage, from the telemetry.
+- **Close:** numbers and a table per stage, from the telemetry, then the
+  retro's sections.
 
 `claude/report/example/` is a working sample of the whole report.

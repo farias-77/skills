@@ -24,7 +24,7 @@ it) the session root's `CLAUDE.md` is the source every stage reads.
 
 | # | Role | Level | Used by |
 |---|---|---|---|
-| 1 | Standards and the commands table | required | every stage |
+| 1 | The standards book and the commands table | required | every stage |
 | 2 | Golden paths | required | design, plan, execute |
 | 3 | The fast check | required | execute |
 | 4 | The entry gate, sized to the change | required | plan, execute |
@@ -49,12 +49,16 @@ it) the session root's `CLAUDE.md` is the source every stage reads.
 
 ## Required
 
-### 1 · Standards and the commands table
+### 1 · The standards book and the commands table
 
-**What it is.** A folder of short standards (architecture, backend,
-frontend, code, testing, security and data, delivery), each rule with
-an id a reviewer can cite, plus an index; and in `CLAUDE.md` the
-commands table that names the command, file or folder of every role
+**What it is.** The **standards book**: one folder the line
+`standards: <folder>` in `CLAUDE.md` names, with the project's
+architecture map, engineering, testing, security, design-system and
+operations rules and the feature maps, each rule with an id a reviewer
+can cite, plus an index (`claude/skills/standards/references/book.md`
+is its contract; `/standards setup` builds it from the repo and the
+kit's templates, and maps rules the project already keeps elsewhere);
+and in `CLAUDE.md` the commands table that names the command, file or folder of every role
 here, the worktrees root, and whether a cloud environment exists; and
 the line `designs-root: ../designs` (the folder that holds each
 workstream's folder and `_coordination.md`) in `CLAUDE.md`, in git, relative
@@ -64,16 +68,21 @@ too). Without it every stage stops at its open.
 **Why.** The pipeline carries no taste of its own. A reviewer's
 finding blocks on a `rule` basis only when it cites a written rule.
 
-**How the stages use it.** Design applies it and never reopens it; a
-change to it is his question. The builders write to it, the reviewer
-cites it by id, the weekly retro sends standards changes to him as a
-PR in the project.
+**How the stages use it.** Every stage reads the files it needs (the
+book's table says which); design applies it and never reopens it, and a
+change to it is his question; the builders follow it and keep its maps
+current in the same diff; the reviewer cites it by id; a gap the work
+shows becomes a `[standards]` line, and the weekly retro hands what he
+approved to `/standards update`, which opens one PR in the project.
+Without the `standards:` line a stage says so in one line, proposes
+`/standards setup`, and runs on what `CLAUDE.md` names.
 
 ### 2 · Golden paths
 
-**What it is.** A short file naming one exemplar per kind of code (a
-server module, an endpoint, a job, a screen, a component, a migration,
-a test per layer), each a path and one sentence on what to copy. A
+**What it is.** The "Golden paths" table of the book's
+`architecture.md`: one exemplar per kind of code (a server module, an
+endpoint, a job, a screen, a component, a migration, a test per layer),
+each a path and one sentence on what to copy. A
 kind the codebase lacks says "none"; the contract commit builds the
 first.
 
@@ -111,7 +120,7 @@ dependency. Under 5 minutes is the aim.
 once. Running the whole gate each time multiplies the clock.
 
 **How the stages use it.** The plan copies it into `plan.md`;
-`exec-gate (Sonnet 5.5, low)` runs it once per pass; the merge queue
+`exec-gate (Haiku 5.5, medium)` runs it once per pass; the merge queue
 runs it on the merged tree (skipped when the base has not moved since
 the entry's green gate).
 
@@ -359,13 +368,15 @@ the trend.
 
 **What it is.** The tokens (colors, type, spacing, radii, motion) as one
 CSS file and one JSON, generated from the source of truth, plus the
-core components with their props.
+core components with their props, listed in the book's
+`design-system.md`, which every surface follows: the screens, the
+e-mails, the mocks, the reports, the slides and the videos.
 
 **Why.** A mock that looks like another product is approved for the
 wrong reasons.
 
 **How the stages use it.** Discovery's recon hands them to
-`prototype-builder (Sonnet 5.5, medium)`; `builder-frontend (Opus 5.5,
+`prototype-builder (Sonnet 5.5, high)`; `builder-frontend (Opus 5.5,
 medium)` builds on the same tokens.
 
 ### 19 · Observability as code

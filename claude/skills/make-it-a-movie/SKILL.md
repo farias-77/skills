@@ -111,7 +111,6 @@ files or docs that weren't asked for.
 |---|---|---|
 | a stage video for the reviewer | 45–90 s | `--size 720` (default), 30 fps, `--max-mb 10` |
 | the release video for the reviewer | 30–45 s | `--size 720`, 30 fps, `--max-mb 10` |
-| the design debate's video, watched live | ≤ 60 s | `--size 720`, `fps: 24`, `--first` (goes ahead of the queue) |
 | the users' video (what is new) | 30 s – 3 min; a one-label change 30–45 s | `--size 1080` when it shows real screens, else 720; `--max-mb 15` |
 
 **One format:** 1920×1080, horizontal. A vertical or square cut is never

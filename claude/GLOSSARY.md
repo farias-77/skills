@@ -26,10 +26,10 @@ is here, it uses this one.
 | **AC** | an acceptance criterion: exactly one per rule or behaviour, judgeable by a stranger |
 | **playback** | his story-by-story confirmation (Confirm · Adjust · Cut), four stories per question call |
 | **disc-lens kinds** | **in-out** (In or Out, nothing in limbo) · **coverage** (every rule has its AC; limit, dependency failure, permission, repeat walked) · **acceptance** (a stranger can pass or fail it) |
-| **double-blind** | two `blind-reader` read one story or brief alone; a `blind-judge` compares them |
+| **double-blind** | two readers read one text alone (`story-reader` for a story, `blind-reader` for a brief); a `blind-judge` compares them |
 | **blind-judge kinds** | **diverge** (two readings) · **contradicts** (the mock or another text says otherwise) · **undecidable** (something is missing) |
-| **proposal** | design's one solution sized to the problem, with its evolution path v1 → v2 → v3 |
-| **the debate** | design's rounds with him over the proposal, until he says "closed" |
+| **solution** | design's one solution sized to the problem, with its evolution path v1 → v2 → v3, in `solution.md`: drafted, debated, closed, then expanded for the builders |
+| **the debate** | design's rounds with him over the solution, drawn as one page, until he says "closed" |
 
 ## Plan and execute
 
@@ -57,6 +57,10 @@ is here, it uses this one.
 |---|---|
 | **the report** · **the workstream's link** | one private page per workstream: a rail of stages, each with Video · Deck · Explainer, finished before the stage closes (`docs/stage-report.md`) |
 | **`rulings.md`** | one line per ruling (his, or `ruled: conductor`), at the workstream's root |
-| **`dreaming-notes.md`** | the frictions each stage notes as they happen; his own words marked `[user]`, a pattern of his choices marked `[taste]` |
+| **`dreaming-notes.md`** | the frictions each stage notes as they happen; his own words marked `[user]`, a pattern of his choices marked `[taste]`, a gap in the project's standards marked `[standards]` |
+| **standards book** | the project's own rules in its own repo, in the folder `standards:` names: `architecture.md` (`ARC-n`), `engineering.md` (`ENG-n`), `testing.md` (`TST-n`), `security.md` (`SEC-n`), `design-system.md` (`DS-n`), `operations.md` (`OPS-n`), the feature maps; built by `/standards setup`, changed only by a pull request he approved |
+| **stack pack** | the kit's defaults for one stack (`claude/skills/standards/references/stacks/`), read where the project's book leaves a choice to the stack |
+| **rule → check** | a rule the reviewers cite three or more times in a week becomes a demand for a check (a lint rule, a test helper) that catches it for free |
+| **signals** | the counts `telemetry.mjs` writes beside the numbers for the weekly retro: first passes, A.n and X.n rounds, rulings taken in his place, tagged notes, rule ids cited |
 | **`metrics.json`** | the workstream's numbers, written by `claude/scripts/telemetry.mjs` |
 | **weekly retro** | the only place the pipeline changes: the week's closed workstreams read together, he rules each proposal (apply · park · drop) |

@@ -3,7 +3,7 @@
 Every agent of the pipeline runs on **Opus 5.5** or **Sonnet 5.5**,
 and on **Haiku 5.5** only for a role where a blinded A/B on real past
 dispatches showed it ties (no worse on the blind verdict, no worse on
-false greens): today `scout`, and `blind-reader` on plan briefs. The
+false greens): today `scout`, `story-reader`, `blind-reader` and `exec-gate`. The
 evidence is in each row. Three findings carry most of the table:
 
 - **Opus 5.5 at medium writes the most mergeable code** (FrontierCode
@@ -24,18 +24,19 @@ the row together.
 
 | Agent | Stage | Model | Effort | Evidence |
 |---|---|---|---|---|
-| `scout` | all | Haiku 5.5 | medium | Lookups, not writing. Blinded A/B on 15 real past lookups (2026-10-07): Haiku medium won 20 of 30 pairs against Sonnet low, 0 false greens against 2, about 8× cheaper |
+| `scout` | all | Haiku 5.5 | high | Lookups, not writing. Blinded A/B on 15 real past lookups (2026-10-07): Haiku medium won 20 of 30 pairs against Sonnet low, 0 false greens against 2, about 8× cheaper. Raised to high by him (27/10/2026) |
 | `video-builder` | every stage's report, the close's users' video | Sonnet 5.5 | high | One film from a fixed brief on a motion library, scored from its own frames; composition and scale are visual judgment, so high |
 | `slides-builder` | every stage's report | Sonnet 5.5 | medium | A deck from a layout guide and the stage's files; medium follows a fixed guide well |
 | `artifact-builder` | discovery, design, a release incident | Sonnet 5.5 | medium | One explainer page from the draw-it-for-me references |
-| `blind-reader` | discovery, plan | Sonnet 5.5 | low | A blind reader must read literally; low keeps it cheap. Discovery stories stay on Sonnet: in the A/B, Haiku high won only 3 of 8 blinded pairs and passed a known defect twice. Plan briefs run on Haiku 5.5, high (per-call override below) |
+| `story-reader` | discovery | Haiku 5.5 | high | Reads one story blind and walks the mock. The earlier A/B on stories had Haiku high win 3 of 8 pairs and pass a known defect twice; he chose Haiku high (27/10/2026); the lenses and the judge still read every story |
+| `blind-reader` | plan | Haiku 5.5 | high | Reads one brief blind. Haiku high won 9 of 10 blinded pairs against Sonnet low (1 tie), 0 false greens |
 | `blind-judge` | discovery, plan | Sonnet 5.5 | medium | Compares two readings key by key; reports only where the text failed |
-| `prototype-builder` | discovery | Sonnet 5.5 | medium | Builds the mock of a changed screen from the stories and the project's design system, then one round order at a time; each round is small and he reviews it |
+| `prototype-builder` | discovery | Sonnet 5.5 | high | Builds the mock of a changed screen from the stories and the project's design system, then one round order at a time; each round is small and he reviews it. Raised to high (27/10/2026): at medium Sonnet 5.5 skips checks and stops early on long tasks, and the first build is long |
 | `story-writer` | discovery | Sonnet 5.5 | high | Writes stories and ACs from the interview notes, then anchors them on the locked mock when there is one: templated writing |
 | `disc-lens` | discovery | Sonnet 5.5 | medium | One checklist lens per call (in-out, coverage, acceptance) |
 | `architect` | design | Opus 5.5 | high | Open-ended design judgment: GDPval 1576 (medium) → 1690 (high) |
 | `overengineering-guard` | design | Opus 5.5 | medium | Cuts what serves no AC and no real risk: judgment on "does this need to exist?" |
-| `design-writer` | design | Sonnet 5.5 | high | One document from a template and the closed proposal |
+| `design-writer` | design | Sonnet 5.5 | high | One document from a template and the closed solution |
 | `design-consistency` | design | Opus 5.5 | medium | Contradictions across six documents and the mock: judgment over a long context |
 | `design-security` | design | Opus 5.5 | medium | Security and data posture: a miss here is expensive |
 | `design-contracts` | design | Sonnet 5.5 | high | Each Contract against the code that exists: literal comparison |
@@ -44,10 +45,11 @@ the row together.
 | `plan-reviewer` | plan | Opus 5.5 | medium | One reader of the cut and every brief: buildable, edges real, the contract commit thin |
 | `builder-backend` | execute | Opus 5.5 | medium | FrontierCode peaks at Opus medium (54.6%); the fix pass too |
 | `builder-frontend` | execute | Opus 5.5 | medium | The same; the screens with taste, faithful to the locked mock |
-| `exec-gate` | execute | Sonnet 5.5 | low | Runs the gate commands once and reads logs: no judgment. Haiku 5.5, medium won the A/B (11/0/5, 0 false greens against 5); it switches only after a live check: at the first workstream, 2–3 real entries' gates run on Haiku beside Sonnet, and it switches if they agree |
+| `exec-gate` | execute | Haiku 5.5 | medium | Runs the gate commands once and reads logs: no judgment. Haiku 5.5, medium won the A/B against Sonnet 5.5, low (11/0/5, 0 false greens against 5); switched 28/10/2026 without the extra live check, and the weekly retro watches the gate's signals |
 | `reviewer` | execute | Opus 5.5 | high | One reader carries the whole closed scope; hardest bugs: Opus caught them at 67% precision, Sonnet at 41% |
 | `qa-frontend` | execute | Opus 5.5 | medium | Drives the screens in a browser: Opus beats Sonnet on OSWorld at every cost |
 | `qa-backend` | execute | Opus 5.5 | medium | Calls the API and reads the store: judgment on what a customer would hit |
+| `standards-writer` | standards | Sonnet 5.5 | high | One file of a project's standards book from a template, the recon and his answers: templated writing that must check every claim against the repo |
 
 ## Per-call overrides
 
@@ -61,10 +63,11 @@ in both of its modes; the agent file keeps the row above.
 ## The sessions
 
 A stage's conductor is the session itself, so its model is the one the
-session runs on. Every main session runs on **Opus 5.5, high**: at the
-open, a session on anything else gets one line recommending the
-switch and goes on without waiting.
+session runs on. At the open, a session on another model or effort
+than its row gets one line recommending the switch and goes on without
+waiting.
 
 | Session | Model, effort | Evidence |
 |---|---|---|
-| `/lets-cook`, every `/stage-*`, `/weekly-retro` | Opus 5.5, high | Long contexts where almost every turn rules, cuts or orchestrates; one setting for every stage keeps the play simple |
+| every `/stage-*`, `/standards` | Opus 5.5, medium | Chosen by him for discovery, design and plan (27–28/10/2026) and extended to execute, release and close: Opus 5.5 medium is about Opus 5 at high; the heavy judgment sits in the agents (the architect, the planner, the reviewer at high), and the session stays faster and cheaper |
+| `/lets-cook`, `/weekly-retro` | Opus 5.5, high | The route and the week's rulings are the two places where one session's judgment sets everything after it |

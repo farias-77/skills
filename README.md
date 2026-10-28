@@ -55,21 +55,32 @@ flowchart LR
 
 Each stage, except discovery, hands him **one `/goal`**; then it
 runs on its own to its close. It closes with its report published and
-the next play: `/clear`, then `/stage-<next> <slug>`. Every session
-runs on Opus 5.5, high.
+the next play: `/clear`, then `/stage-<next> <slug>`. The stage
+sessions run on Opus 5.5, medium; `/lets-cook` and `/weekly-retro` on
+Opus 5.5, high.
 
 | Stage | What happens | His part |
 |---|---|---|
-| **1 · Discovery** | an interview that infers the obvious from the rest of the system; at its end `story-writer (Sonnet 5.5, high)` writes the stories, one AC per rule; when a screen changes, `prototype-builder (Sonnet 5.5, medium)` builds the exact mock in the project's design system and he iterates it until he says it is ready; one review round (`discovery-review-workflow.js`: three `disc-lens (Sonnet 5.5, medium)` and, per story, two `blind-reader (Sonnet 5.5, low)` and a `blind-judge (Sonnet 5.5, medium)`) | the interview; the mock's rounds; the playback, story by story |
-| **2 · Design** | scouts read the system; `architect (Opus 5.5, high)` writes one proposal with its v1 → v2 → v3 path; `overengineering-guard (Opus 5.5, medium)` cuts; after his "closed", the architect writes `solution.md` and five `design-writer (Sonnet 5.5, high)` the other documents; four lenses review once, called directly by the session: `design-consistency` and `design-security` (Opus 5.5, medium), `design-contracts (Sonnet 5.5, high)`, the guard again | the debate over a deck and a ≤60 s video, until "closed" |
-| **3 · Plan** | `planner (Opus 5.5, high)` cuts the widest graph: a thin contract commit C, entries of one whole behaviour (≤12 ACs) with frontend and backend in parallel, E-int last; `plan-writer (Sonnet 5.5, high)` writes one brief per node; one round (`plan-review-workflow.js`: `plan-reviewer (Opus 5.5, medium)` and the double-blind per brief); the session rules everything and writes the pre-flight | nothing; a veto list at the close |
-| **4 · Execute** | the session is the tech lead. Every ready entry runs `exec-entry-workflow.js`, in its own cloud session when the project has one: `builder-backend` ∥ `builder-frontend (Opus 5.5, medium)` → `exec-gate (Sonnet 5.5, low)` → `reviewer (Opus 5.5, high)` ∥ `qa-frontend` · `qa-backend (Opus 5.5, medium)` by surface → one fix pass → the delta. A serial queue merges into `feat/<slug>`; the project's signoff command runs the whole gate once, after his ok, and posts `local-ci` | the pre-flight; his hands-on with the running app, each answer an `A.n` round, until "ok" |
+| **1 · Discovery** | an interview that infers the obvious from the rest of the system; at its end `story-writer (Sonnet 5.5, high)` writes the stories, one AC per rule; when a screen changes, `prototype-builder (Sonnet 5.5, high)` builds the exact mock in the project's design system and he iterates it until he says it is ready; one review round (`discovery-review-workflow.js`: three `disc-lens (Sonnet 5.5, medium)` and, per story, two `story-reader (Haiku 5.5, high)` and a `blind-judge (Sonnet 5.5, medium)`) | the interview; the mock's rounds; the playback: one plain text, one question |
+| **2 · Design** | scouts read the system; `architect (Opus 5.5, high)` drafts one solution with its v1 → v2 → v3 path; `overengineering-guard (Opus 5.5, medium)` cuts; `artifact-builder` draws it as one page; after his "closed", the architect expands `solution.md` and five `design-writer (Sonnet 5.5, high)` write the other documents; four lenses review once, called directly by the session: `design-consistency` and `design-security` (Opus 5.5, medium), `design-contracts (Sonnet 5.5, high)`, the guard again | the debate over one visual page, until "closed" |
+| **3 · Plan** | the sprint planning of a team with no size limit: `planner (Opus 5.5, high)` cuts the widest natural graph from today's repo to the design: a thin contract commit C, entries of one whole behaviour (≤12 ACs) with frontend and backend in parallel, E-int last; `plan-writer (Sonnet 5.5, high)` writes one brief per node; one round (`plan-review-workflow.js`: `plan-reviewer (Opus 5.5, medium)` and the double-blind per brief); the session rules everything and writes the pre-flight | nothing; a veto list at the close |
+| **4 · Execute** | the session is the tech lead. Every ready entry runs `exec-entry-workflow.js`, in its own cloud session when the project has one: `builder-backend` ∥ `builder-frontend (Opus 5.5, medium)` → `exec-gate (Haiku 5.5, medium)` → `reviewer (Opus 5.5, high)` ∥ `qa-frontend` · `qa-backend (Opus 5.5, medium)` by surface → one fix pass → the delta. A serial queue merges into `feat/<slug>`; the project's signoff command runs the whole gate once, after his ok, and posts `local-ci` | the pre-flight; his hands-on with the running app, each answer an `A.n` round, until "ok" |
 | **5 · Release** | merge into `main` behind `local-ci`; the CI deploys staging and smokes; a `vX.Y.Z` tag promotes the same image to production, smokes, watches 15 minutes and rolls back on its own. A red gets one fix entry; a second red stops | his go is the release's `/goal`; a question only on the stop list (a new production deploy after a rollback is one) |
-| **6 · Close** | the users' video (1–3 min, recorded on staging) and a "what's new" text he forwards; a short retro with the script's numbers; a script proves nothing of the workstream is left on the machine | nothing |
+| **6 · Close** | a "what's new" text and, when he asks, a video and a deck that explain the feature to its users and the team, in the project's design system; a short retro with the script's numbers and the proposals for the project's standards; a script proves nothing of the workstream is left on the machine | which material to make |
 
-The **weekly retro** reads the week's closed workstreams together and
-proposes changes, each with its evidence and exact edit; he rules each
-one (apply · park · drop). It is the only place the pipeline changes.
+The **weekly retro** reads every workstream that moved that week,
+closed or in flight, with the numbers and signals the stages record on
+their own, and proposes changes, each with its evidence and exact edit;
+he rules each one (apply · park · drop). It is the only place the
+pipeline and a project's standards change.
+
+**The standards book** is each project's own rules in its own repo:
+the architecture map, the engineering, testing, security and operations
+rules, the design system and the feature maps. `/standards setup`
+builds it from the repo and the kit's templates; every stage reads it,
+every reviewer cites it by id, and the gaps the work shows come back
+through the weekly retro as one pull request (`/standards update`). A
+rule the reviewers keep enforcing by hand becomes a check.
 
 ## The roster
 
@@ -84,9 +95,10 @@ and templated writing, never above high.
 | all | `scout` | Haiku 5.5, medium |
 | every report | `video-builder` | Sonnet 5.5, high |
 | every report | `slides-builder` · `artifact-builder` | Sonnet 5.5, medium |
-| discovery, plan | `blind-reader` | Sonnet 5.5, low (plan briefs: Haiku 5.5, high) |
+| discovery | `story-reader` | Haiku 5.5, high |
+| plan | `blind-reader` | Haiku 5.5, high |
 |  | `blind-judge` | Sonnet 5.5, medium |
-| discovery | `prototype-builder` | Sonnet 5.5, medium |
+| discovery | `prototype-builder` | Sonnet 5.5, high |
 |  | `story-writer` | Sonnet 5.5, high |
 |  | `disc-lens` | Sonnet 5.5, medium |
 | design | `architect` | Opus 5.5, high |
@@ -98,9 +110,10 @@ and templated writing, never above high.
 |  | `plan-writer` | Sonnet 5.5, high |
 |  | `plan-reviewer` | Opus 5.5, medium |
 | execute | `builder-backend` · `builder-frontend` | Opus 5.5, medium |
-|  | `exec-gate` | Sonnet 5.5, low |
+|  | `exec-gate` | Haiku 5.5, medium |
 |  | `reviewer` | Opus 5.5, high |
 |  | `qa-frontend` · `qa-backend` | Opus 5.5, medium |
+| standards | `standards-writer` | Sonnet 5.5, high |
 
 ## The skills
 
@@ -109,7 +122,8 @@ and templated writing, never above high.
 | `lets-cook` | session | the one door: interview, route, and the short route and hotfix end to end |
 | `stage-discovery` · `stage-design` · `stage-plan` · `stage-execute` · `stage-release` · `stage-close` | session | the six stages |
 | `notion-tracker` | session, loaded by the others | optional: pulls a demand from a Notion database and keeps its page in step with the stages |
-| `weekly-retro` | session | the week's workstreams read together; the only place the pipeline changes |
+| `weekly-retro` | session | the week's workstreams read together; the only place the pipeline and a project's standards change |
+| `standards` | session | builds a project's standards book from its repo, and applies the changes he approved; publishes the Architecture and Design System pages |
 | `draw-it-for-me` | preloaded by `artifact-builder`, `prototype-builder` | explanatory pages: diagrams that build, motion, 3D, charts |
 | `pitch-it-for-me` | preloaded by `slides-builder` | HTML slide decks, one idea per slide |
 | `make-it-a-movie` | preloaded by `video-builder` | motion films written as one TSX file on the video kit, rendered once |

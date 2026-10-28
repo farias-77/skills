@@ -80,7 +80,7 @@ for (const sc of scenarios) {
     const n = calls[key] = (calls[key] ?? 0) + 1;
     if (name === 'disc-lens') return (sc.lens ?? (() => lensReport()))(prompt.match(/Lens: ([a-z-]+)/)[1], n);
     const story = prompt.match(/Story (S-\d+)/)[1];
-    if (name === 'blind-reader') return sc.reader ? sc.reader(story) : reading(story, prompt.match(/The AC ids: (.*)/)[1].split(', '));
+    if (name === 'story-reader') return sc.reader ? sc.reader(story) : reading(story, prompt.match(/The AC ids: (.*)/)[1].split(', '));
     if (name === 'blind-judge') return (sc.judge ?? ((s) => ({ story: s, findings: [] })))(story);
     throw new Error(`unknown agent ${name}`);
   };
@@ -97,7 +97,7 @@ for (const sc of scenarios) {
   if ('skippedBuild' in e && r.skippedBuild.length !== e.skippedBuild) got.push(`skippedBuild ${r.skippedBuild.length}`);
   if ('blocks' in e && r.findings.filter((f) => f.severity === 'blocks').length !== e.blocks) got.push('blocks count');
   if ('ids' in e && JSON.stringify(r.findings.map((f) => f.id)) !== JSON.stringify(e.ids)) got.push(`ids ${r.findings.map((f) => f.id)}`);
-  if ('readers' in e && (counts['blind-reader'] ?? 0) !== e.readers) got.push(`readers ${counts['blind-reader'] ?? 0}`);
+  if ('readers' in e && (counts['story-reader'] ?? 0) !== e.readers) got.push(`readers ${counts['story-reader'] ?? 0}`);
   if ('judges' in e && (counts['blind-judge'] ?? 0) !== e.judges) got.push(`judges ${counts['blind-judge'] ?? 0}`);
   if ('agents' in e && total !== e.agents) got.push(`agents ${total}`);
   if (e.textOnly && prompts.some((p) => /locked mock|The tool:/.test(p))) got.push('a prompt names a mock');
