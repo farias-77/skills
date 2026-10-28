@@ -12,6 +12,7 @@ weekly.
 ├── Went well     ≤ 5
 ├── Got stuck     ≤ 5   each with the time it cost; slowness counts
 ├── Ideas         ≤ 5   each with the number it should move (time, cost or touches)
+├── For the standards  every [standards] line and every map drift, each with its evidence
 └── His notes     [user] lines, verbatim, appended later
 ```
 
@@ -20,9 +21,10 @@ weekly.
 | Source | What it gives |
 |---|---|
 | `metrics.json` (`telemetry.mjs`) | the numbers; the stage that took longest; the wait on him |
-| the harvest of `scout (Haiku 5.5, medium)` | each friction with `path:line`, the quote, the time it cost |
+| the harvest of `scout (Haiku 5.5, high)` | each friction with `path:line`, the quote, the time it cost |
 | `dreaming-notes.md` | frictions noted on the spot; his `[user]` notes; `[taste]` patterns in his rulings |
 | `rulings.md` | what he ruled, and where he ruled against the recommendation |
+| the drift check (a second scout) | what the merged diff added that the feature maps or `architecture.md` do not name |
 
 ## How to choose
 
@@ -35,5 +37,8 @@ weekly.
    the retro. A `null` is written as "not measured" with the gap.
 4. **At most 5 per section.** Pick what would change a decision at the
    weekly; group what is one idea.
-5. **Unmerged work kept for later** (the cleanup's `kept` lines): one
+5. **For the standards has no cap**: every `[standards]` line and every
+   drift goes in, one row each, with its evidence. The weekly retro
+   rules them.
+6. **Unmerged work kept for later** (the cleanup's `kept` lines): one
    "Got stuck" line saying where it is.

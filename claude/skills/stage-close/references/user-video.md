@@ -1,4 +1,4 @@
-# The video for users
+# The material for users: the video and the deck
 
 The close delivers one video to the people who use the product: the
 operators, the employees, the clients. It answers three things: what
@@ -30,6 +30,24 @@ one render.
   `05-close/whats-new.md`, its scratch under `05-close/_scratch/`. On
   the short route and the hotfix: the text is the "what's new" of
   `close.md`, and the scratch is `report/close/film/`.
+
+## The deck for the team
+
+When he picks it, `slides-builder` makes a deck that explains the
+feature to the people who will use it or support it, in the same tone
+as the video: the problem it solves, then each screen in the order a
+person meets it (a real staging screenshot per slide, one sentence
+under it), then where to find it and who to ask. 6–10 slides, 40
+words at most per slide, no technical word. It follows the project's
+`design-system.md`, surface "slides": its fonts, its colors, its logo
+rules.
+
+## The look
+
+The video and the deck follow the project's `design-system.md`: its
+"Surfaces" section for video and slides, its tokens for color and type.
+When the project has no design system, they follow the report's look
+(`claude/report/tokens.css`).
 
 ## Recorded in staging, never in production
 
@@ -63,6 +81,4 @@ message as a known issue.
 `claude/references/artifact-writing.md` sets for it: a title, two or three
 sentences of what changed for them, one line per thing they can now
 do, and where to find it. No version numbers, no technical words. It
-goes in full in the final message. In the Close deck a slide holds 40
-words at most (`check-deck.mjs`): the title and the sentences on one
-slide, the lines of what they can now do on the next.
+goes in full in the final message, and its lines close the deck.

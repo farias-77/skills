@@ -1,9 +1,11 @@
 # The builders' role
 
-For `builder-backend (Opus 5.5, medium)` and `builder-frontend (Opus 5.5,
-medium)`. How to build in this codebase lives in the product's own
-standards and golden paths (its `CLAUDE.md` names them); this file is
-the role: what you deliver, how you prove it, what comes after you.
+For `builder-backend` and `builder-frontend`. How to build in this
+codebase lives in the project's standards book (its `CLAUDE.md` names
+the folder): the golden paths in `architecture.md`, the rules in
+`engineering.md`, `testing.md`, `security.md` and `design-system.md`.
+This file is the role: what you deliver, how you prove it, what comes
+after you.
 
 ## Where you sit
 
@@ -14,58 +16,16 @@ you (backend ∥ frontend) ──► exec-gate: the entry gate once ──► re
 You do not run the whole suite and you do not review yourself: the gate
 and the readers after you do. You own the code and its proofs.
 
-## The testing rule
+## How you prove
 
-Test what a user or an attacker would notice. Each behaviour has **one
-primary proof, at the cheapest layer that really proves it.**
-A new journey test says, in the PR, why no layer above it in this table
-fails on the same bug.
-
-| Layer | Proves | Not for |
-|---|---|---|
-| unit, server | a rule, a limit, a scope, a transition | SQL, HTTP |
-| unit, frontend | pure logic: a format, a displayed calculation, a language, a theme | what needs a screen |
-| integration (API in process, a real database) | SQL, permission, scope, idempotency, concurrency | what the user sees |
-| component (DOM runner, the API mocked from the contract's types) | a screen's states: forms, dialogs, errors (a 500, a 429), what each role sees | layout, canvas, navigation, reload |
-| browser, no backend | layout, canvas, first paint, server-rendered or no-JS pages | the API |
-| journey (browser + the stack) | one flow: action → result → reload → still there | the limits of a rule, a screen's states |
-
-- **One proof, not three.** The limit in a unit test, the wiring in one
-  journey per flow. A matrix (language, theme, role, tier) is rows of
-  one table at the cheapest layer; in the browser only when the AC is
-  about that dimension.
-- **A proof fails if the AC breaks.** Each AC has the proof of its
-  success case and of the failure cases it implies, each at the
-  cheapest layer; a test exists for a decision of the behaviour, never
-  to cover a line. Assert state and effect, never
-  markup or an internal call. An expected value is a literal, never the
-  code's own formula. Would it pass if every function it imports
-  returned `undefined`? Then rewrite it or delete it: no new test beats
-  a bad one. See a new proof red for the right reason before green.
-- **Deterministic.** Time, ids and randomness injected; no sleep; a wait
-  has a deadline and an observable condition; each test creates its own
-  data.
-- **The database is never mocked.**
-- **The floor, always, where the rule exists:** a permission or scope
-  rule has an API test (another unit's actor is refused, nothing
-  written); authentication before the body; a security fix comes with
-  the test that reproduces it, red before, green after; "only once"
-  (two concurrent requests, a repeated confirmation) has a test through
-  the real stack. The project tags these as its floor.
-- **Look before you add.** A test that already owns the behaviour is
-  extended, not duplicated.
-- **Never:** a screenshot or a recorded red for the record, mutation
-  scaffolding, fuzz or property tests outside a public decoder, a test
-  that pins a stub, copy pinned unless the AC is about the copy, an
-  assert loosened to fit the code.
-- **One exception:** a "never" AC (an invariant: "a total is never
-  negative", "two units never share an item") may take a property-based
-  test as its one proof. It runs with a fixed seed, so it never flakes,
-  and it replaces the example tests for that AC; it does not add to them.
-  Use the library the stack already has; never add one for this.
-
-The gate measures coverage by function: every new or changed function
-runs in some test. That is a floor, not a target.
+By the project's `testing.md` (its standards book), and where the
+project has none, the kit's default
+(`../../standards/templates/testing.md` from this folder). In short: each
+behaviour has **one primary proof, at the cheapest layer that really
+proves it**; a proof fails if its AC breaks; the floor tests are never
+skipped; a new journey says, in the PR, why no cheaper layer fails on
+the same bug. The reviewer blocks a proof that would pass if every
+function it imports returned `undefined`.
 
 ## Try it once
 

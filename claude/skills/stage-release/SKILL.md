@@ -1,77 +1,83 @@
 ---
 name: stage-release
-description: Conducts stage 5 (Release) of the pipeline under one /goal. It merges the finished workstream (feat/<slug>) into main under the user's `/goal`, follows the CI's staging deploy and smoke, tags vX.Y.Z so the CI promotes the same image to production with a smoke and a 15-minute watch that rolls back on its own, and closes with its report (video, deck, explainer). A red gets one fix entry through the stage-4 pipeline, then it stops. It stops for the user only on its stop list. The short route and the hotfix follow the same path from lets-cook. The session runs on Opus 5.5, high. Use when a workstream's .state.md says stage release, or to resume a release by its slug.
+description: Stage 5 of the pipeline, under one /goal. Takes the finished feat/<slug> to production safely - up to date with main, merged, staging deployed and smoked by the CI, a tag that promotes the same image to production with a smoke and a 15-minute watch that rolls back on its own - and stops for him only on its stop list. A red gets one fix, a second red stops. Use when a workstream's .state.md says stage release, or to resume a release by its slug.
 argument-hint: "<workstream-slug>"
 allowed-tools: Read, Write, Edit, Glob, Grep, Agent, SendMessage, ListAgents, Workflow, AskUserQuestion, Artifact, PushNotification, ScheduleWakeup, Skill, Bash
 ---
 
-# Stage 5: Release
+# Stage 5 · Release
+
+Release takes what he already used and said ok to, and puts it in
+production the way the project's `operations.md` says: through staging,
+then the same image to production, watched, with a rollback written in
+advance. The session never writes or reviews code; it moves the work
+through the gates, waits on the CI without polling, and stops only for
+what cannot be undone.
 
 ## The bar
 
-1. From the `/goal` to production without him, except an irreversible
-   step nobody planned.
-2. Production runs the image staging ran. A red production goes back
-   to the previous tag by itself, through the CI.
-3. His `/goal` covers one workstream.
-4. A red gets one fix. A second red stops.
-5. The report (Video, Deck, Explainer) is finished before the stage
-   closes.
+The stage is done when every line holds:
 
-## The team
-
-| Who (model, effort) | Does |
-|---|---|
-| you, the session (Opus 5.5, high) | every step below; you never write or review code |
-| the CI (GitHub Actions) | push to `main`: staging deploy + smoke. Tag `v*`: the same image to production, smoke, 15-minute watch, rollback, then the GitHub release |
-| the project's signoff command (`claude/scripts/local-ci.sh` when it names none) | the project's whole gate in a fresh worktree: in a cloud VM with `--record` when the project has a cloud environment (this machine then posts with `--post-from`), else on this machine; the only writer of the required `local-ci` status, posted under the bot identity on green |
-| the stage-4 cast through `exec-entry-workflow.js` mode `fix` | an `X.n` fix: `builder-backend` · `builder-frontend (Opus 5.5, medium)`, `exec-gate (Sonnet 5.5, low)`, `reviewer (Opus 5.5, high)`; no QA unless the fix asks for one (`qa: 'backend'` when it touches auth, permissions or personal data) |
-| `scout (Haiku 5.5, medium)` | anything you need to look up |
-| `video-builder (Sonnet 5.5, high)` · `slides-builder` · `artifact-builder (Sonnet 5.5, medium)` | the report's tabs: the Explainer always, the Video and the Deck when he picks them |
+1. The tag is in production, the image staging ran, with the smoke and
+   the 15-minute watch green, and the GitHub release exists.
+2. Nothing reached production that he did not authorize in the `/goal`;
+   a step outside it stopped and asked.
+3. A red got one fix at most; a second red stopped.
+4. `trace.md` has one line per step, and the report's Explainer is
+   published.
 
 ## The flow
 
 ```
-0 open        preconditions · the /goal → he pastes it
-1 main        up to date (house rule): fetch · origin/main into feat + local CI when it moved · merge
-2 staging     the CI deploys and smokes · green → peers told
-3 tag         vX.Y.Z on the merge, notes from the stories → push
-4 production  the CI: same image → smoke → 15-min watch → GitHub release · red → rollback by itself
-5 close       trace · telemetry · report (Explainer + what he picks) · cleanup · .state.md → close · the message
+/stage-release <slug> → opening: preconditions + the /goal
+  1 main: take the turn → up to date → merge
+  → 2 staging (the CI deploys and smokes)
+  → 3 the tag vX.Y.Z, notes from the stories
+  → 4 production (the CI: same image → smoke → 15-min watch → release · red → rollback by itself)
+  → 5 report ∥ cleanup → /clear, /stage-close <slug>
+  a red anywhere → one X.n fix → again · a second red → stop
 ```
 
-Read [references/release.md](references/release.md) before step 1. It
-holds the trunk, the merge and the tag, how workstreams take turns on `main`, the
-smoke and the watch, the hotfix and the legacy repos. Read
-[references/migrations.md](references/migrations.md) when `plan.md`
-lists a migration.
+| Step | Who (model, effort) | Produces |
+|---|---|---|
+| every step | you (Opus 5.5, medium) | `trace.md`, the merge, the tag, the notes |
+| staging, production | the CI | the deploys, the smokes, the watch, the rollback, the GitHub release |
+| the whole gate | the project's signoff command | `local-ci` on the head that merges |
+| an `X.n` fix | `exec-entry-workflow.js` mode `fix`: the builders, `exec-gate`, the `reviewer`; a QA when it touches auth, permissions or personal data | the fix, merged |
+| facts | `scout` (Haiku 5.5, high) | what you need to look up |
+| report | the Explainer from the template with `trace.md`; `artifact-builder` (Sonnet 5.5, medium) when there was an incident; video and slides only when he asks | the Release tab |
+
+## What you read
+
+| File | When |
+|---|---|
+| the project's `operations.md` (its standards folder) | at the opening: its environments, delivery, rollback and alarms win over the kit's defaults |
+| [references/release.md](references/release.md) | before step 1: the trunk, taking turns on `main`, the smoke and the watch, the hotfix, legacy repos |
+| [references/migrations.md](references/migrations.md) | when `plan.md` lists a migration |
+| `04-release/plan.md` | whole, at the opening |
+
+## Files
 
 ```
 <designs-root>/<slug>/04-release/
-├── plan.md      written at execute, during his use (templates/plan.md)
-├── trace.md     one line per step as it ends, `date -u` (templates/trace.md)
+├── plan.md      written at execute, during his use (template: templates/plan.md)
+├── trace.md     one line per step as it ends, `date -u` (template: templates/trace.md)
 └── notes.md     the tag's annotation
 ```
 
-## Unattended
+## Opening
 
-Inside the `/goal` nothing waits for him but the stop list. A wait on
-the CI ends the turn on a `ScheduleWakeup` sized to it (a staging deploy
-~20 min, production plus the watch ~35 min), never on a question. Keep
-`trace.md` current: it is your checklist and your resume point.
-
-## Step 0 · Open
-
-1. **The house rules.** Read the file that
-   `realpath ${CLAUDE_SKILL_DIR}/../../../CLAUDE.md` prints and run its
-   Open: the pulls, who else is working, then the designs root.
-2. **Preconditions.** `.state.md` says `stage: release`; the execute
-   recorded his ok; `04-release/plan.md` exists; the PR
-   `feat/<slug>` → `main` is open and ready. Missing: stop and send him
-   back to the stage that owns it.
-3. **Coordination.** Edit your line in `_coordination.md`: stage
-   `release`, branch, this session's name.
-4. **The `/goal`.** Fill it from `plan.md` and end the turn:
+1. **The kit.** `realpath ${CLAUDE_SKILL_DIR}/../..`, written as `kit:`
+   in `.state.md`.
+2. **The house Open.** Read `<kit>/../CLAUDE.md` and run its Open: the
+   pulls, who else is working.
+3. **Preconditions.** `.state.md` says `stage: release`; the execute
+   recorded his ok; `04-release/plan.md` exists; the PR `feat/<slug>` →
+   `main` is open and ready. Missing: stop and name the stage that owns
+   it.
+4. **Coordination.** Your line in `_coordination.md`: stage `release`,
+   branch, this session's name.
+5. **The goal**, filled from `plan.md`:
 
 ```
 /goal Release <slug> with the stage-release skill, without asking me anything outside its stop list.
@@ -79,125 +85,114 @@ Authorized in this release: the merge of feat/<slug> into main, its fix/<slug>/X
 vX.Y.Z, and these known irreversible steps from plan.md: <list, or "none">.
 Goes live for real people: <from plan.md, or "nothing">.
 Done when: the tag is in production with the smoke and the 15-minute watch green, the GitHub release
-exists, the report's Explainer and the tabs I picked are published, and I got the notification with the link and the next command.
+exists, the Release tab is published, and I got the notification with the link and the next command.
 ```
 
-## Step 1 · Into main
+A wait on the CI ends the turn on a `ScheduleWakeup` sized to it (a
+staging deploy about 20 minutes, production plus the watch about 35),
+never on a question. `trace.md` is your checklist and your resume
+point: one line per step as it ends.
 
-1. **Take the turn** on `main` by references/release.md, "Taking
-   turns on main".
-2. **Up to date, right before the merge**, by the house rule "Up to
-   date before a shared merge": fetch; when `origin/main` has commits
-   `feat/<slug>` lacks, merge it in, renumber the migrations if the
-   project has a command for it (`make restamp`), push, run the signoff
-   command on the new head, and fetch again. With a cloud environment
-   the merge of `main`, the restamp and the whole gate run in cloud
+## 1 · Into main
+
+1. **Take the turn** on `main` by release.md, "Taking turns on main".
+2. **Up to date, right before the merge**, by the house rule: fetch;
+   when `origin/main` has commits `feat/<slug>` lacks, merge it in, run
+   the project's restamp, push, run the signoff command on the new
+   head, fetch again. With a cloud environment these run in cloud
    sessions and this machine only fast-forwards `feat` and posts the
    status (stage-execute's `references/cloud.md`). A red here is an
-   `X.n` on `feat`, exactly as at execute.
-3. **The merge.** The PR's head has `local-ci` green, and the code
-   owner's approval when the PR touches the gate's paths (asked at the
-   execute's ok). Then
-   `gh pr merge <n> --merge --match-head-commit <head>`. When Claude
-   Code refuses the merge (its classifier may ask for a human), send
-   him the PR link and the merge is his click; that wait is his.
+   `X.n` on `feat`.
+3. **The merge.** The head has `local-ci` green, and the code owner's
+   approval when the PR touches a gate path. Then `gh pr merge <n>
+   --merge --match-head-commit <head>`. When Claude Code refuses it,
+   send him the PR link: the merge is his click, and that wait is his.
 
-## Step 2 · Staging
+## 2 · Staging
 
 The push to `main` runs the staging deploy and its smoke. Wake when it
-should be done and read the run (`gh run view <id>`); never poll.
+should be done and read the run (`gh run view <id>`). Green: tell the
+peers `main` is free. Red: the red rule.
 
-- **Green:** tell the peers `main` is free. The video for users is
-  the close's, and only when he asks for it there.
-- **Red:** the red rule below.
-
-## Step 3 · The tag
+## 3 · The tag
 
 1. **Version.** A workstream is a minor, the short route and a hotfix a
    patch, a major only on his word. No `v*` tag yet: `v1.0.0`.
-2. **Notes**, in `04-release/notes.md`: the version and date, then one
-   line per story (id + what changed for its user), then what goes
-   live for real people. The CI publishes them with the release.
+2. **Notes** in `04-release/notes.md`: the version and date, one line
+   per story (what changed for its user), then what goes live for real
+   people. The CI publishes them with the release.
 3. `git tag -a vX.Y.Z <the merge sha on main> -F 04-release/notes.md`,
-   then `git push origin vX.Y.Z`; a refusal by Claude Code goes to him
-   the same way. The CI holds the tag until the previous tag's watch
-   ends.
+   then `git push origin vX.Y.Z`; a refusal goes to him the same way.
+   The CI holds the tag until the previous tag's watch ends.
 
-## Step 4 · Production
+## 4 · Production
 
 The tag runs production: the image staging ran, the smoke, the
 15-minute watch, then the GitHub release. A red smoke or watch moves
-the traffic back to the previous tag, alarms him by email, and
+the traffic back to the previous tag by itself, alarms him, and
 creates no release. Wake when it should be done and read the run.
-
-- **Green:** the release exists. Go to step 5.
-- **Rolled back:** the red rule.
+Green: step 5. Rolled back: the red rule.
 
 ## The red rule: one fix, then stop
 
 | Red | What happens |
 |---|---|
-| staging (deploy, migrate, smoke) | one `X.n`: `exec-entry-workflow.js` mode `fix` on `fix/<slug>/X.n` from `main` (the `reviewer (Opus 5.5, high)` always; in a cloud session, and its whole gate in a signoff session, when the project has a cloud environment: stage-execute's `references/cloud.md`) → PR → `local-ci` → merge → staging again |
+| staging (deploy, migrate, smoke) | one `X.n`: exec-entry mode `fix` on `fix/<slug>/X.n` from `main` (in a cloud session when the project has one) → PR → `local-ci` → merge → staging again |
 | `local-ci` on the PR at step 1 | one `X.n` on `feat/<slug>`, as at execute |
-| production rolled back | one `X.n` on `fix/<slug>/X.n`, its PR green on `local-ci` → **ask** him before it goes anywhere → merge → staging and smoke → a patch tag |
-| the environment (runner, network, a quota) | run it again once; it does not count. Never a production `migrate`: that is a stop |
+| production rolled back | one `X.n`, its PR green on `local-ci` → **ask** him before it goes anywhere → merge → staging → a patch tag |
+| the environment (runner, network, a quota) | run it again once; it does not count. A production `migrate` is never run again: that is a stop |
 | a second red of code, anywhere | stop |
 
-## The stop list (only these stop)
+## The stop list
 
 | Stop and ask | Why |
 |---|---|
-| a contract migration (drop, rename) or deleting data not named in the `/goal` | cannot be undone |
-| a red `migrate` in production: never run again by you | production's schema may be half-applied |
-| turning on an effect for real people the `/goal` did not name | real people |
+| a contract migration (drop, rename) or deleting data the `/goal` did not name | cannot be undone |
+| a red `migrate` in production | production's schema may be half-applied |
+| an effect for real people the `/goal` did not name | real people |
 | a new paid resource, a DNS switch | cost and cutover |
 | a new production deploy after a rollback | a real incident: he decides |
 | a second red of code | it does not loop |
 
 A stop is a `PushNotification` plus the question tool: what happened,
-the evidence in one line, the options with yours first. A refusal by
-Claude Code of an irreversible step goes to him the same way, with the
-evidence.
+the evidence in one line, the options with yours first.
 
-## Step 5 · Close
+## 5 · The report and the close
 
 1. **Trace and numbers.** With a `tracker:` line in `.state.md`,
-   `notion-tracker released <tag>` (or `stopped <why>` when it did not
-   reach production). `trace.md` complete; run
-   `node claude/scripts/telemetry.mjs <slug> --stage release --ws <designs-root>/<slug> --out -`.
-2. **The report, finished before the close.** The Explainer always;
-   ask the close's question (Video · Deck) and dispatch what he picks,
-   in the background, with the stage's files and `report/release/`, as
-   `docs/stage-report.md` describes:
+   `notion-tracker released <tag>` (or `stopped <why>`). `trace.md`
+   complete; `node <kit>/scripts/telemetry.mjs <slug> --stage release
+   --ws <workstream> --out -`.
+2. **The report**, as `<kit>/../docs/stage-report.md` describes. The
+   Explainer is the release's timeline from `trace.md`; with an
+   incident, `artifact-builder` draws the incident. Ask the close's
+   question (also make: Video · Deck) and dispatch what he picks:
+   `video-builder` (Sonnet 5.5, high) `main` → staging → tag →
+   production, 30–45 s; `slides-builder` (Sonnet 5.5, medium) the
+   version and notes, the smokes, a rollback if one happened, what went
+   live. Check every number against `trace.md` and the CI runs,
+   `gitleaks dir <workstream>`, publish labelled "release closed". The
+   short route and the hotfix stop at step 4: their Release tab is
+   published at the short close (`lets-cook`).
+3. **Cleanup.** The `X.n` worktrees and their stacks
+   (`<kit>/scripts/cleanup.sh <slug> --check` shows what is left; the
+   full sweep is the close's).
+4. **What the runbook lacked.** A step you had to work out that the
+   project's `operations.md` does not say is a `[standards]` line in
+   `dreaming-notes.md`.
 
-| Tab | Builder | Brief |
-|---|---|---|
-| Video | `video-builder (Sonnet 5.5, high)` | `main` → staging → tag → production, the smokes and the watch, 30–45 s |
-| Deck | `slides-builder (Sonnet 5.5, medium)` | the version and notes, the smokes, a rollback if one happened, what went live for real people, the stage's numbers |
-| Explainer | the report template from `trace.md`; with an incident, `artifact-builder (Sonnet 5.5, medium)` draws it | the release's timeline |
+Then `.state.md` → `stage: close`, your line in `_coordination.md` "out
+in vX.Y.Z", commit the workstream folder, and one message with a
+`PushNotification`: vX.Y.Z and the GitHub release's link · the link ·
+the watch (green, or the rollback and what came after) · the next play:
 
-   When they return, check every number against `trace.md` and the CI
-   runs, run `gitleaks dir <designs-root>/<slug>` (a finding stops the
-   publish), and publish to the workstream's link with the label "release
-   closed". The short route and the hotfix stop at step 4: their
-   Release tab is published at the short close (`lets-cook` §8).
-3. **Cleanup.** Remove what this stage created: the `X.n` worktrees and
-   their stacks (`claude/scripts/cleanup.sh <slug> --check` shows what
-   is left; the full sweep is the close's).
-4. **Records.** `.state.md` → `stage: close`. Your line in
-   `_coordination.md`: "out in vX.Y.Z". Commit the workstream folder.
-5. **The message**, with a `PushNotification`:
-
-| | |
-|---|---|
-| In production | vX.Y.Z, the GitHub release's link |
-| The link | the workstream's report, Release tab |
-| Watch | green, or the rollback and what came after |
-| Next | `/clear`, then `/stage-close <slug>` |
+```
+/clear
+/stage-close <slug>
+```
 
 ## Resuming
 
-`/stage-release <slug>`: run the house Open (the pulls,
-who else is working), then read `.state.md`,
+`/stage-release <slug>`: the opening's steps 1–2, then `.state.md`,
 `trace.md` and the CI runs of `main` and of the tags. The trace's last
-line is where you are; never resume from memory.
+line is where you are.

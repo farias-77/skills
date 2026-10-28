@@ -1,6 +1,6 @@
 # Release: the path to production
 
-The project's CLAUDE.md and its delivery doc name the real workflows,
+The project's `operations.md` (its standards book) names the real workflows,
 commands and URLs; this file is the shape they follow.
 
 ## The trunk

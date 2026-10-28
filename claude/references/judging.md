@@ -78,7 +78,7 @@ contradicts the oracle. In doubt between the writer and him: him.
 
 The lenses are `disc-lens (Sonnet 5.5, medium)` × 3 (**in-out**,
 **coverage**, **acceptance**); the double-blind is two
-`blind-reader (Sonnet 5.5, low)` and a `blind-judge (Sonnet 5.5,
+`story-reader (Haiku 5.5, high)` and a `blind-judge (Sonnet 5.5,
 medium)` per story, whose kinds are **diverge**, **contradicts** and
 **undecidable**. A `contradicts` is evidence, not a verdict: run the
 reader's steps yourself.
@@ -87,7 +87,7 @@ reader's steps yourself.
 
 | Ruling | When | Goes to |
 |---|---|---|
-| fix, owner the writer | a document's text: a value, a name, a field, a missing state the proposal already fixes | its `design-writer (Sonnet 5.5, high)`, or the `architect (Opus 5.5, high)` for `solution.md` and the proposal, by `SendMessage`, no question |
+| fix, owner the writer | a document's text: a value, a name, a field, a missing state the solution already fixes | its `design-writer (Sonnet 5.5, high)`, or the `architect (Opus 5.5, high)` for `solution.md`, by `SendMessage`, no question |
 | conductor, conservative | his class with an option that keeps the lock, is reversible and costs nothing new | you; `ruled: conductor`; the notes' Veto list |
 | his question | a locked AC changes, a recurring cost appears, or it cannot be undone | one question per decision, one batch |
 | latitude | a real choice the design may leave open | one line in the document's "The implementer decides" (never a hard class: where it runs and what happens when the other side fails, a stored entity's key, format and retention, a contract's shape, who can do what, which alarms wake whom) |

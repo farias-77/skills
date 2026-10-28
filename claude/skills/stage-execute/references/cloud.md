@@ -30,10 +30,11 @@ product's history.
 ```
 evidence/<slug>/<id>
 ├── input/args.json        the exec-entry args; paths as {repo}/… and {evidence}/…; no loadThreshold;
-│                          inlineAgents: true, agentsDir and referencesDir under {evidence}/input/pipeline/;
+│                          inlineAgents: true, agentsDir, referencesDir and packsDir under {evidence}/input/pipeline/;
+│                          standardsDir as {repo}/<the standards folder>;
 │                          heartbeat: HEARTBEAT_PUSH=1 bash {evidence}/input/pipeline/skills/stage-execute/scripts/heartbeat.sh {evidence}
 ├── input/brief.md · design/ · discovery/ (the entry's mock frames only) · rulings.md
-├── input/pipeline/        this pipeline at the session's version: workflows/, agents/, references/, skills/stage-execute/
+├── input/pipeline/        this pipeline at the session's version: workflows/, agents/, references/, skills/stage-execute/, skills/standards/
 ├── beats.jsonl            one line per agent start and end (heartbeat.sh)
 ├── run-<n>.json           the workflow's return (run-<n>.args.json the resolved args, run-<n>.log the nested run)
 └── notes.md, screenshots, logs/

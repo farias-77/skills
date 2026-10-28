@@ -22,16 +22,16 @@ instructions without the team.
 
 The project must have: a `local-ci` status required on `main`; a
 staging deploy on push to `main`; a production deploy on `v*` tags that
-promotes the staging image, smokes, watches and rolls back.
+promotes the staging image, smokes, watches and rolls back; and its
+`operations.md` in the standards book, which the release follows.
 
 ## Agents it dispatches
 
 | Agent | Does |
 |---|---|
-| `scout (Haiku 5.5, medium)` | lookups |
+| `scout (Haiku 5.5, high)` | lookups |
 | the stage-4 cast, through `exec-entry-workflow.js` mode `fix` | an `X.n` fix |
-| `video-builder (Sonnet 5.5, high)` | the Release video; starts the close's video for users at the green staging |
-| `slides-builder (Sonnet 5.5, medium)` | the Release deck |
+| `video-builder (Sonnet 5.5, high)` · `slides-builder (Sonnet 5.5, medium)` | the Release video and deck, only when he asks |
 | `artifact-builder (Sonnet 5.5, medium)` | the Explainer, only when there was an incident |
 
 ## Files

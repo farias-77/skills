@@ -1,163 +1,169 @@
 ---
 name: stage-close
-description: Conducts stage 6 (Close) of the pipeline under one /goal, and closes on its own. It delivers the video for users (30 s – 3 min, a motion piece recorded in staging, no technical words) as an .mp4 plus a "what's new" text for the user to forward; writes the workstream's retro (at most 5 items per section, numbers from claude/scripts/telemetry.mjs, slowness counted as something that went wrong); proves nothing of the workstream is left on the machine with claude/scripts/cleanup.sh; and publishes its report (video, deck, explainer). A scout harvests the frictions. The retro changes nothing in the pipeline: the weekly retro does. The session runs on Opus 5.5, high. Use when a workstream's .state.md says stage close, or to resume a close by its slug.
+description: Stage 6 of the pipeline, under one /goal, asking him nothing but what to make. Closes a workstream that is in production - the workstream's retro with the script's numbers and the proposals for the project's standards, the "what's new" text, and when he asks, a video and a deck that explain the new feature to its users and the team in the project's design system - proves nothing is left on the machine, and publishes its report. Use when a workstream's .state.md says stage close, or to resume a close by its slug.
 argument-hint: "<workstream-slug>"
 allowed-tools: Read, Write, Edit, Glob, Grep, Agent, SendMessage, ListAgents, AskUserQuestion, Artifact, PushNotification, ScheduleWakeup, Bash
 ---
 
-# Stage 6: Close
+# Stage 6 · Close
+
+Close does two things. It looks back: a short retro with real numbers,
+so the weekly retro can make the pipeline better, and the proposals
+the work raised for the project's standards. And it looks out: the
+people who use the product learn what is new, in a text he forwards
+and, when he asks, a video and a deck in the product's own look. It
+changes nothing in the pipeline or the standards: the weekly retro
+rules those.
 
 ## The bar
 
-1. The users get a 30 s – 3 min video, in motion, with no technical
-   word, and a "what's new" text ready to paste.
-2. The retro has at most 5 items per section; its numbers come from
-   the script; time lost counts as something that went wrong.
-3. Nothing of the workstream is left on the machine, proven by a script.
-4. It closes on its own. What he says later goes into the retro,
-   verbatim.
-5. When he asks for the video for users, it is the one stage that
-   waits for its own video: that video is what the close delivers.
+The stage is done when every line holds:
 
-## The team
-
-| Who (model, effort) | Does |
-|---|---|
-| you, the session (Opus 5.5, high) | the retro, the cleanup, the checks, the delivery |
-| `video-builder (Sonnet 5.5, high)` | the video for users, started at the release's green staging |
-| `scout (Haiku 5.5, medium)` | the harvest of frictions, with `templates/harvest.md` |
-| `slides-builder (Sonnet 5.5, medium)` | the Close deck |
+1. `retro.md` has at most 5 items per section, its numbers from
+   `telemetry.mjs`, time lost counted as something that went wrong.
+2. Every `[standards]` line of the workstream and every drift between
+   the merged code and the maps is in the retro's "For the standards".
+3. The "what's new" text is ready to paste; the video and the deck he
+   picked explain the feature to its users, follow the project's
+   `design-system.md`, and carry no technical word.
+4. `cleanup.sh --check` comes back empty.
+5. The report's Explainer is published.
 
 ## The flow
 
 ```
-0 open            preconditions · the /goal → he pastes it
-1 in parallel ┌── the video for users: wait for what is left of its render (or dispatch it now)
-              ├── harvest: scout + templates/harvest.md ──► telemetry.mjs ──► retro.md
-              └── cleanup.sh --check → --apply → --check empty
-2 report          Video (the users' video) · Deck (retro, numbers, what's new) · Explainer (the numbers)
-3 deliver         the .mp4, the text, the link · PushNotification · closed
+/stage-close <slug> → opening: preconditions + the /goal + one question (Video · Deck)
+  in parallel ┌── the users' material: what's new ∥ video ∥ deck (what he picked)
+              ├── the retro: harvest ∥ drift check → telemetry → retro.md
+              └── cleanup: --check → --apply → --check empty
+  → report → deliver
 ```
 
-| Read | When |
+| Step | Who (model, effort) | Produces |
+|---|---|---|
+| everything else | you (Opus 5.5, medium) | `retro.md`, `whats-new.md`, the cleanup proof |
+| harvest · drift check | `scout` (Haiku 5.5, high) × 2 | the frictions with `path:line`; what the merged diff added that the maps do not name |
+| the video for users | `video-builder` (Sonnet 5.5, high), when he asks | `report/close/video.mp4` |
+| the deck for the team | `slides-builder` (Sonnet 5.5, medium), when he asks | `report/close/deck/` |
+| the Explainer | the report template from `metrics.json` and the retro | the Close tab |
+
+## What you read
+
+| File | When |
 |---|---|
-| [references/user-video.md](references/user-video.md) | before you brief or check the video |
 | [references/retro.md](references/retro.md) | before you write the retro |
+| [references/user-video.md](references/user-video.md) | before you brief or check the video and the deck |
 | [references/cleanup.md](references/cleanup.md) | before the cleanup |
+| the project's `design-system.md` | handed to the video and deck builders |
+
+## Files
 
 ```
-<designs-root>/<slug>/05-close/
-├── whats-new.md                 the text for users (templates/whats-new.md)
-├── retro.md                     templates/retro.md
-└── trace.md                     one line per step (templates/trace.md)
-<designs-root>/<slug>/report/close/video.mp4   the video for users, also the Close tab's Video
-<designs-root>/<slug>/metrics.json             written by telemetry.mjs
+<designs-root>/<slug>/
+├── 05-close/
+│   ├── whats-new.md     the text for users (template: templates/whats-new.md)
+│   ├── retro.md         template: templates/retro.md
+│   └── trace.md         one line per step (template: templates/trace.md)
+├── report/close/        video.mp4 and deck/ when asked
+└── metrics.json         written by telemetry.mjs
 ```
 
-## Unattended
+## Opening
 
-Nothing in this stage asks him. A wait on the render ends the turn on
-a `ScheduleWakeup` sized to what is left. Keep `trace.md` current; it
-is the resume point.
-
-## Step 0 · Open
-
-1. **The house rules.** Read the file that
-   `realpath ${CLAUDE_SKILL_DIR}/../../../CLAUDE.md` prints and run its
-   Open: the pulls, who else is working, then the designs root.
-2. **Preconditions.** `.state.md` says `stage: close`; the release's
-   trace ends with the tag in production (a short route or a hotfix
-   closes inside lets-cook, with `templates/short-close.md` of that
-   skill, not here).
-3. **The `/goal`**, then end the turn:
+1. **The kit.** `realpath ${CLAUDE_SKILL_DIR}/../..`, written as `kit:`
+   in `.state.md`.
+2. **The house Open.** Read `<kit>/../CLAUDE.md` and run its Open: the
+   pulls, who else is working.
+3. **Preconditions.** `.state.md` says `stage: close`; the release's
+   trace ends with the tag in production. A short route or a hotfix
+   closes inside `lets-cook`, not here.
+4. **The goal**, and in the same message the one question this stage
+   asks (multi-select, none is a valid answer): "For the people who use
+   it, also make:" **Video** · **Deck**.
 
 ```
-/goal Close <slug> with the stage-close skill, without asking me anything.
-Done when: the video for users and the "what's new" text are ready; retro.md is written with the
-script's numbers; cleanup.sh --check comes back empty; the Close tab is on the workstream's link; and I
-got the notification with the video, the text and the link.
+/goal Close <slug> with the stage-close skill, asking me nothing else.
+Done when: retro.md is written with the script's numbers and the standards proposals; the
+"what's new" text and the material I picked are ready; cleanup.sh --check comes back empty;
+the Close tab is published; and I got the notification with the text, the files and the link.
 ```
 
-## Step 1 · Three jobs at once
+A wait on a render ends the turn on a `ScheduleWakeup` sized to what is
+left. `trace.md` is the resume point.
 
-Start all three in one turn.
+## 1 · Three jobs at once
 
-**The video for users, when he asks for it.** First, one question
-through the question tool, multi-select: "The close's Explainer is
-being made. Also make:" Video for users · Deck (none is a valid
-answer). On Video: `report/close/video.mp4` already there → done;
-else dispatch `video-builder (Sonnet 5.5, high)` with
-`references/user-video.md` and the stories (it records in staging).
-When it returns, check it as that reference says. Without it, the
-message carries the "what's new" text alone.
+**The users' material**, by
+[references/user-video.md](references/user-video.md):
+
+- `05-close/whats-new.md` from its template, always: what they can now
+  do, in their words.
+- **Video**, when picked: `video-builder` with the stories, the tag's
+  notes, the staging URLs and actors, and the project's
+  `design-system.md` (surface: video). It records on staging. Check it
+  as the reference says.
+- **Deck**, when picked: `slides-builder` with the same sources and
+  `design-system.md` (surface: slides): the feature explained to the
+  team, screen by screen, in the product's look.
 
 **The retro.**
-1. Dispatch one `scout (Haiku 5.5, medium)` with `templates/harvest.md`
-   and these paths: `dreaming-notes.md`, `rulings.md`, every stage's
-   board or trace (`03-execution/` board and parked list,
-   `04-release/trace.md`), and the reviews files. It returns each
-   friction with `path:line`, the quote and the time it cost; nothing
-   is written to a file.
-2. Run `node claude/scripts/telemetry.mjs <slug> --ws <designs-root>/<slug>`. It writes
-   `metrics.json`: time, cost and his touches per stage, with `gaps`
-   for what it could not measure.
-3. Write `05-close/retro.md` from `templates/retro.md`, as
-   `references/retro.md` says.
 
-**The cleanup.** Follow `references/cleanup.md`:
+1. Two `scout`s, in parallel. The **harvest**, with
+   [templates/harvest.md](templates/harvest.md) and the paths:
+   `dreaming-notes.md`, `rulings.md`, `03-execution/board.md` and its
+   parked list, `04-release/trace.md`, every stage's `reviews.md`. The
+   **drift check**: "List each route, table, job, module, cloud
+   resource and integration that `git diff <the previous tag>...<this
+   tag>` adds in the product repo, and for each, quote where the
+   project's feature maps or `architecture.md` name it, or say it is
+   missing."
+2. `node <kit>/scripts/telemetry.mjs <slug> --ws <workstream>` writes
+   `metrics.json`: time, cost and his touches per stage, with `gaps`.
+3. Write `05-close/retro.md` from its template, by
+   [references/retro.md](references/retro.md).
+
+**The cleanup**, by [references/cleanup.md](references/cleanup.md):
 `cleanup.sh <slug> --check`, decide what is his (unmerged work),
-`--apply`, then `--check` until it comes back empty. Paste the final
-`--check` output into `trace.md`: it is the proof. A checkout
-listed as `his` (left off the default branch) goes in the message.
+`--apply`, then `--check` until it comes back empty. The final
+`--check` output goes into `trace.md`: it is the proof.
 
-## Step 2 · The report, finished before the close
+## 2 · The report
 
-The Explainer always; the Deck by `slides-builder (Sonnet 5.5,
-medium)` and the Video only when he picked them in step 1, as
-`docs/stage-report.md` describes, into `report/close/`:
+As `<kit>/../docs/stage-report.md` describes. The Explainer is filled
+from the template with `metrics.json` and the retro: the workstream's
+time, cost and touches per stage beside the earlier workstreams', and
+the retro's sections. The video and the deck are the users' material
+from step 1. Check every number against `metrics.json`, run `gitleaks
+dir <workstream>` (a finding stops the publish), and publish labelled
+"closed".
 
-| Tab | Who | What |
-|---|---|---|
-| Video | the users' video itself | 30 s – 3 min, for users |
-| Deck | `slides-builder (Sonnet 5.5, medium)` | the retro (at most 5 per section), the numbers per stage, the "what's new" text |
-| Explainer | the report template from `metrics.json` | the workstream's time, cost and touches per stage, beside the earlier workstreams' `metrics.json` |
+## 3 · Deliver
 
-Check every number on a slide against `metrics.json`. Run
-`gitleaks dir <designs-root>/<slug>`; a finding stops the publish.
-Publish to the workstream's link with the label "closed".
+`.state.md` → `stage: closed`; your line in `_coordination.md`:
+closed; with a `tracker:` line, `notion-tracker done`. Commit the
+workstream folder. From here the folder is history: what must last
+lives in the feature maps and the standards.
 
-## Step 3 · Deliver and close
-
-1. `.state.md` → `stage: closed`. Your line in `_coordination.md`:
-   closed. With a `tracker:` line, `notion-tracker done`. Commit the workstream folder (push only on his word).
-   From here the folder is history, read only: nobody updates its
-   design documents; what must last lives in the feature map.
-2. One message and a `PushNotification`:
+One message and a `PushNotification`:
 
 | | |
 |---|---|
-| For users | the `.mp4` path (≤ 15 MB, ready to forward) |
 | What's new | the text, in full, ready to paste |
+| For users | the video's path (≤ 15 MB) and the deck, when made |
 | The link | the workstream's report, Close tab |
 | The numbers | time · cost (estimate) · his touches, one line |
-| Known issue | only if the video has one he should know before forwarding |
+| For the standards | how many proposals wait for the weekly retro |
 
 It is the last stage: no next command. When he comments later, append
 his words verbatim at the end of `retro.md`, marked `[user]`, and
 commit.
 
-## When the render fails
-
-Run the cleanup first (it frees the render caches and the workstream's images),
-then render **once more** if the failure was the machine's (disk,
-memory). A second failure: deliver the text alone, mark the Video tab
-"failed", and write one line in `dreaming-notes.md`. A problem seen in
-the finished video goes in the message as a known issue; it is
-rendered again only on his note.
+**A render that fails** gets one more try when the cause was the
+machine (disk, memory), after the cleanup. A second failure: deliver
+without it, mark the tab `failed`, one line in `dreaming-notes.md`.
 
 ## Resuming
 
-`/stage-close <slug>`: the house Open (the pulls, who
-else is working), then `.state.md` and `trace.md`. A
-retro already written is not rewritten; a cleanup is re-checked, never
-assumed.
+`/stage-close <slug>`: the opening's steps 1–2, then `.state.md` and
+`trace.md`. A retro already written is not rewritten; a cleanup is
+re-checked, never assumed.

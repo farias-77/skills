@@ -1,6 +1,6 @@
 # Harvest brief (for the scout)
 
-<!-- The close sends this to scout (Haiku 5.5, medium) with the paths filled.
+<!-- The close sends this to scout (Haiku 5.5, high) with the paths filled.
      The return goes straight into the retro; nothing is written to a file. -->
 
 Read these files whole, and nothing else. A path that does not exist goes
@@ -13,9 +13,10 @@ Return, and nothing more:
 
 1. **Frictions.** Everything that cost a round, a stop, a red, a wait, a
    workaround or a surprise; everything he asked to change; every ruling
-   where he chose against the recommendation. One line each:
+   where he chose against the recommendation; every `[standards]` line.
+   One line each:
    `path:line` · the quote, verbatim · the minutes it cost when the record
-   says · `[user]` or `[taste]` when the line is marked so.
+   says · `[user]`, `[taste]` or `[standards]` when the line is marked so.
 2. **Went well.** What the record shows worked: a stage closed in one
    round, an entry merged on its first pass, a red caught by the gate
    before review. One line each with `path:line`.

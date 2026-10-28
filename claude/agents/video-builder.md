@@ -32,7 +32,6 @@ the brief and the shot list, and they come from the session that sent you.
   and the video path (`<workstream>/report/<stage>/video.mp4`).
 - **The kit:** `claude/video/` of the pipeline repo.
 - **The render flags**, when they differ from the skill's table:
-  - `--first`, for the design debate's video;
   - `--size 1080 --max-mb 15`, for the users' video with real screens.
 
 ## Boundaries

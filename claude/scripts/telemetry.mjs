@@ -18,6 +18,12 @@
 // (subagents/**/*.jsonl, workflows included) are the ones that started
 // inside it. Entries run in the cloud bring their run-*.json.
 //
+// `signals` counts what the weekly retro compares across workstreams: each
+// entry's last status, the entries merged on their first pass, the A.n and
+// X.n rounds, the rulings (and how many the session took in his place), the
+// tagged notes ([user], [taste], [standards]), and the standards rule ids
+// cited in the runs and the reviews.
+//
 // What is not measured stays null with a line in `gaps`; a gap never drops
 // the rest of the sum. Cost is an estimate (tokens × the list price below),
 // marked as one.
@@ -283,6 +289,35 @@ for (const f of runs) {
 }
 if (runs.length && !runTokensSeen) gaps.push('the entries\' run-*.json carry no token usage; cloud entries\' tokens are not counted')
 
+// ---------- the signals the weekly retro reads ----------
+// Counted from files the stages already write; nothing is recorded for this.
+
+const RULE_ID = /\b(?:ARC|ENG|TST|SEC|DS|OPS)-\d+\b/g
+const readText = (f) => { try { return fs.readFileSync(f, 'utf8') } catch { return '' } }
+const signals = { entries: { byStatus: {}, firstPass: 0 }, rounds: { A: 0, X: 0 }, rulings: { total: 0, conductor: 0 }, notes: {}, rulesCited: {} }
+const lastRun = new Map()
+for (const f of runs) {
+  const id = path.basename(path.dirname(f))
+  const n = Number(path.basename(f).match(/\d+/)[0])
+  if (!lastRun.has(id) || lastRun.get(id).n < n) lastRun.set(id, { n, f })
+}
+for (const { f } of lastRun.values()) {
+  let j
+  try { j = JSON.parse(readText(f)) } catch { continue }
+  const k = j.reason ? `${j.status}:${j.reason}` : j.status
+  signals.entries.byStatus[k] = (signals.entries.byStatus[k] ?? 0) + 1
+  if (j.status === 'ready' && !(j.passes?.gateFixes) && !(j.passes?.reviewFixes)) signals.entries.firstPass++
+}
+for (const f of walk(path.join(ws, '03-execution', 'adjust'), (n) => /^[AX]\.\d+\.md$/.test(n))) signals.rounds[path.basename(f)[0]]++
+for (const line of readText(path.join(ws, 'rulings.md')).split('\n').filter((l) => /^\d{4}-\d{2}-\d{2} · /.test(l))) {
+  signals.rulings.total++
+  if (/ruled: conductor/.test(line)) signals.rulings.conductor++
+}
+for (const tag of readText(path.join(ws, 'dreaming-notes.md')).match(/\[(?:user|taste|standards)\]/g) ?? []) signals.notes[tag] = (signals.notes[tag] ?? 0) + 1
+for (const f of [...runs, ...walk(ws, (n) => n === 'reviews.md')]) {
+  for (const id of readText(f).match(RULE_ID) ?? []) signals.rulesCited[id] = (signals.rulesCited[id] ?? 0) + 1
+}
+
 // ---------- the sum ----------
 
 const order = STAGE_SKILLS.map(stageName)
@@ -306,6 +341,7 @@ const result = {
   pipelineSha,
   stages,
   entries: { ...entries, costUsd: cost(entries.tokens) },
+  signals,
   totals: {
     startedAt: starts[0] ?? null,
     endedAt: ends.at(-1) ?? null,

@@ -31,7 +31,8 @@ he rules ──► apply · park · drop ──► fast-forward on the pipeline 
 | fixing something broken | a script that crashes, a stale reference | the agent | applies it; listed on the board for veto |
 | a fix that unblocks a workstream now | a workflow bug that parks entries | the workstream's session | another worktree, the smallest change, the repo's tests, fast-forward; a line in `dreaming-notes.md`; ratified at the weekly. **Never** the settings: those wait for his explicit ok |
 | behavior | a step, an agent, a model, a rule | **him** | at the weekly |
-| the project's standards | tests, architecture | **him** | a PR to the project. A new lint or test check the weekly may open itself, for his approval, only with the proof that it fails on a real past commit (the sha and the failing line) |
+| the project's standards | a rule, a map line, a golden path | **him** | at the weekly; the `standards` skill opens one PR per project with what he approved, and the project's code owner merges it |
+| a rule turned into a check | a lint rule, a structure check, a test helper | **him** | at the weekly, as a demand for `/lets-cook` on the short route; the check proves it fails on a real past commit (the sha and the failing line) |
 | the principles | — | **him** | a conversation of its own |
 
 ## A proposal
@@ -66,6 +67,10 @@ removes, or why nothing can go.
 | cost per workstream | tokens per model × list price: an estimate, marked as one |
 | his touches | `/goal`s, answers and messages from him (from `metrics.json`); the retro names apart the ones that unblocked a stop |
 | dismissed per lens | each review lens's findings ruled dismissed, over its findings (from `rulings.md`); a lens above 50% across 3 workstreams is proposed for a cut or a script |
+| first pass | entries merged with no fix pass, over all entries (`signals.entries`) |
+| rounds | his A.n and the X.n fixes per workstream (`signals.rounds`) |
+| in his place | rulings with `ruled: conductor`, over all rulings (`signals.rulings`); a rise means the stages decide more for him |
+| rules cited | standards ids in the findings (`signals.rulesCited`); three or more in a week is a check candidate, never cited for a month is a rule to question |
 
 No target before measuring: the first workstreams are the baseline. A
 median per route only after 10 workstreams on it.

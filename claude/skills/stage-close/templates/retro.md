@@ -1,7 +1,7 @@
 # Retro · <slug>
 
-<!-- Written by the close from metrics.json and the scout's harvest, in his
-     language. At most 5 items per section. Closed on its own; his later
+<!-- Written by the close from metrics.json and the scout's harvest, in
+     English. At most 5 items per section. Closed on its own; his later
      comments are appended at the end, verbatim. -->
 
 - **Route:** full \| short \| hotfix · **Version:** vX.Y.Z · **Closed:** <date>
@@ -27,6 +27,15 @@ Not measured: <the gaps, one line each> \| nothing
 ## Ideas for the pipeline
 
 1. <the change, in one line> · moves: <time \| cost \| touches> · from: <the "Got stuck" it answers>
+
+## For the standards
+
+<!-- The [standards] lines and the drift check. The weekly retro rules
+     them and opens one pull request in the project per week. -->
+
+| File | Proposal (as the rule would read, or the map line) | Evidence |
+|---|---|---|
+| <architecture.md> | <the route prefix /exports is missing from the Modules table> | <the drift check: path:line> |
 
 ## His notes
 

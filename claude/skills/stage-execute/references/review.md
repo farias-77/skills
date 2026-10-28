@@ -1,6 +1,6 @@
 # Review
 
-For `reviewer (Opus 5.5, high)`: one reader of every diff that enters,
+For the `reviewer`: one reader of every diff that enters,
 entries, A.n rounds, X.n fixes and hotfixes alike. The scope is closed:
 what is below, and nothing else.
 
@@ -27,6 +27,9 @@ block: no speculative cases.
 naming, a refactor you would like: a note at most.
 
 ## The security checklist (every diff)
+
+The floor below, plus every rule of the project's `security.md`; a
+finding cites the rule's id.
 
 - authentication and permission on every route and action the diff adds
   or changes;

@@ -5,7 +5,9 @@ team of agents and builds a closed plan into a finished feature branch,
 under one `/goal`: every ready entry at once (in cloud sessions when the
 project has them), a merge queue that tests each merged tree, the whole
 gate as local CI, the PR to `main`, and the user's hands-on with his
-adjustments. It closes on his "ok".
+adjustments. It closes on his "ok". Every agent follows the project's
+standards book (the `standards` skill): the craft of a stack lives
+there and in the kit's stack packs, never in this stage.
 
 ```
 C ──► entries at once (builders → gate → reviewer ∥ QAs → one fix) ──► queue ──► PR ──► his hands-on ──► ok ──► local-ci once
@@ -33,10 +35,9 @@ it), then run `/stage-execute <workstream-slug>`.
 | `references/tech-lead.md` | the playbook: overlaps, conflicts, parked entries, rate limits, other workstreams, the night |
 | `references/queue.md` | the merge queue, migrations, `main` moving, the PR and local CI |
 | `references/cloud.md` | entries, queue steps and the whole gate in cloud sessions: the evidence branch, the run prompts, heartbeat, relaunch, the record and `--post-from` |
-| `references/builders.md` | the builders' role and the testing rule |
-| `references/backend.md` · `frontend.md` | Go and React craft, and visual taste, trimmed to the standards |
+| `references/builders.md` | the builders' role: where they sit, how they prove (by the project's `testing.md`), try it once |
 | `references/review.md` | the six classes that block, the security checklist, five notes at most |
-| `references/qa.md` | the try-to-break lists for screens and for the API |
+| `references/qa.md` | the QAs' role; their lists are the project's `testing.md` "What QA tries" |
 | `templates/board.md` · `brief-adjust.md` | the board, and the brief of an A.n round or an X.n fix |
 | `scripts/cloud-watch.sh` | waits for pushes on the evidence branches with no model turns |
 | `scripts/heartbeat.sh` | one beat per agent start and end; pushed in a cloud run |

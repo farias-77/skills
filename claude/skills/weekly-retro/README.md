@@ -1,15 +1,16 @@
 # weekly-retro
 
-The only place where the pipeline changes. Once a week the session
-reads the retro and the rulings of every workstream closed that week, writes
-a board (raw numbers per workstream and route, last week's changes beside
-them, proposals with their evidence and exact edit, the live fixes to
-ratify, the fixed items that are due), asks the user to rule each
-proposal, and lands what he approved by fast-forward on the pipeline
-repo.
+The weekly review of the whole factory, and the only place where the
+pipeline and a project's standards change. Once a week the session
+reads every workstream that moved (closed or in flight) with the
+numbers and signals the stages record on their own, writes one board,
+asks him to rule each proposal, lands the pipeline changes by
+fast-forward, and hands the standards changes to `/standards update`,
+which opens one pull request per project. A rule the reviewers keep
+enforcing by hand becomes a demand for a check.
 
 ```
-read the week's retros → the board → apply · park · drop → edit in a worktree → verify → fast-forward
+telemetry on each workstream → the board → apply · park · drop → pipeline: worktree → verify → fast-forward · standards: one PR
 ```
 
 ## Install
@@ -24,7 +25,7 @@ incident issues.
 
 | Agent | Does |
 |---|---|
-| `scout (Haiku 5.5, medium)` | a quote or a line from a workstream's notes or an earlier board |
+| `scout (Haiku 5.5, high)` | a quote or a line from a workstream's notes or an earlier board |
 
 ## Files
 

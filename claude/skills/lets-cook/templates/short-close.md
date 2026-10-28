@@ -1,6 +1,6 @@
 # Close · <slug>
 
-<!-- The short route's and the hotfix's close, in his language. Numbers from
+<!-- The short route's and the hotfix's close, in English. Numbers from
      metrics.json only; at most 3 items per section. His later comments are
      appended at the end, verbatim. -->
 

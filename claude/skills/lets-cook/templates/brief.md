@@ -1,6 +1,6 @@
 # Brief · <slug>
 
-<!-- One page. Written by lets-cook in his language; the entry's builders
+<!-- One page. Written by lets-cook in English; the entry's builders
      work from it as from a plan brief. gitleaks runs on the folder before
      anything leaves the machine. -->
 

@@ -1,6 +1,6 @@
 # Weekly retro · <YYYY>-W<ww>
 
-<!-- Written by weekly-retro in his language. Raw numbers; a median per route
+<!-- Written by weekly-retro in English. Raw numbers; a median per route
      only after 10 workstreams on it. Closed with the shas of what landed. -->
 
 - **Pipeline at the start:** `<sha of main>` · **Workstreams closed:** <n> (full <n> · short <n> · hotfix <n>)
@@ -10,6 +10,23 @@
 | Workstream | Route | Clock | Cost (estimate) | His touches | Got stuck, top line |
 |---|---|---|---|---|---|
 | <slug> | full | <h> | US$ <n> | <n> | <one line> |
+
+## In flight
+
+| Workstream | Stage · step | Days in it | Waits on |
+|---|---|---|---|
+| <slug> | execute · 5 | <n> | <him: the hands-on \| nothing> |
+
+## The signals
+
+| Signal | This week | Last week |
+|---|---|---|
+| entries merged on their first pass | <n of n> | <n of n> |
+| A.n · X.n rounds per workstream | <n · n> | <n · n> |
+| parked, by reason | <round-cap 2 · gate-red 1> | <…> |
+| rulings taken in his place | <n of n> | <…> |
+| dismissed share per lens (above 50% marked) | <lens: n%> | <…> |
+| standards rules cited most · never cited | <ENG-14 ×5 · SEC-9> | <…> |
 
 ## Last week's changes
 
@@ -34,9 +51,17 @@
 |---|---|---|
 | `<sha>` <subject> | <workstream · line> | keep \| revert |
 
-## Not for the pipeline
+## For the standards
 
-- <a pattern that belongs to the project's standards> → a PR to the project, his
+### <project>
+
+| Proposal | File | Evidence | Ruling |
+|---|---|---|---|
+| <the rule as it would read, or the map line> | <engineering.md> | <workstreams · finding ids> | apply \| park \| drop |
+
+**Rule → check:** <ENG-14 cited 4× → a lint rule that flags an outbound call with no deadline> · <make it a demand \| park \| drop>
+
+**Pull request:** <link, once the standards skill opened it>
 
 ## Fixed items
 

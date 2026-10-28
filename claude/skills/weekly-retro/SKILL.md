@@ -1,115 +1,149 @@
 ---
 name: weekly-retro
-description: The weekly retro, the only place where the pipeline changes. Once a week the session (Opus 5.5, high) reads the retro and the rulings of every workstream closed that week, writes the week's board (raw numbers per workstream and route, last week's changes beside them, proposals each with its evidence and exact edit, the live fixes to ratify, the fixed items), asks the user one question per proposal (apply, park, drop), applies what he approved in a separate worktree of the pipeline repo, verifies it, and lands it by fast-forward with his word. No video, no slides. Use once a week, or when the user asks to review the pipeline's lessons.
+description: The weekly review of the whole factory, and the only place the pipeline and the project's standards change. Once a week it reads every workstream that moved that week - closed or in flight - with the numbers the stages record on their own, writes one board, asks him one question per proposal (apply, park, drop), lands what he approved in the pipeline, and hands the approved standards changes to the standards skill as one pull request per project. Use at the end of each week, or when he asks to review the pipeline's lessons.
 argument-hint: "[ISO week, e.g. 2026-W41; default: the week that just ended]"
-allowed-tools: Read, Write, Edit, Glob, Grep, Agent, AskUserQuestion, Bash
+allowed-tools: Read, Write, Edit, Glob, Grep, Agent, AskUserQuestion, Skill, Bash
 ---
 
 # The weekly retro
 
-Every workstream closes with a retro that changes nothing. Once a week this
-session reads them together and turns what repeats into changes to the
-pipeline, with him ruling each one. A friction seen once may be
-chance; seen in three workstreams, it is the pipeline.
+Every workstream records its own numbers and closes with a retro that
+changes nothing. Once a week this session reads them together, with the
+workstreams still in flight, and turns what repeats into changes, with
+him ruling each one. A friction seen once may be chance; seen in three
+workstreams, it is the pipeline. A rule the reviewers keep enforcing by
+hand is a check the project should have.
+
+## The bar
+
+The week is done when every line holds:
+
+1. Every workstream that moved this week is on the board, with its
+   numbers from `metrics.json` and, when in flight, where it stands.
+2. Every proposal has its evidence, its exact edit, the number it
+   should move, and his ruling.
+3. What he approved for the pipeline is landed and verified; what he
+   approved for a project's standards is one pull request there.
+4. Last week's changes sit beside this week's numbers.
 
 ## The flow
 
 ```
-0 open    the week · the workstreams closed in it · last week's board
-1 read    retro.md + rulings.md of each workstream (you) · numbers by jq · the rest by scout
-2 board   _retros/<YYYY>-W<ww>.md: numbers · last week's changes · proposals · live fixes · fixed items
-3 rule    one question per proposal and per live fix, four per call
-4 apply   a separate worktree · the exact edit · verified · diff shown
-5 land    with his word: one commit per proposal · fast-forward the live main · the board closed
+/weekly-retro [week] → 0 the week · the workstreams that moved · last week's board
+  → 1 read: telemetry on each · retros and rulings (you) · the rest by scout
+  → 2 the board → 3 rule ◄ him (four questions per call)
+  → 4 apply: the pipeline in a worktree · the standards through the standards skill
+  → 5 land with his word
 ```
 
-Read [references/governance.md](references/governance.md) before step
-2: who decides what, how a proposal is shaped, how the pipeline is
-versioned and rolled back.
+| Step | Who (model, effort) | Produces |
+|---|---|---|
+| every step | you (Opus 5.5, high) | `_retros/<YYYY>-W<ww>.md` |
+| numbers | `telemetry.mjs` on each workstream | `metrics.json`, with its `signals` |
+| facts | `scout` (Haiku 5.5, high) | a quote from a notes file, an earlier board |
+| standards | the `standards` skill, update mode | one pull request per project |
 
-## Step 0 · Open
+## What you read
+
+| File | When |
+|---|---|
+| [references/governance.md](references/governance.md) | before step 2: who decides what, the shape of a proposal, the numbers, versions and rollback |
+| each workstream's `retro.md` (or `close.md`) and `rulings.md` | whole, at step 1: you rule on them |
+| `<kit>/skills/standards/references/book.md` | before you rank a standards proposal |
+
+## Files
+
+```
+<designs-root>/_retros/<YYYY>-W<ww>.md     the board (template: templates/board.md)
+<designs-root>/<slug>/metrics.json         refreshed by telemetry.mjs for every workstream that moved
+```
+
+## 0 · Open
 
 The week is ISO (`YYYY-Www`), Monday to Sunday: the one given, or the
-one that just ended. A workstream belongs to it when its `.state.md` says
-`closed` and the "Closed:" date of its `05-close/retro.md` falls inside
-the week. Short routes and hotfixes count (their record is `close.md`,
-with the same line). The boards live in
-`<designs-root>/_retros/`; the pipeline repo is the one this skill is
-installed from.
+one that just ended. A workstream **moved** this week when a commit in
+its folder falls inside it; it is **closed** when its `.state.md` says
+`closed` and its retro's "Closed:" date is inside the week. Short
+routes and hotfixes count. Read last week's board for its landed shas
+and its parked list. Nothing moved and nothing is due: say so in one
+line and stop.
 
-No workstream closed: the board holds only the live fixes and the fixed
-items that are due. Nothing due either: say so in one line and stop.
+## 1 · Read
 
-## Step 1 · Read
-
-- **You read**, whole: each workstream's `05-close/retro.md` (or `close.md`)
-  and `rulings.md`. They are short, and they are what you rule on.
-- **Numbers by `jq`**, never by reading: from each workstream's
-  `metrics.json`, the totals (calendar and clock minutes, cost, his
-  touches, waits on him) and the per-stage rows.
-- **The rest by `scout (Haiku 5.5, medium)`**: a quote you need from a
-  workstream's `dreaming-notes.md`, a line of a board, the earlier boards'
-  "dropped" and "parked" lists.
+- **Numbers by script.** `node <kit>/scripts/telemetry.mjs <slug> --ws
+  <workstream>` for every workstream that moved; then `jq` over the
+  `metrics.json` files: totals, the per-stage rows, and `signals`.
+- **You read**, whole: each closed workstream's retro and `rulings.md`.
+- **In flight:** each one's `.state.md` (stage and step), the days since
+  its stage opened, and what waits on him (`_coordination.md`, its
+  board or trace).
+- **By scout:** a quote you need from a `dreaming-notes.md`, the
+  earlier boards' dropped and parked lists.
 - **Live fixes:** `git log` of the pipeline repo's `main` since last
-  week's board (its sha is in the board). Every commit not applied at a
-  weekly is a live fix to ratify.
-- **Incidents:** the week's `incident` issues of the project
-  (`gh issue list --label incident`).
+  week's board. Every commit not landed at a weekly is a live fix to
+  ratify.
+- **Incidents:** the week's `incident` issues of each project.
 
-## Step 2 · The board
+## 2 · The board
 
-Write `_retros/<YYYY>-W<ww>.md` from `templates/board.md`:
+Write `_retros/<YYYY>-W<ww>.md` from
+[templates/board.md](templates/board.md):
 
-1. **The week in numbers.** One row per workstream: route, clock, cost
-   (estimate), his touches. Raw numbers; a median per route only
-   after 10 workstreams on that route.
-2. **Last week's changes**, beside the numbers, so he sees their
-   effect.
-3. **Proposals**, ranked: his `[user]` notes first, then how many
-   workstreams saw it, then the time it cost. Each opens with one plain
-   sentence of what changes in practice, then the evidence (the workstreams,
-   a quote), the exact edit (the file and the change) and what it
-   costs. A proposal he could not picture from its first sentence is
-   dropped on the spot.
-4. **Live fixes to ratify**: each commit, its dreaming line, keep or
-   revert.
-5. **Not for the pipeline**: what belongs to the project's standards
-   (a PR there, his), listed for him.
-6. **Fixed items** that are due (governance.md).
-7. **Dropped before**: his earlier "drop", with the week; never asked
-   again unless he names it.
+1. **The week in numbers**: one row per closed workstream (route,
+   clock, cost estimate, his touches, wait on him). Raw numbers; a
+   median per route only after 10 workstreams on it.
+2. **In flight**: one row per open workstream: stage, days in it, what
+   waits and on whom.
+3. **The signals**, across the workstreams: entries merged on their
+   first pass, A.n and X.n rounds per workstream, the parked reasons,
+   the share of rulings taken in his place, the dismissed share per
+   review lens, the standards rules cited most and never.
+4. **Last week's changes** beside the numbers they should have moved.
+5. **Proposals for the pipeline**, ranked: his `[user]` notes first,
+   then how many workstreams saw it, then the time it cost. Each in the
+   shape governance.md sets.
+6. **For the standards**, per project: the retros' "For the standards"
+   rows merged, the map drifts, and **rule → check** candidates (a rule
+   cited three or more times this week, with the check that would catch
+   it: a lint rule, a structure check, a test helper, a generator).
+7. **Live fixes to ratify**, the **fixed items** that are due
+   (governance.md), and what he **dropped before**.
 
-## Step 3 · Rule
+## 3 · Rule
 
 Through the question tool, four per call, in rank order: one question
-per proposal (apply, recommended when two or more workstreams saw it or he
-noted it · park, it returns next week · drop) and one per live fix
-(keep · revert). The question carries the plain sentence, the evidence
-in one line and the edit. He may change an edit in "Other"; the
-changed edit is the one applied. His answers go into the board with
-his words.
+per proposal, pipeline and standards alike (**apply**, your pick when
+two or more workstreams saw it or he noted it · **park**, it returns
+next week · **drop**), one per live fix (**keep** · **revert**), and one
+per rule → check candidate (**make it a demand** · **park** ·
+**drop**). Each question carries the plain sentence, the evidence in
+one line and the edit. An edit he changes in "Other" is the one
+applied. His answers go into the board with his words.
 
-## Step 4 · Apply
+## 4 · Apply
 
-In a separate worktree of the pipeline repo, never in the live
-checkout the sessions read:
+**The pipeline**, in a separate worktree of the pipeline repo, never in
+the live checkout the sessions read: the approved edit and nothing
+around it; the pipeline stays generic (no company, product or private
+name); `node --check` on a workflow or script, `bash -n` on a shell
+file, then `bash tests/run.sh`; show him the diff.
 
-1. The approved edit, nothing around it. The pipeline stays generic:
-   no company, product or private name in its files.
-2. Verify what can be verified: `node --check` on a workflow or script,
-   `bash -n` on a shell file, then `bash tests/run.sh`.
-3. Show him the diff.
+**The standards**: load the `standards` skill in update mode with the
+project and the approved rows. It opens one pull request in that
+project, which he (or its code owner) merges.
 
-## Step 5 · Land
+**A rule → check he made a demand**: write its one-paragraph demand
+into the board and give him the `/lets-cook` line on his clipboard.
 
-With his word: one commit per proposal (what changed, why, the workstreams
-that taught it), then fast-forward the live `main`. A workstream in flight
-picks the change up at its next stage. Push only on his word. Write
-the shas into the board and close it.
+## 5 · Land
 
-## Boundaries
+With his word: one commit per pipeline proposal (what changed, why,
+the workstreams that taught it), then fast-forward the live `main`; a
+workstream in flight picks it up at its next stage. Push only on his
+word. Write the shas and the pull request links into the board and
+close it.
 
-This skill changes the pipeline and nothing else: no product code, no
-project standard, no workstream's folder but the board. The one exception is
-a lint or test check opened as a PR to the project for his approval,
-as governance.md allows. Never an edit he did not approve.
+This skill changes the pipeline and, through the `standards` skill,
+opens pull requests to the projects; it touches no product code and no
+workstream's folder but the board, and lands nothing he did not
+approve.

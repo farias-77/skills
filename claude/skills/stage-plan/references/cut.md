@@ -2,7 +2,25 @@
 
 How a closed design becomes a graph that stage 4 runs as wide as it
 can. The planner cuts by these rules; the plan-reviewer and the
-conductor judge by them; `plan-graph.mjs` holds the mechanical ones.
+session judge by them; `plan-graph.mjs` holds the mechanical ones.
+
+## The bar of a good cut
+
+Plan it the way a senior team with no size limit would plan the
+sprint. Three tests, in order:
+
+1. **Natural.** Each entry is a piece of work a good team would hand to
+   one pair as one pull request: a whole behaviour, in its golden path,
+   that someone can see work. The order is the order that team would
+   build in: what everything stands on first, then the behaviours, then
+   what crosses them.
+2. **Wide.** Every entry whose seam is real starts at once: the Contract
+   fixes the shape between the two sides, a factory gives the data, a
+   fake stands in for an interface.
+3. **No hacks for width.** A behaviour is never split, a stub never
+   pinned by a test, a shared file never edited by two entries, only to
+   run one more thing at once. When width and a natural cut disagree,
+   the natural cut wins and the plan names the edge.
 
 ## The rules
 
@@ -49,6 +67,7 @@ A deeper graph needs an edge that nothing can fake, named.
 | an entry over the cap on the critical path | it sets the stage's length | split it into two behaviours |
 | an edge for data | a factory seeds it | drop the edge |
 | a test that pins a stub ("not implemented") | the entry that fills it breaks a green test | no test asserts a stub |
+| a split that only buys width (the validation of a form in one entry, its submit in another) | two builders rebuild the same context and meet in a conflict | one entry; the width comes from other behaviours |
 
 ## Example
 

@@ -1,6 +1,6 @@
 export const meta = {
   name: 'exec-entry',
-  description: 'One stage-4 entry end to end: builder-backend ∥ builder-frontend (Opus 5.5, medium) → exec-gate (Sonnet 5.5, low) → reviewer (Opus 5.5, high) ∥ the QAs the surface calls for (Opus 5.5, medium) → a mechanical triage → at most one fix pass → the delta; modes build, resume, update and fix',
+  description: 'One stage-4 entry end to end: builder-backend ∥ builder-frontend (Opus 5.5, medium) → exec-gate (Haiku 5.5, medium) → reviewer (Opus 5.5, high) ∥ the QAs the surface calls for (Opus 5.5, medium) → a mechanical triage → at most one fix pass → the delta; modes build, resume, update and fix',
   whenToUse: 'Called by the stage-execute session (the tech lead) once per entry, A.n round or X.n; args carry paths, never text',
   phases: [
     { title: 'Build', detail: 'builder-backend ∥ builder-frontend, each in its own folder of the same worktree' },
@@ -14,7 +14,7 @@ export const meta = {
 const AGENTS = {
   'builder-backend': { model: 'opus', effort: 'medium' },
   'builder-frontend': { model: 'opus', effort: 'medium' },
-  'exec-gate': { model: 'sonnet', effort: 'low' },
+  'exec-gate': { model: 'haiku', effort: 'medium' },
   reviewer: { model: 'opus', effort: 'high' },
   'qa-frontend': { model: 'opus', effort: 'medium' },
   'qa-backend': { model: 'opus', effort: 'medium' },
@@ -142,7 +142,9 @@ const sources = `Brief: ${args?.briefPath}
 Design: ${args?.designDir}
 Stories: ${args?.storiesPath ?? '(not given)'}
 Mock frames: ${args?.mockDir ?? '(none)'}
-The project's CLAUDE.md (its standards and golden paths): ${args?.projectDocs}
+The project's CLAUDE.md: ${args?.projectDocs}
+The project's standards book (rules you follow and cite by id): ${args?.standardsDir ?? '(the folder its CLAUDE.md names)'}
+Stack packs, for what the book leaves to them: ${args?.packsDir ?? '(none)'}
 Your role's references: ${args?.referencesDir}
 Evidence folder: ${args?.evidenceDir}${args?.priorRuns?.length ? `\nEarlier runs of this entry: ${args.priorRuns.join(', ')}` : ''}`
 
