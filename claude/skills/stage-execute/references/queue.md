@@ -42,23 +42,27 @@ The queue above is one entry per step. When two or more entries are
 `ready` at once, run them as one **batch** and pay the queue's fixed
 cost (a session, a stack, the affected gate) once.
 
-1. **Assemble.** On a scratch branch `story/<slug>/batch-<n>` created at
-   `feat/<slug>`, merge each ready head `--no-ff`, critical path first. A
-   text conflict takes that entry out of the batch: it goes the
-   single-entry way above, and the batch goes on without it.
-2. **Fast check first.** Run the project's `fastCheck` on the scratch
-   head. It is seconds, and it names a collision the merge could not (the
-   same symbol declared in two entries). The entries it names leave the
-   batch and are resumed as in the red row of tech-lead.md; the rest are
-   assembled again.
-3. **One affected gate** on the scratch head, as in step 3.
-4. **Merge in the same order.** On green, and `feat/<slug>` unmoved since
-   step 1, merge each entry's head into `feat/<slug>` `--no-ff` in the
-   order assembled, notes in each merge body, one push. The tree is the
-   checked tree. Write "gate shared: batch <n>" on the board for each.
-5. **A red batch gate** names failing files; the entries that own them
-   leave the batch (a resume each), and the others run again as a
-   smaller batch. A batch of one is the queue above.
+1. **Assemble.** Create `story/<slug>/batch-<n>` at `feat/<slug>` and
+   merge each ready head into it `--no-ff`, critical path first, each
+   merge body carrying that entry's notes. A text conflict takes that
+   entry out of the batch: it goes the single-entry way above, and the
+   batch goes on without it. Then step 2 above (migrations) on the batch
+   branch: a restamp is one more commit on it.
+2. **Fast check first**, then **one affected gate**, both on the batch
+   head and both where every gate runs (in the cloud, the queue session:
+   cloud.md). The fast check is seconds and names a collision the merge
+   could not see (the same symbol declared in two entries).
+3. **A red** names failing files. The entries whose diff touches those
+   files leave the batch (exec-entry `resume` each, as in the red row of
+   tech-lead.md); the rest run again as a smaller batch. When the red
+   names no entry's file, or a batch goes red a second time, every entry
+   left goes the single-entry way. A batch of one is the queue above.
+4. **Merge.** On green, and `feat/<slug>` unmoved since step 1,
+   `git merge --ff-only story/<slug>/batch-<n>` into `feat/<slug>`, one
+   push. `feat` becomes the checked head itself, with each entry's merge
+   commit and any restamp in it. Then step 5 above (record) and the
+   cleanup of step 4 for each entry; "gate shared: batch <n>" on the
+   board for each.
 
 The whole gate at the end is unchanged: the batch only replaces the
 repeated affected gates in the queue, never the final proof.
