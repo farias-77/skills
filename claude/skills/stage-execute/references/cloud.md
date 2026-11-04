@@ -164,6 +164,12 @@ Never merge into feat/<slug> or main, never push another branch, never post a st
 - **On green**, the tech lead checks that `feat` is still the record's
   `feat` (`git merge-base --is-ancestor origin/feat/<slug> <head>`),
   then merges. Otherwise one more queue step runs on the new `feat`.
+- **A batch** (queue.md, "A batch"): the tech lead creates
+  `story/<slug>/batch-<n>` at `feat/<slug>`, merges the ready heads into
+  it and runs the fast check there; `<branch>` is that branch and
+  `<base>` is `feat/<slug>`, so one queue session serves the batch. On
+  green it merges each head into `feat` in the assembled order, and
+  `feat` still being the record's `feat` is checked as for one entry.
 - **A conflict** is the queue's (queue.md, step 1): `exec-entry
   update` in a cloud session for a text conflict; the base's version
   and the generator for a generated file.
