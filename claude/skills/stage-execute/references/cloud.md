@@ -145,7 +145,8 @@ Workstream <slug>, branch <branch>, base <base>, step <n>.
    with the conflicted paths; go to step 5.
 3. When one of the branch's migrations is older than the newest on origin/feat/<slug>:
    <the restamp command>, committed alone as "restamp".
-4. Wait until the session hook's stack is up; run <the affected gate> base=origin/feat/<slug>.
+4. Wait until the session hook's stack is up; on a batch branch run <the fast check> first (red → the record, step 5);
+   run <the affected gate> base=origin/feat/<slug>.
 5. git push origin <branch>. Write ../evidence-queue/queue-<n>.json:
    {"status":"green"|"red"|"conflict","head":"<HEAD sha>","base":"<origin/<base> sha>",
     "feat":"<origin/feat/<slug> sha>","files":[...],"lines":"<the gate's last 40 lines on red>"}
@@ -164,6 +165,14 @@ Never merge into feat/<slug> or main, never push another branch, never post a st
 - **On green**, the tech lead checks that `feat` is still the record's
   `feat` (`git merge-base --is-ancestor origin/feat/<slug> <head>`),
   then merges. Otherwise one more queue step runs on the new `feat`.
+- **A batch** (queue.md, "A batch"): the tech lead creates
+  `story/<slug>/batch-<n>` at `feat/<slug>`, merges the ready heads into
+  it (a merge, no gate) and pushes it; `<branch>` is that branch and
+  `<base>` is `feat/<slug>`, and the queue prompt's step 4 runs
+  `<the fast check>` before the affected gate, so one queue session
+  serves the batch. On green, with `feat` still the record's `feat`, it
+  fast-forwards `feat` to the record's head (`git merge --ff-only`) and
+  pushes it, as for `main-<n>`.
 - **A conflict** is the queue's (queue.md, step 1): `exec-entry
   update` in a cloud session for a text conflict; the base's version
   and the generator for a generated file.

@@ -36,6 +36,37 @@ for each ready entry
    reason; they do not block (the reviewer read them).
 5. **The merge body** carries the entry's notes; notes never open work.
 
+## A batch, when several entries are ready
+
+The queue above is one entry per step. When two or more entries are
+`ready` at once, run them as one **batch** and pay the queue's fixed
+cost (a session, a stack, the affected gate) once.
+
+1. **Assemble.** Create `story/<slug>/batch-<n>` at `feat/<slug>` and
+   merge each ready head into it `--no-ff`, critical path first, each
+   merge body carrying that entry's notes. A text conflict takes that
+   entry out of the batch: it goes the single-entry way above, and the
+   batch goes on without it. Then step 2 above (migrations) on the batch
+   branch: a restamp is one more commit on it.
+2. **Fast check first**, then **one affected gate**, both on the batch
+   head and both where every gate runs (in the cloud, the queue session:
+   cloud.md). The fast check is seconds and names a collision the merge
+   could not see (the same symbol declared in two entries).
+3. **A red** names failing files. The entries whose diff touches those
+   files leave the batch (exec-entry `resume` each, as in the red row of
+   tech-lead.md); the rest run again as a smaller batch. When the red
+   names no entry's file, or a batch goes red a second time, every entry
+   left goes the single-entry way. A batch of one is the queue above.
+4. **Merge.** On green, and `feat/<slug>` unmoved since step 1,
+   `git merge --ff-only story/<slug>/batch-<n>` into `feat/<slug>`, one
+   push. `feat` becomes the checked head itself, with each entry's merge
+   commit and any restamp in it. Then step 5 above (record) and the
+   cleanup of step 4 for each entry; "gate shared: batch <n>" on the
+   board for each.
+
+The whole gate at the end is unchanged: the batch only replaces the
+repeated affected gates in the queue, never the final proof.
+
 ## Another workstream lands on main
 
 Between two queue merges: `git merge main` into `feat/<slug>`, `make
