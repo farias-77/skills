@@ -296,8 +296,7 @@ retro and the weekly retro use those numbers.
 - **Workflows** are plain JavaScript files named `<name>-workflow.js`
   under `claude/workflows/`: small named functions, sections that match
   the phases, comments only for why. Whoever writes or changes one runs
-  it before the push; a dry run under `tests/` is kept only where one
-  exists.
+  it before the push.
 - **This repo is public:** generic English, no company, product or
   person's name.
 - Literal sentences, one idea each, concrete values. Prefer removing to

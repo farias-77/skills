@@ -135,11 +135,11 @@ only it, its files. Knowledge lives in each skill's `references/`.
 
 ## The workflows
 
-| Workflow | Stage | Runs | Dry run |
-|---|---|---|---|
-| `discovery-review-workflow.js` | discovery | four hunts ∥ two blind readers per story, then one comparer per story and a verifier per claim | none: whoever changes it runs it on a real workstream |
-| `plan-review-workflow.js` | plan | the plan reviewer ∥ the double-blind per brief | `tests/plan-review-dry-run.mjs` |
-| `exec-entry-workflow.js` | execute, release, lets-cook | one entry: builders → gate → reviewer ∥ QAs → triage → one fix → the delta; modes `build`, `resume`, `update`, `fix` | `tests/exec-entry-dry-run.mjs` |
+| Workflow | Stage | Runs |
+|---|---|---|
+| `discovery-review-workflow.js` | discovery | four hunts ∥ two blind readers per story, then one comparer per story and a verifier per claim |
+| `plan-review-workflow.js` | plan | the plan reviewer ∥ the double-blind per brief |
+| `exec-entry-workflow.js` | execute, release, lets-cook | one entry: builders → gate → reviewer ∥ QAs → triage → one fix → the delta; modes `build`, `resume`, `update`, `fix` |
 
 The design review needs no workflow: the session calls its four lenses
 directly.
@@ -233,7 +233,6 @@ claude/
   report/               the report shell, the template explainer, a working example
   video/                the video kit (Remotion): the motion library, render.sh
 docs/                   the bar, models.md, the stage report, testing the pipeline
-tests/                  run.sh: every kit check in one command; the workflows' and local-ci's dry runs
 ```
 
 Terms are in [claude/GLOSSARY.md](claude/GLOSSARY.md).
