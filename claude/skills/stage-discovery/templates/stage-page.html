@@ -103,14 +103,15 @@ mark{background:var(--mark);color:inherit;padding:.05em .2em;border-radius:.2em;
 .shell{display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center;margin:0 auto 32px;max-width:1320px;font-size:15px;white-space:nowrap}
 .brand{display:flex;align-items:center;gap:14px;height:40px}
 .logo{flex:none;width:40px;height:40px;border-radius:11px;background:var(--solid);color:var(--on-solid);display:grid;place-items:center;font:600 13px/1 var(--mono)}
-.brand .lbl{font:600 16px/1 var(--display);overflow:hidden;text-overflow:ellipsis}
+.brand .lbl{font:600 17px/1.15 var(--display);overflow:hidden;text-overflow:ellipsis;min-width:0}
 .stages{display:flex;flex-wrap:wrap;gap:4px 12px;position:relative}
-.st{position:relative;display:flex;align-items:center;gap:12px;height:40px;text-decoration:none;color:var(--soft)}
+.st{position:relative;display:flex;align-items:center;gap:12px;height:40px;text-decoration:none;color:var(--soft);border-radius:12px}
 .st .num{flex:none;width:26px;height:26px;border-radius:50%;border:2px solid var(--line);background:var(--paper);display:grid;place-items:center;font:600 12px/1 var(--mono)}
 .st.cur{color:var(--ink);font-weight:600}
 .st.cur .num{background:var(--solid);color:var(--on-solid);border-color:var(--solid)}
 .st.done .num{border-color:var(--ink);color:var(--ink)}
 .st:not(.cur) .lbl{opacity:.55}
+.st .lbl small{display:none}
 .ctl{display:flex;gap:2px;padding:4px;border-radius:14px;background:var(--wash);border:1px solid var(--line);align-self:flex-start}
 .ctl button{all:unset;cursor:pointer;width:30px;height:30px;border-radius:10px;display:grid;place-items:center;color:var(--soft);opacity:.5}
 .ctl button:hover{opacity:1;color:var(--ink)}
@@ -124,10 +125,15 @@ mark{background:var(--mark);color:inherit;padding:.05em .2em;border-radius:.2em;
   .shell:hover,.shell:focus-within{width:248px;box-shadow:0 0 48px rgba(0,0,0,.16)}
   .shell .lbl,.shell .st:not(.cur) .lbl{opacity:0;transition:opacity .14s}
   .shell:hover .lbl,.shell:focus-within .lbl{opacity:1}
-  .shell:hover .st:not(.cur) .lbl,.shell:focus-within .st:not(.cur) .lbl{opacity:.55}
-  .stages{flex-direction:column;flex-wrap:nowrap;gap:8px}
-  .stages::before{content:"";position:absolute;left:19px;top:20px;bottom:20px;width:2px;background:var(--line)}
+  .shell:hover .st:not(.cur) .lbl,.shell:focus-within .st:not(.cur) .lbl{opacity:.7}
+  /* open, each stage is a card as wide as the rail: its name, and under it what the stage answers */
+  .stages{flex-direction:column;flex-wrap:nowrap;gap:4px}
+  .stages::before{content:"";position:absolute;left:19px;top:28px;bottom:28px;width:2px;background:var(--line)}
+  .st{height:56px;gap:14px;padding-right:14px}
+  .st.cur{background:var(--wash)}
   .st .num{margin-left:7px}
+  .st .lbl{display:flex;flex-direction:column;gap:5px;min-width:0;font:600 17px/1 var(--display)}
+  .st .lbl small{display:block;font:500 12.5px/1 var(--body);color:var(--soft);letter-spacing:.01em}
   .ctl{margin-top:auto;flex-direction:column;width:30px}
 }
 /* components, by the width of their own section */
@@ -204,7 +210,7 @@ const esc = (s) => String(s ?? '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<
 const changed = new Set(PAGE.changed || []);
 const mk = (key, html) => (changed.has(key) ? `<mark>${html}</mark>` : html);
 const plural = (n, one, many) => `${n} ${n === 1 ? one : many}`;
-const STAGES = ['Discovery', 'Design', 'Plan', 'Execute', 'Release', 'Close'];
+const STAGES = [['Discovery', 'what to build'], ['Design', 'how it works'], ['Plan', 'in what order'], ['Execute', 'build and prove'], ['Release', 'ship it'], ['Close', 'learn and tell']];
 
 function head() {
   const d = PAGE.youDecide.length, f = PAGE.decidedForYou.length;
@@ -279,7 +285,7 @@ function notBuilding() {
   <div>${PAGE.notBuilding.map((n) => `<div class="nb"><span class="mono soft">${esc(n.id)}</span><span>${mk('nb:' + n.id, esc(n.what))}</span><span class="soft">${n.kind === 'later' ? '<span class="tag">later</span>' : ''}${esc(n.reason)}</span></div>`).join('')}</div></section>`;
 }
 
-document.getElementById('stages').innerHTML = STAGES.map((n, i) => `<span class="st ${i === 0 ? 'cur' : ''}"><span class="num">${i + 1}</span><span class="lbl">${n}</span></span>`).join('');
+document.getElementById('stages').innerHTML = STAGES.map(([n, asks], i) => `<span class="st ${i === 0 ? 'cur' : ''}"><span class="num">${i + 1}</span><span class="lbl">${n}<small>${asks}</small></span></span>`).join('');
 const pg = document.getElementById('pg');
 pg.innerHTML = head() + youDecide() + decidedForYou() + mockSection() + casesSection() + stories() + notBuilding();
 // On a whole ultrawide the screen is pinned beside the document: it spans every row of the left column.
