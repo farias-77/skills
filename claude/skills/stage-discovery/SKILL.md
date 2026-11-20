@@ -172,8 +172,8 @@ check one rule, every example value is the notes'. A miss goes back
 to the writer in one message. What it listed under Open you settle
 from the notes, or it is a question to him.
 
-Then start stop 6, and stop 5 when a screen changes, **in the same
-turn**: the review runs while the mock is drawn. He is shown the
+Then, with any batch from your own read already applied, start stop
+6, and stop 5 when a screen changes, **in the same turn**: the review runs while the mock is drawn. He is shown the
 screen once, after the review's fixes are in it.
 
 ## Stop 5 · The mock, when a screen changes

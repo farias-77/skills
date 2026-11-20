@@ -108,10 +108,11 @@ Then, in order:
 2. `.state.md`: `--set stage=design`, and the state line for the
    close.
 3. With a `tracker:` line, `notion-tracker close discovery <url>`.
-4. Remove what the stage left behind: `mock/shots/`,
-   `discovery/review/stories/`, `discovery/review/before.json`,
-   anything still running. `discovery/page/shots/` stays: it is the
-   picture of what he approved.
+4. Remove what the stage left behind: `discovery/review/stories/`,
+   `discovery/review/fixes/`, `discovery/review/before.json`,
+   anything still running. The pictures stay (`mock/shots/`, or
+   `discovery/page/shots/` with no screen): they are what he approved
+   and what the lock rests on.
 5. Commit the workstream folder when the designs root is a git
    repository (push on his word); when it is not, say so in the close
    message.

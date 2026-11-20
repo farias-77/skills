@@ -94,6 +94,13 @@ two tabs, a retry). Each row lands on one of:
 
 A row with none of these is a line under Open.
 
+An error path gets a criterion of its own when he decided its
+outcome, or when the outcome is new behavior. A path whose outcome is
+what the product already does everywhere (the standard inline error,
+the standard refusal) is an extension line at its step and a THEN
+line in the criterion of the rule it protects; its row points to
+that criterion. The count is the cost.
+
 ## not-building.md
 
 One line per capability left out, in one of two kinds:

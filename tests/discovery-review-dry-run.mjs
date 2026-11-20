@@ -78,6 +78,10 @@ const scenarios = [
     mode: 'delta', fixes: [{ id: 'limits#1', finding: HOLE, diff: '+ GIVEN … 2 of them cancelled' }, { id: 'errors#2', finding: HOLE, diff: '+ AND …' }, { id: 'no-diff', finding: HOLE }],
     verifier: (prompt) => /2 of them cancelled/.test(prompt) ? { verdict: 'landed', evidence: 'the GIVEN now says it', where: 'stories.md:40', what: '' } : { verdict: 'not-landed', evidence: 'the AND line still has no (seen: …)', where: 'stories.md:44', what: 'no place to see it' },
     expect: { valid: true, fixes: 2, landed: 1, verifiers: 2 } },
+  { title: 'delta: a fix given as a file is read by its verifier from that path',
+    mode: 'delta', fixes: [{ id: 'limits#1', file: '/w/discovery/review/fixes/limits_1.md' }],
+    verifier: (prompt) => /read it\): \/w\/discovery\/review\/fixes\/limits_1\.md/.test(prompt) ? { verdict: 'landed', evidence: 'the line now says it', where: 'stories.md:40', what: '' } : { verdict: 'not-landed', evidence: 'no file in the prompt', where: '', what: 'no file' },
+    expect: { valid: true, fixes: 1, landed: 1, verifiers: 1 } },
   { title: 'delta with no usable fix → invalid',
     mode: 'delta', fixes: [], expect: { valid: false, agents: 0 } },
 ];

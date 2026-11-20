@@ -233,7 +233,9 @@ async function compareReadings(run) {
 
 async function checkFix(f) {
   const verdict = await once(
-    () => call('discovery-finding-verifier', `Mode: fix.\nThe finding:\n${typeof f.finding === 'string' ? f.finding : JSON.stringify(f.finding, null, 1)}\n\nThe diff of the lines changed for it:\n${f.diff}\n\n${files}`, { label: `fix·${f.id}`, phase: 'Verify', schema: FIX_VERDICT }),
+    () => call('discovery-finding-verifier', filled(f.file)
+      ? `Mode: fix.\nThe finding and what changed for it are in this file (read it): ${f.file}\n\n${files}`
+      : `Mode: fix.\nThe finding:\n${typeof f.finding === 'string' ? f.finding : JSON.stringify(f.finding, null, 1)}\n\nThe diff of the lines changed for it:\n${f.diff}\n\n${files}`, { label: `fix·${f.id}`, phase: 'Verify', schema: FIX_VERDICT }),
     (v) => v && filled(v.verdict),
     `fix ${f.id}`,
   )
@@ -241,8 +243,8 @@ async function checkFix(f) {
 }
 
 async function delta() {
-  const fixes = Array.isArray(args?.fixes) ? args.fixes.filter((f) => filled(f.id) && filled(f.diff)) : []
-  if (!fixes.length) { log('delta: args.fixes has no fix with an id and a diff'); return { valid: false, mode: 'delta', fixes: [] } }
+  const fixes = Array.isArray(args?.fixes) ? args.fixes.filter((f) => filled(f.id) && (filled(f.diff) || filled(f.file))) : []
+  if (!fixes.length) { log('delta: args.fixes has no fix with an id and a diff or a file'); return { valid: false, mode: 'delta', fixes: [] } }
   log(`delta: ${fixes.length} fix(es), each checked on its diff only`)
   const results = await parallel(fixes.map((f) => () => checkFix(f)))
   const checked = results.map((r, i) => r ?? { id: fixes[i].id, verdict: 'unverified', evidence: '', where: '', what: 'the verifier died' })

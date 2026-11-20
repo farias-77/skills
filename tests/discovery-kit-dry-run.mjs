@@ -168,6 +168,17 @@ const cases = [
     const one = cli('diff', ws).json.changed;
     return none.length === 0 && one.length === 1 && one[0].item === 'criterion J1.s2.1' && one[0].before.includes('6 of 10') && one[0].after.includes('"6 invites left today"') ? null : JSON.stringify(one).slice(0, 600);
   } },
+  { title: 'diff --for writes one file per finding whose place changed and names the rest', run() {
+    const ws = workstream();
+    const f = (id, anchor) => ({ id, anchor, story: 'S-001', title: `finding ${id}`, gap: 'a gap', where: 'stories.md:41', kind: 'writing', severity: 'blocks', evidence: 'the quote', conservative: '', fix: 'say the number' });
+    const file = join(scratch, 'for.json');
+    writeFileSync(file, JSON.stringify({ mode: 'round', valid: true, found: 2, confirmed: [f('limits#1', 'J1.s2.1'), f('code#2', 'J5.s2.1')], groups: [], forDesign: [], refuted: [], unverified: [], unread: [] }));
+    cli('round', ws, file); cli('mark', ws);
+    writeFileSync(join(ws, 'stories.md'), readFileSync(join(ws, 'stories.md'), 'utf8').replace('"6 of 10 invites left today"', '"6 invites left today"'));
+    const r = cli('diff', ws, '--for', 'round-1').json;
+    const text = r?.fixes?.[0] ? readFileSync(r.fixes[0].file, 'utf8') : '';
+    return r?.fixes.length === 1 && r.fixes[0].id === 'limits#1' && JSON.stringify(r.untouched) === '["code#2"]' && r.unclaimed.length === 0 && /Before:[\s\S]*6 of 10[\s\S]*After:[\s\S]*"6 invites left today"/.test(text) && /say the number/.test(text) ? null : JSON.stringify(r).slice(0, 500);
+  } },
   { title: 'diff refuses when nothing was marked', run() {
     const r = cli('diff', workstream());
     return r.code === 1 && /mark/.test(r.err) ? null : `exit ${r.code} ${r.err}`;

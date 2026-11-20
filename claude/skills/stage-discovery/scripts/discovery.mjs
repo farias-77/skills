@@ -9,7 +9,7 @@
  *   node discovery.mjs split  <workstream>
  *   node discovery.mjs round  <workstream> <result-file> [--name round-1]
  *   node discovery.mjs mark   <workstream>
- *   node discovery.mjs diff   <workstream>
+ *   node discovery.mjs diff   <workstream> [--for round-1]
  *   node discovery.mjs page   <workstream> [--read]
  *   node discovery.mjs shots  <workstream> [--chrome <path>]
  *   node discovery.mjs lock   <workstream> --words "<his words>"
@@ -28,7 +28,10 @@
  *         result itself, or an object that holds it under "result") and prints the counts.
  * mark    records stories.md and not-building.md as they are, before the fixes of a review.
  * diff    prints what changed since mark, item by item (a criterion, a rule, a not-building line, an assumption,
- *         a story's flow): the before and after text of each. This is the diff a delta pass reads.
+ *         a story's flow): the before and after text of each. --for <round> writes, per confirmed finding
+ *         of that saved round whose place changed, one file with the finding and its changes under
+ *         discovery/review/fixes/, and prints the list to pass to the delta pass as `fixes`; it also names
+ *         the findings whose place did not change and the changes no finding claims.
  * page    builds discovery/page/index.html from the stage files. Items that differ from the version he last
  *         read are highlighted; --read records the current build as that version.
  * shots   renders the page in a browser: every state, light and dark, 390 and 1280 wide, every tour stop, into
@@ -419,7 +422,7 @@ function saveRound(ws, file, name = 'round-1') {
 
 // The round as a list the conductor rules from: one block per place, one line per finding. The JSON keeps the detail.
 function roundList(r) {
-  const one = (s, max = 220) => String(s ?? '').replace(/\s+/g, ' ').trim().slice(0, max);
+  const one = (s, max = 900) => String(s ?? '').replace(/\s+/g, ' ').trim().slice(0, max);
   const byId = new Map(r.confirmed.map((f) => [f.id, f]));
   const line = (f) => `- \`${f.id}\` · ${f.severity} · ${f.kind} · ${one(f.title, 120)}\n  - gap: ${one(f.gap)}\n  - evidence: ${one(f.evidence)} (${one(f.where, 80)})${f.conservative ? `\n  - conservative: ${one(f.conservative)}` : ''}${f.touches ? `\n  - touches: ${one(f.touches, 80)}` : ''}${f.fix ? `\n  - fix: ${one(f.fix)}` : ''}`;
   const groups = (r.groups ?? []).map((g) => `### ${g.anchor} · ${g.ids.length} finding(s) · ${g.blocks} block\n\n${g.ids.map((id) => line(byId.get(id))).join('\n')}`);
@@ -456,14 +459,46 @@ function mark(ws) {
   return { marked: Object.keys(items).length, file: out };
 }
 
-function diff(ws) {
+// Only the lines that differ: a story's text is long and a fix touches a line or two of it.
+function changedLines(before, after) {
+  if (before === undefined) return { before: '(did not exist)', after };
+  if (after === undefined) return { before, after: '(removed)' };
+  const a = before.split('\n'), b = after.split('\n');
+  if (a.length < 2 && b.length < 2) return { before, after };
+  const inA = new Set(a), inB = new Set(b);
+  return { before: a.filter((l) => !inB.has(l)).join('\n') || '(nothing removed)', after: b.filter((l) => !inA.has(l)).join('\n') || '(nothing added)' };
+}
+
+function diff(ws, forRound) {
   const file = join(ws, 'discovery', 'review', 'before.json');
   if (!existsSync(file)) fail('nothing marked: run mark before the fixes');
   const before = JSON.parse(read(file)), after = reviewItems(ws);
   const changed = [...new Set([...Object.keys(before), ...Object.keys(after)])]
     .filter((k) => before[k] !== after[k])
-    .map((k) => ({ item: k, before: before[k] ?? '(did not exist)', after: after[k] ?? '(removed)' }));
-  return { changed };
+    .map((k) => ({ item: k, ...changedLines(before[k], after[k]) }));
+  if (typeof forRound !== 'string') return { changed };
+
+  // One file per finding the fixes answer, so the delta pass gets a path per fix and nobody copies a diff by hand.
+  const roundFile = join(ws, 'discovery', 'review', `${forRound}.json`);
+  if (!existsSync(roundFile)) fail(`${roundFile} not found (save the round first: discovery.mjs round)`);
+  const round = JSON.parse(read(roundFile));
+  const dir = join(ws, 'discovery', 'review', 'fixes');
+  rmSync(dir, { recursive: true, force: true });
+  mkdirSync(dir, { recursive: true });
+  const idOf = (item) => item.split(' ').slice(1).join(' ');
+  const claimed = new Set(), fixes = [], untouched = [];
+  for (const f of round.confirmed ?? []) {
+    const anchors = new Set([f.anchor, ...(f.criteria ?? [])].filter(Boolean));
+    let hits = changed.filter((c) => anchors.has(idOf(c.item)));
+    if (!hits.length) hits = changed.filter((c) => idOf(c.item) === f.story || (c.item.startsWith('criterion ') && c.after.includes(`[${f.anchor}`)));
+    if (!hits.length) { untouched.push(f.id); continue; }
+    hits.forEach((c) => claimed.add(c.item));
+    const name = `${f.id.replace(/[^A-Za-z0-9.-]+/g, '_')}.md`;
+    writeFileSync(join(dir, name), [`# ${f.id} · ${f.title}`, `Class: ${f.kind} · ${f.severity}`, `Gap: ${f.gap}`, `Evidence: ${f.evidence} (${f.where})`, f.conservative ? `Conservative answer: ${f.conservative}` : '', f.fix ? `Proposed fix: ${f.fix}` : '',
+      '## What changed', ...hits.map((c) => `### ${c.item}\nBefore:\n${c.before}\n\nAfter:\n${c.after}`)].filter(Boolean).join('\n\n') + '\n');
+    fixes.push({ id: f.id, file: join(dir, name) });
+  }
+  return { fixes, untouched, unclaimed: changed.filter((c) => !claimed.has(c.item)).map((c) => c.item) };
 }
 
 // ---------- lock, freeze, state ----------
@@ -525,7 +560,7 @@ if (command === 'init') print(init(ws));
 else if (command === 'state') print(state(ws, flags));
 else if (command === 'round') print(saveRound(ws, extra, typeof flags.name === 'string' ? flags.name : undefined));
 else if (command === 'mark') print(mark(ws));
-else if (command === 'diff') print(diff(ws));
+else if (command === 'diff') print(diff(ws, flags.for));
 else if (command === 'check') exitOn(check(ws, { gate: flags.gate === true }));
 else if (command === 'split') print(split(ws));
 else if (command === 'page') print(page(ws, { markRead: flags.read === true }));

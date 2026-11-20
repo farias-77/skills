@@ -50,9 +50,10 @@ node <discovery.mjs> split <workstream>      prints the index
 ```
 
 Run the workflow by `scriptPath` with `args`: `workstream` (absolute),
-`size`, `index` (the JSON `split` printed, as a value), `code` (the
-repo paths the recon named), `rules` (the absolute path of
-[stories.md](stories.md)), and `inlineAgents: true` with `agentsDir:
+`size`, `index` (the JSON `split` printed, as a value), `code` (an
+array of the absolute repo paths the recon named), `rules` (the
+absolute path of [stories.md](stories.md)), `mock: true` once the
+mock is locked, and `inlineAgents: true` with `agentsDir:
 <kit>/agents`. Start the wait with the "running without you" template
 and the 🟢 line. The Workflow tool writes the whole result to a file
 and shows a shortened copy; save the whole one with
@@ -108,19 +109,24 @@ The fixes below run while he answers.
    is. Then send the writer its batch by `SendMessage`: per fix, the
    finding id, the quote, the oracle line.
 2. `node <discovery.mjs> check <workstream>` passes.
-3. `node <discovery.mjs> diff <workstream>` prints each item that
-   changed, before and after. Run the workflow again with `mode:
-   "delta"` and `fixes`: per fix, the finding and the changed items
-   that answer it, as its `diff`. Each verifier reads only that diff:
-   did the fix land, and did the new text open a hole? Save the result
-   with `round <workstream> <file> --name delta-1`.
-4. A fix that did not land goes back to the writer once. What is
-   still wrong after that is his, at the gate.
-5. With a screen: send the `discovery-mock-designer` one round with
-   the `diff` output, the rulings that touch the screen and his
-   answers. The mock was drawn from the stories as they were before
-   the review; he is shown it after this round
-   ([mock.md](mock.md)).
+3. `node <discovery.mjs> diff <workstream> --for round-1` writes one
+   file per finding whose place changed (the finding, then the lines
+   before and after) and prints `fixes`: pass that list as it is to
+   the workflow with `mode: "delta"`. Each verifier reads only its
+   file: did the fix land, and did the new text open a hole? Look at
+   the two short lists it also prints: `untouched` (a finding you
+   ruled a fix whose place did not change is a miss) and `unclaimed`
+   (a change no finding asked for). Save the result with `round
+   <workstream> <file> --name delta-1`.
+4. A fix that did not land goes back to the writer once; a miss of a
+   line or two you write yourself. What is still wrong after that is
+   his, at the gate.
+5. With a screen, when a ruling, a changed item or one of his answers
+   touches what the screen shows: send the `discovery-mock-designer`
+   one round with `diff`'s changed items and those rulings. The mock
+   was drawn from the stories as they were before the review; he is
+   shown it after this round ([mock.md](mock.md)). When nothing on
+   screen changed, there is no round.
 
 Nothing opens a second round. New findings on text that did not
 change are not looked for.

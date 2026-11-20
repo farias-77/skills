@@ -30,7 +30,10 @@ the standards folder, the designs root), and the file to write:
 
 1. Find the places. Grep and glob the term, its synonyms, and the
    name it would carry in a file of that kind. Read each match with
-   enough lines around it to quote exactly.
+   enough lines around it to quote exactly. Stay next to the change:
+   the files the question names, what calls them and what they call.
+   The session is waiting on you with him in the conversation; a
+   survey of the whole product is not asked.
 2. Answer each part of the question with the literal text and its
    `path:line`. Copy numbers, names, keys and statuses from the file.
 3. Where two places disagree (the code and the standards book, two
