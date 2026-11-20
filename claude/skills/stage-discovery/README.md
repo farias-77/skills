@@ -84,15 +84,3 @@ The review workflow is `claude/workflows/discovery-review-workflow.js`.
   discovery/         recon/, review/, page/, page.json, ids.json
 ```
 
-## Tests
-
-From the repo root, offline, no model:
-
-```
-node tests/discovery-kit-dry-run.mjs       the script on the worked example and on broken copies of it
-node tests/discovery-review-dry-run.mjs    the review workflow with canned agents
-```
-
-The worked example is `tests/fixtures/discovery/workspace-invites/`:
-a complete workstream (notes, stories, not-building, mock, page data)
-to read when a format is in doubt.

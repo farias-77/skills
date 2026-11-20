@@ -5,7 +5,6 @@
   references/stories.md. The headings, the id formats and the criterion's
   shape are read by discovery.mjs check: keep them exactly.
   Nothing here is new: what he neither said nor accepted is under Assumptions.
-  A complete example: tests/fixtures/discovery/workspace-invites/stories.md.
 -->
 
 Mock: `mock/mock.html` · <not built yet | open | locked v<N>> | none: no screen changes

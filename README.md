@@ -137,7 +137,7 @@ only it, its files. Knowledge lives in each skill's `references/`.
 
 | Workflow | Stage | Runs | Dry run |
 |---|---|---|---|
-| `discovery-review-workflow.js` | discovery | three lenses ∥ the double-blind per story | `tests/discovery-review-dry-run.mjs` |
+| `discovery-review-workflow.js` | discovery | four hunts ∥ two blind readers per story, then one comparer per story and a verifier per claim | none: whoever changes it runs it on a real workstream |
 | `plan-review-workflow.js` | plan | the plan reviewer ∥ the double-blind per brief | `tests/plan-review-dry-run.mjs` |
 | `exec-entry-workflow.js` | execute, release, lets-cook | one entry: builders → gate → reviewer ∥ QAs → triage → one fix → the delta; modes `build`, `resume`, `update`, `fix` | `tests/exec-entry-dry-run.mjs` |
 
