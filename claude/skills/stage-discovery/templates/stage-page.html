@@ -277,9 +277,9 @@ function mockSection() {
   const m = PAGE.mock;
   if (!m) return '';
   return `<section class="sec" id="mock"><div class="head"><span class="eyebrow">The screen${changed.has('screen') ? ' · <mark>changed since you last looked</mark>' : ''}</span><h2 class="h2">${esc(m.title)}</h2>
-    <p class="p soft"><span class="kbd">←</span> <span class="kbd">→</span> walk the tour · <span class="kbd">F</span> expand</p></div>
+    <p class="p soft"><span class="kbd">←</span> <span class="kbd">→</span> walk the tour · <span class="kbd">C</span> highlight on or off · <span class="kbd">F</span> expand</p></div>
     <div class="demo" id="demo">
-      <div class="bar"><span class="nav"><button id="tprev" type="button" aria-label="Previous stop">‹</button><span class="n" id="stopn"></span><button id="tnext" type="button" aria-label="Next stop">›</button></span><span class="say" id="why"></span><span class="tools"><label for="statesel">State</label><select id="statesel"></select><button class="btn" id="mapbtn" type="button"></button><button class="btn" id="fsbtn" type="button"></button></span></div>
+      <div class="bar"><span class="nav"><button id="tprev" type="button" aria-label="Previous stop">‹</button><span class="n" id="stopn"></span><button id="tnext" type="button" aria-label="Next stop">›</button></span><span class="say" id="why"></span><span class="tools"><label for="statesel">State</label><select id="statesel"></select><button class="btn" id="spotbtn" type="button" title="Show or hide the highlight of this stop (C)">Highlight</button><button class="btn" id="mapbtn" type="button"></button><button class="btn" id="fsbtn" type="button"></button></span></div>
       <div class="demobody" id="demobody"><div class="stagewrap" id="stagewrap"><div class="viewport" id="viewport"></div></div></div>
       <div class="map" id="map" hidden></div>
     </div></section>`;
@@ -340,7 +340,7 @@ if (PAGE.mock) {
   const el = (id) => document.getElementById(id);
   const demo = el('demo'), wrap = el('stagewrap'), viewport = el('viewport'), map = el('map'), body = el('demobody');
   const label = Object.fromEntries(M.states.map((s) => [s.id, s.label]));
-  let st = M.states[0].id, stop = -1, mapOpen = false, fs = false;
+  let st = M.states[0].id, stop = -1, mapOpen = false, fs = false, lit = true;
   const theme = () => (M.themes && M.themes.length === 1 ? M.themes[0] : isDark() ? 'dark' : 'light');
   const html = (state) => `<div class="screen" data-theme="${theme()}" data-state="${esc(state)}">${MOCK_SCREEN(state)}</div>`;
   function fit() {
@@ -369,7 +369,7 @@ if (PAGE.mock) {
     const t = stop >= 0 ? M.tour[stop] : null;
     if (t) {
       const target = viewport.querySelector(`[data-part="${t.focus}"]`);
-      if (target) { if (fs) target.scrollIntoView({ block: 'nearest' }); spotlight(target); }
+      if (target) { if (fs) target.scrollIntoView({ block: 'nearest' }); if (lit) spotlight(target); }
     }
     el('stopn').textContent = `${t ? stop + 1 : '–'} / ${M.tour.length}`;
     el('why').innerHTML = t
@@ -377,6 +377,8 @@ if (PAGE.mock) {
       : `<button class="btn go" id="startbtn" type="button">Start the tour</button><span class="soft">${M.tour.length} stops · about ${M.minutes || 2} min</span>`;
     el('why').title = t ? t.why : '';
     el('statesel').innerHTML = M.states.map((x) => `<option value="${esc(x.id)}" ${x.id === st ? 'selected' : ''}>${esc(x.label)}</option>`).join('');
+    el('spotbtn').hidden = !t;
+    el('spotbtn').setAttribute('aria-pressed', lit);
     el('fsbtn').textContent = fs ? 'Close' : 'Expand';
     el('fsbtn').title = fs ? 'Back to the page (Esc)' : 'Open over the whole page (F)';
     if (mapOpen) {
@@ -396,7 +398,7 @@ if (PAGE.mock) {
     place();
     requestAnimationFrame(place);
   }
-  function go(i) { mapOpen = false; stop = Math.max(0, Math.min(M.tour.length - 1, i)); st = M.tour[stop].state; draw(); }
+  function go(i) { mapOpen = false; lit = true; stop = Math.max(0, Math.min(M.tour.length - 1, i)); st = M.tour[stop].state; draw(); }
   function setState(s) { st = s; stop = -1; mapOpen = false; draw(); }
   el('why').addEventListener('click', (e) => { if (e.target.id === 'startbtn') go(0); });
   el('mapbtn').addEventListener('click', () => { mapOpen = !mapOpen; draw(); });
@@ -414,6 +416,8 @@ if (PAGE.mock) {
   }
   const full = () => setFull(!fs);
   el('fsbtn').addEventListener('click', full);
+  const light = () => { if (stop >= 0) { lit = !lit; draw(); } };
+  el('spotbtn').addEventListener('click', light);
   new ResizeObserver(fit).observe(wrap);
   let inView = false;
   new IntersectionObserver((es) => { inView = es[0].isIntersecting; }, { threshold: 0.25 }).observe(demo);
@@ -426,6 +430,7 @@ if (PAGE.mock) {
     else if (k === 's') setState(M.states[(M.states.findIndex((s) => s.id === st) + 1) % M.states.length].id);
     else if (k === 'm') { mapOpen = !mapOpen; draw(); }
     else if (k === 'f') full();
+    else if (k === 'c') light();
     else if (k === 'escape') { if (fs) setFull(false); else { stop = -1; mapOpen = false; draw(); } }
   });
   pg.addEventListener('click', (e) => {
@@ -436,7 +441,7 @@ if (PAGE.mock) {
     see.closest('.crit').classList.add('lit');
     if (getComputedStyle(el('mock')).position !== 'sticky') demo.scrollIntoView({ behavior: 'smooth', block: 'center' });
   });
-  window.__mock = { draw, go, setState, full: setFull, map: (on) => { mapOpen = on; draw(); }, focused: () => !!viewport.querySelector('.spot') };
+  window.__mock = { draw, go, setState, full: setFull, light, map: (on) => { mapOpen = on; draw(); }, focused: () => !!viewport.querySelector('.spot') };
   draw();
 }
 document.addEventListener('keydown', (e) => {
