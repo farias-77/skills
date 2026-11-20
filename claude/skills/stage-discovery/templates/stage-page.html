@@ -45,16 +45,23 @@ mark{background:var(--mark);color:inherit;padding:.05em .2em;border-radius:.2em;
 .card.pick{border-color:var(--ink);border-width:2px}
 .card .q{font:600 19px/1.3 var(--display)}
 .card .id{font:600 12px/1 var(--mono);letter-spacing:.1em;color:var(--soft)}
-.list{display:flex;flex-direction:column}
-.item{display:grid;grid-template-columns:minmax(0,1fr);gap:8px 28px;padding:14px 0;border-top:1px solid var(--line);font-size:16.5px;line-height:1.5}
-.item .src{color:var(--soft);font-size:15px}
 .tag{font:600 11px/1 var(--mono);letter-spacing:.08em;text-transform:uppercase;border:1px solid var(--line);border-radius:5px;padding:4px 6px;margin-right:8px;white-space:nowrap}
 .tag.hot{background:var(--solid);color:var(--on-solid);border-color:var(--solid)}
 
 .lead{font-size:19px;line-height:1.5;max-width:76ch;margin:0}
 .more .n{font:500 14px/1 var(--mono);color:var(--soft)}
-.more .item:first-of-type{border-top:0;padding-top:4px}
-.more[open]{padding-bottom:10px}
+.block{display:flex;flex-direction:column;gap:12px;min-width:0}
+.sub{font:600 12px/1.2 var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--soft)}
+.assume{display:grid;grid-template-columns:3.4em minmax(0,1fr);gap:4px 12px;padding:14px 0;border-top:1px solid var(--line);font-size:16.5px;line-height:1.5}
+.assume .aid{font:600 13px/1.9 var(--mono);color:var(--soft)}
+.assume .because{grid-column:2;font-size:14.5px;line-height:1.45;color:var(--soft);overflow-wrap:anywhere}
+.card.pick .assume{border-top:0;padding:0;font-size:18px}
+.card.pick .assume+.assume{border-top:1px solid var(--line);padding-top:14px;margin-top:4px}
+.folds{border:1px solid var(--line);border-radius:14px;overflow:hidden}
+.folds .more>summary{padding:15px 20px}
+.folds .more:first-child>summary{border-top:0}
+.folds .more .assume{margin:0 20px}
+.folds .more[open]{padding-bottom:6px}
 .more>summary{cursor:pointer;list-style:none;display:flex;gap:12px;align-items:baseline;padding:14px 0;border-top:1px solid var(--line);font:600 17px/1.3 var(--display)}
 .more>summary::-webkit-details-marker{display:none}
 .more>summary::after,.story>summary::after{content:"+";margin-left:auto;font:600 18px/1 var(--mono);color:var(--soft)}
@@ -153,7 +160,6 @@ mark{background:var(--mark);color:inherit;padding:.05em .2em;border-radius:.2em;
 }
 @container sec (min-width:700px){
   .grid{grid-template-columns:repeat(2,minmax(0,1fr))}
-  .item{grid-template-columns:minmax(0,5fr) minmax(0,4fr)}
   .nb{grid-template-columns:5em minmax(0,3fr) minmax(0,4fr)}
   .case .cb{grid-template-columns:minmax(0,1fr) minmax(8ch,16ch) minmax(0,1fr);align-items:center}
   .case .act{text-align:center}
@@ -252,12 +258,14 @@ function themes(list) {
 }
 
 function decidedForYou() {
-  if (!PAGE.decidedForYou.length) return '';
-  const line = (a) => `<div class="item"><span>${a.cost === 'costly' ? '<span class="tag hot">costly</span>' : ''}${mk('decided:' + a.id, esc(a.what))}</span><span class="src mono">${esc(String(a.source || '').replace(/`/g, ''))}</span></div>`;
-  const costly = PAGE.decidedForYou.filter((a) => a.cost === 'costly'), cheap = PAGE.decidedForYou.filter((a) => a.cost !== 'costly');
+  const all = PAGE.decidedForYou;
+  if (!all.length) return '';
+  const line = (a) => `<div class="assume"><span class="aid">${esc(a.id)}</span><span>${mk('decided:' + a.id, esc(a.what))}</span><span class="because">Because: ${esc(String(a.source || '').replace(/`/g, ''))}</span></div>`;
+  const costly = all.filter((a) => a.cost === 'costly'), cheap = all.filter((a) => a.cost !== 'costly');
   const fold = (g) => `<details class="more" ${g.items.some((a) => changed.has('decided:' + a.id)) ? 'open' : ''}><summary>${esc(g.title)}<span class="n">${g.items.length}</span></summary>${g.items.map(line).join('')}</details>`;
-  return `<section class="sec" id="decided"><div class="head"><span class="eyebrow">Decided for you</span><h2 class="h2">Say no to any of these</h2><p class="p soft">${costly.length ? `${plural(costly.length, 'is', 'are')} expensive to undo later. The rest is cheap to change; open a theme to read it.` : 'All cheap to change later. Open a theme to read it.'}</p></div>
-  <div class="list">${costly.map(line).join('')}${themes(cheap).map(fold).join('')}</div></section>`;
+  return `<section class="sec" id="decided"><div class="head"><span class="eyebrow">Decided for you</span><h2 class="h2">${plural(all.length, 'assumption', 'assumptions')} made in your place</h2><p class="p soft">Right as they are: do nothing. Wrong: say its number in the chat.</p></div>
+  ${costly.length ? `<div class="block"><span class="sub">Expensive to undo later · ${costly.length}</span><div class="card pick">${costly.map(line).join('')}</div></div>` : ''}
+  ${cheap.length ? `<div class="block"><span class="sub">Cheap to change later · ${cheap.length}, by theme</span><div class="folds">${themes(cheap).map(fold).join('')}</div></div>` : ''}</section>`;
 }
 
 function mockSection() {
