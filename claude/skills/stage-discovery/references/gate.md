@@ -15,7 +15,7 @@ folded, so the first look is a map and not a wall of text.
 |---|---|---|
 | 1 | a short title, the demand under it, the counts | `discovery/page.json` (`title`, `demand`, `status`, `minutes`) |
 | 2 | what he decides | `page.json` `youDecide`: the review's findings that are his |
-| 3 | the screen: the guided mock under one thin bar (the tour, the state, full screen) | `mock/mock.html` |
+| 3 | the screen: the guided mock under one thin bar (the tour, the state, expand) | `mock/mock.html` |
 | 3 | or, with no screen, the cases | `page.json` `cases`: before, action, after, the ids each proves |
 | 4 | what was decided for him: the costly ones open, the rest folded by theme | the stories' Assumptions with their sources; `page.json` `groups` |
 | 5 | the stories, folded; each opens on its criteria | `stories.md` |
@@ -27,9 +27,9 @@ short sentences a stranger understands, with the number that matters
 in it ("Managers invite people by e-mail, 10 a day."). `groups` sorts
 the assumptions into three to five themes he would name himself ("Who
 can do what", "The words on screen"), each with the assumption ids it
-holds; an assumption in no group shows under "Other". Full screen is
-the screen as the product opens it, at the size of the window, under
-the same thin bar. The
+holds; an assumption in no group shows under "Other". Expanded, the
+mock is the screen as the product opens it, covering the window
+(never the monitor's full screen), under the same thin bar. The
 page is in simplified English
 (`<kit>/references/artifact-writing.md`); the screen's copy is in the
 product's languages.

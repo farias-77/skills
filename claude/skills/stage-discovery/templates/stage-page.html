@@ -93,19 +93,24 @@ mark{background:var(--mark);color:inherit;padding:.05em .2em;border-radius:.2em;
 
 /* the guided mock */
 .demo{border:1px solid var(--line);border-radius:14px;overflow:hidden;background:var(--paper);container:demo/inline-size}
-/* the mock is the screen under one thin bar, nothing beside or below it; full screen is the same at the size of the window */
+/* the mock is the screen under one thin bar, nothing beside or below it; expanded, it covers the window (never the monitor) */
 .demo.fs{position:fixed;inset:0;z-index:60;border:0;border-radius:0;display:flex;flex-direction:column;overflow:hidden}
 .demo.fs .demobody{flex:1;min-height:0;overflow:auto}
 .demo.fs .stagewrap{min-height:100%}
 .demo.fs .map{flex:1;min-height:0;overflow:auto}
-.bar{display:flex;flex-wrap:wrap;align-items:center;gap:6px 14px;min-height:46px;box-sizing:border-box;padding:6px 14px;border-bottom:1px solid var(--line);font-size:14.5px;line-height:1.35}
-.bar .nav{display:flex;align-items:center;gap:6px;flex:none}
-.bar .n{font:600 13px/1 var(--mono);min-width:3.4em;text-align:center}
-.bar .why{flex:1 1 260px;min-width:0;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
-.bar .why .btn{margin-right:10px}
-.bar .ids{flex:0 1 auto;max-width:24ch;font:13px/1.3 var(--mono);color:var(--soft);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.bar select{font:inherit;font-size:14px;color:inherit;background:var(--paper);border:1px solid var(--line);border-radius:8px;padding:5px 8px;max-width:24ch}
-.bar .btn{font-size:14px;padding:5px 10px}
+.bar{display:flex;flex-wrap:wrap;align-items:center;gap:8px 16px;min-height:48px;box-sizing:border-box;padding:7px 14px;border-bottom:1px solid var(--line);font-size:14.5px;line-height:1.4}
+.bar .nav{display:flex;align-items:center;flex:none;border:1px solid var(--line);border-radius:9px;overflow:hidden}
+.bar .nav button{all:unset;cursor:pointer;width:32px;height:32px;display:grid;place-items:center;font-size:17px}
+.bar .nav button:hover{background:var(--wash)}
+.bar .nav button:focus-visible{outline:3px solid var(--ink);outline-offset:-3px}
+.bar .n{font:600 13px/32px var(--mono);min-width:4em;text-align:center;border-inline:1px solid var(--line)}
+.bar .say{flex:1 1 280px;min-width:0;max-width:110ch;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.bar .say .btn{margin-right:10px}
+.bar .ids{margin-left:10px;font:12.5px/1 var(--mono);color:var(--soft);white-space:nowrap}
+.bar .tools{display:flex;align-items:center;gap:8px;flex:none;margin-left:auto;padding-left:16px;border-left:1px solid var(--line)}
+.bar .tools label{font:600 11px/1 var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--soft)}
+.bar select{font:inherit;font-size:14px;color:inherit;background:var(--paper);border:1px solid var(--line);border-radius:8px;padding:5px 8px;max-width:26ch}
+.bar .btn{font-size:14px;padding:5px 11px}
 .bar .btn.go{background:var(--solid);color:var(--on-solid);border-color:var(--solid)}
 .demobody{display:block}
 .stagewrap{min-width:0;overflow:hidden;background:var(--wash)}
@@ -168,7 +173,7 @@ mark{background:var(--mark);color:inherit;padding:.05em .2em;border-radius:.2em;
   .grid{grid-template-columns:repeat(3,minmax(0,1fr))}
   .crits,.cases{grid-template-columns:repeat(2,minmax(0,1fr))}
 }
-@container demo (max-width:640px){.bar .ids,.bar #mapbtn{display:none}.bar .why{order:9;flex-basis:100%}.bar select{flex:1 1 0;min-width:0;max-width:none}}
+@container demo (max-width:700px){.bar .ids,.bar #mapbtn,.bar .tools label{display:none}.bar .say{order:9;flex-basis:100%}.bar .tools{flex:1 1 0;min-width:0;padding-left:0;border-left:0}.bar select{flex:1 1 0;min-width:0;max-width:none}}
 @container demo (min-width:560px){.map{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @container demo (min-width:980px){
   .map{grid-template-columns:repeat(3,minmax(0,1fr))}
@@ -272,9 +277,9 @@ function mockSection() {
   const m = PAGE.mock;
   if (!m) return '';
   return `<section class="sec" id="mock"><div class="head"><span class="eyebrow">The screen${changed.has('screen') ? ' · <mark>changed since you last looked</mark>' : ''}</span><h2 class="h2">${esc(m.title)}</h2>
-    <p class="p soft"><span class="kbd">←</span> <span class="kbd">→</span> walk the tour · <span class="kbd">F</span> full screen</p></div>
+    <p class="p soft"><span class="kbd">←</span> <span class="kbd">→</span> walk the tour · <span class="kbd">F</span> expand</p></div>
     <div class="demo" id="demo">
-      <div class="bar"><span class="nav"><button class="btn" id="tprev" type="button" aria-label="Previous stop">‹</button><span class="n" id="stopn"></span><button class="btn" id="tnext" type="button" aria-label="Next stop">›</button></span><span class="why" id="why"></span><span class="ids" id="proves"></span><select id="statesel" aria-label="State"></select><button class="btn" id="mapbtn" type="button"></button><button class="btn" id="fsbtn" type="button" title="Full screen (F)"></button></div>
+      <div class="bar"><span class="nav"><button id="tprev" type="button" aria-label="Previous stop">‹</button><span class="n" id="stopn"></span><button id="tnext" type="button" aria-label="Next stop">›</button></span><span class="say" id="why"></span><span class="tools"><label for="statesel">State</label><select id="statesel"></select><button class="btn" id="mapbtn" type="button"></button><button class="btn" id="fsbtn" type="button"></button></span></div>
       <div class="demobody" id="demobody"><div class="stagewrap" id="stagewrap"><div class="viewport" id="viewport"></div></div></div>
       <div class="map" id="map" hidden></div>
     </div></section>`;
@@ -335,7 +340,7 @@ if (PAGE.mock) {
   const el = (id) => document.getElementById(id);
   const demo = el('demo'), wrap = el('stagewrap'), viewport = el('viewport'), map = el('map'), body = el('demobody');
   const label = Object.fromEntries(M.states.map((s) => [s.id, s.label]));
-  let st = M.states[0].id, stop = -1, mapOpen = false, fs = false, native = false;
+  let st = M.states[0].id, stop = -1, mapOpen = false, fs = false;
   const theme = () => (M.themes && M.themes.length === 1 ? M.themes[0] : isDark() ? 'dark' : 'light');
   const html = (state) => `<div class="screen" data-theme="${theme()}" data-state="${esc(state)}">${MOCK_SCREEN(state)}</div>`;
   function fit() {
@@ -368,12 +373,12 @@ if (PAGE.mock) {
     }
     el('stopn').textContent = `${t ? stop + 1 : '–'} / ${M.tour.length}`;
     el('why').innerHTML = t
-      ? mk('tour:' + stop, esc(t.why)) + (stop === M.tour.length - 1 ? ' <span class="soft">End of the tour: say in the chat what is right and what is not.</span>' : '')
+      ? mk('tour:' + stop, esc(t.why)) + (stop === M.tour.length - 1 ? ' <span class="soft">End of the tour: say in the chat what is right and what is not.</span>' : '') + `<span class="ids">proves ${esc(t.proves.join(' · '))}</span>`
       : `<button class="btn go" id="startbtn" type="button">Start the tour</button><span class="soft">${M.tour.length} stops · about ${M.minutes || 2} min</span>`;
     el('why').title = t ? t.why : '';
-    el('proves').textContent = t ? t.proves.join(' · ') : '';
     el('statesel').innerHTML = M.states.map((x) => `<option value="${esc(x.id)}" ${x.id === st ? 'selected' : ''}>${esc(x.label)}</option>`).join('');
-    el('fsbtn').textContent = fs ? 'Exit' : 'Full screen';
+    el('fsbtn').textContent = fs ? 'Close' : 'Expand';
+    el('fsbtn').title = fs ? 'Back to the page (Esc)' : 'Open over the whole page (F)';
     if (mapOpen) {
       map.innerHTML = M.states.map((s) => `<div class="fig" data-s="${esc(s.id)}"><span class="figcap">${esc(s.label)}</span><div class="frame"><div class="viewport" style="width:${W}px">${html(s.id)}</div></div></div>`).join('');
       map.querySelectorAll('.frame').forEach((f) => { const v = f.firstElementChild, k = f.clientWidth / W; v.style.transform = `scale(${k})`; f.style.height = v.offsetHeight * k + 'px'; });
@@ -400,22 +405,15 @@ if (PAGE.mock) {
   el('statesel').addEventListener('change', (e) => { setState(e.target.value); el('statesel').blur(); });
   map.addEventListener('click', (e) => { const f = e.target.closest('.fig'); if (f) setState(f.dataset.s); });
   viewport.addEventListener('click', (e) => { const g = e.target.closest('[data-go]'); if (g && label[g.dataset.go]) { e.preventDefault(); setState(g.dataset.go); } });
-  // Full screen is a state of the page; the browser's own full screen is asked for on top of it and may be refused.
+  // Expanded, the mock covers the window and nothing more: the monitor's own full screen is never asked for.
   function setFull(on) {
     fs = on;
     demo.classList.toggle('fs', fs);
     document.documentElement.style.overflow = fs ? 'hidden' : '';
-    if (fs && demo.requestFullscreen) demo.requestFullscreen().catch(() => {});
-    if (!fs && document.fullscreenElement) document.exitFullscreen();
     draw();
   }
   const full = () => setFull(!fs);
   el('fsbtn').addEventListener('click', full);
-  document.addEventListener('fullscreenchange', () => {
-    if (document.fullscreenElement === demo) native = true;
-    else if (native) { native = false; if (fs) return setFull(false); }
-    draw();
-  });
   new ResizeObserver(fit).observe(wrap);
   let inView = false;
   new IntersectionObserver((es) => { inView = es[0].isIntersecting; }, { threshold: 0.25 }).observe(demo);
