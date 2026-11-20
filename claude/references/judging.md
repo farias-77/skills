@@ -64,14 +64,16 @@ The oracle is what he decided: the notes' lines marked `said` and
 `accepted`, the Rules table, `not-building.md`, and the locked mock
 when a screen changes. A line marked `assumed` is the conductor's
 guess, not his decision. Every finding reaches the conductor already
-checked by a `discovery-finding-verifier`, with its class. Detail:
+checked, with its class: a hunter's claim by a
+`discovery-finding-verifier`, a story's two blind readings by a
+`discovery-reading-comparer`. Detail:
 `stage-discovery/references/review.md`.
 
-| The verifier's class | Ruling | Goes to |
+| The class | Ruling | Goes to |
 |---|---|---|
 | `writing`: the oracle settles it and the story says otherwise, omits it, or leaves two readings | fix | `discovery-story-writer (Sonnet 5.5, high)`, one batch, no question |
 | `gap` with a conservative answer (smaller scope, what the product already does, cheap to undo) | the conductor decides in his place | a new assumption, `ruled: conductor`, shown at the gate as "decided for you" |
-| `gap` that changes something he said, is costly or impossible to undo, or touches personal data, money, or a legal or stated constraint | his | one question, before the gate |
+| `gap` that changes something he said or an assumption he was shown, is costly or impossible to undo, or touches personal data, money, or a legal or stated constraint | his | one question, as soon as the rulings are written |
 | `mechanism`: a lock, a retry, a status code, a storage shape | for the design | the stories' "For the design"; never asked |
 | `note` | nothing built changes | `discovery/review/reviews.md` |
 

@@ -17,6 +17,8 @@
 :root[data-theme="dark"]{--paper:#121211;--ink:#ecece6;--soft:#a3a39b;--line:#33332f;--wash:#1c1c1a;--solid:#ecece6;--on-solid:#121211;--mark:#665500;color-scheme:dark}
 html,body{overflow-x:clip}
 body{background:var(--paper);color:var(--ink);font:18px/1.65 var(--body);padding-block:48px 96px;padding-left:max(20px,env(safe-area-inset-left,0px));padding-right:max(20px,env(safe-area-inset-right,0px))}
+/* The page's own rules stop at the screen: a class the product also uses (.card, .list, .shell) is styled by the product alone. */
+@scope (html) to (.screen){
 .pg{max-width:1320px;margin:0 auto;display:grid;grid-template-columns:minmax(0,1fr);gap:80px}
 .sec{display:flex;flex-direction:column;gap:24px;min-width:0;container:sec/inline-size}
 .head{display:flex;flex-direction:column;gap:12px}
@@ -120,7 +122,7 @@ mark{background:var(--mark);color:inherit;padding:.05em .2em;border-radius:.2em;
   body{padding-left:max(96px,env(safe-area-inset-left,0px))}
   .shell{position:fixed;left:0;top:0;bottom:0;z-index:20;width:64px;box-sizing:border-box;margin:0;padding:22px 12px;flex-direction:column;flex-wrap:nowrap;align-items:stretch;gap:30px;background:var(--paper);border-right:1px solid var(--line);overflow:hidden;transition:width .18s ease,box-shadow .18s ease}
   .shell:hover,.shell:focus-within{width:248px;box-shadow:0 0 48px rgba(0,0,0,.16)}
-  .shell .lbl{opacity:0;transition:opacity .14s}
+  .shell .lbl,.shell .st:not(.cur) .lbl{opacity:0;transition:opacity .14s}
   .shell:hover .lbl,.shell:focus-within .lbl{opacity:1}
   .shell:hover .st:not(.cur) .lbl,.shell:focus-within .st:not(.cur) .lbl{opacity:.55}
   .stages{flex-direction:column;flex-wrap:nowrap;gap:8px}
@@ -170,6 +172,7 @@ mark{background:var(--mark);color:inherit;padding:.05em .2em;border-radius:.2em;
   .pg.duo>#mock>.head .h2{font-size:24px}
 }
 @media (prefers-reduced-motion: reduce){.shell,.shell .lbl,.spot{transition:none}}
+}
 </style>
 <style id="mock-tokens">
 .screen{all:initial;display:block;container:screen/inline-size}
@@ -232,7 +235,7 @@ function decidedForYou() {
 function mockSection() {
   const m = PAGE.mock;
   if (!m) return '';
-  return `<section class="sec" id="mock"><div class="head"><span class="eyebrow">The screen</span><h2 class="h2">${esc(m.title)}</h2>
+  return `<section class="sec" id="mock"><div class="head"><span class="eyebrow">The screen${changed.has('screen') ? ' · <mark>changed since you last looked</mark>' : ''}</span><h2 class="h2">${esc(m.title)}</h2>
     <p class="p soft"><span class="kbd">←</span> <span class="kbd">→</span> walk the tour · <span class="kbd">S</span> next state · <span class="kbd">M</span> every state · <span class="kbd">F</span> full screen · <span class="kbd">Esc</span> leave</p></div>
     <div class="demo" id="demo">
       <div class="demobar"><span><b id="tourtitle"></b> <span class="soft" id="stopn"></span></span><span class="dots" id="dots" aria-hidden="true"></span>

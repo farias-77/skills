@@ -2,27 +2,40 @@
 /*
  * discovery.mjs — the mechanical side of stage 1. No dependency except for `shots`.
  *
+ *   node discovery.mjs init   <workstream>
  *   node discovery.mjs state  <workstream> --stop <0-7> --state needs-you|running|done --about "<a few words>"
  *                             [--lang en|pt-BR] [--set key=value]…
  *   node discovery.mjs check  <workstream> [--gate]
  *   node discovery.mjs split  <workstream>
+ *   node discovery.mjs round  <workstream> <result-file> [--name round-1]
+ *   node discovery.mjs mark   <workstream>
+ *   node discovery.mjs diff   <workstream>
  *   node discovery.mjs page   <workstream> [--read]
  *   node discovery.mjs shots  <workstream> [--chrome <path>]
  *   node discovery.mjs lock   <workstream> --words "<his words>"
  *   node discovery.mjs freeze <workstream>
  *
+ * init    creates the workstream folder, its discovery/ folders and notes.md from the template. Changes nothing
+ *         that already exists.
  * state   rewrites .state.md and prints the status line, to be pasted as written. The same line is what a
  *         coordinator session reads, so the chat and the file never disagree.
  * check   proves the stories: every rule has exactly one criterion, every criterion has its parts and its
  *         "(seen: …)" places, every id resolves (journeys, steps, rules, not-building, the tour's "proves"),
  *         no frozen id is gone. --gate also requires Open empty and, with a screen, the lock. Exit 1 on a problem.
  * split   cuts one file per story under discovery/review/stories/ for the blind readers and prints the index.
+ * round   saves a review workflow's result as discovery/review/<name>.json and, for a round, <name>.md: the
+ *         confirmed findings grouped by place, one line each. Takes the file the Workflow tool wrote (the
+ *         result itself, or an object that holds it under "result") and prints the counts.
+ * mark    records stories.md and not-building.md as they are, before the fixes of a review.
+ * diff    prints what changed since mark, item by item (a criterion, a rule, a not-building line, an assumption,
+ *         a story's flow): the before and after text of each. This is the diff a delta pass reads.
  * page    builds discovery/page/index.html from the stage files. Items that differ from the version he last
  *         read are highlighted; --read records the current build as that version.
- * shots   renders the page in a browser: every state, light and dark, 390 and 1280 wide, every tour stop.
+ * shots   renders the page in a browser: every state, light and dark, 390 and 1280 wide, every tour stop, into
+ *         mock/shots/. With no screen, two pictures of the page into discovery/page/shots/.
  *         Fails on a console error, a sideways scroll or a tour stop with no element. Needs playwright-core
- *         and a Chromium: the kit's own (npm ci --prefix <kit>/video), or PLAYWRIGHT_DIR.
- *         (found through NODE_PATH, the working directory or `npm root -g`; --chrome names a Chromium binary).
+ *         and a Chromium: the kit's own (npm ci --prefix <kit>/video), or PLAYWRIGHT_DIR
+ *         (--chrome names a Chromium binary).
  * lock    records that he said the screen is right: refuses without his words, without green shots of this
  *         exact mock, or with a failing check.
  * freeze  records every id after his approval; from then on `check` fails when one disappears.
@@ -286,8 +299,8 @@ function split(ws) {
 function pageData(ws) {
   const { stories: S, nb, mock } = load(ws);
   const cfgFile = join(ws, 'discovery', 'page.json');
-  if (!existsSync(cfgFile)) fail(`${cfgFile} not found (templates/page.json is the shape)`);
-  const cfg = JSON.parse(read(cfgFile));
+  // The designer runs shots before the conductor has written page.json: the mock is drawn on a page with no words yet.
+  const cfg = existsSync(cfgFile) ? JSON.parse(read(cfgFile)) : { workstream: ws.split('/').filter(Boolean).pop(), demand: '' };
   const data = {
     workstream: cfg.workstream, demand: cfg.demand, status: cfg.status || 'in progress', minutes: cfg.minutes || 4,
     youDecide: cfg.youDecide || [],
@@ -304,6 +317,7 @@ function pageData(ws) {
   data.stories.forEach((s) => { items['story:' + s.id] = s.title + '|' + s.job; s.criteria.forEach((c) => { items['criterion:' + c.id] = JSON.stringify(c); }); });
   data.notBuilding.forEach((n) => { items['nb:' + n.id] = n.what + '|' + n.reason; });
   (data.mock?.tour || []).forEach((t, i) => { items['tour:' + i] = JSON.stringify(t); });
+  if (mock) items.screen = mock.sha;
   return { data, items, mock };
 }
 
@@ -341,7 +355,7 @@ async function browser(chromePath) {
 async function shots(ws, { chrome } = {}) {
   const built = page(ws);
   const { mock } = load(ws);
-  const out = join(ws, 'mock', 'shots');
+  const out = mock ? join(ws, 'mock', 'shots') : join(ws, 'discovery', 'page', 'shots');
   rmSync(out, { recursive: true, force: true });
   mkdirSync(out, { recursive: true });
   const b = await browser(typeof chrome === 'string' ? chrome : process.env.PLAYWRIGHT_CHROMIUM);
@@ -352,6 +366,7 @@ async function shots(ws, { chrome } = {}) {
     p.on('console', (m) => { if (m.type() === 'error') problems.push(`${width}/${theme}: console error: ${m.text()}`); });
     p.on('pageerror', (e) => problems.push(`${width}/${theme}: ${e.message}`));
     await p.goto(url);
+    await p.mouse.move(width / 2, 450); // the pointer starts on the stage rail, which opens over the page
     await p.waitForTimeout(300);
     const wide = await p.evaluate(() => document.documentElement.scrollWidth - innerWidth);
     if (wide > 1) problems.push(`${width}/${theme}: the page scrolls sideways by ${wide}px`);
@@ -374,6 +389,81 @@ async function shots(ws, { chrome } = {}) {
   const report = { ok: problems.length === 0, mockSha: mock?.sha ?? null, page: built.file, files, problems };
   writeFileSync(join(out, 'report.json'), JSON.stringify(report, null, 1));
   return report;
+}
+
+// ---------- init, round, mark, diff ----------
+
+function init(ws) {
+  const made = [];
+  for (const dir of [ws, join(ws, 'discovery', 'recon'), join(ws, 'discovery', 'review'), join(ws, 'discovery', 'page')]) if (!existsSync(dir)) { mkdirSync(dir, { recursive: true }); made.push(dir); }
+  const notes = join(ws, 'notes.md');
+  if (!existsSync(notes)) { writeFileSync(notes, read(join(HERE, '..', 'templates', 'notes.md'))); made.push(notes); }
+  return { workstream: ws, created: made };
+}
+
+function saveRound(ws, file, name = 'round-1') {
+  if (typeof file !== 'string' || !existsSync(file)) fail('round needs the file the Workflow tool wrote: node discovery.mjs round <workstream> <result-file>');
+  let value;
+  try { value = JSON.parse(read(file)); } catch (e) { fail(`${file} is not JSON: ${e.message}`); }
+  const result = value && typeof value.result === 'object' && value.result !== null && !('mode' in value) ? value.result : value;
+  if (!result || !('valid' in result) || !('mode' in result)) fail(`${file} holds no review result (an object with "mode" and "valid")`);
+  const out = join(ws, 'discovery', 'review', `${name}.json`);
+  mkdirSync(dirname(out), { recursive: true });
+  writeFileSync(out, JSON.stringify(result, null, 1));
+  if (result.mode === 'delta') return { file: out, valid: result.valid, mode: 'delta', fixes: result.fixes.length, landed: result.fixes.filter((f) => f.verdict === 'landed').length, open: result.fixes.filter((f) => f.verdict !== 'landed').map((f) => `${f.id}: ${f.verdict} · ${f.what}`) };
+  const list = join(ws, 'discovery', 'review', `${name}.md`);
+  writeFileSync(list, roundList(result));
+  return { file: out, list, valid: result.valid, mode: result.mode, found: result.found, confirmed: result.confirmed.length, places: (result.groups ?? []).length, forDesign: (result.forDesign ?? []).length,
+    refuted: result.refuted.length, unverified: result.unverified.length, unread: result.unread ?? [] };
+}
+
+// The round as a list the conductor rules from: one block per place, one line per finding. The JSON keeps the detail.
+function roundList(r) {
+  const one = (s, max = 220) => String(s ?? '').replace(/\s+/g, ' ').trim().slice(0, max);
+  const byId = new Map(r.confirmed.map((f) => [f.id, f]));
+  const line = (f) => `- \`${f.id}\` · ${f.severity} · ${f.kind} · ${one(f.title, 120)}\n  - gap: ${one(f.gap)}\n  - evidence: ${one(f.evidence)} (${one(f.where, 80)})${f.conservative ? `\n  - conservative: ${one(f.conservative)}` : ''}${f.touches ? `\n  - touches: ${one(f.touches, 80)}` : ''}${f.fix ? `\n  - fix: ${one(f.fix)}` : ''}`;
+  const groups = (r.groups ?? []).map((g) => `### ${g.anchor} · ${g.ids.length} finding(s) · ${g.blocks} block\n\n${g.ids.map((id) => line(byId.get(id))).join('\n')}`);
+  const short = (f) => `- \`${f.id}\` · ${one(f.title, 120)} · ${one(f.evidence, 160)}`;
+  return [`# Review round · ${r.found} found · ${r.confirmed.length} confirmed in ${(r.groups ?? []).length} place(s) · ${(r.forDesign ?? []).length} for the design · ${r.refuted.length} refuted${r.unverified.length ? ` · ${r.unverified.length} unverified` : ''}${(r.unread ?? []).length ? ` · unread: ${r.unread.join(', ')}` : ''}`,
+    '## Confirmed, by place', groups.join('\n\n') || 'None.',
+    '## For the design (mechanisms)', (r.forDesign ?? []).map(short).join('\n') || 'None.',
+    '## Unverified', r.unverified.map((f) => `- \`${f.id}\` · ${one(f.title, 120)} · ${one(f.gap)}`).join('\n') || 'None.',
+    '## Refuted', r.refuted.map((f) => `${short(f)}${f.touches ? ` · touches: ${one(f.touches, 60)}` : ''}`).join('\n') || 'None.'].join('\n\n') + '\n';
+}
+
+// One entry per thing a fix can change, keyed by its id, so a delta pass gets the before and after of that thing alone.
+function reviewItems(ws) {
+  const { stories: S, nb } = load(ws);
+  const items = {};
+  for (const r of S.rules) items[`rule ${r.id}`] = JSON.stringify(r);
+  for (const s of S.stories) {
+    // The story's own text, without its criteria: each criterion is an item of its own.
+    items[`story ${s.id}`] = s.text.split('\n').filter((l) => !/^- \*\*`/.test(l) && !/^\s+(GIVEN|WHEN|THEN|AND)\b/.test(l)).join('\n').replace(/\n{3,}/g, '\n\n');
+    for (const c of s.criteria) items[`criterion ${c.id}`] = `[${c.tags.join(', ')}] ` + c.lines.map((l) => `${l.kw} ${l.text}${l.seen ? ` (seen: ${l.seen})` : ''}`).join(' / ');
+  }
+  for (const a of S.assumptions) items[`assumption ${a.id}`] = JSON.stringify(a);
+  for (const n of nb.items) items[`not-building ${n.id}`] = `${n.what} — ${n.kind}: ${n.reason}`;
+  items.open = S.open.join(' / ');
+  items.vocabulary = S.vocabulary;
+  return items;
+}
+
+function mark(ws) {
+  const items = reviewItems(ws);
+  const out = join(ws, 'discovery', 'review', 'before.json');
+  mkdirSync(dirname(out), { recursive: true });
+  writeFileSync(out, JSON.stringify(items, null, 1));
+  return { marked: Object.keys(items).length, file: out };
+}
+
+function diff(ws) {
+  const file = join(ws, 'discovery', 'review', 'before.json');
+  if (!existsSync(file)) fail('nothing marked: run mark before the fixes');
+  const before = JSON.parse(read(file)), after = reviewItems(ws);
+  const changed = [...new Set([...Object.keys(before), ...Object.keys(after)])]
+    .filter((k) => before[k] !== after[k])
+    .map((k) => ({ item: k, before: before[k] ?? '(did not exist)', after: after[k] ?? '(removed)' }));
+  return { changed };
 }
 
 // ---------- lock, freeze, state ----------
@@ -425,13 +515,17 @@ function state(ws, flags) {
 
 // ---------- main ----------
 
-const { positional: [command, wsArg], flags } = parseArgs(process.argv.slice(2));
-if (!command || !wsArg) fail('usage: node discovery.mjs <state|check|split|page|shots|lock|freeze> <workstream> [flags] (the header documents each)');
+const { positional: [command, wsArg, extra], flags } = parseArgs(process.argv.slice(2));
+if (!command || !wsArg) fail('usage: node discovery.mjs <init|state|check|split|round|mark|diff|page|shots|lock|freeze> <workstream> [flags] (the header documents each)');
 const ws = resolve(wsArg);
 const print = (value) => console.log(typeof value === 'string' ? value : JSON.stringify(value, null, 1));
 const exitOn = (result) => { print(result); process.exit(result.ok ? 0 : 1); };
 
-if (command === 'state') print(state(ws, flags));
+if (command === 'init') print(init(ws));
+else if (command === 'state') print(state(ws, flags));
+else if (command === 'round') print(saveRound(ws, extra, typeof flags.name === 'string' ? flags.name : undefined));
+else if (command === 'mark') print(mark(ws));
+else if (command === 'diff') print(diff(ws));
 else if (command === 'check') exitOn(check(ws, { gate: flags.gate === true }));
 else if (command === 'split') print(split(ws));
 else if (command === 'page') print(page(ws, { markRead: flags.read === true }));

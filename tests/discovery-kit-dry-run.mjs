@@ -128,6 +128,61 @@ const cases = [
     return a.out === '🔴 NEEDS YOU · the mock is ready, walk the tour · ●●●●●○○ 5/7' && b.out === '🟢 RUNNING ON ITS OWN · review running · ●●●●●○○ 5/7'
       && file.includes(`line: ${b.out}`) && /size: feature/.test(file) && /stop: 5\/7 mock/.test(file) && c.out.startsWith('✅ TERMINEI · PODE FECHAR') && cli('state', ws, '--state', 'paused').code === 1 ? null : `${a.out} | ${b.out} | ${c.out}`;
   } },
+  { title: 'a change in the screen alone is highlighted as the screen', run() {
+    const ws = workstream();
+    cli('page', ws); cli('page', ws, '--read');
+    writeFileSync(join(ws, 'mock/mock.html'), readFileSync(join(ws, 'mock/mock.html'), 'utf8').replace('Send invite', 'Invite'));
+    const r = cli('page', ws);
+    const html = readFileSync(join(ws, 'discovery/page/index.html'), 'utf8');
+    return JSON.stringify(r.json.changed) === '["screen"]' && /"changed":\["screen"\]/.test(html) ? null : JSON.stringify(r.json.changed);
+  } },
+  { title: 'page builds before page.json exists, so the designer can run shots', run() {
+    const ws = workstream();
+    rmSync(join(ws, 'discovery/page.json'));
+    const r = cli('page', ws);
+    return r.code === 0 && existsSync(join(ws, 'discovery/page/index.html')) ? null : `exit ${r.code} ${r.err}`;
+  } },
+  { title: 'round writes the list the conductor rules from: findings by place, mechanisms apart', run() {
+    const ws = workstream();
+    const f = (id, anchor, o = {}) => ({ id, anchor, source: 'hunter/limits', story: 'S-001', title: `finding ${id}`, gap: 'a gap', quote: 'q', where: 'stories.md:41', verdict: 'confirmed', kind: 'gap', severity: 'blocks', evidence: 'the quote', conservative: 'keep it', touches: '', fix: '', ...o });
+    const result = { mode: 'round', valid: true, size: 'feature', found: 4, confirmed: [f('limits#1', 'J2.s2.1'), f('readers/S-001#1', 'J2.s2.1')], groups: [{ anchor: 'J2.s2.1', ids: ['limits#1', 'readers/S-001#1'], blocks: 2, notes: 0 }],
+      forDesign: [f('errors#1', 'J3.s2.1', { kind: 'mechanism', severity: 'note', title: 'status code of the refusal' })], refuted: [{ id: 'code#1', title: 'misread', evidence: 'stories.md:12 covers it', where: 'stories.md:12', touches: '' }], unverified: [], unread: [] };
+    const file = join(scratch, 'grouped.json');
+    writeFileSync(file, JSON.stringify(result));
+    const r = cli('round', ws, file);
+    const list = readFileSync(join(ws, 'discovery/review/round-1.md'), 'utf8');
+    return r.json?.places === 1 && r.json.forDesign === 1 && /### J2\.s2\.1 · 2 finding/.test(list) && /status code of the refusal/.test(list.split('## For the design')[1]) && /code#1/.test(list.split('## Refuted')[1]) ? null : `${r.out}\n${list}`;
+  } },
+  { title: 'init creates the folders and notes.md, and leaves an existing workstream alone', run() {
+    const ws = join(scratch, 'fresh-thing');
+    const a = cli('init', ws);
+    writeFileSync(join(ws, 'notes.md'), 'his words');
+    const b = cli('init', ws);
+    return a.json?.created.length === 5 && existsSync(join(ws, 'discovery/review')) && b.json?.created.length === 0 && readFileSync(join(ws, 'notes.md'), 'utf8') === 'his words' ? null : `${a.out} | ${b.out}`;
+  } },
+  { title: 'mark then diff names exactly the items a fix changed, before and after', run() {
+    const ws = workstream();
+    cli('mark', ws);
+    const none = cli('diff', ws).json.changed;
+    writeFileSync(join(ws, 'stories.md'), readFileSync(join(ws, 'stories.md'), 'utf8').replace('"6 of 10 invites left today"', '"6 invites left today"'));
+    const one = cli('diff', ws).json.changed;
+    return none.length === 0 && one.length === 1 && one[0].item === 'criterion J1.s2.1' && one[0].before.includes('6 of 10') && one[0].after.includes('"6 invites left today"') ? null : JSON.stringify(one).slice(0, 600);
+  } },
+  { title: 'diff refuses when nothing was marked', run() {
+    const r = cli('diff', workstream());
+    return r.code === 1 && /mark/.test(r.err) ? null : `exit ${r.code} ${r.err}`;
+  } },
+  { title: 'round saves the review result, whole or wrapped by the Workflow tool, and refuses anything else', run() {
+    const ws = workstream();
+    const result = { mode: 'round', valid: true, found: 3, confirmed: [{ id: 'errors#1' }], refuted: [], unverified: [], unread: [] };
+    const bare = join(scratch, 'bare.json'), wrapped = join(scratch, 'wrapped.json'), junk = join(scratch, 'junk.json');
+    writeFileSync(bare, JSON.stringify(result));
+    writeFileSync(wrapped, JSON.stringify({ summary: 'done', logs: [], result }));
+    writeFileSync(junk, JSON.stringify({ summary: 'done' }));
+    const a = cli('round', ws, bare), b = cli('round', ws, wrapped, '--name', 'again'), c = cli('round', ws, junk);
+    const saved = JSON.parse(readFileSync(join(ws, 'discovery/review/again.json'), 'utf8'));
+    return a.json?.confirmed === 1 && a.json.file.endsWith('round-1.json') && b.json?.found === 3 && saved.mode === 'round' && c.code === 1 ? null : `${a.out} | ${b.out} | ${c.err}`;
+  } },
 ];
 
 // Stands in for `shots`, which needs a browser: a green report for this exact mock.

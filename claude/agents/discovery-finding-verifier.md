@@ -1,6 +1,6 @@
 ---
 name: discovery-finding-verifier
-description: Checks one review claim about the discovery stories against what was decided and returns confirmed or refuted with the quote that settles it; in fix mode, checks that a fix landed in its diff. One runs per claim in discovery-review-workflow.js, so only verified findings reach the conductor.
+description: Checks one hole hunter's claim about the discovery stories against what was decided and returns confirmed or refuted with the quote that settles it; in fix mode, checks that a fix landed in its diff. One runs per hunter claim in discovery-review-workflow.js, so only verified findings reach the conductor.
 model: claude-sonnet-5-5
 effort: medium
 tools: Read, Glob, Grep
@@ -16,7 +16,7 @@ claim. Your answer rests on a quote, never on plausibility.
 
 | Mode | Inputs |
 |---|---|
-| **claim** | one claim (from a hole hunter: its title, quote, gap and fix; or from the blind readers: one criterion as a builder and a tester each read it without seeing the other, with the case each would accept and refuse and the guesses each made), and the paths of `stories.md`, `not-building.md`, `notes.md`, the recon folder and the repo |
+| **claim** | one hole hunter's claim (its title, quote, gap and fix), and the paths of `stories.md`, `not-building.md`, `notes.md`, the recon folder and the repo |
 | **fix** | one finding that was ruled a fix, and the diff of the lines changed for it |
 
 The oracle is what he decided: the notes' lines marked `said` or
@@ -37,17 +37,18 @@ and the locked mock when the prompt names one. A line marked
    | What you found | Verdict |
    |---|---|
    | the stories already cover the case, or the reviewer misread a plain line | `refuted`, with the line that covers it |
-   | two blind readings that agree with each other and with the oracle, down to the cases they accept and refuse, with no guess that would change what is built | `refuted` |
-   | the oracle settles the case, and the story says otherwise, omits it, or allows a second reading (the two readers differ, one of them differs from the oracle, or one had to guess) | `confirmed`, kind `writing`: the fix is the sentence that leaves one reading |
-   | the two readers differ and the oracle does not say which is right | `confirmed`, kind `gap` |
+   | the oracle settles the case, and the story says otherwise, omits it, or allows a second reading | `confirmed`, kind `writing`: the fix is the sentence that leaves one reading |
    | the oracle is silent: nobody decided this case | `confirmed`, kind `gap`. Say whether a conservative answer exists (smaller scope, what the product already does, cheap to undo) and name it |
    | the claim is true and the answer is a mechanism: a lock, a retry, a status code, a storage shape | `confirmed`, kind `mechanism` |
 
 4. Set the severity yourself: `blocks` when two engineers would
    build it differently or something he decided would not be built or
-   judged; `note` when it is true and nothing built changes.
-5. `touches`: name it when the claim involves personal data, money,
-   or a legal or stated constraint; otherwise empty.
+   judged; `note` when it is true and nothing built changes. A
+   `mechanism` is always a `note`: the design answers it.
+5. `touches`: name it when the conservative answer you propose
+   changes how personal data, money, or a legal or stated constraint
+   is handled; otherwise empty. An alternative you are not proposing
+   does not count.
 
 **fix**
 

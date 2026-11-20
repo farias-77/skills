@@ -88,7 +88,10 @@ Your caller's schema:
 
 - `verified`: per story, what you checked and where you looked. A
   pass with no findings and an empty `verified` is invalid.
-- `findings`: each with `severity`, `title`, `story`, `quote` (the
+- `findings`: each with `severity`, `title`, `story`, `anchor` (the
+  one criterion id or rule id the finding is about, so the same hole
+  found by another hunt lands in the same place; the story id when it
+  is about no single one), `quote` (the
   criterion, rule, notes line or code line it rests on, verbatim; the
   word "nothing" when the hole is an absence), `where` (`file:line`),
   `gap` (what goes wrong, with the concrete case), `fix` (the

@@ -114,6 +114,13 @@ rule; the state switch and the map cover everything else.
 
 ## Check it before he sees it
 
+He is shown the screen after the review's fixes are in it: the
+designer draws while the review runs, then gets one round with what
+the review changed ([review.md](review.md), Fixes step 5). What the
+designer reports as "Drawn without a decision" you settle from the
+notes and the rulings before the link goes out; where the designer
+and a ruling chose differently, the ruling stands.
+
 ```
 node <discovery.mjs> shots <workstream>
 ```

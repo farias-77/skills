@@ -35,14 +35,20 @@ Run `--read` each time he has reacted to a published version, right
 before the next build. The highlight then shows exactly the diff from
 what he last read, and resets every round.
 
+This page is the stage's whole report: the Discovery tab of
+`Report - <workstream>`. The stage builds no Explainer and asks no
+Video or Deck question; the house rule on those pieces starts at the
+next stage.
+
 Before each publish: `node <discovery.mjs> check <workstream>` and
 `gitleaks dir <workstream>` are clean. Publish with the `Artifact`
 tool to the workstream's one link (the first publish creates it;
 write its URL in `.state.md` as `page:`). To let him comment on
 elements, load the `artifact-capabilities` skill and declare
 comments on the first publish. Look at the page yourself before the
-link goes out: `discovery.mjs shots` when a screen changes, a
-screenshot at 1280 and 390 otherwise.
+link goes out: `discovery.mjs shots`. With a screen it pictures every
+state and tour stop into `mock/shots/`; with none, the page at 1280
+and 390 into `discovery/page/shots/`.
 
 The same page serves the mock rounds at stop 5: it is built as soon
 as the mock exists, with `status: "screen in review"`.
@@ -72,13 +78,15 @@ question back.
 
   1. his words into the notes as `said`;
   2. the `discovery-story-writer`, amend mode, for the stories it touches;
-  3. with a screen: one round to the `discovery-mock-designer`, `shots`, and
-     `lock` again with the words of this answer;
+  3. with a screen: one round to the `discovery-mock-designer` and `shots`;
   4. `check`; one `discovery-finding-verifier` pass on the diff
      ([review.md](review.md), the second pass);
   5. `page --read` (he read the last version), `page`, publish;
   6. one short message: what changed, the link, and the same
-     question.
+     question. When the screen changed, his yes to this message is
+     also the screen's lock: `lock` with those words, then the
+     close. A screen is never locked on words he said before he saw
+     it.
 
 Assumptions he did not mention stay `assumed`: his yes approves the
 page, and the page lists them as decided for him. One he rejects is
@@ -101,8 +109,12 @@ Then, in order:
    close.
 3. With a `tracker:` line, `notion-tracker close discovery <url>`.
 4. Remove what the stage left behind: `mock/shots/`,
-   `discovery/review/stories/`, anything still running.
-5. Commit the workstream folder (push on his word).
+   `discovery/review/stories/`, `discovery/review/before.json`,
+   anything still running. `discovery/page/shots/` stays: it is the
+   picture of what he approved.
+5. Commit the workstream folder when the designs root is a git
+   repository (push on his word); when it is not, say so in the close
+   message.
 6. The approved template: the next play on his clipboard and printed.
 
 ```

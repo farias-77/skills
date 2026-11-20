@@ -35,7 +35,8 @@ the row together.
 | `discovery-mock-designer` | discovery | Opus 5.5 | medium | Designs the guided mock from the project's design system and checks its own screenshots against the real screen: visual judgment. To be compared with Sonnet 5.5 high on real mocks |
 | `discovery-story-writer` | discovery | Sonnet 5.5 | high | Writes stories and criteria from the interview notes to a format a script checks: templated writing |
 | `discovery-hole-hunter` | discovery | Sonnet 5.5 | medium | One hunt per call (errors, access, limits, code) |
-| `discovery-finding-verifier` | discovery | Sonnet 5.5 | medium | One claim per call against what he decided; returns confirmed or refuted with the quote |
+| `discovery-reading-comparer` | discovery | Sonnet 5.5 | medium | One story per call: the two blind reports side by side against what he decided |
+| `discovery-finding-verifier` | discovery | Sonnet 5.5 | medium | One hunter claim per call against what he decided; returns confirmed or refuted with the quote |
 | `architect` | design | Opus 5.5 | high | Open-ended design judgment: GDPval 1576 (medium) → 1690 (high) |
 | `overengineering-guard` | design | Opus 5.5 | medium | Cuts what serves no AC and no real risk: judgment on "does this need to exist?" |
 | `design-writer` | design | Sonnet 5.5 | high | One document from a template and the closed solution |

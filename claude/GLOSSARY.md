@@ -30,7 +30,7 @@ is here, it uses this one.
 | **the gate** | discovery's stop 7: he approves the stories, what was decided for him and the mock on one page; after his yes the ids freeze (`discovery/ids.json`) |
 | **hunt** | one kind of hole a `discovery-hole-hunter` looks for: **errors** · **access** · **limits** · **code** (a small demand runs them as one, **whole**) |
 | **seat** | the point of view of a `discovery-story-reader`: **builder** or **tester**; two seats read each story without seeing each other, and their disagreement is the finding |
-| **verifier classes** | what a `discovery-finding-verifier` returns for a confirmed claim: **writing** (the text is wrong or reads two ways) · **gap** (nobody decided it) · **mechanism** (the answer belongs to the design) |
+| **verifier classes** | what a `discovery-finding-verifier` (a hunter's claim) or a `discovery-reading-comparer` (a story's two blind readings) returns for a finding that holds: **writing** (the text is wrong or reads two ways) · **gap** (nobody decided it) · **mechanism** (the answer belongs to the design) |
 | **double-blind** | plan: two `blind-reader`s read one brief alone and a `blind-judge` compares them (**diverge** · **contradicts** · **undecidable**) |
 | **solution** | design's one solution sized to the problem, with its evolution path v1 → v2 → v3, in `solution.md`: drafted, debated, closed, then expanded for the builders |
 | **the debate** | design's rounds with him over the solution, drawn as one page, until he says "closed" |

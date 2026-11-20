@@ -44,7 +44,8 @@ dispatches them.
 | `discovery-mock-designer` | Opus 5.5, medium | when a screen changes: the guided mock, checked against its own screenshots; applies his rounds |
 | `discovery-story-reader` × 2 per story | Haiku 5.5, high | reads one story blind, one as builder and one as tester; commits to a case that passes and one that fails |
 | `discovery-hole-hunter` × 4 | Sonnet 5.5, medium | one hunt each: errors, access, limits, code |
-| `discovery-finding-verifier` per claim | Sonnet 5.5, medium | checks each claim against what he decided; only verified findings reach the conductor |
+| `discovery-reading-comparer` per story | Sonnet 5.5, medium | compares the two blind reports against what he decided; reports only the criteria that leave two readings or a guess |
+| `discovery-finding-verifier` per hunter claim | Sonnet 5.5, medium | checks each claim against what he decided; only verified findings reach the conductor |
 
 The conductor is the session itself.
 
@@ -65,7 +66,7 @@ The conductor is the session itself.
 | `templates/mock.html` | the mock's starting point |
 | `templates/page.json` | what the conductor writes for the stage page |
 | `templates/stage-page.html` | the stage page's shell: the reading column, the guided mock, the stage rail |
-| `scripts/discovery.mjs` | `state` · `check` · `split` · `page` · `shots` · `lock` · `freeze` |
+| `scripts/discovery.mjs` | `init` · `state` · `check` · `split` · `round` · `mark` · `diff` · `page` · `shots` · `lock` · `freeze` |
 
 The review workflow is `claude/workflows/discovery-review-workflow.js`.
 

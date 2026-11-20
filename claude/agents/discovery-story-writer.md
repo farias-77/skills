@@ -38,7 +38,10 @@ checks the result against it.
    decided, with its id on the journey step where it first shows.
    Take every value from the notes' examples: names, numbers, dates,
    the exact words on screen. A rule with a number is checked at its
-   boundary.
+   boundary. One rule seen in two places (a menu item that is absent
+   and the API that refuses) is one criterion with two THEN/AND
+   lines, never two criteria. A case the notes do not settle goes
+   under Open, never into a criterion or an assumption of yours.
 5. Fill each story's error-path table: every row lands on a step with
    its criterion, a not-building id, or `n/a: <why>`.
 6. Copy the notes' Assumptions and For the design. Add an assumption

@@ -67,7 +67,7 @@
 
 ## Rules
 
-<!-- Every rule with a number. The example is at the boundary and its values come from him or a system of record. -->
+<!-- Every rule and every behavior he decided. With a number: the example is at the boundary and its values come from him or a system of record. With no number: "—" in Number, and the example is one case that passes and the nearest that does not. -->
 
 | ID | Rule | Number | Examples | Provenance | Source |
 |---|---|---|---|---|---|

@@ -54,7 +54,9 @@ message.
 A link, a command, an id: put it on his clipboard with the clipboard
 command his `CLAUDE.md` names, and also print it in a code block in
 the same message. Several sessions compete for the clipboard; the
-printed copy is the fallback.
+printed copy is the fallback. Write "(also in your clipboard)" only
+after the clipboard command ran and exited 0; otherwise leave the
+line out.
 
 ## 1 · Opening (stop 0 → 1)
 
@@ -121,6 +123,7 @@ DISCOVERY READY · <slug>
 You decide    <N things, asked next> | nothing
 Decided       <N in your place, listed on the page>
 Delivered     <N stories · N criteria · screen locked | N cases>
+Review        <N found · N confirmed · N ruled in your place · N yours>
 
 Link          <url>
               (also in your clipboard)

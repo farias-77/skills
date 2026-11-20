@@ -48,7 +48,7 @@ The stage is done when every line holds:
 | 3 interview | you and him | the notes' Decisions, Rules, Journeys, every turn |
 | 4 stories | `discovery-story-writer` (Sonnet 5.5, high) | `stories.md`, `not-building.md` |
 | 5 mock, when a screen changes | `discovery-mock-designer` (Opus 5.5, medium); you run the rounds | `mock/mock.html`, the page, `mock/LOCK.json` |
-| 6 review | `discovery-review-workflow.js`: `discovery-story-reader` × 2 per story (Haiku 5.5, high), `discovery-hole-hunter` and `discovery-finding-verifier` (Sonnet 5.5, medium); you rule | `discovery/review/`, `rulings.md` |
+| 6 review | `discovery-review-workflow.js`: `discovery-story-reader` × 2 per story (Haiku 5.5, high), `discovery-hole-hunter`, `discovery-reading-comparer` and `discovery-finding-verifier` (Sonnet 5.5, medium); you rule | `discovery/review/`, `rulings.md` |
 | 7 gate | you and him | his yes, `discovery/ids.json`, the next play |
 
 ## The three sizes
@@ -59,7 +59,7 @@ down only on his word.
 
 | Size | Signs | Stops |
 |---|---|---|
-| **small**: a clear idea, no screen | one rule or behavior changes, nothing new on screen | 1, 2, 4, 6 (one reviewer), 7. The interview happens only if the readback leaves a question |
+| **small**: a clear idea, no screen | one rule or behavior changes; on screen, at most the words of a control that already exists | 1, 2, 4, 6 (one reviewer), 7. The interview happens only if the readback leaves a question. The status line counts the same seven stops; 3 and 5 are passed over |
 | **feature** | a screen changes, or several rules, or a new kind of user | every stop |
 | **large and foggy** | several independent parts, or the goal itself is unclear | 1, 2, then cut: the readback proposes the parts and their order; on his yes, write `parts.md` (one line per part: slug, one sentence, what it depends on) and hand him one play per part. Each part is its own discovery at feature size |
 
@@ -104,15 +104,19 @@ install command from the header.
    `.state.md` as `kit:` and give agents absolute paths.
 2. **The house Open.** Read `<kit>/../CLAUDE.md` and run its Open:
    the pulls, who else is working, the designs root, the tracker.
+   A designs root that is not a git repository: tell him in one line
+   and go on; nothing in this stage needs git but the commit at the
+   close.
 3. **An existing slug** resumes (last section). Otherwise:
 4. **The demand.** His sentence, or the tracker request pulled by
    `notion-tracker pull <code>`. Ask now only what would throw the
    whole stage away if guessed wrong (which product or repo, when
    more than one fits); usually nothing.
 5. **The size**, by the table above, from the request alone.
-6. **The folder.** The slug is a short kebab name; create the
-   folder, `notes.md` from the template with the request, and the
-   state: `discovery.mjs state <ws> --stop 1 --state needs-you
+6. **The folder.** The slug is a short kebab name;
+   `discovery.mjs init <ws>` creates the folder and `notes.md` from
+   the template (write the request in it), then the state:
+   `discovery.mjs state <ws> --stop 1 --state needs-you
    --about "<tell me everything>" --lang <his language> --set
    size=<size> --set kit=<kit> --set session="discovery · <slug>"`.
 7. **Another workstream holds him** in a discovery or a design
@@ -142,6 +146,11 @@ By [references/interview.md](references/interview.md) and
 | `words` | words he used that the product already uses for something else |
 | `design-system` | when a screen changes: the design system as paths (tokens, shared components, the app shell, that screen's source) and screenshots of the screen today |
 
+One scout may take two small topics (`words` with `neighbors`). When
+he has finished talking and the `today` scout has not answered, send
+the "running without you" template with what is being read; the
+readback waits for `today` and `standards` only.
+
 Every agent of this stage is the stage's own, named `discovery-…`
 (`<kit>/agents/`); no other stage dispatches them.
 
@@ -164,7 +173,8 @@ to the writer in one message. What it listed under Open you settle
 from the notes, or it is a question to him.
 
 Then start stop 6, and stop 5 when a screen changes, **in the same
-turn**: the review does not wait for the mock.
+turn**: the review runs while the mock is drawn. He is shown the
+screen once, after the review's fixes are in it.
 
 ## Stop 5 · The mock, when a screen changes
 
@@ -174,8 +184,11 @@ in the background with: `stories.md`, `notes.md`, the recon folder
 `templates/mock.html`, the script, the workstream path. Keep its
 agent id in `.state.md`.
 
-When it returns: `check`, write `discovery/page.json` (status "screen
-in review"), `page`, look at the pictures it checked, publish
+When it returns, and the review's fixes have landed, his review
+questions are answered and the designer has had its round with what
+changed ([references/review.md](references/review.md), Fixes step
+5): `check`, write `discovery/page.json` (status "screen in
+review"), `page`, look at the pictures it checked, publish
 ([references/gate.md](references/gate.md), The page). Then the "back"
 template with the link, 🔴, and a push notification. He walks the
 tour and reacts; you run the rounds; he says it is right; you lock.
@@ -188,12 +201,12 @@ stop 5.
 ## Stop 6 · The review, one round
 
 By [references/review.md](references/review.md). `check`, `split`,
-the workflow, then you rule every confirmed finding: the writer's
+the workflow, then you rule every place it confirmed: the writer's
 fixes in one batch, yours in his place, his as questions, the
 design's to its list. The second pass reads only the diff.
 
-With a screen, his questions from the review wait until the mock is
-locked, then go one at a time.
+His questions from the review go out as soon as the rulings are
+written, one at a time, before he is shown the screen.
 
 ## Stop 7 · The gate, and the close
 
