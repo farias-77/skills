@@ -126,7 +126,7 @@ applied. His answers go into the board with his words.
 the live checkout the sessions read: the approved edit and nothing
 around it; the pipeline stays generic (no company, product or private
 name); `node --check` on a workflow or script, `bash -n` on a shell
-file, then `bash tests/run.sh`; show him the diff.
+file; show him the diff.
 
 **The standards**: load the `standards` skill in update mode with the
 project and the approved rows. It opens one pull request in that

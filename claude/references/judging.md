@@ -58,30 +58,34 @@ Every ruling is one line of the workstream's `rulings.md`:
 2026-10-05 · design D6 · design-security#S-2 · conductor: conservative (scope from the actor) · ruled: conductor · "keeps the lock, reversible"
 ```
 
-## Discovery (D4, the review)
+## Discovery (stop 6, the review)
 
-The oracle is what he decided: the **locked mock** when a screen
-changes (what does it do? `proto.mjs look` on the locked version,
-never memory), otherwise the notes' Confirmed lines, Rules and Out. Detail and calibrations:
-`stage-discovery/references/playback.md`.
+The oracle is what he decided: the notes' lines marked `said` and
+`accepted`, the Rules table, `not-building.md`, and the locked mock
+when a screen changes. A line marked `assumed` is the conductor's
+guess, not his decision. Every finding reaches the conductor already
+checked, with its class: a hunter's claim by a
+`discovery-finding-verifier`, a story's two blind readings by a
+`discovery-reading-comparer`. Detail:
+`stage-discovery/references/review.md`.
 
-| Ruling | When | Goes to |
+| The class | Ruling | Goes to |
 |---|---|---|
-| fix, owner `story-writer (Sonnet 5.5, high)` | the fix changes how something is written and decides nothing: an AC rewritten to the oracle, a THEN given its place, two ACs on one rule merged | the writer, one batch, no question |
-| his, at the playback | the fix changes the behavior he decided (an amendment), scope, personal data, money, a stated constraint, or contests what he confirmed | one question per decision, inside the story's playback call |
-| for the design | the answer is a mechanism: a lock, a retry, a status code, a storage shape, a threshold | `reviews.md` "For the design"; never asked |
-| dismissed | taste, wording, a divergence that builds the same thing, a misread | with its quote |
+| `writing`: the oracle settles it and the story says otherwise, omits it, or leaves two readings | fix | `discovery-story-writer (Sonnet 5.5, high)`, one batch, no question |
+| `gap` with a conservative answer (smaller scope, what the product already does, cheap to undo) | the conductor decides in his place | a new assumption, `ruled: conductor`, shown at the gate as "decided for you" |
+| `gap` that changes something he said or an assumption he was shown, is costly or impossible to undo, or touches personal data, money, or a legal or stated constraint | his | one question, as soon as the rulings are written |
+| `mechanism`: a lock, a retry, a status code, a storage shape | for the design | the stories' "For the design"; never asked |
+| `note` | nothing built changes | `discovery/review/reviews.md` |
 
-**Never dismissed:** personal data, money, legal and stated
-constraints, a confirmed fact contested with a quote, a story that
-contradicts the oracle. In doubt between the writer and him: him.
+**Never ruled in his place:** personal data, money, legal and stated
+constraints, something he said contested with a quote. In doubt
+between the conductor and him: him.
 
-The lenses are `disc-lens (Sonnet 5.5, medium)` × 3 (**in-out**,
-**coverage**, **acceptance**); the double-blind is two
-`story-reader (Haiku 5.5, high)` and a `blind-judge (Sonnet 5.5,
-medium)` per story, whose kinds are **diverge**, **contradicts** and
-**undecidable**. A `contradicts` is evidence, not a verdict: run the
-reader's steps yourself.
+The panel is `discovery-hole-hunter (Sonnet 5.5, medium)` × 4
+(**errors**, **access**, **limits**, **code**) and, per story, two
+`discovery-story-reader (Haiku 5.5, high)` in different seats
+(builder, tester) that do not see each other. One round; the second
+pass reads only the diff of each fix.
 
 ## Design (D2 and D6, after his "closed")
 

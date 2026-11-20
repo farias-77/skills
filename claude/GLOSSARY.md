@@ -21,13 +21,17 @@ is here, it uses this one.
 
 | Term | Meaning |
 |---|---|
-| **mock** | the exact, clickable prototype of a changed screen, built after the stories in the project's own design system, only as wide as the change; none when no screen changes |
-| **the lock** | discovery's closed output: `stories.md` with frozen AC ids and, when a screen changes, the mock frozen once he says it is ready (`LOCK.json`, `versions/v<N>.html`, `frames/`); changed after only by an amendment |
-| **AC** | an acceptance criterion: exactly one per rule or behaviour, judgeable by a stranger |
-| **playback** | his story-by-story confirmation (Confirm · Adjust · Cut), four stories per question call |
-| **disc-lens kinds** | **in-out** (In or Out, nothing in limbo) · **coverage** (every rule has its AC; limit, dependency failure, permission, repeat walked) · **acceptance** (a stranger can pass or fail it) |
-| **double-blind** | two readers read one text alone (`story-reader` for a story, `blind-reader` for a brief); a `blind-judge` compares them |
-| **blind-judge kinds** | **diverge** (two readings) · **contradicts** (the mock or another text says otherwise) · **undecidable** (something is missing) |
+| **readback** | discovery's one message after he talks: what was understood, what will be assumed (with its source, most costly first), and what only he decides |
+| **provenance** | how a line of `notes.md` was decided: **said** (his words), **accepted** (proposed, and he said yes to that item), **assumed** (proposed, not answered) |
+| **criterion** | an acceptance criterion: exactly one per rule or behaviour, with real values and the place each outcome is seen; its id is `J<journey>.s<step>.<n>` |
+| **not-building** | `not-building.md`: what was decided not to build, each line an `NB-n` with its reason; a later request for it is an amendment, not a bug |
+| **guided mock** | the changed screen built from the project's own design system: one real screen, a switch between its states, and a tour of about five stops that says where to look and which rule each stop proves; none when no screen changes |
+| **the lock** | the mock frozen with his words once he walked the tour (`mock/LOCK.json`); changed after only by an amendment |
+| **the gate** | discovery's stop 7: he approves the stories, what was decided for him and the mock on one page; after his yes the ids freeze (`discovery/ids.json`) |
+| **hunt** | one kind of hole a `discovery-hole-hunter` looks for: **errors** · **access** · **limits** · **code** (a small demand runs them as one, **whole**) |
+| **seat** | the point of view of a `discovery-story-reader`: **builder** or **tester**; two seats read each story without seeing each other, and their disagreement is the finding |
+| **verifier classes** | what a `discovery-finding-verifier` (a hunter's claim) or a `discovery-reading-comparer` (a story's two blind readings) returns for a finding that holds: **writing** (the text is wrong or reads two ways) · **gap** (nobody decided it) · **mechanism** (the answer belongs to the design) |
+| **double-blind** | plan: two `blind-reader`s read one brief alone and a `blind-judge` compares them (**diverge** · **contradicts** · **undecidable**) |
 | **solution** | design's one solution sized to the problem, with its evolution path v1 → v2 → v3, in `solution.md`: drafted, debated, closed, then expanded for the builders |
 | **the debate** | design's rounds with him over the solution, drawn as one page, until he says "closed" |
 

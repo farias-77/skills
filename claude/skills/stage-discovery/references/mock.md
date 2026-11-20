@@ -1,250 +1,231 @@
 # The mock
 
-Read by `prototype-builder (Sonnet 5.5, high)` before every build and
-by the conductor (Opus 5.5, high) when it writes a round order. A mock
-exists only when a screen changes; it is built after the stories, from
-`stories.md` and the notes, and he iterates it until he says it is
-ready. At the lock it becomes the reference every later stage builds
-against: the journeys become test walks, the frames become the pictures
-the real screens are compared with. So it is **exact** (looks and
-behaves like the real thing will), **complete** for the change (every
-state the changed screen really reaches is there and reachable),
-**only as wide as the change**, and **never fragile**.
+Stop 5, only when a screen changes. Read by the `discovery-mock-designer`
+before every build and by the conductor before every round. The mock
+is **one real screen**: built from the project's design system,
+inside the product's real frame, with a switch for its states and a
+short guided tour that shows him where to look. He reacts to it until
+he says it is right; locked, it is the screen every later stage
+builds.
 
-The order of authority: his words, then the project's design system,
-then the `draw-it-for-me` skill (only for what the project does not
-decide).
+One screen with a state switch, never one picture per state: a mock
+of eighty near-identical frames hides the three things that changed.
 
-## The page contract (a claude.ai artifact)
+Order of authority: his words, then the project's design system, then
+your own judgment for what the project does not decide.
 
-The platform enforces these; a page that breaks one renders broken,
-with no error shown.
+## The file
 
-- **No skeleton.** No `<!doctype>`, `<html>`, `<head>` or `<body>`, not
-  even inside a comment: the publish adds them. The file starts with
-  `<title>`.
-- **Scripts** only from `cdnjs.cloudflare.com` (preferred),
-  `cdn.jsdelivr.net/npm/` or `unpkg.com`, pinned, before the inline
-  script that uses it. The shell needs none.
-- **Stylesheets** only from Google Fonts, each face with a fallback
-  stack. All other CSS inline.
-- **No other network.** No `fetch`, no image from any host, no iframe,
-  no form `action`. Images are inline SVG or small `data:` URIs.
-- **No `alert`, `confirm`, `prompt`, `window.print`.** A confirmation
-  is a state of the page.
-- **Addresses** are bare `#tokens` (the shell's router), never a query
-  string.
-- **Themes.** Every color is a token on bare `:root`, redefined under
-  `@media (prefers-color-scheme: dark)` guarded by
-  `:root:not([data-theme="light"])`, and again under
-  `:root[data-theme="dark"]`. No literal color in a component rule.
-- **Width.** Works at 390 px with a 16 px gutter and no sideways page
-  scroll; only a table or a chart scrolls inside its own box. The
-  phone width is a 390 px device drawn inside a wide window, so a
-  `@media` query never fires: `#screen` is a container named `screen`,
-  and narrow rules are `@container screen (max-width: …)`.
-- **Size.** Under 300 KB.
+`mock/mock.html` holds four blocks and nothing else
+([templates/mock.html](../templates/mock.html)):
 
-## The shell contract
-
-Start from `templates/prototype-shell.html`, never from a blank page.
-Four places are yours: the `<title>` (`Mock - <feature>`),
-the style block `id="tokens"`, the style block `id="product"`, and the
-script block `id="product"`. Keep the three blocks as files,
-`prototype/_src/tokens.css`, `product.css` and `product.js`, and build
-`index.html` from them with
-`node <proto.mjs> assemble <prototype>/index.html --shell <shell> --title "Mock - <feature>" --tokens <_src/tokens.css> --css <_src/product.css> --js <_src/product.js>`;
-never edit `index.html` by hand. The blocks marked SHELL are not
-yours; a bug there is reported, never patched.
-
-The product block is one `P.define({...})` call:
-
-| Key | Holds |
+| Block | Holds |
 |---|---|
-| `meta` | `name`, `version` (bumped every build), `languages`, `clock` (the fixed "now"), `currency`, `fixtures` (every person's name in the seed, all invented) |
-| `copy` | `{ <lang>: { key: string, or { one, other } } }`: every visible string, every language |
-| `seed()` | a fresh store: `{ screen, view: { <screen>: { state, fields } }, db: { <table>: [rows] } }` |
-| `screens` | `{ <name>: { title, variants, render(s, P) } }`: `render` is pure, reads `s`, returns `P.html\`…\``; `title` names the screen; `variants` (two or more names) are that screen's design options, `P.variant()` reads the one picked |
-| `frames` | `{ '<screen>.<state>': { title, setup(s), debugOnly?, terminal? } }`: every state the mock can show |
-| `actions` | `{ <name>: (s, ctx, P) => … }`, named by `data-act`; may `await P.request` |
-| `journeys` | `[{ id: 'J1', title, actor, job, rules, start, steps: [{ id: 's1', do, target, fill, net, expect, see, effects, rules }] }]` |
-| `variants` | legacy, for every screen at once: prefer each screen's own `variants` |
-| `actors` | when more than one kind of user sees it: `[{ id, title, home }]`, the controls' "View as" |
-| `clock` | when time changes what is shown: `{ marks: [{ label, at }], onAdvance(s, P) }`, the controls' "Clock" |
-| `review` | the path he follows with Ctrl+→: `[{ frame, check, as, theme }]`, every state he must see in the order of the flow, each with one line of what to check from the story's ACs, the actor it is seen as (`as`), and `theme: 'dark'` where a dark view matters |
-| `meta.uiLang` | the language of the controls' labels: `en` (the default) or `pt-BR`; `meta.ui` overrides any label |
+| `<style id="mock-tokens">` | the product's tokens as custom properties on `.screen`, and again on `.screen[data-theme="dark"]` when the product has a dark theme; `@font-face` and `@keyframes` go here too |
+| `<style id="mock-product">` | the screen's CSS, written as if `.screen` were the page. It is nested inside `.screen { … }` at build time, so `&` is the screen itself and no rule can leak into the page around it. No `:root`, `html` or `body`. Narrow layouts use `@container screen (max-width: …)`, never `@media`: the screen is drawn inside a page |
+| `<script type="application/json" id="mock-tour">` | `title`, `width` (`desktop` or `phone`), `minutes`, `states` (`id`, `label`), `tour` (the stops) and, when the product has one theme only, `themes: ["light"]` |
+| `<script id="mock-screen">` | `function MOCK_SCREEN(state)`, pure, returning the screen's HTML for that state |
 
-Helpers: `P.html` (escapes; `P.raw` for trusted markup), `P.t(key,
-vars)`, `P.fmt.number/money/date/time/relative`, `P.nav(screen, state,
-extra)`, `P.view()`, `P.request(name, fn)` (the fake network; `fn`
-writes only on ok or slow), `P.effect(kind, data)`, `P.toast(text)`
-(transient only), `P.now()`, `P.actor()`, `P.render()`.
+Rules of the screen function:
 
-**The product fills the window; he sees only the product, and moves
-with Ctrl+→ and Ctrl+←.** The review is the one way through the mock:
-every state that is not `debugOnly` (normal, loading, empty, error and
-the screen's own), each already seen as the right actor, and every
-screen once in each theme, so he never opens a control to see
-something. Write `review` so it holds all of that in the order of the
-flow; the shell adds any frame left out, and a dark pass (the screen's
-first step again) for a screen with no dark step. The controls are one
-thin bar at the top, a label: "‹ 7/48 <what to check here> ⋯ ›", a
-"◆ 2" when the screen has design options, a red dot on a mock problem.
-The page moves down by the bar's height, so the bar never covers the
-product; H hides the bar. Everything else sits behind "⋯" (Esc closes
-it): the step's screen, state, actor and theme, the design options, the
-width (Fit, Phone, Desktop; the review renders at the width he picks,
-never one step per width), the language, "All steps" to jump. Write each
-`check` as the one sentence he reads on that bar: short, concrete, what
-to look at on this screen. No state picker, "view as", theme, clock or
-journey is shown: the review covers them. Inside a published artifact
-the `#hash` does not reach the page; the review is the way there. So every state he must be able to see is a
-frame with its own title (a loading state is a frame, not a slow
-request he has to time). Never draw a "view as" switch, a clock or a
-"Mock" strip inside `#screen`: everything there is in the reference
-frames.
+- One function draws every state from the same markup; a state
+  changes values and adds or removes a piece. Copying the whole
+  screen per state is the frame-per-state mock again.
+- Every region is wrapped in an element with a `data-part` name
+  (`nav`, `header`, `form`, `list`…). The tour points at parts.
+- A control that moves to another state carries
+  `data-go="<state id>"`, so he can click through the screen as if it
+  were the app.
+- No network, no timers, no randomness, no real clock: fixed data,
+  fixed "now". Images are inline SVG or a placeholder at the real
+  size.
+- A Google Fonts `<link>` is the only outside resource allowed.
 
-## Rules the walk enforces
+The page around the screen (the tour bar, the state switch, the map,
+full screen, the keys) is the stage page's; you never write it.
 
-`node proto.mjs walk` checks them; a failing walk is never published.
+## The real product
 
-- A screen's state is **one value** (the frame token's tail), never a
-  set of booleans.
-- Every state the mock reaches is a **frame** whose `setup` reaches it
-  from `seed()`. A state no journey reaches (one only the tools render)
-  is `debugOnly`; every other frame is visited by a journey.
-- **Every visible string is a copy key** present in every language.
-- An action is reached through `data-act` on a button or a `<form>`.
-  Inputs have a `name`, an `id` and a `<label>`.
-- A **journey step** has exactly one event (`target`, `as` or `clock`),
-  lands on its `expect` frame, shows its `see` keys and produces
-  exactly its `effects`; a step that produces nothing says
-  `effects: []`. `net` sets the next request's answer.
-- **`P.effect` records the whole write**: every field of the row, the
-  e-mail or the event. The effects (`window.proto.effects()`, the
-  walk's report) are what the story writer and the blind readers read
-  as "what was written"; a field missing there reads as not written. A field a mock cannot know: `partial: true`.
-- Nothing is a dead end: something on screen can be acted on, or the
-  frame is `terminal` and the builder's report says why (the conductor
-  writes it to the notes). A journey's `start` counts as visited.
-- Journey and step ids are the stories' (the AC ids derive from them).
-  Before the first lock, a step the mock adds takes the next free id
-  and a removed step leaves its id unused; the lock renumbers `s1, s2,
-  …` in play order and the anchor moves the AC ids with the map. After
-  the anchor, a step an amendment adds is appended at the journey's
-  end, or becomes an extension journey: the ids never move again.
+The recon gives the paths: the tokens, the shared components, the app
+shell, the source of the screen the change sits in, and screenshots
+of it as it is today. Open those files and copy from them.
 
-## Which states
+- **Tokens.** Map the project's token source onto custom properties,
+  both themes when it has both. No literal color in the product CSS.
+- **Components.** Reproduce each component the changed screen uses
+  from its source: height, padding, radius, border, type size, icon,
+  density, how a field shows its error. Use the component the product
+  has; a new one is a decision, listed in your report.
+- **The frame.** The app shell, the navigation and the sibling tabs
+  are copied faithfully and are static. He judges the change in
+  place.
+- **Only as wide as the change.** The change is exact and
+  interactive. A region next to it that it does not touch is a simple
+  copy when cheap, otherwise a quiet block at its real size. Read
+  only the source of the screen and the shell.
+- **Data.** Realistic and worst case: invented names, a long e-mail,
+  counts of zero, one and many, a missing optional value. The names
+  and values are the stories' fixtures, so the screen and the
+  criteria show the same example.
+- **Copy.** The words on screen are the stories' words: a string
+  quoted in a criterion appears exactly so. Every other string
+  follows the product's voice in the screens around it.
+- **No design system** (the recon found none): say so in the report
+  and keep the look plain and consistent. Where the project decides
+  nothing, stay clear of the generic defaults: a cream page with a
+  serif headline, a purple-to-blue gradient, pill buttons everywhere,
+  emoji as icons, a card around every element.
 
-**The states the screen really reaches**, never a catalogue. For each
-screen ask which of these the product can actually be in: ideal, empty
-(first use, cleared, no results), loading, partial, error, no
-permission; for each action: idle, submitting, success, refused by a
-rule, failed dependency. Build those; skip the ones it cannot reach.
+## The person, before the pixels
 
-A rule with a number has its boundary reachable: a fixture or a clock
-mark on each side of it (the 24 h: marks at +23 h 59 min and +24 h), so
-its one AC is observed at the boundary, never "a day later".
+Before any markup, walk the main flow of each story as the person who
+does that job, and write what you find in your checklist. A screen
+that matches the design system and makes him think is not done.
 
-The four error paths of every journey (a limit hit, a dependency down,
-a permission refused, a repeat) each map to a state, and the state to
-a journey or a debug-only frame. An error says what happened and what
-to do, sits next to its source, and keeps the input. A state the notes
-do not settle is built at its most direct reading and listed as
-Inferred, never left out.
-
-## Looking like the real product
-
-The project's design system is the look; this file never names one.
-The recon (`recon/*.md`) gives its paths: the tokens, the shared
-components, the app shell, the source of the screens the change sits
-in, and screenshots of them. Open those files and copy from them.
-
-- **Tokens.** Read the project's token source (an exported tokens
-  file first; otherwise the CSS variables or theme config the recon
-  names) and map each value onto the shell's names (`--background`,
-  `--foreground`, `--muted`, `--muted-foreground`, `--border`,
-  `--input`, `--ring`, `--primary`, `--primary-foreground`, `--card`,
-  `--success`, `--warning`, `--warning-text`, `--danger`,
-  `--radius-*`, `--font-sans`, `--font-mono`, `--ease-out`), keeping
-  the three-block shape. Both themes when the product has both.
-- **Components.** Reproduce each component the changed screen uses from
-  its source: height, padding, radius, border weight, type size, icon
-  family and size, density, how a field shows its error. Never invent a
-  component the product has; never restyle one. Where a component
-  disagrees with the Copy rules below (an empty state with no reason
-  line), the component wins. A control the product shows only on hover
-  is drawn visible in the frames that need it, listed as Inferred.
-- **Data.** Realistic and worst case: real-sounding invented names in
-  each language, messy numbers, a long e-mail, a long name, counts of
-  0, 1 and many, a missing optional field. Never "John Doe", "Test 123"
-  or lorem ipsum. Every name is listed in `meta.fixtures`; e-mails on
-  reserved domains (`example.com`, `.test`). A real person's name is
-  personal data and never appears.
-- **Photos.** A one-file mock carries no real photos: draw a
-  placeholder at the real size and crop (the aspect, the focal point),
-  never a stock picture. "Photos not locked" goes as a gap at the lock.
-- **Without a design system** (the recon found none): keep the shell's
-  defaults and say so in the report's Gaps.
-
-## Only as wide as the change
-
-He judges the change in place, so the screen around it is drawn, but
-the work goes into the change. Sort every region of the screen:
-
-| Region | How it is built |
+| Ask | The screen answers when |
 |---|---|
-| the change: the new screen, tab, control, column, state | exact, interactive, every state it reaches |
-| the frame that gives it place: the app shell, the sidebar, the header, the sibling tabs | copied faithfully from the source, static: a sibling tab or link does nothing, or is not clickable |
-| content next to the change that it does not touch | a simple copy when that is cheap; otherwise a quiet block at its real size and position |
+| what does this person come here to do, and what do they see first? | the thing they came for is the first thing the eye lands on, above anything the product wants to say |
+| what is the one action of this state? | one control is the most visible; the secondary ones are quieter; a destructive one stands apart and names what it destroys |
+| how short is the path? | every field is one the job needs, in the order the person thinks of them; what the product already knows is filled in; nothing is asked twice |
+| can a refusal be seen coming? | a limit shows before it is hit ("7 of 10 today"), a control that cannot be used says why, and an error appears next to its cause |
+| what tells them it worked? | the result shows where they are already looking, in the words of what they did, and what can be undone says how |
+| does it work without a mouse, and on a phone? | the tab order is the reading order, Enter does the main action, focus lands on the first field and returns to where they were; at 390 wide every target is at least 44px and the main action is in reach |
+| do the words do the work? | a label says what the control holds in the product's vocabulary; a button is a verb with its object ("Send invite", never "Submit") |
 
-Read only the source of the screens the change sits in and the shell;
-never explore or rebuild the rest of the product. A region that would
-take long to copy and does not affect the change is a block, and the
-report says so in one line.
+A choice here that changes a rule, a number or the scope is not
+yours: draw the most direct reading and list it.
 
-## Copy
+## The craft of what is new
 
-Every language written together, each one native, never translated
-word for word. Buttons are verb + noun ("Send invite"); an error says
-what happened and what to do; an empty state has a title, a reason and
-one action. No "Oops", no "Something went wrong", no "Are you sure?",
-no "invalid", no "the user". Numbers, dates and money through `P.fmt`.
-The words are the notes' Vocabulary.
+The frame is copied. What the change adds is designed, with the
+project's own means and nothing else:
 
-## Motion
+- **Hierarchy.** One thing stands out per region, by size, then
+  weight, then contrast. Blur your eyes at the picture: what is left
+  visible is what he will read first.
+- **Spacing.** Only steps of the project's spacing scale. Things that
+  belong together sit closer than things that do not: the gap inside
+  a group is smaller than the gap between groups. New elements align
+  to the edges and columns the screen already has.
+- **Type.** The sizes and weights the product already uses; no new
+  size. Prose runs 45 to 75 characters a line; numbers in a column
+  are tabular and right-aligned.
+- **Density.** The same as the screen around it: a roomy block in a
+  dense table reads as another product.
+- **Controls.** Hover, focus, pressed and disabled are drawn as the
+  product draws them, with a visible focus ring.
+- **Restraint.** Reuse before adding. An element the job does not
+  need is removed; a border, a shadow or a color that separates
+  nothing is removed.
 
-Every animation names its purpose (feedback, origin, state change).
-Product UI: press 100–160 ms, menus 150–200 ms, modals 200–250 ms,
-nothing over 300 ms; `transform` and `opacity` only; never
-`transition: all`. Frequent actions do not animate.
-`prefers-reduced-motion` keeps opacity only. Frames render in still
-mode, so motion never changes a frame.
+## The states
 
-## Never fragile
+The states the screen really reaches, not a catalogue. For the
+changed screen ask which of these can happen: ideal, empty, loading,
+partial, error, no permission; and for each action: idle, submitting,
+done, refused by a rule, failed dependency. Build those and skip the
+rest. Every extension journey of the stories has its state. A good
+state passes its own test:
 
-- `render` never throws; guard every optional value; no `undefined` on
-  screen.
-- No randomness, no real clock, no timers of your own: time is
-  `P.now()`, waits are `P.request`.
-- Every selector a journey uses exists on the step's screen.
-- Long text wraps (`overflow-wrap: anywhere` on e-mails and ids);
-  nothing clips at 390 px in any language.
+| State | Passes when |
+|---|---|
+| empty | it says why it is empty and offers the next action |
+| error | it names what failed and what to do, next to its source, and keeps what he typed |
+| refused by a rule | it says the rule and when it stops applying |
+| no permission | the control is absent or disabled with the reason, as the product does elsewhere |
 
-## Publishing
+Four to eight states is typical. A state the stories do not settle is
+built at its most direct reading and listed in the report.
 
-The builder publishes its own file with the `Artifact` tool, always to
-the same URL, after a green walk.
+## The tour
 
-| | First publish | Every later publish |
-|---|---|---|
-| Call | `file_path` = `00-discovery/prototype/index.html`, `icon: "prototype"`, a one-sentence `description`, `capabilities: {"comments": {"composer_only": true}}` (load the `artifact-capabilities` skill first) | the same `file_path`; with `url` when this builder did not publish it in its own conversation (read it first, as the tool asks); no `icon`, no `capabilities` |
-| Before | `cp index.html versions/v<N>.html` | the same |
+About five stops, two minutes. Each stop is `focus` (a `data-part`),
+`state`, `why` (one or two short sentences, written to him) and
+`proves` (the story, rule and criterion ids that stop shows). The
+order tells the story of the change:
 
-The edits of one round order are published together, once, so the mock
-does not flicker.
+1. where it lives (the frame; nothing else changed);
+2. the main action;
+3. what is new on the screen;
+4. what can go wrong (the rule that refuses, the failure);
+5. the result.
 
-**Local mode** (no `Artifact` tool: a headless or cloud session):
-`node proto.mjs shots 00-discovery/prototype/index.html <the changed
-states and journeys>` writes `prototype/shots/v<N>/`; the report gives
-the PNG paths and the path of `index.html`.
+One more stop only for something he decided and would want to see (a
+second actor's view). The tour shows what changed and what proves a
+rule; the state switch and the map cover everything else.
+
+## Check it before he sees it
+
+He is shown the screen after the review's fixes are in it: the
+designer draws while the review runs, then gets one round with what
+the review changed ([review.md](review.md), Fixes step 5). What the
+designer reports as "Drawn without a decision" you settle from the
+notes and the rulings before the link goes out; where the designer
+and a ruling chose differently, the ruling stands.
+
+```
+node <discovery.mjs> shots <workstream>
+```
+
+renders every state in light and dark at 1280 and 390 wide and every
+tour stop, and fails on a console error, a sideways scroll or a stop
+that highlights nothing. Then look at what you built:
+
+1. Open the 1280 light picture of each state beside the recon's
+   screenshot of the real screen. The frame around the change should
+   be hard to tell apart: same spacing, same type, same component
+   shapes.
+2. Open the 390 pictures: nothing clipped, nothing overlapping, long
+   values wrap.
+3. Open one dark picture per state when the product has a dark theme.
+4. Look at each state once more as the person doing the job. In
+   three seconds, can you say what this screen is for and what to do
+   next? Is the main action the most visible thing? Is anything on it
+   that the job does not need? Measure two gaps of the new part
+   against the scale.
+5. Fix what you see, run `shots` again, and report with the pictures
+   you checked.
+
+`discovery.mjs check` proves the tour: every state exists, every
+focus is a part, every `proves` id is in the stories.
+
+## Rounds (the conductor)
+
+He reacts in the chat and in comments on the page.
+
+1. Read every comment and every chat line of the round before
+   ordering anything. An order that skips a comment costs a round.
+2. Sort each item:
+
+   | Item | Path |
+   |---|---|
+   | look, copy, layout, a missing state, a name | straight to the designer |
+   | a rule, a number, scope, data shown, a journey added or cut | restate it to him in one line and confirm first; write it to the notes as `said`; then the designer, and the `discovery-story-writer` for the stories it touches |
+
+3. One order per round to the same designer, one line per change:
+   its source (`chat`, `comment <id>`), his words, your restatement.
+4. After the build: `check`, `page`, publish, answer each comment
+   with what was done, and send him the link with what changed (the
+   page highlights it).
+
+Two design options for one region are shown as two states with the
+option in the label, and the tour stops on each.
+
+## The lock
+
+```
+node <discovery.mjs> lock <workstream> --words "<what he said>"
+```
+
+- He says the screen is right in his own words, in any language;
+  there is no magic word. When a message could be read either way,
+  ask.
+- His words must come after he had the link in hand and time to walk
+  the tour: a reply to the message that carried it. A lock is never
+  taken from silence, from an earlier "looks good" about a
+  description, or while he is away. A session running on its own
+  waits at this stop.
+- The script refuses without green `shots` of this exact file and a
+  passing `check`. After the lock the file changes only by an
+  amendment at the gate, which locks again with the words of that
+  answer.

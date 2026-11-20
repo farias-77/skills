@@ -3,7 +3,7 @@
 Every agent of the pipeline runs on **Opus 5.5** or **Sonnet 5.5**,
 and on **Haiku 5.5** only for a role where a blinded A/B on real past
 dispatches showed it ties (no worse on the blind verdict, no worse on
-false greens): today `scout`, `story-reader`, `blind-reader` and `exec-gate`. The
+false greens): today `scout`, `discovery-scout`, `discovery-story-reader`, `blind-reader` and `exec-gate`. The
 evidence is in each row. Three findings carry most of the table:
 
 - **Opus 5.5 at medium writes the most mergeable code** (FrontierCode
@@ -28,12 +28,15 @@ the row together.
 | `video-builder` | every stage's report, the close's users' video | Sonnet 5.5 | high | One film from a fixed brief on a motion library, scored from its own frames; composition and scale are visual judgment, so high |
 | `slides-builder` | every stage's report | Sonnet 5.5 | medium | A deck from a layout guide and the stage's files; medium follows a fixed guide well |
 | `artifact-builder` | discovery, design, a release incident | Sonnet 5.5 | medium | One explainer page from the draw-it-for-me references |
-| `story-reader` | discovery | Haiku 5.5 | high | Reads one story blind and walks the mock. The earlier A/B on stories had Haiku high win 3 of 8 pairs and pass a known defect twice; he chose Haiku high (27/10/2026); the lenses and the judge still read every story |
+| `discovery-scout` | discovery | Haiku 5.5 | high | The stage's own scout: one recon topic per call (today, standards, neighbors, words, design-system). Same evidence as `scout` |
+| `discovery-story-reader` | discovery | Haiku 5.5 | high | Two per story, one as builder and one as tester, each committing to a case that passes and one that fails; the signal is where the two differ. The earlier A/B on stories had Haiku high win 3 of 8 pairs and pass a known defect twice; he chose Haiku high (27/10/2026); a verifier compares both readings with what was decided |
 | `blind-reader` | plan | Haiku 5.5 | high | Reads one brief blind. Haiku high won 9 of 10 blinded pairs against Sonnet low (1 tie), 0 false greens |
-| `blind-judge` | discovery, plan | Sonnet 5.5 | medium | Compares two readings key by key; reports only where the text failed |
-| `prototype-builder` | discovery | Sonnet 5.5 | high | Builds the mock of a changed screen from the stories and the project's design system, then one round order at a time; each round is small and he reviews it. Raised to high (27/10/2026): at medium Sonnet 5.5 skips checks and stops early on long tasks, and the first build is long |
-| `story-writer` | discovery | Sonnet 5.5 | high | Writes stories and ACs from the interview notes, then anchors them on the locked mock when there is one: templated writing |
-| `disc-lens` | discovery | Sonnet 5.5 | medium | One checklist lens per call (in-out, coverage, acceptance) |
+| `blind-judge` | plan | Sonnet 5.5 | medium | Compares two readings key by key; reports only where the text failed |
+| `discovery-mock-designer` | discovery | Opus 5.5 | high | Designs the guided mock from the project's design system and checks its own screenshots against the real screen: visual judgment. To be compared with Sonnet 5.5 high on real mocks |
+| `discovery-story-writer` | discovery | Sonnet 5.5 | high | Writes stories and criteria from the interview notes to a format a script checks: templated writing |
+| `discovery-hole-hunter` | discovery | Sonnet 5.5 | medium | One hunt per call (errors, access, limits, code) |
+| `discovery-reading-comparer` | discovery | Sonnet 5.5 | medium | One story per call: the two blind reports side by side against what he decided |
+| `discovery-finding-verifier` | discovery | Sonnet 5.5 | medium | One hunter claim per call against what he decided; returns confirmed or refuted with the quote |
 | `architect` | design | Opus 5.5 | high | Open-ended design judgment: GDPval 1576 (medium) → 1690 (high) |
 | `overengineering-guard` | design | Opus 5.5 | medium | Cuts what serves no AC and no real risk: judgment on "does this need to exist?" |
 | `design-writer` | design | Sonnet 5.5 | high | One document from a template and the closed solution |

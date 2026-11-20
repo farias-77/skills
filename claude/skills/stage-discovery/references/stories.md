@@ -1,101 +1,152 @@
 # Stories and acceptance criteria
 
-The source of truth for how stories and ACs are written. The
-`story-writer` reads it before it writes, `disc-lens` before it judges,
-and the session before it rules. The stories come from the notes and,
-once a screen's mock is locked, from the mock too. Nothing in a story
-is new: what the writer had to guess is listed as Inferred.
+The source of truth for how the stories are written. The
+`discovery-story-writer` reads it before it writes, the review panel before it
+judges, and the conductor before it rules. The stories come from
+`notes.md`. Nothing in them is new: what the writer had to fill in is
+listed under Assumptions, where he can reject it.
 
-## One AC per rule
+A story file is a behavior contract, not a plan. The test for every
+line: if the implementation could change without anyone outside
+noticing, the line does not belong here.
 
-**One AC per rule or behavior he decided, never one per step, state or
-copy string.** Every AC becomes a test downstream: the count is the
-cost. The locked frames cover the states, the layout and the copy; a
-string that carries a rule (a refusal, an e-mail's content) is a THEN
-line of its rule's AC. A small feature has a few ACs per story; past
-ten in one story, look for two that check the same thing.
+## The files
 
-A behavior is something the product does when someone acts: it writes,
-sends, refuses, keeps, or must not do something.
+| File | Holds |
+|---|---|
+| `stories.md` | vocabulary, the rules, one block per story, the assumptions, the technical questions for the design, Open |
+| `not-building.md` | every capability left out, with its reason |
+
+Templates: [templates/stories.md](../templates/stories.md),
+[templates/not-building.md](../templates/not-building.md). The
+headings, the id formats and the criterion's shape are what
+`discovery.mjs check` reads; keep them as the template has them.
+
+## One criterion per rule
+
+**One acceptance criterion per rule or behavior he decided. Never one
+per step, per state or per string.** Every criterion becomes a test
+downstream, so the count is the cost: one too many is paid on every
+run, one missing is a hole.
+
+A behavior is something the product does when someone acts: it
+writes, sends, refuses, keeps, or must not do something. A string
+that carries a rule (a refusal, an e-mail's content) is a THEN line
+of that rule's criterion. A screen's states, its layout and its other
+copy belong to the mock. A small feature has a few criteria per
+story; past ten in one story, two of them check the same thing.
 
 ## A story
 
-One story per job: the journeys with the same actor and job. The happy
-journey is the main flow; each other journey is an extension at the
-step where it branches. A story carries its actor and job, its
-journeys, its main flow and extensions, its ACs, its error-path table,
-and its In and Out.
+One story per job: the journeys that share an actor and a job. The
+happy journey is the main flow; each other journey is an extension at
+the step where it branches. Each block carries its actor and job, its
+journeys, the flow, its criteria, its error-path table, what is In,
+and the not-building ids that touch it.
 
-**Each story stands alone**: a blind reader gets one story plus the
-vocabulary and must judge every AC from it (and the mock). So an Out
-line that touches the story is repeated in it, and a story cites only
-its own AC ids; another story's criterion is named in words.
+**Each story stands alone.** A reader who gets one block, the
+vocabulary and the rules it cites must be able to say what to build
+and how to judge it. So a block cites only its own criterion ids, and
+names another story's criterion in words ("the limit criterion of
+S-001").
 
-## An AC
+## A criterion
 
 ```
-- **`J1.s2.1`** [INV-1] GIVEN Marina Okafor's workspace has 10 invites sent today
-  WHEN she sends an 11th invite to joao.lima@example.com
-  THEN the form shows `invite.limit` ("You reached today's 10 invites" · "Você chegou aos 10 convites de hoje") (observed: screen)
-  AND the invites list still holds 10 pending invites (observed: row read back)
-  AND no e-mail goes to joao.lima@example.com (observed: inbox)
+- **`J2.s2.1`** [INV-1] GIVEN Marina Okafor's workspace has sent 10 invites today, 2 of them cancelled
+  WHEN she sends an invite to joao.lima@example.com
+  THEN the form shows "You reached today's 10 invites. The count resets at midnight." (seen: screen)
+  AND no invite row exists for joao.lima@example.com (seen: row read back)
+  AND no e-mail reaches joao.lima@example.com (seen: inbox)
 ```
 
 | Part | Rule |
 |---|---|
-| id | `<journey>.<step>.<n>`: the step where the behavior shows first (the notes' steps; after the anchor, the locked step). `frame:<token>.<n>` for a behavior only a debug-only frame shows. Frozen after the anchor, or after the write when no screen changes |
-| `[ ]` | the rule ids it checks (the notes' Rules table), or the story id when no numbered rule covers it. A rule id sits in one AC only |
-| GIVEN | the state before the event, with named fixtures; a state, never clicks |
-| WHEN | exactly one event, declarative |
-| THEN / AND | one observable outcome per line, each with where it is observed: screen (role and accessible name, or copy key with every language's string) · inbox · row read back · event · log · alarm · file |
-| values | concrete: fixture names, numbers with units |
-| must not | effects that must not happen are stated ("no e-mail goes to…", "the count stays 1") |
-| boundary | a rule with a number gets one AC, at its boundary (the 11th refused, the 10th kept) |
-| `[build]` | only when a screen changes, after the rule ids, when the notes' Proof says `[build]`: a rule a one-file mock cannot show (real time, a server's refusal, a reload, a second session). Same shape, observed in the built product |
+| id | `J<journey>.s<step>.<n>`: the step of the notes' journey where the behavior first shows. Assigned once; never renumbered, never reused. After his approval the ids are frozen and every later stage cites them |
+| `[ ]` | the rule ids it checks, from the Rules table, or its own story id when no numbered rule covers the behavior. A rule id sits in exactly one criterion |
+| GIVEN | the state before the event, with named fixtures. A state, never a list of clicks |
+| WHEN | exactly one event, said as what the person or the clock does |
+| THEN, AND | one outcome per line, each ending with where it is seen: `(seen: screen)`, `row read back`, `inbox`, `response`, `event`, `log`, `alarm` or `file` |
+| values | literal and real: a name, a number with its unit, a date and hour, the exact words on screen. They come from the notes' examples. "Quickly", "correctly", "properly" judge nothing |
+| must not | what must not happen is a line of its own ("no e-mail reaches…", "the count stays 10") |
+| boundary | a rule with a number gets its one criterion at the boundary: the 11th refused, the 10th kept |
+
+Fixture names and e-mails are invented, on reserved domains
+(`example.com`). A real person's name is personal data and never
+appears.
+
+**The expected value is never computed by you.** It is what he said,
+or what a system of record holds. When the notes do not say what
+should happen in a case, that is a line under Open, not a criterion
+with a plausible outcome.
 
 ## The four error paths
 
-Every story has a table: **limit** (boundary or invalid input),
-**dependency failure**, **permission**, **repeat** (double submit, two
-tabs, a retry). Each row points to the step or frame with the AC that
-proves it (the refusal, and what is not written), or to an Out line
-with a reason. A path another story proves names that criterion in
-words, with `—` in the AC column. A path that cannot happen here (a
-read-only list has no repeat) is `n/a: <why>`. A row with none of these
-goes to Inferred or Open.
+Every story has the table: **limit** (a boundary or invalid input),
+**dependency failure**, **permission**, **repeat** (a double submit,
+two tabs, a retry). Each row lands on one of:
 
-## Inferred and Open
+- a step and the criterion that proves it (the refusal, and what is
+  not written);
+- a not-building id, when he left that path out;
+- `n/a: <why>`, when the path cannot happen here (a read-only list
+  has no repeat).
 
-- **Inferred** (`I-1`, `I-2`…): every fact written that neither the
-  notes nor the mock hold, with the AC it landed in. Fixture names and
-  e-mails are invented by rule and are not Inferred. The text states it
-  as fact so the document reads as one; the list lets him reject it.
-- **Open**: what the writer could not settle, such as a boundary the
-  notes do not give.
+A row with none of these is a line under Open.
 
-Both go to the playback and are empty before the stage closes.
+An error path gets a criterion of its own when he decided its
+outcome, or when the outcome is new behavior. A path whose outcome is
+what the product already does everywhere (the standard inline error,
+the standard refusal) is an extension line at its step and a THEN
+line in the criterion of the rule it protects; its row points to
+that criterion. The count is the cost.
 
-## Good ACs read like this
+## not-building.md
 
-- Each line is something a tester can see: a message on screen, a row,
-  an e-mail in an inbox.
-- The event is what the person does ("she sends an 11th invite"), not
-  how a script drives the page.
-- The outcome is what the product does, not which function it calls.
-- Every story goes through its limit, its failure, its permission and
-  its repeat.
-- A duplicate submit is checked in the inbox and in the rows, not only
-  on screen.
+One line per capability left out, in one of two kinds:
+
+```
+- **NB-1** — Inviting many people at once — not building: one at a time covers the team sizes he named
+- **NB-4** — Resending a pending invite — later: he wants to see how often invites expire first
+```
+
+The reason is his, quoted or close to it, or yours when he accepted
+it. The predictable next requests of a feature (for invites: resend,
+revoke, bulk) are each built or listed here. A story names the ids
+that touch it.
+
+## Assumptions, For the design, Open
+
+- **Assumptions** (`A-1`…): everything written that he neither said
+  nor accepted, each with its source and its cost if wrong (`cheap`
+  or `costly`). The stories state it as fact so the text reads as
+  one; this list lets him reject it. It is shown at the gate as
+  "decided for you".
+- **For the design** (`T-1`…): questions whose answer is a mechanism
+  (a lock, a retry policy, how long a row is kept). Never asked to
+  him; stage 2 opens on them.
+- **Open**: what could not be settled from the notes. Empty before
+  the gate.
+
+## Work with no screen
+
+When no screen changes, the stories carry the same criteria, and the
+conductor shows him three to five cases instead of a mock: the data
+before, the action, the data after, each with real values and the ids
+it proves. For a migration or a refactor, the existing behavior is
+the oracle and one criterion says so: the same input gives the same
+output as today.
 
 ## The mechanical proof
 
 ```
-node <proto.mjs> trace <mock> 00-discovery/journeys 00-discovery/stories.md --notes 00-discovery/notes.md
+node <discovery.mjs> check <workstream>
 ```
 
-proves that every journey has its YAML with the mock's steps and frames,
-every AC resolves to a step or a frame, every rule has exactly one AC,
-and no story cites another's AC id. With no mock, the same checks run
-against the notes' Journeys:
-`node <proto.mjs> trace none - 00-discovery/stories.md --notes 00-discovery/notes.md`.
-It must pass before the review.
+It proves that every rule has exactly one criterion, every criterion
+has one GIVEN, one WHEN, one THEN and a `(seen: …)` on every outcome,
+every id resolves (journeys, steps, rules, not-building, the tour's
+`proves`), each error-path table has its four rows, the rules match
+the notes', and no frozen id is gone. `--gate` also requires Open
+empty and, with a screen, the lock. It must pass before the review
+and again before the gate.
