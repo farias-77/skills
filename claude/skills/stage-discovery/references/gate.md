@@ -7,21 +7,29 @@ read it is read again.
 ## The page
 
 `discovery/page/index.html`, built by the script from the stage
-files, published as `Report - <workstream>`. It opens on the verdict,
-because few readers go past the first screen:
+files, published as `Report - <workstream>`. He skims it: what is
+his comes first, then the screen, and every list after it starts
+folded, so the first look is a map and not a wall of text.
 
 | Order | Section | From |
 |---|---|---|
-| 1 | the demand in one sentence, with the counts | `discovery/page.json` (`demand`, `status`, `minutes`) |
+| 1 | a short title, the demand under it, the counts | `discovery/page.json` (`title`, `demand`, `status`, `minutes`) |
 | 2 | what he decides | `page.json` `youDecide`: the review's findings that are his |
-| 3 | what was decided for him | the stories' Assumptions, each with its source, the costly ones marked |
-| 4 | the screen: the guided mock, with full screen | `mock/mock.html` |
-| 4 | or, with no screen, the cases | `page.json` `cases`: before, action, after, the ids each proves |
-| 5 | the stories and their criteria | `stories.md` |
+| 3 | the screen: the guided mock under one thin bar (the tour, the state, full screen) | `mock/mock.html` |
+| 3 | or, with no screen, the cases | `page.json` `cases`: before, action, after, the ids each proves |
+| 4 | what was decided for him: the costly ones open, the rest folded by theme | the stories' Assumptions with their sources; `page.json` `groups` |
+| 5 | the stories, folded; each opens on its criteria | `stories.md` |
 | 6 | what is not being built | `not-building.md` |
 
-`demand` is one sentence a stranger understands, with the number that
-matters in it ("Managers invite people by e-mail, 10 a day."). The
+`title` is the change in eight words or fewer, with no counts
+("Archive a project instead of deleting it"). `demand` is one or two
+short sentences a stranger understands, with the number that matters
+in it ("Managers invite people by e-mail, 10 a day."). `groups` sorts
+the assumptions into three to five themes he would name himself ("Who
+can do what", "The words on screen"), each with the assumption ids it
+holds; an assumption in no group shows under "Other". Full screen is
+the screen as the product opens it, at the size of the window, under
+the same thin bar. The
 page is in simplified English
 (`<kit>/references/artifact-writing.md`); the screen's copy is in the
 product's languages.

@@ -1,6 +1,7 @@
 {
   "workstream": "<slug>",
-  "demand": "<one sentence a stranger understands, with the number that matters>",
+  "title": "<the change in eight words or fewer, no counts>",
+  "demand": "<one or two short sentences a stranger understands, with the number that matters>",
   "status": "<screen in review | in review | ready for you | approved>",
   "minutes": 4,
   "youDecide": [
@@ -11,6 +12,9 @@
       "pick": "<the recommended answer>",
       "why": "<what it costs and buys, one line>"
     }
+  ],
+  "groups": [
+    { "title": "<a theme of the assumptions, two to five words>", "ids": ["A-<n>"] }
   ],
   "cases": [
     {

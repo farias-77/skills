@@ -305,8 +305,8 @@ function pageData(ws) {
   // The designer runs shots before the conductor has written page.json: the mock is drawn on a page with no words yet.
   const cfg = existsSync(cfgFile) ? JSON.parse(read(cfgFile)) : { workstream: ws.split('/').filter(Boolean).pop(), demand: '' };
   const data = {
-    workstream: cfg.workstream, demand: cfg.demand, status: cfg.status || 'in progress', minutes: cfg.minutes || 4,
-    youDecide: cfg.youDecide || [],
+    workstream: cfg.workstream, title: cfg.title || '', demand: cfg.demand, status: cfg.status || 'in progress', minutes: cfg.minutes || 4,
+    youDecide: cfg.youDecide || [], groups: cfg.groups || [],
     decidedForYou: S.assumptions.length ? S.assumptions : (cfg.decidedForYou || []),
     cases: cfg.cases || [],
     stories: S.stories.map((s) => ({ id: s.id, title: s.title, job: s.job, criteria: s.criteria })),

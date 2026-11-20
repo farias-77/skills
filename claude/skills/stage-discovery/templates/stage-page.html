@@ -23,7 +23,7 @@ body{background:var(--paper);color:var(--ink);font:18px/1.65 var(--body);padding
 .sec{display:flex;flex-direction:column;gap:24px;min-width:0;container:sec/inline-size}
 .head{display:flex;flex-direction:column;gap:12px}
 .eyebrow{font:600 13px/1.2 var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--soft)}
-.h1{font:600 42px/1.12 var(--display);letter-spacing:-.01em;text-wrap:balance;margin:0;max-width:24ch}
+.h1{font:600 42px/1.12 var(--display);letter-spacing:-.01em;text-wrap:balance;margin:0;max-width:38ch}
 .h2{font:600 30px/1.18 var(--display);letter-spacing:-.01em;text-wrap:balance;margin:0}
 .h3{font:600 20px/1.3 var(--display);margin:0}
 .p{margin:0;max-width:68ch}
@@ -51,6 +51,14 @@ mark{background:var(--mark);color:inherit;padding:.05em .2em;border-radius:.2em;
 .tag{font:600 11px/1 var(--mono);letter-spacing:.08em;text-transform:uppercase;border:1px solid var(--line);border-radius:5px;padding:4px 6px;margin-right:8px;white-space:nowrap}
 .tag.hot{background:var(--solid);color:var(--on-solid);border-color:var(--solid)}
 
+.lead{font-size:19px;line-height:1.5;max-width:76ch;margin:0}
+.more .n{font:500 14px/1 var(--mono);color:var(--soft)}
+.more .item:first-of-type{border-top:0;padding-top:4px}
+.more[open]{padding-bottom:10px}
+.more>summary{cursor:pointer;list-style:none;display:flex;gap:12px;align-items:baseline;padding:14px 0;border-top:1px solid var(--line);font:600 17px/1.3 var(--display)}
+.more>summary::-webkit-details-marker{display:none}
+.more>summary::after,.story>summary::after{content:"+";margin-left:auto;font:600 18px/1 var(--mono);color:var(--soft)}
+.more[open]>summary::after,.story[open]>summary::after{content:"\2212"}
 .story{border-top:2px solid var(--ink);padding:18px 0 6px}
 .story>summary{cursor:pointer;display:flex;flex-wrap:wrap;gap:6px 16px;align-items:baseline;list-style:none}
 .story>summary::-webkit-details-marker{display:none}
@@ -78,21 +86,24 @@ mark{background:var(--mark);color:inherit;padding:.05em .2em;border-radius:.2em;
 
 /* the guided mock */
 .demo{border:1px solid var(--line);border-radius:14px;overflow:hidden;background:var(--paper);container:demo/inline-size}
-.demo:fullscreen{border-radius:0;display:flex;flex-direction:column;overflow:auto}
-.demo:fullscreen .demobody{flex:1}
-.demobar{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;padding:12px 18px;border-bottom:1px solid var(--line);font-size:15px}
-.dots{display:flex;gap:6px}
-.dots i{width:9px;height:9px;border-radius:50%;border:1.5px solid var(--ink)}
-.dots i.on{background:var(--ink)}
-.demobody{display:grid;grid-template-columns:minmax(0,1fr)}
+/* the mock is the screen under one thin bar, nothing beside or below it; full screen is the same at the size of the window */
+.demo.fs{position:fixed;inset:0;z-index:60;border:0;border-radius:0;display:flex;flex-direction:column;overflow:hidden}
+.demo.fs .demobody{flex:1;min-height:0;overflow:auto}
+.demo.fs .stagewrap{min-height:100%}
+.demo.fs .map{flex:1;min-height:0;overflow:auto}
+.bar{display:flex;flex-wrap:wrap;align-items:center;gap:6px 14px;min-height:46px;box-sizing:border-box;padding:6px 14px;border-bottom:1px solid var(--line);font-size:14.5px;line-height:1.35}
+.bar .nav{display:flex;align-items:center;gap:6px;flex:none}
+.bar .n{font:600 13px/1 var(--mono);min-width:3.4em;text-align:center}
+.bar .why{flex:1 1 260px;min-width:0;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.bar .why .btn{margin-right:10px}
+.bar .ids{flex:0 1 auto;max-width:24ch;font:13px/1.3 var(--mono);color:var(--soft);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bar select{font:inherit;font-size:14px;color:inherit;background:var(--paper);border:1px solid var(--line);border-radius:8px;padding:5px 8px;max-width:24ch}
+.bar .btn{font-size:14px;padding:5px 10px}
+.bar .btn.go{background:var(--solid);color:var(--on-solid);border-color:var(--solid)}
+.demobody{display:block}
 .stagewrap{min-width:0;overflow:hidden;background:var(--wash)}
 .viewport{transform-origin:0 0;position:relative;overflow:hidden}
 .viewport.phone{width:390px;margin:18px auto;border:1px solid var(--line);border-radius:26px;overflow:hidden}
-.side{border-top:1px solid var(--line);padding:20px;display:flex;flex-direction:column;gap:12px;font-size:15.5px;line-height:1.5;min-width:0}
-.side .cap{font:600 12px/1 var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--soft)}
-.side .why{font-size:17px;line-height:1.45}
-.statebar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;padding:12px 18px;border-top:1px solid var(--line);font-size:14px}
-.statebar .btn{font-size:14px;padding:5px 11px}
 .map{display:grid;grid-template-columns:minmax(0,1fr);gap:16px;padding:18px}
 .map .fig{margin:0;display:flex;flex-direction:column;gap:8px;min-width:0;cursor:pointer}
 .map .figcap{font:600 12px/1 var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--soft)}
@@ -151,15 +162,12 @@ mark{background:var(--mark);color:inherit;padding:.05em .2em;border-radius:.2em;
   .grid{grid-template-columns:repeat(3,minmax(0,1fr))}
   .crits,.cases{grid-template-columns:repeat(2,minmax(0,1fr))}
 }
+@container demo (max-width:640px){.bar .ids,.bar #mapbtn{display:none}.bar .why{order:9;flex-basis:100%}.bar select{flex:1 1 0;min-width:0;max-width:none}}
 @container demo (min-width:560px){.map{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @container demo (min-width:980px){
-  .demobody{grid-template-columns:minmax(0,1fr) 300px}
-  .side{border-top:0;border-left:1px solid var(--line)}
   .map{grid-template-columns:repeat(3,minmax(0,1fr))}
 }
 @container demo (min-width:1640px){
-  .demobody{grid-template-columns:minmax(0,1fr) 380px}
-  .side{padding:28px;font-size:16.5px}.side .why{font-size:19px}
   .map{grid-template-columns:repeat(4,minmax(0,1fr))}
 }
 /* the page frame, by the width of the window */
@@ -217,7 +225,8 @@ function head() {
   const crit = PAGE.stories.reduce((n, s) => n + s.criteria.length, 0);
   return `<header class="head">
     <span class="eyebrow">Discovery · ${esc(PAGE.status)} · ${esc(PAGE.minutes)} min</span>
-    <h1 class="h1">${mk('demand', esc(PAGE.demand))}</h1>
+    <h1 class="h1">${PAGE.title ? esc(PAGE.title) : mk('demand', esc(PAGE.demand))}</h1>
+    ${PAGE.title ? `<p class="lead">${mk('demand', esc(PAGE.demand))}</p>` : ''}
     <div class="row">
       <span class="pill ${d ? 'on' : ''}">you decide ${d}</span>
       <span class="pill">decided for you ${f}</span>
@@ -232,25 +241,34 @@ function youDecide() {
   <div class="grid">${PAGE.youDecide.map((q) => `<div class="card pick"><span class="id">${esc(q.id)}</span><span class="q">${mk('decide:' + q.id, esc(q.question))}</span><span>${esc(q.context || '')}</span><span><span class="tag hot">recommended</span>${esc(q.pick)}</span><span class="soft">${esc(q.why || '')}</span></div>`).join('')}</div></section>`;
 }
 
+// The themes the conductor named in page.json; without them, the assumptions fall under where each one came from.
+function themes(list) {
+  const named = (PAGE.groups || []).map((g) => ({ title: g.title, items: list.filter((a) => (g.ids || []).includes(a.id)) }));
+  const taken = new Set(named.flatMap((g) => g.items.map((a) => a.id)));
+  const rest = list.filter((a) => !taken.has(a.id));
+  if (named.some((g) => g.items.length)) return [...named, { title: 'Other', items: rest }].filter((g) => g.items.length);
+  const from = (a) => { const src = String(a.source || ''); return /^review\b/i.test(src) ? 'Found by the review' : /^(he|she|they) said\b/i.test(src) ? 'From your words' : /\.\w+:\d|\.md\b|docs\//.test(src) ? 'How the product works today' : 'Sensible defaults'; };
+  return ['From your words', 'How the product works today', 'Sensible defaults', 'Found by the review'].map((title) => ({ title, items: rest.filter((a) => from(a) === title) })).filter((g) => g.items.length);
+}
+
 function decidedForYou() {
   if (!PAGE.decidedForYou.length) return '';
-  return `<section class="sec" id="decided"><div class="head"><span class="eyebrow">Decided for you</span><h2 class="h2">Say no to any of these</h2><p class="p soft">Each line is an assumption with its source. The ones marked costly are expensive to undo later.</p></div>
-  <div class="list">${PAGE.decidedForYou.map((a) => `<div class="item"><span>${a.cost === 'costly' ? '<span class="tag hot">costly</span>' : ''}${mk('decided:' + a.id, esc(a.what))}</span><span class="src mono">${esc(String(a.source || '').replace(/`/g, ''))}</span></div>`).join('')}</div></section>`;
+  const line = (a) => `<div class="item"><span>${a.cost === 'costly' ? '<span class="tag hot">costly</span>' : ''}${mk('decided:' + a.id, esc(a.what))}</span><span class="src mono">${esc(String(a.source || '').replace(/`/g, ''))}</span></div>`;
+  const costly = PAGE.decidedForYou.filter((a) => a.cost === 'costly'), cheap = PAGE.decidedForYou.filter((a) => a.cost !== 'costly');
+  const fold = (g) => `<details class="more" ${g.items.some((a) => changed.has('decided:' + a.id)) ? 'open' : ''}><summary>${esc(g.title)}<span class="n">${g.items.length}</span></summary>${g.items.map(line).join('')}</details>`;
+  return `<section class="sec" id="decided"><div class="head"><span class="eyebrow">Decided for you</span><h2 class="h2">Say no to any of these</h2><p class="p soft">${costly.length ? `${plural(costly.length, 'is', 'are')} expensive to undo later. The rest is cheap to change; open a theme to read it.` : 'All cheap to change later. Open a theme to read it.'}</p></div>
+  <div class="list">${costly.map(line).join('')}${themes(cheap).map(fold).join('')}</div></section>`;
 }
 
 function mockSection() {
   const m = PAGE.mock;
   if (!m) return '';
   return `<section class="sec" id="mock"><div class="head"><span class="eyebrow">The screen${changed.has('screen') ? ' · <mark>changed since you last looked</mark>' : ''}</span><h2 class="h2">${esc(m.title)}</h2>
-    <p class="p soft"><span class="kbd">←</span> <span class="kbd">→</span> walk the tour · <span class="kbd">S</span> next state · <span class="kbd">M</span> every state · <span class="kbd">F</span> full screen · <span class="kbd">Esc</span> leave</p></div>
+    <p class="p soft"><span class="kbd">←</span> <span class="kbd">→</span> walk the tour · <span class="kbd">F</span> full screen</p></div>
     <div class="demo" id="demo">
-      <div class="demobar"><span><b id="tourtitle"></b> <span class="soft" id="stopn"></span></span><span class="dots" id="dots" aria-hidden="true"></span>
-        <span class="row"><button class="btn" id="tourbtn" type="button"></button><button class="btn" id="mapbtn" type="button"></button><button class="btn" id="fsbtn" type="button">Full screen</button></span></div>
-      <div class="demobody" id="demobody"><div class="stagewrap" id="stagewrap"><div class="viewport" id="viewport"></div></div>
-        <aside class="side"><span class="cap">Why you are here</span><span class="why" id="why"></span><span class="cap">This proves</span><span class="mono" id="proves"></span>
-          <div class="row"><button class="btn" id="tprev" type="button" aria-label="Previous stop">←</button><button class="btn" id="tnext" type="button" aria-label="Next stop">→</button></div></aside></div>
+      <div class="bar"><span class="nav"><button class="btn" id="tprev" type="button" aria-label="Previous stop">‹</button><span class="n" id="stopn"></span><button class="btn" id="tnext" type="button" aria-label="Next stop">›</button></span><span class="why" id="why"></span><span class="ids" id="proves"></span><select id="statesel" aria-label="State"></select><button class="btn" id="mapbtn" type="button"></button><button class="btn" id="fsbtn" type="button" title="Full screen (F)"></button></div>
+      <div class="demobody" id="demobody"><div class="stagewrap" id="stagewrap"><div class="viewport" id="viewport"></div></div></div>
       <div class="map" id="map" hidden></div>
-      <div class="statebar" id="statebar"></div>
     </div></section>`;
 }
 
@@ -275,8 +293,8 @@ function criterion(c) {
 }
 
 function stories() {
-  return `<section class="sec" id="stories"><div class="head"><span class="eyebrow">What gets built</span><h2 class="h2">${plural(PAGE.stories.length, 'story', 'stories')}, one criterion per rule</h2><p class="p soft">The file is the authority: <span class="mono">stories.md</span>. Every later stage cites these ids.</p></div>
-  <div>${PAGE.stories.map((s, i) => `<details class="story" ${i === 0 ? 'open' : ''}><summary><span class="sid">${esc(s.id)}</span><span class="h3">${mk('story:' + s.id, esc(s.title))}</span><span class="soft">${plural(s.criteria.length, 'criterion', 'criteria')}</span></summary><p class="job">${esc(s.job)}</p><div class="crits">${s.criteria.map(criterion).join('')}</div></details>`).join('')}</div></section>`;
+  return `<section class="sec" id="stories"><div class="head"><span class="eyebrow">What gets built</span><h2 class="h2">${plural(PAGE.stories.length, 'story', 'stories')}, one criterion per rule</h2><p class="p soft">Open one to read its criteria. The file is the authority: <span class="mono">stories.md</span>.</p></div>
+  <div>${PAGE.stories.map((s) => `<details class="story" ${changed.has('story:' + s.id) || s.criteria.some((c) => changed.has('criterion:' + c.id)) ? 'open' : ''}><summary><span class="sid">${esc(s.id)}</span><span class="h3">${mk('story:' + s.id, esc(s.title))}</span><span class="soft">${plural(s.criteria.length, 'criterion', 'criteria')}</span></summary><p class="job">${esc(s.job)}</p><div class="crits">${s.criteria.map(criterion).join('')}</div></details>`).join('')}</div></section>`;
 }
 
 function notBuilding() {
@@ -287,7 +305,7 @@ function notBuilding() {
 
 document.getElementById('stages').innerHTML = STAGES.map(([n, asks], i) => `<span class="st ${i === 0 ? 'cur' : ''}"><span class="num">${i + 1}</span><span class="lbl">${n}<small>${asks}</small></span></span>`).join('');
 const pg = document.getElementById('pg');
-pg.innerHTML = head() + youDecide() + decidedForYou() + mockSection() + casesSection() + stories() + notBuilding();
+pg.innerHTML = head() + youDecide() + mockSection() + casesSection() + decidedForYou() + stories() + notBuilding();
 // On a whole ultrawide the screen is pinned beside the document: it spans every row of the left column.
 if (PAGE.mock) { pg.classList.add('duo'); document.getElementById('mock').style.setProperty('--rows', pg.children.length - 1); }
 
@@ -309,13 +327,20 @@ if (PAGE.mock) {
   const el = (id) => document.getElementById(id);
   const demo = el('demo'), wrap = el('stagewrap'), viewport = el('viewport'), map = el('map'), body = el('demobody');
   const label = Object.fromEntries(M.states.map((s) => [s.id, s.label]));
-  let st = M.states[0].id, stop = -1, mapOpen = false;
+  let st = M.states[0].id, stop = -1, mapOpen = false, fs = false, native = false;
   const theme = () => (M.themes && M.themes.length === 1 ? M.themes[0] : isDark() ? 'dark' : 'light');
   const html = (state) => `<div class="screen" data-theme="${theme()}" data-state="${esc(state)}">${MOCK_SCREEN(state)}</div>`;
   function fit() {
     if (M.width === 'phone') return;
     const room = wrap.clientWidth;
     if (!room) return;
+    if (fs) { // the screen at the window's own width, as the product opens it
+      Object.assign(viewport.style, { width: '', transform: '', marginLeft: '' });
+      wrap.style.height = '';
+      const scr = viewport.firstElementChild, h = body.clientHeight + 'px'; // the product's own frame reaches the bottom of the window
+      if (scr) { scr.style.minHeight = h; if (scr.children.length === 1) scr.firstElementChild.style.minHeight = h; }
+      return;
+    }
     const natural = room < 700 ? room : W;
     const k = Math.min(1.35, room / natural);
     viewport.style.width = natural + 'px';
@@ -328,22 +353,19 @@ if (PAGE.mock) {
     el('mapbtn').textContent = mapOpen ? 'Back to the screen' : 'Every state';
     viewport.className = 'viewport' + (M.width === 'phone' ? ' phone' : '');
     viewport.innerHTML = html(st);
-        el('tourtitle').textContent = M.title;
-    if (stop >= 0) {
-      const t = M.tour[stop], target = viewport.querySelector(`[data-part="${t.focus}"]`);
-      if (target) spotlight(target);
-      el('why').innerHTML = mk('tour:' + stop, esc(t.why)) + (stop === M.tour.length - 1 ? '<br><span class="soft">End of the tour. Say in the chat what is right and what is not.</span>' : '');
-      el('proves').textContent = t.proves.join(' · ');
-      el('stopn').textContent = `stop ${stop + 1} / ${M.tour.length}`;
-      el('tourbtn').textContent = 'Leave the tour';
-    } else {
-      el('why').textContent = 'Free look. Switch the state below, or start the tour to be shown where to look.';
-      el('proves').textContent = label[st] ? `state: ${label[st]}` : '';
-      el('stopn').textContent = `${M.tour.length} stops · about ${M.minutes || 2} min`;
-      el('tourbtn').textContent = 'Start the tour';
+    const t = stop >= 0 ? M.tour[stop] : null;
+    if (t) {
+      const target = viewport.querySelector(`[data-part="${t.focus}"]`);
+      if (target) { if (fs) target.scrollIntoView({ block: 'nearest' }); spotlight(target); }
     }
-    el('dots').innerHTML = M.tour.map((_, i) => `<i class="${i === stop ? 'on' : ''}"></i>`).join('');
-    el('statebar').innerHTML = '<span class="soft">state</span>' + M.states.map((s) => `<button class="btn" type="button" data-s="${esc(s.id)}" aria-pressed="${s.id === st}">${esc(s.label)}</button>`).join('');
+    el('stopn').textContent = `${t ? stop + 1 : '–'} / ${M.tour.length}`;
+    el('why').innerHTML = t
+      ? mk('tour:' + stop, esc(t.why)) + (stop === M.tour.length - 1 ? ' <span class="soft">End of the tour: say in the chat what is right and what is not.</span>' : '')
+      : `<button class="btn go" id="startbtn" type="button">Start the tour</button><span class="soft">${M.tour.length} stops · about ${M.minutes || 2} min</span>`;
+    el('why').title = t ? t.why : '';
+    el('proves').textContent = t ? t.proves.join(' · ') : '';
+    el('statesel').innerHTML = M.states.map((x) => `<option value="${esc(x.id)}" ${x.id === st ? 'selected' : ''}>${esc(x.label)}</option>`).join('');
+    el('fsbtn').textContent = fs ? 'Exit' : 'Full screen';
     if (mapOpen) {
       map.innerHTML = M.states.map((s) => `<div class="fig" data-s="${esc(s.id)}"><span class="figcap">${esc(s.label)}</span><div class="frame"><div class="viewport" style="width:${W}px">${html(s.id)}</div></div></div>`).join('');
       map.querySelectorAll('.frame').forEach((f) => { const v = f.firstElementChild, k = f.clientWidth / W; v.style.transform = `scale(${k})`; f.style.height = v.offsetHeight * k + 'px'; });
@@ -363,29 +385,42 @@ if (PAGE.mock) {
   }
   function go(i) { mapOpen = false; stop = Math.max(0, Math.min(M.tour.length - 1, i)); st = M.tour[stop].state; draw(); }
   function setState(s) { st = s; stop = -1; mapOpen = false; draw(); }
-  el('tourbtn').addEventListener('click', () => { if (stop >= 0) { stop = -1; draw(); } else go(0); });
+  el('why').addEventListener('click', (e) => { if (e.target.id === 'startbtn') go(0); });
   el('mapbtn').addEventListener('click', () => { mapOpen = !mapOpen; draw(); });
   el('tprev').addEventListener('click', () => go(stop < 0 ? 0 : stop - 1));
   el('tnext').addEventListener('click', () => go(stop < 0 ? 0 : stop + 1));
-  el('statebar').addEventListener('click', (e) => { const s = e.target.dataset && e.target.dataset.s; if (s) setState(s); });
+  el('statesel').addEventListener('change', (e) => { setState(e.target.value); el('statesel').blur(); });
   map.addEventListener('click', (e) => { const f = e.target.closest('.fig'); if (f) setState(f.dataset.s); });
   viewport.addEventListener('click', (e) => { const g = e.target.closest('[data-go]'); if (g && label[g.dataset.go]) { e.preventDefault(); setState(g.dataset.go); } });
-  const full = () => { if (document.fullscreenElement) document.exitFullscreen(); else if (demo.requestFullscreen) demo.requestFullscreen().catch(() => {}); };
+  // Full screen is a state of the page; the browser's own full screen is asked for on top of it and may be refused.
+  function setFull(on) {
+    fs = on;
+    demo.classList.toggle('fs', fs);
+    document.documentElement.style.overflow = fs ? 'hidden' : '';
+    if (fs && demo.requestFullscreen) demo.requestFullscreen().catch(() => {});
+    if (!fs && document.fullscreenElement) document.exitFullscreen();
+    draw();
+  }
+  const full = () => setFull(!fs);
   el('fsbtn').addEventListener('click', full);
-  document.addEventListener('fullscreenchange', draw);
+  document.addEventListener('fullscreenchange', () => {
+    if (document.fullscreenElement === demo) native = true;
+    else if (native) { native = false; if (fs) return setFull(false); }
+    draw();
+  });
   new ResizeObserver(fit).observe(wrap);
   let inView = false;
   new IntersectionObserver((es) => { inView = es[0].isIntersecting; }, { threshold: 0.25 }).observe(demo);
   document.addEventListener('keydown', (e) => {
     if (e.metaKey || e.ctrlKey || e.altKey || /^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName)) return;
-    if (!inView && !document.fullscreenElement) return;
+    if (!inView && !fs) return;
     const k = e.key.toLowerCase();
     if (k === 'arrowright') { e.preventDefault(); go(stop < 0 ? 0 : stop + 1); }
     else if (k === 'arrowleft') { e.preventDefault(); go(stop < 0 ? 0 : stop - 1); }
     else if (k === 's') setState(M.states[(M.states.findIndex((s) => s.id === st) + 1) % M.states.length].id);
     else if (k === 'm') { mapOpen = !mapOpen; draw(); }
     else if (k === 'f') full();
-    else if (k === 'escape') { stop = -1; mapOpen = false; draw(); }
+    else if (k === 'escape') { if (fs) setFull(false); else { stop = -1; mapOpen = false; draw(); } }
   });
   pg.addEventListener('click', (e) => {
     const see = e.target.closest('.see');
@@ -395,7 +430,7 @@ if (PAGE.mock) {
     see.closest('.crit').classList.add('lit');
     if (getComputedStyle(el('mock')).position !== 'sticky') demo.scrollIntoView({ behavior: 'smooth', block: 'center' });
   });
-  window.__mock = { draw, go, setState, map: (on) => { mapOpen = on; draw(); }, focused: () => !!viewport.querySelector('.spot') };
+  window.__mock = { draw, go, setState, full: setFull, map: (on) => { mapOpen = on; draw(); }, focused: () => !!viewport.querySelector('.spot') };
   draw();
 }
 document.addEventListener('keydown', (e) => {
