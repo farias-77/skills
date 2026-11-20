@@ -93,8 +93,8 @@ A trivial change (a label, a one-line fix) is not this stage's:
 ```
 
 The script is `node <kit>/skills/stage-discovery/scripts/discovery.mjs`
-(`state`, `check`, `split`, `page`, `shots`, `lock`, `freeze`; its
-header documents each). Only `shots` needs a browser
+(`init`, `state`, `check`, `split`, `round`, `mark`, `diff`, `page`,
+`shots`, `lock`, `freeze`; its header documents each). Only `shots` needs a browser
 (`playwright-core`); when it is missing, say so in one line with the
 install command from the header.
 
