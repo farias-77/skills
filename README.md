@@ -61,7 +61,7 @@ Opus 5.5, high.
 
 | Stage | What happens | His part |
 |---|---|---|
-| **1 · Discovery** | an interview that infers the obvious from the rest of the system; at its end `story-writer (Sonnet 5.5, high)` writes the stories, one AC per rule; when a screen changes, `prototype-builder (Sonnet 5.5, high)` builds the exact mock in the project's design system and he iterates it until he says it is ready; one review round (`discovery-review-workflow.js`: three `disc-lens (Sonnet 5.5, medium)` and, per story, two `story-reader (Haiku 5.5, high)` and a `blind-judge (Sonnet 5.5, medium)`) | the interview; the mock's rounds; the playback: one plain text, one question |
+| **1 · Discovery** | he says what he wants while `discovery-scout`s (Haiku 5.5, high) read the product; one readback (understood · will assume · only you decide), then an interview that asks only what is his; `discovery-story-writer (Sonnet 5.5, high)` writes the stories, one criterion per rule with real values, checked by script; when a screen changes, `discovery-mock-designer (Opus 5.5, medium)` builds the guided mock from the project's design system; one adversarial round in parallel (`discovery-review-workflow.js`: four `discovery-hole-hunter` and, per story, two `discovery-story-reader (Haiku 5.5, high)` in different seats; a `discovery-finding-verifier` per claim) | the dump; the questions; the mock's tour; the gate on one page |
 | **2 · Design** | scouts read the system; `architect (Opus 5.5, high)` drafts one solution with its v1 → v2 → v3 path; `overengineering-guard (Opus 5.5, medium)` cuts; `artifact-builder` draws it as one page; after his "closed", the architect expands `solution.md` and five `design-writer (Sonnet 5.5, high)` write the other documents; four lenses review once, called directly by the session: `design-consistency` and `design-security` (Opus 5.5, medium), `design-contracts (Sonnet 5.5, high)`, the guard again | the debate over one visual page, until "closed" |
 | **3 · Plan** | the sprint planning of a team with no size limit: `planner (Opus 5.5, high)` cuts the widest natural graph from today's repo to the design: a thin contract commit C, entries of one whole behaviour (≤12 ACs) with frontend and backend in parallel, E-int last; `plan-writer (Sonnet 5.5, high)` writes one brief per node; one round (`plan-review-workflow.js`: `plan-reviewer (Opus 5.5, medium)` and the double-blind per brief); the session rules everything and writes the pre-flight | nothing; a veto list at the close |
 | **4 · Execute** | the session is the tech lead. Every ready entry runs `exec-entry-workflow.js`, in its own cloud session when the project has one: `builder-backend` ∥ `builder-frontend (Opus 5.5, medium)` → `exec-gate (Haiku 5.5, medium)` → `reviewer (Opus 5.5, high)` ∥ `qa-frontend` · `qa-backend (Opus 5.5, medium)` by surface → one fix pass → the delta. A serial queue merges into `feat/<slug>`; the project's signoff command runs the whole gate once, after his ok, and posts `local-ci` | the pre-flight; his hands-on with the running app, each answer an `A.n` round, until "ok" |
@@ -95,12 +95,12 @@ and templated writing, never above high.
 | all | `scout` | Haiku 5.5, medium |
 | every report | `video-builder` | Sonnet 5.5, high |
 | every report | `slides-builder` · `artifact-builder` | Sonnet 5.5, medium |
-| discovery | `story-reader` | Haiku 5.5, high |
+| discovery | `discovery-scout` · `discovery-story-reader` | Haiku 5.5, high |
+|  | `discovery-story-writer` | Sonnet 5.5, high |
+|  | `discovery-mock-designer` | Opus 5.5, medium |
+|  | `discovery-hole-hunter` · `discovery-finding-verifier` | Sonnet 5.5, medium |
 | plan | `blind-reader` | Haiku 5.5, high |
 |  | `blind-judge` | Sonnet 5.5, medium |
-| discovery | `prototype-builder` | Sonnet 5.5, high |
-|  | `story-writer` | Sonnet 5.5, high |
-|  | `disc-lens` | Sonnet 5.5, medium |
 | design | `architect` | Opus 5.5, high |
 |  | `overengineering-guard` | Opus 5.5, medium |
 |  | `design-writer` | Sonnet 5.5, high |
@@ -124,7 +124,7 @@ and templated writing, never above high.
 | `notion-tracker` | session, loaded by the others | optional: pulls a demand from a Notion database and keeps its page in step with the stages |
 | `weekly-retro` | session | the week's workstreams read together; the only place the pipeline and a project's standards change |
 | `standards` | session | builds a project's standards book from its repo, and applies the changes he approved; publishes the Architecture and Design System pages |
-| `draw-it-for-me` | preloaded by `artifact-builder`, `prototype-builder` | explanatory pages: diagrams that build, motion, 3D, charts |
+| `draw-it-for-me` | preloaded by `artifact-builder` | explanatory pages: diagrams that build, motion, 3D, charts |
 | `pitch-it-for-me` | preloaded by `slides-builder` | HTML slide decks, one idea per slide |
 | `make-it-a-movie` | preloaded by `video-builder` | motion films written as one TSX file on the video kit, rendered once |
 | `i-wont-read-all-this` | always on | replies shaped for a reader who skims |

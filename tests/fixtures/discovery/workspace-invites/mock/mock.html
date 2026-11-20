@@ -1,0 +1,82 @@
+<style id="mock-tokens">
+.screen{--bg:#ffffff;--fg:#17181c;--muted:#6a6f7a;--border:#e2e4e9;--panel:#f6f7f9;--primary:#2f5bd8;--on-primary:#ffffff;--danger:#b3261e;--radius:8px;--font:"Inter",system-ui,sans-serif}
+.screen[data-theme="dark"]{--bg:#141518;--fg:#eceef2;--muted:#9aa0ac;--border:#2c2f36;--panel:#1b1d21;--primary:#7d9cf0;--on-primary:#10131a;--danger:#f2857d}
+</style>
+<style id="mock-product">
+& { background: var(--bg); color: var(--fg); font: 15px/1.5 var(--font); }
+.app { display: grid; grid-template-columns: 220px minmax(0, 1fr); min-height: 560px; }
+.nav { background: var(--panel); border-right: 1px solid var(--border); padding: 20px 12px; display: flex; flex-direction: column; gap: 4px; }
+.nav .ws { font-weight: 600; padding: 6px 10px 14px; }
+.nav a { padding: 8px 10px; border-radius: var(--radius); color: var(--muted); text-decoration: none; }
+.nav a.cur { background: var(--bg); color: var(--fg); font-weight: 600; border: 1px solid var(--border); }
+.main { padding: 28px 36px; display: flex; flex-direction: column; gap: 18px; min-width: 0; }
+.main h1 { font-size: 24px; margin: 0; }
+.invite { display: flex; flex-direction: column; gap: 8px; }
+.invite .line { display: flex; gap: 10px; }
+.invite input { flex: 1; min-width: 0; font: inherit; color: inherit; background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius); padding: 9px 12px; }
+.invite input.bad { border-color: var(--danger); }
+.invite button { font: inherit; font-weight: 600; background: var(--primary); color: var(--on-primary); border: 0; border-radius: var(--radius); padding: 9px 16px; cursor: pointer; }
+.invite button[disabled] { background: var(--border); color: var(--muted); cursor: default; }
+.invite .err { color: var(--danger); font-size: 14px; }
+.counter { color: var(--muted); font-size: 14px; }
+.rows { border: 1px solid var(--border); border-radius: var(--radius); }
+.rows div { display: flex; justify-content: space-between; gap: 16px; padding: 11px 14px; border-top: 1px solid var(--border); overflow-wrap: anywhere; }
+.rows div:first-child { border-top: 0; }
+.rows em { font-style: normal; color: var(--muted); white-space: nowrap; }
+@container screen (max-width: 640px) {
+  .app { grid-template-columns: minmax(0, 1fr); }
+  .nav { display: none; }
+  .main { padding: 20px 16px; }
+  .invite .line { flex-direction: column; }
+}
+</style>
+<script type="application/json" id="mock-tour">
+{
+  "title": "Invite people from Members",
+  "width": "desktop",
+  "minutes": 2,
+  "states": [
+    { "id": "empty", "label": "Nothing typed" },
+    { "id": "typing", "label": "E-mail typed" },
+    { "id": "sent", "label": "Invite sent" },
+    { "id": "limit", "label": "Daily limit" },
+    { "id": "mail-down", "label": "E-mail down" },
+    { "id": "member", "label": "Seen by a member" }
+  ],
+  "tour": [
+    { "focus": "nav", "state": "empty", "why": "Where it lives. Members is a page that exists; nothing else in the menu changes.", "proves": ["S-001", "J1.s1"] },
+    { "focus": "invite", "state": "typing", "why": "The main action. One field and one button; the button wakes up when the e-mail is valid.", "proves": ["J1.s2.1"] },
+    { "focus": "counter", "state": "typing", "why": "This is new. The counter tells the manager how many invites are left today.", "proves": ["INV-1"] },
+    { "focus": "invite", "state": "limit", "why": "What can go wrong. At the limit the invite is refused and the message says when the count resets.", "proves": ["INV-1", "J2.s2.1"] },
+    { "focus": "list", "state": "sent", "why": "The result. The invite shows as pending, with the day it expires.", "proves": ["J1.s2.1", "INV-2"] },
+    { "focus": "main", "state": "member", "why": "A member sees the same page with no form, no counter and no pending rows.", "proves": ["INV-3", "J4.s1.1"] }
+  ]
+}
+</script>
+<script id="mock-screen">
+function MOCK_SCREEN(state) {
+  const typed = state === 'typing' || state === 'limit' || state === 'mail-down';
+  const left = { empty: 7, typing: 7, sent: 6, limit: 0, 'mail-down': 7 }[state];
+  const error = { limit: "You reached today's 10 invites. The count resets at midnight.", 'mail-down': 'The invite was not sent. Try again in a minute.' }[state];
+  const form = state === 'member' ? '' : `
+    <div class="invite" data-part="invite">
+      <div class="line">
+        <input class="${error ? 'bad' : ''}" aria-label="E-mail" placeholder="name@company.com" value="${typed ? 'joao.lima@example.com' : ''}">
+        <button ${state === 'typing' ? 'data-go="sent"' : 'disabled'}>Send invite</button>
+      </div>
+      ${error ? `<span class="err">${error}</span>` : ''}
+    </div>
+    <span class="counter" data-part="counter">${left} of 10 invites left today</span>`;
+  const pending = state === 'sent' ? '<div><span>joao.lima@example.com</span><em>pending · expires 26 Nov</em></div>' : '';
+  return `<div class="app">
+    <nav class="nav" data-part="nav"><span class="ws">Northwind Studio</span><a>Home</a><a class="cur">Members</a><a>Billing</a></nav>
+    <div class="main" data-part="main">
+      <h1>Members</h1>${form}
+      <div class="rows" data-part="list">
+        <div><span>marina.okafor@example.com</span><em>manager</em></div>
+        <div><span>dana.reyes@example.com</span><em>member</em></div>${pending}
+      </div>
+    </div>
+  </div>`;
+}
+</script>

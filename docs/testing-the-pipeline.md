@@ -28,17 +28,17 @@ The prompt tells the conductor three things beyond the slash command:
 |---|---|
 | `--settings <the project's .claude/settings.json>` | print mode ignores the `permissions.allow` entries of a workspace never trusted interactively ("Ignoring N permissions.allow entries"); passed with `--settings`, they apply, and every gate, stack and check command is not refused |
 | `--add-dir <designs-root> --add-dir <the pipeline root>` | print mode denies every Read and Write outside the working directories, subagents' included: the workstreams' folders and the kit sit beside the repository, not in it |
-| `CLAUDE_CODE_PRINT_BG_WAIT_CEILING_MS=0` in the session's environment | print mode ends background tasks 600 s after the turn ends ("Background tasks still running after 600s; terminating"). A stage dispatches long agents in the background (the prototype-builder, the report builders, the review); without this they die midway and nothing is written |
+| `CLAUDE_CODE_PRINT_BG_WAIT_CEILING_MS=0` in the session's environment | print mode ends background tasks 600 s after the turn ends ("Background tasks still running after 600s; terminating"). A stage dispatches long agents in the background (the mock designer, the report builders, the review); without this they die midway and nothing is written |
 | the persona's definition and any harness agents JSON **outside** the conductor's working directories | the persona's prompt holds the answers (what he wants built, his rules, when he locks). A file the conductor can read contaminates the test: it knows the answers before it asks. Keep it where only the harness reads it (a path passed with `--agents` from outside the tree, or the user-level agents folder of a separate config dir) |
 | the pipeline reachable without a symlink across directories, or `--add-dir <the pipeline root>` | the Workflow tool refuses a `scriptPath` that resolves outside the session's working directories; the skills then pass the script's content inline (`script`), which works but costs a turn |
-| `PLAYWRIGHT_DIR` (optional) | `proto.mjs` finds `playwright-core` in the pipeline's `claude/video/node_modules` by default; set it only to use another install |
+| `PLAYWRIGHT_DIR` (optional) | discovery's `discovery.mjs shots` finds `playwright-core` in the pipeline's `claude/video/node_modules` by default; set it only to use another install |
 
 ## What a headless run cannot test
 
 - **The Artifact tools.** A print-mode or cloud session usually has no
   `Artifact`, `ArtifactData` or `ArtifactComments`. Discovery then runs
   in local mode (its skill, the Opening's missing-tool table): no
-  published mock, pictures from `proto.mjs shots`, the stage report
+  published page, pictures from `discovery.mjs shots`, the stage page
   kept local. The publish and the comments are not exercised; say so in
   the run's findings.
 - **The question tool.** Without it the batches go as text in the house

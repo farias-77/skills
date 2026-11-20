@@ -341,7 +341,7 @@ publish runs first.
 **Why.** The mock is proved by walking it headless; every stage's
 report has a video; nothing is published before a leak check.
 
-**How the stages use it.** `proto.mjs` walks and locks the mock;
+**How the stages use it.** Discovery's `discovery.mjs shots` renders the mock in every state before he sees it;
 `claude/video/render.sh` renders every video; `gitleaks dir` gates every
 publish. Without the video toolchain the Video tab is `failed` with its
 reason and the stage closes on the other two.
@@ -376,7 +376,7 @@ e-mails, the mocks, the reports, the slides and the videos.
 wrong reasons.
 
 **How the stages use it.** Discovery's recon hands them to
-`prototype-builder (Sonnet 5.5, high)`; `builder-frontend (Opus 5.5,
+`discovery-mock-designer (Opus 5.5, medium)`; `builder-frontend (Opus 5.5,
 medium)` builds on the same tokens.
 
 ### 19 · Observability as code

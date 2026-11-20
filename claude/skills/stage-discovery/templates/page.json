@@ -1,0 +1,24 @@
+{
+  "workstream": "<slug>",
+  "demand": "<one sentence a stranger understands, with the number that matters>",
+  "status": "<screen in review | in review | ready for you | approved>",
+  "minutes": 4,
+  "youDecide": [
+    {
+      "id": "D-<n>",
+      "question": "<the decision that is his, one sentence ending in a question mark>",
+      "context": "<the real case, and what the product does there today>",
+      "pick": "<the recommended answer>",
+      "why": "<what it costs and buys, one line>"
+    }
+  ],
+  "cases": [
+    {
+      "title": "<only when no screen changes: the case in a few words>",
+      "before": "<the data before, real values, one fact per line>",
+      "action": "<what happens>",
+      "after": "<the data after, real values>",
+      "proves": ["<rule or criterion id>"]
+    }
+  ]
+}

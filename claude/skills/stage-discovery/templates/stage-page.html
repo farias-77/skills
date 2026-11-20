@@ -1,0 +1,337 @@
+<title>{{TITLE}}</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Space+Grotesk:wght@600&family=JetBrains+Mono:wght@400;600&display=swap">
+{{MOCK_FONTS}}
+<style>
+/* The stage page. One wide column: the verdict first, then what he decides, the screen, the stories.
+   Every rule is class-scoped so nothing here styles the product drawn inside .screen. */
+:root{
+  --paper:#fbfbf9; --ink:#141412; --soft:#5d5d57; --line:#d9d9d2; --wash:#f0f0eb; --solid:#141412; --on-solid:#fbfbf9; --mark:#ffe566;
+  --display:"Space Grotesk","Inter",system-ui,sans-serif; --body:"Inter",system-ui,-apple-system,"Segoe UI",sans-serif; --mono:"JetBrains Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--paper:#121211;--ink:#ecece6;--soft:#a3a39b;--line:#33332f;--wash:#1c1c1a;--solid:#ecece6;--on-solid:#121211;--mark:#665500;color-scheme:dark}}
+:root[data-theme="dark"]{--paper:#121211;--ink:#ecece6;--soft:#a3a39b;--line:#33332f;--wash:#1c1c1a;--solid:#ecece6;--on-solid:#121211;--mark:#665500;color-scheme:dark}
+html,body{overflow-x:clip}
+body{background:var(--paper);color:var(--ink);font:18px/1.65 var(--body);padding-block:48px 96px;padding-left:max(20px,env(safe-area-inset-left,0px));padding-right:max(20px,env(safe-area-inset-right,0px))}
+.pg{max-width:1320px;margin:0 auto;display:flex;flex-direction:column;gap:80px}
+.sec{display:flex;flex-direction:column;gap:24px;min-width:0}
+.head{display:flex;flex-direction:column;gap:12px}
+.eyebrow{font:600 13px/1.2 var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--soft)}
+.h1{font:600 42px/1.12 var(--display);letter-spacing:-.01em;text-wrap:balance;margin:0;max-width:24ch}
+.h2{font:600 30px/1.18 var(--display);letter-spacing:-.01em;text-wrap:balance;margin:0}
+.h3{font:600 20px/1.3 var(--display);margin:0}
+.p{margin:0;max-width:68ch}
+.soft{color:var(--soft)}
+.mono{font-family:var(--mono);font-size:.86em}
+.row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.pill{display:inline-block;font:600 13px/1 var(--mono);padding:7px 10px;border:1px solid var(--line);border-radius:999px;white-space:nowrap}
+.pill.on{background:var(--solid);color:var(--on-solid);border-color:var(--solid)}
+.btn{font:inherit;font-size:15px;color:inherit;background:none;border:1px solid var(--line);border-radius:8px;padding:7px 13px;cursor:pointer}
+.btn:hover{border-color:var(--ink)}
+.btn:focus-visible{outline:3px solid var(--ink);outline-offset:3px}
+.btn[aria-pressed="true"]{background:var(--solid);color:var(--on-solid);border-color:var(--solid)}
+.kbd{font:600 12px/1 var(--mono);border:1px solid var(--line);border-bottom-width:2px;border-radius:5px;padding:4px 6px;background:var(--wash)}
+mark{background:var(--mark);color:inherit;padding:.05em .2em;border-radius:.2em;box-decoration-break:clone;-webkit-box-decoration-break:clone}
+.nohl mark{background:none;padding:0}
+
+.grid{display:grid;gap:18px;grid-template-columns:repeat(2,minmax(0,1fr))}
+.card{border:1px solid var(--line);border-radius:14px;padding:22px;display:flex;flex-direction:column;gap:10px;min-width:0;font-size:16.5px;line-height:1.55}
+.card.pick{border-color:var(--ink);border-width:2px}
+.card .q{font:600 19px/1.3 var(--display)}
+.card .id{font:600 12px/1 var(--mono);letter-spacing:.1em;color:var(--soft)}
+.list{display:flex;flex-direction:column}
+.item{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,4fr);gap:8px 28px;padding:14px 0;border-top:1px solid var(--line);font-size:16.5px;line-height:1.5}
+.item .src{color:var(--soft);font-size:15px}
+.tag{font:600 11px/1 var(--mono);letter-spacing:.08em;text-transform:uppercase;border:1px solid var(--line);border-radius:5px;padding:4px 6px;margin-right:8px;white-space:nowrap}
+.tag.hot{background:var(--solid);color:var(--on-solid);border-color:var(--solid)}
+
+.story{border-top:2px solid var(--ink);padding:18px 0 6px}
+.story>summary{cursor:pointer;display:flex;flex-wrap:wrap;gap:6px 16px;align-items:baseline;list-style:none}
+.story>summary::-webkit-details-marker{display:none}
+.story .sid{font:600 13px/1 var(--mono);letter-spacing:.1em;color:var(--soft)}
+.story .job{margin:10px 0 0;max-width:72ch;font-size:16.5px}
+.crit{margin:18px 0 0;padding:16px 18px;background:var(--wash);border-radius:12px;font:14.5px/1.75 var(--mono);overflow-wrap:anywhere;display:grid;grid-template-columns:5.2em minmax(0,1fr);gap:0 10px}
+.crit .cid{grid-column:1/-1;font-weight:600;margin-bottom:4px}
+.crit .kw{color:var(--soft);font-weight:600}
+.crit .seen{color:var(--soft)}
+.nb{display:grid;grid-template-columns:5em minmax(0,3fr) minmax(0,4fr);gap:6px 20px;padding:12px 0;border-top:1px solid var(--line);font-size:16.5px;line-height:1.5}
+
+.case{border:1px solid var(--line);border-radius:14px;overflow:hidden;min-width:0}
+.case .ct{padding:14px 18px;font:600 18px/1.3 var(--display);border-bottom:1px solid var(--line)}
+.case .cb{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);gap:14px;align-items:center;padding:16px 18px}
+.case .box{background:var(--wash);border-radius:10px;padding:12px 14px;font:14px/1.7 var(--mono);white-space:pre-wrap;overflow-wrap:anywhere;min-width:0}
+.case .act{font:600 14px/1.4 var(--body);text-align:center;max-width:16ch}
+.case .cap{font:600 11px/1 var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--soft);display:block;margin-bottom:6px}
+.case .proves{padding:0 18px 14px;font:13px/1.4 var(--mono);color:var(--soft)}
+
+/* the guided mock */
+.demo{border:1px solid var(--line);border-radius:14px;overflow:hidden;background:var(--paper)}
+.demo:fullscreen{border-radius:0;display:flex;flex-direction:column;overflow:auto}
+.demo:fullscreen .demobody{flex:1}
+.demobar{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;padding:12px 18px;border-bottom:1px solid var(--line);font-size:15px}
+.dots{display:flex;gap:6px}
+.dots i{width:9px;height:9px;border-radius:50%;border:1.5px solid var(--ink)}
+.dots i.on{background:var(--ink)}
+.demobody{display:grid;grid-template-columns:minmax(0,1fr) 300px}
+.stagewrap{min-width:0;overflow:hidden;background:var(--wash)}
+.viewport{transform-origin:0 0;position:relative;overflow:hidden}
+.viewport.phone{width:390px;margin:18px auto;border:1px solid var(--line);border-radius:26px;overflow:hidden}
+.side{border-left:1px solid var(--line);padding:20px;display:flex;flex-direction:column;gap:12px;font-size:15.5px;line-height:1.5;min-width:0}
+.side .cap{font:600 12px/1 var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--soft)}
+.side .why{font-size:17px;line-height:1.45}
+.statebar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;padding:12px 18px;border-top:1px solid var(--line);font-size:14px}
+.statebar .btn{font-size:14px;padding:5px 11px}
+.map{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;padding:18px}
+.map .fig{margin:0;display:flex;flex-direction:column;gap:8px;min-width:0;cursor:pointer}
+.map .figcap{font:600 12px/1 var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--soft)}
+.map .frame{border:1px solid var(--line);border-radius:8px;overflow:hidden;pointer-events:none}
+.spot{position:absolute;border-radius:8px;outline:2px solid var(--ink);box-shadow:0 0 0 9999px color-mix(in srgb,var(--paper) 76%,transparent);pointer-events:none;transition:left .18s,top .18s,width .18s,height .18s}
+
+/* the shell: stages on a rail that opens on hover, two controls in a capsule */
+.shell{display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center;margin:0 auto 32px;max-width:1320px;font-size:15px;white-space:nowrap}
+.brand{display:flex;align-items:center;gap:14px;height:40px}
+.logo{flex:none;width:40px;height:40px;border-radius:11px;background:var(--solid);color:var(--on-solid);display:grid;place-items:center;font:600 13px/1 var(--mono)}
+.brand .lbl{font:600 16px/1 var(--display);overflow:hidden;text-overflow:ellipsis}
+.stages{display:flex;flex-wrap:wrap;gap:4px 12px;position:relative}
+.st{position:relative;display:flex;align-items:center;gap:12px;height:40px;text-decoration:none;color:var(--soft)}
+.st .num{flex:none;width:26px;height:26px;border-radius:50%;border:2px solid var(--line);background:var(--paper);display:grid;place-items:center;font:600 12px/1 var(--mono)}
+.st.cur{color:var(--ink);font-weight:600}
+.st.cur .num{background:var(--solid);color:var(--on-solid);border-color:var(--solid)}
+.st.done .num{border-color:var(--ink);color:var(--ink)}
+.st:not(.cur) .lbl{opacity:.55}
+.ctl{display:flex;gap:2px;padding:4px;border-radius:14px;background:var(--wash);border:1px solid var(--line);align-self:flex-start}
+.ctl button{all:unset;cursor:pointer;width:30px;height:30px;border-radius:10px;display:grid;place-items:center;color:var(--soft);opacity:.5}
+.ctl button:hover{opacity:1;color:var(--ink)}
+.ctl button:focus-visible{outline:3px solid var(--ink);outline-offset:2px}
+.ctl button[aria-pressed="true"]{background:var(--paper);opacity:1;color:var(--ink);box-shadow:0 1px 2px rgba(0,0,0,.2)}
+#hlbtn[aria-pressed="true"]{background:var(--mark)}
+.ctl svg{width:17px;height:17px}
+@media (min-width:760px){
+  body{padding-left:max(96px,env(safe-area-inset-left,0px))}
+  .shell{position:fixed;left:0;top:0;bottom:0;z-index:20;width:64px;box-sizing:border-box;margin:0;padding:22px 12px;flex-direction:column;flex-wrap:nowrap;align-items:stretch;gap:30px;background:var(--paper);border-right:1px solid var(--line);overflow:hidden;transition:width .18s ease,box-shadow .18s ease}
+  .shell:hover,.shell:focus-within{width:248px;box-shadow:0 0 48px rgba(0,0,0,.16)}
+  .shell .lbl{opacity:0;transition:opacity .14s}
+  .shell:hover .lbl,.shell:focus-within .lbl{opacity:1}
+  .shell:hover .st:not(.cur) .lbl,.shell:focus-within .st:not(.cur) .lbl{opacity:.55}
+  .stages{flex-direction:column;flex-wrap:nowrap;gap:8px}
+  .stages::before{content:"";position:absolute;left:19px;top:20px;bottom:20px;width:2px;background:var(--line)}
+  .st .num{margin-left:7px}
+  .ctl{margin-top:auto;flex-direction:column;width:30px}
+}
+@media (max-width:1000px){
+  .demobody,.grid,.item{grid-template-columns:minmax(0,1fr)}
+  .side{border-left:0;border-top:1px solid var(--line)}
+  .map{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media (max-width:640px){
+  body{font-size:17px}
+  .h1{font-size:32px}.h2{font-size:25px}
+  .map,.nb{grid-template-columns:minmax(0,1fr)}
+  .case .cb{grid-template-columns:minmax(0,1fr)}
+  .crit{grid-template-columns:minmax(0,1fr)}
+}
+@media (prefers-reduced-motion: reduce){.shell,.shell .lbl,.spot{transition:none}}
+</style>
+<style id="mock-tokens">
+.screen{all:initial;display:block;container:screen/inline-size}
+{{MOCK_TOKENS}}
+</style>
+<style id="mock-product">
+.screen{
+{{MOCK_PRODUCT}}
+}
+</style>
+
+<aside class="shell" aria-label="Stages and controls">
+  <div class="brand"><span class="logo">{{MONOGRAM}}</span><span class="lbl">{{WORKSTREAM}}</span></div>
+  <nav class="stages" aria-label="Stages" id="stages"></nav>
+  <div class="ctl">
+    <button id="themebtn" type="button" aria-pressed="false" aria-label="Dark theme" title="Dark theme (T)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 14.5A8.5 8.5 0 0 1 9.5 4a8.5 8.5 0 1 0 10.5 10.5z" fill="currentColor"/></svg></button>
+    <button id="hlbtn" type="button" aria-pressed="true" aria-label="Highlight what changed" title="Highlight what changed (H)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14.5 3.5l6 6-8.5 8.5H6v-6z" fill="currentColor"/><path d="M4 21h10" stroke="currentColor" stroke-width="2" stroke-linecap="round" fill="none"/></svg></button>
+  </div>
+</aside>
+
+<div class="pg" id="pg"></div>
+
+<script>
+{{MOCK_SCREEN}}
+</script>
+<script>
+const PAGE = {{DATA}};
+const esc = (s) => String(s ?? '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const changed = new Set(PAGE.changed || []);
+const mk = (key, html) => (changed.has(key) ? `<mark>${html}</mark>` : html);
+const plural = (n, one, many) => `${n} ${n === 1 ? one : many}`;
+const STAGES = ['Discovery', 'Design', 'Plan', 'Execute', 'Release', 'Close'];
+
+function head() {
+  const d = PAGE.youDecide.length, f = PAGE.decidedForYou.length;
+  const crit = PAGE.stories.reduce((n, s) => n + s.criteria.length, 0);
+  return `<header class="head">
+    <span class="eyebrow">Discovery · ${esc(PAGE.status)} · ${esc(PAGE.minutes)} min</span>
+    <h1 class="h1">${mk('demand', esc(PAGE.demand))}</h1>
+    <div class="row">
+      <span class="pill ${d ? 'on' : ''}">you decide ${d}</span>
+      <span class="pill">decided for you ${f}</span>
+      <span class="pill">${plural(PAGE.stories.length, 'story', 'stories')} · ${plural(crit, 'criterion', 'criteria')}</span>
+      <span class="pill">${PAGE.mock ? (PAGE.mock.locked ? 'screen locked' : 'screen open') : 'no screen changes'}</span>
+    </div></header>`;
+}
+
+function youDecide() {
+  if (!PAGE.youDecide.length) return '';
+  return `<section class="sec" id="you-decide"><div class="head"><span class="eyebrow">Only you can decide</span><h2 class="h2">${plural(PAGE.youDecide.length, 'decision is', 'decisions are')} yours</h2><p class="p soft">Each one is asked in the chat, one at a time. The first option is the recommendation.</p></div>
+  <div class="grid">${PAGE.youDecide.map((q) => `<div class="card pick"><span class="id">${esc(q.id)}</span><span class="q">${mk('decide:' + q.id, esc(q.question))}</span><span>${esc(q.context || '')}</span><span><span class="tag hot">recommended</span>${esc(q.pick)}</span><span class="soft">${esc(q.why || '')}</span></div>`).join('')}</div></section>`;
+}
+
+function decidedForYou() {
+  if (!PAGE.decidedForYou.length) return '';
+  return `<section class="sec" id="decided"><div class="head"><span class="eyebrow">Decided for you</span><h2 class="h2">Say no to any of these</h2><p class="p soft">Each line is an assumption with its source. The ones marked costly are expensive to undo later.</p></div>
+  <div class="list">${PAGE.decidedForYou.map((a) => `<div class="item"><span>${a.cost === 'costly' ? '<span class="tag hot">costly</span>' : ''}${mk('decided:' + a.id, esc(a.what))}</span><span class="src mono">${esc(String(a.source || '').replace(/`/g, ''))}</span></div>`).join('')}</div></section>`;
+}
+
+function mockSection() {
+  const m = PAGE.mock;
+  if (!m) return '';
+  return `<section class="sec" id="mock"><div class="head"><span class="eyebrow">The screen</span><h2 class="h2">${esc(m.title)}</h2>
+    <p class="p soft"><span class="kbd">←</span> <span class="kbd">→</span> walk the tour · <span class="kbd">S</span> next state · <span class="kbd">M</span> every state · <span class="kbd">F</span> full screen · <span class="kbd">Esc</span> leave</p></div>
+    <div class="demo" id="demo">
+      <div class="demobar"><span><b id="tourtitle"></b> <span class="soft" id="stopn"></span></span><span class="dots" id="dots" aria-hidden="true"></span>
+        <span class="row"><button class="btn" id="tourbtn" type="button"></button><button class="btn" id="mapbtn" type="button"></button><button class="btn" id="fsbtn" type="button">Full screen</button></span></div>
+      <div class="demobody" id="demobody"><div class="stagewrap" id="stagewrap"><div class="viewport" id="viewport"></div></div>
+        <aside class="side"><span class="cap">Why you are here</span><span class="why" id="why"></span><span class="cap">This proves</span><span class="mono" id="proves"></span>
+          <div class="row"><button class="btn" id="tprev" type="button" aria-label="Previous stop">←</button><button class="btn" id="tnext" type="button" aria-label="Next stop">→</button></div></aside></div>
+      <div class="map" id="map" hidden></div>
+      <div class="statebar" id="statebar"></div>
+    </div></section>`;
+}
+
+function casesSection() {
+  if (!PAGE.cases.length) return '';
+  return `<section class="sec" id="cases"><div class="head"><span class="eyebrow">No screen changes</span><h2 class="h2">${plural(PAGE.cases.length, 'case', 'cases')} with real values</h2><p class="p soft">The data before, what happens, the data after.</p></div>
+  ${PAGE.cases.map((c, i) => `<div class="case"><div class="ct">${mk('case:' + i, esc(c.title))}</div><div class="cb"><div class="box"><span class="cap">before</span>${esc(c.before)}</div><div class="act">${esc(c.action)} →</div><div class="box"><span class="cap">after</span>${esc(c.after)}</div></div><div class="proves">proves ${esc((c.proves || []).join(' · '))}</div></div>`).join('')}</section>`;
+}
+
+function criterion(c) {
+  const lines = c.lines.map((l) => `<span class="kw">${esc(l.kw)}</span><span>${esc(l.text)}${l.seen ? ` <span class="seen">(seen: ${esc(l.seen)})</span>` : ''}</span>`).join('');
+  return `<div class="crit" id="${esc(c.id)}"><span class="cid">${mk('criterion:' + c.id, esc(c.id))} <span class="soft">[${esc(c.tags.join(', '))}]</span></span>${lines}</div>`;
+}
+
+function stories() {
+  return `<section class="sec" id="stories"><div class="head"><span class="eyebrow">What gets built</span><h2 class="h2">${plural(PAGE.stories.length, 'story', 'stories')}, one criterion per rule</h2><p class="p soft">The file is the authority: <span class="mono">stories.md</span>. Every later stage cites these ids.</p></div>
+  <div>${PAGE.stories.map((s, i) => `<details class="story" ${i === 0 ? 'open' : ''}><summary><span class="sid">${esc(s.id)}</span><span class="h3">${mk('story:' + s.id, esc(s.title))}</span><span class="soft">${plural(s.criteria.length, 'criterion', 'criteria')}</span></summary><p class="job">${esc(s.job)}</p>${s.criteria.map(criterion).join('')}</details>`).join('')}</div></section>`;
+}
+
+function notBuilding() {
+  if (!PAGE.notBuilding.length) return '';
+  return `<section class="sec" id="not-building"><div class="head"><span class="eyebrow">Left out on purpose</span><h2 class="h2">Not building</h2></div>
+  <div>${PAGE.notBuilding.map((n) => `<div class="nb"><span class="mono soft">${esc(n.id)}</span><span>${mk('nb:' + n.id, esc(n.what))}</span><span class="soft">${n.kind === 'later' ? '<span class="tag">later</span>' : ''}${esc(n.reason)}</span></div>`).join('')}</div></section>`;
+}
+
+document.getElementById('stages').innerHTML = STAGES.map((n, i) => `<span class="st ${i === 0 ? 'cur' : ''}"><span class="num">${i + 1}</span><span class="lbl">${n}</span></span>`).join('');
+const pg = document.getElementById('pg');
+pg.innerHTML = head() + youDecide() + decidedForYou() + mockSection() + casesSection() + stories() + notBuilding();
+
+/* shell controls */
+const root = document.documentElement, themebtn = document.getElementById('themebtn'), hlbtn = document.getElementById('hlbtn');
+function store(k, v) { try { if (v === undefined) return localStorage.getItem(k); localStorage.setItem(k, v); } catch (_) { return null; } }
+const isDark = () => { const t = root.getAttribute('data-theme'); return t ? t === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches; };
+function setTheme(dark) { root.setAttribute('data-theme', dark ? 'dark' : 'light'); themebtn.setAttribute('aria-pressed', dark); store('theme', dark ? 'dark' : 'light'); if (window.__mock) window.__mock.draw(); }
+function setHl(on) { pg.classList.toggle('nohl', !on); hlbtn.setAttribute('aria-pressed', on); store('hl', on ? '1' : '0'); }
+themebtn.addEventListener('click', () => setTheme(!isDark()));
+hlbtn.addEventListener('click', () => setHl(pg.classList.contains('nohl')));
+setHl(store('hl') !== '0');
+const savedTheme = store('theme');
+if (savedTheme) setTheme(savedTheme === 'dark'); else themebtn.setAttribute('aria-pressed', isDark());
+
+/* the guided mock */
+if (PAGE.mock) {
+  const M = PAGE.mock, W = M.width === 'phone' ? 390 : 1280;
+  const el = (id) => document.getElementById(id);
+  const demo = el('demo'), wrap = el('stagewrap'), viewport = el('viewport'), map = el('map'), body = el('demobody');
+  const label = Object.fromEntries(M.states.map((s) => [s.id, s.label]));
+  let st = M.states[0].id, stop = -1, mapOpen = false;
+  const theme = () => (M.themes && M.themes.length === 1 ? M.themes[0] : isDark() ? 'dark' : 'light');
+  const html = (state) => `<div class="screen" data-theme="${theme()}" data-state="${esc(state)}">${MOCK_SCREEN(state)}</div>`;
+  function fit() {
+    if (M.width === 'phone') return;
+    const natural = wrap.clientWidth < 700 ? wrap.clientWidth : W;
+    const k = Math.min(1, wrap.clientWidth / natural);
+    viewport.style.width = natural + 'px';
+    viewport.style.transform = `scale(${k})`;
+    wrap.style.height = viewport.offsetHeight * k + 'px';
+  }
+  function draw() {
+    body.hidden = mapOpen; map.hidden = !mapOpen;
+    el('mapbtn').textContent = mapOpen ? 'Back to the screen' : 'Every state';
+    viewport.className = 'viewport' + (M.width === 'phone' ? ' phone' : '');
+    viewport.innerHTML = html(st);
+        el('tourtitle').textContent = M.title;
+    if (stop >= 0) {
+      const t = M.tour[stop], target = viewport.querySelector(`[data-part="${t.focus}"]`);
+      if (target) spotlight(target);
+      el('why').innerHTML = mk('tour:' + stop, esc(t.why)) + (stop === M.tour.length - 1 ? '<br><span class="soft">End of the tour. Say in the chat what is right and what is not.</span>' : '');
+      el('proves').textContent = t.proves.join(' · ');
+      el('stopn').textContent = `stop ${stop + 1} / ${M.tour.length}`;
+      el('tourbtn').textContent = 'Leave the tour';
+    } else {
+      el('why').textContent = 'Free look. Switch the state below, or start the tour to be shown where to look.';
+      el('proves').textContent = label[st] ? `state: ${label[st]}` : '';
+      el('stopn').textContent = `${M.tour.length} stops · about ${M.minutes || 2} min`;
+      el('tourbtn').textContent = 'Start the tour';
+    }
+    el('dots').innerHTML = M.tour.map((_, i) => `<i class="${i === stop ? 'on' : ''}"></i>`).join('');
+    el('statebar').innerHTML = '<span class="soft">state</span>' + M.states.map((s) => `<button class="btn" type="button" data-s="${esc(s.id)}" aria-pressed="${s.id === st}">${esc(s.label)}</button>`).join('');
+    if (mapOpen) {
+      map.innerHTML = M.states.map((s) => `<div class="fig" data-s="${esc(s.id)}"><span class="figcap">${esc(s.label)}</span><div class="frame"><div class="viewport" style="width:${W}px">${html(s.id)}</div></div></div>`).join('');
+      map.querySelectorAll('.frame').forEach((f) => { const v = f.firstElementChild, k = f.clientWidth / W; v.style.transform = `scale(${k})`; f.style.height = v.offsetHeight * k + 'px'; });
+    }
+    fit();
+  }
+  function spotlight(target) {
+    const spot = document.createElement('div');
+    spot.className = 'spot';
+    viewport.appendChild(spot);
+    const place = () => {
+      const r = target.getBoundingClientRect(), v = viewport.getBoundingClientRect(), k = v.width / viewport.offsetWidth || 1, pad = 6;
+      Object.assign(spot.style, { left: (r.left - v.left) / k - pad + 'px', top: (r.top - v.top) / k - pad + 'px', width: r.width / k + pad * 2 + 'px', height: r.height / k + pad * 2 + 'px' });
+    };
+    place();
+    requestAnimationFrame(place);
+  }
+  function go(i) { mapOpen = false; stop = Math.max(0, Math.min(M.tour.length - 1, i)); st = M.tour[stop].state; draw(); }
+  function setState(s) { st = s; stop = -1; mapOpen = false; draw(); }
+  el('tourbtn').addEventListener('click', () => { if (stop >= 0) { stop = -1; draw(); } else go(0); });
+  el('mapbtn').addEventListener('click', () => { mapOpen = !mapOpen; draw(); });
+  el('tprev').addEventListener('click', () => go(stop < 0 ? 0 : stop - 1));
+  el('tnext').addEventListener('click', () => go(stop < 0 ? 0 : stop + 1));
+  el('statebar').addEventListener('click', (e) => { const s = e.target.dataset && e.target.dataset.s; if (s) setState(s); });
+  map.addEventListener('click', (e) => { const f = e.target.closest('.fig'); if (f) setState(f.dataset.s); });
+  viewport.addEventListener('click', (e) => { const g = e.target.closest('[data-go]'); if (g && label[g.dataset.go]) { e.preventDefault(); setState(g.dataset.go); } });
+  const full = () => { if (document.fullscreenElement) document.exitFullscreen(); else if (demo.requestFullscreen) demo.requestFullscreen().catch(() => {}); };
+  el('fsbtn').addEventListener('click', full);
+  document.addEventListener('fullscreenchange', draw);
+  addEventListener('resize', fit);
+  let inView = false;
+  new IntersectionObserver((es) => { inView = es[0].isIntersecting; }, { threshold: 0.25 }).observe(demo);
+  document.addEventListener('keydown', (e) => {
+    if (e.metaKey || e.ctrlKey || e.altKey || /^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName)) return;
+    if (!inView && !document.fullscreenElement) return;
+    const k = e.key.toLowerCase();
+    if (k === 'arrowright') { e.preventDefault(); go(stop < 0 ? 0 : stop + 1); }
+    else if (k === 'arrowleft') { e.preventDefault(); go(stop < 0 ? 0 : stop - 1); }
+    else if (k === 's') setState(M.states[(M.states.findIndex((s) => s.id === st) + 1) % M.states.length].id);
+    else if (k === 'm') { mapOpen = !mapOpen; draw(); }
+    else if (k === 'f') full();
+    else if (k === 'escape') { stop = -1; mapOpen = false; draw(); }
+  });
+  window.__mock = { draw, go, setState, map: (on) => { mapOpen = on; draw(); }, focused: () => !!viewport.querySelector('.spot') };
+  draw();
+}
+document.addEventListener('keydown', (e) => {
+  if (e.metaKey || e.ctrlKey || e.altKey || /^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName)) return;
+  const k = e.key.toLowerCase();
+  if (k === 'h') setHl(pg.classList.contains('nohl'));
+  else if (k === 't') setTheme(!isDark());
+});
+</script>

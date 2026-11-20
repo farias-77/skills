@@ -1,133 +1,82 @@
 # Stories: <feature name> (`<slug>`)
 
 <!--
-  Written by story-writer from the conversation at the end of the interview; when a screen
-  changes, anchored on the LOCKED mock. Nothing here is new: every use case is a family of
-  journeys, every acceptance criterion is a rule or a behavior he said (and the mock shows,
-  when there is one), every value is one the notes confirmed or the mock shows.
-  What the writer had to guess goes to Inferred; what it could not settle
-  goes to Open. Both MUST be empty to close the stage.
-
-  IDs:
-  - A story is a use case: S-001, S-002…, one per job, with its journeys.
-  - One AC per rule and one per behavior he said, never one per step, per
-    state or per copy string: the locked frames (when there is a mock) cover the states, the
-    layout and the copy. A step with no rule or behavior of its own has no
-    AC. A rule id sits in one AC only.
-  - An AC id anchors on the step where the behavior shows first:
-    <journey>.<step>.<n> (J1.s2.1), the notes' step, moved to the locked
-    step when a mock is anchored. It never changes after that; later
-    stages cite it.
-  - In [ ] after the id: the rule ids the AC checks (the notes' Rules
-    table), or the story id when it checks behavior no numbered rule covers.
-  - An AC on a behavior only a debug-only frame shows (an error with a
-    retry he asked for) is frame:<token>.<n> (frame:invites.error.1). A
-    state alone (loading, empty) gets no AC.
-  - [build] after the rule ids marks an AC only the build can prove (a
-    rule the notes' Rules table marks [build]: real time, a server's
-    refusal, a count that changes on reload). It keeps the shape and says
-    where it is observed in the built product; the blind readers skip it.
-  - A story block cites only its own AC ids. Another story's criterion is
-    named in words ("the publish criterion of S-001"), never by id: a
-    blind reader reads one block and would take the id for its own.
-
-  An AC (the format `proto.mjs trace` reads):
-  - **`J1.s2.1`** [INV-1] GIVEN <the state before the step, no clicks>
-    WHEN <exactly one event, declarative>
-    THEN <an outcome that makes the behavior> (observed: <where>)
-    AND <one more outcome per line> (observed: <where>)
-  "observed" is one of: screen (role + accessible name, or the copy key
-  with both strings) · inbox · row read back · event · log · alarm · file.
-  Values are concrete: fixture names, numbers with their units, copy keys
-  where the copy is the point. No selectors, no internals, no "quickly" or
-  "correctly". Effects that must not happen are stated ("the inbox still
-  holds 1 e-mail"). A rule with a number gets ONE AC at its boundary
-  (the 11th refused, the 10th kept).
-
-  Each story block stands alone: a blind reader gets ONE block plus the
-  vocabulary and must be able to judge every AC against the mock, or
-  from the text alone when there is none.
+  Written by discovery-story-writer from notes.md. The rules of this file are
+  references/stories.md. The headings, the id formats and the criterion's
+  shape are read by discovery.mjs check: keep them exactly.
+  Nothing here is new: what he neither said nor accepted is under Assumptions.
+  A complete example: tests/fixtures/discovery/workspace-invites/stories.md.
 -->
 
-Locked mock: **v<N>** · `00-discovery/prototype/LOCK.json` · frames in `00-discovery/prototype/frames/` | not yet: a screen changes, the anchor fills this line | none: no screen changes
+Mock: `mock/mock.html` · <not built yet | open | locked v<N>> | none: no screen changes
 
-Personas: **<persona>** (<who, in one line>), …
+Personas: **<persona>** (<who, in one line>) · **<persona>** (<…>)
 
 ## Vocabulary
 
-- **<word>** — <definition, from the notes; the mock's labels use this word>
+- **<word>** — <definition, from the notes>
 
 ## Rules
 
-<!-- Copied from the notes' Rules table: every number that encodes a rule. -->
-
-| ID | Rule | Number | Source |
-|---|---|---|---|
-| <PREFIX-1> | <the rule in one sentence> | <value + unit> | <his words, or the document he named> |
+| ID | Rule | Number | Examples | Source |
+|---|---|---|---|---|
+| <PREFIX-1> | <the rule in one sentence> | <value + unit> | <the boundary, with real values> | "<his words>" · D-<n> |
 
 ---
 
-## S-001 — <use case name, a verb phrase>
+## S-001 — <the job as a verb phrase>
 
 **Actor:** <persona> · **Job:** When <situation>, I want to <motivation>, so I can <outcome>.
 
-**Journeys:** J1 (main flow) · J2 (extension at s2) · J3 (extension at s2)
+**Journeys:** J1 (main flow) · J2 (extension at s2)
 
 ### Main flow (J1)
 
-1. **s1** <do> → <frame title>
-2. **s2** <do> → <frame title> · behind: <the effects in a few words>
+1. **s1** <do> → <what the person sees>
+2. **s2** <do> → <what the person sees> · behind: <what is written or sent>
 
 ### Extensions
 
 - **at s2, J2** <the condition> → <what happens, and what does not>
-- **at s2, J3** <the condition> → <what happens>
 
 ### Acceptance criteria
 
-- **`J1.s2.1`** [<RULE-1>] GIVEN <state>
-  WHEN <event>
-  THEN <outcome> (observed: screen)
-  AND <outcome> (observed: row read back)
-  AND <outcome> (observed: inbox)
-- **`J2.s2.1`** [S-001] GIVEN <state>
-  WHEN <event>
-  THEN <the behavior he said, with no numbered rule> (observed: screen)
-- **`frame:<token>.1`** [<RULE-2>] GIVEN <the debug-only state, reached by its frame>
-  WHEN <event>
-  THEN <the behavior only that frame shows> (observed: screen)
-- **`frame:<token>.2`** [<RULE-3>] [build] GIVEN <state>
-  WHEN <event the mock cannot play: a reload, a second user, the server>
-  THEN <outcome> (observed: <where, in the built product>)
+- **`J1.s2.1`** [S-001] GIVEN <the state before, with named fixtures>
+  WHEN <exactly one event>
+  THEN <an outcome with its literal value> (seen: screen)
+  AND <one more outcome> (seen: row read back)
+- **`J2.s2.1`** [<PREFIX-1>] GIVEN <the state at the rule's boundary>
+  WHEN <the event>
+  THEN <the refusal, in the exact words shown> (seen: screen)
+  AND <what is not written> (seen: row read back)
 
 ### Error paths
 
-<!-- The four paths, each mapped to a journey step or a frame with the
-     AC that proves it, or to an Out line with its reason. A path with
-     none of them is a gap: it goes to Inferred or Open, never silence. -->
-
-| Path | Case | Where (journey step, or frame with a mock) | AC |
+| Path | Case | Where | Criterion |
 |---|---|---|---|
-| Limit (boundary or invalid input) | <case> | <J4.s1, or frame token> | <AC id> |
-| Dependency failure | <case> | <…> | <AC id> |
-| Permission | <case> | <…, or "Out: <reason>"> | <AC id, or — when Out> |
-| Repeat (double submit, two tabs, a retry) | <case> | <…> | <AC id> |
+| Limit | <the case> | <J2.s2> | `J2.s2.1` |
+| Dependency failure | <the case> | <J3.s2> | `<id>` |
+| Permission | <the case> | <NB-n> | — |
+| Repeat | <the case> | n/a: <why it cannot happen here> | — |
 
-### In and Out
+### In
 
-- **In:** <what this story builds, one line each>
-- **Out:** <capability> — not building: <reason> | future direction, not scheduled
+- <what this story builds, one line each>
+
+### Not building
+
+- NB-1 (see `not-building.md`)
 
 ---
 
-## Inferred
+## Assumptions
 
-<!-- Every fact the writer wrote that neither the locked mock nor the notes
-     contain: id, the guess, where it landed. The conductor asks him at the
-     playback. MUST be empty to close. -->
+- **A-1** — <what is assumed, stated as fact> — source: <`path:line` | the product does this next to it | review> — cost if wrong: cheap
 
-- **I-1** — <the guess> — in <AC id>
+## For the design
 
-## Open questions
+- **T-1** — <a question whose answer is a mechanism>
 
-(none)
+## Open
+
+- (none)

@@ -1,136 +1,117 @@
-# Interview notes: <workstream title> (`<slug>`)
+# Notes: <workstream title> (`<slug>`)
 
 <!--
-  The interview's record, written by the conductor as the conversation
-  happens, every turn. Three readers: the conductor, to resume from any
-  point; story-writer, which writes the stories from it at the end of the
-  interview; prototype-builder, which builds the mock from the stories and
-  it when a screen changes.
-  If a fact is not here (or, later, in the locked mock), they do not know it. Write in
-  English; quote his own words where they carry a decision or a taste.
+  The interview's record, written by the conductor every turn, in English.
+  Readers: the conductor, to resume from any point; discovery-story-writer, which
+  writes the stories from it; discovery-mock-designer; the review panel, as the
+  oracle of what he decided. A fact that is not here, they do not know.
+  Every line that is a decision carries its provenance:
+    said      his words, quoted
+    accepted  the conductor proposed it and he said yes to that one item
+    assumed   the conductor proposed it and he has not answered that item
+  A yes to a list accepts nothing in it.
 -->
 
 ## Starting point
 
-- **What he brought:** <the demand in one paragraph, as first stated (the voice dump, condensed)>
-- **How formed it is:** <idea · sketch · spec> · <what he has already covered alone>
-- **References:** <product, site, screen, repo folder: what to look at, what he liked>
-- **Prior decisions:** <none> | <document · what it decided · imported as Confirmed with its source>
-- **Screens:** <which screens change> | none (no mock)
-- **Languages of the copy:** <en, pt-BR, …> · **Widths that matter:** <phone, desktop>
+- **Request:** "<the demand in his words, one line>"
+- **Origin:** <tracker id · who asked · when> | typed in the session
+- **Size:** <small | feature | large> · <why, in a few words> · <stepped up on <date>: why>
+- **Screen:** <which screen changes> | none
+- **Languages of the copy:** <en, …> · **Widths that matter:** <desktop, phone>
+
+## Said
+
+<!-- The dump, as he said it. Dictation noise removed, meaning and wording kept. -->
+
+- "<quote>"
 
 ## Recon
 
-<!-- What the scouts and the screenshot pass brought (D0). Paths, not content. -->
+<!-- Paths, not content: what each scout wrote. -->
 
-- **Feature maps read:** <path> · <path>
-- **Current screens:** `00-discovery/recon/screens/<name>.png` · …
-- **Design system (only when a screen changes):** <tokens path · components path · app shell path · source of the screens the change sits in> | <none found: shell defaults, gap noted>
-- **How the system behaves next to the change:** <recon/<topic>.md> (what is inferred from)
-- **Other workstreams touching these areas:** <workstream · what it changes> | none
-- **Term collisions:** <word · what it already means in the product · path:line> | none (each one is in the Vocabulary's "avoid")
+- **Next to the change today:** `discovery/recon/<topic>.md`
+- **Design system (when a screen changes):** tokens `<path>` · components `<path>` · app shell `<path>` · the screen's source `<path>` · screenshots `discovery/recon/screens/`
+- **Other workstreams on the same area:** <slug · what it changes> | none
+- **Words the product already uses for something else:** <word · its meaning there · path:line> | none
 
-## Coverage map
+## Coverage
 
-| Category | State |
+<!-- The conductor's checklist, never shown to him as a form. State: missing · partial · clear · n/a. -->
+
+| Area | State |
 |---|---|
-| People and jobs (who, in what situation) | Missing |
-| Journeys (trigger → steps → end, happy and bad) | Missing |
-| Rules with numbers (limits, expiry, cadence, thresholds) | Missing |
-| Data on screen (and where each value comes from) | Missing |
-| States per screen (only with a screen; settled in the mock's rounds) | Missing |
-| Error paths (limit, dependency down, permission, repeat) | Missing |
-| Personal data (who sees it, how long it is kept) | Missing |
-| Copy (the words that carry a rule; the rest in the mock's rounds) | Missing |
-| Look (only with a screen: where it sits, references he brings) | Missing |
-| Constraints (legal, cost, deadline, platform, personal data) | Missing |
-| Vocabulary (every domain word defined) | Missing |
-| Boundary (In and Out closed; direction mapped) | Missing |
+| Why, and for whom | missing |
+| Journeys (trigger, steps, end) | missing |
+| Rules with numbers (limit, expiry, cadence) and their boundary | missing |
+| Error paths (limit, dependency down, permission, repeat) | missing |
+| Who can do and see what | missing |
+| Data shown and where it comes from | missing |
+| Personal data (who sees it, how long it is kept) | missing |
+| Words that carry a rule (a refusal, an e-mail) | missing |
+| Constraints (legal, cost, deadline, platform) | missing |
+| In and not building | missing |
 
 ## Vocabulary
 
 - **<word>** — <definition> · avoid: <the words not to use for it>
 
+## Decisions
+
+<!-- The tree. A decision that depends on another names it in "After". Open ones have an empty Answer. -->
+
+| ID | Decision | After | Answer | Provenance | His words, or the source |
+|---|---|---|---|---|---|
+| D-1 | <what is being decided> | — | <the answer> | said | "<quote>" |
+| D-2 | <…> | D-1 | <…> | accepted | proposed: <the reason given> |
+
 ## Rules
 
-<!-- Every number that encodes a rule, one id each. The ACs cite them; a mock,
-     when there is one, enforces them. An example per rule ("the one where…"), and its
-     boundaries. -->
+<!-- Every rule with a number. The example is at the boundary and its values come from him or a system of record. -->
 
-<!-- Proof, only when a screen changes: `mock` when a journey step of the mock
-     can show it; `[build]` when a one-file mock cannot (real time, a server's refusal, a reload, a second session):
-     he confirms the [build] marking, the rule counts as covered by the
-     build, and its one AC carries [build]. -->
-
-| ID | Rule | Number | Source | Examples | Proof |
+| ID | Rule | Number | Examples | Provenance | Source |
 |---|---|---|---|---|---|
-| <PREFIX-1> | <rule> | <value + unit> | "<his words>" | <the one where…> | mock |
+| <PREFIX-1> | <the rule in one sentence> | <value + unit> | <the 10th is sent, the 11th is refused> | said | "<quote>" · D-3 |
 
 ## Journeys
-
-<!-- The sketch the stories are written from. One line per step; the step ids
-     are the AC ids' anchors. A journey is ready when its actor, trigger,
-     steps and end are here. -->
 
 ### J1 — <title>
 
 - **Actor / job:** <persona> · When <situation>, I want to <motivation>, so I can <outcome>.
-- **Steps:** s1 <do> → <lands on> · s2 <do> → <lands on> · …
+- **Steps:** s1 <do> → <result> · s2 <do> → <result>
 - **Behind:** <rows, e-mails, events per step>
-- **Error paths:** <limit · dependency down · permission · repeat: each → a journey, a frame, or Out>
-- **Status:** sketched · in the stories · in mock v<N>
+- **Error paths:** limit → <J2 | NB-n | n/a: why> · dependency → <…> · permission → <…> · repeat → <…>
 
-## Themes
+## Assumptions
 
-<!-- One section per theme, in the order discussed. Four blocks each; an
-     empty block says "(none)". -->
+<!-- Most costly first. Each one is shown to him: at the readback, and again at the gate as "decided for you". -->
 
-### <theme>
+- **A-1** — <what is assumed> — source: <path:line, or "the product does this next to it", or "review"> — cost if wrong: cheap | costly — assumed
 
-**Said** — his words, close to verbatim, where they decide something.
+## Not building
 
-- "<quote>"
+- <capability> — not building: <reason> | later: <reason> — <said | accepted | assumed>
 
-**Confirmed** — facts he confirmed when restated. The ACs check them; a mock shows them.
+## Deferred
 
-- WHEN <condition>, the system does <behavior>.
-
-**Inferred** — what the conductor proposed and he did not discuss, with its source (the rest of the system, or common sense). Each one is confirmed or rejected before the interview ends.
-
-- <guess> — because <why it seemed right>
-
-**Out** — what this theme leaves out. Two kinds, always named.
-
-- <capability> — not building: <reason>
-- <capability> — future direction, not scheduled
-
-## Mock log
-
-<!-- Only when a screen changes: one row per published version. -->
-
-| Version | Date | What changed | From |
-|---|---|---|---|
-| v1 | <date> | first build: J1, J2 | the stories |
-| v2 | <date> | <change> | <round n · comment <id> · chat> |
-
-## Open
-
-<!-- Questions that passed the razor and are not answered yet. Empty before
-     the stories are written. -->
+<!-- Important and unasked: he ran out of time, or said "you decide". Each becomes an assumption shown at the gate. -->
 
 - (none)
 
-## Lock
-
-<!-- Only when a screen changes: written at D3's lock, and again at each
-     amendment of the playback. -->
-
-- **Version:** v<N> · **Date:** <date> · **Words:** "<his words that said it was ready, or his answer that locked an amendment>"
-- **Walk:** <passed> | <gaps carried in LOCK.json: where · what>
-- **[build] rules he confirmed:** <ids> | none
-
 ## For the design
 
-<!-- The last playback call's answer, verbatim. Stage 2 opens on it. -->
+<!-- Questions whose answer is a mechanism. Never asked to him. -->
 
-- **His answer:** <Nothing in mind, propose> | <I have an idea: "…"> | <I have a constraint: "…">
+- (none)
+
+## Mock log
+
+<!-- Only when a screen changes: one row per build he saw. -->
+
+| Build | Date | What changed | From |
+|---|---|---|---|
+| 1 | <date> | first build | the stories |
+
+## Lock
+
+- **Locked:** v<N> · <date> · "<his words>"
