@@ -3,8 +3,12 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Space+Grotesk:wght@600&family=JetBrains+Mono:wght@400;600&display=swap">
 {{MOCK_FONTS}}
 <style>
-/* The stage page. One wide column: the verdict first, then what he decides, the screen, the stories.
-   Every rule is class-scoped so nothing here styles the product drawn inside .screen. */
+/* The stage page: the verdict first, then what he decides, the screen, the stories.
+   Every rule is class-scoped so nothing here styles the product drawn inside .screen.
+   Two kinds of width rule. The page frame follows the window: stacked under 760px, one column with
+   the rail up to 1700px, a wider column after, and from 2300px (a whole ultrawide) the document on
+   the left with the screen pinned on the right. Every component follows the width of its own
+   section (@container), so it is right in any of those frames and in half a window. */
 :root{
   --paper:#fbfbf9; --ink:#141412; --soft:#5d5d57; --line:#d9d9d2; --wash:#f0f0eb; --solid:#141412; --on-solid:#fbfbf9; --mark:#ffe566;
   --display:"Space Grotesk","Inter",system-ui,sans-serif; --body:"Inter",system-ui,-apple-system,"Segoe UI",sans-serif; --mono:"JetBrains Mono",ui-monospace,Menlo,monospace;
@@ -13,8 +17,8 @@
 :root[data-theme="dark"]{--paper:#121211;--ink:#ecece6;--soft:#a3a39b;--line:#33332f;--wash:#1c1c1a;--solid:#ecece6;--on-solid:#121211;--mark:#665500;color-scheme:dark}
 html,body{overflow-x:clip}
 body{background:var(--paper);color:var(--ink);font:18px/1.65 var(--body);padding-block:48px 96px;padding-left:max(20px,env(safe-area-inset-left,0px));padding-right:max(20px,env(safe-area-inset-right,0px))}
-.pg{max-width:1320px;margin:0 auto;display:flex;flex-direction:column;gap:80px}
-.sec{display:flex;flex-direction:column;gap:24px;min-width:0}
+.pg{max-width:1320px;margin:0 auto;display:grid;grid-template-columns:minmax(0,1fr);gap:80px}
+.sec{display:flex;flex-direction:column;gap:24px;min-width:0;container:sec/inline-size}
 .head{display:flex;flex-direction:column;gap:12px}
 .eyebrow{font:600 13px/1.2 var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--soft)}
 .h1{font:600 42px/1.12 var(--display);letter-spacing:-.01em;text-wrap:balance;margin:0;max-width:24ch}
@@ -34,13 +38,13 @@ body{background:var(--paper);color:var(--ink);font:18px/1.65 var(--body);padding
 mark{background:var(--mark);color:inherit;padding:.05em .2em;border-radius:.2em;box-decoration-break:clone;-webkit-box-decoration-break:clone}
 .nohl mark{background:none;padding:0}
 
-.grid{display:grid;gap:18px;grid-template-columns:repeat(2,minmax(0,1fr))}
+.grid{display:grid;gap:18px;grid-template-columns:minmax(0,1fr)}
 .card{border:1px solid var(--line);border-radius:14px;padding:22px;display:flex;flex-direction:column;gap:10px;min-width:0;font-size:16.5px;line-height:1.55}
 .card.pick{border-color:var(--ink);border-width:2px}
 .card .q{font:600 19px/1.3 var(--display)}
 .card .id{font:600 12px/1 var(--mono);letter-spacing:.1em;color:var(--soft)}
 .list{display:flex;flex-direction:column}
-.item{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,4fr);gap:8px 28px;padding:14px 0;border-top:1px solid var(--line);font-size:16.5px;line-height:1.5}
+.item{display:grid;grid-template-columns:minmax(0,1fr);gap:8px 28px;padding:14px 0;border-top:1px solid var(--line);font-size:16.5px;line-height:1.5}
 .item .src{color:var(--soft);font-size:15px}
 .tag{font:600 11px/1 var(--mono);letter-spacing:.08em;text-transform:uppercase;border:1px solid var(--line);border-radius:5px;padding:4px 6px;margin-right:8px;white-space:nowrap}
 .tag.hot{background:var(--solid);color:var(--on-solid);border-color:var(--solid)}
@@ -50,38 +54,44 @@ mark{background:var(--mark);color:inherit;padding:.05em .2em;border-radius:.2em;
 .story>summary::-webkit-details-marker{display:none}
 .story .sid{font:600 13px/1 var(--mono);letter-spacing:.1em;color:var(--soft)}
 .story .job{margin:10px 0 0;max-width:72ch;font-size:16.5px}
-.crit{margin:18px 0 0;padding:16px 18px;background:var(--wash);border-radius:12px;font:14.5px/1.75 var(--mono);overflow-wrap:anywhere;display:grid;grid-template-columns:5.2em minmax(0,1fr);gap:0 10px}
+.crits{display:grid;grid-template-columns:minmax(0,1fr);gap:18px;margin-top:18px;align-items:start}
+.crit{padding:16px 18px;background:var(--wash);border-radius:12px;font:14.5px/1.75 var(--mono);overflow-wrap:anywhere;display:grid;grid-template-columns:minmax(0,1fr);gap:0 10px;scroll-margin-top:24px}
+.crit .see{all:unset;cursor:pointer;float:right;font:600 11px/1 var(--mono);letter-spacing:.08em;text-transform:uppercase;border:1px solid var(--line);border-radius:5px;padding:5px 7px;color:var(--soft)}
+.crit .see:hover{color:var(--ink);border-color:var(--ink)}
+.crit .see:focus-visible{outline:3px solid var(--ink);outline-offset:2px}
+.crit.lit{outline:2px solid var(--ink)}
 .crit .cid{grid-column:1/-1;font-weight:600;margin-bottom:4px}
 .crit .kw{color:var(--soft);font-weight:600}
 .crit .seen{color:var(--soft)}
-.nb{display:grid;grid-template-columns:5em minmax(0,3fr) minmax(0,4fr);gap:6px 20px;padding:12px 0;border-top:1px solid var(--line);font-size:16.5px;line-height:1.5}
+.nb{display:grid;grid-template-columns:minmax(0,1fr);gap:6px 20px;padding:12px 0;border-top:1px solid var(--line);font-size:16.5px;line-height:1.5}
 
 .case{border:1px solid var(--line);border-radius:14px;overflow:hidden;min-width:0}
 .case .ct{padding:14px 18px;font:600 18px/1.3 var(--display);border-bottom:1px solid var(--line)}
-.case .cb{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);gap:14px;align-items:center;padding:16px 18px}
+.cases{display:grid;grid-template-columns:minmax(0,1fr);gap:18px;align-items:start}
+.case .cb{display:grid;grid-template-columns:minmax(0,1fr);gap:14px;align-items:center;padding:16px 18px}
 .case .box{background:var(--wash);border-radius:10px;padding:12px 14px;font:14px/1.7 var(--mono);white-space:pre-wrap;overflow-wrap:anywhere;min-width:0}
-.case .act{font:600 14px/1.4 var(--body);text-align:center;max-width:16ch}
+.case .act{font:600 14px/1.4 var(--body)}
 .case .cap{font:600 11px/1 var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--soft);display:block;margin-bottom:6px}
 .case .proves{padding:0 18px 14px;font:13px/1.4 var(--mono);color:var(--soft)}
 
 /* the guided mock */
-.demo{border:1px solid var(--line);border-radius:14px;overflow:hidden;background:var(--paper)}
+.demo{border:1px solid var(--line);border-radius:14px;overflow:hidden;background:var(--paper);container:demo/inline-size}
 .demo:fullscreen{border-radius:0;display:flex;flex-direction:column;overflow:auto}
 .demo:fullscreen .demobody{flex:1}
 .demobar{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;padding:12px 18px;border-bottom:1px solid var(--line);font-size:15px}
 .dots{display:flex;gap:6px}
 .dots i{width:9px;height:9px;border-radius:50%;border:1.5px solid var(--ink)}
 .dots i.on{background:var(--ink)}
-.demobody{display:grid;grid-template-columns:minmax(0,1fr) 300px}
+.demobody{display:grid;grid-template-columns:minmax(0,1fr)}
 .stagewrap{min-width:0;overflow:hidden;background:var(--wash)}
 .viewport{transform-origin:0 0;position:relative;overflow:hidden}
 .viewport.phone{width:390px;margin:18px auto;border:1px solid var(--line);border-radius:26px;overflow:hidden}
-.side{border-left:1px solid var(--line);padding:20px;display:flex;flex-direction:column;gap:12px;font-size:15.5px;line-height:1.5;min-width:0}
+.side{border-top:1px solid var(--line);padding:20px;display:flex;flex-direction:column;gap:12px;font-size:15.5px;line-height:1.5;min-width:0}
 .side .cap{font:600 12px/1 var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--soft)}
 .side .why{font-size:17px;line-height:1.45}
 .statebar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;padding:12px 18px;border-top:1px solid var(--line);font-size:14px}
 .statebar .btn{font-size:14px;padding:5px 11px}
-.map{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;padding:18px}
+.map{display:grid;grid-template-columns:minmax(0,1fr);gap:16px;padding:18px}
 .map .fig{margin:0;display:flex;flex-direction:column;gap:8px;min-width:0;cursor:pointer}
 .map .figcap{font:600 12px/1 var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--soft)}
 .map .frame{border:1px solid var(--line);border-radius:8px;overflow:hidden;pointer-events:none}
@@ -118,17 +128,46 @@ mark{background:var(--mark);color:inherit;padding:.05em .2em;border-radius:.2em;
   .st .num{margin-left:7px}
   .ctl{margin-top:auto;flex-direction:column;width:30px}
 }
-@media (max-width:1000px){
-  .demobody,.grid,.item{grid-template-columns:minmax(0,1fr)}
-  .side{border-left:0;border-top:1px solid var(--line)}
-  .map{grid-template-columns:repeat(2,minmax(0,1fr))}
+/* components, by the width of their own section */
+@container sec (min-width:520px){
+  .crit{grid-template-columns:5.2em minmax(0,1fr)}
 }
+@container sec (min-width:700px){
+  .grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .item{grid-template-columns:minmax(0,5fr) minmax(0,4fr)}
+  .nb{grid-template-columns:5em minmax(0,3fr) minmax(0,4fr)}
+  .case .cb{grid-template-columns:minmax(0,1fr) minmax(8ch,16ch) minmax(0,1fr);align-items:center}
+  .case .act{text-align:center}
+}
+@container sec (min-width:1380px){
+  .grid{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .crits,.cases{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@container demo (min-width:560px){.map{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@container demo (min-width:980px){
+  .demobody{grid-template-columns:minmax(0,1fr) 300px}
+  .side{border-top:0;border-left:1px solid var(--line)}
+  .map{grid-template-columns:repeat(3,minmax(0,1fr))}
+}
+@container demo (min-width:1640px){
+  .demobody{grid-template-columns:minmax(0,1fr) 380px}
+  .side{padding:28px;font-size:16.5px}.side .why{font-size:19px}
+  .map{grid-template-columns:repeat(4,minmax(0,1fr))}
+}
+/* the page frame, by the width of the window */
 @media (max-width:640px){
   body{font-size:17px}
   .h1{font-size:32px}.h2{font-size:25px}
-  .map,.nb{grid-template-columns:minmax(0,1fr)}
-  .case .cb{grid-template-columns:minmax(0,1fr)}
-  .crit{grid-template-columns:minmax(0,1fr)}
+}
+@media (min-width:1700px){
+  .pg{max-width:1560px}
+  .h1{font-size:48px}
+}
+@media (min-width:2300px){
+  .pg.duo{max-width:none;margin:0;grid-template-columns:minmax(0,1080px) minmax(0,1fr);column-gap:72px}
+  .pg.duo>*{grid-column:1}
+  .pg.duo>#mock{grid-column:2;grid-row:1/span var(--rows,8);position:sticky;top:32px;align-self:start;max-height:calc(100vh - 64px);overflow:auto}
+  .pg.duo>#mock>.head .h2{font-size:24px}
 }
 @media (prefers-reduced-motion: reduce){.shell,.shell .lbl,.spot{transition:none}}
 </style>
@@ -209,17 +248,26 @@ function mockSection() {
 function casesSection() {
   if (!PAGE.cases.length) return '';
   return `<section class="sec" id="cases"><div class="head"><span class="eyebrow">No screen changes</span><h2 class="h2">${plural(PAGE.cases.length, 'case', 'cases')} with real values</h2><p class="p soft">The data before, what happens, the data after.</p></div>
-  ${PAGE.cases.map((c, i) => `<div class="case"><div class="ct">${mk('case:' + i, esc(c.title))}</div><div class="cb"><div class="box"><span class="cap">before</span>${esc(c.before)}</div><div class="act">${esc(c.action)} →</div><div class="box"><span class="cap">after</span>${esc(c.after)}</div></div><div class="proves">proves ${esc((c.proves || []).join(' · '))}</div></div>`).join('')}</section>`;
+  <div class="cases">${PAGE.cases.map((c, i) => `<div class="case"><div class="ct">${mk('case:' + i, esc(c.title))}</div><div class="cb"><div class="box"><span class="cap">before</span>${esc(c.before)}</div><div class="act">${esc(c.action)} →</div><div class="box"><span class="cap">after</span>${esc(c.after)}</div></div><div class="proves">proves ${esc((c.proves || []).join(' · '))}</div></div>`).join('')}</div></section>`;
+}
+
+// The tour stop that proves a criterion: by its own id first, then by a rule it carries.
+function stopFor(c) {
+  const tour = PAGE.mock ? PAGE.mock.tour : [];
+  const own = tour.findIndex((t) => t.proves.includes(c.id));
+  return own >= 0 ? own : tour.findIndex((t) => c.tags.some((tag) => !/^S-\d+$/.test(tag) && t.proves.includes(tag)));
 }
 
 function criterion(c) {
   const lines = c.lines.map((l) => `<span class="kw">${esc(l.kw)}</span><span>${esc(l.text)}${l.seen ? ` <span class="seen">(seen: ${esc(l.seen)})</span>` : ''}</span>`).join('');
-  return `<div class="crit" id="${esc(c.id)}"><span class="cid">${mk('criterion:' + c.id, esc(c.id))} <span class="soft">[${esc(c.tags.join(', '))}]</span></span>${lines}</div>`;
+  const at = stopFor(c);
+  const see = at < 0 ? '' : `<button class="see" type="button" data-stop="${at}" title="Show where the screen proves this">on screen</button>`;
+  return `<div class="crit" id="${esc(c.id)}"><span class="cid">${see}${mk('criterion:' + c.id, esc(c.id))} <span class="soft">[${esc(c.tags.join(', '))}]</span></span>${lines}</div>`;
 }
 
 function stories() {
   return `<section class="sec" id="stories"><div class="head"><span class="eyebrow">What gets built</span><h2 class="h2">${plural(PAGE.stories.length, 'story', 'stories')}, one criterion per rule</h2><p class="p soft">The file is the authority: <span class="mono">stories.md</span>. Every later stage cites these ids.</p></div>
-  <div>${PAGE.stories.map((s, i) => `<details class="story" ${i === 0 ? 'open' : ''}><summary><span class="sid">${esc(s.id)}</span><span class="h3">${mk('story:' + s.id, esc(s.title))}</span><span class="soft">${plural(s.criteria.length, 'criterion', 'criteria')}</span></summary><p class="job">${esc(s.job)}</p>${s.criteria.map(criterion).join('')}</details>`).join('')}</div></section>`;
+  <div>${PAGE.stories.map((s, i) => `<details class="story" ${i === 0 ? 'open' : ''}><summary><span class="sid">${esc(s.id)}</span><span class="h3">${mk('story:' + s.id, esc(s.title))}</span><span class="soft">${plural(s.criteria.length, 'criterion', 'criteria')}</span></summary><p class="job">${esc(s.job)}</p><div class="crits">${s.criteria.map(criterion).join('')}</div></details>`).join('')}</div></section>`;
 }
 
 function notBuilding() {
@@ -231,6 +279,8 @@ function notBuilding() {
 document.getElementById('stages').innerHTML = STAGES.map((n, i) => `<span class="st ${i === 0 ? 'cur' : ''}"><span class="num">${i + 1}</span><span class="lbl">${n}</span></span>`).join('');
 const pg = document.getElementById('pg');
 pg.innerHTML = head() + youDecide() + decidedForYou() + mockSection() + casesSection() + stories() + notBuilding();
+// On a whole ultrawide the screen is pinned beside the document: it spans every row of the left column.
+if (PAGE.mock) { pg.classList.add('duo'); document.getElementById('mock').style.setProperty('--rows', pg.children.length - 1); }
 
 /* shell controls */
 const root = document.documentElement, themebtn = document.getElementById('themebtn'), hlbtn = document.getElementById('hlbtn');
@@ -255,10 +305,13 @@ if (PAGE.mock) {
   const html = (state) => `<div class="screen" data-theme="${theme()}" data-state="${esc(state)}">${MOCK_SCREEN(state)}</div>`;
   function fit() {
     if (M.width === 'phone') return;
-    const natural = wrap.clientWidth < 700 ? wrap.clientWidth : W;
-    const k = Math.min(1, wrap.clientWidth / natural);
+    const room = wrap.clientWidth;
+    if (!room) return;
+    const natural = room < 700 ? room : W;
+    const k = Math.min(1.35, room / natural);
     viewport.style.width = natural + 'px';
     viewport.style.transform = `scale(${k})`;
+    viewport.style.marginLeft = Math.max(0, (room - natural * k) / 2) + 'px';
     wrap.style.height = viewport.offsetHeight * k + 'px';
   }
   function draw() {
@@ -311,7 +364,7 @@ if (PAGE.mock) {
   const full = () => { if (document.fullscreenElement) document.exitFullscreen(); else if (demo.requestFullscreen) demo.requestFullscreen().catch(() => {}); };
   el('fsbtn').addEventListener('click', full);
   document.addEventListener('fullscreenchange', draw);
-  addEventListener('resize', fit);
+  new ResizeObserver(fit).observe(wrap);
   let inView = false;
   new IntersectionObserver((es) => { inView = es[0].isIntersecting; }, { threshold: 0.25 }).observe(demo);
   document.addEventListener('keydown', (e) => {
@@ -324,6 +377,14 @@ if (PAGE.mock) {
     else if (k === 'm') { mapOpen = !mapOpen; draw(); }
     else if (k === 'f') full();
     else if (k === 'escape') { stop = -1; mapOpen = false; draw(); }
+  });
+  pg.addEventListener('click', (e) => {
+    const see = e.target.closest('.see');
+    if (!see) return;
+    go(Number(see.dataset.stop));
+    pg.querySelectorAll('.crit.lit').forEach((c) => c.classList.remove('lit'));
+    see.closest('.crit').classList.add('lit');
+    if (getComputedStyle(el('mock')).position !== 'sticky') demo.scrollIntoView({ behavior: 'smooth', block: 'center' });
   });
   window.__mock = { draw, go, setState, map: (on) => { mapOpen = on; draw(); }, focused: () => !!viewport.querySelector('.spot') };
   draw();
