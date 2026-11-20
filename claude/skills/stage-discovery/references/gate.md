@@ -29,7 +29,9 @@ the assumptions into three to five themes he would name himself ("Who
 can do what", "The words on screen"), each with the assumption ids it
 holds; an assumption in no group shows under "Other". Expanded, the
 mock is the screen as the product opens it, covering the window
-(never the monitor's full screen), under the same thin bar. The
+(never the monitor's full screen), under the same thin bar. At each
+tour stop the highlight shows where to look for one second and
+fades, so he judges the screen as the product draws it. The
 page is in simplified English
 (`<kit>/references/artifact-writing.md`); the screen's copy is in the
 product's languages.

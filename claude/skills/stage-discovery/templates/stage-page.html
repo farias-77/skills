@@ -103,7 +103,7 @@ mark{background:var(--mark);color:inherit;padding:.05em .2em;border-radius:.2em;
 .bar .nav button{all:unset;cursor:pointer;width:32px;height:32px;display:grid;place-items:center;font-size:17px}
 .bar .nav button:hover{background:var(--wash)}
 .bar .nav button:focus-visible{outline:3px solid var(--ink);outline-offset:-3px}
-.bar .n{font:600 13px/32px var(--mono);min-width:4em;text-align:center;border-inline:1px solid var(--line)}
+.bar .n{font:600 13px/32px var(--mono);min-width:4em;text-align:center;border-inline:1px solid var(--line);cursor:pointer}
 .bar .say{flex:1 1 280px;min-width:0;max-width:110ch;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 .bar .say .btn{margin-right:10px}
 .bar .ids{margin-left:10px;font:12.5px/1 var(--mono);color:var(--soft);white-space:nowrap}
@@ -120,7 +120,8 @@ mark{background:var(--mark);color:inherit;padding:.05em .2em;border-radius:.2em;
 .map .fig{margin:0;display:flex;flex-direction:column;gap:8px;min-width:0;cursor:pointer}
 .map .figcap{font:600 12px/1 var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--soft)}
 .map .frame{border:1px solid var(--line);border-radius:8px;overflow:hidden;pointer-events:none}
-.spot{position:absolute;border-radius:8px;outline:2px solid var(--ink);box-shadow:0 0 0 9999px color-mix(in srgb,var(--paper) 76%,transparent);pointer-events:none;transition:left .18s,top .18s,width .18s,height .18s}
+.spot{position:absolute;border-radius:8px;outline:2px solid var(--ink);box-shadow:0 0 0 9999px color-mix(in srgb,var(--paper) 76%,transparent);pointer-events:none;transition:opacity .35s ease}
+.spot.out{opacity:0}
 
 /* the shell: stages on a rail that opens on hover, two controls in a capsule */
 .shell{display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center;margin:0 auto 32px;max-width:1320px;font-size:15px;white-space:nowrap}
@@ -277,9 +278,9 @@ function mockSection() {
   const m = PAGE.mock;
   if (!m) return '';
   return `<section class="sec" id="mock"><div class="head"><span class="eyebrow">The screen${changed.has('screen') ? ' · <mark>changed since you last looked</mark>' : ''}</span><h2 class="h2">${esc(m.title)}</h2>
-    <p class="p soft"><span class="kbd">←</span> <span class="kbd">→</span> walk the tour · <span class="kbd">C</span> highlight on or off · <span class="kbd">F</span> expand</p></div>
+    <p class="p soft"><span class="kbd">←</span> <span class="kbd">→</span> walk the tour · <span class="kbd">F</span> expand</p></div>
     <div class="demo" id="demo">
-      <div class="bar"><span class="nav"><button id="tprev" type="button" aria-label="Previous stop">‹</button><span class="n" id="stopn"></span><button id="tnext" type="button" aria-label="Next stop">›</button></span><span class="say" id="why"></span><span class="tools"><label for="statesel">State</label><select id="statesel"></select><button class="btn" id="spotbtn" type="button" title="Show or hide the highlight of this stop (C)">Highlight</button><button class="btn" id="mapbtn" type="button"></button><button class="btn" id="fsbtn" type="button"></button></span></div>
+      <div class="bar"><span class="nav"><button id="tprev" type="button" aria-label="Previous stop">‹</button><span class="n" id="stopn" title="Show where to look again"></span><button id="tnext" type="button" aria-label="Next stop">›</button></span><span class="say" id="why"></span><span class="tools"><label for="statesel">State</label><select id="statesel"></select><button class="btn" id="mapbtn" type="button"></button><button class="btn" id="fsbtn" type="button"></button></span></div>
       <div class="demobody" id="demobody"><div class="stagewrap" id="stagewrap"><div class="viewport" id="viewport"></div></div></div>
       <div class="map" id="map" hidden></div>
     </div></section>`;
@@ -340,7 +341,7 @@ if (PAGE.mock) {
   const el = (id) => document.getElementById(id);
   const demo = el('demo'), wrap = el('stagewrap'), viewport = el('viewport'), map = el('map'), body = el('demobody');
   const label = Object.fromEntries(M.states.map((s) => [s.id, s.label]));
-  let st = M.states[0].id, stop = -1, mapOpen = false, fs = false, lit = true;
+  let st = M.states[0].id, stop = -1, mapOpen = false, fs = false, flash = false;
   const theme = () => (M.themes && M.themes.length === 1 ? M.themes[0] : isDark() ? 'dark' : 'light');
   const html = (state) => `<div class="screen" data-theme="${theme()}" data-state="${esc(state)}">${MOCK_SCREEN(state)}</div>`;
   function fit() {
@@ -369,7 +370,8 @@ if (PAGE.mock) {
     const t = stop >= 0 ? M.tour[stop] : null;
     if (t) {
       const target = viewport.querySelector(`[data-part="${t.focus}"]`);
-      if (target) { if (fs) target.scrollIntoView({ block: 'nearest' }); if (lit) spotlight(target); }
+      if (target) { if (fs) target.scrollIntoView({ block: 'nearest' }); if (flash) spotlight(target); }
+      flash = false;
     }
     el('stopn').textContent = `${t ? stop + 1 : '–'} / ${M.tour.length}`;
     el('why').innerHTML = t
@@ -377,8 +379,6 @@ if (PAGE.mock) {
       : `<button class="btn go" id="startbtn" type="button">Start the tour</button><span class="soft">${M.tour.length} stops · about ${M.minutes || 2} min</span>`;
     el('why').title = t ? t.why : '';
     el('statesel').innerHTML = M.states.map((x) => `<option value="${esc(x.id)}" ${x.id === st ? 'selected' : ''}>${esc(x.label)}</option>`).join('');
-    el('spotbtn').hidden = !t;
-    el('spotbtn').setAttribute('aria-pressed', lit);
     el('fsbtn').textContent = fs ? 'Close' : 'Expand';
     el('fsbtn').title = fs ? 'Back to the page (Esc)' : 'Open over the whole page (F)';
     if (mapOpen) {
@@ -397,8 +397,11 @@ if (PAGE.mock) {
     };
     place();
     requestAnimationFrame(place);
+    // It shows where to look, then leaves the screen as the product draws it.
+    setTimeout(() => spot.classList.add('out'), 1000);
+    setTimeout(() => spot.remove(), 1400);
   }
-  function go(i) { mapOpen = false; lit = true; stop = Math.max(0, Math.min(M.tour.length - 1, i)); st = M.tour[stop].state; draw(); }
+  function go(i) { mapOpen = false; flash = true; stop = Math.max(0, Math.min(M.tour.length - 1, i)); st = M.tour[stop].state; draw(); }
   function setState(s) { st = s; stop = -1; mapOpen = false; draw(); }
   el('why').addEventListener('click', (e) => { if (e.target.id === 'startbtn') go(0); });
   el('mapbtn').addEventListener('click', () => { mapOpen = !mapOpen; draw(); });
@@ -416,8 +419,7 @@ if (PAGE.mock) {
   }
   const full = () => setFull(!fs);
   el('fsbtn').addEventListener('click', full);
-  const light = () => { if (stop >= 0) { lit = !lit; draw(); } };
-  el('spotbtn').addEventListener('click', light);
+  el('stopn').addEventListener('click', () => { if (stop >= 0) go(stop); });
   new ResizeObserver(fit).observe(wrap);
   let inView = false;
   new IntersectionObserver((es) => { inView = es[0].isIntersecting; }, { threshold: 0.25 }).observe(demo);
@@ -430,7 +432,6 @@ if (PAGE.mock) {
     else if (k === 's') setState(M.states[(M.states.findIndex((s) => s.id === st) + 1) % M.states.length].id);
     else if (k === 'm') { mapOpen = !mapOpen; draw(); }
     else if (k === 'f') full();
-    else if (k === 'c') light();
     else if (k === 'escape') { if (fs) setFull(false); else { stop = -1; mapOpen = false; draw(); } }
   });
   pg.addEventListener('click', (e) => {
@@ -441,7 +442,7 @@ if (PAGE.mock) {
     see.closest('.crit').classList.add('lit');
     if (getComputedStyle(el('mock')).position !== 'sticky') demo.scrollIntoView({ behavior: 'smooth', block: 'center' });
   });
-  window.__mock = { draw, go, setState, full: setFull, light, map: (on) => { mapOpen = on; draw(); }, focused: () => !!viewport.querySelector('.spot') };
+  window.__mock = { draw, go, setState, full: setFull, map: (on) => { mapOpen = on; draw(); }, focused: () => !!viewport.querySelector('.spot') };
   draw();
 }
 document.addEventListener('keydown', (e) => {
