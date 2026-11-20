@@ -76,6 +76,48 @@ of it as it is today. Open those files and copy from them.
   serif headline, a purple-to-blue gradient, pill buttons everywhere,
   emoji as icons, a card around every element.
 
+## The person, before the pixels
+
+Before any markup, walk the main flow of each story as the person who
+does that job, and write what you find in your checklist. A screen
+that matches the design system and makes him think is not done.
+
+| Ask | The screen answers when |
+|---|---|
+| what does this person come here to do, and what do they see first? | the thing they came for is the first thing the eye lands on, above anything the product wants to say |
+| what is the one action of this state? | one control is the most visible; the secondary ones are quieter; a destructive one stands apart and names what it destroys |
+| how short is the path? | every field is one the job needs, in the order the person thinks of them; what the product already knows is filled in; nothing is asked twice |
+| can a refusal be seen coming? | a limit shows before it is hit ("7 of 10 today"), a control that cannot be used says why, and an error appears next to its cause |
+| what tells them it worked? | the result shows where they are already looking, in the words of what they did, and what can be undone says how |
+| does it work without a mouse, and on a phone? | the tab order is the reading order, Enter does the main action, focus lands on the first field and returns to where they were; at 390 wide every target is at least 44px and the main action is in reach |
+| do the words do the work? | a label says what the control holds in the product's vocabulary; a button is a verb with its object ("Send invite", never "Submit") |
+
+A choice here that changes a rule, a number or the scope is not
+yours: draw the most direct reading and list it.
+
+## The craft of what is new
+
+The frame is copied. What the change adds is designed, with the
+project's own means and nothing else:
+
+- **Hierarchy.** One thing stands out per region, by size, then
+  weight, then contrast. Blur your eyes at the picture: what is left
+  visible is what he will read first.
+- **Spacing.** Only steps of the project's spacing scale. Things that
+  belong together sit closer than things that do not: the gap inside
+  a group is smaller than the gap between groups. New elements align
+  to the edges and columns the screen already has.
+- **Type.** The sizes and weights the product already uses; no new
+  size. Prose runs 45 to 75 characters a line; numbers in a column
+  are tabular and right-aligned.
+- **Density.** The same as the screen around it: a roomy block in a
+  dense table reads as another product.
+- **Controls.** Hover, focus, pressed and disabled are drawn as the
+  product draws them, with a visible focus ring.
+- **Restraint.** Reuse before adding. An element the job does not
+  need is removed; a border, a shadow or a color that separates
+  nothing is removed.
+
 ## The states
 
 The states the screen really reaches, not a catalogue. For the
@@ -136,7 +178,12 @@ that highlights nothing. Then look at what you built:
 2. Open the 390 pictures: nothing clipped, nothing overlapping, long
    values wrap.
 3. Open one dark picture per state when the product has a dark theme.
-4. Fix what you see, run `shots` again, and report with the pictures
+4. Look at each state once more as the person doing the job. In
+   three seconds, can you say what this screen is for and what to do
+   next? Is the main action the most visible thing? Is anything on it
+   that the job does not need? Measure two gaps of the new part
+   against the scale.
+5. Fix what you see, run `shots` again, and report with the pictures
    you checked.
 
 `discovery.mjs check` proves the tour: every state exists, every

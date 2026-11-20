@@ -14,7 +14,10 @@ stops that shows him where to look. He reacts to it until he says it
 is right; locked, it is the screen every later stage builds. This is
 design work: the difference between a mock he trusts and one he
 doubts is whether the frame around the change is indistinguishable
-from his product. Read the `references/mock.md` path in your brief
+from his product, and whether the part that is new was thought
+through for the person who will use it: what they see first, the one
+action, the shortest path, spacing and type that follow the product's
+own scale. Read the `references/mock.md` path in your brief
 before you touch a file: it is the contract.
 
 ## What you receive
@@ -32,23 +35,27 @@ before you touch a file: it is the contract.
    at the screenshots of the screen as it is today. Keep reading
    until you could describe the screen's spacing, type and component
    shapes without the files open.
-2. **List the states and the tour** before any markup: the states the
-   screen really reaches (every extension journey of the stories has
-   one), and the tour's stops with the ids each proves. Keep this
-   list as your checklist and tick it as you build.
+2. **Walk the job, then list the states and the tour**, before any
+   markup. Go through each story's main flow as the person who does
+   it and answer the questions of `references/mock.md` § "The person,
+   before the pixels". Then list the states the screen really reaches
+   (every extension journey of the stories has one) and the tour's
+   stops with the ids each proves. Keep the answers and the list as
+   your checklist and tick it as you build.
 3. **Build `mock/mock.html`** from the template: the tokens, the
    screen's CSS, the tour data, and one `MOCK_SCREEN(state)` function
    that draws every state from the same markup. The words and values
    on screen are the stories' (a string quoted in a criterion appears
-   exactly so).
+   exactly so). What is new follows § "The craft of what is new".
 4. **Check the contract:** `node <discovery.mjs> check <workstream>`
    until the tour resolves (every state, every part, every id).
 5. **Render and look:** `node <discovery.mjs> shots <workstream>`
    until it is green, then open the pictures as `references/mock.md`
    § "Check it before he sees it" says: each state at 1280 beside
-   the real screen's screenshot, the 390 ones, a dark one per state.
-   Fix what you see and render again. One careful pass of fixes is
-   expected; a mock sent without this look is not done.
+   the real screen's screenshot, the 390 ones, a dark one per state,
+   then each state once more as the person doing the job. Fix what
+   you see and render again. One careful pass of fixes is expected; a
+   mock sent without this look is not done.
 
 In a round, apply every line of the order, then steps 4 and 5 again.
 
@@ -82,9 +89,11 @@ pictures.
 
 The states built (id and label) · the tour, one line per stop with
 its ids · the last line of `check` and of `shots` · the pictures you
-compared and what you fixed after looking · **Drawn without a
-decision**: each behavior, value or new component you chose, with the
-state it shows in · **Gaps**: what the design system or the notes
+compared and what you fixed after looking · **Made for the
+person**: each choice you made for the one who uses it (what comes
+first, a default filled in, where the result shows), one line each,
+so he can react to it · **Drawn without a decision**: each behavior,
+value or new component you chose, with the state it shows in · **Gaps**: what the design system or the notes
 lack for the mock to be exact · in a round, per order line, done or
 not and why.
 
