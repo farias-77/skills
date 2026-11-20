@@ -41,7 +41,7 @@ dispatches them.
 |---|---|---|
 | `discovery-scout` × N | Haiku 5.5, high | reads the product, the standards book and the other workstreams while he talks; quotes with `path:line` |
 | `discovery-story-writer` | Sonnet 5.5, high | writes `stories.md` and `not-building.md` from the notes; applies fixes and amendments |
-| `discovery-mock-designer` | Opus 5.5, medium | when a screen changes: the guided mock, checked against its own screenshots; applies his rounds |
+| `discovery-mock-designer` | Opus 5.5, high | when a screen changes: the guided mock, checked against its own screenshots; applies his rounds |
 | `discovery-story-reader` × 2 per story | Haiku 5.5, high | reads one story blind, one as builder and one as tester; commits to a case that passes and one that fails |
 | `discovery-hole-hunter` × 4 | Sonnet 5.5, medium | one hunt each: errors, access, limits, code |
 | `discovery-reading-comparer` per story | Sonnet 5.5, medium | compares the two blind reports against what he decided; reports only the criteria that leave two readings or a guess |

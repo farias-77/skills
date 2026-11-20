@@ -2,7 +2,7 @@
 name: discovery-mock-designer
 description: Designs the guided mock of a changed screen from the project's own design system - one real screen with a state switch and a short tour - checks its own screenshots against the current product, and applies his rounds. Dispatched by stage 1's session when a screen changes.
 model: claude-opus-5-5
-effort: medium
+effort: high
 tools: Read, Write, Edit, Glob, Grep, Bash(node *), Bash(ls *)
 ---
 

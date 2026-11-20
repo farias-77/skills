@@ -47,7 +47,7 @@ The stage is done when every line holds:
 | 2 readback | you | one message; the notes' Assumptions |
 | 3 interview | you and him | the notes' Decisions, Rules, Journeys, every turn |
 | 4 stories | `discovery-story-writer` (Sonnet 5.5, high) | `stories.md`, `not-building.md` |
-| 5 mock, when a screen changes | `discovery-mock-designer` (Opus 5.5, medium); you run the rounds | `mock/mock.html`, the page, `mock/LOCK.json` |
+| 5 mock, when a screen changes | `discovery-mock-designer` (Opus 5.5, high); you run the rounds | `mock/mock.html`, the page, `mock/LOCK.json` |
 | 6 review | `discovery-review-workflow.js`: `discovery-story-reader` × 2 per story (Haiku 5.5, high), `discovery-hole-hunter`, `discovery-reading-comparer` and `discovery-finding-verifier` (Sonnet 5.5, medium); you rule | `discovery/review/`, `rulings.md` |
 | 7 gate | you and him | his yes, `discovery/ids.json`, the next play |
 

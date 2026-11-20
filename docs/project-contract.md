@@ -376,7 +376,7 @@ e-mails, the mocks, the reports, the slides and the videos.
 wrong reasons.
 
 **How the stages use it.** Discovery's recon hands them to
-`discovery-mock-designer (Opus 5.5, medium)`; `builder-frontend (Opus 5.5,
+`discovery-mock-designer (Opus 5.5, high)`; `builder-frontend (Opus 5.5,
 medium)` builds on the same tokens.
 
 ### 19 · Observability as code

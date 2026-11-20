@@ -97,7 +97,7 @@ and templated writing, never above high.
 | every report | `slides-builder` · `artifact-builder` | Sonnet 5.5, medium |
 | discovery | `discovery-scout` · `discovery-story-reader` | Haiku 5.5, high |
 |  | `discovery-story-writer` | Sonnet 5.5, high |
-|  | `discovery-mock-designer` | Opus 5.5, medium |
+|  | `discovery-mock-designer` | Opus 5.5, high |
 |  | `discovery-hole-hunter` · `discovery-reading-comparer` · `discovery-finding-verifier` | Sonnet 5.5, medium |
 | plan | `blind-reader` | Haiku 5.5, high |
 |  | `blind-judge` | Sonnet 5.5, medium |

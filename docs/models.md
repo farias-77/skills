@@ -32,7 +32,7 @@ the row together.
 | `discovery-story-reader` | discovery | Haiku 5.5 | high | Two per story, one as builder and one as tester, each committing to a case that passes and one that fails; the signal is where the two differ. The earlier A/B on stories had Haiku high win 3 of 8 pairs and pass a known defect twice; he chose Haiku high (27/10/2026); a verifier compares both readings with what was decided |
 | `blind-reader` | plan | Haiku 5.5 | high | Reads one brief blind. Haiku high won 9 of 10 blinded pairs against Sonnet low (1 tie), 0 false greens |
 | `blind-judge` | plan | Sonnet 5.5 | medium | Compares two readings key by key; reports only where the text failed |
-| `discovery-mock-designer` | discovery | Opus 5.5 | medium | Designs the guided mock from the project's design system and checks its own screenshots against the real screen: visual judgment. To be compared with Sonnet 5.5 high on real mocks |
+| `discovery-mock-designer` | discovery | Opus 5.5 | high | Designs the guided mock from the project's design system and checks its own screenshots against the real screen: visual judgment. To be compared with Sonnet 5.5 high on real mocks |
 | `discovery-story-writer` | discovery | Sonnet 5.5 | high | Writes stories and criteria from the interview notes to a format a script checks: templated writing |
 | `discovery-hole-hunter` | discovery | Sonnet 5.5 | medium | One hunt per call (errors, access, limits, code) |
 | `discovery-reading-comparer` | discovery | Sonnet 5.5 | medium | One story per call: the two blind reports side by side against what he decided |
